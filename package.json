@@ -1,0 +1,48 @@
+{
+  "name": "state-mate",
+  "version": "0.1.0",
+  "description": "Ethereum + L2s smart contract state checker",
+  "main": "state-checker.ts",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "ts-node src/state-mate.ts",
+    "lint": "eslint . --ignore-path .gitignore --max-warnings=0",
+    "lint:fix": "yarn lint:ts --fix",
+    "format": "prettier . --write --ignore-path .gitignore --ignore-path .prettierignore",
+    "prepare": "husky install"
+  },
+  "lint-staged": {
+    "./**/*.ts": [
+      "eslint --ignore-path .gitignore --max-warnings=0"
+    ],
+    "./**/*.{ts,md,json}": [
+      "prettier --write"
+    ]
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^17.7.1",
+    "@commitlint/config-conventional": "^17.7.0",
+    "@tsconfig/node20": "^20.1.2",
+    "@types/node": "^20.14.2",
+    "@typescript-eslint/eslint-plugin": "^6.6.0",
+    "@typescript-eslint/parser": "^6.6.0",
+    "eslint": "^8.48.0",
+    "eslint-config-prettier": "^9.0.0",
+    "husky": "^8.0.0",
+    "lint-staged": "^14.0.1",
+    "prettier": "^3.0.3",
+    "ts-node": ">=8.0.0",
+    "typescript": "^5.2.2"
+  },
+  "dependencies": {
+    "@types/chai": "^4.3.16",
+    "dotenv": "^16.4.5",
+    "chai": "^4.4.1",
+    "ethers": "^6.13.0",
+    "yaml": "^2.3.4"
+  }
+}
