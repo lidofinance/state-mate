@@ -12,14 +12,15 @@
     "start": "ts-node src/state-mate.ts",
     "lint": "eslint . --max-warnings=0",
     "lint:fix": "yarn lint --fix",
-    "format": "prettier . --write --ignore-pattern .gitignore --ignore-path .prettierignore",
+    "format": "prettier . --ignore-path .gitignore --check",
+    "format:fix": "prettier . --ignore-path .gitignore --write",
     "prepare": "husky install"
   },
   "lint-staged": {
     "./**/*.ts": [
-      "eslint --ignore-pattern .gitignore --max-warnings=0"
+      "eslint --max-warnings=0"
     ],
-    "./**/*.{ts,md,json}": [
+    "./**.{ts,md,json}": [
       "prettier --write"
     ]
   },
