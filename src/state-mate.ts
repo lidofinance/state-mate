@@ -1,4 +1,4 @@
-import fs, { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 
 import "dotenv/config";
@@ -13,7 +13,7 @@ const WARNING_MARK = chalk.yellow("⚠");
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore: Unreachable code error
-BigInt.prototype.toJSON = function(): number {
+BigInt.prototype.toJSON = function (): number {
   return Number(this);
 };
 
@@ -36,9 +36,9 @@ type ViewResult = ViewResultPlainValue | ArbitraryObject;
 type ArgsAndResult = {
   args: [string];
   result: ViewResult;
-  mustRevert?: boolean,
-  signature?: string,
-  bigint?: boolean
+  mustRevert?: boolean;
+  signature?: string;
+  bigint?: boolean;
 };
 
 type ChecksEntryValue = ViewResult | ArgsAndResult | [ArgsAndResult];
@@ -117,7 +117,7 @@ class LogCommand {
 
 function loadAbi(contractName: string) {
   let path = `${g_abiDirectory}/${contractName}.json`;
-  if (!fs.existsSync(path)) {
+  if (!existsSync(path)) {
     path = `${g_abiDirectory}/${contractName}.sol/${contractName}.json`;
   }
   const abi = JSON.parse(readFileSync(path).toString());
@@ -193,14 +193,14 @@ function reportNonCoveredNonMutableChecks(
   contractAlias: string,
   checksType: string,
   contractName: string,
-  checks: string[]
+  checks: string[],
 ) {
   const abi = loadAbi(contractName);
   const nonMutableFromAbi = getNonMutableFunctionNames(abi);
   const nonCovered = nonMutableFromAbi.filter((x) => !checks.includes(x));
   if (nonCovered.length) {
     logError(
-      `Section ${contractAlias} ${checksType} does not cover these non-mutable function from ABI: ${chalk.red(nonCovered.join(", "))}`
+      `Section ${contractAlias} ${checksType} does not cover these non-mutable function from ABI: ${chalk.red(nonCovered.join(", "))}`,
     );
     g_errors++;
   }
@@ -208,7 +208,7 @@ function reportNonCoveredNonMutableChecks(
 
 async function checkContractEntry(
   { address, name, checks, ozNonEnumerableAcl }: RegularContractEntry,
-  provider: JsonRpcProvider
+  provider: JsonRpcProvider,
 ) {
   expect(isAddress(address), `${address} is invalid address`).to.be.true;
   const contract: BaseContract = await loadContract(name, address, provider);
@@ -282,7 +282,7 @@ async function checkViewFunction(contract: BaseContract, method: string, expecte
       result: expected,
       mustRevert = false,
       signature = method,
-      bigint = false
+      bigint = false,
     } = expectedOrObject as ArgsAndResult);
   } else {
     expected = expectedOrObject as ViewResult;
@@ -350,9 +350,9 @@ async function checkNetworkSection(section: NetworkSection, sectionTitle: string
         {
           checks: entry[Ef.checks],
           name: entry.name,
-          address: entry.address
+          address: entry.address,
         },
-        provider
+        provider,
       );
     }
 
@@ -362,9 +362,9 @@ async function checkNetworkSection(section: NetworkSection, sectionTitle: string
         {
           checks: entry[Ef.proxyChecks],
           name: entry.proxyName,
-          address: entry.address
+          address: entry.address,
         },
-        provider
+        provider,
       );
     }
 
@@ -374,9 +374,9 @@ async function checkNetworkSection(section: NetworkSection, sectionTitle: string
         {
           checks: entry[Ef.implementationChecks],
           name: entry.name,
-          address: entry.implementation
+          address: entry.implementation,
         },
-        provider
+        provider,
       );
 
       for (const methodName of getNonMutableFunctionNames(loadAbi(entry.name))) {
@@ -400,7 +400,7 @@ The "abi" directory is expected to be located nearby.`);
   const configPath = argv[2];
   return {
     configPath,
-    abiDirPath: path.join(path.dirname(configPath), "abi")
+    abiDirPath: path.join(path.dirname(configPath), "abi"),
   };
 }
 
