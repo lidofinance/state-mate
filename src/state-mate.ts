@@ -5,7 +5,7 @@ import "dotenv/config";
 import { expect } from "chai";
 import { BaseContract, Contract, getAddress, isAddress, JsonRpcProvider, Result } from "ethers";
 import * as YAML from "yaml";
-import * as chalk from "chalk";
+import chalk from "chalk";
 
 const SUCCESS_MARK = chalk.green("✔");
 const FAILURE_MARK = chalk.red("✘");
@@ -370,18 +370,18 @@ async function checkNetworkSection(section: NetworkSection, sectionTitle: string
 
     if (entry.implementationChecks) {
       logHeader2(Ef.implementationChecks);
+      // For implementation by default skip all checks
+      const allNonMutable = getNonMutableFunctionNames(loadAbi(entry.name));
+      const skippedChecks: Checks = {};
+      allNonMutable.reduce((acc, x)=> (acc[x] = null, acc), skippedChecks);
       await checkContractEntry(
         {
-          checks: entry[Ef.implementationChecks],
+          checks: { ...skippedChecks, ...entry[Ef.implementationChecks] },
           name: entry.name,
           address: entry.implementation,
         },
         provider,
       );
-
-      for (const methodName of getNonMutableFunctionNames(loadAbi(entry.name))) {
-        logMethodSkipped(methodName);
-      }
     }
   }
 }
