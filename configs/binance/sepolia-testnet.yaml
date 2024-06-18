@@ -1,0 +1,594 @@
+# Testnets Deployment & Configuration
+
+parameters:
+  # Already deployed contracts or other parameters
+  - &SEP_DAO_AGENT "0x32A0E5828B62AAb932362a4816ae03b860b65e83"
+
+misc:
+  - &ZERO_ADDRESS "0x0000000000000000000000000000000000000000"
+  - &DEAD_ADDRESS "0x000000000000000000000000000000000000dead"
+  - &ZERO_BYTES32 "0x0000000000000000000000000000000000000000000000000000000000000000"
+  # Chains
+  - &SEP_CHAIN_ID 11155111
+  - &SEP_CCC_ENVELOPE_NONCE 3
+  - &SEP_CCC_TRANSACTION_NONCE 3
+  - &BNB_TEST_CHAIN_ID 97
+  - &BNB_TEST_CONFIRMATIONS 3
+  # Adapters
+  - &CCIP_SEP_CHAIN_ID "16015286601757825753" # https://docs.chain.link/ccip/supported-networks/v1_2_0/testnet#ethereum-sepolia
+  - &CCIP_BNB_TEST_CHAIN_ID "13264668187771770619" # https://docs.chain.link/ccip/supported-networks/v1_2_0/testnet#bnb-testnet
+  - &LZ_SEP_CHAIN_ID 40161 # https://docs.layerzero.network/v2/developers/evm/technical-reference/deployed-contracts#sepolia
+  - &LZ_BNB_TEST_CHAIN_ID 40102 # https://docs.layerzero.network/v2/developers/evm/technical-reference/deployed-contracts#bsc-testnet
+  - &WH_SEP_CHAIN_ID 10002 # https://docs.wormhole.com/wormhole/reference/constants#chain-ids
+  - &WH_BNB_TESTNET_CHAIN_ID 4 # https://docs.wormhole.com/wormhole/reference/constants#chain-ids
+  # CrossChainExecutor options
+  - &BNB_CCE_DELAY 0
+  - &BNB_CCE_GRACE_PERIOD 86400 # 1 day
+  - &BNB_CCE_MINIMUM_DELAY 0
+  - &BNB_CCE_MAXIMUM_DELAY 1
+  - &BNB_TEST_CCE_ACTIONS_SET_COUNT 3
+
+deployed:
+  # Newly deployed contracts
+  - &sepProxyAdmin "0x7BE89331452883D335C2556d1863CD2925E76afc"
+  - &sepCCC "0x9d8548963Fa0a9BE7C434cA482dd5b79E8062d3A"
+  - &sepCCCImp "0x57B3C8DC50d1C881fCB384Da4d66f3d610671177"
+  - &sepCCIPAdapter "0xA0362E6D6f399A3dca79a20cf6041807F7Bfd89e"
+  - &sepLZAdapter "0xFA3199330C9F33e5bA2D559574033D9cf3FCb609"
+  - &sepHLAdapter "0x9aa88aD35da12C89F5514d04e3BBd8CD95fDf428"
+  - &sepWormholeAdapter "0x82C16B1e054fa94bf60b54A1Aa9FA74c5872899d"
+
+  - &bnbtProxyAdmin "0x490E441352635aacA64224c8205636FD9d2e3362"
+  - &bnbtCCC "0x1FAa7AFD7851e7Cf931053e49CE26D4E262698b6"
+  - &bnbtCCCImp "0x5EC23B39E6E8eb5BA0c7064a0c08b5e678b02F37"
+  - &bnbtCCE "0x69EE990d0AADEfcbbA0F2de94E0F26521ae680ff"
+  - &bnbtCCIPAdapter "0x39B321FC78B96fB184191788dD87e8B7c498bcEa"
+  - &bnbtLZAdapter "0xa950B68BDA44419683c788C5E5845abC8F1863C1"
+  - &bnbtHLAdapter "0xa75A4F7E70a983b7388CcAA1F6C88BebC4AFc0Ef"
+  - &bnbtWormholeAdapter "0x30dF46cF148Df5eB53eb8B81b0BD5Bc785001E12"
+
+  # Extra data for LZ adapter
+  - &sepCCCBytes32 "0x0000000000000000000000009d8548963Fa0a9BE7C434cA482dd5b79E8062d3A"
+  - &bnbtCCCBytes32 "0x0000000000000000000000001FAa7AFD7851e7Cf931053e49CE26D4E262698b6"
+
+roles:
+# No roles check
+
+l1:
+  rpcUrl: https://ethereum-sepolia.publicnode.com # L1_RPC_URL # https://eth.drpc.org # L1_RPC_URL # https://ethereum.publicnode.com # url or env var
+  contracts:
+    proxyAdmin:
+      name: "ProxyAdmin"
+      address: *sepProxyAdmin
+      checks:
+        owner: *SEP_DAO_AGENT
+        getProxyAdmin:
+          - args: [*sepCCC]
+            result: *sepProxyAdmin
+        getProxyImplementation:
+          - args: [*sepCCC]
+            result: *sepCCCImp
+
+    crossChainController:
+      name: "CrossChainController"
+      address: *sepCCC
+      proxyName: TransparentUpgradeableProxy
+      implementation: *sepCCCImp
+      proxyChecks: {}
+      checks:
+        owner: *SEP_DAO_AGENT
+        guardian: *ZERO_ADDRESS
+        # CrossChainReceiver
+        getReceiverBridgeAdaptersByChain:
+          - args: [*BNB_TEST_CHAIN_ID]
+            result: []
+        getSupportedChains: []
+        getConfigurationByChain:
+          - args: [*BNB_TEST_CHAIN_ID]
+            result: { requiredConfirmation: 0, validityTimestamp: 0 }
+        isReceiverBridgeAdapterAllowed:
+          - args: [*sepCCIPAdapter, *BNB_TEST_CHAIN_ID]
+            result: false
+          - args: [*sepHLAdapter, *BNB_TEST_CHAIN_ID]
+            result: false
+          - args: [*sepLZAdapter, *BNB_TEST_CHAIN_ID]
+            result: false
+          - args: [*sepWormholeAdapter, *BNB_TEST_CHAIN_ID]
+            result: false
+        getTransactionState: # no real transactions yet
+          - args: [*ZERO_BYTES32]
+            signature: "getTransactionState(bytes32)"
+            result: { confirmations: 0, firstBridgedAt: 0 }
+        getEnvelopeState:
+          - args: [*ZERO_BYTES32]
+            signature: "getEnvelopeState(bytes32)"
+            result: 0
+        isTransactionReceivedByAdapter:
+          - args: [*ZERO_BYTES32, *sepCCIPAdapter]
+            result: false
+          - args: [*ZERO_BYTES32, *sepHLAdapter]
+            result: false
+          - args: [*ZERO_BYTES32, *sepLZAdapter]
+            result: false
+          - args: [*ZERO_BYTES32, *sepWormholeAdapter]
+            result: false
+        # CrossChainForwarder
+        getCurrentEnvelopeNonce: *SEP_CCC_ENVELOPE_NONCE
+        getCurrentTransactionNonce: *SEP_CCC_TRANSACTION_NONCE
+        isEnvelopeRegistered:
+          - args: [*ZERO_BYTES32]
+            signature: "isEnvelopeRegistered(bytes32)"
+            result: false
+        isTransactionForwarded:
+          - args: [*ZERO_BYTES32]
+            signature: "isTransactionForwarded(bytes32)"
+            result: false
+        getForwarderBridgeAdaptersByChain:
+          - args: [*BNB_TEST_CHAIN_ID]
+            result:
+              [
+                [*bnbtCCIPAdapter, *sepCCIPAdapter],
+                [*bnbtLZAdapter, *sepLZAdapter],
+                [*bnbtHLAdapter, *sepHLAdapter],
+                [*bnbtWormholeAdapter, *sepWormholeAdapter],
+              ]
+        isSenderApproved:
+          - args: [*SEP_DAO_AGENT]
+            result: true
+          - args: [*ZERO_ADDRESS]
+            result: false
+        whoCanRescue: *SEP_DAO_AGENT
+      implementationChecks:
+        owner: *DEAD_ADDRESS
+        guardian: *ZERO_ADDRESS
+        getReceiverBridgeAdaptersByChain:
+          - args: [*BNB_TEST_CHAIN_ID]
+            result: []
+        getSupportedChains: []
+        getConfigurationByChain:
+          - args: [*BNB_TEST_CHAIN_ID]
+            result: { requiredConfirmation: 0, validityTimestamp: 0 }
+        isReceiverBridgeAdapterAllowed:
+          - args: [*sepCCIPAdapter, *BNB_TEST_CHAIN_ID]
+            result: false
+          - args: [*sepHLAdapter, *BNB_TEST_CHAIN_ID]
+            result: false
+          - args: [*sepLZAdapter, *BNB_TEST_CHAIN_ID]
+            result: false
+          - args: [*sepWormholeAdapter, *BNB_TEST_CHAIN_ID]
+            result: false
+        getTransactionState: # no real transactions yet
+          - args: [*ZERO_BYTES32]
+            signature: "getTransactionState(bytes32)"
+            result: { confirmations: 0, firstBridgedAt: 0 }
+        getEnvelopeState:
+          - args: [*ZERO_BYTES32]
+            signature: "getEnvelopeState(bytes32)"
+            result: 0
+        isTransactionReceivedByAdapter:
+          - args: [*ZERO_BYTES32, *sepCCIPAdapter]
+            result: false
+          - args: [*ZERO_BYTES32, *sepHLAdapter]
+            result: false
+          - args: [*ZERO_BYTES32, *sepLZAdapter]
+            result: false
+          - args: [*ZERO_BYTES32, *sepWormholeAdapter]
+            result: false
+        # CrossChainForwarder
+        getCurrentEnvelopeNonce: 0
+        getCurrentTransactionNonce: 0
+        isEnvelopeRegistered:
+          - args: [*ZERO_BYTES32]
+            signature: "isEnvelopeRegistered(bytes32)"
+            result: false
+        isTransactionForwarded:
+          - args: [*ZERO_BYTES32]
+            signature: "isTransactionForwarded(bytes32)"
+            result: false
+        getForwarderBridgeAdaptersByChain:
+          - args: [*BNB_TEST_CHAIN_ID]
+            result: []
+        isSenderApproved:
+          - args: [*SEP_DAO_AGENT]
+            result: false
+          - args: [*DEAD_ADDRESS]
+            result: false
+        whoCanRescue: *DEAD_ADDRESS
+
+    # https://docs.chain.link/ccip/supported-networks/v1_2_0/testnet#ethereum-sepolia
+    # @dev # BNB_TESTNET for CCIP = 13264668187771770619
+    ccipAdapter:
+      name: "CCIPAdapter"
+      address: *sepCCIPAdapter
+      checks:
+        BASE_GAS_LIMIT: 0
+        CCIP_ROUTER: "0x0BF3dE8c5D3e8A2B34D2BEeB17ABfCeBaf363A59"
+        CROSS_CHAIN_CONTROLLER: *sepCCC
+        LINK_TOKEN: "0x779877A7B0D9E8603169DdbD7836e478b4624789"
+        adapterName: "CCIP adapter"
+        getTrustedRemoteByChainId:
+          - args: [*BNB_TEST_CHAIN_ID]
+            result: *ZERO_ADDRESS
+        infraToNativeChainId:
+          - args: [*BNB_TEST_CHAIN_ID]
+            result: *CCIP_BNB_TEST_CHAIN_ID
+            bigint: true
+        nativeToInfraChainId:
+          - args: [*CCIP_BNB_TEST_CHAIN_ID]
+            result: *BNB_TEST_CHAIN_ID
+        supportsInterface:
+          - args: ["0x01ffc9a7"] # IERC165
+            result: true
+          - args: ["0x85572ffb"] # IAny2EVMMessageReceiver
+            result: true
+
+    # https://docs.hyperlane.xyz/docs/reference/contract-addresses
+    hlAdapter:
+      name: "HyperLaneAdapter"
+      address: *sepHLAdapter
+      checks:
+        BASE_GAS_LIMIT: 0
+        HL_MAIL_BOX: "0xfFAEF09B3cd11D9b20d1a19bECca54EEC2884766"
+        CROSS_CHAIN_CONTROLLER: *sepCCC
+        adapterName: "Hyperlane adapter"
+        getTrustedRemoteByChainId:
+          - args: [*BNB_TEST_CHAIN_ID]
+            result: *ZERO_ADDRESS
+        infraToNativeChainId:
+          - args: [*BNB_TEST_CHAIN_ID]
+            result: *BNB_TEST_CHAIN_ID
+        nativeToInfraChainId:
+          - args: [*BNB_TEST_CHAIN_ID]
+            result: *BNB_TEST_CHAIN_ID
+
+    # https://docs.layerzero.network/v2/developers/evm/technical-reference/endpoints#sepolia-testnet
+    lzAdapter:
+      name: "LayerZeroAdapter"
+      address: *sepLZAdapter
+      checks:
+        BASE_GAS_LIMIT: 0
+        LZ_ENDPOINT: "0x6EDCE65403992e310A62460808c4b910D972f10f"
+        CROSS_CHAIN_CONTROLLER: *sepCCC
+        adapterName: "LayerZero adapter"
+        allowInitializePath:
+          - args: [[*LZ_BNB_TEST_CHAIN_ID, *bnbtCCCBytes32, 0]]
+            result: false
+        nextNonce:
+          - args: [*LZ_BNB_TEST_CHAIN_ID, *bnbtCCCBytes32]
+            result: 0
+        getTrustedRemoteByChainId:
+          - args: [*BNB_TEST_CHAIN_ID]
+            result: *ZERO_ADDRESS
+        infraToNativeChainId:
+          - args: [*BNB_TEST_CHAIN_ID]
+            result: *LZ_BNB_TEST_CHAIN_ID
+        nativeToInfraChainId:
+          - args: [*LZ_BNB_TEST_CHAIN_ID]
+            result: *BNB_TEST_CHAIN_ID
+
+    # https://docs.wormhole.com/wormhole/reference/constants#standard-relayer
+    wormholeAdapter:
+      name: "WormholeAdapter"
+      address: *sepWormholeAdapter
+      checks:
+        BASE_GAS_LIMIT: 0
+        WORMHOLE_RELAYER: "0x7B1bD7a6b4E61c2a123AC6BC2cbfC614437D0470"
+        REFUND_ADDRESS: *bnbtCCC
+        CROSS_CHAIN_CONTROLLER: *sepCCC
+        adapterName: "Wormhole adapter"
+        getTrustedRemoteByChainId:
+          - args: [*BNB_TEST_CHAIN_ID]
+            result: *ZERO_ADDRESS
+        infraToNativeChainId:
+          - args: [*BNB_TEST_CHAIN_ID]
+            result: *WH_BNB_TESTNET_CHAIN_ID
+        nativeToInfraChainId:
+          - args: [*WH_BNB_TESTNET_CHAIN_ID]
+            result: *BNB_TEST_CHAIN_ID
+
+l2:
+  rpcUrl: https://data-seed-prebsc-1-s1.binance.org:8545 # L2_RPC_URL # https://bsc-dataseed.binance.org # L2_RPC_URL # url or env var
+  contracts:
+    proxyAdmin:
+      name: "ProxyAdmin"
+      address: *bnbtProxyAdmin
+      checks:
+        owner: *bnbtCCE
+        getProxyAdmin:
+          - args: [*bnbtCCC]
+            result: *bnbtProxyAdmin
+        getProxyImplementation:
+          - args: [*bnbtCCC]
+            result: *bnbtCCCImp
+
+    crossChainController:
+      name: "CrossChainController"
+      address: *bnbtCCC
+      proxyName: TransparentUpgradeableProxy
+      implementation: *bnbtCCCImp
+      proxyChecks: {}
+      checks:
+        owner: *bnbtCCE
+        guardian: *ZERO_ADDRESS
+        # CrossChainReceiver
+        getReceiverBridgeAdaptersByChain:
+          - args: [*SEP_CHAIN_ID]
+            result: [*bnbtCCIPAdapter, *bnbtLZAdapter, *bnbtHLAdapter, *bnbtWormholeAdapter]
+        getSupportedChains: []
+        getConfigurationByChain:
+          - args: [*SEP_CHAIN_ID]
+            result: { requiredConfirmation: *BNB_TEST_CONFIRMATIONS, validityTimestamp: 0 }
+        isReceiverBridgeAdapterAllowed:
+          - args: [*bnbtCCIPAdapter, *SEP_CHAIN_ID]
+            result: true
+          - args: [*bnbtHLAdapter, *SEP_CHAIN_ID]
+            result: true
+          - args: [*bnbtLZAdapter, *SEP_CHAIN_ID]
+            result: true
+          - args: [*bnbtWormholeAdapter, *SEP_CHAIN_ID]
+            result: true
+        getTransactionState: # no real transactions yet
+          - args: [*ZERO_BYTES32]
+            signature: "getTransactionState(bytes32)"
+            result: { confirmations: 0, firstBridgedAt: 0 }
+        getEnvelopeState:
+          - args: [*ZERO_BYTES32]
+            signature: "getEnvelopeState(bytes32)"
+            result: 0
+        isTransactionReceivedByAdapter:
+          - args: [*ZERO_BYTES32, *sepCCIPAdapter]
+            result: false
+          - args: [*ZERO_BYTES32, *sepHLAdapter]
+            result: false
+          - args: [*ZERO_BYTES32, *sepLZAdapter]
+            result: false
+          - args: [*ZERO_BYTES32, *sepWormholeAdapter]
+            result: false
+        # CrossChainForwarder
+        getCurrentEnvelopeNonce: 0
+        getCurrentTransactionNonce: 0
+        isEnvelopeRegistered:
+          - args: [*ZERO_BYTES32]
+            signature: "isEnvelopeRegistered(bytes32)"
+            result: false
+        isTransactionForwarded:
+          - args: [*ZERO_BYTES32]
+            signature: "isTransactionForwarded(bytes32)"
+            result: false
+        getForwarderBridgeAdaptersByChain:
+          - args: [*SEP_CHAIN_ID]
+            result: []
+        isSenderApproved:
+          - args: [*bnbtCCE]
+            result: false # no sender from BNB
+          - args: [*ZERO_ADDRESS]
+            result: false
+        whoCanRescue: *bnbtCCE
+
+      implementationChecks:
+        owner: *DEAD_ADDRESS
+        guardian: *ZERO_ADDRESS
+        getReceiverBridgeAdaptersByChain:
+          - args: [*SEP_CHAIN_ID]
+            result: []
+        getSupportedChains: []
+        getConfigurationByChain:
+          - args: [*SEP_CHAIN_ID]
+            result: { requiredConfirmation: 0, validityTimestamp: 0 }
+        isReceiverBridgeAdapterAllowed:
+          - args: [*bnbtCCIPAdapter, *SEP_CHAIN_ID]
+            result: false
+          - args: [*bnbtHLAdapter, *SEP_CHAIN_ID]
+            result: false
+          - args: [*bnbtLZAdapter, *SEP_CHAIN_ID]
+            result: false
+          - args: [*bnbtWormholeAdapter, *SEP_CHAIN_ID]
+            result: false
+        getTransactionState: # no real transactions yet
+          - args: [*ZERO_BYTES32]
+            signature: "getTransactionState(bytes32)"
+            result: { confirmations: 0, firstBridgedAt: 0 }
+        getEnvelopeState:
+          - args: [*ZERO_BYTES32]
+            signature: "getEnvelopeState(bytes32)"
+            result: 0
+        isTransactionReceivedByAdapter:
+          - args: [*ZERO_BYTES32, *sepCCIPAdapter]
+            result: false
+          - args: [*ZERO_BYTES32, *sepHLAdapter]
+            result: false
+          - args: [*ZERO_BYTES32, *sepLZAdapter]
+            result: false
+          - args: [*ZERO_BYTES32, *sepWormholeAdapter]
+            result: false
+        # CrossChainForwarder
+        getCurrentEnvelopeNonce: 0
+        getCurrentTransactionNonce: 0
+        isEnvelopeRegistered:
+          - args: [*ZERO_BYTES32]
+            signature: "isEnvelopeRegistered(bytes32)"
+            result: false
+        isTransactionForwarded:
+          - args: [*ZERO_BYTES32]
+            signature: "isTransactionForwarded(bytes32)"
+            result: false
+        getForwarderBridgeAdaptersByChain:
+          - args: [*SEP_CHAIN_ID]
+            result: []
+        isSenderApproved:
+          - args: [*bnbtCCE]
+            result: false
+          - args: [*DEAD_ADDRESS]
+            result: false
+        whoCanRescue: *DEAD_ADDRESS
+
+    crossChainExecutor:
+      name: "CrossChainExecutor"
+      address: *bnbtCCE
+      proxyName: TransparentUpgradeableProxy
+      implementation: *bnbtCCE
+      proxyChecks: {}
+      checks:
+        getCrossChainController: *bnbtCCC
+        getEthereumGovernanceChainId: *SEP_CHAIN_ID
+        getEthereumGovernanceExecutor: *SEP_DAO_AGENT
+        getDelay: *BNB_CCE_DELAY
+        getGracePeriod: *BNB_CCE_GRACE_PERIOD
+        getMinimumDelay: *BNB_CCE_MINIMUM_DELAY
+        getMaximumDelay: *BNB_CCE_MAXIMUM_DELAY
+        getGuardian: *ZERO_ADDRESS
+        getActionsSetCount: *BNB_TEST_CCE_ACTIONS_SET_COUNT
+        getActionsSetById:
+          - args: [0]
+            # https://github.com/lidofinance/scripts/blob/61f33eec9ad24422c6dd33d9bf1f24cc865dfb88/scripts/vote_2024_05_08_sepolia.py
+            result:
+              [
+                ["0x9f3e9fD45Cf09E786eDF77E7B74341336FE58609"],
+                [0],
+                ["test(string)"],
+                [
+                  "0x00000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000044566f74696e672030382f30352f323032342e205365706f6c6961203d3e2042696e616e636520612e4449207465737420766f74696e672074657374206d6573736167652e00000000000000000000000000000000000000000000000000000000",
+                ],
+                [false],
+                1715178462,
+                true,
+                false,
+              ]
+          - args: [1]
+            # Test voting for deploy #1 (not executed)
+            result:
+              [
+                ["0x9f3e9fD45Cf09E786eDF77E7B74341336FE58609"],
+                [0],
+                ["test(string)"],
+                [
+                  "0x00000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000044566f74696e672030382f30352f323032342e205365706f6c6961203d3e2042696e616e636520612e4449207465737420766f74696e672074657374206d6573736167652e00000000000000000000000000000000000000000000000000000000",
+                ],
+                [false],
+                1715247979,
+                false,
+                false,
+              ]
+          - args: [2]
+            # Test voting for deploy #2 (executed)
+            result:
+              [
+                ["0x9f3e9fD45Cf09E786eDF77E7B74341336FE58609", "0x9f3e9fD45Cf09E786eDF77E7B74341336FE58609"],
+                [0, 0],
+                ["test(string)", "test(string)"],
+                [
+                  "0x000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000505468697320697320616e20656e636f646564206d6573736167652066726f6d2044414f20566f746520746f20757064617465204d6f636b206f6e2042696e616e636520746573746e65742e2e2e20233100000000000000000000000000000000",
+                  "0x000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000505468697320697320616e20656e636f646564206d6573736167652066726f6d2044414f20566f746520746f20757064617465204d6f636b206f6e2042696e616e636520746573746e65742e2e2e20233200000000000000000000000000000000",
+                ],
+                [false, false],
+                1717062251,
+                true,
+                false,
+              ]
+          - args: [3]
+            # Test voting for deploy #3 (executed)
+            result: false
+            mustRevert: true
+        getCurrentState:
+          - args: [0]
+            result: 1
+          - args: [1]
+            result: 3
+          - args: [2]
+            result: 1
+          - args: [3]
+            result: 0
+            mustRevert: true
+        isActionQueued:
+          - args: [*ZERO_BYTES32] # want to skip this for now as it's too complex to verify and not worth it, tbh
+            result: false
+
+    # https://docs.chain.link/ccip/supported-networks/v1_2_0/testnet#ethereum-sepolia
+    ccipAdapter:
+      name: "CCIPAdapter"
+      address: *bnbtCCIPAdapter
+      checks:
+        BASE_GAS_LIMIT: 0
+        CCIP_ROUTER: "0xE1053aE1857476f36A3C62580FF9b016E8EE8F6f"
+        CROSS_CHAIN_CONTROLLER: *bnbtCCC
+        LINK_TOKEN: "0x84b9B910527Ad5C03A9Ca831909E21e236EA7b06"
+        adapterName: "CCIP adapter"
+        getTrustedRemoteByChainId:
+          - args: [*SEP_CHAIN_ID]
+            result: *sepCCC
+        infraToNativeChainId:
+          - args: [*SEP_CHAIN_ID]
+            result: *CCIP_SEP_CHAIN_ID
+            bigint: true
+        nativeToInfraChainId:
+          - args: [*CCIP_SEP_CHAIN_ID]
+            result: *SEP_CHAIN_ID
+        supportsInterface:
+          - args: ["0x01ffc9a7"] # IERC165
+            result: true
+          - args: ["0x85572ffb"] # IAny2EVMMessageReceiver
+            result: true
+
+    # https://docs.hyperlane.xyz/docs/reference/contract-addresses
+    hlAdapter:
+      name: "HyperLaneAdapter"
+      address: *bnbtHLAdapter
+      checks:
+        BASE_GAS_LIMIT: 0
+        HL_MAIL_BOX: "0xF9F6F5646F478d5ab4e20B0F910C92F1CCC9Cc6D"
+        CROSS_CHAIN_CONTROLLER: *bnbtCCC
+        adapterName: "Hyperlane adapter"
+        getTrustedRemoteByChainId:
+          - args: [*SEP_CHAIN_ID]
+            result: *sepCCC
+        infraToNativeChainId:
+          - args: [*SEP_CHAIN_ID]
+            result: *SEP_CHAIN_ID
+        nativeToInfraChainId:
+          - args: [*SEP_CHAIN_ID]
+            result: *SEP_CHAIN_ID
+
+    # https://docs.layerzero.network/v2/developers/evm/technical-reference/endpoints#sepolia-testnet
+    lzAdapter:
+      name: "LayerZeroAdapter"
+      address: *bnbtLZAdapter
+      checks:
+        BASE_GAS_LIMIT: 0
+        LZ_ENDPOINT: "0x6EDCE65403992e310A62460808c4b910D972f10f"
+        CROSS_CHAIN_CONTROLLER: *bnbtCCC
+        adapterName: "LayerZero adapter"
+        allowInitializePath:
+          - args: [[*LZ_SEP_CHAIN_ID, *sepCCCBytes32, 0]]
+            result: true # allow to initialize messages
+        nextNonce:
+          - args: [*LZ_SEP_CHAIN_ID, *sepCCCBytes32]
+            result: 0
+        getTrustedRemoteByChainId:
+          - args: [*SEP_CHAIN_ID]
+            result: *sepCCC
+        infraToNativeChainId:
+          - args: [*SEP_CHAIN_ID]
+            result: *LZ_SEP_CHAIN_ID
+        nativeToInfraChainId:
+          - args: [*LZ_SEP_CHAIN_ID]
+            result: *SEP_CHAIN_ID
+
+    # https://docs.wormhole.com/wormhole/reference/constants#standard-relayer
+    wormholeAdapter:
+      name: "WormholeAdapter"
+      address: *bnbtWormholeAdapter
+      checks:
+        BASE_GAS_LIMIT: 0
+        WORMHOLE_RELAYER: "0x80aC94316391752A193C1c47E27D382b507c93F3"
+        REFUND_ADDRESS: *ZERO_ADDRESS # no refund address for BNB
+        CROSS_CHAIN_CONTROLLER: *bnbtCCC
+        adapterName: "Wormhole adapter"
+        getTrustedRemoteByChainId:
+          - args: [*SEP_CHAIN_ID]
+            result: *sepCCC
+        infraToNativeChainId:
+          - args: [*SEP_CHAIN_ID]
+            result: *WH_SEP_CHAIN_ID
+        nativeToInfraChainId:
+          - args: [*WH_SEP_CHAIN_ID]
+            result: *SEP_CHAIN_ID
