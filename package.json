@@ -10,36 +10,41 @@
   "scripts": {
     "build": "tsc",
     "start": "ts-node src/state-mate.ts",
-    "lint": "eslint . --ignore-path .gitignore --max-warnings=0",
-    "lint:fix": "yarn lint:ts --fix",
-    "format": "prettier . --write --ignore-path .gitignore --ignore-path .prettierignore",
+    "lint": "eslint . --max-warnings=0",
+    "lint:fix": "yarn lint --fix",
+    "format": "prettier . --write --ignore-pattern .gitignore --ignore-path .prettierignore",
     "prepare": "husky install"
   },
   "lint-staged": {
     "./**/*.ts": [
-      "eslint --ignore-path .gitignore --max-warnings=0"
+      "eslint --ignore-pattern .gitignore --max-warnings=0"
     ],
     "./**/*.{ts,md,json}": [
       "prettier --write"
     ]
   },
   "devDependencies": {
-    "@commitlint/cli": "^17.7.1",
-    "@commitlint/config-conventional": "^17.7.0",
+    "@commitlint/cli": "^19.3.0",
+    "@commitlint/config-conventional": "^19.2.2",
     "@tsconfig/node20": "^20.1.2",
     "@types/node": "^20.14.2",
-    "@typescript-eslint/eslint-plugin": "^6.6.0",
-    "@typescript-eslint/parser": "^6.6.0",
-    "eslint": "^8.48.0",
-    "eslint-config-prettier": "^9.0.0",
-    "husky": "^8.0.0",
-    "lint-staged": "^14.0.1",
-    "prettier": "^3.0.3",
+    "@typescript-eslint/eslint-plugin": "^7.13.1",
+    "@typescript-eslint/parser": "^7.13.1",
+    "@eslint/compat": "^1.1.0",
+    "@eslint/js": "^9.5.0",
+    "@eslint/eslintrc": "^3.1.0",
+    "eslint": "^9.5.0",
+    "eslint-config-prettier": "^9.1.0",
+    "globals": "^15.6.0",
+    "husky": "^9.0.11",
+    "lint-staged": "^15.2.7",
+    "prettier": "^3.3.2",
     "ts-node": ">=8.0.0",
-    "typescript": "^5.2.2"
+    "typescript": "^5.4.5"
   },
   "dependencies": {
     "@types/chai": "^4.3.16",
+    "chalk": "^4.1.2",
     "dotenv": "^16.4.5",
     "chai": "^4.4.1",
     "ethers": "^6.13.0",

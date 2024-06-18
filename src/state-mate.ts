@@ -4,8 +4,8 @@ import path from "node:path";
 import "dotenv/config";
 import { expect } from "chai";
 import { BaseContract, Contract, getAddress, isAddress, JsonRpcProvider, Result } from "ethers";
-import YAML from "yaml";
-import chalk from "chalk";
+import * as YAML from "yaml";
+import * as chalk from "chalk";
 
 const SUCCESS_MARK = chalk.green("✔");
 const FAILURE_MARK = chalk.red("✘");
