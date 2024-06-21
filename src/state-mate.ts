@@ -25,6 +25,14 @@ enum Ef {
   proxyChecks = "proxyChecks",
   implementationChecks = "implementationChecks",
   ozNonEnumerableAcl = "ozNonEnumerableAcl",
+  result = "result",
+}
+
+enum CheckLevel {
+  section = "section",
+  contract = "contract",
+  checksType = "checksType",
+  method = "method",
 }
 
 type ViewResultPlainValue = null | string | boolean | bigint;
@@ -33,7 +41,7 @@ type ArbitraryObject = Omit<{ [key: string]: ViewResultPlainValue }, "args" | "r
 
 type ViewResult = ViewResultPlainValue | ArbitraryObject;
 
-type ArgsAndResult = {
+type ArgsResult = {
   args: [string];
   result: ViewResult;
   mustRevert?: boolean;
@@ -41,7 +49,7 @@ type ArgsAndResult = {
   bigint?: boolean;
 };
 
-type ChecksEntryValue = ViewResult | ArgsAndResult | [ArgsAndResult];
+type ChecksEntryValue = ViewResult | [ArgsResult];
 
 type Checks = {
   [key: string]: ChecksEntryValue;
@@ -83,7 +91,7 @@ type Abi = [
 // ==== GLOBAL VARIABLES ====
 let g_abiDirectory: string;
 let g_errors = 0;
-
+let g_checkOnly: null | { section: string, contract: string | null, checksType: string | null, method: string | null } = null;
 // ==========================
 
 class LogCommand {
@@ -156,12 +164,25 @@ function isUrl(maybeUrl: string) {
   }
 }
 
+function needCheck(level: CheckLevel, name: string) {
+  if (g_checkOnly === null) {
+    return true;
+  }
+  const checkOnTheLevel = g_checkOnly[level];
+  return checkOnTheLevel === null || checkOnTheLevel === undefined || name === checkOnTheLevel;
+}
+
 function log(arg: unknown) {
   console.log(arg);
 }
 
 function logError(arg: unknown) {
   console.error(arg);
+}
+
+function logErrorAndExit(arg: unknown) {
+  logError(arg);
+  process.exit(1);
 }
 
 function logHeader1(arg: string) {
@@ -206,6 +227,13 @@ function reportNonCoveredNonMutableChecks(
   }
 }
 
+function parseAsArgsResultsArray(entry: ChecksEntryValue): [ArgsResult] | null {
+  if (entry instanceof Array && entry.length > 0 && entry[0].args instanceof Array && Ef.result in entry[0]) {
+    return entry
+  }
+  return null;
+}
+
 async function checkContractEntry(
   { address, name, checks, ozNonEnumerableAcl }: RegularContractEntry,
   provider: JsonRpcProvider,
@@ -213,12 +241,16 @@ async function checkContractEntry(
   expect(isAddress(address), `${address} is invalid address`).to.be.true;
   const contract: BaseContract = await loadContract(name, address, provider);
   for (const [method, checkEntryValue] of Object.entries(checks)) {
-    if (checkEntryValue instanceof Array) {
-      for (const viewResultOrObject of checkEntryValue) {
-        await checkViewFunction(contract, method, viewResultOrObject);
-      }
+    if (!needCheck(CheckLevel.method, method)) {
+      continue;
+    }
+    const argsResultsArray = parseAsArgsResultsArray(checkEntryValue)
+    if (argsResultsArray === null) {
+      await checkViewFunction(contract, method, checkEntryValue as unknown as ArgsResult);
     } else {
-      await checkViewFunction(contract, method, checkEntryValue);
+      for (const argsResult of argsResultsArray) {
+        await checkViewFunction(contract, method, argsResult);
+      }
     }
   }
 
@@ -263,7 +295,7 @@ function expectToEqualStruct(expected: null | ArbitraryObject, actual: Result) {
   }
 }
 
-async function checkViewFunction(contract: BaseContract, method: string, expectedOrObject: ChecksEntryValue) {
+async function checkViewFunction(contract: BaseContract, method: string, expectedOrObject: ArgsResult) {
   // Skip check if expected is null
   if (expectedOrObject === null) {
     logMethodSkipped(method);
@@ -283,7 +315,7 @@ async function checkViewFunction(contract: BaseContract, method: string, expecte
       mustRevert = false,
       signature = method,
       bigint = false,
-    } = expectedOrObject as ArgsAndResult);
+    } = expectedOrObject as ArgsResult);
   } else {
     expected = expectedOrObject as ViewResult;
   }
@@ -293,8 +325,6 @@ async function checkViewFunction(contract: BaseContract, method: string, expecte
 
   try {
     const actual = await contract.getFunction(signature).staticCall(...args);
-    // console.log("actual", actual);
-    // console.log("expected", expected);
     if (typeof expected === "string") {
       if (isAddress(expected)) {
         expect(getAddress(actual)).to.equal(getAddress(expected));
@@ -323,6 +353,10 @@ async function checkViewFunction(contract: BaseContract, method: string, expecte
 }
 
 async function checkNetworkSection(section: NetworkSection, sectionTitle: string) {
+  if (g_checkOnly && g_checkOnly.section !== sectionTitle) {
+    return;
+  }
+
   if (!section) {
     log(`Network section ${sectionTitle} is empty, skipped`);
     return;
@@ -330,22 +364,22 @@ async function checkNetworkSection(section: NetworkSection, sectionTitle: string
 
   const rpcUrl = isUrl(section.rpcUrl) ? section.rpcUrl : process.env[section.rpcUrl];
   if (!(rpcUrl && isUrl(rpcUrl))) {
-    logError(`ERROR: Invalid RPC URL ${rpcUrl} is specified via env variable ${section.rpcUrl}`);
-    process.exit(1);
+    logErrorAndExit(`ERROR: Invalid RPC URL ${rpcUrl} is specified via env variable ${section.rpcUrl}`);
   }
 
   const provider = new JsonRpcProvider(rpcUrl);
   for (const contractAlias in section.contracts) {
+    if (!needCheck(CheckLevel.contract, contractAlias)) {
+      continue;
+    }
     const entry = section.contracts[contractAlias];
     logHeader1(`Contract (${sectionTitle}): ${contractAlias} (${entry.name}, ${entry.address})`);
 
-    reportNonCoveredNonMutableChecks(contractAlias, Ef.checks, entry.name, Object.keys(entry.checks));
-    if (entry.proxyName) {
-      reportNonCoveredNonMutableChecks(contractAlias, Ef.proxyChecks, entry.proxyName, Object.keys(entry.proxyChecks));
-    }
-
-    if (Ef.checks in entry) {
+    if (Ef.checks in entry && needCheck(CheckLevel.checksType, Ef.checks)) {
       logHeader2(Ef.checks);
+
+      reportNonCoveredNonMutableChecks(contractAlias, Ef.checks, entry.name, Object.keys(entry[Ef.checks]));
+
       await checkContractEntry(
         {
           checks: entry[Ef.checks],
@@ -356,8 +390,9 @@ async function checkNetworkSection(section: NetworkSection, sectionTitle: string
       );
     }
 
-    if (Ef.proxyChecks in entry) {
+    if (Ef.proxyChecks in entry && needCheck(CheckLevel.checksType, Ef.proxyChecks)) {
       logHeader2(Ef.proxyChecks);
+      reportNonCoveredNonMutableChecks(contractAlias, Ef.proxyChecks, entry.proxyName, Object.keys(entry.proxyChecks));
       await checkContractEntry(
         {
           checks: entry[Ef.proxyChecks],
@@ -368,7 +403,7 @@ async function checkNetworkSection(section: NetworkSection, sectionTitle: string
       );
     }
 
-    if (entry.implementationChecks) {
+    if (Ef.implementationChecks in entry && needCheck(CheckLevel.checksType, Ef.implementationChecks)) {
       logHeader2(Ef.implementationChecks);
       // For implementation by default skip all checks
       const allNonMutable = getNonMutableFunctionNames(loadAbi(entry.name));
@@ -387,10 +422,9 @@ async function checkNetworkSection(section: NetworkSection, sectionTitle: string
 }
 
 function parseCommandLineArgs(argv: string[]) {
-  if (argv.length != 3) {
-    logError(`ERROR: Invalid number of arguments. Expected: <path-to-state-config-yaml>.
+  if (argv.length < 3) {
+    logErrorAndExit(`ERROR: Invalid number of arguments. Expected: <path-to-state-config-yaml> [<section/contractName>].
 The "abi" directory is expected to be located nearby.`);
-    process.exit(1);
   }
   const firstArg = argv[2];
   if (["--help", "-h"].includes(firstArg)) {
@@ -398,27 +432,47 @@ The "abi" directory is expected to be located nearby.`);
     process.exit(0);
   }
   const configPath = argv[2];
+  let checkOnly: typeof g_checkOnly = null;
+  const checkOnlyArg = argv[3];
+  if (checkOnlyArg) {
+    const checksPath = argv[3].split("/");
+    if (checksPath.length < 1) {
+      logErrorAndExit(`Invalid checkOnly argument format, must be <section>/[<contractName>]/[<checks|proxyChecks|implementationChecks>]/<method>`);
+    }
+    checkOnly = {
+      section: checksPath[0],
+      contract: checksPath[1],
+      checksType: checksPath[2],
+      method: checksPath[3],
+    };
+  }
   return {
     configPath,
     abiDirPath: path.join(path.dirname(configPath), "abi"),
+    checkOnly,
+    checkOnlyArg,
   };
 }
 
 export async function main() {
-  const { configPath, abiDirPath } = parseCommandLineArgs(process.argv);
+  const { configPath, abiDirPath, checkOnly, checkOnlyArg } = parseCommandLineArgs(process.argv);
   g_abiDirectory = abiDirPath;
+  g_checkOnly = checkOnly;
 
   const state = loadStateFromYaml(configPath);
 
   logHeader1(`Used state config: ${chalk.magenta(configPath)}`);
 
-  await checkNetworkSection(state.l1, "L1");
+  await checkNetworkSection(state.l1, "l1");
 
-  await checkNetworkSection(state.l2, "L2");
+  await checkNetworkSection(state.l2, "l2");
 
   if (g_errors) {
-    logError(`\n${FAILURE_MARK} ${chalk.bold(`${g_errors} errors found!`)}`);
-    process.exit(1);
+    logErrorAndExit(`\n${FAILURE_MARK} ${chalk.bold(`${g_errors} errors found!`)}`);
+  }
+
+  if (g_checkOnly) {
+    log(`\n${WARNING_MARK}${WARNING_MARK}${WARNING_MARK} Checks run only for "${checkOnlyArg}"\n`);
   }
 }
 
