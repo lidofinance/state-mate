@@ -31,7 +31,7 @@ type ViewResultPlainValue = null | string | boolean | bigint;
 
 type ArbitraryObject = Omit<{ [key: string]: ViewResultPlainValue }, "args" | "result">;
 
-type ViewResult = ViewResultPlainValue | ArbitraryObject;
+type ViewResult = ViewResultPlainValue | ArbitraryObject | never[];
 
 type ArgsAndResult = {
   args: [string];
@@ -211,9 +211,24 @@ async function checkContractEntry(
   provider: JsonRpcProvider,
 ) {
   expect(isAddress(address), `${address} is invalid address`).to.be.true;
+
   const contract: BaseContract = await loadContract(name, address, provider);
   for (const [method, checkEntryValue] of Object.entries(checks)) {
     if (checkEntryValue instanceof Array) {
+      // In case of empty array we need to check it as a single entry
+      if (checkEntryValue.length === 0) {
+        await checkViewFunction(contract, method, checkEntryValue);
+        continue;
+      }
+
+      // In case it is not an array of calls, check it as a single entry
+      const isCall = checkEntryValue.some((x) => typeof x === "object" && "args" in x);
+      if (!isCall) {
+        await checkViewFunction(contract, method, checkEntryValue);
+        continue;
+      }
+
+      // In case it is an array of calls, check each call
       for (const viewResultOrObject of checkEntryValue) {
         await checkViewFunction(contract, method, viewResultOrObject);
       }
