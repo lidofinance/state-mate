@@ -33,7 +33,7 @@ type ArbitraryObject = Omit<{ [key: string]: ViewResultPlainValue }, "args" | "r
 
 type ViewResult = ViewResultPlainValue | ArbitraryObject;
 
-type ArgsAndResult = {
+type ArgsResult = {
   args: [string];
   result: ViewResult;
   mustRevert?: boolean;
@@ -41,7 +41,7 @@ type ArgsAndResult = {
   bigint?: boolean;
 };
 
-type ChecksEntryValue = ViewResult | ArgsAndResult | [ArgsAndResult];
+type ChecksEntryValue = ViewResult | [ArgsResult];
 
 type Checks = {
   [key: string]: ChecksEntryValue;
@@ -206,6 +206,13 @@ function reportNonCoveredNonMutableChecks(
   }
 }
 
+function parseAsArgsResultsArray(entry: ChecksEntryValue): [ArgsResult] | null {
+  if (entry instanceof Array && entry.length > 0 && entry[0].args instanceof Array && Ef.result in entry[0]) {
+    return entry
+  }
+  return null;
+}
+
 async function checkContractEntry(
   { address, name, checks, ozNonEnumerableAcl }: RegularContractEntry,
   provider: JsonRpcProvider,
@@ -213,12 +220,16 @@ async function checkContractEntry(
   expect(isAddress(address), `${address} is invalid address`).to.be.true;
   const contract: BaseContract = await loadContract(name, address, provider);
   for (const [method, checkEntryValue] of Object.entries(checks)) {
-    if (checkEntryValue instanceof Array) {
-      for (const viewResultOrObject of checkEntryValue) {
-        await checkViewFunction(contract, method, viewResultOrObject);
-      }
+    if (g_checkOnly && g_checkOnly.method && g_checkOnly.method !== method) {
+      continue;
+    }
+    const argsResultsArray = parseAsArgsResultsArray(checkEntryValue)
+    if (argsResultsArray === null) {
+      await checkViewFunction(contract, method, checkEntryValue as unknown as ArgsResult);
     } else {
-      await checkViewFunction(contract, method, checkEntryValue);
+      for (const argsResult of argsResultsArray) {
+        await checkViewFunction(contract, method, argsResult);
+      }
     }
   }
 
@@ -263,7 +274,7 @@ function expectToEqualStruct(expected: null | ArbitraryObject, actual: Result) {
   }
 }
 
-async function checkViewFunction(contract: BaseContract, method: string, expectedOrObject: ChecksEntryValue) {
+async function checkViewFunction(contract: BaseContract, method: string, expectedOrObject: ArgsResult) {
   // Skip check if expected is null
   if (expectedOrObject === null) {
     logMethodSkipped(method);
@@ -283,7 +294,7 @@ async function checkViewFunction(contract: BaseContract, method: string, expecte
       mustRevert = false,
       signature = method,
       bigint = false,
-    } = expectedOrObject as ArgsAndResult);
+    } = expectedOrObject as ArgsResult);
   } else {
     expected = expectedOrObject as ViewResult;
   }
