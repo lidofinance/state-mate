@@ -5,6 +5,15 @@ parameters:
   - &ETH_DAO_AGENT_MOCK "0x184d39300f2fA4419d04998e9C58Cb5De586d879"
   - &ETH_DAO_AGENT "0x3e40D73EB977Dc6a537aF587D48316feE66E9C8c"
 
+  # validityTimestamp means confirmation is to be gathered only from the messages after the timestamp
+  # validityTimestamp common usage or by guardian (we don't use it) or on upgrade to invalidate
+  # all old messages to the adapters. Neither is of interest for us.
+  - &VALIDITY_TIMESTAMP 0
+
+  # Used when it is not possible to automatically calc gas tx cost, e.g. on Base and Metis,
+  # Gnosis Chain (at the moment at least).  Not used on BSC
+  - &ADAPTER_ZERO_BASE_GAS_LIMIT 0
+
 misc:
   - &ZERO_ADDRESS "0x0000000000000000000000000000000000000000"
   - &DEAD_ADDRESS "0x000000000000000000000000000000000000dead"
@@ -87,7 +96,7 @@ l1:
         getSupportedChains: [ ]
         getConfigurationByChain:
           - args: [ *BNB_CHAIN_ID ]
-            result: { requiredConfirmation: 0, validityTimestamp: 0 }
+            result: { requiredConfirmation: 0, validityTimestamp: *VALIDITY_TIMESTAMP }
         isReceiverBridgeAdapterAllowed:
           - args: [ *ethCCIPAdapter, *BNB_CHAIN_ID ]
             result: false
@@ -144,67 +153,15 @@ l1:
       implementationChecks:
         owner: *DEAD_ADDRESS
         guardian: *ZERO_ADDRESS
-        getReceiverBridgeAdaptersByChain:
-          - args: [ *BNB_CHAIN_ID ]
-            result: [ ]
-        getSupportedChains: [ ]
-        getConfigurationByChain:
-          - args: [ *BNB_CHAIN_ID ]
-            result: { requiredConfirmation: 0, validityTimestamp: 0 }
-        isReceiverBridgeAdapterAllowed:
-          - args: [ *ethCCIPAdapter, *BNB_CHAIN_ID ]
-            result: false
-          - args: [ *ethHLAdapter, *BNB_CHAIN_ID ]
-            result: false
-          - args: [ *ethLZAdapter, *BNB_CHAIN_ID ]
-            result: false
-          - args: [ *ethWormholeAdapter, *BNB_CHAIN_ID ]
-            result: false
-        getTransactionState: # no real transactions yet
-          - args: [ *ZERO_BYTES32 ]
-            signature: "getTransactionState(bytes32)"
-            result: { confirmations: 0, firstBridgedAt: 0 }
-        getEnvelopeState:
-          - args: [ *ZERO_BYTES32 ]
-            signature: "getEnvelopeState(bytes32)"
-            result: 0
-        isTransactionReceivedByAdapter:
-          - args: [ *ZERO_BYTES32, *ethCCIPAdapter ]
-            result: false
-          - args: [ *ZERO_BYTES32, *ethHLAdapter ]
-            result: false
-          - args: [ *ZERO_BYTES32, *ethLZAdapter ]
-            result: false
-          - args: [ *ZERO_BYTES32, *ethWormholeAdapter ]
-            result: false
-        # CrossChainForwarder
-        getCurrentEnvelopeNonce: 0
-        getCurrentTransactionNonce: 0
-        isEnvelopeRegistered:
-          - args: [ *ZERO_BYTES32 ]
-            signature: "isEnvelopeRegistered(bytes32)"
-            result: false
-        isTransactionForwarded:
-          - args: [ *ZERO_BYTES32 ]
-            signature: "isTransactionForwarded(bytes32)"
-            result: false
-        getForwarderBridgeAdaptersByChain:
-          - args: [ *BNB_CHAIN_ID ]
-            result: [ ]
-        isSenderApproved:
-          - args: [ *ETH_DAO_AGENT_MOCK ]
-            result: false
-          - args: [ *DEAD_ADDRESS ]
-            result: false
         whoCanRescue: *DEAD_ADDRESS
 
-    # https://docs.chain.link/ccip/supported-networks/v1_2_0/testnet#ethereum-sepolia
+    # https://docs.chain.link/ccip/supported-networks/v1_2_0/mainnet
     # @dev # BNB_TESTNET for CCIP = 13264668187771770619
     ccipAdapter:
       name: "CCIPAdapter"
       address: *ethCCIPAdapter
       checks:
-        BASE_GAS_LIMIT: 0
+        BASE_GAS_LIMIT: *ADAPTER_ZERO_BASE_GAS_LIMIT
         CCIP_ROUTER: "0x80226fc0Ee2b096224EeAc085Bb9a8cba1146f7D"
         CROSS_CHAIN_CONTROLLER: *ethCCC
         LINK_TOKEN: "0x514910771AF9Ca656af840dff83E8264EcF986CA"
@@ -230,7 +187,7 @@ l1:
       name: "HyperLaneAdapter"
       address: *ethHLAdapter
       checks:
-        BASE_GAS_LIMIT: 0
+        BASE_GAS_LIMIT: *ADAPTER_ZERO_BASE_GAS_LIMIT
         HL_MAIL_BOX: "0xc005dc82818d67AF737725bD4bf75435d065D239"
         CROSS_CHAIN_CONTROLLER: *ethCCC
         adapterName: "Hyperlane adapter"
@@ -244,12 +201,12 @@ l1:
           - args: [ *BNB_CHAIN_ID ]
             result: *BNB_CHAIN_ID
 
-    # https://docs.layerzero.network/v2/developers/evm/technical-reference/endpoints#sepolia-testnet
+    # https://docs.layerzero.network/v2/developers/evm/technical-reference/endpoints
     lzAdapter:
       name: "LayerZeroAdapter"
       address: *ethLZAdapter
       checks:
-        BASE_GAS_LIMIT: 0
+        BASE_GAS_LIMIT: *ADAPTER_ZERO_BASE_GAS_LIMIT
         LZ_ENDPOINT: "0x1a44076050125825900e736c501f859c50fE728c"
         CROSS_CHAIN_CONTROLLER: *ethCCC
         adapterName: "LayerZero adapter"
@@ -274,7 +231,7 @@ l1:
       name: "WormholeAdapter"
       address: *ethWormholeAdapter
       checks:
-        BASE_GAS_LIMIT: 0
+        BASE_GAS_LIMIT: *ADAPTER_ZERO_BASE_GAS_LIMIT
         WORMHOLE_RELAYER: "0x27428DD2d3DD32A4D7f7C497eAaa23130d894911"
         REFUND_ADDRESS: *bnbCCC
         CROSS_CHAIN_CONTROLLER: *ethCCC
@@ -326,7 +283,7 @@ l2:
         getSupportedChains: [ 1 ]
         getConfigurationByChain:
           - args: [ *ETH_CHAIN_ID ]
-            result: { requiredConfirmation: *BNB_CONFIRMATIONS , validityTimestamp: 0 }
+            result: { requiredConfirmation: *BNB_CONFIRMATIONS , validityTimestamp: *VALIDITY_TIMESTAMP }
         isReceiverBridgeAdapterAllowed:
           - args: [ *bnbCCIPAdapter, *ETH_CHAIN_ID ]
             result: true
@@ -377,66 +334,11 @@ l2:
       implementationChecks:
         owner: *DEAD_ADDRESS
         guardian: *ZERO_ADDRESS
-        getReceiverBridgeAdaptersByChain:
-          - args: [ *ETH_CHAIN_ID ]
-            result: [ ]
-        getSupportedChains: [ ]
-        getConfigurationByChain:
-          - args: [ *ETH_CHAIN_ID ]
-            result: { requiredConfirmation: 0, validityTimestamp: 0 }
-        isReceiverBridgeAdapterAllowed:
-          - args: [ *bnbCCIPAdapter, *ETH_CHAIN_ID ]
-            result: false
-          - args: [ *bnbHLAdapter, *ETH_CHAIN_ID ]
-            result: false
-          - args: [ *bnbLZAdapter, *ETH_CHAIN_ID ]
-            result: false
-          - args: [ *bnbWormholeAdapter, *ETH_CHAIN_ID ]
-            result: false
-        getTransactionState: # no real transactions yet
-          - args: [ *ZERO_BYTES32 ]
-            signature: "getTransactionState(bytes32)"
-            result: { confirmations: 0, firstBridgedAt: 0 }
-        getEnvelopeState:
-          - args: [ *ZERO_BYTES32 ]
-            signature: "getEnvelopeState(bytes32)"
-            result: 0
-        isTransactionReceivedByAdapter:
-          - args: [ *ZERO_BYTES32, *ethCCIPAdapter ]
-            result: false
-          - args: [ *ZERO_BYTES32, *ethHLAdapter ]
-            result: false
-          - args: [ *ZERO_BYTES32, *ethLZAdapter ]
-            result: false
-          - args: [ *ZERO_BYTES32, *ethWormholeAdapter ]
-            result: false
-        # CrossChainForwarder
-        getCurrentEnvelopeNonce: 0
-        getCurrentTransactionNonce: 0
-        isEnvelopeRegistered:
-          - args: [ *ZERO_BYTES32 ]
-            signature: "isEnvelopeRegistered(bytes32)"
-            result: false
-        isTransactionForwarded:
-          - args: [ *ZERO_BYTES32 ]
-            signature: "isTransactionForwarded(bytes32)"
-            result: false
-        getForwarderBridgeAdaptersByChain:
-          - args: [ *ETH_CHAIN_ID ]
-            result: [ ]
-        isSenderApproved:
-          - args: [ *bnbCCE ]
-            result: false
-          - args: [ *DEAD_ADDRESS ]
-            result: false
         whoCanRescue: *DEAD_ADDRESS
 
     crossChainExecutor:
       name: "CrossChainExecutor"
       address: *bnbCCE
-      proxyName: TransparentUpgradeableProxy
-      implementation: *bnbCCE
-      proxyChecks: { }
       checks:
         getCrossChainController: *bnbCCC
         getEthereumGovernanceChainId: *ETH_CHAIN_ID
@@ -467,12 +369,12 @@ l2:
           - args: [ *ZERO_BYTES32 ] # want to skip this for now as it's too complex to verify and not worth it, tbh
             result: false
 
-    # https://docs.chain.link/ccip/supported-networks/v1_2_0/testnet#ethereum-sepolia
+    # https://docs.chain.link/ccip/supported-networks/v1_2_0/mainnet
     ccipAdapter:
       name: "CCIPAdapter"
       address: *bnbCCIPAdapter
       checks:
-        BASE_GAS_LIMIT: 0
+        BASE_GAS_LIMIT: *ADAPTER_ZERO_BASE_GAS_LIMIT
         CCIP_ROUTER: "0x34B03Cb9086d7D758AC55af71584F81A598759FE"
         CROSS_CHAIN_CONTROLLER: *bnbCCC
         LINK_TOKEN: "0x404460C6A5EdE2D891e8297795264fDe62ADBB75"
@@ -498,7 +400,7 @@ l2:
       name: "HyperLaneAdapter"
       address: *bnbHLAdapter
       checks:
-        BASE_GAS_LIMIT: 0
+        BASE_GAS_LIMIT: *ADAPTER_ZERO_BASE_GAS_LIMIT
         HL_MAIL_BOX: "0x2971b9Aec44bE4eb673DF1B88cDB57b96eefe8a4"
         CROSS_CHAIN_CONTROLLER: *bnbCCC
         adapterName: "Hyperlane adapter"
@@ -512,12 +414,12 @@ l2:
           - args: [ *ETH_CHAIN_ID ]
             result: *ETH_CHAIN_ID
 
-    # https://docs.layerzero.network/v2/developers/evm/technical-reference/endpoints#sepolia-testnet
+    # https://docs.layerzero.network/v2/developers/evm/technical-reference/endpoints
     lzAdapter:
       name: "LayerZeroAdapter"
       address: *bnbLZAdapter
       checks:
-        BASE_GAS_LIMIT: 0
+        BASE_GAS_LIMIT: *ADAPTER_ZERO_BASE_GAS_LIMIT
         LZ_ENDPOINT: "0x1a44076050125825900e736c501f859c50fE728c"
         CROSS_CHAIN_CONTROLLER: *bnbCCC
         adapterName: "LayerZero adapter"
@@ -542,7 +444,7 @@ l2:
       name: "WormholeAdapter"
       address: *bnbWormholeAdapter
       checks:
-        BASE_GAS_LIMIT: 0
+        BASE_GAS_LIMIT: *ADAPTER_ZERO_BASE_GAS_LIMIT
         WORMHOLE_RELAYER: "0x27428DD2d3DD32A4D7f7C497eAaa23130d894911"
         REFUND_ADDRESS: *ZERO_ADDRESS # no refund address for BNB
         CROSS_CHAIN_CONTROLLER: *bnbCCC
