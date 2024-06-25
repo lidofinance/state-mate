@@ -20,8 +20,8 @@ misc:
   - &ZERO_BYTES32 "0x0000000000000000000000000000000000000000000000000000000000000000"
   # Chains
   - &ETH_CHAIN_ID 1
-  - &ETH_CCC_ENVELOPE_NONCE 0
-  - &ETH_CCC_TRANSACTION_NONCE 0
+  - &ETH_CCC_ENVELOPE_NONCE 1
+  - &ETH_CCC_TRANSACTION_NONCE 1
   - &BNB_CHAIN_ID 56
   - &BNB_CONFIRMATIONS 3
   # Adapters
@@ -51,7 +51,7 @@ deployed:
   - &bnbProxyAdmin "0x29E6817db339795766244B96aEf5Dc534a98518d"
   - &bnbCCC "0x40C4464fCa8caCd550C33B39d674fC257966022F"
   - &bnbCCCImp "0xB7Ba81dd07885ae7BFD18452B36D3404d7EDD8Ee"
-  - &bnbCCE "0x250227c30e3b26525f292f63756e5eB3C425427E"
+  - &bnbCCE "0x8E5175D17f74d1D512de59b2f5d5A5d8177A123d"
   - &bnbCCIPAdapter "0x15AD245133568c2498c7dA0cf2204A03b0e9b98A"
   - &bnbLZAdapter "0xc934433f4c433Cf80DE6fB65fd70C7a650D8a408"
   - &bnbHLAdapter "0xCd867B440c726461e5fAbe8d3a050b2f8701C230"
@@ -72,7 +72,7 @@ l1:
       name: "ProxyAdmin"
       address: *ethProxyAdmin
       checks:
-        owner: *ETH_DAO_AGENT_MOCK
+        owner: *ETH_DAO_AGENT
         getProxyAdmin:
           - args: [ *ethCCC ]
             result: *ethProxyAdmin
@@ -87,7 +87,7 @@ l1:
       implementation: *ethCCCImp
       proxyChecks: { }
       checks:
-        owner: *ETH_DAO_AGENT_MOCK
+        owner: *ETH_DAO_AGENT
         guardian: *ZERO_ADDRESS
         # CrossChainReceiver
         getReceiverBridgeAdaptersByChain:
@@ -144,12 +144,12 @@ l1:
             ]
         isSenderApproved:
           - args: [ *ETH_DAO_AGENT_MOCK ]
-            result: true
-          - args: [ *ETH_DAO_AGENT ]
             result: false
+          - args: [ *ETH_DAO_AGENT ]
+            result: true
           - args: [ *ZERO_ADDRESS ]
             result: false
-        whoCanRescue: *ETH_DAO_AGENT_MOCK
+        whoCanRescue: *ETH_DAO_AGENT
       implementationChecks:
         owner: *DEAD_ADDRESS
         guardian: *ZERO_ADDRESS
@@ -297,10 +297,16 @@ l2:
           - args: [ *ZERO_BYTES32 ]
             signature: "getTransactionState(bytes32)"
             result: { confirmations: 0, firstBridgedAt: 0 }
+          - args: [ "0x9a3408ef1a0ec12a5081af3a1ea3b669dd0b2caecf617ec81647c71a5ccced13" ]
+            signature: "getTransactionState(bytes32)"
+            result: { confirmations: 4, firstBridgedAt: 1719319210 }
         getEnvelopeState:
           - args: [ *ZERO_BYTES32 ]
             signature: "getEnvelopeState(bytes32)"
             result: 0
+          - args: [ "0x0c39ef7274a750de961d1ee0e2083ecccacef2c4c5bd3499317f3f2177e43470" ]
+            signature: "getEnvelopeState(bytes32)"
+            result: 2
         isTransactionReceivedByAdapter:
           - args: [ *ZERO_BYTES32, *ethCCIPAdapter ]
             result: false
@@ -342,7 +348,7 @@ l2:
       checks:
         getCrossChainController: *bnbCCC
         getEthereumGovernanceChainId: *ETH_CHAIN_ID
-        getEthereumGovernanceExecutor: *ETH_DAO_AGENT_MOCK
+        getEthereumGovernanceExecutor: *ETH_DAO_AGENT
         getDelay: *BNB_CCE_DELAY
         getGracePeriod: *BNB_CCE_GRACE_PERIOD
         getMinimumDelay: *BNB_CCE_MINIMUM_DELAY
