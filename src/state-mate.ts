@@ -2,8 +2,8 @@ import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 
 import "dotenv/config";
-import { expect } from "chai";
-import { BaseContract, Contract, getAddress, isAddress, JsonRpcProvider, Result } from "ethers";
+import { assert } from "chai";
+import { BaseContract, Contract, isAddress, JsonRpcProvider, Result } from "ethers";
 import * as YAML from "yaml";
 import chalk from "chalk";
 import { program } from "commander";
@@ -135,11 +135,13 @@ function loadAbi(contractName: string) {
 
 function loadStateFromYaml(stateFile: string) {
   const file = path.resolve(stateFile);
-  const configContent = readFileSync(file).toString();
+  const configContent = readFileSync(file, 'utf-8');
   const reviver = (_: unknown, v: unknown) => {
-    return typeof v === "number" ? BigInt(v) : v;
+    return typeof v === "bigint" ? String(v) : v;
   };
-  return YAML.parse(configContent, reviver);
+
+  const config = YAML.parse(configContent, reviver, { schema: "core", intAsBigInt: true });
+  return config;
 }
 
 // Supports bigint as object values
@@ -178,7 +180,7 @@ function log(arg: unknown) {
 }
 
 function logError(arg: unknown) {
-  console.error(arg);
+  console.error(`ERROR: ${arg}`);
 }
 
 function logErrorAndExit(arg: unknown) {
@@ -239,7 +241,7 @@ async function checkContractEntry(
   { address, name, checks, ozNonEnumerableAcl }: RegularContractEntry,
   provider: JsonRpcProvider,
 ) {
-  expect(isAddress(address), `${address} is invalid address`).to.be.true;
+  assert(isAddress(address), `${address} is invalid address`);
   const contract: BaseContract = await loadContract(name, address, provider);
   for (const [method, checkEntryValue] of Object.entries(checks)) {
     if (!needCheck(CheckLevel.method, method)) {
@@ -262,7 +264,7 @@ async function checkContractEntry(
         const isRoleOnHolder = await contract.getFunction("hasRole").staticCall(role, holder);
         const logHandle = new LogCommand(`.hasRole(${role}, ${holder})`);
         try {
-          expect(isRoleOnHolder).to.be.true;
+          assert(isRoleOnHolder);
           logHandle.success(`${isRoleOnHolder}`);
         } catch (error) {
           logHandle.failure(`REVERTED with: ${(error as Error).message}`);
@@ -273,7 +275,27 @@ async function checkContractEntry(
   }
 }
 
-function expectToEqualStruct(expected: null | ArbitraryObject, actual: Result) {
+function assertEqual(actual: unknown, expected: ViewResult, errorMessage?: string) {
+  if (typeof actual === "bigint") {
+    assert(typeof expected === "string" || typeof expected === "bigint");
+    assert.strictEqual(actual, BigInt(expected), errorMessage);
+  } else if (Array.isArray(expected)) {
+    assert.strictEqual((actual as unknown[]).length, expected.length,
+      `Array length differ: actual = '${actual}', expected = '${expected}'`);
+    if (!errorMessage) {
+      errorMessage = `Actual value '${actual} is not equal to expected array '[${expected}]`;
+    }
+    for (let i = 0; i < (actual as unknown[]).length; ++i) {
+      assertEqual((actual as unknown[])[i], expected[i], errorMessage);
+    }
+  } else if (typeof expected === "object") {
+    assertEqualStruct(expected, actual as Result);
+  } else {
+    assert.strictEqual(actual, expected, errorMessage);
+  }
+}
+
+function assertEqualStruct(expected: null | ArbitraryObject, actual: Result) {
   if (expected === null) {
     return;
   }
@@ -281,7 +303,7 @@ function expectToEqualStruct(expected: null | ArbitraryObject, actual: Result) {
   const actualAsObject = actual.toObject();
   const errorMessage = `expected ${stringify(actualAsObject)} to equal ${stringify(expected)}`;
 
-  expect(Object.keys(actualAsObject).length, errorMessage).to.equal(Object.keys(expected).length);
+  assert.strictEqual(Object.keys(actualAsObject).length, Object.keys(expected).length, errorMessage);
   for (const field in actualAsObject) {
     const expectedValue = expected[field];
     if (expectedValue === null) {
@@ -292,7 +314,7 @@ function expectToEqualStruct(expected: null | ArbitraryObject, actual: Result) {
     if (actualValue instanceof Result && (expectedValue as unknown) instanceof Array) {
       actualValue = actualValue.toArray();
     }
-    expect(actualValue, errorMessageDetailed).to.deep.equal(expectedValue);
+    assertEqual(actualValue, expectedValue, errorMessageDetailed);
   }
 }
 
@@ -307,7 +329,6 @@ async function checkViewFunction(contract: BaseContract, method: string, expecte
   let args: unknown[] = [];
   let mustRevert: boolean = false;
   let signature: string = method;
-  let bigint: boolean = false;
 
   if (typeof expectedOrObject === "object" && "args" in expectedOrObject && "result" in expectedOrObject) {
     ({
@@ -315,7 +336,6 @@ async function checkViewFunction(contract: BaseContract, method: string, expecte
       result: expected,
       mustRevert = false,
       signature = method,
-      bigint = false,
     } = expectedOrObject as ArgsResult);
   } else {
     expected = expectedOrObject as ViewResult;
@@ -326,21 +346,9 @@ async function checkViewFunction(contract: BaseContract, method: string, expecte
 
   try {
     const actual = await contract.getFunction(signature).staticCall(...args);
-    if (typeof expected === "string") {
-      if (isAddress(expected)) {
-        expect(getAddress(actual)).to.equal(getAddress(expected));
-      } else if (bigint) {
-        expect(actual).to.equal(BigInt(expected));
-      } else {
-        expect(actual).to.equal(expected);
-      }
-    } else if (Array.isArray(expected)) {
-      expect(actual).to.deep.equal(expected);
-    } else if (typeof expected === "object") {
-      expectToEqualStruct(expected, actual);
-    } else {
-      expect(actual).to.equal(expected);
-    }
+
+    assertEqual(actual, expected);
+
     logHandle.success(stringify(actual));
   } catch (error) {
     const errorMessage = `REVERTED with: ${(error as Error).message}`;
@@ -365,7 +373,7 @@ async function checkNetworkSection(section: NetworkSection, sectionTitle: string
 
   const rpcUrl = isUrl(section.rpcUrl) ? section.rpcUrl : process.env[section.rpcUrl];
   if (!(rpcUrl && isUrl(rpcUrl))) {
-    logErrorAndExit(`ERROR: Invalid RPC URL ${rpcUrl} is specified via env variable ${section.rpcUrl}`);
+    logErrorAndExit(`Invalid RPC URL ${rpcUrl} is specified via env variable ${section.rpcUrl}`);
   }
 
   const provider = new JsonRpcProvider(rpcUrl);
