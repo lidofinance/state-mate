@@ -6,6 +6,7 @@ import { expect } from "chai";
 import { BaseContract, Contract, getAddress, isAddress, JsonRpcProvider, Result } from "ethers";
 import * as YAML from "yaml";
 import chalk from "chalk";
+import { program } from "commander";
 
 const SUCCESS_MARK = chalk.green("✔");
 const FAILURE_MARK = chalk.red("✘");
@@ -421,22 +422,20 @@ async function checkNetworkSection(section: NetworkSection, sectionTitle: string
   }
 }
 
-function parseCommandLineArgs(argv: string[]) {
-  if (argv.length < 3) {
-    logErrorAndExit(`ERROR: Invalid number of arguments. Expected: <path-to-state-config-yaml> [<section/contractName>].
-The "abi" directory is expected to be located nearby.`);
-  }
-  const firstArg = argv[2];
-  if (["--help", "-h"].includes(firstArg)) {
-    log(`TODO`);
-    process.exit(0);
-  }
-  const configPath = argv[2];
+function parseCommandLineArgs() {
+  program
+    .argument("<config-path>", "path to .yaml state config file")
+    .allowExcessArguments(false)
+    .option("-o, --only <check-path>", "only checks to do, e.g. 'l2/proxyAdmin/checks/owner', 'l1', 'l1/controller'")
+    .parse();
+
+  const configPath = program.args[0];
+  const options = program.opts();
   let checkOnly: typeof g_checkOnly = null;
-  const checkOnlyArg = argv[3];
-  if (checkOnlyArg) {
-    const checksPath = argv[3].split("/");
-    if (checksPath.length < 1) {
+
+  if (options.only) {
+    const checksPath = options.only.split("/");
+    if (checksPath.length < 1 || checksPath.length > 4) {
       logErrorAndExit(`Invalid checkOnly argument format, must be <section>/[<contractName>]/[<checks|proxyChecks|implementationChecks>]/<method>`);
     }
     checkOnly = {
@@ -446,16 +445,17 @@ The "abi" directory is expected to be located nearby.`);
       method: checksPath[3],
     };
   }
+
   return {
     configPath,
     abiDirPath: path.join(path.dirname(configPath), "abi"),
     checkOnly,
-    checkOnlyArg,
+    checkOnlyCmdArg: options.only,
   };
 }
 
 export async function main() {
-  const { configPath, abiDirPath, checkOnly, checkOnlyArg } = parseCommandLineArgs(process.argv);
+  const { configPath, abiDirPath, checkOnly, checkOnlyCmdArg } = parseCommandLineArgs();
   g_abiDirectory = abiDirPath;
   g_checkOnly = checkOnly;
 
@@ -472,7 +472,7 @@ export async function main() {
   }
 
   if (g_checkOnly) {
-    log(`\n${WARNING_MARK}${WARNING_MARK}${WARNING_MARK} Checks run only for "${checkOnlyArg}"\n`);
+    log(`\n${WARNING_MARK}${WARNING_MARK}${WARNING_MARK} Checks run only for "${chalk.bold(chalk.blue(checkOnlyCmdArg))}"\n`);
   }
 }
 
