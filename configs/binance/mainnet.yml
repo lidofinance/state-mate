@@ -16,7 +16,7 @@ parameters:
 
 misc:
   - &ZERO_ADDRESS "0x0000000000000000000000000000000000000000"
-  - &DEAD_ADDRESS "0x000000000000000000000000000000000000dead"
+  - &DEAD_ADDRESS "0x000000000000000000000000000000000000dEaD"
   - &ZERO_BYTES32 "0x0000000000000000000000000000000000000000000000000000000000000000"
   # Chains
   - &ETH_CHAIN_ID 1
@@ -172,7 +172,6 @@ l1:
         infraToNativeChainId:
           - args: [ *BNB_CHAIN_ID ]
             result: *CCIP_BNB_CHAIN_ID
-            bigint: true
         nativeToInfraChainId:
           - args: [ *CCIP_BNB_CHAIN_ID ]
             result: *BNB_CHAIN_ID
@@ -391,7 +390,6 @@ l2:
         infraToNativeChainId:
           - args: [ *ETH_CHAIN_ID ]
             result: *CCIP_ETH_CHAIN_ID
-            bigint: true
         nativeToInfraChainId:
           - args: [ *CCIP_ETH_CHAIN_ID ]
             result: *ETH_CHAIN_ID
