@@ -1,5 +1,8 @@
-import { existsSync, readFileSync } from "node:fs";
+// import { existsSync, readFileSync, writeFileSync, copyFileSync } from "node:fs";
+import fs from "node:fs";
 import path from "node:path";
+import https from 'https';
+import http from 'http';
 
 import "dotenv/config";
 import { assert } from "chai";
@@ -11,6 +14,8 @@ import { program } from "commander";
 const SUCCESS_MARK = chalk.green("✔");
 const FAILURE_MARK = chalk.red("✘");
 const WARNING_MARK = chalk.yellow("⚠");
+const REPLACE_ME_PLACEHOLDER = "REPLACEME";
+const YML = "yml";
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore: Unreachable code error
@@ -27,6 +32,10 @@ enum Ef {
   implementationChecks = "implementationChecks",
   ozNonEnumerableAcl = "ozNonEnumerableAcl",
   result = "result",
+  contracts = "contracts",
+  explorerHostname = "explorerHostname",
+  explorerTokenEnv = "explorerTokenEnv",
+  rpcUrl = "rpcUrl",
 }
 
 enum CheckLevel {
@@ -86,13 +95,38 @@ type Abi = [
     name: string;
     type: string;
     stateMutability: string;
+    inputs: unknown[];
   },
 ];
 
+type CheckOnlyOptionType = null | { section: string, contract: string | null, checksType: string | null, method: string | null };
+
+type ContractInfoFromExplorer = {
+  contractName: string,
+  abi: Abi,
+  address: string,
+  implementation: null | {
+    contractName: string,
+    abi: Abi,
+    address: string,
+  }
+};
+
+type YamlDoc = ReturnType<typeof YAML.parseDocument> | YAML.Document;
+
+type DeployedAddressInfo = {
+  deployedNode: YAML.Scalar,
+  sectionName: string,
+  address: string,
+  rpcUrl: string,
+  explorerHostname: string,
+  explorerKey?: string,
+};
+
+
 // ==== GLOBAL VARIABLES ====
-let g_abiDirectory: string;
+let g_Args: ReturnType<typeof parseCmdLineArgs>;
 let g_errors = 0;
-let g_checkOnly: null | { section: string, contract: string | null, checksType: string | null, method: string | null } = null;
 // ==========================
 
 class LogCommand {
@@ -124,18 +158,47 @@ class LogCommand {
   }
 }
 
-function loadAbi(contractName: string) {
-  let path = `${g_abiDirectory}/${contractName}.json`;
-  if (!existsSync(path)) {
-    path = `${g_abiDirectory}/${contractName}.sol/${contractName}.json`;
+function getAbiFileName(contractName: string, address?: string) {
+  return address ? `${contractName}-${address}.json` : `${contractName}.json`;
+}
+
+function loadAbiFromFile(contractName?: string, address?: string) {
+  let abiPath = "";
+  if (contractName && address && g_Args.generate) {
+    abiPath = path.join(g_Args.abiDirPath, getAbiFileName(contractName, address));
   }
-  const abi = JSON.parse(readFileSync(path).toString());
+  else if (contractName) {
+      abiPath = path.join(g_Args.abiDirPath, `${contractName}.json`);
+      if (!fs.existsSync(abiPath)) {
+        abiPath = `${g_Args.abiDirPath}/${contractName}.sol/${contractName}.json`;
+      }
+      if (!fs.existsSync(abiPath)) {
+        abiPath = path.join(g_Args.abiDirPath, getAbiFileName(contractName, address));
+      }
+  } else {
+    assert(address);
+    const abiDirContent = fs.readdirSync(g_Args.abiDirPath);
+    let abiFileName = "";
+    for (const fileName of abiDirContent) {
+      if (fileName.split("-")[1] === `${address}.json`) {
+        abiFileName = fileName;
+        break;
+      }
+    }
+    if (!abiFileName) {
+      logErrorAndExit(`Cannot find ABI file for address ${address} in ${g_Args.abiDirPath}`);
+    }
+    abiPath = path.join(g_Args.abiDirPath, abiFileName);
+  }
+  const abiFileContent = fs.readFileSync(abiPath, "utf-8");
+  assert(abiFileContent);
+  const abi = JSON.parse(abiFileContent);
   return abi.abi ?? abi;
 }
 
 function loadStateFromYaml(stateFile: string) {
   const file = path.resolve(stateFile);
-  const configContent = readFileSync(file, 'utf-8');
+  const configContent = fs.readFileSync(file, 'utf-8');
   const reviver = (_: unknown, v: unknown) => {
     return typeof v === "bigint" ? String(v) : v;
   };
@@ -154,7 +217,7 @@ function stringify(value: unknown) {
 }
 
 async function loadContract(contractName: string, address: string, provider: JsonRpcProvider) {
-  const abi = loadAbi(contractName);
+  const abi = loadAbiFromFile(contractName, address);
   return new Contract(address, abi, provider);
 }
 
@@ -168,10 +231,10 @@ function isUrl(maybeUrl: string) {
 }
 
 function needCheck(level: CheckLevel, name: string) {
-  if (g_checkOnly === null) {
+  if (g_Args.checkOnly === null) {
     return true;
   }
-  const checkOnTheLevel = g_checkOnly[level];
+  const checkOnTheLevel = g_Args.checkOnly[level];
   return checkOnTheLevel === null || checkOnTheLevel === undefined || name === checkOnTheLevel;
 }
 
@@ -203,12 +266,30 @@ function logMethodSkipped(methodName: string) {
   log(`${WARNING_MARK} .${methodName}: ${chalk.yellow("skipped")}`);
 }
 
-function getNonMutableFunctionNames(abi: Abi) {
-  const result = [];
+async function sleep(timeoutMs: number) {
+  await new Promise(resolve => setTimeout(resolve, timeoutMs));
+}
+
+function getNonMutables(abi: Abi) {
+  const result: { name: string, numArgs: number }[] = [];
   for (const e of abi) {
     if (e.type == "function" && !["payable", "nonpayable"].includes(e.stateMutability)) {
-      result.push(e.name);
+      result.push({ name: e.name, numArgs: e.inputs.length});
     }
+  }
+  return result;
+}
+
+async function makeBoilerplateForAllNonMutableFunctions(abi: Abi, contract: Contract) {
+  const nonMutables = getNonMutables(abi);
+  const result: { [key: string]: YAML.Scalar } = {};
+  for (const methodInfo of nonMutables) {
+    const value = new YAML.Scalar(REPLACE_ME_PLACEHOLDER);
+    const view = contract.getFunction(methodInfo.name);
+    value.comment = methodInfo.numArgs > 0
+      ? ` need to specify args`
+      : ` ${await view.staticCall()}`;
+    result[methodInfo.name] = value;
   }
   return result;
 }
@@ -219,9 +300,9 @@ function reportNonCoveredNonMutableChecks(
   contractName: string,
   checks: string[],
 ) {
-  const abi = loadAbi(contractName);
-  const nonMutableFromAbi = getNonMutableFunctionNames(abi);
-  const nonCovered = nonMutableFromAbi.filter((x) => !checks.includes(x));
+  const abi = loadAbiFromFile(contractName);
+  const nonMutableFromAbi = getNonMutables(abi);
+  const nonCovered = nonMutableFromAbi.filter((x) => !checks.includes(x.name));
   if (nonCovered.length) {
     logError(
       `Section ${contractAlias} ${checksType} does not cover these non-mutable function from ABI: ${chalk.red(nonCovered.join(", "))}`,
@@ -242,7 +323,7 @@ async function checkContractEntry(
   provider: JsonRpcProvider,
 ) {
   assert(isAddress(address), `${address} is invalid address`);
-  const contract: BaseContract = await loadContract(name, address, provider);
+  const contract = await loadContract(name, address, provider);
   for (const [method, checkEntryValue] of Object.entries(checks)) {
     if (!needCheck(CheckLevel.method, method)) {
       continue;
@@ -361,17 +442,31 @@ async function checkViewFunction(contract: BaseContract, method: string, expecte
   }
 }
 
-async function checkNetworkSection(section: NetworkSection, sectionTitle: string) {
-  if (g_checkOnly && g_checkOnly.section !== sectionTitle) {
+function readUrlOrFromEnv(urlOrEnvVarName: string) {
+  if (isUrl(urlOrEnvVarName)) {
+    return urlOrEnvVarName;
+  } else {
+    const valueFromEnv = process.env[urlOrEnvVarName] || "";
+    if (!isUrl(valueFromEnv)) {
+      logErrorAndExit(`Value "${valueFromEnv}" from env var "${urlOrEnvVarName}" is not a valid RPC url`);
+    }
+    return valueFromEnv;
+  }
+}
+
+async function checkNetworkSection(state: { [key: string]: unknown }, sectionTitle: string) {
+  if (g_Args.checkOnly && g_Args.checkOnly.section !== sectionTitle) {
     return;
   }
+
+  const section = state[sectionTitle] as NetworkSection;
 
   if (!section) {
     log(`Network section ${sectionTitle} is empty, skipped`);
     return;
   }
 
-  const rpcUrl = isUrl(section.rpcUrl) ? section.rpcUrl : process.env[section.rpcUrl];
+  const rpcUrl = readUrlOrFromEnv(section.rpcUrl);
   if (!(rpcUrl && isUrl(rpcUrl))) {
     logErrorAndExit(`Invalid RPC URL ${rpcUrl} is specified via env variable ${section.rpcUrl}`);
   }
@@ -415,9 +510,9 @@ async function checkNetworkSection(section: NetworkSection, sectionTitle: string
     if (Ef.implementationChecks in entry && needCheck(CheckLevel.checksType, Ef.implementationChecks)) {
       logHeader2(Ef.implementationChecks);
       // For implementation by default skip all checks
-      const allNonMutable = getNonMutableFunctionNames(loadAbi(entry.name));
+      const allNonMutable = getNonMutables(loadAbiFromFile(entry.name));
       const skippedChecks: Checks = {};
-      allNonMutable.reduce((acc, x)=> (acc[x] = null, acc), skippedChecks);
+      allNonMutable.reduce((acc, x)=> (acc[x.name] = null, acc), skippedChecks);
       await checkContractEntry(
         {
           checks: { ...skippedChecks, ...entry[Ef.implementationChecks] },
@@ -430,17 +525,196 @@ async function checkNetworkSection(section: NetworkSection, sectionTitle: string
   }
 }
 
-function parseCommandLineArgs() {
+function httpGetAsync(url: string) {
+  return new Promise((resolve, reject) => {
+    https.get(url, (response: http.IncomingMessage) => {
+      let data = '';
+
+      // A chunk of data has been received.
+      response.on('data', (chunk) => {
+        data += chunk;
+      });
+
+      // The whole response has been received.
+      response.on('end', () => {
+
+        if (response.statusCode && response.statusCode >= 200 && response.statusCode < 300) {
+          resolve(data);
+        } else {
+          reject(new Error(`HTTP status code ${response.statusCode}`));
+        }
+      });
+    }).on('error', (err) => {
+      reject(err);
+    });
+  });
+}
+
+async function loadContractInfoFromExplorer(address: string, explorerHostname: string, explorerKey?: string): Promise<ContractInfoFromExplorer> {
+  let sourcesUrl = `https://${explorerHostname}/api?module=contract&action=getsourcecode&address=${address}`;
+  if (explorerKey) {
+    sourcesUrl = `${sourcesUrl}&apikey=${explorerKey}`;
+  }
+  let sourcesResponse = JSON.parse(await httpGetAsync(sourcesUrl) as string);
+  if (sourcesResponse.message.indexOf("rate limit") > -1) {
+    log(`Reached rate limit ${explorerHostname}, waiting for 5 seconds...`);
+    await sleep(5000);
+    sourcesResponse = JSON.parse(await httpGetAsync(sourcesUrl) as string);
+  }
+  if (sourcesResponse.message != "OK") {
+    // TODO: error, but check ContractName instead
+    logErrorAndExit(`Failed to download from ${explorerHostname}: ${sourcesResponse.message}\n${JSON.stringify(sourcesResponse, null, 2)}`);
+  }
+  const contractInfo = sourcesResponse.result[0]
+  const contractName = contractInfo["ContractName"];
+  const abi = JSON.parse(contractInfo["ABI"]) as Abi;
+  let implementation = null;
+  const implementationAddress = contractInfo["Implementation"];
+  if (implementationAddress) {
+    implementation = await loadContractInfoFromExplorer(implementationAddress, explorerHostname, explorerKey);
+  }
+
+  return { contractName, abi, address, implementation };
+}
+
+async function iterateDeployedAddresses(doc: YamlDoc, callback: (ctx: DeployedAddressInfo) => void) {
+  const deployedSection = doc.get("deployed") as YAML.YAMLMap;
+  const deployedSectionEntries = deployedSection.items as YAML.Pair<YAML.Scalar, YAML.YAMLMap>[];
+  for (const deployedSectionNode of deployedSectionEntries) {
+    const sectionName = deployedSectionNode.key.value as string;
+
+    const explorerTokenEnv = doc.getIn([`${sectionName}`, Ef.explorerTokenEnv]) as string;
+    const explorerHostname = doc.getIn([`${sectionName}`, Ef.explorerHostname]) as string;
+    const rpcUrl = readUrlOrFromEnv(doc.getIn([`${sectionName}`, Ef.rpcUrl]) as string);
+    const explorerKey = process.env[explorerTokenEnv];
+    for (const deployedNode of (deployedSectionNode.value as YAML.YAMLMap).items) {
+      const address = deployedNode.value as string;
+
+      await callback({
+        deployedNode: deployedNode as unknown as YAML.Scalar,
+        sectionName,
+        address,
+        explorerHostname,
+        explorerKey,
+        rpcUrl,
+      });
+    }
+  }
+}
+
+async function downloadAndSaveAbis(configPath: string) {
+  const doc = YAML.parseDocument(fs.readFileSync(configPath, "utf-8"));
+  const abiDirPath = path.join(path.dirname(configPath), "abi");
+  if (!fs.existsSync(abiDirPath)) {
+    fs.mkdirSync(abiDirPath);
+  }
+
+  function writeAbi(contractName: string, address: string, abi: Abi) {
+    const abiPath = path.join(abiDirPath, getAbiFileName(contractName, address));
+    if (fs.existsSync(abiPath)) {
+      log(`ABI already exists: ${abiPath}`);
+    } else {
+      fs.writeFileSync(abiPath, JSON.stringify(abi, null, 2));
+      log(`Saved ABI to ${abiPath}`);
+    }
+  }
+
+  await iterateDeployedAddresses(doc, async (ctx: DeployedAddressInfo) => {
+    const address = ctx.deployedNode.value as string;
+    const { abi, contractName, implementation } = await loadContractInfoFromExplorer(address, ctx.explorerHostname, ctx.explorerKey);
+    if (implementation) {
+      writeAbi(contractName, address, abi);
+      writeAbi(implementation.contractName, address, implementation.abi);
+      writeAbi(implementation.contractName, implementation.address, implementation.abi);
+    } else {
+      writeAbi(contractName, address, abi);
+    }
+  });
+}
+
+async function generateBoilerplate(seedConfigPath: string) {
+  const seedDoc = YAML.parseDocument(fs.readFileSync(seedConfigPath, "utf-8"));
+
+  const doc = new YAML.Document(seedDoc);
+
+  await iterateDeployedAddresses(doc, async (ctx: DeployedAddressInfo) => {
+    const address = ctx.deployedNode.value as string;
+    const { contractName, implementation } = await loadContractInfoFromExplorer(address, ctx.explorerHostname, ctx.explorerKey);
+
+    const provider = new JsonRpcProvider(ctx.rpcUrl);
+    let contractEntryIfProxy = null;
+    let contractEntryIfRegular = null;
+    if (implementation) {
+      const proxyAbi = loadAbiFromFile(contractName, address);
+      const implementationAbi = loadAbiFromFile(implementation.contractName, implementation.address);
+      const proxyContract = await loadContract(contractName, address, provider);
+      const contract = await loadContract(implementation.contractName, address, provider);
+      const implementationContract = await loadContract(implementation.contractName, implementation.address, provider);
+      contractEntryIfProxy = {
+        [Ef.name]: implementation.contractName,
+        [Ef.address]: doc.createAlias(ctx.deployedNode),
+        proxyName: contractName,
+        implementation: implementation.address,
+        [Ef.proxyChecks]: await makeBoilerplateForAllNonMutableFunctions(proxyAbi, proxyContract),
+        [Ef.checks]: await makeBoilerplateForAllNonMutableFunctions(implementationAbi, contract),
+        [Ef.implementationChecks]: await makeBoilerplateForAllNonMutableFunctions(implementationAbi, implementationContract),
+      };
+    } else {
+      const abi = loadAbiFromFile(contractName, address);
+      const contract = await loadContract(contractName, address, provider);
+      contractEntryIfRegular = {
+        name: contractName,
+        address: doc.createAlias(ctx.deployedNode),
+        checks: await makeBoilerplateForAllNonMutableFunctions(abi, contract),
+      };
+    }
+
+    const sectionNode = doc.get(ctx.sectionName) as YAML.YAMLMap;
+    const contractEntry = implementation ? contractEntryIfProxy : contractEntryIfRegular;
+    sectionNode.addIn([Ef.contracts], {
+      [ctx.deployedNode.anchor as string]: contractEntry,
+    });
+  });
+
+  const generatedFilePath = path.join(path.dirname(seedConfigPath),
+    `${path.basename(seedConfigPath, "."+YML)}.generated.${YML}`);
+  fs.writeFileSync(generatedFilePath, doc.toString());
+  log(`Generated state config: ${chalk.bold(generatedFilePath)}`);
+}
+
+async function doChecks(configPath: string) {
+  const state = loadStateFromYaml(configPath);
+
+  logHeader1(`Used state config: ${chalk.magenta(configPath)}`);
+
+  for (const key of Object.keys(state)) {
+    const section = state[key];
+    if (section && section[Ef.rpcUrl] && section[Ef.contracts]) {
+      await checkNetworkSection(state, key);
+    }
+  }
+
+  if (g_errors) {
+    logErrorAndExit(`\n${FAILURE_MARK} ${chalk.bold(`${g_errors} errors found!`)}`);
+  }
+
+  if (g_Args.checkOnly) {
+    log(`\n${WARNING_MARK}${WARNING_MARK}${WARNING_MARK} Checks run only for "${chalk.bold(chalk.blue(g_Args.checkOnlyCmdArg))}"\n`);
+  }
+}
+
+function parseCmdLineArgs() {
   program
     .argument("<config-path>", "path to .yaml state config file")
     .allowExcessArguments(false)
-    .option("-o, --only <check-path>", "only checks to do, e.g. 'l2/proxyAdmin/checks/owner', 'l1', 'l1/controller'")
+    .option("-o, --only <check-path>", `only checks to do, e.g. 'l2/proxyAdmin/${Ef.checks}/owner', 'l1', 'l1/controller'`)
+    .option("--generate", "NB: currently, boilerplate generation only works with downloading ABIs from explorer")
+    .option("--save-abi-from-explorer", "for addresses in 'deployed' section download ABIs to abi directory")
     .parse();
 
   const configPath = program.args[0];
   const options = program.opts();
-  let checkOnly: typeof g_checkOnly = null;
-
+  let checkOnly: CheckOnlyOptionType = null;
   if (options.only) {
     const checksPath = options.only.split("/");
     if (checksPath.length < 1 || checksPath.length > 4) {
@@ -459,28 +733,20 @@ function parseCommandLineArgs() {
     abiDirPath: path.join(path.dirname(configPath), "abi"),
     checkOnly,
     checkOnlyCmdArg: options.only,
+    generate: options.generate,
+    saveAbiFromExplorer: options.saveAbiFromExplorer,
   };
 }
 
 export async function main() {
-  const { configPath, abiDirPath, checkOnly, checkOnlyCmdArg } = parseCommandLineArgs();
-  g_abiDirectory = abiDirPath;
-  g_checkOnly = checkOnly;
-
-  const state = loadStateFromYaml(configPath);
-
-  logHeader1(`Used state config: ${chalk.magenta(configPath)}`);
-
-  await checkNetworkSection(state.l1, "l1");
-
-  await checkNetworkSection(state.l2, "l2");
-
-  if (g_errors) {
-    logErrorAndExit(`\n${FAILURE_MARK} ${chalk.bold(`${g_errors} errors found!`)}`);
+  g_Args = parseCmdLineArgs();
+  if (g_Args.saveAbiFromExplorer) {
+    await downloadAndSaveAbis(g_Args.configPath);
   }
-
-  if (g_checkOnly) {
-    log(`\n${WARNING_MARK}${WARNING_MARK}${WARNING_MARK} Checks run only for "${chalk.bold(chalk.blue(checkOnlyCmdArg))}"\n`);
+  if (g_Args.generate) {
+    await generateBoilerplate(g_Args.configPath);
+  } else {
+    await doChecks(g_Args.configPath);
   }
 }
 
