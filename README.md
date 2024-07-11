@@ -79,10 +79,10 @@ l1:
 
 All requried ABIs must be located in the same directory as the config and placed under `abi` folder. See [configs](/configs/).
 
-## Contributing
+## Contributing 🔧
 
 Any contributions to this project are welcome. Please fork the repository and submit pull requests with detailed descriptions of your changes. Or you can submit an issue, bug report or feature request.
 
-## License
+## License 📃
 
 This project is licensed under the MIT License. See the [LICENSE](/LICENSE) file for details.
