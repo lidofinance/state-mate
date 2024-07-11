@@ -80,6 +80,8 @@ l1:
         # list of view functions and expected results
         getMyParameter: *MY_PARAMETER
         getFoo: *FOO
+      ozAcl:
+        *DEFAULT_ADMIN_ROLE : [*adminMultisig]
 ```
 
 ### ABIs
