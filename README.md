@@ -65,6 +65,7 @@ misc:
 deployed:
   # Contract addresses
   - &myContract "0x0000000000000000000000000000000000000001"
+  - &adminMultisig "0x0000000000000000000000000000000000000002"
 
 roles:
   # ACL checks
