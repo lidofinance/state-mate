@@ -1,16 +1,16 @@
-# state-mate
-
 <div>
     <img alt="state-mate" src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2Flidofinance%2Fstate-mate%2Fmain%2Fpackage.json&query=%24.version&label=state-mate&labelColor=white&color=green"/>
     <img alt="Node.js" src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2Flidofinance%2Fstate-mate%2Fmain%2Fpackage.json&query=%24.engines.node&style=flat&label=node.js&labelColor=rgb(62%2C%20109%2C%2026)&color=white"/>
     <img alt="GitHub license" src="https://img.shields.io/github/license/lidofinance/state-mate?labelColor=orange&color=white"/>
 </div>
 
+# state-mate
+
 state-mate is a simple automation tool that validates the protocol state against an input configuration. Run state-mate to verify deploy parameters, current state, access control and more.
 
 state-mate accepts a yaml file that includes contract addresses, view functions and their expected results. It calls each function and compares the output to the expected result.
 
-## Features ✨
+## ✨ Features
 
 - state verification,
 - supports any EVM network,
@@ -18,7 +18,7 @@ state-mate accepts a yaml file that includes contract addresses, view functions 
 - CI-friendly,
 - uses yaml config (env variables, variables, comments).
 
-## Getting started ⚡
+## ⚡ Getting started
 
 ### Requirements
 
@@ -85,10 +85,10 @@ l1:
 
 All requried ABIs must be located in the same directory as the config and placed under `abi` folder. See [configs](/configs/).
 
-## Contributing 🔧
+## 🔧 Contributing
 
 Any contributions to this project are welcome. Please fork the repository and submit pull requests with detailed descriptions of your changes. Or you can submit an issue, bug report or feature request.
 
-## License 📃
+## 📃 License
 
 This project is licensed under the MIT License. See the [LICENSE](/LICENSE) file for details.
