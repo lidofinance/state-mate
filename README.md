@@ -1,5 +1,11 @@
 # state-mate
 
+<div>
+    <img alt="state-mate" src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2Flidofinance%2Fstate-mate%2Fmain%2Fpackage.json&query=%24.version&label=state-mate&labelColor=white&color=green"/>
+    <img alt="Node.js" src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2Flidofinance%2Fstate-mate%2Fmain%2Fpackage.json&query=%24.engines.node&style=flat&label=node.js&labelColor=rgb(62%2C%20109%2C%2026)&color=white"/>
+    <img alt="GitHub license" src="https://img.shields.io/github/license/lidofinance/state-mate?labelColor=orange&color=white"/>
+</div>
+
 state-mate is a simple automation tool that validates the protocol state against an input configuration. Run state-mate to verify deploy parameters, current state, access control and more.
 
 state-mate accepts a yaml file that includes contract addresses, view functions and their expected results. It calls each function and compares the output to the expected result.
@@ -18,7 +24,7 @@ state-mate accepts a yaml file that includes contract addresses, view functions 
 
 - git
 - Node.js >=20,
-- yarn
+- yarn 1.x
 
 ### Usage
 
