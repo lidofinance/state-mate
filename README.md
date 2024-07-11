@@ -12,7 +12,8 @@ state-mate accepts a yaml file that includes contract addresses, view functions 
 
 ## ✨ Features
 
-- state verification,
+- state (non-mutable functions result) verification,
+- automatically validates that all functions covered,
 - supports any EVM network,
 - easily configurable checks,
 - CI-friendly,
