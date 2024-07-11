@@ -77,6 +77,9 @@ l1:
     myContract:
       name: "myContract"
       address: *myContract
+      implementation: "%implementation address%"
+      proxyChecks:
+        proxy__getAdmin: *adminMultisig
       checks:
         # list of view functions and expected results
         getMyParameter: *MY_PARAMETER
