@@ -6,6 +6,10 @@
 
 # state-mate
 
+<div>
+    <img alt="state-mate banner" src="assets/banner.jpeg" width=300 />
+</div>
+
 state-mate is a simple automation tool that validates the protocol state against an input configuration. Run state-mate to verify deploy parameters, current state, access control and more.
 
 state-mate accepts a yaml file that includes contract addresses, view functions and their expected results. It calls each function and compares the output to the expected result.
@@ -24,7 +28,7 @@ state-mate accepts a yaml file that includes contract addresses, view functions 
 
 - git
 - Node.js >=20,
-- yarn 1.x
+- yarn
 
 ### Usage
 
