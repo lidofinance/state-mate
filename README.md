@@ -10,13 +10,14 @@
     <img alt="state-mate banner" src="assets/banner.jpeg" width=300 />
 </div>
 
-state-mate is a simple automation tool that validates the protocol state against an input configuration. Run state-mate to verify deploy parameters, current state, access control and more.
+state-mate is a simple tool that validates contracts' states against a concise YAML-based description. Run state-mate to verify deploy outcome, current state, access control and more.
 
 state-mate accepts a yaml file that includes contract addresses, view functions and their expected results. It calls each function and compares the output to the expected result.
 
 ## ✨ Features
 
-- state verification,
+- state (non-mutable functions result) verification,
+- automatically validates that all functions covered,
 - supports any EVM network,
 - easily configurable checks,
 - CI-friendly,
@@ -68,6 +69,7 @@ misc:
 deployed:
   # Contract addresses
   - &myContract "0x0000000000000000000000000000000000000001"
+  - &adminMultisig "0x0000000000000000000000000000000000000002"
 
 roles:
   # ACL checks
@@ -79,10 +81,15 @@ l1:
     myContract:
       name: "myContract"
       address: *myContract
+      implementation: "%implementation address%"
+      proxyChecks:
+        proxy__getAdmin: *adminMultisig
       checks:
         # list of view functions and expected results
         getMyParameter: *MY_PARAMETER
         getFoo: *FOO
+      ozAcl:
+        *DEFAULT_ADMIN_ROLE : [*adminMultisig]
 ```
 
 ### ABIs
