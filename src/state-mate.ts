@@ -5,7 +5,7 @@ import https from 'https';
 import http from 'http';
 
 import "dotenv/config";
-import { assert } from "chai";
+import { assert, AssertionError } from "chai";
 import { BaseContract, Contract, isAddress, JsonRpcProvider, Result } from "ethers";
 import * as YAML from "yaml";
 import chalk from "chalk";
@@ -164,17 +164,17 @@ function getAbiFileName(contractName: string, address?: string) {
 
 function loadAbiFromFile(contractName?: string, address?: string) {
   let abiPath = "";
-  if (contractName && address && g_Args.generate) {
+  if (contractName) {
     abiPath = path.join(g_Args.abiDirPath, getAbiFileName(contractName, address));
-  }
-  else if (contractName) {
+    if (!fs.existsSync(abiPath)) {
       abiPath = path.join(g_Args.abiDirPath, `${contractName}.json`);
-      if (!fs.existsSync(abiPath)) {
-        abiPath = `${g_Args.abiDirPath}/${contractName}.sol/${contractName}.json`;
-      }
-      if (!fs.existsSync(abiPath)) {
-        abiPath = path.join(g_Args.abiDirPath, getAbiFileName(contractName, address));
-      }
+    }
+    if (!fs.existsSync(abiPath)) {
+      abiPath = `${g_Args.abiDirPath}/${contractName}.sol/${contractName}.json`;
+    }
+    if (!fs.existsSync(abiPath)) {
+      abiPath = path.join(g_Args.abiDirPath, getAbiFileName(contractName, address));
+    }
   } else {
     assert(address);
     const abiDirContent = fs.readdirSync(g_Args.abiDirPath);
@@ -244,6 +244,7 @@ function log(arg: unknown) {
 
 function logError(arg: unknown) {
   console.error(`ERROR: ${arg}`);
+  console.trace();
 }
 
 function logErrorAndExit(arg: unknown) {
@@ -298,9 +299,10 @@ function reportNonCoveredNonMutableChecks(
   contractAlias: string,
   checksType: string,
   contractName: string,
+  address: string,
   checks: string[],
 ) {
-  const abi = loadAbiFromFile(contractName);
+  const abi = loadAbiFromFile(contractName, address);
   const nonMutableFromAbi = getNonMutables(abi);
   const nonCovered = nonMutableFromAbi.filter((x) => !checks.includes(x.name));
   if (nonCovered.length) {
@@ -319,7 +321,7 @@ function parseAsArgsResultsArray(entry: ChecksEntryValue): [ArgsResult] | null {
 }
 
 async function checkContractEntry(
-  { address, name, checks, ozNonEnumerableAcl }: RegularContractEntry,
+  { address, name, checks }: RegularContractEntry,
   provider: JsonRpcProvider,
 ) {
   assert(isAddress(address), `${address} is invalid address`);
@@ -337,32 +339,23 @@ async function checkContractEntry(
       }
     }
   }
+}
 
-  if (ozNonEnumerableAcl) {
-    logHeader2("Non-enumerable OZ Acl checks");
-    for (const role in ozNonEnumerableAcl) {
-      for (const holder of ozNonEnumerableAcl[role]) {
-        const isRoleOnHolder = await contract.getFunction("hasRole").staticCall(role, holder);
-        const logHandle = new LogCommand(`.hasRole(${role}, ${holder})`);
-        try {
-          assert(isRoleOnHolder);
-          logHandle.success(`${isRoleOnHolder}`);
-        } catch (error) {
-          logHandle.failure(`REVERTED with: ${(error as Error).message}`);
-          g_errors++;
-        }
-      }
+function equalOrThrow(actual: unknown, expected: unknown, errorMessage?: string) {
+  if (actual !== expected) {
+    if (!errorMessage) {
+      errorMessage = `Expected "${stringify(expected)}" to equal actual "${stringify(actual)}"`;
     }
+    throw new AssertionError(errorMessage);
   }
 }
 
 function assertEqual(actual: unknown, expected: ViewResult, errorMessage?: string) {
   if (typeof actual === "bigint") {
     assert(typeof expected === "string" || typeof expected === "bigint");
-    assert.strictEqual(actual, BigInt(expected), errorMessage);
+    equalOrThrow(actual, BigInt(expected), errorMessage);
   } else if (Array.isArray(expected)) {
-    assert.strictEqual((actual as unknown[]).length, expected.length,
-      `Array length differ: actual = '${actual}', expected = '${expected}'`);
+    equalOrThrow((actual as unknown[]).length, expected.length, `Array length differ: actual = '${actual}', expected = '${expected}'`);
     if (!errorMessage) {
       errorMessage = `Actual value '${actual} is not equal to expected array '[${expected}]`;
     }
@@ -372,7 +365,7 @@ function assertEqual(actual: unknown, expected: ViewResult, errorMessage?: strin
   } else if (typeof expected === "object") {
     assertEqualStruct(expected, actual as Result);
   } else {
-    assert.strictEqual(actual, expected, errorMessage);
+    equalOrThrow(actual, expected, errorMessage);
   }
 }
 
@@ -384,7 +377,7 @@ function assertEqualStruct(expected: null | ArbitraryObject, actual: Result) {
   const actualAsObject = actual.toObject();
   const errorMessage = `expected ${stringify(actualAsObject)} to equal ${stringify(expected)}`;
 
-  assert.strictEqual(Object.keys(actualAsObject).length, Object.keys(expected).length, errorMessage);
+  equalOrThrow(Object.keys(actualAsObject).length, Object.keys(expected).length, errorMessage);
   for (const field in actualAsObject) {
     const expectedValue = expected[field];
     if (expectedValue === null) {
@@ -427,9 +420,7 @@ async function checkViewFunction(contract: BaseContract, method: string, expecte
 
   try {
     const actual = await contract.getFunction(signature).staticCall(...args);
-
     assertEqual(actual, expected);
-
     logHandle.success(stringify(actual));
   } catch (error) {
     const errorMessage = `REVERTED with: ${(error as Error).message}`;
@@ -482,7 +473,7 @@ async function checkNetworkSection(state: { [key: string]: unknown }, sectionTit
     if (Ef.checks in entry && needCheck(CheckLevel.checksType, Ef.checks)) {
       logHeader2(Ef.checks);
 
-      reportNonCoveredNonMutableChecks(contractAlias, Ef.checks, entry.name, Object.keys(entry[Ef.checks]));
+      reportNonCoveredNonMutableChecks(contractAlias, Ef.checks, entry.name, entry.address, Object.keys(entry[Ef.checks]));
 
       await checkContractEntry(
         {
@@ -496,7 +487,7 @@ async function checkNetworkSection(state: { [key: string]: unknown }, sectionTit
 
     if (Ef.proxyChecks in entry && needCheck(CheckLevel.checksType, Ef.proxyChecks)) {
       logHeader2(Ef.proxyChecks);
-      reportNonCoveredNonMutableChecks(contractAlias, Ef.proxyChecks, entry.proxyName, Object.keys(entry.proxyChecks));
+      reportNonCoveredNonMutableChecks(contractAlias, Ef.proxyChecks, entry.proxyName, entry.address, Object.keys(entry.proxyChecks));
       await checkContractEntry(
         {
           checks: entry[Ef.proxyChecks],
@@ -507,10 +498,54 @@ async function checkNetworkSection(state: { [key: string]: unknown }, sectionTit
       );
     }
 
+    if (Ef.ozNonEnumerableAcl in entry) {
+      const contract = await loadContract(entry.name, entry.address, provider);
+      logHeader2("Non-enumerable OZ Acl checks");
+      log(`${WARNING_MARK}: Non-enumerable OZ Acl means it is impossible to check absence of an arbitrary role holder `
+        + `only by means of calling view function. Current version of state-mate does what it can at most: for all the `
+        + `role holders specified checks they do not hold roles they are not described to have among all the roles mentioned.`
+      );
+
+      const rolesByHolders = new Map<string, Set<string>>();
+      for (const role in entry.ozNonEnumerableAcl) {
+        for (const holder of entry.ozNonEnumerableAcl[role]) {
+          if (!rolesByHolders.has(holder)) {
+            rolesByHolders.set(holder, new Set<string>());
+          }
+          rolesByHolders.get(holder)?.add(role);
+          const isRoleOnHolder = await contract.getFunction("hasRole").staticCall(role, holder);
+          const logHandle = new LogCommand(`.hasRole(${role}, ${holder})`);
+          try {
+            assert.isTrue(isRoleOnHolder);
+            logHandle.success(`${isRoleOnHolder}`);
+          } catch (error) {
+            logHandle.failure(`REVERTED with: ${(error as Error).message}`);
+            g_errors++;
+          }
+        }
+      }
+
+      for (const [holder, rolesExpectedOnTheHolder] of rolesByHolders) {
+        for (const role in entry.ozNonEnumerableAcl) {
+          if (!rolesExpectedOnTheHolder.has(role)) {
+            const isRoleOnHolder = await contract.getFunction("hasRole").staticCall(role, holder);
+            const logHandle = new LogCommand(`.hasRole(${role}, ${holder})`);
+            try {
+              assert.isFalse(isRoleOnHolder);
+              logHandle.success(`${isRoleOnHolder}`);
+            } catch (error) {
+              logHandle.failure(`REVERTED with: ${(error as Error).message}`);
+              g_errors++;
+            }
+          }
+        }
+      }
+    }
+
     if (Ef.implementationChecks in entry && needCheck(CheckLevel.checksType, Ef.implementationChecks)) {
       logHeader2(Ef.implementationChecks);
       // For implementation by default skip all checks
-      const allNonMutable = getNonMutables(loadAbiFromFile(entry.name));
+      const allNonMutable = getNonMutables(loadAbiFromFile(entry.name, entry.implementation));
       const skippedChecks: Checks = {};
       allNonMutable.reduce((acc, x)=> (acc[x.name] = null, acc), skippedChecks);
       await checkContractEntry(
@@ -550,7 +585,26 @@ function httpGetAsync(url: string) {
   });
 }
 
-async function loadContractInfoFromExplorer(address: string, explorerHostname: string, explorerKey?: string): Promise<ContractInfoFromExplorer> {
+async function _loadContractInfoFromModeExplorer(address: string, explorerHostname: string, explorerKey?: string): Promise<ContractInfoFromExplorer> {
+  let sourcesUrl = `https://${explorerHostname}/api?module=contract&action=getsourcecode&address=${address}`;
+  if (explorerKey) {
+    sourcesUrl = `${sourcesUrl}&apikey=${explorerKey}`;
+  }
+  const sourcesResponse = JSON.parse(await httpGetAsync(sourcesUrl) as string);
+  const contractInfo = sourcesResponse.result[0];
+  const contractName = contractInfo["ContractName"];
+  const abi = JSON.parse(contractInfo["ABI"]) as Abi;
+  let implementation = null;
+  if (contractInfo["IsProxy"] === "true") {
+    const implementationAddress = contractInfo["ImplementationAddress"];
+    assert(implementationAddress);
+    implementation = await _loadContractInfoFromModeExplorer(implementationAddress, explorerHostname, explorerKey);
+  }
+  return { contractName, abi, address, implementation };
+}
+
+async function _loadContractInfoFromEtherscanExplorer(address: string, explorerHostname: string, explorerKey?: string): Promise<ContractInfoFromExplorer> {
+
   let sourcesUrl = `https://${explorerHostname}/api?module=contract&action=getsourcecode&address=${address}`;
   if (explorerKey) {
     sourcesUrl = `${sourcesUrl}&apikey=${explorerKey}`;
@@ -563,18 +617,25 @@ async function loadContractInfoFromExplorer(address: string, explorerHostname: s
   }
   if (sourcesResponse.message != "OK") {
     // TODO: error, but check ContractName instead
-    logErrorAndExit(`Failed to download from ${explorerHostname}: ${sourcesResponse.message}\n${JSON.stringify(sourcesResponse, null, 2)}`);
+    logErrorAndExit(`Failed to download contract info from ${explorerHostname}: ${sourcesResponse.message}\n${JSON.stringify(sourcesResponse, null, 2)}`);
   }
-  const contractInfo = sourcesResponse.result[0]
-  const contractName = contractInfo["ContractName"];
+  const contractInfo = sourcesResponse.result[0];
   const abi = JSON.parse(contractInfo["ABI"]) as Abi;
   let implementation = null;
   const implementationAddress = contractInfo["Implementation"];
   if (implementationAddress) {
-    implementation = await loadContractInfoFromExplorer(implementationAddress, explorerHostname, explorerKey);
+    implementation = await _loadContractInfoFromEtherscanExplorer(implementationAddress, explorerHostname, explorerKey);
   }
 
-  return { contractName, abi, address, implementation };
+  return { contractName: contractInfo["ContractName"], abi, address, implementation };
+}
+
+async function loadContractInfoFromExplorer(address: string, explorerHostname: string, explorerKey?: string): Promise<ContractInfoFromExplorer> {
+  if (explorerHostname.indexOf("mode.network") > -1) {
+    return _loadContractInfoFromModeExplorer(address, explorerHostname, explorerKey);
+  } else {
+    return _loadContractInfoFromEtherscanExplorer(address, explorerHostname, explorerKey);
+  }
 }
 
 async function iterateDeployedAddresses(doc: YamlDoc, callback: (ctx: DeployedAddressInfo) => void) {
@@ -671,9 +732,7 @@ async function generateBoilerplate(seedConfigPath: string) {
 
     const sectionNode = doc.get(ctx.sectionName) as YAML.YAMLMap;
     const contractEntry = implementation ? contractEntryIfProxy : contractEntryIfRegular;
-    sectionNode.addIn([Ef.contracts], {
-      [ctx.deployedNode.anchor as string]: contractEntry,
-    });
+    sectionNode.addIn([Ef.contracts], new YAML.Pair(ctx.deployedNode.anchor, contractEntry));
   });
 
   const generatedFilePath = path.join(path.dirname(seedConfigPath),
@@ -695,7 +754,8 @@ async function doChecks(configPath: string) {
   }
 
   if (g_errors) {
-    logErrorAndExit(`\n${FAILURE_MARK} ${chalk.bold(`${g_errors} errors found!`)}`);
+    log(`\n${FAILURE_MARK} ${chalk.bold(`${g_errors} errors found!`)}`);
+    process.exit(2);
   }
 
   if (g_Args.checkOnly) {
