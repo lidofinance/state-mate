@@ -10,6 +10,7 @@ import { BaseContract, Contract, isAddress, JsonRpcProvider, Result } from "ethe
 import * as YAML from "yaml";
 import chalk from "chalk";
 import { program } from "commander";
+import { confirm as askUserToConfirm } from '@inquirer/prompts';
 
 const SUCCESS_MARK = chalk.green("✔");
 const FAILURE_MARK = chalk.red("✘");
@@ -806,6 +807,11 @@ export async function main() {
   if (g_Args.generate) {
     await generateBoilerplate(g_Args.configPath);
   } else {
+    if (!fs.existsSync(g_Args.abiDirPath)) {
+      if (await askUserToConfirm({ message: `No ABI found at ${g_Args.abiDirPath}. Download?` })) {
+        await downloadAndSaveAbis(g_Args.configPath);
+      }
+    }
     await doChecks(g_Args.configPath);
   }
 }
