@@ -1,6 +1,7 @@
 # npm, typescript
 node_modules
 dist
+.yarn
 
 # Hardhat files
 cache
