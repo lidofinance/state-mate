@@ -204,8 +204,7 @@ function loadStateFromYaml(stateFile: string) {
     return typeof v === "bigint" ? String(v) : v;
   };
 
-  const config = YAML.parse(configContent, reviver, { schema: "core", intAsBigInt: true });
-  return config;
+  return YAML.parse(configContent, reviver, { schema: "core", intAsBigInt: true });
 }
 
 // Supports bigint as object values
@@ -561,7 +560,7 @@ async function checkNetworkSection(state: { [key: string]: unknown }, sectionTit
   }
 }
 
-function httpGetAsync(url: string) {
+function httpGetAsync(url: string): Promise<string> {
   return new Promise((resolve, reject) => {
     https.get(url, (response: http.IncomingMessage) => {
       let data = '';
@@ -586,12 +585,17 @@ function httpGetAsync(url: string) {
   });
 }
 
-async function _loadContractInfoFromModeExplorer(address: string, explorerHostname: string, explorerKey?: string): Promise<ContractInfoFromExplorer> {
-  let sourcesUrl = `https://${explorerHostname}/api?module=contract&action=getsourcecode&address=${address}`;
+function getExplorerApiUrl(explorerHostname: string, address: string, explorerKey?: string) {
+  let url = `https://${explorerHostname}/api?module=contract&action=getsourcecode&address=${address}`;
   if (explorerKey) {
-    sourcesUrl = `${sourcesUrl}&apikey=${explorerKey}`;
+    url = `${url}&apikey=${explorerKey}`;
   }
-  const sourcesResponse = JSON.parse(await httpGetAsync(sourcesUrl) as string);
+  return url;
+}
+
+async function _loadContractInfoFromModeExplorer(address: string, explorerHostname: string, explorerKey?: string): Promise<ContractInfoFromExplorer> {
+  const sourcesUrl = getExplorerApiUrl(explorerHostname, address, explorerKey);
+  const sourcesResponse = JSON.parse(await httpGetAsync(sourcesUrl));
   const contractInfo = sourcesResponse.result[0];
   const contractName = contractInfo["ContractName"];
   const abi = JSON.parse(contractInfo["ABI"]) as Abi;
@@ -605,12 +609,8 @@ async function _loadContractInfoFromModeExplorer(address: string, explorerHostna
 }
 
 async function _loadContractInfoFromEtherscanExplorer(address: string, explorerHostname: string, explorerKey?: string): Promise<ContractInfoFromExplorer> {
-
-  let sourcesUrl = `https://${explorerHostname}/api?module=contract&action=getsourcecode&address=${address}`;
-  if (explorerKey) {
-    sourcesUrl = `${sourcesUrl}&apikey=${explorerKey}`;
-  }
-  let sourcesResponse = JSON.parse(await httpGetAsync(sourcesUrl) as string);
+  const sourcesUrl = getExplorerApiUrl(explorerHostname, address, explorerKey);
+  let sourcesResponse = JSON.parse(await httpGetAsync(sourcesUrl));
   if (sourcesResponse.message.indexOf("rate limit") > -1) {
     log(`Reached rate limit ${explorerHostname}, waiting for 5 seconds...`);
     await sleep(5000);
@@ -694,9 +694,8 @@ async function downloadAndSaveAbis(configPath: string) {
   });
 }
 
-async function generateBoilerplate(seedConfigPath: string) {
+async function doGenerateBoilerplate(seedConfigPath: string) {
   const seedDoc = YAML.parseDocument(fs.readFileSync(seedConfigPath, "utf-8"));
-
   const doc = new YAML.Document(seedDoc);
 
   await iterateDeployedAddresses(doc, async (ctx: DeployedAddressInfo) => {
@@ -744,6 +743,12 @@ async function generateBoilerplate(seedConfigPath: string) {
 
 async function doChecks(configPath: string) {
   const state = loadStateFromYaml(configPath);
+
+  if (!fs.existsSync(g_Args.abiDirPath)) {
+    if (await askUserToConfirm({ message: `No ABI directory found at ${g_Args.abiDirPath}. Download?` })) {
+      await downloadAndSaveAbis(g_Args.configPath);
+    }
+  }
 
   logHeader1(`Used state config: ${chalk.magenta(configPath)}`);
 
@@ -801,17 +806,14 @@ function parseCmdLineArgs() {
 
 export async function main() {
   g_Args = parseCmdLineArgs();
+
   if (g_Args.saveAbiFromExplorer) {
     await downloadAndSaveAbis(g_Args.configPath);
   }
+
   if (g_Args.generate) {
-    await generateBoilerplate(g_Args.configPath);
+    await doGenerateBoilerplate(g_Args.configPath);
   } else {
-    if (!fs.existsSync(g_Args.abiDirPath)) {
-      if (await askUserToConfirm({ message: `No ABI found at ${g_Args.abiDirPath}. Download?` })) {
-        await downloadAndSaveAbis(g_Args.configPath);
-      }
-    }
     await doChecks(g_Args.configPath);
   }
 }
