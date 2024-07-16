@@ -6,7 +6,7 @@ parameters:
 
 misc:
   - &ZERO_ADDRESS "0x0000000000000000000000000000000000000000"
-  - &DEAD_ADDRESS "0x000000000000000000000000000000000000dead"
+  - &DEAD_ADDRESS "0x000000000000000000000000000000000000dEaD"
   - &ZERO_BYTES32 "0x0000000000000000000000000000000000000000000000000000000000000000"
   # Chains
   - &SEP_CHAIN_ID 11155111
@@ -59,6 +59,8 @@ roles:
 
 l1:
   rpcUrl: https://ethereum-sepolia.publicnode.com # L1_RPC_URL # https://eth.drpc.org # L1_RPC_URL # https://ethereum.publicnode.com # url or env var
+  explorerHostname: api-sepolia.etherscan.io
+  explorerTokenEnv: ETHERSCAN_API_KEY
   contracts:
     proxyAdmin:
       name: "ProxyAdmin"
@@ -201,7 +203,7 @@ l1:
     # https://docs.chain.link/ccip/supported-networks/v1_2_0/testnet#ethereum-sepolia
     # @dev # BNB_TESTNET for CCIP = 13264668187771770619
     ccipAdapter:
-      name: "CCIPAdapter"
+      name: "CCIPAdapterTestnet"
       address: *sepCCIPAdapter
       checks:
         BASE_GAS_LIMIT: 0
@@ -246,7 +248,7 @@ l1:
 
     # https://docs.layerzero.network/v2/developers/evm/technical-reference/endpoints#sepolia-testnet
     lzAdapter:
-      name: "LayerZeroAdapter"
+      name: "LayerZeroAdapterTestnet"
       address: *sepLZAdapter
       checks:
         BASE_GAS_LIMIT: 0
@@ -271,7 +273,7 @@ l1:
 
     # https://docs.wormhole.com/wormhole/reference/constants#standard-relayer
     wormholeAdapter:
-      name: "WormholeAdapter"
+      name: "WormholeAdapterTestnet"
       address: *sepWormholeAdapter
       checks:
         BASE_GAS_LIMIT: 0
@@ -291,6 +293,8 @@ l1:
 
 l2:
   rpcUrl: https://data-seed-prebsc-1-s1.binance.org:8545 # L2_RPC_URL # https://bsc-dataseed.binance.org # L2_RPC_URL # url or env var
+  explorerHostname: api-testnet.bscscan.com
+  explorerTokenEnv: BSCSCAN_API_KEY
   contracts:
     proxyAdmin:
       name: "ProxyAdmin"
@@ -317,7 +321,7 @@ l2:
         getReceiverBridgeAdaptersByChain:
           - args: [*SEP_CHAIN_ID]
             result: [*bnbtCCIPAdapter, *bnbtLZAdapter, *bnbtHLAdapter, *bnbtWormholeAdapter]
-        getSupportedChains: []
+        getSupportedChains: [*SEP_CHAIN_ID]
         getConfigurationByChain:
           - args: [*SEP_CHAIN_ID]
             result: { requiredConfirmation: *BNB_TEST_CONFIRMATIONS, validityTimestamp: 0 }
@@ -428,9 +432,6 @@ l2:
     crossChainExecutor:
       name: "CrossChainExecutor"
       address: *bnbtCCE
-      proxyName: TransparentUpgradeableProxy
-      implementation: *bnbtCCE
-      proxyChecks: {}
       checks:
         getCrossChainController: *bnbtCCC
         getEthereumGovernanceChainId: *SEP_CHAIN_ID
@@ -508,7 +509,7 @@ l2:
 
     # https://docs.chain.link/ccip/supported-networks/v1_2_0/testnet#ethereum-sepolia
     ccipAdapter:
-      name: "CCIPAdapter"
+      name: "CCIPAdapterTestnet"
       address: *bnbtCCIPAdapter
       checks:
         BASE_GAS_LIMIT: 0
@@ -553,7 +554,7 @@ l2:
 
     # https://docs.layerzero.network/v2/developers/evm/technical-reference/endpoints#sepolia-testnet
     lzAdapter:
-      name: "LayerZeroAdapter"
+      name: "LayerZeroAdapterTestnet"
       address: *bnbtLZAdapter
       checks:
         BASE_GAS_LIMIT: 0
@@ -578,7 +579,7 @@ l2:
 
     # https://docs.wormhole.com/wormhole/reference/constants#standard-relayer
     wormholeAdapter:
-      name: "WormholeAdapter"
+      name: "WormholeAdapterTestnet"
       address: *bnbtWormholeAdapter
       checks:
         BASE_GAS_LIMIT: 0
