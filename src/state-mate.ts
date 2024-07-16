@@ -240,8 +240,15 @@ function log(arg: unknown) {
   console.log(arg);
 }
 
+function logReplaceLine(arg: unknown) {
+  process.stdout.clearLine(0);
+  process.stdout.cursorTo(0);
+  process.stdout.write(`${arg}`);
+}
+
 function logError(arg: unknown) {
   console.error(`ERROR: ${arg}`);
+  console.error();
   console.trace();
 }
 
@@ -279,17 +286,20 @@ function getNonMutables(abi: Abi) {
   return result;
 }
 
-async function makeBoilerplateForAllNonMutableFunctions(abi: Abi, contract: Contract) {
+async function makeBoilerplateForAllNonMutableFunctions(abi: Abi, contract: Contract, contractName: string) {
   const nonMutables = getNonMutables(abi);
   const result: { [key: string]: YAML.Scalar } = {};
+  log(`Fetching contract ${contractName}'s non-mutable function values...`);
   for (const methodInfo of nonMutables) {
     const value = new YAML.Scalar(REPLACE_ME_PLACEHOLDER);
     const view = contract.getFunction(methodInfo.name);
+    logReplaceLine(`${methodInfo.name}...`);
     value.comment = methodInfo.numArgs > 0
       ? ` need to specify args`
       : ` ${await view.staticCall()}`;
     result[methodInfo.name] = value;
   }
+  logReplaceLine("Done.\n");
   return result;
 }
 
@@ -576,6 +586,7 @@ function getExplorerApiUrl(explorerHostname: string, address: string, explorerKe
 
 async function _loadContractInfoFromModeExplorer(address: string, explorerHostname: string, explorerKey?: string): Promise<ContractInfoFromExplorer> {
   const sourcesUrl = getExplorerApiUrl(explorerHostname, address, explorerKey);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const sourcesResponse = await httpGetAsync(sourcesUrl) as any; // TODO: add proper type
   const contractInfo = sourcesResponse.result[0];
   const contractName = contractInfo["ContractName"];
@@ -591,10 +602,12 @@ async function _loadContractInfoFromModeExplorer(address: string, explorerHostna
 
 async function _loadContractInfoFromEtherscanExplorer(address: string, explorerHostname: string, explorerKey?: string): Promise<ContractInfoFromExplorer> {
   const sourcesUrl = getExplorerApiUrl(explorerHostname, address, explorerKey);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let sourcesResponse = await httpGetAsync(sourcesUrl) as any; // TODO: add proper type
   if (sourcesResponse.message.indexOf("rate limit") > -1) {
     log(`Reached rate limit ${explorerHostname}, waiting for 5 seconds...`);
     await sleep(5000);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     sourcesResponse = await httpGetAsync(sourcesUrl) as any; // TODO: add proper type
   }
   if (sourcesResponse.message != "OK") {
@@ -616,8 +629,17 @@ async function loadContractInfoFromExplorer(address: string, explorerHostname: s
   if (explorerHostname.indexOf("mode.network") > -1) {
     return _loadContractInfoFromModeExplorer(address, explorerHostname, explorerKey);
   } else {
+    // At least same for: api.etherscan.io, api.bscscan.com
     return _loadContractInfoFromEtherscanExplorer(address, explorerHostname, explorerKey);
   }
+}
+
+function getOrExit<T>(doc: YamlDoc, path: string[]) {
+  const value = doc.getIn(path);
+  if (value === undefined) {
+    logErrorAndExit(`Config format invalid: cannot get value at "${path.join('/')}"`);
+  }
+  return value as T;
 }
 
 async function iterateDeployedAddresses(doc: YamlDoc, callback: (ctx: DeployedAddressInfo) => Promise<void>) {
@@ -626,10 +648,11 @@ async function iterateDeployedAddresses(doc: YamlDoc, callback: (ctx: DeployedAd
   for (const deployedSectionNode of deployedSectionEntries) {
     const sectionName = deployedSectionNode.key.value as string;
 
-    const explorerTokenEnv = doc.getIn([`${sectionName}`, Ef.explorerTokenEnv]) as string;
-    const explorerHostname = doc.getIn([`${sectionName}`, Ef.explorerHostname]) as string;
-    const rpcUrl = readUrlOrFromEnv(doc.getIn([`${sectionName}`, Ef.rpcUrl]) as string);
-    const explorerKey = process.env[explorerTokenEnv];
+    const explorerHostname = getOrExit<string>(doc, [`${sectionName}`, Ef.explorerHostname]);
+    const explorerKeyEnv = doc.getIn([`${sectionName}`, Ef.explorerTokenEnv]);
+    const explorerKey = process.env[explorerKeyEnv];
+    const rpcUrl = readUrlOrFromEnv(getOrExit<string>(doc, [`${sectionName}`, Ef.rpcUrl]));
+
     for (const deployedNode of (deployedSectionNode.value as YAML.YAMLMap).items) {
       const address = deployedNode.value as string;
 
@@ -648,9 +671,10 @@ async function iterateDeployedAddresses(doc: YamlDoc, callback: (ctx: DeployedAd
 async function downloadAndSaveAbis(configPath: string) {
   const doc = YAML.parseDocument(fs.readFileSync(configPath, "utf-8"));
   const abiDirPath = path.join(path.dirname(configPath), "abi");
-  if (!fs.existsSync(abiDirPath)) {
-    fs.mkdirSync(abiDirPath);
+  if (fs.existsSync(abiDirPath)) {
+    logErrorAndExit(`ABI directory "${abiDirPath}" already exists: delete before a run with saving ABIs`);
   }
+  fs.mkdirSync(abiDirPath);
 
   function writeAbi(contractName: string, address: string, abi: Abi) {
     const abiPath = path.join(abiDirPath, getAbiFileName(contractName, address));
@@ -697,9 +721,9 @@ async function doGenerateBoilerplate(seedConfigPath: string) {
         [Ef.address]: doc.createAlias(ctx.deployedNode),
         proxyName: contractName,
         implementation: implementation.address,
-        [Ef.proxyChecks]: await makeBoilerplateForAllNonMutableFunctions(proxyAbi, proxyContract),
-        [Ef.checks]: await makeBoilerplateForAllNonMutableFunctions(implementationAbi, contract),
-        [Ef.implementationChecks]: await makeBoilerplateForAllNonMutableFunctions(implementationAbi, implementationContract),
+        [Ef.proxyChecks]: await makeBoilerplateForAllNonMutableFunctions(proxyAbi, proxyContract, contractName),
+        [Ef.checks]: await makeBoilerplateForAllNonMutableFunctions(implementationAbi, contract, contractName),
+        [Ef.implementationChecks]: await makeBoilerplateForAllNonMutableFunctions(implementationAbi, implementationContract, contractName),
       };
     } else {
       const abi = loadAbiFromFile(contractName, address);
@@ -707,7 +731,7 @@ async function doGenerateBoilerplate(seedConfigPath: string) {
       contractEntryIfRegular = {
         name: contractName,
         address: doc.createAlias(ctx.deployedNode),
-        checks: await makeBoilerplateForAllNonMutableFunctions(abi, contract),
+        checks: await makeBoilerplateForAllNonMutableFunctions(abi, contract, contractName),
       };
     }
 
