@@ -604,7 +604,7 @@ async function _loadContractInfoFromEtherscanExplorer(address: string, explorerH
   const sourcesUrl = getExplorerApiUrl(explorerHostname, address, explorerKey);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let sourcesResponse = await httpGetAsync(sourcesUrl) as any; // TODO: add proper type
-  if (sourcesResponse.message.indexOf("rate limit") > -1) {
+  if (sourcesResponse.result.indexOf("rate limit") > -1) {
     log(`Reached rate limit ${explorerHostname}, waiting for 5 seconds...`);
     await sleep(5000);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
