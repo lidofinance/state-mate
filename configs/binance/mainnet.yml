@@ -68,7 +68,9 @@ roles:
   # No roles check
 
 l1:
-  rpcUrl: L1_MAINNET_RPC_URL # http://localhost:8545 # L1_RPC_URL # https://eth.drpc.org # L1_RPC_URL # https://ethereum.publicnode.com # url or env var
+  rpcUrl: https://eth.drpc.org # http://localhost:8545 # L1_RPC_URL # https://eth.drpc.org # L1_RPC_URL # https://ethereum.publicnode.com # url or env var
+  explorerHostname: api.etherscan.io
+  explorerTokenEnv: ETHERSCAN_API_KEY
   contracts:
 
     proxyAdmin:
@@ -250,6 +252,9 @@ l1:
 
 l2:
   rpcUrl: https://bsc-dataseed.binance.org # http://localhost:8546 # L2_RPC_URL # https://bsc-dataseed.binance.org # L2_RPC_URL # url or env var
+  explorerHostname: api.bscscan.com
+  explorerTokenEnv: BSCSCAN_API_KEY
+
   contracts:
 
     proxyAdmin:
