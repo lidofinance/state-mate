@@ -1,8 +1,6 @@
 // import { existsSync, readFileSync, writeFileSync, copyFileSync } from "node:fs";
 import fs from "node:fs";
 import path from "node:path";
-import https from 'https';
-import http from 'http';
 
 import "dotenv/config";
 import { assert, AssertionError } from "chai";
@@ -560,29 +558,12 @@ async function checkNetworkSection(state: { [key: string]: unknown }, sectionTit
   }
 }
 
-function httpGetAsync(url: string): Promise<string> {
-  return new Promise((resolve, reject) => {
-    https.get(url, (response: http.IncomingMessage) => {
-      let data = '';
-
-      // A chunk of data has been received.
-      response.on('data', (chunk) => {
-        data += chunk;
-      });
-
-      // The whole response has been received.
-      response.on('end', () => {
-
-        if (response.statusCode && response.statusCode >= 200 && response.statusCode < 300) {
-          resolve(data);
-        } else {
-          reject(new Error(`HTTP status code ${response.statusCode}`));
-        }
-      });
-    }).on('error', (err) => {
-      reject(err);
-    });
-  });
+async function httpGetAsync<T>(url: string): Promise<T> {
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error(`HTTP status code ${response.status}`);
+  }
+  return await response.json() as T;
 }
 
 function getExplorerApiUrl(explorerHostname: string, address: string, explorerKey?: string) {
@@ -595,7 +576,7 @@ function getExplorerApiUrl(explorerHostname: string, address: string, explorerKe
 
 async function _loadContractInfoFromModeExplorer(address: string, explorerHostname: string, explorerKey?: string): Promise<ContractInfoFromExplorer> {
   const sourcesUrl = getExplorerApiUrl(explorerHostname, address, explorerKey);
-  const sourcesResponse = JSON.parse(await httpGetAsync(sourcesUrl));
+  const sourcesResponse = await httpGetAsync(sourcesUrl) as any; // TODO: add proper type
   const contractInfo = sourcesResponse.result[0];
   const contractName = contractInfo["ContractName"];
   const abi = JSON.parse(contractInfo["ABI"]) as Abi;
@@ -610,11 +591,11 @@ async function _loadContractInfoFromModeExplorer(address: string, explorerHostna
 
 async function _loadContractInfoFromEtherscanExplorer(address: string, explorerHostname: string, explorerKey?: string): Promise<ContractInfoFromExplorer> {
   const sourcesUrl = getExplorerApiUrl(explorerHostname, address, explorerKey);
-  let sourcesResponse = JSON.parse(await httpGetAsync(sourcesUrl));
+  let sourcesResponse = await httpGetAsync(sourcesUrl) as any; // TODO: add proper type
   if (sourcesResponse.message.indexOf("rate limit") > -1) {
     log(`Reached rate limit ${explorerHostname}, waiting for 5 seconds...`);
     await sleep(5000);
-    sourcesResponse = JSON.parse(await httpGetAsync(sourcesUrl) as string);
+    sourcesResponse = await httpGetAsync(sourcesUrl) as any; // TODO: add proper type
   }
   if (sourcesResponse.message != "OK") {
     // TODO: error, but check ContractName instead
@@ -639,7 +620,7 @@ async function loadContractInfoFromExplorer(address: string, explorerHostname: s
   }
 }
 
-async function iterateDeployedAddresses(doc: YamlDoc, callback: (ctx: DeployedAddressInfo) => void) {
+async function iterateDeployedAddresses(doc: YamlDoc, callback: (ctx: DeployedAddressInfo) => Promise<void>) {
   const deployedSection = doc.get("deployed") as YAML.YAMLMap;
   const deployedSectionEntries = deployedSection.items as YAML.Pair<YAML.Scalar, YAML.YAMLMap>[];
   for (const deployedSectionNode of deployedSectionEntries) {
