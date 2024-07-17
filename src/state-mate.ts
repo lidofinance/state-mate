@@ -8,7 +8,7 @@ import { BaseContract, Contract, isAddress, JsonRpcProvider, Result } from "ethe
 import * as YAML from "yaml";
 import chalk from "chalk";
 import { program } from "commander";
-import { confirm as askUserToConfirm } from '@inquirer/prompts';
+import { confirm as askUserToConfirm } from "@inquirer/prompts";
 
 const SUCCESS_MARK = chalk.green("✔");
 const FAILURE_MARK = chalk.red("✘");
@@ -18,9 +18,11 @@ const YML = "yml";
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore: Unreachable code error
-BigInt.prototype.toJSON = function (): number {
+BigInt.prototype.toJSON = function(): number {
   return Number(this);
 };
+
+const RATE_LIMIT_TIMEOUT = 6 * 1000; // 5 seconds is not enough for BscScan free tier
 
 // Contract entry fields
 enum Ef {
@@ -197,7 +199,7 @@ function loadAbiFromFile(contractName?: string, address?: string) {
 
 function loadStateFromYaml(stateFile: string) {
   const file = path.resolve(stateFile);
-  const configContent = fs.readFileSync(file, 'utf-8');
+  const configContent = fs.readFileSync(file, "utf-8");
   const reviver = (_: unknown, v: unknown) => {
     return typeof v === "bigint" ? String(v) : v;
   };
@@ -280,7 +282,7 @@ function getNonMutables(abi: Abi) {
   const result: { name: string, numArgs: number }[] = [];
   for (const e of abi) {
     if (e.type == "function" && !["payable", "nonpayable"].includes(e.stateMutability)) {
-      result.push({ name: e.name, numArgs: e.inputs.length});
+      result.push({ name: e.name, numArgs: e.inputs.length });
     }
   }
   return result;
@@ -323,7 +325,7 @@ function reportNonCoveredNonMutableChecks(
 
 function parseAsArgsResultsArray(entry: ChecksEntryValue): [ArgsResult] | null {
   if (entry instanceof Array && entry.length > 0 && entry[0].args instanceof Array && Ef.result in entry[0]) {
-    return entry
+    return entry;
   }
   return null;
 }
@@ -338,7 +340,7 @@ async function checkContractEntry(
     if (!needCheck(CheckLevel.method, method)) {
       continue;
     }
-    const argsResultsArray = parseAsArgsResultsArray(checkEntryValue)
+    const argsResultsArray = parseAsArgsResultsArray(checkEntryValue);
     if (argsResultsArray === null) {
       await checkViewFunction(contract, method, checkEntryValue as unknown as ArgsResult);
     } else {
@@ -555,7 +557,7 @@ async function checkNetworkSection(state: { [key: string]: unknown }, sectionTit
       // For implementation by default skip all checks
       const allNonMutable = getNonMutables(loadAbiFromFile(entry.name, entry.implementation));
       const skippedChecks: Checks = {};
-      allNonMutable.reduce((acc, x)=> (acc[x.name] = null, acc), skippedChecks);
+      allNonMutable.reduce((acc, x) => (acc[x.name] = null, acc), skippedChecks);
       await checkContractEntry(
         {
           checks: { ...skippedChecks, ...entry[Ef.implementationChecks] },
@@ -604,16 +606,22 @@ async function _loadContractInfoFromEtherscanExplorer(address: string, explorerH
   const sourcesUrl = getExplorerApiUrl(explorerHostname, address, explorerKey);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let sourcesResponse = await httpGetAsync(sourcesUrl) as any; // TODO: add proper type
-  if (sourcesResponse.message.indexOf("rate limit") > -1) {
-    log(`Reached rate limit ${explorerHostname}, waiting for 5 seconds...`);
-    await sleep(5000);
+
+  const isRateLimitEtherScan = sourcesResponse.result.includes("rate limit"); // EtherScan
+  const isRateLimitBscScan = sourcesResponse.message.includes("rate limit"); // BscScan
+
+  if (isRateLimitEtherScan || isRateLimitBscScan) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     sourcesResponse = await httpGetAsync(sourcesUrl) as any; // TODO: add proper type
+    log(`Reached rate limit ${explorerHostname}, waiting for ${RATE_LIMIT_TIMEOUT} seconds...`);
+    await sleep(RATE_LIMIT_TIMEOUT);
   }
+
   if (sourcesResponse.message != "OK") {
     // TODO: error, but check ContractName instead
     logErrorAndExit(`Failed to download contract info from ${explorerHostname}: ${sourcesResponse.message}\n${JSON.stringify(sourcesResponse, null, 2)}`);
   }
+
   const contractInfo = sourcesResponse.result[0];
   const abi = JSON.parse(contractInfo["ABI"]) as Abi;
   let implementation = null;
@@ -637,7 +645,7 @@ async function loadContractInfoFromExplorer(address: string, explorerHostname: s
 function getOrExit<T>(doc: YamlDoc, path: string[]) {
   const value = doc.getIn(path);
   if (value === undefined) {
-    logErrorAndExit(`Config format invalid: cannot get value at "${path.join('/')}"`);
+    logErrorAndExit(`Config format invalid: cannot get value at "${path.join("/")}"`);
   }
   return value as T;
 }
@@ -741,7 +749,7 @@ async function doGenerateBoilerplate(seedConfigPath: string) {
   });
 
   const generatedFilePath = path.join(path.dirname(seedConfigPath),
-    `${path.basename(seedConfigPath, "."+YML)}.generated.${YML}`);
+    `${path.basename(seedConfigPath, "." + YML)}.generated.${YML}`);
   fs.writeFileSync(generatedFilePath, doc.toString());
   log(`Generated state config: ${chalk.bold(generatedFilePath)}`);
 }
