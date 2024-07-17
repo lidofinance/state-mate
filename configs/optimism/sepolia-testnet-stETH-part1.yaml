@@ -1,0 +1,262 @@
+# Optimism Testnet Deployment & Configuration
+# Checks state when new contracts were deployed but no upgrade happened
+
+parameters:
+  - &lido "0x3e3FE7dBc6B4C189E7128855dD526361c49b40Af"
+  - &accountingOracle "0xd497Be005638efCf09F6BFC8DAFBBB0BB72cD991"
+  - &wstETH "0xB82381A3fBD3FaFA77B3a7bE693342618240067b"
+  - &agent "0x32A0E5828B62AAb932362a4816ae03b860b65e83"
+  - &l1EmergencyBreaksMultisig "0xa5F1d7D49F581136Cf6e58B32cBE9a2039C48bA1"
+  - &l2EmergencyBreaksMultisig "0xa5F1d7D49F581136Cf6e58B32cBE9a2039C48bA1"
+  - &l1CrossDomainMessenger "0x58Cc85b8D04EA49cC6DBd3CbFFd00B4B8D6cb3ef"
+  - &l2CrossDomainMessenger "0x4200000000000000000000000000000000000007"
+
+
+deployed:
+  l1:
+    - &l1TokenBridge "0x4Abf633d9c0F4aEebB4C2E3213c7aa1b8505D332"
+    - &l1TokenBridgeImpl "0x02825dbCaFbBfda57511dBD73d22c2787B653814"
+    - &l1TokenRateNotifier "0x10cA9008D7dcea1Bed4d5394F8c58F3113A2814D"
+    - &l1OpStackTokenRatePusher "0x4067B05a6B2f6801Bfb8d4fF417eD32e71c216d9"
+
+  l2:
+    - &l2GovernanceExecutor "0xf695357C66bA514150Da95b189acb37b46DDe602"
+    - &l2TokenBridge "0xdBA2760246f315203F8B716b3a7590F0FFdc704a"
+    - &l2TokenBridgeImpl "0x2B4a7968C173ea52745C3740B13da9609D83Bd82"
+    - &l2WstETH "0x24B47cd3A74f1799b32B2de11073764Cb1bb318B"
+    - &l2WstETHImpl "0xaB0c6F1015b644c252064155759Cdc90a6CBd50d"
+    - &l2StETH "0xf49D208B5C7b10415C7BeAFe9e656F2DF9eDfe3B"
+    - &l2StETHImpl "0xFd21C82c99ddFa56EB0B9B2D1d0709b7E26D1B2C"
+    - &l2TokenRateOracle "0xB34F2747BCd9BCC4107A0ccEb43D5dcdd7Fabf89"
+    - &l2TokenRateOracleImpl "0xa989A4B3A26e28DC9d106F163B2B1f35153E0517"
+
+
+roles:
+  - &DEFAULT_ADMIN_ROLE "0x0000000000000000000000000000000000000000000000000000000000000000"
+  - &DEPOSITS_DISABLER_ROLE "0x63f736f21cb2943826cd50b191eb054ebbea670e4e962d0527611f830cd399d6"
+  - &DEPOSITS_ENABLER_ROLE "0x4b43b36766bde12c5e9cbbc37d15f8d1f769f08f54720ab370faeb4ce893753a"
+  - &WITHDRAWALS_DISABLER_ROLE "0x94a954c0bc99227eddbc0715a62a7e1056ed8784cd719c2303b685683908857c"
+  - &WITHDRAWALS_ENABLER_ROLE "0x9ab8816a3dc0b3849ec1ac00483f6ec815b07eee2fd766a353311c823ad59d0d"
+  - &RATE_UPDATE_DISABLER_ROLE "0x1e8b59162351029dd98a93e3f40b9a963abf5ee753e69105079697f8cb505af3"
+  - &RATE_UPDATE_ENABLER_ROLE "0x5a883d2caeb13c05f1649a05c9c61c1deb622a06bff8d94d071d35c5ad8c2c94"
+
+l1:
+  rpcUrl: "http://localhost:8545" #L1_MAINNET_RPC_URL # https://ethereum.publicnode.com # url or env var
+  contracts:
+    tokenRateNotifier:
+      name: TokenRateNotifier
+      address: *l1TokenRateNotifier
+      checks:
+        owner: *agent
+        MAX_OBSERVERS_COUNT: 32
+        LIDO: *lido
+        INDEX_NOT_FOUND: 115792089237316195423570985008687907853269984665640564039457584007913129639935
+        REQUIRED_INTERFACE: "0xa16ba44d"
+        observersLength: 1
+        observers:
+            args: [0]
+            result: *l1OpStackTokenRatePusher
+    opStackTokenRatePusher:
+      name: OpStackTokenRatePusher
+      address: *l1OpStackTokenRatePusher
+      checks:
+        ACCOUNTING_ORACLE: *accountingOracle
+        WSTETH: *wstETH
+        L2_TOKEN_RATE_ORACLE: *l2TokenRateOracle
+        MESSENGER: *l1CrossDomainMessenger
+        GENESIS_TIME: 1655733600
+        L2_GAS_LIMIT_FOR_PUSHING_TOKEN_RATE: 300000
+        SECONDS_PER_SLOT: 12
+        TOKEN_RATE_DECIMALS: 27
+        supportsInterface:
+          - args: [ "0x01ffc9a7" ] # IERC165
+            result: true
+    tokenBridge:
+      name: L1ERC20TokenBridge
+      address: *l1TokenBridge
+      proxyName: OssifiableProxy
+      implementation: *l1TokenBridgeImpl
+      proxyChecks:
+        proxy__getImplementation: *l1TokenBridgeImpl
+        proxy__getAdmin: *agent
+        proxy__getIsOssified: false
+      checks:
+        isInitialized: true
+        isDepositsEnabled: true
+        isWithdrawalsEnabled: true
+        l1Token: *wstETH
+        l2Token: *l2WstETH
+        l2TokenBridge: *l2TokenBridge
+        messenger: *l1CrossDomainMessenger
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        DEPOSITS_DISABLER_ROLE: *DEPOSITS_DISABLER_ROLE
+        DEPOSITS_ENABLER_ROLE: *DEPOSITS_ENABLER_ROLE
+        WITHDRAWALS_DISABLER_ROLE: *WITHDRAWALS_DISABLER_ROLE
+        WITHDRAWALS_ENABLER_ROLE: *WITHDRAWALS_ENABLER_ROLE
+        getRoleAdmin: null
+        hasRole: null
+        supportsInterface: null
+      implementationChecks:
+        isInitialized: true
+        isDepositsEnabled: false
+        isWithdrawalsEnabled: false
+        hasRole:
+          args: [*DEFAULT_ADMIN_ROLE, "0x0000000000000000000000000000000000000000"]
+          result: true
+      ozAcl:
+        *DEFAULT_ADMIN_ROLE : [*agent]
+        *DEPOSITS_DISABLER_ROLE : [*agent, *l1EmergencyBreaksMultisig]
+        *WITHDRAWALS_DISABLER_ROLE : [*agent, *l1EmergencyBreaksMultisig]
+        *WITHDRAWALS_ENABLER_ROLE : [*agent]
+
+l2:
+  rpcUrl: "http://localhost:9545" #https://optimism-sepolia.infura.io/v3/8d011e4e23594b869770b69ba649cc83
+  contracts:
+    tokenRateOracle:
+      name: TokenRateOracle
+      address: *l2TokenRateOracle
+      proxyName: OssifiableProxy
+      implementation: *l2TokenRateOracleImpl
+      proxyChecks:
+        proxy__getImplementation: *l2TokenRateOracleImpl
+        proxy__getAdmin: *l2GovernanceExecutor
+        proxy__getIsOssified: false
+      checks:
+        L1_TOKEN_RATE_PUSHER: *l1OpStackTokenRatePusher
+        L2_ERC20_TOKEN_BRIDGE: *l2TokenBridge
+        MESSENGER: *l2CrossDomainMessenger
+        DECIMALS: 27
+        decimals: 27
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        RATE_UPDATE_DISABLER_ROLE: *RATE_UPDATE_DISABLER_ROLE
+        RATE_UPDATE_ENABLER_ROLE: *RATE_UPDATE_ENABLER_ROLE
+        MAX_ALLOWED_L2_TO_L1_CLOCK_LAG: 172800
+        MAX_ALLOWED_TOKEN_RATE_DEVIATION_PER_DAY_BP: 500
+        MAX_SANE_TOKEN_RATE: 100000000000000000000000000000
+        MIN_SANE_TOKEN_RATE: 10000000000000000000000000
+        MIN_TIME_BETWEEN_TOKEN_RATE_UPDATES: 3600
+        OLDEST_RATE_ALLOWED_IN_PAUSE_TIME_SPAN: 86400
+        TOKEN_RATE_OUTDATED_DELAY: 86400
+        getContractVersion: 1
+        getTokenRatesLength: 1
+        isLikelyOutdated: false
+        isTokenRateUpdatesPaused: false
+        supportsInterface:
+          - args: [ "0x01ffc9a7" ] # IERC165
+            result: true
+        hasRole:
+          - args: [*RATE_UPDATE_DISABLER_ROLE, *l2GovernanceExecutor]
+            result: true
+          - args: [*RATE_UPDATE_ENABLER_ROLE, *l2GovernanceExecutor]
+            result: true
+          - args: [*RATE_UPDATE_ENABLER_ROLE, *l2EmergencyBreaksMultisig]
+            result: true
+        getRoleAdmin: null
+        getTokenRateByIndex: null
+        latestAnswer: null
+        latestRoundData: null
+
+    stETH:
+      name: ERC20RebasableBridgedPermit
+      address: *l2StETH
+      proxyName: OssifiableProxy
+      implementation: *l2StETHImpl
+      proxyChecks:
+        proxy__getImplementation: *l2StETHImpl
+        proxy__getAdmin: *l2GovernanceExecutor
+        proxy__getIsOssified: false
+      checks:
+        name: Liquid staked Ether 2.0
+        symbol: stETH
+        decimals: 18
+        TOKEN_RATE_ORACLE_DECIMALS: 27
+        DOMAIN_SEPARATOR: "0xa9dd3a9faf5603ede655a8c912088ca7a16771911489468a111dba7d199160cf"
+        L2_ERC20_TOKEN_BRIDGE: *l2TokenBridge
+        TOKEN_RATE_ORACLE: *l2TokenRateOracle
+        TOKEN_TO_WRAP_FROM: *l2WstETH
+        getContractVersion: 1
+        getTotalShares: 0
+        totalSupply: 0
+        eip712Domain: null
+        nonces: null
+        getSharesByTokens: null
+        getTokensByShares: null
+        sharesOf: null
+        allowance: null
+        balanceOf: null
+      implementationChecks: {}
+
+    governanceExecutor:
+      name: OptimismBridgeExecutor
+      address: *l2GovernanceExecutor
+      checks:
+        getEthereumGovernanceExecutor: *agent
+        getGracePeriod: 86400
+        getGuardian: "0xD06491e4C8B3107B83dC134894C4c96ED8ddbfa2"
+        getDelay: 0
+        getMinimumDelay: 0
+        getMaximumDelay: 1
+        getActionsSetCount: 18
+        OVM_L2_CROSS_DOMAIN_MESSENGER: null
+        getActionsSetById: null
+        getCurrentState: null
+        isActionQueued: null
+    wstETH:
+      name: ERC20Bridged
+      address: *l2WstETH
+      proxyName: OssifiableProxy
+      implementation: *l2WstETHImpl
+      proxyChecks:
+        proxy__getImplementation: *l2WstETHImpl
+        proxy__getAdmin: *l2GovernanceExecutor
+        proxy__getIsOssified: false
+      checks:
+        name: Wrapped liquid staked Ether 2.0
+        symbol: wstETH
+        decimals: 18
+        bridge: *l2TokenBridge
+        DOMAIN_SEPARATOR: null
+        PERMIT_TYPEHASH: null
+        allowance: null
+        balanceOf: null
+        nonces: null
+        totalSupply: null
+      implementationChecks: {}
+    tokenBridge:
+      name: L2ERC20TokenBridge
+      address: *l2TokenBridge
+      proxyName: OssifiableProxy
+      implementation: *l2TokenBridgeImpl
+      proxyChecks:
+        proxy__getImplementation: *l2TokenBridgeImpl
+        proxy__getAdmin: *l2GovernanceExecutor
+        proxy__getIsOssified: false
+      checks:
+        isDepositsEnabled: true
+        isWithdrawalsEnabled: true
+        isInitialized: true
+        l1Token: *wstETH
+        l2Token: *l2WstETH
+        l1TokenBridge: *l1TokenBridge
+        messenger: *l2CrossDomainMessenger
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        DEPOSITS_DISABLER_ROLE: *DEPOSITS_DISABLER_ROLE
+        DEPOSITS_ENABLER_ROLE: *DEPOSITS_ENABLER_ROLE
+        WITHDRAWALS_DISABLER_ROLE: *WITHDRAWALS_DISABLER_ROLE
+        WITHDRAWALS_ENABLER_ROLE: *WITHDRAWALS_ENABLER_ROLE
+        getRoleAdmin: null
+        hasRole: null
+        supportsInterface: null
+      implementationChecks:
+        isInitialized: true
+        isDepositsEnabled: false
+        isWithdrawalsEnabled: false
+        hasRole:
+          args: [*DEFAULT_ADMIN_ROLE, "0x0000000000000000000000000000000000000000"]
+          result: true
+      ozAcl:
+        *DEFAULT_ADMIN_ROLE : [*l2GovernanceExecutor]
+        *DEPOSITS_DISABLER_ROLE : [*l2GovernanceExecutor, *l2EmergencyBreaksMultisig]
+        *DEPOSITS_ENABLER_ROLE : [*l2GovernanceExecutor]
+        *WITHDRAWALS_DISABLER_ROLE : [*l2GovernanceExecutor, *l2EmergencyBreaksMultisig]
+        *WITHDRAWALS_ENABLER_ROLE : [*l2GovernanceExecutor]
