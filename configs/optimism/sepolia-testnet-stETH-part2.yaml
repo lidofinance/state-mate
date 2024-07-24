@@ -12,26 +12,7 @@ parameters:
   - &l1CrossDomainMessenger "0x58Cc85b8D04EA49cC6DBd3CbFFd00B4B8D6cb3ef"
   - &l2CrossDomainMessenger "0x4200000000000000000000000000000000000007"
 
-# # config for deploy from scratch state
-# deployed:
-#   l1:
-#     - &l1TokenBridge "0xb2B2403667638d27aDC00F318beBb7c8b1c97061"
-#     - &l1TokenBridgeImpl "0x1b4f7D1e42B10aaB15c4464E0539B2697A3578A6"
-#     - &l1TokenRateNotifier "0x61ddb3966320d4a451D79F2D1aD0DFA98A587d30"
-#     - &l1OpStackTokenRatePusher "0xfeaA3db2E1D173e12459ddB7ee9E49695033aC35"
-
-#   l2:
-#     - &l2GovernanceExecutor "0xf695357C66bA514150Da95b189acb37b46DDe602"
-#     - &l2TokenBridge "0x3bC7eF9398DA08Ef53A31731636AfeA3353a6a21"
-#     - &l2TokenBridgeImpl "0xa990FD597794D78e6c3eB98192d83d0fD44EF6bd"
-#     - &l2WstETH "0x74E175cf4661Ec17614D5D89745724186B07F0f5"
-#     - &l2WstETHImpl "0x23C6eD8A14d0B22f8c2eD7F719ef0C4D710262B7"
-#     - &l2StETH "0x1D4FB1AfFc3Aa7C5C0EEb01c6bc02a8fFcdbfA63"
-#     - &l2StETHImpl "0x552D26d9cfa3aB42709F26bd5Ac5e8db085d55e4"
-#     - &l2TokenRateOracle "0xd5c57F40704049B7aD4AC0edfCDB12Da28113116"
-#     - &l2TokenRateOracleImpl "0x861f889D131a2983a00d7aFC4AD3185C64e8a18d"
-
-# after python upgrade config (will be failed until python script runs)
+# upgrade config for after voting state (will be failed until voting script runs)
 deployed:
   l1:
     - &l1TokenBridge "0x4Abf633d9c0F4aEebB4C2E3213c7aa1b8505D332"
@@ -60,7 +41,7 @@ roles:
   - &RATE_UPDATE_ENABLER_ROLE "0x5a883d2caeb13c05f1649a05c9c61c1deb622a06bff8d94d071d35c5ad8c2c94"
 
 l1:
-  rpcUrl: L1_MAINNET_RPC_URL # https://ethereum.publicnode.com # url or env var
+  rpcUrl: http://localhost:8545 #L1_MAINNET_RPC_URL # https://ethereum.publicnode.com # url or env var
   contracts:
     tokenRateNotifier:
       name: TokenRateNotifier
@@ -124,8 +105,22 @@ l1:
           - args: [ "0x01ffc9a7" ] # IERC165
             result: true
         hasRole:
-          args: [*DEFAULT_ADMIN_ROLE, *agent]
-          result: true
+          - args: [*DEFAULT_ADMIN_ROLE, *agent]
+            result: true
+          - args: [*DEPOSITS_ENABLER_ROLE, *agent]
+            result: true
+          - args: [*DEPOSITS_ENABLER_ROLE, *l1EmergencyBreaksMultisig]
+            result: true
+          - args: [*DEPOSITS_DISABLER_ROLE, *agent]
+            result: true
+          - args: [*DEPOSITS_DISABLER_ROLE, *l1EmergencyBreaksMultisig]
+            result: true
+          - args: [*WITHDRAWALS_ENABLER_ROLE, *agent]
+            result: true
+          - args: [*WITHDRAWALS_DISABLER_ROLE, *agent]
+            result: true
+          - args: [*WITHDRAWALS_DISABLER_ROLE, *l1EmergencyBreaksMultisig]
+            result: true
         getRoleAdmin: null
       implementationChecks:
         getContractVersion: 115792089237316195423570985008687907853269984665640564039457584007913129639935
@@ -142,7 +137,7 @@ l1:
         *WITHDRAWALS_ENABLER_ROLE : [*agent]
 
 l2:
-  rpcUrl: https://optimism-sepolia.infura.io/v3/8d011e4e23594b869770b69ba649cc83
+  rpcUrl: http://localhost:9545 #https://optimism-sepolia.infura.io/v3/8d011e4e23594b869770b69ba649cc83
   contracts:
     governanceExecutor:
       name: OptimismBridgeExecutor
@@ -154,7 +149,7 @@ l2:
         getDelay: 0
         getMinimumDelay: 0
         getMaximumDelay: 1
-        getActionsSetCount: 18
+        getActionsSetCount: 19
         OVM_L2_CROSS_DOMAIN_MESSENGER: null
         getActionsSetById: null
         getCurrentState: null
@@ -187,7 +182,7 @@ l2:
         TOKEN_RATE_OUTDATED_DELAY: 86400
         getContractVersion: 1
         getTokenRatesLength: 1
-        isLikelyOutdated: false
+        isLikelyOutdated: true
         isTokenRateUpdatesPaused: false
         supportsInterface:
           - args: [ "0x01ffc9a7" ] # IERC165
@@ -218,7 +213,7 @@ l2:
         symbol: stETH
         decimals: 18
         TOKEN_RATE_ORACLE_DECIMALS: 27
-        DOMAIN_SEPARATOR: "0xf263bd4a5df4c4a67bcf947a8c87fde73c4df067dca628bd2a0625c557329085"
+        DOMAIN_SEPARATOR: "0xa9dd3a9faf5603ede655a8c912088ca7a16771911489468a111dba7d199160cf"
         L2_ERC20_TOKEN_BRIDGE: *l2TokenBridge
         TOKEN_RATE_ORACLE: *l2TokenRateOracle
         TOKEN_TO_WRAP_FROM: *l2WstETH
@@ -248,9 +243,10 @@ l2:
         symbol: wstETH
         decimals: 18
         bridge: *l2TokenBridge
-        DOMAIN_SEPARATOR: "0xf10c1feead969a7cf9eec8c34472faefccf819691d9537ed722809e72ceee465"
+        DOMAIN_SEPARATOR: "0xc1fc179d73b7759a54e180334400ea9b5297eb5b8f5fdbf2372481045fe0beec"
         getContractVersion: 2
         PERMIT_TYPEHASH: null
+        totalSupply: null
         allowance: null
         balanceOf: null
         nonces: null
@@ -286,7 +282,21 @@ l2:
           - args: [ "0x01ffc9a7" ] # IERC165
             result: true
         getRoleAdmin: null
-        hasRole: null
+        hasRole:
+          - args: [*DEFAULT_ADMIN_ROLE, "0x0000000000000000000000000000000000000000"]
+            result: false
+          - args: [*DEPOSITS_ENABLER_ROLE, *l2GovernanceExecutor]
+            result: true
+          - args: [*DEPOSITS_DISABLER_ROLE, *l2GovernanceExecutor]
+            result: true
+          - args: [*DEPOSITS_DISABLER_ROLE, *l2EmergencyBreaksMultisig]
+            result: true
+          - args: [*WITHDRAWALS_ENABLER_ROLE, *l2GovernanceExecutor]
+            result: true
+          - args: [*WITHDRAWALS_DISABLER_ROLE, *l2GovernanceExecutor]
+            result: true
+          - args: [*WITHDRAWALS_DISABLER_ROLE, *l2EmergencyBreaksMultisig]
+            result: true
       implementationChecks:
         getContractVersion: 115792089237316195423570985008687907853269984665640564039457584007913129639935
         isInitialized: false
