@@ -30,7 +30,7 @@ roles:
 
 
 l1:
-  rpcUrl: L1_MAINNET_RPC_URL # https://ethereum.publicnode.com # url or env var
+  rpcUrl: L1_RPC_URL
   contracts:
     tokenBridge:
       name: L1ERC20TokenBridge

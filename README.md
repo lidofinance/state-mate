@@ -42,7 +42,8 @@ yarn install
 2. Specify RPC endpoints for your target networks, e.g.
 
 ```sh
-export L1_MAINNET_RPC_URL=%YOUR_RPC_URL%
+export L1_RPC_URL=%YOUR_RPC_URL%
+export L2_RPC_URL=%YOUR_RPC_URL%
 ```
 
 3. Start the program
@@ -76,7 +77,7 @@ roles:
   - &DEFAULT_ADMIN_ROLE "0x0000000000000000000000000000000000000000000000000000000000000000"
 
 l1:
-  rpcUrl: L1_MAINNET_RPC_URL # env variable
+  rpcUrl: L1_RPC_URL # env variable
   contracts:
     myContract:
       name: "myContract"

@@ -41,7 +41,7 @@ roles:
   - &RATE_UPDATE_ENABLER_ROLE "0x5a883d2caeb13c05f1649a05c9c61c1deb622a06bff8d94d071d35c5ad8c2c94"
 
 l1:
-  rpcUrl: "http://localhost:8545" #L1_MAINNET_RPC_URL # https://ethereum.publicnode.com # url or env var
+  rpcUrl: L1_RPC_URL
   contracts:
     tokenRateNotifier:
       name: TokenRateNotifier
@@ -110,7 +110,7 @@ l1:
         *WITHDRAWALS_ENABLER_ROLE : [*agent]
 
 l2:
-  rpcUrl: "http://localhost:9545" #https://optimism-sepolia.infura.io/v3/8d011e4e23594b869770b69ba649cc83
+  rpcUrl: L2_RPC_URL
   contracts:
     tokenRateOracle:
       name: TokenRateOracle
