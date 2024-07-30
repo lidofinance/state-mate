@@ -86,8 +86,11 @@ l1:
         messenger: *l1CrossDomainMessenger
         supportsInterface: null
       implementationChecks:
+        isInitialized: true
+        hasRole:
+          args: [*DEFAULT_ADMIN_ROLE, *ZERO_ADDRESS]
+          result: true
         isDepositsEnabled: false
-        isInitialized: false
         isWithdrawalsEnabled: false
         l1Token: *l1Wsteth
         l2Token: *l2Wsteth
@@ -168,8 +171,11 @@ l2:
         supportsInterface: null
 
       implementationChecks:
+        isInitialized: true
+        hasRole:
+          args: [*DEFAULT_ADMIN_ROLE, *ZERO_ADDRESS]
+          result: true
         isDepositsEnabled: false
-        isInitialized: false
         isWithdrawalsEnabled: false
         l1Token: *l1Wsteth
         l1TokenBridge: *l1TokenBridge
