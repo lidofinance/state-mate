@@ -13,14 +13,14 @@ deployed:
     - &l2Wsteth "0x98f96A4B34D03a2E6f225B28b8f8Cb1279562d81"
     - &l2WstethImpl "0xF27b1B121e55A13047d66dC4AAA8c17BA72c762A"
     - &l2GovExecutor "0x2aCeC6D8ABA90685927b61968D84CfFf6192B32C"
+    - &l2EmergencyBreaksMultisig "0x244912352A639001ceCFa208cDaa7CB474c9eadE"
 
 parameters:
+  - &l1EmergencyBreaksMultisig "0x73b047fe6337183A454c5217241D780a932777bD" # https://docs.lido.fi/token-guides/wsteth-bridging-guide/#mainnet
   - &l1Agent "0x3e40D73EB977Dc6a537aF587D48316feE66E9C8c"
   - &l1Wsteth "0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0"
-  - &l1EmergencyBreaksMultisig "0x73b047fe6337183A454c5217241D780a932777bD" # https://docs.lido.fi/token-guides/wsteth-bridging-guide/#mainnet
   - &l1CrossDomainMessenger "0x95bDCA6c8EdEB69C98Bd5bd17660BaCef1298A6f"
   - &l2CrossDomainMessenger "0x4200000000000000000000000000000000000007"
-  - &l2EmergencyBreaksMultisig "0x244912352A639001ceCFa208cDaa7CB474c9eadE"
 
 roles:
   - &DEFAULT_ADMIN_ROLE "0x0000000000000000000000000000000000000000000000000000000000000000"
@@ -32,6 +32,12 @@ roles:
 misc:
   - &ZERO_ADDRESS "0x0000000000000000000000000000000000000000"
 
+  # Owners of multisig on Mainnet and Mode must be the same (order is arbitrary)
+  - &multisigOwner1 "0xCFfE0F3B089e46D8212408Ba061c425776E64322"
+  - &multisigOwner2 "0xdd19274b614b5ecAcf493Bc43C380ef6B8dfB56c"
+  - &multisigOwner3 "0x59F8D74Fe49d5ebEAc069E3baf07eB4b614BD5A7"
+  - &multisigOwner4 "0x6f5c9B92DC47C89155930E708fBc305b55A5519A"
+  - &multisigOwner5 "0x2a61d3ba5030Ef471C74f612962c7367ECa3a62d"
 
 l1:
   rpcUrl: L1_MAINNET_RPC_URL
@@ -87,6 +93,33 @@ l1:
         l2Token: *l2Wsteth
         l2TokenBridge: *l2TokenBridge
 
+    l1EmergencyBreaksMultisigContract:
+      name: GnosisSafe
+      proxyName: GnosisSafeProxy
+      address: *l1EmergencyBreaksMultisig
+      checks:
+        getOwners:
+          - *multisigOwner1
+          - *multisigOwner2
+          - *multisigOwner3
+          - *multisigOwner4
+          - *multisigOwner5
+        getThreshold: 3
+        VERSION: null
+        approvedHashes: null
+        checkNSignatures: null
+        checkSignatures: null
+        domainSeparator: null
+        encodeTransactionData: null
+        getChainId: null
+        getModulesPaginated: null
+        getStorageAt: null
+        getTransactionHash: null
+        isModuleEnabled: null
+        isOwner: null
+        nonce: null
+        signedMessages: null
+
 l2:
   rpcUrl: https://mainnet.mode.network
   explorerHostname: explorer.mode.network
@@ -141,6 +174,7 @@ l2:
         l1Token: *l1Wsteth
         l1TokenBridge: *l1TokenBridge
         l2Token: *l2Wsteth
+
     l2Wsteth:
       name: ERC20Bridged
       address: *l2Wsteth
@@ -157,13 +191,14 @@ l2:
         decimals: 18
         name: Wrapped liquid staked Ether 2.0
         symbol: wstETH
-        totalSupply: 0
+        totalSupply: null
       implementationChecks:
         bridge: *l2TokenBridge
         decimals: 18
         name: Wrapped liquid staked Ether 2.0
         symbol: wstETH
         totalSupply: 0
+
     l2GovExecutor:
       name: OptimismBridgeExecutor
       address: *l2GovExecutor
@@ -179,3 +214,30 @@ l2:
         getMaximumDelay: 1
         getMinimumDelay: 0
         isActionQueued: null
+
+    l2EmergencyBreaksMultisigContract:
+      name: GnosisSafeL2
+      proxyName: GnosisSafeProxy
+      address: *l2EmergencyBreaksMultisig
+      checks:
+        getOwners:
+          - *multisigOwner4
+          - *multisigOwner5
+          - *multisigOwner2
+          - *multisigOwner1
+          - *multisigOwner3
+        getThreshold: 3
+        VERSION: null
+        approvedHashes: null
+        checkNSignatures: null
+        checkSignatures: null
+        domainSeparator: null
+        encodeTransactionData: null
+        getChainId: null
+        getModulesPaginated: null
+        getStorageAt: null
+        getTransactionHash: null
+        isModuleEnabled: null
+        isOwner: null
+        nonce: null
+        signedMessages: null
