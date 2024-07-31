@@ -186,21 +186,38 @@ l1:
       proxyChecks: {}
       checks:
         WORMHOLE_TRANSCEIVER_VERSION: *NTT_MANAGER_VERSION # 1.1.0
-        consistencyLevel: REPLACEME # 1
-        encodeWormholeTransceiverInstruction: REPLACEME # need to specify args
-        gasLimit: REPLACEME # 500000
-        getMigratesImmutables: REPLACEME # false
+        consistencyLevel: 1
+        encodeWormholeTransceiverInstruction:
+          - args: [ ]
+            result: [ ]
+            mustRevert: true
+        gasLimit: 500000
+        getMigratesImmutables: false
         getNttManagerOwner: *L1_NEW_INTERIM_MSIG
         getNttManagerToken: *L1_WSTETH # 0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0
-        getTransceiverType: REPLACEME # wormhole
-        getWormholePeer: REPLACEME # need to specify args
-        isPaused: REPLACEME # false
-        isSpecialRelayingEnabled: REPLACEME # need to specify args
-        isVAAConsumed: REPLACEME # need to specify args
-        isWormholeEvmChain: REPLACEME # need to specify args
+        getTransceiverType: "wormhole"
+        getWormholePeer:
+          - args: [ *ETH_CHAIN_ID ]
+            result: [ *ZERO_BYTES32 ]
+          - args: [ *BSC_CHAIN_ID ]
+            result: [ *ZERO_BYTES32 ]
+        isPaused: false
+        isSpecialRelayingEnabled:
+          - args: [ *ETH_CHAIN_ID ]
+            result: false
+          - args: [ *BSC_CHAIN_ID ]
+            result: false
+        isVAAConsumed:
+          - args: [ *ZERO_BYTES32 ]
+            result: false
+        isWormholeEvmChain:
+          - args: [ *ETH_CHAIN_ID ]
+            result: true
+          - args: [ *BSC_CHAIN_ID ]
+            result: true
         isWormholeRelayingEnabled: REPLACEME # need to specify args
-        nttManager: REPLACEME # 0xb948a93827d68a82F6513Ad178964Da487fe2BD9
-        nttManagerToken: REPLACEME # 0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0
+        nttManager: *l1NttManager
+        nttManagerToken: *L1_WSTETH
         owner: *L1_NEW_INTERIM_MSIG
         parseWormholeTransceiverInstruction: REPLACEME # need to specify args
         pauser: *L1_NEW_INTERIM_MSIG
