@@ -111,9 +111,9 @@ l1:
         isPaused: false # false
         messageAttestations: REPLACEME # need to specify args
         mode: REPLACEME # 0
-        nextMessageSequence: REPLACEME # 0
-        owner: *ZERO_ADDRESS # 0x0000000000000000000000000000000000000000
-        pauser: *ZERO_ADDRESS # 0x0000000000000000000000000000000000000000
+        nextMessageSequence: 0 # 0
+        owner: *ZERO_ADDRESS
+        pauser: *ZERO_ADDRESS
         quoteDeliveryPrice: REPLACEME # need to specify args
         rateLimitDuration: *RATE_LIMIT_DURATION # 86400
         token: *L1_WSTETH # 0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0
@@ -131,7 +131,7 @@ l1:
         encodeWormholeTransceiverInstruction: REPLACEME # need to specify args
         gasLimit: REPLACEME # 500000
         getMigratesImmutables: REPLACEME # false
-        getNttManagerOwner: *L1_OLD_INTERIM_MSIG # 0x3cbBdACD98E29d1A71F16b89eD99400cE185a711
+        getNttManagerOwner: *L1_NEW_INTERIM_MSIG
         getNttManagerToken: *L1_WSTETH # 0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0
         getTransceiverType: REPLACEME # wormhole
         getWormholePeer: REPLACEME # need to specify args
@@ -142,9 +142,9 @@ l1:
         isWormholeRelayingEnabled: REPLACEME # need to specify args
         nttManager: REPLACEME # 0xb948a93827d68a82F6513Ad178964Da487fe2BD9
         nttManagerToken: REPLACEME # 0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0
-        owner: REPLACEME # 0x3cbBdACD98E29d1A71F16b89eD99400cE185a711
+        owner: *L1_NEW_INTERIM_MSIG
         parseWormholeTransceiverInstruction: REPLACEME # need to specify args
-        pauser: REPLACEME # 0x3cbBdACD98E29d1A71F16b89eD99400cE185a711
+        pauser: *L1_NEW_INTERIM_MSIG
         quoteDeliveryPrice: REPLACEME # need to specify args
         specialRelayer: REPLACEME # 0x63BE47835c7D66c4aA5B2C688Dc6ed9771c94C74
         wormhole: REPLACEME # 0x98f3c9e6E3fAce36bAAd05FE09d375Ef1464288B
@@ -155,7 +155,7 @@ l1:
         encodeWormholeTransceiverInstruction: REPLACEME # need to specify args
         gasLimit: REPLACEME # 500000
         getMigratesImmutables: REPLACEME # false
-        getNttManagerOwner: *L1_OLD_INTERIM_MSIG # 0x3cbBdACD98E29d1A71F16b89eD99400cE185a711
+        getNttManagerOwner: *L1_NEW_INTERIM_MSIG
         getNttManagerToken: *L1_WSTETH # 0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0
         getTransceiverType: REPLACEME # wormhole
         getWormholePeer: REPLACEME # need to specify args
@@ -166,9 +166,9 @@ l1:
         isWormholeRelayingEnabled: REPLACEME # need to specify args
         nttManager: REPLACEME # 0xb948a93827d68a82F6513Ad178964Da487fe2BD9
         nttManagerToken: REPLACEME # 0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0
-        owner: REPLACEME # 0x0000000000000000000000000000000000000000
+        owner: *ZERO_ADDRESS
         parseWormholeTransceiverInstruction: REPLACEME # need to specify args
-        pauser: REPLACEME # 0x0000000000000000000000000000000000000000
+        pauser: *ZERO_ADDRESS
         quoteDeliveryPrice: REPLACEME # need to specify args
         specialRelayer: REPLACEME # 0x63BE47835c7D66c4aA5B2C688Dc6ed9771c94C74
         wormhole: REPLACEME # 0x98f3c9e6E3fAce36bAAd05FE09d375Ef1464288B
@@ -184,28 +184,28 @@ l1:
         gasService: REPLACEME # 0x2d5d7d31F671F86C782533cc367F14109a082712
         gateway: REPLACEME # 0x4F4495243837681061C4743b74B3eEdf548D56A5
         getMigratesImmutables: REPLACEME # false
-        getNttManagerOwner: REPLACEME # 0x3cbBdACD98E29d1A71F16b89eD99400cE185a711
-        getNttManagerToken: REPLACEME # 0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0
+        getNttManagerOwner: *L1_NEW_INTERIM_MSIG
+        getNttManagerToken: *L1_WSTETH
         getTransceiverType: REPLACEME # axelar
         isPaused: REPLACEME # false
         nttManager: REPLACEME # 0xb948a93827d68a82F6513Ad178964Da487fe2BD9
         nttManagerToken: REPLACEME # 0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0
-        owner: REPLACEME # 0x3cbBdACD98E29d1A71F16b89eD99400cE185a711
-        pauser: REPLACEME # 0x3cbBdACD98E29d1A71F16b89eD99400cE185a711
+        owner: *L1_NEW_INTERIM_MSIG
+        pauser: *L1_NEW_INTERIM_MSIG
         quoteDeliveryPrice: REPLACEME # need to specify args
       implementationChecks:
         AXELAR_TRANSCEIVER_VERSION: *NTT_MANAGER_VERSION # 1.1.0
         gasService: REPLACEME # 0x2d5d7d31F671F86C782533cc367F14109a082712
         gateway: REPLACEME # 0x4F4495243837681061C4743b74B3eEdf548D56A5
         getMigratesImmutables: REPLACEME # false
-        getNttManagerOwner: REPLACEME # 0x3cbBdACD98E29d1A71F16b89eD99400cE185a711
-        getNttManagerToken: REPLACEME # 0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0
+        getNttManagerOwner: *L1_NEW_INTERIM_MSIG
+        getNttManagerToken: *L1_WSTETH
         getTransceiverType: REPLACEME # axelar
         isPaused: REPLACEME # false
         nttManager: REPLACEME # 0xb948a93827d68a82F6513Ad178964Da487fe2BD9
-        nttManagerToken: REPLACEME # 0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0
-        owner: REPLACEME # 0x0000000000000000000000000000000000000000
-        pauser: REPLACEME # 0x0000000000000000000000000000000000000000
+        nttManagerToken: *L1_WSTETH
+        owner: *ZERO_ADDRESS
+        pauser: *ZERO_ADDRESS
         quoteDeliveryPrice: REPLACEME # need to specify args
     l1TransceiverStructs:
       name: TransceiverStructs
@@ -269,7 +269,7 @@ l2:
         decimals: REPLACEME # 18
         minter: REPLACEME # 0x6981F5621691CBfE3DdD524dE71076b79F0A0278
         name: REPLACEME # Wrapped liquid staked Ether 2.0
-        owner: REPLACEME # 0x5c4e359827Ee1B4dd845502c24fbd3472114909b
+        owner: *L2_NEW_INTERIM_MSIG
         proxiableUUID: REPLACEME # view call reverted
         symbol: REPLACEME # wstETH
         totalSupply: REPLACEME # 594100000000000
@@ -278,13 +278,13 @@ l2:
         allowance: REPLACEME # need to specify args
         balanceOf: REPLACEME # need to specify args
         burnFrom: REPLACEME # need to specify args
-        decimals: REPLACEME # 18
-        minter: REPLACEME # 0x0000000000000000000000000000000000000000
-        name: REPLACEME #
-        owner: REPLACEME # 0x0000000000000000000000000000000000000000
+        decimals: *DECIMALS
+        minter: *ZERO_ADDRESS
+        name: ""
+        owner: *ZERO_ADDRESS
         proxiableUUID: REPLACEME # 0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc
-        symbol: REPLACEME #
-        totalSupply: REPLACEME # 0
+        symbol: ""
+        totalSupply: 0
     l2NttManager:
       name: NttManager
       address: *l2NttManager
@@ -312,12 +312,12 @@ l2:
         messageAttestations: REPLACEME # need to specify args
         mode: REPLACEME # 1
         nextMessageSequence: REPLACEME # 31
-        owner: REPLACEME # 0x5c4e359827Ee1B4dd845502c24fbd3472114909b
-        pauser: REPLACEME # 0x5c4e359827Ee1B4dd845502c24fbd3472114909b
+        owner: *L2_NEW_INTERIM_MSIG
+        pauser: *L2_NEW_INTERIM_MSIG
         quoteDeliveryPrice: REPLACEME # need to specify args
         rateLimitDuration: REPLACEME # view call reverted
-        token: REPLACEME # 0x26c5e01524d2E6280A48F2c50fF6De7e52E9611C
-        tokenDecimals: REPLACEME # 18
+        token: *l2wstETHToken
+        tokenDecimals: *DECIMALS
         transceiverAttestedToMessage: REPLACEME # need to specify args
       implementationChecks:
         NTT_MANAGER_VERSION: *NTT_MANAGER_VERSION # 1.1.0
@@ -336,16 +336,16 @@ l2:
         getTransceivers: REPLACEME #
         isMessageApproved: REPLACEME # need to specify args
         isMessageExecuted: REPLACEME # need to specify args
-        isPaused: REPLACEME # false
+        isPaused: false
         messageAttestations: REPLACEME # need to specify args
         mode: REPLACEME # 1
         nextMessageSequence: REPLACEME # 0
-        owner: REPLACEME # 0x0000000000000000000000000000000000000000
-        pauser: REPLACEME # 0x0000000000000000000000000000000000000000
+        owner: *ZERO_ADDRESS
+        pauser: *ZERO_ADDRESS
         quoteDeliveryPrice: REPLACEME # need to specify args
         rateLimitDuration: REPLACEME # 86400
-        token: REPLACEME # 0x26c5e01524d2E6280A48F2c50fF6De7e52E9611C
-        tokenDecimals: REPLACEME # 18
+        token: *l2wstETHToken
+        tokenDecimals: *DECIMALS
         transceiverAttestedToMessage: REPLACEME # need to specify args
     l2WormholeTransceiver:
       name: WormholeTransceiver
@@ -359,20 +359,20 @@ l2:
         encodeWormholeTransceiverInstruction: REPLACEME # need to specify args
         gasLimit: REPLACEME # 500000
         getMigratesImmutables: REPLACEME # false
-        getNttManagerOwner: REPLACEME # 0x5c4e359827Ee1B4dd845502c24fbd3472114909b
-        getNttManagerToken: REPLACEME # 0x26c5e01524d2E6280A48F2c50fF6De7e52E9611C
+        getNttManagerOwner: *L2_NEW_INTERIM_MSIG
+        getNttManagerToken: *l2wstETHToken
         getTransceiverType: REPLACEME # wormhole
         getWormholePeer: REPLACEME # need to specify args
-        isPaused: REPLACEME # false
+        isPaused: false
         isSpecialRelayingEnabled: REPLACEME # need to specify args
         isVAAConsumed: REPLACEME # need to specify args
         isWormholeEvmChain: REPLACEME # need to specify args
         isWormholeRelayingEnabled: REPLACEME # need to specify args
         nttManager: REPLACEME # 0x6981F5621691CBfE3DdD524dE71076b79F0A0278
-        nttManagerToken: REPLACEME # 0x26c5e01524d2E6280A48F2c50fF6De7e52E9611C
-        owner: REPLACEME # 0x5c4e359827Ee1B4dd845502c24fbd3472114909b
+        nttManagerToken: *l2wstETHToken
+        owner: *L2_NEW_INTERIM_MSIG
         parseWormholeTransceiverInstruction: REPLACEME # need to specify args
-        pauser: REPLACEME # 0x5c4e359827Ee1B4dd845502c24fbd3472114909b
+        pauser: *L2_NEW_INTERIM_MSIG
         quoteDeliveryPrice: REPLACEME # need to specify args
         specialRelayer: REPLACEME # 0x63BE47835c7D66c4aA5B2C688Dc6ed9771c94C74
         wormhole: REPLACEME # 0x98f3c9e6E3fAce36bAAd05FE09d375Ef1464288B
@@ -383,20 +383,20 @@ l2:
         encodeWormholeTransceiverInstruction: REPLACEME # need to specify args
         gasLimit: REPLACEME # 500000
         getMigratesImmutables: REPLACEME # false
-        getNttManagerOwner: REPLACEME # 0x5c4e359827Ee1B4dd845502c24fbd3472114909b
-        getNttManagerToken: REPLACEME # 0x26c5e01524d2E6280A48F2c50fF6De7e52E9611C
+        getNttManagerOwner: *L2_NEW_INTERIM_MSIG
+        getNttManagerToken: *l2wstETHToken
         getTransceiverType: REPLACEME # wormhole
         getWormholePeer: REPLACEME # need to specify args
-        isPaused: REPLACEME # false
+        isPaused: false
         isSpecialRelayingEnabled: REPLACEME # need to specify args
         isVAAConsumed: REPLACEME # need to specify args
         isWormholeEvmChain: REPLACEME # need to specify args
         isWormholeRelayingEnabled: REPLACEME # need to specify args
         nttManager: REPLACEME # 0x6981F5621691CBfE3DdD524dE71076b79F0A0278
         nttManagerToken: REPLACEME # 0x26c5e01524d2E6280A48F2c50fF6De7e52E9611C
-        owner: REPLACEME # 0x0000000000000000000000000000000000000000
+        owner: *ZERO_ADDRESS
         parseWormholeTransceiverInstruction: REPLACEME # need to specify args
-        pauser: REPLACEME # 0x0000000000000000000000000000000000000000
+        pauser: *ZERO_ADDRESS
         quoteDeliveryPrice: REPLACEME # need to specify args
         specialRelayer: REPLACEME # 0x63BE47835c7D66c4aA5B2C688Dc6ed9771c94C74
         wormhole: REPLACEME # 0x98f3c9e6E3fAce36bAAd05FE09d375Ef1464288B
@@ -412,28 +412,28 @@ l2:
         gasService: REPLACEME # 0x2d5d7d31F671F86C782533cc367F14109a082712
         gateway: REPLACEME # 0x304acf330bbE08d1e512eefaa92F6a57871fD895
         getMigratesImmutables: REPLACEME # false
-        getNttManagerOwner: REPLACEME # 0x5c4e359827Ee1B4dd845502c24fbd3472114909b
-        getNttManagerToken: REPLACEME # 0x26c5e01524d2E6280A48F2c50fF6De7e52E9611C
+        getNttManagerOwner: *L2_NEW_INTERIM_MSIG
+        getNttManagerToken: *l2wstETHToken
         getTransceiverType: REPLACEME # axelar
         isPaused: REPLACEME # false
         nttManager: REPLACEME # 0x6981F5621691CBfE3DdD524dE71076b79F0A0278
         nttManagerToken: REPLACEME # 0x26c5e01524d2E6280A48F2c50fF6De7e52E9611C
-        owner: REPLACEME # 0x5c4e359827Ee1B4dd845502c24fbd3472114909b
-        pauser: REPLACEME # 0x5c4e359827Ee1B4dd845502c24fbd3472114909b
+        owner: *L2_NEW_INTERIM_MSIG
+        pauser: *L2_NEW_INTERIM_MSIG
         quoteDeliveryPrice: REPLACEME # need to specify args
       implementationChecks:
         AXELAR_TRANSCEIVER_VERSION: *NTT_MANAGER_VERSION # 1.1.0
         gasService: REPLACEME # 0x2d5d7d31F671F86C782533cc367F14109a082712
         gateway: REPLACEME # 0x304acf330bbE08d1e512eefaa92F6a57871fD895
         getMigratesImmutables: REPLACEME # false
-        getNttManagerOwner: REPLACEME # 0x5c4e359827Ee1B4dd845502c24fbd3472114909b
-        getNttManagerToken: REPLACEME # 0x26c5e01524d2E6280A48F2c50fF6De7e52E9611C
+        getNttManagerOwner: *L2_NEW_INTERIM_MSIG
+        getNttManagerToken: *l2wstETHToken
         getTransceiverType: REPLACEME # axelar
         isPaused: REPLACEME # false
         nttManager: REPLACEME # 0x6981F5621691CBfE3DdD524dE71076b79F0A0278
         nttManagerToken: REPLACEME # 0x26c5e01524d2E6280A48F2c50fF6De7e52E9611C
-        owner: REPLACEME # view call reverted
-        pauser: REPLACEME # 0x0000000000000000000000000000000000000000
+        owner: *ZERO_ADDRESS
+        pauser: *ZERO_ADDRESS
         quoteDeliveryPrice: REPLACEME # need to specify args
     l2TransceiverStructs:
       name: TransceiverStructs
