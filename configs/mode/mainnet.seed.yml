@@ -1,0 +1,18 @@
+---
+deployed:
+  l1:
+    - &l1TokenBridge "0xD0DeA0a3bd8E4D55170943129c025d3fe0493F2A"
+  l2:
+    - &l2TokenBridge "0xb8161F28a5a38cE58f155D9A96bDAc0104985FAc"
+    - &l2Wsteth "0x98f96A4B34D03a2E6f225B28b8f8Cb1279562d81"
+    - &l2GovExecutor "0x2aCeC6D8ABA90685927b61968D84CfFf6192B32C"
+
+l1:
+  rpcUrl: L1_MAINNET_RPC_URL
+  explorerHostname: api.etherscan.io
+  explorerTokenEnv: ETHERSCAN_TOKEN
+
+l2:
+  rpcUrl: https://mainnet.mode.network
+  explorerHostname: explorer.mode.network
+  # explorerTokenEnv: ETHERSCAN_MODE_TOKEN
