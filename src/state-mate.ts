@@ -296,9 +296,15 @@ async function makeBoilerplateForAllNonMutableFunctions(abi: Abi, contract: Cont
     const value = new YAML.Scalar(REPLACE_ME_PLACEHOLDER);
     const view = contract.getFunction(methodInfo.name);
     logReplaceLine(`${methodInfo.name}...`);
-    value.comment = methodInfo.numArgs > 0
-      ? ` need to specify args`
-      : ` ${await view.staticCall()}`;
+    if (methodInfo.numArgs > 0) {
+      value.comment = ` need to specify args`;
+    } else {
+      try {
+        value.comment = ` ${await view.staticCall()}`;
+      } catch (error) {
+        value.comment = ` view call reverted`;
+      }
+    }
     result[methodInfo.name] = value;
   }
   logReplaceLine("Done.\n");
