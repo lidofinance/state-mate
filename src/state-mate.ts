@@ -314,7 +314,7 @@ function reportNonCoveredNonMutableChecks(
 ) {
   const abi = loadAbiFromFile(contractName, address);
   const nonMutableFromAbi = getNonMutables(abi);
-  const nonCovered = nonMutableFromAbi.filter((x) => !checks.includes(x.name));
+  const nonCovered = nonMutableFromAbi.filter((x) => !checks.includes(x.name)).map((x) => x.name ? x.name : x);
   if (nonCovered.length) {
     logError(
       `Section ${contractAlias} ${checksType} does not cover these non-mutable function from ABI: ${chalk.red(nonCovered.join(", "))}`,
@@ -591,6 +591,9 @@ async function _loadContractInfoFromModeExplorer(address: string, explorerHostna
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const sourcesResponse = await httpGetAsync(sourcesUrl) as any; // TODO: add proper type
   const contractInfo = sourcesResponse.result[0];
+  if (!contractInfo["ContractName"]) {
+    logErrorAndExit(`It seems, contract ${address} is not verified on ${explorerHostname}`);
+  }
   const contractName = contractInfo["ContractName"];
   const abi = JSON.parse(contractInfo["ABI"]) as Abi;
   let implementation = null;
