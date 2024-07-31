@@ -5,13 +5,11 @@ parameters:
   - &L1_EMERGENCY_BRAKES "0x73b047fe6337183A454c5217241D780a932777bD"
   - &L2_EMERGENCY_BRAKES "0xC2b778fCc3FF311Cf1abBF4E53880277bfD14C8f"
 
-  # OLD INTERIM MSIG
-  - &L1_OLD_INTERIM_MSIG "0x3cbBdACD98E29d1A71F16b89eD99400cE185a711"
-  - &L2_OLD_INTERIM_MSIG "0x5c4e359827Ee1B4dd845502c24fbd3472114909b"
-
   # NEW INTERIM MSIG
   - &L1_NEW_INTERIM_MSIG "0x83271E76df1eF8f77487A88fc6aE1478280396bD"
   - &L2_NEW_INTERIM_MSIG "0x3e277051019fDBF6A759ff847D197FE657Ca74fe"
+
+  - &L2_NTT_MANAGER_BYTES32_ADDR "0x0000000000000000000000006981f5621691cbfe3ddd524de71076b79f0a0278"
 
 misc:
   - &ZERO_ADDRESS "0x0000000000000000000000000000000000000000"
@@ -19,7 +17,7 @@ misc:
   # Chains
   - &SOL_CHAIN_ID 1 # Placeholder for ETH=2 reasoning ;[
   - &ETH_CHAIN_ID 2
-  - &BNB_CHAIN_ID 4
+  - &BSC_CHAIN_ID 4
   # Versions
   - &NTT_MANAGER_VERSION "1.1.0"
   # Rate limit
@@ -29,6 +27,9 @@ misc:
   - &DECIMALS 18
   # Threshold
   - &THRESHOLD 2
+  # Mode
+  - &LOCKING_MODE 0
+  - &BURNING_MODE 1
 
 deployed:
   l1:
@@ -66,59 +67,117 @@ l1:
       checks:
         NTT_MANAGER_VERSION: *NTT_MANAGER_VERSION # 1.1.0
         chainId: *ETH_CHAIN_ID
-        getCurrentInboundCapacity: REPLACEME # need to specify args
+        getCurrentInboundCapacity:
+          - args: [ *ETH_CHAIN_ID ]
+            result: 0
+          - args: [ *BSC_CHAIN_ID ]
+            result: *RATE_LIMIT
         getCurrentOutboundCapacity: *RATE_LIMIT # 30000000000000000000000
-        getInboundLimitParams: REPLACEME # need to specify args
-        getInboundQueuedTransfer: REPLACEME # need to specify args
-        getMigratesImmutables: REPLACEME # false
-        getMode: REPLACEME # 0
-        getOutboundLimitParams: REPLACEME # 768000000000008,767999999974408,1722353807
-        getOutboundQueuedTransfer: REPLACEME # need to specify args
-        getPeer: REPLACEME # need to specify args
+        getInboundLimitParams:
+          - args: [ *ETH_CHAIN_ID ]
+            result: [0, 0, 0]
+          - args: [ *BSC_CHAIN_ID ]
+            result: [768000000000008, 768000000000008, 1722437087]
+        getInboundQueuedTransfer:
+          - args: [ *ZERO_BYTES32 ]
+            result: [ 0, 0, *ZERO_ADDRESS ]
+        getMigratesImmutables: false
+        getMode: *LOCKING_MODE
+        getOutboundLimitParams: [768000000000008, 767999999974408, 1722437087]
+        getOutboundQueuedTransfer:
+          - args: [ 0 ]
+            result: [ *ZERO_BYTES32, *ZERO_BYTES32, 0, 0, 0, *ZERO_ADDRESS, "0x" ]
+        getPeer:
+          - args: [ *ETH_CHAIN_ID ]
+            result: [ *ZERO_BYTES32, 0 ]
+          - args: [ *BSC_CHAIN_ID ]
+            result: [ *L2_NTT_MANAGER_BYTES32_ADDR, *DECIMALS ]
         getThreshold: *THRESHOLD # 2
-        getTransceiverInfo: REPLACEME # true,true,0,true,true,1
+        getTransceiverInfo: [[ true, true, 0 ],[ true, true, 1 ]] # registered, enabled, index
         getTransceivers: [ *l1WormholeTransceiver, *l1AxelarTransceiver ] # 0xA1ACC1e6edaB281Febd91E3515093F1DE81F25c0,0x723AEAD29acee7E9281C32D11eA4ed0070c41B13
-        isMessageApproved: REPLACEME # need to specify args
-        isMessageExecuted: REPLACEME # need to specify args
+        isMessageApproved:
+          - args: [ *ZERO_BYTES32 ]
+            result: false
+        isMessageExecuted:
+          - args: [ *ZERO_BYTES32 ]
+            result: false
         isPaused: false
-        messageAttestations: REPLACEME # need to specify args
-        mode: REPLACEME # 0
-        nextMessageSequence: REPLACEME # 37
+        messageAttestations:
+         - args: [ *ZERO_BYTES32 ]
+           result: 0
+        mode: *LOCKING_MODE
+        nextMessageSequence: 38
         owner: *L1_NEW_INTERIM_MSIG
         pauser: *L1_NEW_INTERIM_MSIG
-        quoteDeliveryPrice: REPLACEME # need to specify args
-        rateLimitDuration: *RATE_LIMIT_DURATION # 86400
-        token: *L1_WSTETH # 0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0
+        quoteDeliveryPrice:
+          - args: [ *BSC_CHAIN_ID, 0x ]
+            result: [[], 0]
+            mustRevert: true
+        rateLimitDuration: *RATE_LIMIT_DURATION
+        token: *L1_WSTETH
         tokenDecimals: *DECIMALS # 18
-        transceiverAttestedToMessage: REPLACEME # need to specify args
+        transceiverAttestedToMessage:
+          - args: [ *ZERO_BYTES32, 0 ]
+            result: false
+          - args: [ *ZERO_BYTES32, 1 ]
+            result: false
       implementationChecks:
         NTT_MANAGER_VERSION: *NTT_MANAGER_VERSION # 1.1.0
         chainId: *ETH_CHAIN_ID # 2
-        getCurrentInboundCapacity: REPLACEME # need to specify args
-        getCurrentOutboundCapacity: 0 # 0
-        getInboundLimitParams: REPLACEME # need to specify args
-        getInboundQueuedTransfer: REPLACEME # need to specify args
-        getMigratesImmutables: false # false
-        getMode: REPLACEME # 0
-        getOutboundLimitParams: REPLACEME # 0,0,0
-        getOutboundQueuedTransfer: REPLACEME # need to specify args
-        getPeer: REPLACEME # need to specify args
-        getThreshold: 0 # 0
-        getTransceiverInfo: REPLACEME #
-        getTransceivers: REPLACEME #
-        isMessageApproved: REPLACEME # need to specify args
-        isMessageExecuted: REPLACEME # need to specify args
+        getCurrentInboundCapacity:
+          - args: [ *ETH_CHAIN_ID ]
+            result: 0
+          - args: [ *BSC_CHAIN_ID ]
+            result: 0
+        getCurrentOutboundCapacity: 0
+        getInboundLimitParams:
+          - args: [ *ETH_CHAIN_ID ]
+            result: [0, 0, 0]
+          - args: [ *BSC_CHAIN_ID ]
+            result: [0, 0, 0]
+        getInboundQueuedTransfer:
+          - args: [ *ZERO_BYTES32 ]
+            result: [ 0, 0, *ZERO_ADDRESS ]
+        getMigratesImmutables: false
+        getMode: *LOCKING_MODE
+        getOutboundLimitParams: [0, 0, 0]
+        getOutboundQueuedTransfer:
+          - args: [ 0 ]
+            result: [ *ZERO_BYTES32, *ZERO_BYTES32, 0, 0, 0, *ZERO_ADDRESS, "0x" ]
+        getPeer:
+          - args: [ *ETH_CHAIN_ID ]
+            result: [ *ZERO_BYTES32, 0 ]
+          - args: [ *BSC_CHAIN_ID ]
+            result: [ *ZERO_BYTES32, 0 ]
+        getThreshold: 0
+        getTransceiverInfo: []
+        getTransceivers: []
+        isMessageApproved:
+          - args: [ *ZERO_BYTES32 ]
+            result: false
+        isMessageExecuted:
+          - args: [ *ZERO_BYTES32 ]
+            result: false
         isPaused: false # false
-        messageAttestations: REPLACEME # need to specify args
-        mode: REPLACEME # 0
-        nextMessageSequence: 0 # 0
+        messageAttestations:
+         - args: [ *ZERO_BYTES32 ]
+           result: 0
+        mode: *LOCKING_MODE
+        nextMessageSequence: 0
         owner: *ZERO_ADDRESS
         pauser: *ZERO_ADDRESS
-        quoteDeliveryPrice: REPLACEME # need to specify args
+        quoteDeliveryPrice:
+          - args: [ *BSC_CHAIN_ID, 0x ]
+            result: [[], 0]
+            mustRevert: true
         rateLimitDuration: *RATE_LIMIT_DURATION # 86400
         token: *L1_WSTETH # 0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0
         tokenDecimals: *DECIMALS # 18
-        transceiverAttestedToMessage: REPLACEME # need to specify args
+        transceiverAttestedToMessage:
+          - args: [ *ZERO_BYTES32, 0 ]
+            result: false
+          - args: [ *ZERO_BYTES32, 1 ]
+            result: false
     l1WormholeTransceiver:
       name: WormholeTransceiver
       address: *l1WormholeTransceiver
