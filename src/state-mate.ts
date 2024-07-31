@@ -688,10 +688,9 @@ async function iterateDeployedAddresses(doc: YamlDoc, callback: (ctx: DeployedAd
 async function downloadAndSaveAbis(configPath: string) {
   const doc = YAML.parseDocument(fs.readFileSync(configPath, "utf-8"));
   const abiDirPath = path.join(path.dirname(configPath), "abi");
-  if (fs.existsSync(abiDirPath)) {
-    logErrorAndExit(`ABI directory "${abiDirPath}" already exists: delete before a run with saving ABIs`);
+  if (!fs.existsSync(abiDirPath)) {
+    fs.mkdirSync(abiDirPath);
   }
-  fs.mkdirSync(abiDirPath);
 
   function writeAbi(contractName: string, address: string, abi: Abi) {
     const abiPath = path.join(abiDirPath, getAbiFileName(contractName, address));
@@ -797,7 +796,6 @@ function parseCmdLineArgs() {
     .allowExcessArguments(false)
     .option("-o, --only <check-path>", `only checks to do, e.g. 'l2/proxyAdmin/${Ef.checks}/owner', 'l1', 'l1/controller'`)
     .option("--generate", "NB: currently, boilerplate generation only works with downloading ABIs from explorer")
-    .option("--save-abi-from-explorer", "for addresses in 'deployed' section download ABIs to abi directory")
     .parse();
 
   const configPath = program.args[0];
@@ -822,18 +820,14 @@ function parseCmdLineArgs() {
     checkOnly,
     checkOnlyCmdArg: options.only,
     generate: options.generate,
-    saveAbiFromExplorer: options.saveAbiFromExplorer,
   };
 }
 
 export async function main() {
   g_Args = parseCmdLineArgs();
 
-  if (g_Args.saveAbiFromExplorer) {
-    await downloadAndSaveAbis(g_Args.configPath);
-  }
-
   if (g_Args.generate) {
+    await downloadAndSaveAbis(g_Args.configPath);
     await doGenerateBoilerplate(g_Args.configPath);
   } else {
     await doChecks(g_Args.configPath);
