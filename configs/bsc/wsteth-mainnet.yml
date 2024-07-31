@@ -17,9 +17,9 @@ misc:
   - &ZERO_ADDRESS "0x0000000000000000000000000000000000000000"
   - &ZERO_BYTES32 "0x0000000000000000000000000000000000000000000000000000000000000000"
   # Chains
-  - &SOL_CHAIN_ID 1 # Placeholder
+  - &SOL_CHAIN_ID 1 # Placeholder for ETH=2 reasoning ;[
   - &ETH_CHAIN_ID 2
-  - &BNB_CHAIN_ID 56
+  - &BNB_CHAIN_ID 4
   # Versions
   - &NTT_MANAGER_VERSION "1.1.0"
   # Rate limit
@@ -27,6 +27,8 @@ misc:
   - &RATE_LIMIT_DURATION 86400 # per day
   # Decimals
   - &DECIMALS 18
+  # Threshold
+  - &THRESHOLD 2
 
 deployed:
   l1:
@@ -73,17 +75,17 @@ l1:
         getOutboundLimitParams: REPLACEME # 768000000000008,767999999974408,1722353807
         getOutboundQueuedTransfer: REPLACEME # need to specify args
         getPeer: REPLACEME # need to specify args
-        getThreshold: REPLACEME # 2
+        getThreshold: *THRESHOLD # 2
         getTransceiverInfo: REPLACEME # true,true,0,true,true,1
-        getTransceivers: REPLACEME # 0xA1ACC1e6edaB281Febd91E3515093F1DE81F25c0,0x723AEAD29acee7E9281C32D11eA4ed0070c41B13
+        getTransceivers: [ *l1WormholeTransceiver, *l1AxelarTransceiver ] # 0xA1ACC1e6edaB281Febd91E3515093F1DE81F25c0,0x723AEAD29acee7E9281C32D11eA4ed0070c41B13
         isMessageApproved: REPLACEME # need to specify args
         isMessageExecuted: REPLACEME # need to specify args
-        isPaused: REPLACEME # false
+        isPaused: false
         messageAttestations: REPLACEME # need to specify args
         mode: REPLACEME # 0
         nextMessageSequence: REPLACEME # 37
-        owner: *L1_OLD_INTERIM_MSIG # 0x3cbBdACD98E29d1A71F16b89eD99400cE185a711
-        pauser: *L1_OLD_INTERIM_MSIG # 0x3cbBdACD98E29d1A71F16b89eD99400cE185a711
+        owner: *L1_NEW_INTERIM_MSIG
+        pauser: *L1_NEW_INTERIM_MSIG
         quoteDeliveryPrice: REPLACEME # need to specify args
         rateLimitDuration: *RATE_LIMIT_DURATION # 86400
         token: *L1_WSTETH # 0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0
@@ -93,29 +95,29 @@ l1:
         NTT_MANAGER_VERSION: *NTT_MANAGER_VERSION # 1.1.0
         chainId: *ETH_CHAIN_ID # 2
         getCurrentInboundCapacity: REPLACEME # need to specify args
-        getCurrentOutboundCapacity: REPLACEME # 0
+        getCurrentOutboundCapacity: 0 # 0
         getInboundLimitParams: REPLACEME # need to specify args
         getInboundQueuedTransfer: REPLACEME # need to specify args
-        getMigratesImmutables: REPLACEME # false
+        getMigratesImmutables: false # false
         getMode: REPLACEME # 0
         getOutboundLimitParams: REPLACEME # 0,0,0
         getOutboundQueuedTransfer: REPLACEME # need to specify args
         getPeer: REPLACEME # need to specify args
-        getThreshold: REPLACEME # 0
+        getThreshold: 0 # 0
         getTransceiverInfo: REPLACEME #
         getTransceivers: REPLACEME #
         isMessageApproved: REPLACEME # need to specify args
         isMessageExecuted: REPLACEME # need to specify args
-        isPaused: REPLACEME # false
+        isPaused: false # false
         messageAttestations: REPLACEME # need to specify args
         mode: REPLACEME # 0
         nextMessageSequence: REPLACEME # 0
-        owner: REPLACEME # 0x0000000000000000000000000000000000000000
-        pauser: REPLACEME # 0x0000000000000000000000000000000000000000
+        owner: *ZERO_ADDRESS # 0x0000000000000000000000000000000000000000
+        pauser: *ZERO_ADDRESS # 0x0000000000000000000000000000000000000000
         quoteDeliveryPrice: REPLACEME # need to specify args
-        rateLimitDuration: REPLACEME # 86400
-        token: REPLACEME # 0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0
-        tokenDecimals: REPLACEME # 18
+        rateLimitDuration: *RATE_LIMIT_DURATION # 86400
+        token: *L1_WSTETH # 0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0
+        tokenDecimals: *DECIMALS # 18
         transceiverAttestedToMessage: REPLACEME # need to specify args
     l1WormholeTransceiver:
       name: WormholeTransceiver
