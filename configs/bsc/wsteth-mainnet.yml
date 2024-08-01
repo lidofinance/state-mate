@@ -58,8 +58,9 @@ deployed:
     - &l1WormholeTransceiverImpl "0x3ce1230f39302e62b67bbf2316558f79c25424a2"
     - &l1AxelarTransceiver "0x723AEAD29acee7E9281C32D11eA4ed0070c41B13"
     - &l1AxelarTransceiverImpl "0x87fc4B27385Bb4E69A40027931229d74EF4d1943"
-    - &l1TransceiverStructs "0xf0396a8077eda579f657B5E6F3c3F5e8EE81972b"
-    - &l1TransceiverStructsAxelar "0xa12bc993d8144404a8c8c812816048275a066ced"
+    # Stateless libraries
+    # &l1TransceiverStructs "0xf0396a8077eda579f657B5E6F3c3F5e8EE81972b"
+    # &l1TransceiverStructsAxelar "0xa12bc993d8144404a8c8c812816048275a066ced"
   l2:
     - &l2wstETHToken "0x26c5e01524d2E6280A48F2c50fF6De7e52E9611C"
     - &l2wstETHTokenImpl "0x451d447776778870bdfe76d031689703aba73ee5"
@@ -69,11 +70,12 @@ deployed:
     - &l2WormholeTransceiverImpl "0xb948a93827d68a82F6513Ad178964Da487fe2BD9"
     - &l2AxelarTransceiver "0x723AEAD29acee7E9281C32D11eA4ed0070c41B13"
     - &l2AxelarTransceiverImpl "0xa1ebb6a4b856df8bf6c3aca88a9115a9ab3b2e02"
-    - &l2TransceiverStructs "0xf0396a8077eda579f657B5E6F3c3F5e8EE81972b"
-    - &l2TransceiverStructsAxelar "0x27a3daf3b243104e9b0afae6b56026a416b852c9"
+    # Stateless libraries
+    # &l2TransceiverStructs "0xf0396a8077eda579f657B5E6F3c3F5e8EE81972b"
+    # &l2TransceiverStructsAxelar "0x27a3daf3b243104e9b0afae6b56026a416b852c9"
 
 l1:
-  rpcUrl: https://eth.drpc.org
+  rpcUrl: https://ethereum-rpc.publicnode.com
   explorerHostname: api.etherscan.io
   explorerTokenEnv: ETHERSCAN_TOKEN
   contracts:
@@ -343,51 +345,9 @@ l1:
           - args: [ *BSC_CHAIN_ID, 0x ]
             result: [[], 0]
             mustRevert: true
-    l1TransceiverStructs:
-      name: TransceiverStructs
-      address: *l1TransceiverStructs
-      checks:
-        buildAndEncodeTransceiverMessage: REPLACEME # need to specify args
-        decodeTransceiverInit: REPLACEME # need to specify args
-        decodeTransceiverRegistration: REPLACEME # need to specify args
-        encodeNativeTokenTransfer: REPLACEME # need to specify args
-        encodeNttManagerMessage: REPLACEME # need to specify args
-        encodeTransceiverInit: REPLACEME # need to specify args
-        encodeTransceiverInstruction: REPLACEME # need to specify args
-        encodeTransceiverInstructions: REPLACEME # need to specify args
-        encodeTransceiverMessage: REPLACEME # need to specify args
-        encodeTransceiverRegistration: REPLACEME # need to specify args
-        nttManagerMessageDigest: REPLACEME # need to specify args
-        parseNativeTokenTransfer: REPLACEME # need to specify args
-        parseNttManagerMessage: REPLACEME # need to specify args
-        parseTransceiverAndNttManagerMessage: REPLACEME # need to specify args
-        parseTransceiverInstructionChecked: REPLACEME # need to specify args
-        parseTransceiverInstructionUnchecked: REPLACEME # need to specify args
-        parseTransceiverInstructions: REPLACEME # need to specify args
-    l1TransceiverStructsAxelar:
-      name: TransceiverStructs
-      address: *l1TransceiverStructsAxelar
-      checks:
-        buildAndEncodeTransceiverMessage: REPLACEME # need to specify args
-        decodeTransceiverInit: REPLACEME # need to specify args
-        decodeTransceiverRegistration: REPLACEME # need to specify args
-        encodeNativeTokenTransfer: REPLACEME # need to specify args
-        encodeNttManagerMessage: REPLACEME # need to specify args
-        encodeTransceiverInit: REPLACEME # need to specify args
-        encodeTransceiverInstruction: REPLACEME # need to specify args
-        encodeTransceiverInstructions: REPLACEME # need to specify args
-        encodeTransceiverMessage: REPLACEME # need to specify args
-        encodeTransceiverRegistration: REPLACEME # need to specify args
-        nttManagerMessageDigest: REPLACEME # need to specify args
-        parseNativeTokenTransfer: REPLACEME # need to specify args
-        parseNttManagerMessage: REPLACEME # need to specify args
-        parseTransceiverAndNttManagerMessage: REPLACEME # need to specify args
-        parseTransceiverInstructionChecked: REPLACEME # need to specify args
-        parseTransceiverInstructionUnchecked: REPLACEME # need to specify args
-        parseTransceiverInstructions: REPLACEME # need to specify args
 
 l2:
-  rpcUrl: https://bsc.drpc.org
+  rpcUrl: https://bsc-rpc.publicnode.com
   explorerHostname: api.bscscan.com
   explorerTokenEnv: BSCSCAN_TOKEN
   contracts:
@@ -653,7 +613,9 @@ l2:
         nttManager: *l2NttManager
         nttManagerToken: *l2wstETHToken
         owner: *ZERO_ADDRESS
-        parseWormholeTransceiverInstruction: REPLACEME # need to specify args
+        parseWormholeTransceiverInstruction:
+          - args: [ 0x ]
+            result: [ false ]
         pauser: *ZERO_ADDRESS
         quoteDeliveryPrice:
           - args: [ *BSC_CHAIN_ID, 0x ]
@@ -702,45 +664,3 @@ l2:
           - args: [ *BSC_CHAIN_ID, 0x ]
             result: [[], 0]
             mustRevert: true
-    l2TransceiverStructs:
-      name: TransceiverStructs
-      address: *l2TransceiverStructs
-      checks:
-        buildAndEncodeTransceiverMessage: REPLACEME # need to specify args
-        decodeTransceiverInit: REPLACEME # need to specify args
-        decodeTransceiverRegistration: REPLACEME # need to specify args
-        encodeNativeTokenTransfer: REPLACEME # need to specify args
-        encodeNttManagerMessage: REPLACEME # need to specify args
-        encodeTransceiverInit: REPLACEME # need to specify args
-        encodeTransceiverInstruction: REPLACEME # need to specify args
-        encodeTransceiverInstructions: REPLACEME # need to specify args
-        encodeTransceiverMessage: REPLACEME # need to specify args
-        encodeTransceiverRegistration: REPLACEME # need to specify args
-        nttManagerMessageDigest: REPLACEME # need to specify args
-        parseNativeTokenTransfer: REPLACEME # need to specify args
-        parseNttManagerMessage: REPLACEME # need to specify args
-        parseTransceiverAndNttManagerMessage: REPLACEME # need to specify args
-        parseTransceiverInstructionChecked: REPLACEME # need to specify args
-        parseTransceiverInstructionUnchecked: REPLACEME # need to specify args
-        parseTransceiverInstructions: REPLACEME # need to specify args
-    l2TransceiverStructsAxelar:
-      name: TransceiverStructs
-      address: *l2TransceiverStructsAxelar
-      checks:
-        buildAndEncodeTransceiverMessage: REPLACEME # need to specify args
-        decodeTransceiverInit: REPLACEME # need to specify args
-        decodeTransceiverRegistration: REPLACEME # need to specify args
-        encodeNativeTokenTransfer: REPLACEME # need to specify args
-        encodeNttManagerMessage: REPLACEME # need to specify args
-        encodeTransceiverInit: REPLACEME # need to specify args
-        encodeTransceiverInstruction: REPLACEME # need to specify args
-        encodeTransceiverInstructions: REPLACEME # need to specify args
-        encodeTransceiverMessage: REPLACEME # need to specify args
-        encodeTransceiverRegistration: REPLACEME # need to specify args
-        nttManagerMessageDigest: REPLACEME # need to specify args
-        parseNativeTokenTransfer: REPLACEME # need to specify args
-        parseNttManagerMessage: REPLACEME # need to specify args
-        parseTransceiverAndNttManagerMessage: REPLACEME # need to specify args
-        parseTransceiverInstructionChecked: REPLACEME # need to specify args
-        parseTransceiverInstructionUnchecked: REPLACEME # need to specify args
-        parseTransceiverInstructions: REPLACEME # need to specify args
