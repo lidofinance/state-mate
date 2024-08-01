@@ -138,8 +138,8 @@ l2:
         OLDEST_RATE_ALLOWED_IN_PAUSE_TIME_SPAN: 86400
         TOKEN_RATE_OUTDATED_DELAY: 86400
         getContractVersion: 1
-        getTokenRatesLength: 1
-        isLikelyOutdated: false
+        getTokenRatesLength: 2
+        isLikelyOutdated: true
         isTokenRateUpdatesPaused: false
         supportsInterface:
           - args: [ "0x01ffc9a7" ] # IERC165
