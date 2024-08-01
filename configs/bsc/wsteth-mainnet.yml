@@ -10,6 +10,7 @@ parameters:
   - &L2_NEW_INTERIM_MSIG "0x3e277051019fDBF6A759ff847D197FE657Ca74fe"
 
   - &L2_NTT_MANAGER_BYTES32_ADDR "0x0000000000000000000000006981f5621691cbfe3ddd524de71076b79f0a0278"
+  - &L2_WORMHOLE_TRANSCEIVER_BYTES32_ADDR "0x000000000000000000000000be3f7e06872e0df6cd7ff35b7aa4bb1446dc9986"
 
 misc:
   - &ZERO_ADDRESS "0x0000000000000000000000000000000000000000"
@@ -31,12 +32,22 @@ misc:
   - &LOCKING_MODE 0
   - &BURNING_MODE 1
 
+  # Wormhole system contracts (https://docs.wormhole.com/wormhole/reference/blockchain-environments/evm)
+  - &L1_WORMHOLE "0x98f3c9e6E3fAce36bAAd05FE09d375Ef1464288B"
+  - &L1_WORMHOLE_RELAYER "0x27428DD2d3DD32A4D7f7C497eAaa23130d894911"
+  # no evidence outside of the research forum, but unused
+  - &L1_WORMHOLE_SPECIAL_RELAYER "0x63BE47835c7D66c4aA5B2C688Dc6ed9771c94C74"
+
+  # Axelar system contracts (https://docs.axelar.dev/dev/reference/mainnet-contract-addresses)
+  - &L1_AXELAR_GAS_SERVICE "0x2d5d7d31F671F86C782533cc367F14109a082712"
+  - &L1_AXELAR_GATEWAY "0x4F4495243837681061C4743b74B3eEdf548D56A5"
+
 deployed:
   l1:
     - &l1NttManager "0xb948a93827d68a82F6513Ad178964Da487fe2BD9"
     - &l1NttManagerImpl "0xc6c1f091450b54af3280cfed790047431bc99bb1"
     - &l1WormholeTransceiver "0xA1ACC1e6edaB281Febd91E3515093F1DE81F25c0"
-    - &l1WormholeTransceiverImpl "0xb948a93827d68a82F6513Ad178964Da487fe2BD9"
+    - &l1WormholeTransceiverImpl "0x3ce1230f39302e62b67bbf2316558f79c25424a2"
     - &l1AxelarTransceiver "0x723AEAD29acee7E9281C32D11eA4ed0070c41B13"
     - &l1AxelarTransceiverImpl "0x87fc4B27385Bb4E69A40027931229d74EF4d1943"
     - &l1TransceiverStructs "0xf0396a8077eda579f657B5E6F3c3F5e8EE81972b"
@@ -198,9 +209,9 @@ l1:
         getTransceiverType: "wormhole"
         getWormholePeer:
           - args: [ *ETH_CHAIN_ID ]
-            result: [ *ZERO_BYTES32 ]
+            result: *ZERO_BYTES32
           - args: [ *BSC_CHAIN_ID ]
-            result: [ *ZERO_BYTES32 ]
+            result: *L2_WORMHOLE_TRANSCEIVER_BYTES32_ADDR
         isPaused: false
         isSpecialRelayingEnabled:
           - args: [ *ETH_CHAIN_ID ]
@@ -212,43 +223,78 @@ l1:
             result: false
         isWormholeEvmChain:
           - args: [ *ETH_CHAIN_ID ]
-            result: true
+            result: false # how come ???
           - args: [ *BSC_CHAIN_ID ]
             result: true
-        isWormholeRelayingEnabled: REPLACEME # need to specify args
+        isWormholeRelayingEnabled:
+          - args: [ *ETH_CHAIN_ID ]
+            result: false
+          - args: [ *BSC_CHAIN_ID ]
+            result: true
         nttManager: *l1NttManager
         nttManagerToken: *L1_WSTETH
         owner: *L1_NEW_INTERIM_MSIG
-        parseWormholeTransceiverInstruction: REPLACEME # need to specify args
+        parseWormholeTransceiverInstruction:
+          - args: [ 0x ]
+            result: [ false ]
         pauser: *L1_NEW_INTERIM_MSIG
-        quoteDeliveryPrice: REPLACEME # need to specify args
-        specialRelayer: REPLACEME # 0x63BE47835c7D66c4aA5B2C688Dc6ed9771c94C74
-        wormhole: REPLACEME # 0x98f3c9e6E3fAce36bAAd05FE09d375Ef1464288B
-        wormholeRelayer: REPLACEME # 0x27428DD2d3DD32A4D7f7C497eAaa23130d894911
+        quoteDeliveryPrice:
+          - args: [ *BSC_CHAIN_ID, 0x ]
+            result: [[], 0]
+            mustRevert: true
+        specialRelayer: *L1_WORMHOLE_SPECIAL_RELAYER # unused
+        wormhole: *L1_WORMHOLE
+        wormholeRelayer: *L1_WORMHOLE_RELAYER
       implementationChecks:
         WORMHOLE_TRANSCEIVER_VERSION: *NTT_MANAGER_VERSION # 1.1.0
-        consistencyLevel: REPLACEME # 1
-        encodeWormholeTransceiverInstruction: REPLACEME # need to specify args
-        gasLimit: REPLACEME # 500000
-        getMigratesImmutables: REPLACEME # false
+        consistencyLevel: 1
+        encodeWormholeTransceiverInstruction:
+          - args: [ ]
+            result: [ ]
+            mustRevert: true
+        gasLimit: 500000
+        getMigratesImmutables: false
         getNttManagerOwner: *L1_NEW_INTERIM_MSIG
         getNttManagerToken: *L1_WSTETH # 0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0
-        getTransceiverType: REPLACEME # wormhole
-        getWormholePeer: REPLACEME # need to specify args
-        isPaused: REPLACEME # false
-        isSpecialRelayingEnabled: REPLACEME # need to specify args
-        isVAAConsumed: REPLACEME # need to specify args
-        isWormholeEvmChain: REPLACEME # need to specify args
-        isWormholeRelayingEnabled: REPLACEME # need to specify args
-        nttManager: REPLACEME # 0xb948a93827d68a82F6513Ad178964Da487fe2BD9
-        nttManagerToken: REPLACEME # 0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0
+        getTransceiverType: "wormhole"
+        getWormholePeer:
+          - args: [ *ETH_CHAIN_ID ]
+            result: *ZERO_BYTES32
+          - args: [ *BSC_CHAIN_ID ]
+            result: *ZERO_BYTES32 # nowhere
+        isPaused: false
+        isSpecialRelayingEnabled:
+          - args: [ *ETH_CHAIN_ID ]
+            result: false
+          - args: [ *BSC_CHAIN_ID ]
+            result: false
+        isVAAConsumed:
+          - args: [ *ZERO_BYTES32 ]
+            result: false
+        isWormholeEvmChain:
+          - args: [ *ETH_CHAIN_ID ]
+            result: false
+          - args: [ *BSC_CHAIN_ID ]
+            result: false # unplugged
+        isWormholeRelayingEnabled:
+          - args: [ *ETH_CHAIN_ID ]
+            result: false
+          - args: [ *BSC_CHAIN_ID ]
+            result: false # unplugged
+        nttManager: *l1NttManager
+        nttManagerToken: *L1_WSTETH
         owner: *ZERO_ADDRESS
-        parseWormholeTransceiverInstruction: REPLACEME # need to specify args
+        parseWormholeTransceiverInstruction:
+          - args: [ 0x ]
+            result: [ false ]
         pauser: *ZERO_ADDRESS
-        quoteDeliveryPrice: REPLACEME # need to specify args
-        specialRelayer: REPLACEME # 0x63BE47835c7D66c4aA5B2C688Dc6ed9771c94C74
-        wormhole: REPLACEME # 0x98f3c9e6E3fAce36bAAd05FE09d375Ef1464288B
-        wormholeRelayer: REPLACEME # 0x27428DD2d3DD32A4D7f7C497eAaa23130d894911
+        quoteDeliveryPrice:
+          - args: [ *BSC_CHAIN_ID, 0x ]
+            result: [[], 0]
+            mustRevert: true
+        specialRelayer: *L1_WORMHOLE_SPECIAL_RELAYER # unused
+        wormhole: *L1_WORMHOLE
+        wormholeRelayer: *L1_WORMHOLE_RELAYER
     l1AxelarTransceiver:
       name: AxelarTransceiver
       address: *l1AxelarTransceiver
@@ -257,32 +303,38 @@ l1:
       proxyChecks: {}
       checks:
         AXELAR_TRANSCEIVER_VERSION: *NTT_MANAGER_VERSION # 1.1.0
-        gasService: REPLACEME # 0x2d5d7d31F671F86C782533cc367F14109a082712
-        gateway: REPLACEME # 0x4F4495243837681061C4743b74B3eEdf548D56A5
-        getMigratesImmutables: REPLACEME # false
+        gasService: *L1_AXELAR_GAS_SERVICE
+        gateway: *L1_AXELAR_GATEWAY
+        getMigratesImmutables: false
         getNttManagerOwner: *L1_NEW_INTERIM_MSIG
         getNttManagerToken: *L1_WSTETH
-        getTransceiverType: REPLACEME # axelar
-        isPaused: REPLACEME # false
-        nttManager: REPLACEME # 0xb948a93827d68a82F6513Ad178964Da487fe2BD9
-        nttManagerToken: REPLACEME # 0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0
+        getTransceiverType: "axelar"
+        isPaused: false
+        nttManager: *l1NttManager
+        nttManagerToken: *L1_WSTETH
         owner: *L1_NEW_INTERIM_MSIG
         pauser: *L1_NEW_INTERIM_MSIG
-        quoteDeliveryPrice: REPLACEME # need to specify args
+        quoteDeliveryPrice:
+          - args: [ *BSC_CHAIN_ID, 0x ]
+            result: [[], 0]
+            mustRevert: true
       implementationChecks:
         AXELAR_TRANSCEIVER_VERSION: *NTT_MANAGER_VERSION # 1.1.0
-        gasService: REPLACEME # 0x2d5d7d31F671F86C782533cc367F14109a082712
-        gateway: REPLACEME # 0x4F4495243837681061C4743b74B3eEdf548D56A5
-        getMigratesImmutables: REPLACEME # false
+        gasService: *L1_AXELAR_GAS_SERVICE
+        gateway: *L1_AXELAR_GATEWAY
+        getMigratesImmutables: false
         getNttManagerOwner: *L1_NEW_INTERIM_MSIG
         getNttManagerToken: *L1_WSTETH
-        getTransceiverType: REPLACEME # axelar
-        isPaused: REPLACEME # false
-        nttManager: REPLACEME # 0xb948a93827d68a82F6513Ad178964Da487fe2BD9
+        getTransceiverType: "axelar"
+        isPaused: false
+        nttManager: *l1NttManager
         nttManagerToken: *L1_WSTETH
         owner: *ZERO_ADDRESS
         pauser: *ZERO_ADDRESS
-        quoteDeliveryPrice: REPLACEME # need to specify args
+        quoteDeliveryPrice:
+          - args: [ *BSC_CHAIN_ID, 0x ]
+            result: [[], 0]
+            mustRevert: true
     l1TransceiverStructs:
       name: TransceiverStructs
       address: *l1TransceiverStructs
