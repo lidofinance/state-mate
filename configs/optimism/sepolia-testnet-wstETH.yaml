@@ -30,7 +30,7 @@ roles:
 
 
 l1:
-  rpcUrl: L1_RPC_URL
+  rpcUrl: L1_TESTNET_RPC_URL
   contracts:
     tokenBridge:
       name: L1ERC20TokenBridge
@@ -71,7 +71,7 @@ l1:
         *WITHDRAWALS_ENABLER_ROLE : [*agent]
 
 l2:
-  rpcUrl: https://optimism-sepolia.infura.io/v3/8d011e4e23594b869770b69ba649cc83
+  rpcUrl: L2_TESTNET_RPC_URL
   contracts:
     governanceExecutor:
       name: OptimismBridgeExecutor

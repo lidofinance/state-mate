@@ -41,7 +41,7 @@ roles:
   - &RATE_UPDATE_ENABLER_ROLE "0x5a883d2caeb13c05f1649a05c9c61c1deb622a06bff8d94d071d35c5ad8c2c94"
 
 l1:
-  rpcUrl: L1_RPC_URL
+  rpcUrl: L1_TESTNET_RPC_URL
   contracts:
     tokenRateNotifier:
       name: TokenRateNotifier
@@ -110,7 +110,7 @@ l1:
         *WITHDRAWALS_ENABLER_ROLE : [*agent]
 
 l2:
-  rpcUrl: L2_RPC_URL
+  rpcUrl: L2_TESTNET_RPC_URL
   contracts:
     tokenRateOracle:
       name: TokenRateOracle
