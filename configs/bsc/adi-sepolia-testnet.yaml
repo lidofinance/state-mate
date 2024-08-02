@@ -60,7 +60,7 @@ roles:
 l1:
   rpcUrl: https://ethereum-sepolia.publicnode.com # L1_RPC_URL # https://eth.drpc.org # L1_RPC_URL # https://ethereum.publicnode.com # url or env var
   explorerHostname: api-sepolia.etherscan.io
-  explorerTokenEnv: ETHERSCAN_API_KEY
+  explorerTokenEnv: ETHERSCAN_TOKEN
   contracts:
     proxyAdmin:
       name: "ProxyAdmin"
@@ -294,7 +294,7 @@ l1:
 l2:
   rpcUrl: https://data-seed-prebsc-1-s1.binance.org:8545 # L2_RPC_URL # https://bsc-dataseed.binance.org # L2_RPC_URL # url or env var
   explorerHostname: api-testnet.bscscan.com
-  explorerTokenEnv: BSCSCAN_API_KEY
+  explorerTokenEnv: BSCSCAN_TOKEN
   contracts:
     proxyAdmin:
       name: "ProxyAdmin"
