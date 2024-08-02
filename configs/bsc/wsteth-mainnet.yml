@@ -106,7 +106,7 @@ l1:
             result: [ 0, 0, *ZERO_ADDRESS ]
         getMigratesImmutables: false
         getMode: *LOCKING_MODE
-        getOutboundLimitParams: [768000000000008, 767999999974408, 1722521939]
+        getOutboundLimitParams: [768000000000008,767999999974408,1722521939]
         getOutboundQueuedTransfer:
           - args: [ 0 ]
             result: [ *ZERO_BYTES32, *ZERO_BYTES32, 0, 0, 0, *ZERO_ADDRESS, "0x" ]
@@ -134,7 +134,7 @@ l1:
         pauser: *L1_NEW_INTERIM_MSIG
         quoteDeliveryPrice:
           - args: [ *BSC_CHAIN_ID, "0x" ]
-            result: [[], 0]
+            result: []
             mustRevert: true
         rateLimitDuration: *RATE_LIMIT_DURATION
         token: *L1_WSTETH
@@ -191,7 +191,7 @@ l1:
         pauser: *ZERO_ADDRESS
         quoteDeliveryPrice:
           - args: [ *BSC_CHAIN_ID, "0x" ]
-            result: [[], 0]
+            result: []
             mustRevert: true
         rateLimitDuration: *RATE_LIMIT_DURATION
         token: *L1_WSTETH
@@ -212,7 +212,7 @@ l1:
         consistencyLevel: 1
         encodeWormholeTransceiverInstruction:
           - args: [ ]
-            result: [ ]
+            result: []
             mustRevert: true
         gasLimit: *GAS_LIMIT
         getMigratesImmutables: false
@@ -252,7 +252,7 @@ l1:
         pauser: *L1_NEW_INTERIM_MSIG
         quoteDeliveryPrice:
           - args: [ *BSC_CHAIN_ID, "0x" ]
-            result: [[], 0]
+            result: []
             mustRevert: true
         specialRelayer: *L1_L2_WORMHOLE_SPECIAL_RELAYER # unused
         wormhole: *L1_L2_WORMHOLE
@@ -262,7 +262,7 @@ l1:
         consistencyLevel: 1
         encodeWormholeTransceiverInstruction:
           - args: [ ]
-            result: [ ]
+            result: []
             mustRevert: true
         gasLimit: *GAS_LIMIT
         getMigratesImmutables: false
@@ -302,7 +302,7 @@ l1:
         pauser: *ZERO_ADDRESS
         quoteDeliveryPrice:
           - args: [ *BSC_CHAIN_ID, "0x" ]
-            result: [[], 0]
+            result: []
             mustRevert: true
         specialRelayer: *L1_L2_WORMHOLE_SPECIAL_RELAYER # unused
         wormhole: *L1_L2_WORMHOLE
@@ -328,7 +328,7 @@ l1:
         pauser: *L1_NEW_INTERIM_MSIG
         quoteDeliveryPrice:
           - args: [ *BSC_CHAIN_ID, "0x" ]
-            result: [[], 0]
+            result: []
             mustRevert: true
       implementationChecks:
         AXELAR_TRANSCEIVER_VERSION: *NTT_MANAGER_VERSION
@@ -345,7 +345,7 @@ l1:
         pauser: *ZERO_ADDRESS
         quoteDeliveryPrice:
           - args: [ *BSC_CHAIN_ID, "0x" ]
-            result: [[], 0]
+            result: []
             mustRevert: true
 
 l2:
@@ -380,7 +380,7 @@ l2:
             result: []
             mustRevert: true
         symbol: *TOKEN_SYMBOL
-        totalSupply: 595100000000000
+        totalSupply: 596100000000000
       implementationChecks:
         UPGRADE_INTERFACE_VERSION: *TOKEN_UPGRADE_INTERFACE_VERSION
         allowance:
@@ -417,7 +417,7 @@ l2:
         getCurrentOutboundCapacity: *RATE_LIMIT
         getInboundLimitParams:
           - args: [ *ETH_CHAIN_ID ]
-            result: [768000000000008, 767999999974408, 1722438124]
+            result: [768000000000008,767999999974408,1722523012]
           - args: [ *BSC_CHAIN_ID ]
             result: [0, 0, 0]
         getInboundQueuedTransfer:
@@ -425,7 +425,7 @@ l2:
             result: [ 0, 0, *ZERO_ADDRESS ]
         getMigratesImmutables: false
         getMode: *BURNING_MODE
-        getOutboundLimitParams: [768000000000008, 768000000000008, 1722438124]
+        getOutboundLimitParams: [768000000000008,768000000000008,1722523012]
         getOutboundQueuedTransfer:
           - args: [ 0 ]
             result: [ *ZERO_BYTES32, *ZERO_BYTES32, 0, 0, 0, *ZERO_ADDRESS, "0x" ]
@@ -453,7 +453,7 @@ l2:
         pauser: *L2_NEW_INTERIM_MSIG
         quoteDeliveryPrice:
           - args: [ *ETH_CHAIN_ID, "0x" ]
-            result: [[], 0]
+            result: []
             mustRevert: true
         rateLimitDuration: *RATE_LIMIT_DURATION
         token: *l2wstETHToken
@@ -510,7 +510,7 @@ l2:
         pauser: *ZERO_ADDRESS
         quoteDeliveryPrice:
           - args: [ *ETH_CHAIN_ID, "0x" ]
-            result: [[], 0]
+            result: []
             mustRevert: true
         rateLimitDuration: *RATE_LIMIT_DURATION
         token: *l2wstETHToken
@@ -531,7 +531,7 @@ l2:
         consistencyLevel: 15
         encodeWormholeTransceiverInstruction:
           - args: [ ]
-            result: [ ]
+            result: []
             mustRevert: true
         gasLimit: *GAS_LIMIT
         getMigratesImmutables: false
@@ -571,7 +571,7 @@ l2:
         pauser: *L2_NEW_INTERIM_MSIG
         quoteDeliveryPrice:
           - args: [ *BSC_CHAIN_ID, "0x" ]
-            result: [[], 0]
+            result: []
             mustRevert: true
         specialRelayer: *L1_L2_WORMHOLE_SPECIAL_RELAYER
         wormhole: *L1_L2_WORMHOLE
@@ -581,7 +581,7 @@ l2:
         consistencyLevel: 15
         encodeWormholeTransceiverInstruction:
           - args: [ ]
-            result: [ ]
+            result: []
             mustRevert: true
         gasLimit: *GAS_LIMIT
         getMigratesImmutables: false
@@ -621,7 +621,7 @@ l2:
         pauser: *ZERO_ADDRESS
         quoteDeliveryPrice:
           - args: [ *BSC_CHAIN_ID, "0x" ]
-            result: [[], 0]
+            result: []
             mustRevert: true
         specialRelayer: *L1_L2_WORMHOLE_SPECIAL_RELAYER # unused
         wormhole: *L1_L2_WORMHOLE
@@ -647,6 +647,7 @@ l2:
         pauser: *L2_NEW_INTERIM_MSIG
         quoteDeliveryPrice:
           - args: [ *BSC_CHAIN_ID, "0x" ]
+            result: []
             mustRevert: true
       implementationChecks:
         AXELAR_TRANSCEIVER_VERSION: *NTT_MANAGER_VERSION
@@ -663,4 +664,5 @@ l2:
         pauser: *ZERO_ADDRESS
         quoteDeliveryPrice:
           - args: [ *BSC_CHAIN_ID, "0x" ]
+            result: []
             mustRevert: true
