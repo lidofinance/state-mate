@@ -87,6 +87,26 @@ l1:
         oracleDaemonConfig: *oracleDaemonConfig
         coreComponents: null
         oracleReportComponentsForLido: null
+    previousLidoLocatorImpl:
+      name: LidoLocator
+      address: *lidoLocatorPreviousImpl
+      checks:
+        postTokenRebaseReceiver: *legacyOracle
+        lido: *lido
+        accountingOracle: *accountingOracle
+        depositSecurityModule: *depositSecurityModule
+        elRewardsVault: *elRewardsVault
+        legacyOracle: *legacyOracle
+        oracleReportSanityChecker: *oracleReportSanityChecker
+        burner: *burner
+        stakingRouter: *stakingRouter
+        treasury: *treasury
+        validatorsExitBusOracle: *validatorsExitBusOracle
+        withdrawalQueue: *withdrawalQueue
+        withdrawalVault: *withdrawalVault
+        oracleDaemonConfig: *oracleDaemonConfig
+        coreComponents: null
+        oracleReportComponentsForLido: null
     tokenRateNotifier:
       name: TokenRateNotifier
       address: *l1TokenRateNotifier
@@ -126,7 +146,7 @@ l1:
         proxy__getIsOssified: false
       checks:
         isInitialized: true
-        isDepositsEnabled: true
+        isDepositsEnabled: false
         isWithdrawalsEnabled: true
         L1_TOKEN_NON_REBASABLE: *wstETH
         L1_TOKEN_REBASABLE: *stETH
@@ -166,6 +186,11 @@ l1:
           - args: [*WITHDRAWALS_DISABLER_ROLE, *l1EmergencyBreaksMultisig]
             result: true
         getRoleAdmin: null
+      ozNonEnumerableAcl:
+        *DEFAULT_ADMIN_ROLE : [*agent]
+        *DEPOSITS_DISABLER_ROLE : [*agent, *l1EmergencyBreaksMultisig]
+        *WITHDRAWALS_DISABLER_ROLE : [*agent, *l1EmergencyBreaksMultisig]
+        *WITHDRAWALS_ENABLER_ROLE : [*agent]
       implementationChecks:
         getContractVersion: 115792089237316195423570985008687907853269984665640564039457584007913129639935
         isInitialized: false
@@ -174,11 +199,6 @@ l1:
         hasRole:
           args: [*DEFAULT_ADMIN_ROLE, "0x0000000000000000000000000000000000000000"]
           result: false
-      ozAcl:
-        *DEFAULT_ADMIN_ROLE : [*agent]
-        *DEPOSITS_DISABLER_ROLE : [*agent, *l1EmergencyBreaksMultisig]
-        *WITHDRAWALS_DISABLER_ROLE : [*agent, *l1EmergencyBreaksMultisig]
-        *WITHDRAWALS_ENABLER_ROLE : [*agent]
 
 l2:
   rpcUrl: L2_TESTNET_RPC_URL
@@ -226,7 +246,7 @@ l2:
         TOKEN_RATE_OUTDATED_DELAY: 86400
         getContractVersion: 1
         getTokenRatesLength: 2
-        isLikelyOutdated: false
+        isLikelyOutdated: true
         isTokenRateUpdatesPaused: false
         supportsInterface:
           - args: [ "0x01ffc9a7" ] # IERC165
@@ -331,6 +351,8 @@ l2:
             result: false
           - args: [*DEPOSITS_ENABLER_ROLE, *l2GovernanceExecutor]
             result: true
+          - args: [*DEPOSITS_ENABLER_ROLE, *l2EmergencyBreaksMultisig]
+            result: false
           - args: [*DEPOSITS_DISABLER_ROLE, *l2GovernanceExecutor]
             result: true
           - args: [*DEPOSITS_DISABLER_ROLE, *l2EmergencyBreaksMultisig]
@@ -341,6 +363,12 @@ l2:
             result: true
           - args: [*WITHDRAWALS_DISABLER_ROLE, *l2EmergencyBreaksMultisig]
             result: true
+      ozNonEnumerableAcl:
+        *DEFAULT_ADMIN_ROLE : [*l2GovernanceExecutor]
+        *DEPOSITS_DISABLER_ROLE : [*l2GovernanceExecutor, *l2EmergencyBreaksMultisig]
+        *DEPOSITS_ENABLER_ROLE : [*l2GovernanceExecutor]
+        *WITHDRAWALS_DISABLER_ROLE : [*l2GovernanceExecutor, *l2EmergencyBreaksMultisig]
+        *WITHDRAWALS_ENABLER_ROLE : [*l2GovernanceExecutor]
       implementationChecks:
         getContractVersion: 115792089237316195423570985008687907853269984665640564039457584007913129639935
         isInitialized: false
@@ -349,9 +377,3 @@ l2:
         hasRole:
           args: [*DEFAULT_ADMIN_ROLE, "0x0000000000000000000000000000000000000000"]
           result: false
-      ozAcl:
-        *DEFAULT_ADMIN_ROLE : [*l2GovernanceExecutor]
-        *DEPOSITS_DISABLER_ROLE : [*l2GovernanceExecutor, *l2EmergencyBreaksMultisig]
-        *DEPOSITS_ENABLER_ROLE : [*l2GovernanceExecutor]
-        *WITHDRAWALS_DISABLER_ROLE : [*l2GovernanceExecutor, *l2EmergencyBreaksMultisig]
-        *WITHDRAWALS_ENABLER_ROLE : [*l2GovernanceExecutor]
