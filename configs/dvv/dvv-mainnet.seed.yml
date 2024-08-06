@@ -1,0 +1,24 @@
+---
+deployed:
+  l1:
+    - &Vault "0xe2D2E90122cb203CF1565a37ef90a256843A825A"
+    - &ERC20TvlModule "0x2c73350310C2b8c721d8192bd7620D1DCB1219ce"
+    - &Initializer "0x969A0c7699ad0AC38fE05117c81D662762443E07"
+    - &StakingModule "0xD570E16E3B62F05EcF3ff2706D331B7f56453adA"
+    - &ManagedRatiosOracle "0xFeAFe509fae65962EF81555E3f078D58aF7ca3e9"
+    - &ChainlinkOracle "0x39D5F9aEbBEcba99ED5d707b11d790387B5acB63"
+    - &ConstantAggregatorV3 "0x278798AE6ea76ae75b381eA0D8DF140C1D5a7712"
+    - &WStethRatiosAggregatorV3 "0x966a3b1c9d477D113630290F037b12349649d1bd"
+    - &DefaultProxyImplementation "0xB8eF363E1909665c18BF0CB72Cba9a8152413A2E"
+    - &VaultConfigurator "0xDee41701310f48744e6Bb4A5df6B5e714cE49133"
+    - &ManagedValidator "0xA1b3a352c3fC7cfcBD36381CC2D0b157d6843473"
+    - &SimpleDVTStakingStrategy "0x078b1C03d14652bfeeDFadf7985fdf2D8a2e8108"
+    - &TransparentUpgradeableProxy "0x5E362eb2c0706Bd1d134689eC75176018385430B"
+    - &ProxyAdmin "0x8E6C80c41450D3fA7B1Fd0196676b99Bfb34bF48"
+    - &ProxyAdminMsig "0x81698f87C6482bF1ce9bFcfC0F103C4A0Adf0Af0"
+    - &AdminMsig "0x9437B2a8cF3b69D782a61f9814baAbc172f72003"
+
+l1:
+  rpcUrl: https://ethereum-rpc.publicnode.com
+  explorerHostname: api.etherscan.io
+  explorerTokenEnv: ETHERSCAN_TOKEN
