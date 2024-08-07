@@ -37,10 +37,26 @@ misc:
 
   # Implementation-deployed vault configurator
   - &VAULT_CONFIGURATOR_AUX "0x7C28a258078274DE9f3799f84676CeB8079ca0B9"
+  - &MAX_WITHDRAWAL_FEE "50000000"
 
 tvl:
   - &WSTETH_TVL 0
   - &WETH_TVL 200010000000000
+
+delays:
+  - &MAX_DELAY "31536000" # 365 days
+  - &BASE_DELAY "2592000" # 30 days
+  - &DEPOSIT_CALLBACK_DELAY "86400" # 1 day
+  - &WITHDRAWAL_CALLBACK_DELAY "86400" # 1 day
+  - &WITHDRAWAL_FEE_DELAY "2592000" # 30 days
+  - &DEPOSIT_LOCKED_DELAY "3600" # 1 hour
+  - &TRANSFERS_LOCKED_DELAY "31536000" # 365 days
+  - &DELEGATE_MODULE_APPROVED_DELAY "86400" # 1 day
+  - &MAX_TVL_DELAY "14400" # 4 hours
+  - &RATIOS_ORACLE_DELAY "2592000" # 30 days
+  - &PRICE_ORACLE_DELAY "2592000" # 30 days
+  - &VALIDATOR_DELAY "2592000" # 30 days
+  - &EMERGENCY_WITHDRAWAL_DELAY "7776000" # 90 days
 
 deployed:
   l1:
@@ -241,8 +257,16 @@ l1:
       name: DefaultProxyImplementation
       address: *DefaultProxyImplementation
       checks:
-        allowance: REPLACEME # need to specify args
-        balanceOf: REPLACEME # need to specify args
+        allowance:
+          - args: [ *ZERO_ADDRESS, *ZERO_ADDRESS ]
+            result: 0
+          - args: [ *TransparentUpgradeableProxy, *DEPLOYER ]
+            result: 0
+        balanceOf:
+          - args: [ *ZERO_ADDRESS ]
+            result: 0
+          - args: [ *DEPLOYER ]
+            result: 0
         decimals: *DECIMALS
         name: ""
         symbol: ""
@@ -251,64 +275,200 @@ l1:
       name: VaultConfigurator
       address: *VaultConfigurator
       checks:
-        MAX_DELAY: REPLACEME # 31536000
-        MAX_WITHDRAWAL_FEE: REPLACEME # 50000000
-        areTransfersLocked: REPLACEME # false
-        areTransfersLockedDelay: REPLACEME # 31536000
-        baseDelay: REPLACEME # 2592000
-        delegateModuleApprovalDelay: REPLACEME # 86400
+        MAX_DELAY: *MAX_DELAY
+        MAX_WITHDRAWAL_FEE: *MAX_WITHDRAWAL_FEE
+        areTransfersLocked: false
+        areTransfersLockedDelay: *TRANSFERS_LOCKED_DELAY
+        baseDelay: *BASE_DELAY
+        delegateModuleApprovalDelay: *DELEGATE_MODULE_APPROVED_DELAY
         depositCallback: *ZERO_ADDRESS
-        depositCallbackDelay: REPLACEME # 86400
-        emergencyWithdrawalDelay: REPLACEME # 7776000
-        isDelegateModuleApproved: REPLACEME # need to specify args
-        isDepositLocked: REPLACEME # false
-        isDepositLockedDelay: REPLACEME # 3600
+        depositCallbackDelay: *DEPOSIT_CALLBACK_DELAY
+        emergencyWithdrawalDelay: *EMERGENCY_WITHDRAWAL_DELAY
+        isDelegateModuleApproved:
+          - args: [ *StakingModule ]
+            result: true
+          - args: [ "0xD8619769fed318714d362BfF01CA98ac938Bdf9b" ] # DefaultBondModule
+            result: false
+          - args: [ *TransparentUpgradeableProxy ]
+            result: false
+        isDepositLocked: false
+        isDepositLockedDelay: *DEPOSIT_LOCKED_DELAY
         maximalTotalSupply: *TVL_LIMIT
-        maximalTotalSupplyDelay: REPLACEME # 14400
-        priceOracle: REPLACEME # 0x39D5F9aEbBEcba99ED5d707b11d790387B5acB63
-        priceOracleDelay: REPLACEME # 2592000
-        ratiosOracle: REPLACEME # 0xFeAFe509fae65962EF81555E3f078D58aF7ca3e9
-        ratiosOracleDelay: REPLACEME # 2592000
+        maximalTotalSupplyDelay: *MAX_TVL_DELAY
+        priceOracle: *ChainlinkOracle
+        priceOracleDelay: *PRICE_ORACLE_DELAY
+        ratiosOracle: *ManagedRatiosOracle
+        ratiosOracleDelay: *RATIOS_ORACLE_DELAY
         validator: *ManagedValidator
-        validatorDelay: REPLACEME # 2592000
+        validatorDelay: *VALIDATOR_DELAY
         vault: *TransparentUpgradeableProxy
         withdrawalCallback: *ZERO_ADDRESS
-        withdrawalCallbackDelay: REPLACEME # 86400
-        withdrawalFeeD9: REPLACEME # 0
-        withdrawalFeeD9Delay: REPLACEME # 2592000
+        withdrawalCallbackDelay: *WITHDRAWAL_CALLBACK_DELAY
+        withdrawalFeeD9: 0
+        withdrawalFeeD9Delay: *WITHDRAWAL_FEE_DELAY
     ManagedValidator:
       name: ManagedValidator
       address: *ManagedValidator
       checks:
-        ADMIN_ROLE_MASK: REPLACEME # 57896044618658097711785492504343953926634992332820282019728792003956564819968
-        STORAGE_POSITION: REPLACEME # 0xc5d9a5dc0c3dbbd4debebdb870fda826372ee5f5ea588d9114d28c33a7f08b39
-        allowAllSignaturesRoles: REPLACEME # need to specify args
-        allowSignatureRoles: REPLACEME # need to specify args
-        customValidator: REPLACEME # need to specify args
-        hasPermission: REPLACEME # need to specify args
-        publicRoles: REPLACEME # 1
-        requirePermission: REPLACEME # need to specify args
-        userRoles: REPLACEME # need to specify args
-        validate: REPLACEME # need to specify args
+        ADMIN_ROLE_MASK: "57896044618658097711785492504343953926634992332820282019728792003956564819968" # 2^255
+        STORAGE_POSITION: "0xc5d9a5dc0c3dbbd4debebdb870fda826372ee5f5ea588d9114d28c33a7f08b39" # keccak256("mellow.lrt.permissions.storage")
+        allowAllSignaturesRoles:
+          - args: [ *TransparentUpgradeableProxy ]
+            result: 0
+          - args: [ *SimpleDVTStakingStrategy ]
+            result: 0
+          - args: [ *ProxyAdmin ]
+            result: 0
+          - args: [ *ProxyAdminMsig ]
+            result: 0
+          - args: [ *AdminMsig ]
+            result: 0
+          - args: [ *StakingModule ]
+            result: 4 # VAULT_ROLE, 2^2
+          - args: [ *VaultConfigurator ]
+            result: 0
+        allowSignatureRoles:
+          - args: [ *TransparentUpgradeableProxy, "0x56e7b7aa" ] # Vault.delegateCall
+            result: 2 # DELEGATE_CALL_ROLE
+          - args: [ *TransparentUpgradeableProxy, "0xf379a7d6" ] # Vault.deposit
+            result: 1 # DEPOSIT_ROLE
+          - args: [ *TransparentUpgradeableProxy, "0x00000000" ] # Vault.deposit
+            result: 0 # PROHIBITED
+        customValidator:
+          - args: [ *TransparentUpgradeableProxy ]
+            result: *ZERO_ADDRESS
+          - args: [ *SimpleDVTStakingStrategy ]
+            result: *ZERO_ADDRESS
+          - args: [ *ProxyAdmin ]
+            result: *ZERO_ADDRESS
+          - args: [ *ProxyAdminMsig ]
+            result: *ZERO_ADDRESS
+          - args: [ *AdminMsig ]
+            result: *ZERO_ADDRESS
+          - args: [ *StakingModule ]
+            result: *ZERO_ADDRESS
+          - args: [ *VaultConfigurator ]
+            result: *ZERO_ADDRESS
+        hasPermission:
+          - args: [ *TransparentUpgradeableProxy, *StakingModule, "0x00000000" ]
+            result: true
+          - args: [ *DEPLOYER, *TransparentUpgradeableProxy, "0xf379a7d6" ]
+            result: true
+          - args: [ *DEPLOYER, *TransparentUpgradeableProxy, "0x56e7b7aa" ]
+            result: false
+        publicRoles: "1" # DEPOSITOR_ROLE, 2^0
+        requirePermission:
+          - args: [ *DEPLOYER, *TransparentUpgradeableProxy, "0xf379a7d6" ]
+            result: []
+          - args: [ *DEPLOYER, *TransparentUpgradeableProxy, "0x56e7b7aa" ]
+            result: []
+            mustRevert: true
+          - args: [ *TransparentUpgradeableProxy, *StakingModule, "0x00000000" ]
+            result: []
+          - args: [ *SimpleDVTStakingStrategy, *TransparentUpgradeableProxy, "0x56e7b7aa" ]
+            result: []
+        userRoles:
+          - args: [ *TransparentUpgradeableProxy ]
+            result: 4 # VAULT_ROLE
+          - args: [ *SimpleDVTStakingStrategy ]
+            result: 2 # DELEGATE_CALLER_ROLE
+          - args: [ *ProxyAdmin ]
+            result: 0
+          - args: [ *ProxyAdminMsig ]
+            result: 0
+          - args: [ *AdminMsig ]
+            result: "57896044618658097711785492504343953926634992332820282019728792003956564819968"
+          - args: [ *StakingModule ]
+            result: 0
+          - args: [ *VaultConfigurator ]
+            result: 0
+          - args: [ *DEPLOYER ]
+            result: 0
+        validate:
+          - args: [ *DEPLOYER, *TransparentUpgradeableProxy, "0xf379a7d6" ]
+            result: []
+          - args: [ *DEPLOYER, *TransparentUpgradeableProxy, "0x56e7b7aa" ]
+            result: []
+            mustRevert: true
+          - args: [ *TransparentUpgradeableProxy, *StakingModule, "0x00000000" ]
+            result: []
+          - args: [ *SimpleDVTStakingStrategy, *TransparentUpgradeableProxy, "0x56e7b7aa" ]
+            result: []
     SimpleDVTStakingStrategy:
       name: SimpleDVTStakingStrategy
       address: *SimpleDVTStakingStrategy
       checks:
-        ADMIN_DELEGATE_ROLE: REPLACEME # 0xc171260023d22a25a00a2789664c9334017843b831138c8ef03cc8897e5873d7
-        ADMIN_ROLE: REPLACEME # 0xf23ec0bb4210edd5cba85afd05127efcd2fc6a781bfed49188da1081670b22d8
-        DEFAULT_ADMIN_ROLE: REPLACEME # 0x0000000000000000000000000000000000000000000000000000000000000000
-        OPERATOR: REPLACEME # 0x46a52cf33029de9f84853745a87af28464c80bf0346df1b32e205fc73319f622
-        getRoleAdmin: REPLACEME # need to specify args
-        getRoleMember: REPLACEME # need to specify args
-        getRoleMemberCount: REPLACEME # need to specify args
-        hasRole: REPLACEME # need to specify args
-        isAdmin: REPLACEME # need to specify args
-        isOperator: REPLACEME # need to specify args
+        ADMIN_DELEGATE_ROLE: *ADMIN_DELEGATE_ROLE
+        ADMIN_ROLE: *ADMIN_ROLE
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        OPERATOR: *OPERATOR
+        getRoleAdmin:
+          - args: [ *DEFAULT_ADMIN_ROLE ]
+            result: *DEFAULT_ADMIN_ROLE
+          - args: [ *ADMIN_ROLE ]
+            result: *ADMIN_ROLE
+          - args: [ *ADMIN_DELEGATE_ROLE ]
+            result: *ADMIN_ROLE
+          - args: [ *OPERATOR ]
+            result: *ADMIN_DELEGATE_ROLE
+        getRoleMember:
+          - args: [ *DEFAULT_ADMIN_ROLE, 0 ]
+            result: []
+            mustRevert: true
+          - args: [ *ADMIN_ROLE, 0 ]
+            result: *Initializer
+          - args: [ *ADMIN_DELEGATE_ROLE, 0 ]
+            result: []
+            mustRevert: true
+          - args: [ *OPERATOR, 0 ]
+            result: *Initializer
+        getRoleMemberCount:
+          - args: [ *DEFAULT_ADMIN_ROLE ]
+            result: 0
+          - args: [ *ADMIN_ROLE ]
+            result: 1
+          - args: [ *ADMIN_DELEGATE_ROLE ]
+            result: 0
+          - args: [ *OPERATOR ]
+            result: 1
+        hasRole:
+          - args: [ *DEFAULT_ADMIN_ROLE, *DEPLOYER ]
+            result: false
+          - args: [ *ADMIN_ROLE, *DEPLOYER ]
+            result: false
+          - args: [ *ADMIN_DELEGATE_ROLE, *DEPLOYER ]
+            result: false
+          - args: [ *OPERATOR, *DEPLOYER ]
+            result: false
+        isAdmin:
+          - args: [ *DEPLOYER ]
+            result: false
+          - args: [ *Initializer ]
+            result: true
+        isOperator:
+          - args: [ *DEPLOYER ]
+            result: false
+          - args: [ *Initializer ]
+            result: true
         maxAllowedRemainder: *MAX_ALLOWED_REMAINDER
-        requireAdmin: REPLACEME # need to specify args
-        requireAtLeastOperator: REPLACEME # need to specify args
+        requireAdmin:
+          - args: [ *DEPLOYER ]
+            result: []
+            mustRevert: true
+          - args: [ *Initializer ]
+            result: []
+        requireAtLeastOperator:
+          - args: [ *DEPLOYER ]
+            result: []
+            mustRevert: true
+          - args: [ *Initializer ]
+            result: []
         stakingModule: *StakingModule
-        supportsInterface: REPLACEME # need to specify args
+        supportsInterface:
+          - args: [ *ZERO_BYTES4 ]
+            result: false
+          - args: [ *FULL_BYTES4 ]
+            result: false
         vault: *TransparentUpgradeableProxy
     TransparentUpgradeableProxy:
       name: Vault
