@@ -73,6 +73,12 @@ signers:
   - &ADMIN_7 "0x8888843c607F4Bbd6aD72128F478085256Bdd15D"
   - &THRESHOLD 5
 
+selectors:
+  - &SIG_VAULT_DELEGATE_CALL "0x56e7b7aa"
+  - &SIG_VAULT_DEPOSIT "0xf379a7d6"
+  - &SIG_DUMMY "0x00000000"
+
+
 deployed:
   l1:
     - &Vault "0xe2D2E90122cb203CF1565a37ef90a256843A825A"
@@ -334,11 +340,11 @@ l1:
           - args: [ *VaultConfigurator ]
             result: 0
         allowSignatureRoles:
-          - args: [ *TransparentUpgradeableProxy, "0x56e7b7aa" ] # Vault.delegateCall
+          - args: [ *TransparentUpgradeableProxy, *SIG_VAULT_DELEGATE_CALL ] # Vault.delegateCall
             result: 2 # DELEGATE_CALL_ROLE
-          - args: [ *TransparentUpgradeableProxy, "0xf379a7d6" ] # Vault.deposit
+          - args: [ *TransparentUpgradeableProxy, *SIG_VAULT_DEPOSIT ] # Vault.deposit
             result: 1 # DEPOSIT_ROLE
-          - args: [ *TransparentUpgradeableProxy, "0x00000000" ] # Vault.deposit
+          - args: [ *TransparentUpgradeableProxy, *SIG_DUMMY ]
             result: 0 # PROHIBITED
         customValidator:
           - args: [ *TransparentUpgradeableProxy ]
@@ -356,22 +362,22 @@ l1:
           - args: [ *VaultConfigurator ]
             result: *ZERO_ADDRESS
         hasPermission:
-          - args: [ *TransparentUpgradeableProxy, *StakingModule, "0x00000000" ]
+          - args: [ *TransparentUpgradeableProxy, *StakingModule, *SIG_DUMMY ]
             result: true
-          - args: [ *DEPLOYER, *TransparentUpgradeableProxy, "0xf379a7d6" ]
+          - args: [ *DEPLOYER, *TransparentUpgradeableProxy, *SIG_VAULT_DEPOSIT ]
             result: true
-          - args: [ *DEPLOYER, *TransparentUpgradeableProxy, "0x56e7b7aa" ]
+          - args: [ *DEPLOYER, *TransparentUpgradeableProxy, *SIG_VAULT_DELEGATE_CALL ]
             result: false
         publicRoles: "1" # DEPOSITOR_ROLE, 2^0
         requirePermission:
-          - args: [ *DEPLOYER, *TransparentUpgradeableProxy, "0xf379a7d6" ]
+          - args: [ *DEPLOYER, *TransparentUpgradeableProxy, *SIG_VAULT_DEPOSIT ]
             result: []
-          - args: [ *DEPLOYER, *TransparentUpgradeableProxy, "0x56e7b7aa" ]
+          - args: [ *DEPLOYER, *TransparentUpgradeableProxy, *SIG_VAULT_DELEGATE_CALL ]
             result: []
             mustRevert: true
-          - args: [ *TransparentUpgradeableProxy, *StakingModule, "0x00000000" ]
+          - args: [ *TransparentUpgradeableProxy, *StakingModule, *SIG_DUMMY ]
             result: []
-          - args: [ *SimpleDVTStakingStrategy, *TransparentUpgradeableProxy, "0x56e7b7aa" ]
+          - args: [ *SimpleDVTStakingStrategy, *TransparentUpgradeableProxy, *SIG_VAULT_DELEGATE_CALL ]
             result: []
         userRoles:
           - args: [ *TransparentUpgradeableProxy ]
@@ -391,14 +397,14 @@ l1:
           - args: [ *DEPLOYER ]
             result: 0
         validate:
-          - args: [ *DEPLOYER, *TransparentUpgradeableProxy, "0xf379a7d6" ]
+          - args: [ *DEPLOYER, *TransparentUpgradeableProxy, *SIG_VAULT_DEPOSIT ]
             result: []
-          - args: [ *DEPLOYER, *TransparentUpgradeableProxy, "0x56e7b7aa" ]
+          - args: [ *DEPLOYER, *TransparentUpgradeableProxy, *SIG_VAULT_DELEGATE_CALL ]
             result: []
             mustRevert: true
-          - args: [ *TransparentUpgradeableProxy, *StakingModule, "0x00000000" ]
+          - args: [ *TransparentUpgradeableProxy, *StakingModule, *SIG_DUMMY ]
             result: []
-          - args: [ *SimpleDVTStakingStrategy, *TransparentUpgradeableProxy, "0x56e7b7aa" ]
+          - args: [ *SimpleDVTStakingStrategy, *TransparentUpgradeableProxy, *SIG_VAULT_DELEGATE_CALL ]
             result: []
     SimpleDVTStakingStrategy:
       name: SimpleDVTStakingStrategy
