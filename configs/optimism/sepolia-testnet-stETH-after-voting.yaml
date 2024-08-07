@@ -138,13 +138,15 @@ l1:
           - args: [*DEPOSITS_ENABLER_ROLE, *agent]
             result: true
           - args: [*DEPOSITS_ENABLER_ROLE, *l1EmergencyBreaksMultisig]
-            result: true
+            result: false
           - args: [*DEPOSITS_DISABLER_ROLE, *agent]
             result: true
           - args: [*DEPOSITS_DISABLER_ROLE, *l1EmergencyBreaksMultisig]
             result: true
           - args: [*WITHDRAWALS_ENABLER_ROLE, *agent]
             result: true
+          - args: [*WITHDRAWALS_ENABLER_ROLE, *l1EmergencyBreaksMultisig]
+            result: false
           - args: [*WITHDRAWALS_DISABLER_ROLE, *agent]
             result: true
           - args: [*WITHDRAWALS_DISABLER_ROLE, *l1EmergencyBreaksMultisig]
@@ -177,7 +179,7 @@ l2:
         getDelay: 0
         getMinimumDelay: 0
         getMaximumDelay: 1
-        getActionsSetCount: 19
+        getActionsSetCount: null
         OVM_L2_CROSS_DOMAIN_MESSENGER: null
         getActionsSetById: null
         getCurrentState: null
@@ -209,7 +211,7 @@ l2:
         OLDEST_RATE_ALLOWED_IN_PAUSE_TIME_SPAN: 86400
         TOKEN_RATE_OUTDATED_DELAY: 86400
         getContractVersion: 1
-        getTokenRatesLength: 2
+        getTokenRatesLength: null
         isLikelyOutdated: false
         isTokenRateUpdatesPaused: false
         supportsInterface:
@@ -218,10 +220,12 @@ l2:
         hasRole:
           - args: [*RATE_UPDATE_DISABLER_ROLE, *l2GovernanceExecutor]
             result: true
+          - args: [*RATE_UPDATE_DISABLER_ROLE, *l2EmergencyBreaksMultisig]
+            result: true
           - args: [*RATE_UPDATE_ENABLER_ROLE, *l2GovernanceExecutor]
             result: true
           - args: [*RATE_UPDATE_ENABLER_ROLE, *l2EmergencyBreaksMultisig]
-            result: true
+            result: false
         getRoleAdmin: null
         getTokenRateByIndex: null
         latestAnswer: null
@@ -241,13 +245,13 @@ l2:
         symbol: stETH
         decimals: 18
         TOKEN_RATE_ORACLE_DECIMALS: 27
-        DOMAIN_SEPARATOR: "0xa9dd3a9faf5603ede655a8c912088ca7a16771911489468a111dba7d199160cf"
+        DOMAIN_SEPARATOR: "0xf263bd4a5df4c4a67bcf947a8c87fde73c4df067dca628bd2a0625c557329085"
         L2_ERC20_TOKEN_BRIDGE: *l2TokenBridge
         TOKEN_RATE_ORACLE: *l2TokenRateOracle
         TOKEN_TO_WRAP_FROM: *l2WstETH
         getContractVersion: 1
-        getTotalShares: 0
-        totalSupply: 0
+        getTotalShares: null
+        totalSupply: null
         eip712Domain: null
         nonces: null
         getSharesByTokens: null
@@ -271,7 +275,7 @@ l2:
         symbol: wstETH
         decimals: 18
         bridge: *l2TokenBridge
-        DOMAIN_SEPARATOR: "0xc1fc179d73b7759a54e180334400ea9b5297eb5b8f5fdbf2372481045fe0beec"
+        DOMAIN_SEPARATOR: "0xd767e2c73472c3f7e3225b36a5b47efb4b248a17be58dbd15b9e94792e9202b6"
         getContractVersion: 2
         PERMIT_TYPEHASH: null
         totalSupply: null
@@ -315,12 +319,16 @@ l2:
             result: false
           - args: [*DEPOSITS_ENABLER_ROLE, *l2GovernanceExecutor]
             result: true
+          - args: [*DEPOSITS_ENABLER_ROLE, *l2EmergencyBreaksMultisig]
+            result: false
           - args: [*DEPOSITS_DISABLER_ROLE, *l2GovernanceExecutor]
             result: true
           - args: [*DEPOSITS_DISABLER_ROLE, *l2EmergencyBreaksMultisig]
             result: true
           - args: [*WITHDRAWALS_ENABLER_ROLE, *l2GovernanceExecutor]
             result: true
+          - args: [*WITHDRAWALS_ENABLER_ROLE, *l2EmergencyBreaksMultisig]
+            result: false
           - args: [*WITHDRAWALS_DISABLER_ROLE, *l2GovernanceExecutor]
             result: true
           - args: [*WITHDRAWALS_DISABLER_ROLE, *l2EmergencyBreaksMultisig]
