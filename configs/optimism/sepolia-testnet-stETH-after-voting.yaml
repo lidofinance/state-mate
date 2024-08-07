@@ -169,24 +169,12 @@ l1:
           - args: [ "0x01ffc9a7" ] # IERC165
             result: true
         hasRole:
-          - args: [*DEFAULT_ADMIN_ROLE, *agent]
-            result: true
-          - args: [*DEPOSITS_ENABLER_ROLE, *agent]
-            result: true
+          - args: [*DEFAULT_ADMIN_ROLE, "0x0000000000000000000000000000000000000000"]
+            result: false
           - args: [*DEPOSITS_ENABLER_ROLE, *l1EmergencyBreaksMultisig]
             result: false
-          - args: [*DEPOSITS_DISABLER_ROLE, *agent]
-            result: true
-          - args: [*DEPOSITS_DISABLER_ROLE, *l1EmergencyBreaksMultisig]
-            result: true
-          - args: [*WITHDRAWALS_ENABLER_ROLE, *agent]
-            result: true
           - args: [*WITHDRAWALS_ENABLER_ROLE, *l1EmergencyBreaksMultisig]
             result: false
-          - args: [*WITHDRAWALS_DISABLER_ROLE, *agent]
-            result: true
-          - args: [*WITHDRAWALS_DISABLER_ROLE, *l1EmergencyBreaksMultisig]
-            result: true
         getRoleAdmin: null
       ozNonEnumerableAcl:
         *DEFAULT_ADMIN_ROLE : [*agent]
@@ -254,18 +242,17 @@ l2:
           - args: [ "0x01ffc9a7" ] # IERC165
             result: true
         hasRole:
-          - args: [*RATE_UPDATE_DISABLER_ROLE, *l2GovernanceExecutor]
-            result: true
-          - args: [*RATE_UPDATE_DISABLER_ROLE, *l2EmergencyBreaksMultisig]
-            result: true
-          - args: [*RATE_UPDATE_ENABLER_ROLE, *l2GovernanceExecutor]
-            result: true
+          - args: [*DEFAULT_ADMIN_ROLE, "0x0000000000000000000000000000000000000000"]
+            result: false
           - args: [*RATE_UPDATE_ENABLER_ROLE, *l2EmergencyBreaksMultisig]
             result: false
         getRoleAdmin: null
         getTokenRateByIndex: null
         latestAnswer: null
         latestRoundData: null
+      ozNonEnumerableAcl:
+        *RATE_UPDATE_DISABLER_ROLE : [*l2GovernanceExecutor, *l2EmergencyBreaksMultisig]
+        *RATE_UPDATE_ENABLER_ROLE : [*l2GovernanceExecutor]
 
     stETH:
       name: ERC20RebasableBridgedPermit
@@ -353,22 +340,10 @@ l2:
         hasRole:
           - args: [*DEFAULT_ADMIN_ROLE, "0x0000000000000000000000000000000000000000"]
             result: false
-          - args: [*DEPOSITS_ENABLER_ROLE, *l2GovernanceExecutor]
-            result: true
           - args: [*DEPOSITS_ENABLER_ROLE, *l2EmergencyBreaksMultisig]
             result: false
-          - args: [*DEPOSITS_DISABLER_ROLE, *l2GovernanceExecutor]
-            result: true
-          - args: [*DEPOSITS_DISABLER_ROLE, *l2EmergencyBreaksMultisig]
-            result: true
-          - args: [*WITHDRAWALS_ENABLER_ROLE, *l2GovernanceExecutor]
-            result: true
           - args: [*WITHDRAWALS_ENABLER_ROLE, *l2EmergencyBreaksMultisig]
             result: false
-          - args: [*WITHDRAWALS_DISABLER_ROLE, *l2GovernanceExecutor]
-            result: true
-          - args: [*WITHDRAWALS_DISABLER_ROLE, *l2EmergencyBreaksMultisig]
-            result: true
       ozNonEnumerableAcl:
         *DEFAULT_ADMIN_ROLE : [*l2GovernanceExecutor]
         *DEPOSITS_DISABLER_ROLE : [*l2GovernanceExecutor, *l2EmergencyBreaksMultisig]
