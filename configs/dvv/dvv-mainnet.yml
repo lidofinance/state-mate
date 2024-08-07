@@ -1,5 +1,5 @@
 parameters:
-  - &WETH "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"
+  - &WETH "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
   - &STETH "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84"
   - &WSTETH "0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0"
   - &LIDO_LOCATOR "0xC1d0b3DE6792Bf6b4b37EccdcC24e45978Cfd2Eb"
@@ -10,7 +10,16 @@ parameters:
   - &GNOSIS_IMPL "0xd9db270c1b5e3bd161e8c8503c55ceabee709552"
 
 misc:
+  - &D9 "1000000000" # 10^9
+  - &Q96 "79228162514264337593543950336" # 2^96
+  - &ONE_RATIO "1000000000000000000" # 10^18
+  - &WSTETH_RATIO "1175156638813790774" # 2024-08-07 pre-report
+  - &WSTETH_RATIO_X96 "93105501159655653704807080512" # WSTETH_RATIO * Q96
+
   - &ZERO_ADDRESS "0x0000000000000000000000000000000000000000"
+  - &ZERO_BYTES4 "0x00000000"
+  - &FULL_BYTES4 "0xffffffff"
+
   - &SIMPLEDVT_MODULE_ID 2
 
   # Token params
@@ -18,9 +27,6 @@ misc:
   - &TOKEN_SYMBOL "DVstETH"
   - &DECIMALS 18
   - &TVL_LIMIT "1000000000000000000" # 10^18
-  - &D9 "1000000000" # 10^9
-  - &Q96 "79228162514264337593543950336" # 2^96
-  - &ONE_RATIO "1000000000000000000" # 10^18
   - &MAX_ALLOWED_REMAINDER "1000000000000000000" # 10^18 ???
 
   # ROLES
@@ -28,6 +34,13 @@ misc:
   - &ADMIN_ROLE "0xf23ec0bb4210edd5cba85afd05127efcd2fc6a781bfed49188da1081670b22d8"
   - &ADMIN_DELEGATE_ROLE "0xc171260023d22a25a00a2789664c9334017843b831138c8ef03cc8897e5873d7"
   - &OPERATOR "0x46a52cf33029de9f84853745a87af28464c80bf0346df1b32e205fc73319f622"
+
+  # Implementation-deployed vault configurator
+  - &VAULT_CONFIGURATOR_AUX "0x7C28a258078274DE9f3799f84676CeB8079ca0B9"
+
+tvl:
+  - &WSTETH_TVL 0
+  - &WETH_TVL 200010000000000
 
 deployed:
   l1:
@@ -53,47 +66,13 @@ l1:
   explorerHostname: api.etherscan.io
   explorerTokenEnv: ETHERSCAN_TOKEN
   contracts:
-    Vault:
-      name: Vault
-      address: *Vault
-      checks:
-        ADMIN_DELEGATE_ROLE: *ADMIN_DELEGATE_ROLE
-        ADMIN_ROLE: *ADMIN_ROLE
-        D9: *D9
-        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
-        OPERATOR: *OPERATOR
-        Q96: *Q96
-        allowance: REPLACEME # need to specify args
-        analyzeRequest: REPLACEME # need to specify args
-        balanceOf: REPLACEME # need to specify args
-        baseTvl: REPLACEME # ,
-        calculateStack: REPLACEME # view call reverted
-        configurator: *VaultConfigurator
-        decimals: *DECIMALS
-        getRoleAdmin: REPLACEME # need to specify args
-        getRoleMember: REPLACEME # need to specify args
-        getRoleMemberCount: REPLACEME # need to specify args
-        hasRole: REPLACEME # need to specify args
-        isAdmin: REPLACEME # need to specify args
-        isOperator: REPLACEME # need to specify args
-        isUnderlyingToken: REPLACEME # need to specify args
-        name: ""
-        pendingWithdrawers: REPLACEME #
-        pendingWithdrawersCount: REPLACEME # 0
-        requireAdmin: REPLACEME # need to specify args
-        requireAtLeastOperator: REPLACEME # need to specify args
-        supportsInterface: REPLACEME # need to specify args
-        symbol: ""
-        totalSupply: 0
-        tvlModules: []
-        underlyingTokens: []
-        underlyingTvl: []
-        withdrawalRequest: REPLACEME # need to specify args
     ERC20TvlModule:
       name: ERC20TvlModule
       address: *ERC20TvlModule
       checks:
-        tvl: REPLACEME # need to specify args
+        tvl:
+          - args: [ *TransparentUpgradeableProxy ]
+            result: [[*WSTETH, *WSTETH, *WSTETH_TVL, *WSTETH_TVL, false], [*WETH, *WETH, *WETH_TVL, *WETH_TVL, false]]
     Initializer:
       name: Initializer
       address: *Initializer
@@ -102,20 +81,84 @@ l1:
         ADMIN_ROLE: *ADMIN_ROLE
         DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
         OPERATOR: *OPERATOR
-        allowance: REPLACEME # need to specify args
-        balanceOf: REPLACEME # need to specify args
+        allowance:
+          - args: [ *ZERO_ADDRESS, *ZERO_ADDRESS ]
+            result: 0
+          - args: [ *TransparentUpgradeableProxy, *DEPLOYER ]
+            result: 0
+        balanceOf:
+          - args: [ *ZERO_ADDRESS ]
+            result: 0
+          - args: [ *DEPLOYER ]
+            result: 0
         configurator: *ZERO_ADDRESS
         decimals: *DECIMALS
-        getRoleAdmin: REPLACEME # need to specify args
-        getRoleMember: REPLACEME # need to specify args
-        getRoleMemberCount: REPLACEME # need to specify args
-        hasRole: REPLACEME # need to specify args
-        isAdmin: REPLACEME # need to specify args
-        isOperator: REPLACEME # need to specify args
+        getRoleAdmin:
+          - args: [ *DEFAULT_ADMIN_ROLE ]
+            result: *DEFAULT_ADMIN_ROLE
+          - args: [ *ADMIN_ROLE ]
+            result: *ADMIN_ROLE
+          - args: [ *ADMIN_DELEGATE_ROLE ]
+            result: *ADMIN_ROLE
+          - args: [ *OPERATOR ]
+            result: *ADMIN_DELEGATE_ROLE
+        getRoleMember:
+          - args: [ *DEFAULT_ADMIN_ROLE, 0 ]
+            result: []
+            mustRevert: true
+          - args: [ *ADMIN_ROLE, 0 ]
+            result: *Initializer
+          - args: [ *ADMIN_DELEGATE_ROLE, 0 ]
+            result: []
+            mustRevert: true
+          - args: [ *OPERATOR, 0 ]
+            result: *Initializer
+        getRoleMemberCount:
+          - args: [ *DEFAULT_ADMIN_ROLE ]
+            result: 0
+          - args: [ *ADMIN_ROLE ]
+            result: 1
+          - args: [ *ADMIN_DELEGATE_ROLE ]
+            result: 0
+          - args: [ *OPERATOR ]
+            result: 1
+        hasRole:
+          - args: [ *DEFAULT_ADMIN_ROLE, *DEPLOYER ]
+            result: false
+          - args: [ *ADMIN_ROLE, *DEPLOYER ]
+            result: false
+          - args: [ *ADMIN_DELEGATE_ROLE, *DEPLOYER ]
+            result: false
+          - args: [ *OPERATOR, *DEPLOYER ]
+            result: false
+        isAdmin:
+          - args: [ *DEPLOYER ]
+            result: false
+          - args: [ *Initializer ]
+            result: true
+        isOperator:
+          - args: [ *DEPLOYER ]
+            result: false
+          - args: [ *Initializer ]
+            result: true
         name: "Initializer"
-        requireAdmin: REPLACEME # need to specify args
-        requireAtLeastOperator: REPLACEME # need to specify args
-        supportsInterface: REPLACEME # need to specify args
+        requireAdmin:
+          - args: [ *DEPLOYER ]
+            result: []
+            mustRevert: true
+          - args: [ *Initializer ]
+            result: []
+        requireAtLeastOperator:
+          - args: [ *DEPLOYER ]
+            result: []
+            mustRevert: true
+          - args: [ *Initializer ]
+            result: []
+        supportsInterface:
+          - args: [ *ZERO_BYTES4 ]
+            result: false
+          - args: [ *FULL_BYTES4 ]
+            result: false
         symbol: "init"
         totalSupply: 0
     StakingModule:
@@ -133,31 +176,66 @@ l1:
       address: *ManagedRatiosOracle
       checks:
         Q96: *Q96
-        getTargetRatiosX96: REPLACEME # need to specify args
-        vaultToData: REPLACEME # need to specify args
+        getTargetRatiosX96:
+          - args: [ *TransparentUpgradeableProxy, true ] # deposit
+            result: [ 0, *Q96 ]
+          - args: [ *TransparentUpgradeableProxy, false ] # withdrawal
+            result: [ *Q96, 0 ]
+        vaultToData:
+          - args: [ *TransparentUpgradeableProxy ]
+            result: []
+            mustRevert: true # can't handle nested mappings
     ChainlinkOracle:
       name: ChainlinkOracle
       address: *ChainlinkOracle
       checks:
         Q96: *Q96
-        aggregatorsData: REPLACEME # need to specify args
-        baseTokens: REPLACEME # need to specify args
-        getPrice: REPLACEME # need to specify args
-        priceX96: REPLACEME # need to specify args
+        aggregatorsData:
+          - args: [ *TransparentUpgradeableProxy, *WSTETH ]
+            result: [ *WStethRatiosAggregatorV3, 0 ]
+          - args: [ *TransparentUpgradeableProxy, *WETH ]
+            result: [ *ConstantAggregatorV3, 0 ]
+          - args: [ *TransparentUpgradeableProxy, *STETH ]
+            result: [ *ZERO_ADDRESS, 0 ]
+        baseTokens:
+          - args: [ *TransparentUpgradeableProxy ]
+            result: *WETH
+        getPrice:
+          - args: [ *TransparentUpgradeableProxy, *WSTETH ]
+            result: [ *WSTETH_RATIO, *DECIMALS ]
+          - args: [ *TransparentUpgradeableProxy, *WETH ]
+            result: [ *ONE_RATIO, *DECIMALS ]
+          - args: [ *TransparentUpgradeableProxy, *STETH ]
+            result: []
+            mustRevert: true
+        priceX96:
+          - args: [ *TransparentUpgradeableProxy, *WSTETH ]
+            result: *WSTETH_RATIO_X96
+          - args: [ *TransparentUpgradeableProxy, *WETH ]
+            result: *Q96
+          - args: [ *TransparentUpgradeableProxy, *STETH ]
+            result: 0
+            mustRevert: true
     ConstantAggregatorV3:
       name: ConstantAggregatorV3
       address: *ConstantAggregatorV3
       checks:
-        answer: *ONE_RATIO # 1000000000000000000
+        answer: *ONE_RATIO
         decimals: *DECIMALS
-        latestRoundData: [0,*ONE_RATIO, 1722981035, 1722981035, 0]
+        latestRoundData:
+          - args: []
+            result: [0,*ONE_RATIO, "", "", 0]
+            mustRevert: true # can't bypass timestamp checking atm
     WStethRatiosAggregatorV3:
       name: WStethRatiosAggregatorV3
       address: *WStethRatiosAggregatorV3
       checks:
         decimals: *DECIMALS
-        getAnswer: REPLACEME # 1175156638813790774
-        latestRoundData: REPLACEME # 0,1175156638813790774,1722981035,1722981035,0
+        getAnswer: *WSTETH_RATIO
+        latestRoundData:
+          - args: []
+            result: [0,*WSTETH_RATIO, "", "", 0]
+            mustRevert: true # can't bypass timestamp checking atm
         wsteth: *WSTETH
     DefaultProxyImplementation:
       name: DefaultProxyImplementation
@@ -278,12 +356,26 @@ l1:
         DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
         OPERATOR: *OPERATOR
         Q96: *Q96
-        allowance: REPLACEME # need to specify args
-        analyzeRequest: REPLACEME # need to specify args
-        balanceOf: REPLACEME # need to specify args
-        baseTvl: REPLACEME # ,
-        calculateStack: REPLACEME # view call reverted
-        configurator: *VaultConfigurator
+        allowance:
+          - args: [ *ZERO_ADDRESS, *ZERO_ADDRESS ]
+            result: 0
+          - args: [ *TransparentUpgradeableProxy, *DEPLOYER ]
+            result: 0
+        analyzeRequest: # pure stateless func
+          - args: []
+            result: []
+            mustRevert: true
+        balanceOf:
+          - args: [ *ZERO_ADDRESS ]
+            result: 0
+          - args: [ *DEPLOYER ]
+            result: 0
+        baseTvl: [[], []]
+        calculateStack:
+          - args: []
+            result: []
+            mustRevert: true
+        configurator: *VAULT_CONFIGURATOR_AUX
         decimals: *DECIMALS
         getRoleAdmin: REPLACEME # need to specify args
         getRoleMember: REPLACEME # need to specify args
@@ -302,7 +394,7 @@ l1:
         totalSupply: 0
         tvlModules: []
         underlyingTokens: []
-        underlyingTvl: []
+        underlyingTvl: [[],[]]
         withdrawalRequest: REPLACEME # need to specify args
     ProxyAdmin:
       name: ProxyAdmin
