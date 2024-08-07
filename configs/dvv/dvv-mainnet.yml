@@ -78,6 +78,11 @@ selectors:
   - &SIG_VAULT_DEPOSIT "0xf379a7d6"
   - &SIG_DUMMY "0x00000000"
 
+validators:
+  - &ADMIN_ROLE_MASK "57896044618658097711785492504343953926634992332820282019728792003956564819968"
+  - &VAULT_ROLE_MASK "4"
+  - &DELEGATE_CALL_ROLE_MASK "2"
+  - &DEPOSIT_ROLE_MASK "1"
 
 deployed:
   l1:
@@ -322,9 +327,11 @@ l1:
       name: ManagedValidator
       address: *ManagedValidator
       checks:
-        ADMIN_ROLE_MASK: "57896044618658097711785492504343953926634992332820282019728792003956564819968" # 2^255
+        ADMIN_ROLE_MASK: *ADMIN_ROLE_MASK
         STORAGE_POSITION: "0xc5d9a5dc0c3dbbd4debebdb870fda826372ee5f5ea588d9114d28c33a7f08b39" # keccak256("mellow.lrt.permissions.storage")
         allowAllSignaturesRoles:
+          - args: [ *StakingModule ]
+            result: *VAULT_ROLE_MASK
           - args: [ *TransparentUpgradeableProxy ]
             result: 0
           - args: [ *SimpleDVTStakingStrategy ]
@@ -335,15 +342,13 @@ l1:
             result: 0
           - args: [ *AdminMsig ]
             result: 0
-          - args: [ *StakingModule ]
-            result: 4 # VAULT_ROLE, 2^2
           - args: [ *VaultConfigurator ]
             result: 0
         allowSignatureRoles:
           - args: [ *TransparentUpgradeableProxy, *SIG_VAULT_DELEGATE_CALL ] # Vault.delegateCall
-            result: 2 # DELEGATE_CALL_ROLE
+            result: *DELEGATE_CALL_ROLE_MASK
           - args: [ *TransparentUpgradeableProxy, *SIG_VAULT_DEPOSIT ] # Vault.deposit
-            result: 1 # DEPOSIT_ROLE
+            result: *DEPOSIT_ROLE_MASK
           - args: [ *TransparentUpgradeableProxy, *SIG_DUMMY ]
             result: 0 # PROHIBITED
         customValidator:
@@ -353,13 +358,13 @@ l1:
             result: *ZERO_ADDRESS
           - args: [ *ProxyAdmin ]
             result: *ZERO_ADDRESS
-          - args: [ *ProxyAdminMsig ]
-            result: *ZERO_ADDRESS
-          - args: [ *AdminMsig ]
-            result: *ZERO_ADDRESS
           - args: [ *StakingModule ]
             result: *ZERO_ADDRESS
           - args: [ *VaultConfigurator ]
+            result: *ZERO_ADDRESS
+          - args: [ *ProxyAdminMsig ]
+            result: *ZERO_ADDRESS
+          - args: [ *AdminMsig ]
             result: *ZERO_ADDRESS
         hasPermission:
           - args: [ *TransparentUpgradeableProxy, *StakingModule, *SIG_DUMMY ]
@@ -380,16 +385,20 @@ l1:
           - args: [ *SimpleDVTStakingStrategy, *TransparentUpgradeableProxy, *SIG_VAULT_DELEGATE_CALL ]
             result: []
         userRoles:
+          - args: [ *AdminMsig ]
+            result: *ADMIN_ROLE_MASK
           - args: [ *TransparentUpgradeableProxy ]
-            result: 4 # VAULT_ROLE
+            result: *VAULT_ROLE_MASK
           - args: [ *SimpleDVTStakingStrategy ]
-            result: 2 # DELEGATE_CALLER_ROLE
+            result: *DELEGATE_CALL_ROLE_MASK
+          - args: [ *CURATOR_ADMIN_MSIG ]
+            result: *DELEGATE_CALL_ROLE_MASK
           - args: [ *ProxyAdmin ]
             result: 0
           - args: [ *ProxyAdminMsig ]
             result: 0
-          - args: [ *AdminMsig ]
-            result: "57896044618658097711785492504343953926634992332820282019728792003956564819968"
+          - args: [ *CURATOR_OPERATOR_EOA ]
+            result: 0
           - args: [ *StakingModule ]
             result: 0
           - args: [ *VaultConfigurator ]
