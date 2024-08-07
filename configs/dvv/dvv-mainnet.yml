@@ -4,7 +4,6 @@ parameters:
   - &WSTETH "0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0"
   - &LIDO_LOCATOR "0xC1d0b3DE6792Bf6b4b37EccdcC24e45978Cfd2Eb"
   - &WQ "0x889edC2eDab5f40e902b864aD4d7AdE8E412F9B1"
-  - &CURATOR_ADMIN_MSIG "0x2E93913A796a6C6b2bB76F41690E78a2E206Be54"
   - &CURATOR_OPERATOR_EOA "0x2afc096981c2CFe3501bE4054160048718F6C0C8"
   - &DEPLOYER "0x188858AC61a74350116d1CB6958fBc509FD6afA1"
   - &GNOSIS_IMPL "0xd9db270c1b5e3bd161e8c8503c55ceabee709552"
@@ -45,7 +44,7 @@ misc:
 
 tvl:
   - &WSTETH_TVL 0
-  - &WETH_TVL 300010000000000
+  - &WETH_TVL 3300010000000000
 
 delays:
   - &MAX_DELAY "31536000" # 365 days
@@ -102,6 +101,7 @@ deployed:
     - &ProxyAdmin "0x8E6C80c41450D3fA7B1Fd0196676b99Bfb34bF48"
     - &ProxyAdminMsig "0x81698f87C6482bF1ce9bFcfC0F103C4A0Adf0Af0"
     - &AdminMsig "0x9437B2a8cF3b69D782a61f9814baAbc172f72003"
+    - &CuratorAdminMsig "0x2E93913A796a6C6b2bB76F41690E78a2E206Be54"
 
 l1:
   rpcUrl: https://ethereum-rpc.publicnode.com
@@ -376,7 +376,7 @@ l1:
           # DELEGATE CALLS TO INITIATE FROM VAULT
           - args: [ *SimpleDVTStakingStrategy, *TransparentUpgradeableProxy, *SIG_VAULT_DELEGATE_CALL ]
             result: true
-          - args: [ *CURATOR_ADMIN_MSIG, *TransparentUpgradeableProxy, *SIG_VAULT_DELEGATE_CALL ]
+          - args: [ *CuratorAdminMsig, *TransparentUpgradeableProxy, *SIG_VAULT_DELEGATE_CALL ]
             result: true
           - args: [ *AdminMsig, *TransparentUpgradeableProxy, *SIG_VAULT_DELEGATE_CALL ]
             result: true
@@ -403,7 +403,7 @@ l1:
           # DELEGATE CALLS TO INITIATE FROM VAULT
           - args: [ *SimpleDVTStakingStrategy, *TransparentUpgradeableProxy, *SIG_VAULT_DELEGATE_CALL ]
             result: []
-          - args: [ *CURATOR_ADMIN_MSIG, *TransparentUpgradeableProxy, *SIG_VAULT_DELEGATE_CALL ]
+          - args: [ *CuratorAdminMsig, *TransparentUpgradeableProxy, *SIG_VAULT_DELEGATE_CALL ]
             result: []
           - args: [ *AdminMsig, *TransparentUpgradeableProxy, *SIG_VAULT_DELEGATE_CALL ]
             result: []
@@ -429,7 +429,7 @@ l1:
             result: *VAULT_ROLE_MASK
           - args: [ *SimpleDVTStakingStrategy ]
             result: *DELEGATE_CALL_ROLE_MASK
-          - args: [ *CURATOR_ADMIN_MSIG ]
+          - args: [ *CuratorAdminMsig ]
             result: *DELEGATE_CALL_ROLE_MASK
           - args: [ *ProxyAdmin ]
             result: 0
@@ -453,7 +453,7 @@ l1:
           # DELEGATE CALLS TO INITIATE FROM VAULT
           - args: [ *SimpleDVTStakingStrategy, *TransparentUpgradeableProxy, *SIG_VAULT_DELEGATE_CALL ]
             result: []
-          - args: [ *CURATOR_ADMIN_MSIG, *TransparentUpgradeableProxy, *SIG_VAULT_DELEGATE_CALL ]
+          - args: [ *CuratorAdminMsig, *TransparentUpgradeableProxy, *SIG_VAULT_DELEGATE_CALL ]
             result: []
           - args: [ *AdminMsig, *TransparentUpgradeableProxy, *SIG_VAULT_DELEGATE_CALL ]
             result: []
@@ -595,7 +595,7 @@ l1:
             result: []
             mustRevert: true
           - args: [ *OPERATOR, 0 ]
-            result: *CURATOR_ADMIN_MSIG
+            result: *CuratorAdminMsig
           - args: [ *OPERATOR, 1 ]
             result: *SimpleDVTStakingStrategy
         getRoleMemberCount:
@@ -624,7 +624,7 @@ l1:
         isOperator:
           - args: [ *DEPLOYER ]
             result: false
-          - args: [ *CURATOR_ADMIN_MSIG ]
+          - args: [ *CuratorAdminMsig ]
             result: true
         isUnderlyingToken:
           - args: [ *WSTETH ]
@@ -648,7 +648,7 @@ l1:
           - args: [ *DEPLOYER ]
             result: []
             mustRevert: true
-          - args: [ *CURATOR_ADMIN_MSIG ]
+          - args: [ *CuratorAdminMsig ]
             result: []
         supportsInterface:
           - args: [ *ZERO_BYTES4 ]
@@ -809,6 +809,36 @@ l1:
     AdminMsig:
       name: GnosisSafe
       address: *AdminMsig
+      proxyName: GnosisSafeProxy
+      implementation: *GNOSIS_IMPL
+      proxyChecks: {}
+      checks:
+        VERSION: *GNOSIS_VERSION
+        approvedHashes:
+        checkNSignatures:
+        checkSignatures:
+        domainSeparator:
+        encodeTransactionData:
+        getChainId: 1
+        getModulesPaginated:
+        getOwners: [*ADMIN_0,*ADMIN_1,*ADMIN_2,*ADMIN_3,*ADMIN_4,*ADMIN_5,*ADMIN_6,*ADMIN_7]
+        getStorageAt:
+        getThreshold: *THRESHOLD
+        getTransactionHash:
+        isModuleEnabled:
+        isOwner:
+        nonce: 27
+        signedMessages:
+      implementationChecks:
+        VERSION: *GNOSIS_VERSION
+        getOwners:
+          - args: []
+            result: []
+            mustRevert: true
+        nonce: 0
+    CuratorAdminMsig:
+      name: GnosisSafe
+      address: *CuratorAdminMsig
       proxyName: GnosisSafeProxy
       implementation: *GNOSIS_IMPL
       proxyChecks: {}
