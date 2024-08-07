@@ -45,7 +45,7 @@ misc:
 
 tvl:
   - &WSTETH_TVL 0
-  - &WETH_TVL 200010000000000
+  - &WETH_TVL 300010000000000
 
 delays:
   - &MAX_DELAY "31536000" # 365 days
@@ -329,7 +329,7 @@ l1:
       checks:
         ADMIN_ROLE_MASK: *ADMIN_ROLE_MASK
         STORAGE_POSITION: "0xc5d9a5dc0c3dbbd4debebdb870fda826372ee5f5ea588d9114d28c33a7f08b39" # keccak256("mellow.lrt.permissions.storage")
-        allowAllSignaturesRoles:
+        allowAllSignaturesRoles: # with grantContractRole
           - args: [ *StakingModule ]
             result: *VAULT_ROLE_MASK
           - args: [ *TransparentUpgradeableProxy ]
@@ -344,14 +344,14 @@ l1:
             result: 0
           - args: [ *VaultConfigurator ]
             result: 0
-        allowSignatureRoles:
+        allowSignatureRoles: # with grantContractSignatureRole
           - args: [ *TransparentUpgradeableProxy, *SIG_VAULT_DELEGATE_CALL ] # Vault.delegateCall
             result: *DELEGATE_CALL_ROLE_MASK
           - args: [ *TransparentUpgradeableProxy, *SIG_VAULT_DEPOSIT ] # Vault.deposit
             result: *DEPOSIT_ROLE_MASK
           - args: [ *TransparentUpgradeableProxy, *SIG_DUMMY ]
             result: 0 # PROHIBITED
-        customValidator:
+        customValidator: # with setCustomValidator
           - args: [ *TransparentUpgradeableProxy ]
             result: *ZERO_ADDRESS
           - args: [ *SimpleDVTStakingStrategy ]
@@ -367,24 +367,62 @@ l1:
           - args: [ *AdminMsig ]
             result: *ZERO_ADDRESS
         hasPermission:
-          - args: [ *TransparentUpgradeableProxy, *StakingModule, *SIG_DUMMY ]
-            result: true
+          # Deployer can only deposit
           - args: [ *DEPLOYER, *TransparentUpgradeableProxy, *SIG_VAULT_DEPOSIT ]
+            result: true # Deployer can deposit
+          - args: [ *ZERO_ADDRESS, *TransparentUpgradeableProxy, *SIG_VAULT_DEPOSIT ]
+            result: true # Anyone can deposit
+
+          # DELEGATE CALLS TO INITIATE FROM VAULT
+          - args: [ *SimpleDVTStakingStrategy, *TransparentUpgradeableProxy, *SIG_VAULT_DELEGATE_CALL ]
             result: true
-          - args: [ *DEPLOYER, *TransparentUpgradeableProxy, *SIG_VAULT_DELEGATE_CALL ]
+          - args: [ *CURATOR_ADMIN_MSIG, *TransparentUpgradeableProxy, *SIG_VAULT_DELEGATE_CALL ]
+            result: true
+          - args: [ *AdminMsig, *TransparentUpgradeableProxy, *SIG_VAULT_DELEGATE_CALL ]
+            result: true
+          - args: [ *CURATOR_OPERATOR_EOA, *TransparentUpgradeableProxy, *SIG_VAULT_DELEGATE_CALL ]
             result: false
-        publicRoles: "1" # DEPOSITOR_ROLE, 2^0
+          - args: [ *DEPLOYER, *TransparentUpgradeableProxy, *SIG_VAULT_DELEGATE_CALL ]
+            result: false # Deployer can't do delegate calls
+
+          # VAULT can call any method from StakingModule
+          - args: [ *TransparentUpgradeableProxy, *StakingModule, *SIG_DUMMY ]
+            result: true # Vault has all signature roles against StakingModule
+          - args: [ *AdminMsig, *StakingModule, *SIG_DUMMY ]
+            result: true
+          - args: [ *DEPLOYER, *StakingModule, *SIG_DUMMY ]
+            result: false
+        publicRoles: *DEPOSIT_ROLE_MASK # with grantPublicRole
         requirePermission:
+          # Deployer can only deposit
           - args: [ *DEPLOYER, *TransparentUpgradeableProxy, *SIG_VAULT_DEPOSIT ]
             result: []
+          - args: [ *ZERO_ADDRESS, *TransparentUpgradeableProxy, *SIG_VAULT_DEPOSIT ]
+            result: []
+
+          # DELEGATE CALLS TO INITIATE FROM VAULT
+          - args: [ *SimpleDVTStakingStrategy, *TransparentUpgradeableProxy, *SIG_VAULT_DELEGATE_CALL ]
+            result: []
+          - args: [ *CURATOR_ADMIN_MSIG, *TransparentUpgradeableProxy, *SIG_VAULT_DELEGATE_CALL ]
+            result: []
+          - args: [ *AdminMsig, *TransparentUpgradeableProxy, *SIG_VAULT_DELEGATE_CALL ]
+            result: []
+          - args: [ *CURATOR_OPERATOR_EOA, *TransparentUpgradeableProxy, *SIG_VAULT_DELEGATE_CALL ]
+            result: []
+            mustRevert: true
           - args: [ *DEPLOYER, *TransparentUpgradeableProxy, *SIG_VAULT_DELEGATE_CALL ]
             result: []
             mustRevert: true
+
+          # VAULT can call any method from StakingModule
           - args: [ *TransparentUpgradeableProxy, *StakingModule, *SIG_DUMMY ]
             result: []
-          - args: [ *SimpleDVTStakingStrategy, *TransparentUpgradeableProxy, *SIG_VAULT_DELEGATE_CALL ]
+          - args: [ *AdminMsig, *StakingModule, *SIG_DUMMY ]
             result: []
-        userRoles:
+          - args: [ *DEPLOYER, *StakingModule, *SIG_DUMMY ]
+            result: []
+            mustRevert: true
+        userRoles: # with grantRole
           - args: [ *AdminMsig ]
             result: *ADMIN_ROLE_MASK
           - args: [ *TransparentUpgradeableProxy ]
@@ -406,15 +444,34 @@ l1:
           - args: [ *DEPLOYER ]
             result: 0
         validate:
+          # Deployer can only deposit
           - args: [ *DEPLOYER, *TransparentUpgradeableProxy, *SIG_VAULT_DEPOSIT ]
             result: []
+          - args: [ *ZERO_ADDRESS, *TransparentUpgradeableProxy, *SIG_VAULT_DEPOSIT ]
+            result: []
+
+          # DELEGATE CALLS TO INITIATE FROM VAULT
+          - args: [ *SimpleDVTStakingStrategy, *TransparentUpgradeableProxy, *SIG_VAULT_DELEGATE_CALL ]
+            result: []
+          - args: [ *CURATOR_ADMIN_MSIG, *TransparentUpgradeableProxy, *SIG_VAULT_DELEGATE_CALL ]
+            result: []
+          - args: [ *AdminMsig, *TransparentUpgradeableProxy, *SIG_VAULT_DELEGATE_CALL ]
+            result: []
+          - args: [ *CURATOR_OPERATOR_EOA, *TransparentUpgradeableProxy, *SIG_VAULT_DELEGATE_CALL ]
+            result: []
+            mustRevert: true
           - args: [ *DEPLOYER, *TransparentUpgradeableProxy, *SIG_VAULT_DELEGATE_CALL ]
             result: []
             mustRevert: true
+
+          # VAULT can call any method from StakingModule
           - args: [ *TransparentUpgradeableProxy, *StakingModule, *SIG_DUMMY ]
             result: []
-          - args: [ *SimpleDVTStakingStrategy, *TransparentUpgradeableProxy, *SIG_VAULT_DELEGATE_CALL ]
+          - args: [ *AdminMsig, *StakingModule, *SIG_DUMMY ]
             result: []
+          - args: [ *DEPLOYER, *StakingModule, *SIG_DUMMY ]
+            result: []
+            mustRevert: true
     SimpleDVTStakingStrategy:
       name: SimpleDVTStakingStrategy
       address: *SimpleDVTStakingStrategy
