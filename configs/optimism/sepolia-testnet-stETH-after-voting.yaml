@@ -146,7 +146,7 @@ l1:
         proxy__getIsOssified: false
       checks:
         isInitialized: true
-        isDepositsEnabled: false
+        isDepositsEnabled: true
         isWithdrawalsEnabled: true
         L1_TOKEN_NON_REBASABLE: *wstETH
         L1_TOKEN_REBASABLE: *stETH
