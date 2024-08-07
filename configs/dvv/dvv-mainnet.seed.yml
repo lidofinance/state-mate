@@ -17,6 +17,7 @@ deployed:
     - &ProxyAdmin "0x8E6C80c41450D3fA7B1Fd0196676b99Bfb34bF48"
     - &ProxyAdminMsig "0x81698f87C6482bF1ce9bFcfC0F103C4A0Adf0Af0"
     - &AdminMsig "0x9437B2a8cF3b69D782a61f9814baAbc172f72003"
+    - &CuratorAdminMsig "0x2E93913A796a6C6b2bB76F41690E78a2E206Be54"
 
 l1:
   rpcUrl: https://ethereum-rpc.publicnode.com

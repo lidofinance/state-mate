@@ -7,6 +7,7 @@ parameters:
   - &CURATOR_OPERATOR_EOA "0x2afc096981c2CFe3501bE4054160048718F6C0C8"
   - &DEPLOYER "0x188858AC61a74350116d1CB6958fBc509FD6afA1"
   - &GNOSIS_IMPL "0xd9db270c1b5e3bd161e8c8503c55ceabee709552"
+  - &GNOSIS_L2_IMPL "0xfb1bffc9d739b8d520daf37df666da4c687191ea"
 
 misc:
   - &D9 "1000000000" # 10^9
@@ -44,7 +45,7 @@ misc:
 
 tvl:
   - &WSTETH_TVL 0
-  - &WETH_TVL 3300010000000000
+  - &WETH_TVL 5300010000000000
 
 delays:
   - &MAX_DELAY "31536000" # 365 days
@@ -71,6 +72,13 @@ signers:
   - &ADMIN_6 "0x44A388BBD782AE1D7f4542aEb6C3569E2CfdF5a1"
   - &ADMIN_7 "0x8888843c607F4Bbd6aD72128F478085256Bdd15D"
   - &THRESHOLD 5
+
+  - &SH_0 "0xa9f8D7E123784ED914724B8d11D5e669De5cC4d8"
+  - &SH_1 "0x0D61C8b6CA9669A36F351De3AE335e9689dd9C5b"
+  - &SH_2 "0xe516F2D240F891815bf864DD4AE008007B901885"
+  - &SH_3 "0x2afc096981c2CFe3501bE4054160048718F6C0C8"
+  - &SH_4 "0xcC771952fdE840E30C6802734e5ad20479c2959f"
+  - &SH_THRESHOLD 1 # BAD
 
 selectors:
   - &SIG_VAULT_DELEGATE_CALL "0x56e7b7aa"
@@ -636,8 +644,8 @@ l1:
           - args: [ *TransparentUpgradeableProxy ]
             result: false
         name: *TOKEN_NAME
-        pendingWithdrawers: []
-        pendingWithdrawersCount: 0
+        pendingWithdrawers: [ "0x2b5303771e86B5C1476F35e36BF8A914212ee553" ]
+        pendingWithdrawersCount: 1
         requireAdmin:
           - args: [ *DEPLOYER ]
             result: []
@@ -837,10 +845,10 @@ l1:
             mustRevert: true
         nonce: 0
     CuratorAdminMsig:
-      name: GnosisSafe
+      name: GnosisSafeL2
       address: *CuratorAdminMsig
       proxyName: GnosisSafeProxy
-      implementation: *GNOSIS_IMPL
+      implementation: *GNOSIS_L2_IMPL
       proxyChecks: {}
       checks:
         VERSION: *GNOSIS_VERSION
@@ -851,13 +859,13 @@ l1:
         encodeTransactionData:
         getChainId: 1
         getModulesPaginated:
-        getOwners: [*ADMIN_0,*ADMIN_1,*ADMIN_2,*ADMIN_3,*ADMIN_4,*ADMIN_5,*ADMIN_6,*ADMIN_7]
+        getOwners: [*SH_0, *SH_1, *SH_2, *SH_3, *SH_4]
         getStorageAt:
-        getThreshold: *THRESHOLD
+        getThreshold: *SH_THRESHOLD
         getTransactionHash:
         isModuleEnabled:
         isOwner:
-        nonce: 27
+        nonce: 6
         signedMessages:
       implementationChecks:
         VERSION: *GNOSIS_VERSION
