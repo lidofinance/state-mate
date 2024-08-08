@@ -43,6 +43,9 @@ yarn install
 
 ```sh
 export L1_MAINNET_RPC_URL=%YOUR_RPC_URL%
+export L1_TESTNET_RPC_URL=%YOUR_RPC_URL%
+export L2_MAINNET_RPC_URL=%YOUR_RPC_URL%
+export L2_TESTNET_RPC_URL=%YOUR_RPC_URL%
 ```
 
 3. Start the program
