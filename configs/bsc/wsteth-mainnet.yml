@@ -2,12 +2,9 @@ parameters:
   # Already deployed contracts or other parameters
   - &L1_WSTETH "0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0"
   - &ETH_DAO_AGENT "0x3e40D73EB977Dc6a537aF587D48316feE66E9C8c"
+  - &BSC_ADI_EXECUTOR "0x8E5175D17f74d1D512de59b2f5d5A5d8177A123d"
   - &L1_EMERGENCY_BRAKES "0x73b047fe6337183A454c5217241D780a932777bD"
   - &L2_EMERGENCY_BRAKES "0xC2b778fCc3FF311Cf1abBF4E53880277bfD14C8f"
-
-  # NEW INTERIM MSIG
-  - &L1_NEW_INTERIM_MSIG "0x83271E76df1eF8f77487A88fc6aE1478280396bD"
-  - &L2_NEW_INTERIM_MSIG "0x3e277051019fDBF6A759ff847D197FE657Ca74fe"
 
   - &L2_NTT_MANAGER_BYTES32_ADDR "0x0000000000000000000000006981f5621691cbfe3ddd524de71076b79f0a0278"
   - &L2_WORMHOLE_TRANSCEIVER_BYTES32_ADDR "0x000000000000000000000000be3f7e06872e0df6cd7ff35b7aa4bb1446dc9986"
@@ -99,14 +96,12 @@ l1:
         getInboundLimitParams:
           - args: [ *ETH_CHAIN_ID ]
             result: [0, 0, 0]
-          - args: [ *BSC_CHAIN_ID ]
-            result: [768000000000008,768000000000008,1722521939]
         getInboundQueuedTransfer:
           - args: [ *ZERO_BYTES32 ]
             result: [ 0, 0, *ZERO_ADDRESS ]
         getMigratesImmutables: false
         getMode: *LOCKING_MODE
-        getOutboundLimitParams: [768000000000008,767999999974408,1722521939]
+        getOutboundLimitParams:
         getOutboundQueuedTransfer:
           - args: [ 0 ]
             result: [ *ZERO_BYTES32, *ZERO_BYTES32, 0, 0, 0, *ZERO_ADDRESS, "0x" ]
@@ -129,9 +124,9 @@ l1:
          - args: [ *ZERO_BYTES32 ]
            result: 0
         mode: *LOCKING_MODE
-        nextMessageSequence: 39
-        owner: *L1_NEW_INTERIM_MSIG
-        pauser: *L1_NEW_INTERIM_MSIG
+        nextMessageSequence:
+        owner: *ETH_DAO_AGENT
+        pauser: *L1_EMERGENCY_BRAKES
         quoteDeliveryPrice:
           - args: [ *BSC_CHAIN_ID, "0x" ]
             result: []
@@ -216,7 +211,7 @@ l1:
             mustRevert: true
         gasLimit: *GAS_LIMIT
         getMigratesImmutables: false
-        getNttManagerOwner: *L1_NEW_INTERIM_MSIG
+        getNttManagerOwner: *ETH_DAO_AGENT
         getNttManagerToken: *L1_WSTETH
         getTransceiverType: "wormhole"
         getWormholePeer:
@@ -245,11 +240,11 @@ l1:
             result: true
         nttManager: *l1NttManager
         nttManagerToken: *L1_WSTETH
-        owner: *L1_NEW_INTERIM_MSIG
+        owner: *ETH_DAO_AGENT
         parseWormholeTransceiverInstruction:
           - args: [ "0x" ]
             result: [ false ]
-        pauser: *L1_NEW_INTERIM_MSIG
+        pauser: *L1_EMERGENCY_BRAKES
         quoteDeliveryPrice:
           - args: [ *BSC_CHAIN_ID, "0x" ]
             result: []
@@ -266,7 +261,7 @@ l1:
             mustRevert: true
         gasLimit: *GAS_LIMIT
         getMigratesImmutables: false
-        getNttManagerOwner: *L1_NEW_INTERIM_MSIG
+        getNttManagerOwner: *ETH_DAO_AGENT
         getNttManagerToken: *L1_WSTETH
         getTransceiverType: "wormhole"
         getWormholePeer:
@@ -318,14 +313,14 @@ l1:
         gasService: *L1_AXELAR_GAS_SERVICE
         gateway: *L1_AXELAR_GATEWAY
         getMigratesImmutables: false
-        getNttManagerOwner: *L1_NEW_INTERIM_MSIG
+        getNttManagerOwner: *ETH_DAO_AGENT
         getNttManagerToken: *L1_WSTETH
         getTransceiverType: "axelar"
         isPaused: false
         nttManager: *l1NttManager
         nttManagerToken: *L1_WSTETH
-        owner: *L1_NEW_INTERIM_MSIG
-        pauser: *L1_NEW_INTERIM_MSIG
+        owner: *ETH_DAO_AGENT
+        pauser: *L1_EMERGENCY_BRAKES
         quoteDeliveryPrice:
           - args: [ *BSC_CHAIN_ID, "0x" ]
             result: []
@@ -335,7 +330,7 @@ l1:
         gasService: *L1_AXELAR_GAS_SERVICE
         gateway: *L1_AXELAR_GATEWAY
         getMigratesImmutables: false
-        getNttManagerOwner: *L1_NEW_INTERIM_MSIG
+        getNttManagerOwner: *ETH_DAO_AGENT
         getNttManagerToken: *L1_WSTETH
         getTransceiverType: "axelar"
         isPaused: false
@@ -374,13 +369,13 @@ l2:
         decimals: *DECIMALS
         minter: *l2NttManager
         name: *TOKEN_NAME
-        owner: *L2_NEW_INTERIM_MSIG
+        owner: *BSC_ADI_EXECUTOR
         proxiableUUID:
           - args: []
             result: []
             mustRevert: true
         symbol: *TOKEN_SYMBOL
-        totalSupply: 596100000000000
+        totalSupply:
       implementationChecks:
         UPGRADE_INTERFACE_VERSION: *TOKEN_UPGRADE_INTERFACE_VERSION
         allowance:
@@ -416,8 +411,6 @@ l2:
             result: 0
         getCurrentOutboundCapacity: *RATE_LIMIT
         getInboundLimitParams:
-          - args: [ *ETH_CHAIN_ID ]
-            result: [768000000000008,767999999974408,1722523012]
           - args: [ *BSC_CHAIN_ID ]
             result: [0, 0, 0]
         getInboundQueuedTransfer:
@@ -425,7 +418,7 @@ l2:
             result: [ 0, 0, *ZERO_ADDRESS ]
         getMigratesImmutables: false
         getMode: *BURNING_MODE
-        getOutboundLimitParams: [768000000000008,768000000000008,1722523012]
+        getOutboundLimitParams:
         getOutboundQueuedTransfer:
           - args: [ 0 ]
             result: [ *ZERO_BYTES32, *ZERO_BYTES32, 0, 0, 0, *ZERO_ADDRESS, "0x" ]
@@ -448,9 +441,9 @@ l2:
          - args: [ *ZERO_BYTES32 ]
            result: 0
         mode: *BURNING_MODE
-        nextMessageSequence: 31
-        owner: *L2_NEW_INTERIM_MSIG
-        pauser: *L2_NEW_INTERIM_MSIG
+        nextMessageSequence:
+        owner: *BSC_ADI_EXECUTOR
+        pauser: *L2_EMERGENCY_BRAKES
         quoteDeliveryPrice:
           - args: [ *ETH_CHAIN_ID, "0x" ]
             result: []
@@ -535,7 +528,7 @@ l2:
             mustRevert: true
         gasLimit: *GAS_LIMIT
         getMigratesImmutables: false
-        getNttManagerOwner: *L2_NEW_INTERIM_MSIG
+        getNttManagerOwner: *BSC_ADI_EXECUTOR
         getNttManagerToken: *l2wstETHToken
         getTransceiverType: "wormhole"
         getWormholePeer:
@@ -564,11 +557,11 @@ l2:
             result: false
         nttManager: *l2NttManager
         nttManagerToken: *l2wstETHToken
-        owner: *L2_NEW_INTERIM_MSIG
+        owner: *BSC_ADI_EXECUTOR
         parseWormholeTransceiverInstruction:
           - args: [ "0x" ]
             result: [ false ]
-        pauser: *L2_NEW_INTERIM_MSIG
+        pauser: *L2_EMERGENCY_BRAKES
         quoteDeliveryPrice:
           - args: [ *BSC_CHAIN_ID, "0x" ]
             result: []
@@ -585,7 +578,7 @@ l2:
             mustRevert: true
         gasLimit: *GAS_LIMIT
         getMigratesImmutables: false
-        getNttManagerOwner: *L2_NEW_INTERIM_MSIG
+        getNttManagerOwner: *BSC_ADI_EXECUTOR
         getNttManagerToken: *l2wstETHToken
         getTransceiverType: "wormhole"
         getWormholePeer:
@@ -637,14 +630,14 @@ l2:
         gasService: *L2_AXELAR_GAS_SERVICE
         gateway: *L2_AXELAR_GATEWAY
         getMigratesImmutables: false
-        getNttManagerOwner: *L2_NEW_INTERIM_MSIG
+        getNttManagerOwner: *BSC_ADI_EXECUTOR
         getNttManagerToken: *l2wstETHToken
         getTransceiverType: "axelar"
         isPaused: false
         nttManager: *l2NttManager
         nttManagerToken: *l2wstETHToken
-        owner: *L2_NEW_INTERIM_MSIG
-        pauser: *L2_NEW_INTERIM_MSIG
+        owner: *BSC_ADI_EXECUTOR
+        pauser: *L2_EMERGENCY_BRAKES
         quoteDeliveryPrice:
           - args: [ *BSC_CHAIN_ID, "0x" ]
             result: []
@@ -654,7 +647,7 @@ l2:
         gasService: *L2_AXELAR_GAS_SERVICE
         gateway: *L2_AXELAR_GATEWAY
         getMigratesImmutables: false
-        getNttManagerOwner: *L2_NEW_INTERIM_MSIG
+        getNttManagerOwner: *BSC_ADI_EXECUTOR
         getNttManagerToken: *l2wstETHToken
         getTransceiverType: "axelar"
         isPaused: false
