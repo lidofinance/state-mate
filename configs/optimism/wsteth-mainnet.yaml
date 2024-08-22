@@ -101,8 +101,6 @@ l2:
         symbol: wstETH
         decimals: 18
         bridge: *l2TokenBridge
-        DOMAIN_SEPARATOR: null
-        PERMIT_TYPEHASH: null
         allowance: null
         balanceOf: null
         nonces: null
