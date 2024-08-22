@@ -3,6 +3,7 @@
 
 parameters:
   - &lido "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84"
+  - &lidoLocatorImpl "0x39aFE23cE59e8Ef196b81F0DCb165E9aD38b9463"
   - &accountingOracle "0x852deD011285fe67063a08005c71a85690503Cee"
   - &wstETH "0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0"
   - &stETH "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84"
@@ -34,6 +35,19 @@ deployed:
     - &l2TokenRateOracle "0x294ED1f214F4e0ecAE31C3Eae4F04EBB3b36C9d0"
     - &l2TokenRateOracleImpl "0x4bF0d419793d8722b8391efaD4c9cE78F460CEd3"
 
+misc:
+  - &depositSecurityModule "0xC77F8768774E1c9244BEed705C4354f2113CFc09"
+  - &elRewardsVault "0x388C818CA8B9251b393131C08a736A67ccB19297"
+  - &legacyOracle "0x442af784A788A5bd6F42A01Ebe9F287a871243fb"
+  - &oracleReportSanityChecker "0x9305c1Dbfe22c12c66339184C0025d7006f0f1cC"
+  - &burner "0xD15a672319Cf0352560eE76d9e89eAB0889046D3"
+  - &stakingRouter "0xFdDf38947aFB03C621C71b06C9C70bce73f12999"
+  - &treasury "0x3e40D73EB977Dc6a537aF587D48316feE66E9C8c"
+  - &validatorsExitBusOracle "0x0De4Ea0184c2ad0BacA7183356Aea5B8d5Bf5c6e"
+  - &withdrawalQueue "0x889edC2eDab5f40e902b864aD4d7AdE8E412F9B1"
+  - &withdrawalVault "0xB9D7934878B5FB9610B3fE8A5e441e8fad7E293f"
+  - &oracleDaemonConfig "0xbf05A929c3D7885a6aeAd833a992dA6E5ac23b09"
+
 roles:
   - &DEFAULT_ADMIN_ROLE "0x0000000000000000000000000000000000000000000000000000000000000000"
   - &DEPOSITS_DISABLER_ROLE "0x63f736f21cb2943826cd50b191eb054ebbea670e4e962d0527611f830cd399d6"
@@ -46,6 +60,26 @@ roles:
 l1:
   rpcUrl: L1_MAINNET_RPC_URL
   contracts:
+    lidoLocatorNewImpl:
+      name: LidoLocator
+      address: *lidoLocatorImpl
+      checks:
+        postTokenRebaseReceiver: *l1TokenRateNotifier
+        lido: *lido
+        accountingOracle: *accountingOracle
+        depositSecurityModule: *depositSecurityModule
+        elRewardsVault: *elRewardsVault
+        legacyOracle: *legacyOracle
+        oracleReportSanityChecker: *oracleReportSanityChecker
+        burner: *burner
+        stakingRouter: *stakingRouter
+        treasury: *treasury
+        validatorsExitBusOracle: *validatorsExitBusOracle
+        withdrawalQueue: *withdrawalQueue
+        withdrawalVault: *withdrawalVault
+        oracleDaemonConfig: *oracleDaemonConfig
+        coreComponents: null
+        oracleReportComponentsForLido: null
     tokenRateNotifier:
       name: TokenRateNotifier
       address: *l1TokenRateNotifier
