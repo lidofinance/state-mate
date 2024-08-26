@@ -3,7 +3,6 @@
 
 parameters:
   - &lido "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84"
-  - &lidoLocatorImpl "0x39aFE23cE59e8Ef196b81F0DCb165E9aD38b9463"
   - &accountingOracle "0x852deD011285fe67063a08005c71a85690503Cee"
   - &wstETH "0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0"
   - &stETH "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84"
@@ -21,6 +20,7 @@ deployed:
     - &l1TokenBridgeNewImpl "0x168Cfea1Ad879d7032B3936eF3b0E90790b6B6D4"
     - &l1TokenRateNotifier "0xe6793B9e4FbA7DE0ee833F9D02bba7DB5EB27823"
     - &l1OpStackTokenRatePusher "0xd54c1c6413caac3477AC14b2a80D5398E3c32FfE"
+    - &lidoLocatorImpl "0x39aFE23cE59e8Ef196b81F0DCb165E9aD38b9463"
 
   l2:
     - &l2GovernanceExecutor "0xEfa0dB536d2c8089685630fafe88CF7805966FC3"

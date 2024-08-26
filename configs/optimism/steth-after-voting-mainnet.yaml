@@ -1,5 +1,5 @@
 # Optimism Mainnet Deployment & Configuration
-# Checks state when new contracts were deployed and upgraded.
+# New contracts were deployed and upgraded.
 
 parameters:
   - &lido "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84"
@@ -12,30 +12,29 @@ parameters:
   - &l2EmergencyBreaksMultisig "0x4Cf8fE0A4c2539F7EFDD2047d8A5D46F14613088"
   - &l1CrossDomainMessenger "0x25ace71c97B33Cc4729CF772ae268934F7ab5fA1"
   - &l2CrossDomainMessenger "0x4200000000000000000000000000000000000007"
+  - &maxInt "115792089237316195423570985008687907853269984665640564039457584007913129639935"
 
 # upgrade config for after voting state (will be failed until voting script runs)
 deployed:
   l1:
     - &l1TokenBridge "0x76943C0D61395d8F2edF9060e1533529cAe05dE6"
-    - &l1TokenBridgeImpl ""
-    - &l1TokenRateNotifier ""
-    - &l1OpStackTokenRatePusher ""
-    - &lidoLocatorImpl ""
-
+    - &l1TokenBridgeImpl "0x168Cfea1Ad879d7032B3936eF3b0E90790b6B6D4"
+    - &l1TokenRateNotifier "0xe6793B9e4FbA7DE0ee833F9D02bba7DB5EB27823"
+    - &l1OpStackTokenRatePusher "0xd54c1c6413caac3477AC14b2a80D5398E3c32FfE"
+    - &lidoLocatorImpl "0x39aFE23cE59e8Ef196b81F0DCb165E9aD38b9463"
 
   l2:
     - &l2GovernanceExecutor "0xEfa0dB536d2c8089685630fafe88CF7805966FC3"
     - &l2TokenBridge "0x8E01013243a96601a86eb3153F0d9Fa4fbFb6957"
-    - &l2TokenBridgeImpl ""
+    - &l2TokenBridgeImpl "0x2734602C0CEbbA68662552CacD5553370B283E2E"
     - &l2WstETH "0x1F32b1c2345538c0c6f582fCB022739c4A194Ebb"
-    - &l2WstETHImpl ""
-    - &l2StETH ""
-    - &l2StETHImpl ""
-    - &l2TokenRateOracle ""
-    - &l2TokenRateOracleImpl ""
+    - &l2WstETHImpl "0xFe57042De76c8D6B1DF0E9E2047329fd3e2B7334"
+    - &l2StETH "0x76A50b8c7349cCDDb7578c6627e79b5d99D24138"
+    - &l2StETHImpl "0xe9b65dA5DcBe92f1b397991C464FF568Dc98D761"
+    - &l2TokenRateOracle "0x294ED1f214F4e0ecAE31C3Eae4F04EBB3b36C9d0"
+    - &l2TokenRateOracleImpl "0x4bF0d419793d8722b8391efaD4c9cE78F460CEd3"
 
 misc:
-  - &lidoLocatorPreviousImpl "0x1D920cc5bACf7eE506a271a5259f2417CaDeCE1d" # TODO
   - &depositSecurityModule "0xC77F8768774E1c9244BEed705C4354f2113CFc09"
   - &elRewardsVault "0x388C818CA8B9251b393131C08a736A67ccB19297"
   - &legacyOracle "0x442af784A788A5bd6F42A01Ebe9F287a871243fb"
@@ -59,7 +58,7 @@ roles:
   - &RATE_UPDATE_ENABLER_ROLE "0x5a883d2caeb13c05f1649a05c9c61c1deb622a06bff8d94d071d35c5ad8c2c94"
 
 l1:
-  rpcUrl: L1_TESTNET_RPC_URL
+  rpcUrl: L1_MAINNET_RPC_URL
   contracts:
     lidoLocator:
       name: LidoLocator
@@ -87,26 +86,6 @@ l1:
         oracleDaemonConfig: *oracleDaemonConfig
         coreComponents: null
         oracleReportComponentsForLido: null
-    previousLidoLocatorImpl:
-      name: LidoLocator
-      address: *lidoLocatorPreviousImpl
-      checks:
-        postTokenRebaseReceiver: *legacyOracle
-        lido: *lido
-        accountingOracle: *accountingOracle
-        depositSecurityModule: *depositSecurityModule
-        elRewardsVault: *elRewardsVault
-        legacyOracle: *legacyOracle
-        oracleReportSanityChecker: *oracleReportSanityChecker
-        burner: *burner
-        stakingRouter: *stakingRouter
-        treasury: *treasury
-        validatorsExitBusOracle: *validatorsExitBusOracle
-        withdrawalQueue: *withdrawalQueue
-        withdrawalVault: *withdrawalVault
-        oracleDaemonConfig: *oracleDaemonConfig
-        coreComponents: null
-        oracleReportComponentsForLido: null
     tokenRateNotifier:
       name: TokenRateNotifier
       address: *l1TokenRateNotifier
@@ -114,7 +93,7 @@ l1:
         owner: *agent
         MAX_OBSERVERS_COUNT: 32
         LIDO: *lido
-        INDEX_NOT_FOUND: 115792089237316195423570985008687907853269984665640564039457584007913129639935
+        INDEX_NOT_FOUND: *maxInt
         REQUIRED_INTERFACE: "0xa16ba44d"
         observersLength: 1
         observers:
@@ -128,7 +107,7 @@ l1:
         WSTETH: *wstETH
         L2_TOKEN_RATE_ORACLE: *l2TokenRateOracle
         MESSENGER: *l1CrossDomainMessenger
-        GENESIS_TIME: 1655733600
+        GENESIS_TIME: 1606824023
         L2_GAS_LIMIT_FOR_PUSHING_TOKEN_RATE: 300000
         SECONDS_PER_SLOT: 12
         TOKEN_RATE_DECIMALS: 27
@@ -161,26 +140,21 @@ l1:
         WITHDRAWALS_ENABLER_ROLE: *WITHDRAWALS_ENABLER_ROLE
         ACCOUNTING_ORACLE: *accountingOracle
         WSTETH: *wstETH
-        GENESIS_TIME: 1655733600
+        GENESIS_TIME: 1606824023
         SECONDS_PER_SLOT: 12
         TOKEN_RATE_DECIMALS: 27
         getContractVersion: 2
         supportsInterface:
           - args: [ "0x01ffc9a7" ] # IERC165
             result: true
-        hasRole:
-          - args: [*DEFAULT_ADMIN_ROLE, "0x0000000000000000000000000000000000000000"]
-            result: false
-          - args: [*DEPOSITS_ENABLER_ROLE, *l1EmergencyBreaksMultisig]
-            result: false
-          - args: [*WITHDRAWALS_ENABLER_ROLE, *l1EmergencyBreaksMultisig]
-            result: false
+        hasRole: null
         getRoleAdmin: null
       ozNonEnumerableAcl:
         *DEFAULT_ADMIN_ROLE : [*agent]
+        *DEPOSITS_ENABLER_ROLE : [*agent, *l1EmergencyBreaksMultisig]
         *DEPOSITS_DISABLER_ROLE : [*agent, *l1EmergencyBreaksMultisig]
-        *WITHDRAWALS_DISABLER_ROLE : [*agent, *l1EmergencyBreaksMultisig]
         *WITHDRAWALS_ENABLER_ROLE : [*agent]
+        *WITHDRAWALS_DISABLER_ROLE : [*agent, *l1EmergencyBreaksMultisig]
       implementationChecks:
         getContractVersion: 115792089237316195423570985008687907853269984665640564039457584007913129639935
         isInitialized: false
@@ -199,7 +173,7 @@ l2:
       checks:
         getEthereumGovernanceExecutor: *agent
         getGracePeriod: 86400
-        getGuardian: "0xD06491e4C8B3107B83dC134894C4c96ED8ddbfa2"
+        getGuardian: "0x0000000000000000000000000000000000000000"
         getDelay: 0
         getMinimumDelay: 0
         getMaximumDelay: 1
@@ -208,7 +182,6 @@ l2:
         getActionsSetById: null
         getCurrentState: null
         isActionQueued: null
-
     tokenRateOracle:
       name: TokenRateOracle
       address: *l2TokenRateOracle
@@ -227,7 +200,7 @@ l2:
         DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
         RATE_UPDATE_DISABLER_ROLE: *RATE_UPDATE_DISABLER_ROLE
         RATE_UPDATE_ENABLER_ROLE: *RATE_UPDATE_ENABLER_ROLE
-        MAX_ALLOWED_L2_TO_L1_CLOCK_LAG: 172800
+        MAX_ALLOWED_L2_TO_L1_CLOCK_LAG: 86400
         MAX_ALLOWED_TOKEN_RATE_DEVIATION_PER_DAY_BP: 500
         MAX_SANE_TOKEN_RATE: 100000000000000000000000000000
         MIN_SANE_TOKEN_RATE: 10000000000000000000000000
@@ -253,7 +226,6 @@ l2:
       ozNonEnumerableAcl:
         *RATE_UPDATE_DISABLER_ROLE : [*l2GovernanceExecutor, *l2EmergencyBreaksMultisig]
         *RATE_UPDATE_ENABLER_ROLE : [*l2GovernanceExecutor]
-
     stETH:
       name: ERC20RebasableBridgedPermit
       address: *l2StETH
@@ -268,7 +240,7 @@ l2:
         symbol: stETH
         decimals: 18
         TOKEN_RATE_ORACLE_DECIMALS: 27
-        DOMAIN_SEPARATOR: "0xf263bd4a5df4c4a67bcf947a8c87fde73c4df067dca628bd2a0625c557329085"
+        DOMAIN_SEPARATOR: "0xda0536adc4a27e6c618eb823738afa2cda2005a3c48122c1edd84930f2c8e67d"
         L2_ERC20_TOKEN_BRIDGE: *l2TokenBridge
         TOKEN_RATE_ORACLE: *l2TokenRateOracle
         TOKEN_TO_WRAP_FROM: *l2WstETH
@@ -283,7 +255,6 @@ l2:
         allowance: null
         balanceOf: null
       implementationChecks: {}
-
     wstETH:
       name: ERC20BridgedPermit
       address: *l2WstETH
@@ -298,7 +269,7 @@ l2:
         symbol: wstETH
         decimals: 18
         bridge: *l2TokenBridge
-        DOMAIN_SEPARATOR: "0xd767e2c73472c3f7e3225b36a5b47efb4b248a17be58dbd15b9e94792e9202b6"
+        DOMAIN_SEPARATOR: "0xfd88ee9f803e79b6dbe2f1d8dbec370c1e96797de7eb52dd438056be85105379"
         getContractVersion: 2
         PERMIT_TYPEHASH: null
         totalSupply: null
@@ -307,7 +278,6 @@ l2:
         nonces: null
         eip712Domain: null
       implementationChecks: {}
-
     tokenBridge:
       name: L2ERC20ExtendedTokensBridge
       address: *l2TokenBridge
