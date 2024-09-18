@@ -165,7 +165,7 @@ l1:
           result: false
 
 l2:
-  rpcUrl: L2_TESTNET_RPC_URL
+  rpcUrl: L2_MAINNET_RPC_URL
   contracts:
     governanceExecutor:
       name: OptimismBridgeExecutor
