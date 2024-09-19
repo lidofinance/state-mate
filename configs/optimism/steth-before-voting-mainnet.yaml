@@ -87,7 +87,7 @@ l1:
         owner: *agent
         MAX_OBSERVERS_COUNT: 32
         LIDO: *lido
-        INDEX_NOT_FOUND: 115792089237316195423570985008687907853269984665640564039457584007913129639935
+        INDEX_NOT_FOUND: *maxInt
         REQUIRED_INTERFACE: "0xa16ba44d"
         observersLength: 1
         observers:
@@ -130,9 +130,11 @@ l1:
         DEPOSITS_ENABLER_ROLE: *DEPOSITS_ENABLER_ROLE
         WITHDRAWALS_DISABLER_ROLE: *WITHDRAWALS_DISABLER_ROLE
         WITHDRAWALS_ENABLER_ROLE: *WITHDRAWALS_ENABLER_ROLE
+        supportsInterface:
+          - args: [ "0x01ffc9a7" ] # IERC165
+            result: true
         getRoleAdmin: null
         hasRole: null
-        supportsInterface: null
       implementationChecks:
         isInitialized: true
         isDepositsEnabled: false
@@ -143,6 +145,7 @@ l1:
       ozNonEnumerableAcl:
         *DEFAULT_ADMIN_ROLE : [*agent]
         *DEPOSITS_DISABLER_ROLE : [*agent, *l1EmergencyBreaksMultisig]
+        *DEPOSITS_ENABLER_ROLE : [*agent]
         *WITHDRAWALS_DISABLER_ROLE : [*agent, *l1EmergencyBreaksMultisig]
         *WITHDRAWALS_ENABLER_ROLE : [*agent]
     tokenBridgeNewImpl:
@@ -168,7 +171,7 @@ l1:
         GENESIS_TIME: 1606824023
         SECONDS_PER_SLOT: 12
         TOKEN_RATE_DECIMALS: 27
-        getContractVersion: 115792089237316195423570985008687907853269984665640564039457584007913129639935
+        getContractVersion: *maxInt
         supportsInterface:
           - args: [ "0x01ffc9a7" ] # IERC165
             result: true
@@ -197,6 +200,21 @@ l1:
 l2:
   rpcUrl: L2_MAINNET_RPC_URL
   contracts:
+    governanceExecutor:
+      name: OptimismBridgeExecutor
+      address: *l2GovernanceExecutor
+      checks:
+        getEthereumGovernanceExecutor: *agent
+        getGracePeriod: 86400
+        getGuardian: "0x0000000000000000000000000000000000000000"
+        getDelay: 0
+        getMinimumDelay: 0
+        getMaximumDelay: 1
+        getActionsSetCount: null
+        OVM_L2_CROSS_DOMAIN_MESSENGER: null
+        getActionsSetById: null
+        getCurrentState: null
+        isActionQueued: null
     tokenRateOracle:
       name: TokenRateOracle
       address: *l2TokenRateOracle
@@ -252,13 +270,13 @@ l2:
         decimals: 18
         TOKEN_RATE_ORACLE_DECIMALS: 27
         DOMAIN_SEPARATOR: "0xfe9c79f7aaae9e9922c525ba7a6897f8032438b998d38cbb0b92b74829dea68d"
+        eip712Domain: ["0x0f","Liquid staked Ether 2.0","1",10,"0x76A50b8c7349cCDDb7578c6627e79b5d99D24138","0x0000000000000000000000000000000000000000000000000000000000000000",[]]
         L2_ERC20_TOKEN_BRIDGE: *l2TokenBridge
         TOKEN_RATE_ORACLE: *l2TokenRateOracle
         TOKEN_TO_WRAP_FROM: *l2WstETH
         getContractVersion: 1
         getTotalShares: 0
         totalSupply: 0
-        eip712Domain: null
         nonces: null
         getSharesByTokens: null
         getTokensByShares: null
@@ -266,21 +284,6 @@ l2:
         allowance: null
         balanceOf: null
       implementationChecks: {}
-    governanceExecutor:
-      name: OptimismBridgeExecutor
-      address: *l2GovernanceExecutor
-      checks:
-        getEthereumGovernanceExecutor: *agent
-        getGracePeriod: 86400
-        getGuardian: "0x0000000000000000000000000000000000000000"
-        getDelay: 0
-        getMinimumDelay: 0
-        getMaximumDelay: 1
-        getActionsSetCount: null
-        OVM_L2_CROSS_DOMAIN_MESSENGER: null
-        getActionsSetById: null
-        getCurrentState: null
-        isActionQueued: null
     wstETH:
       name: ERC20Bridged
       address: *l2WstETH
@@ -309,12 +312,12 @@ l2:
         decimals: 18
         bridge: *l2TokenBridge
         DOMAIN_SEPARATOR: "0xde21cfddb7b61ce76bab64e0cf20729dae722f5777fe2494e89e0575ad5ebf56"
+        eip712Domain: ["0x0f","Wrapped liquid staked Ether 2.0","2",10,"0xFe57042De76c8D6B1DF0E9E2047329fd3e2B7334","0x0000000000000000000000000000000000000000000000000000000000000000",[]]
         getContractVersion: *maxInt
         totalSupply: 0
         allowance: null
         balanceOf: null
         nonces: null
-        eip712Domain: ["0x0f","Wrapped liquid staked Ether 2.0","2",10,"0xFe57042De76c8D6B1DF0E9E2047329fd3e2B7334","0x0000000000000000000000000000000000000000000000000000000000000000",[]]
     tokenBridge:
       name: L2ERC20TokenBridge
       address: *l2TokenBridge
@@ -337,9 +340,11 @@ l2:
         DEPOSITS_ENABLER_ROLE: *DEPOSITS_ENABLER_ROLE
         WITHDRAWALS_DISABLER_ROLE: *WITHDRAWALS_DISABLER_ROLE
         WITHDRAWALS_ENABLER_ROLE: *WITHDRAWALS_ENABLER_ROLE
+        supportsInterface:
+          - args: [ "0x01ffc9a7" ] # IERC165
+            result: true
         getRoleAdmin: null
         hasRole: null
-        supportsInterface: null
       implementationChecks:
         isInitialized: true
         isDepositsEnabled: false
@@ -377,9 +382,21 @@ l2:
             result: true
         getRoleAdmin: null
         hasRole:
-          - args: [*DEFAULT_ADMIN_ROLE, "0x0000000000000000000000000000000000000000"]
+          - args: [*DEFAULT_ADMIN_ROLE, *l2GovernanceExecutor]
+            result: false
+          - args: [*DEPOSITS_ENABLER_ROLE, *l2GovernanceExecutor]
             result: false
           - args: [*DEPOSITS_ENABLER_ROLE, *l2EmergencyBreaksMultisig]
             result: false
+          - args: [*DEPOSITS_DISABLER_ROLE, *l2GovernanceExecutor]
+            result: false
+          - args: [*DEPOSITS_DISABLER_ROLE, *l2EmergencyBreaksMultisig]
+            result: false
+          - args: [*WITHDRAWALS_ENABLER_ROLE, *l2GovernanceExecutor]
+            result: false  
           - args: [*WITHDRAWALS_ENABLER_ROLE, *l2EmergencyBreaksMultisig]
+            result: false
+          - args: [*WITHDRAWALS_DISABLER_ROLE, *l2GovernanceExecutor]
+            result: false  
+          - args: [*WITHDRAWALS_DISABLER_ROLE, *l2EmergencyBreaksMultisig]
             result: false

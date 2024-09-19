@@ -14,7 +14,6 @@ parameters:
   - &l2CrossDomainMessenger "0x4200000000000000000000000000000000000007"
   - &maxInt "115792089237316195423570985008687907853269984665640564039457584007913129639935"
 
-# upgrade config for after voting state (will be failed until voting script runs)
 deployed:
   l1:
     - &l1TokenBridge "0x76943C0D61395d8F2edF9060e1533529cAe05dE6"
@@ -151,12 +150,12 @@ l1:
         getRoleAdmin: null
       ozNonEnumerableAcl:
         *DEFAULT_ADMIN_ROLE : [*agent]
-        *DEPOSITS_ENABLER_ROLE : [*agent, *l1EmergencyBreaksMultisig]
         *DEPOSITS_DISABLER_ROLE : [*agent, *l1EmergencyBreaksMultisig]
-        *WITHDRAWALS_ENABLER_ROLE : [*agent]
+        *DEPOSITS_ENABLER_ROLE : [*agent, *l1EmergencyBreaksMultisig]
         *WITHDRAWALS_DISABLER_ROLE : [*agent, *l1EmergencyBreaksMultisig]
+        *WITHDRAWALS_ENABLER_ROLE : [*agent]
       implementationChecks:
-        getContractVersion: 115792089237316195423570985008687907853269984665640564039457584007913129639935
+        getContractVersion: *maxInt
         isInitialized: false
         isDepositsEnabled: false
         isWithdrawalsEnabled: false
@@ -240,14 +239,14 @@ l2:
         symbol: stETH
         decimals: 18
         TOKEN_RATE_ORACLE_DECIMALS: 27
-        DOMAIN_SEPARATOR: "0xda0536adc4a27e6c618eb823738afa2cda2005a3c48122c1edd84930f2c8e67d"
+        DOMAIN_SEPARATOR: "0xfe9c79f7aaae9e9922c525ba7a6897f8032438b998d38cbb0b92b74829dea68d"
+        eip712Domain: ["0x0f","Liquid staked Ether 2.0","1",10,"0x76A50b8c7349cCDDb7578c6627e79b5d99D24138","0x0000000000000000000000000000000000000000000000000000000000000000",[]]
         L2_ERC20_TOKEN_BRIDGE: *l2TokenBridge
         TOKEN_RATE_ORACLE: *l2TokenRateOracle
         TOKEN_TO_WRAP_FROM: *l2WstETH
         getContractVersion: 1
-        getTotalShares: null
-        totalSupply: null
-        eip712Domain: null
+        getTotalShares: 0
+        totalSupply: 0
         nonces: null
         getSharesByTokens: null
         getTokensByShares: null
@@ -269,14 +268,14 @@ l2:
         symbol: wstETH
         decimals: 18
         bridge: *l2TokenBridge
-        DOMAIN_SEPARATOR: "0xfd88ee9f803e79b6dbe2f1d8dbec370c1e96797de7eb52dd438056be85105379"
+        DOMAIN_SEPARATOR: "0xc7078fdc1b0a6dc42aa20237f2c2fe4c9d37d2f61a69811997849b9ca57fe3e9"
+        eip712Domain: ["0x0f","Wrapped liquid staked Ether 2.0","2",10,"0xFe57042De76c8D6B1DF0E9E2047329fd3e2B7334","0x0000000000000000000000000000000000000000000000000000000000000000",[]]
         getContractVersion: 2
-        PERMIT_TYPEHASH: null
         totalSupply: null
+        PERMIT_TYPEHASH: null
         allowance: null
         balanceOf: null
         nonces: null
-        eip712Domain: null
       implementationChecks: {}
     tokenBridge:
       name: L2ERC20ExtendedTokensBridge
@@ -306,7 +305,6 @@ l2:
         supportsInterface:
           - args: [ "0x01ffc9a7" ] # IERC165
             result: true
-        getRoleAdmin: null
         hasRole:
           - args: [*DEFAULT_ADMIN_ROLE, "0x0000000000000000000000000000000000000000"]
             result: false
@@ -314,6 +312,7 @@ l2:
             result: false
           - args: [*WITHDRAWALS_ENABLER_ROLE, *l2EmergencyBreaksMultisig]
             result: false
+        getRoleAdmin: null
       ozNonEnumerableAcl:
         *DEFAULT_ADMIN_ROLE : [*l2GovernanceExecutor]
         *DEPOSITS_DISABLER_ROLE : [*l2GovernanceExecutor, *l2EmergencyBreaksMultisig]
@@ -321,7 +320,7 @@ l2:
         *WITHDRAWALS_DISABLER_ROLE : [*l2GovernanceExecutor, *l2EmergencyBreaksMultisig]
         *WITHDRAWALS_ENABLER_ROLE : [*l2GovernanceExecutor]
       implementationChecks:
-        getContractVersion: 115792089237316195423570985008687907853269984665640564039457584007913129639935
+        getContractVersion: *maxInt
         isInitialized: false
         isDepositsEnabled: false
         isWithdrawalsEnabled: false
