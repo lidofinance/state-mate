@@ -1,0 +1,123 @@
+#6. Call finalize upgrade on Staking Router
+#7. Publish new Node Operators Registry implementation in Node Operators Registry app APM repo
+#8. Update Node Operators Registry implementation
+#9. Finalize Node Operators Registry upgrade
+#10. Publish new SimpleDVT implementation in SimpleDVT app APM repo
+#11. Update SimpleDVT implementation
+#12. Finalize SimpleDVT upgrade
+#13. Update Accounting Oracle implementation
+#14. Finalize Accounting Oracle upgrade and update consensus version
+#15. Grant manage consensus role to Aragon Agent
+#16. Update Validator Exit Bus Oracle consensus version
+#17. Revoke manage consensus role from Aragon Agent
+#18. Remove old UpdateTargetValidatorLimits for SimpleDVT factory from EasyTrack
+#19. Add new UpdateTargetValidatorLimits for SimpleDVT factory to EasyTrack
+#Community Staking Module
+#20. Add Community Staking Module to Staking Router
+#21. Grant request burn role to CSAccounting
+#22. Grant resume role to Aragon Agent
+#23. Resume Community Staking Module
+#24. Revoke resume role from Aragon Agent
+#25. Update initial epoch on CSHashConsensus
+#26. Add CSMSettleElStealingPenalty factory to EasyTrack
+---
+parameters:
+  - &lidoLocator "0x28FAB2059C713A7F9D8c86Db49f9bb0e96Af1ef8"
+  - &lido "0x3F1c547b21f65e10480dE3ad8E19fAAC46C95034"
+  - &stakingRouter "0xd6EbF043D30A7fe46D1Db32BA90a0A51207FE229"
+  - &nodeOperatorRegistry "0x595F64Ddc3856a3b5Ff4f4CC1d1fb4B46cFd2bAC"
+  - &simpleDVT "0x11a93807078f8BB880c1BD0ee4C387537de4b4b6"
+  - &accountingOracle "0x4E97A3972ce8511D87F334dA17a2C332542a5246"
+
+misc:
+  - &agent "0xE92329EC7ddB11D25e25b3c21eeBf11f15eB325d"
+  - &elRewardsVault "0xE73a3602b99f1f913e72F8bdcBC235e206794Ac8"
+  - &legacyOracle "0x072f72BE3AcFE2c52715829F2CD9061A6C8fF019"
+  - &burner "0x4E46BD7147ccf666E1d73A3A456fC7a68de82eCA"
+  - &treasury "0xE92329EC7ddB11D25e25b3c21eeBf11f15eB325d"
+  - &validatorsExitBusOracle "0xffDDF7025410412deaa05E3E1cE68FE53208afcb"
+  - &withdrawalQueue "0xc7cc160b58F8Bb0baC94b80847E2CF2800565C50"
+  - &withdrawalVault "0xF0179dEC45a37423EAD4FaD5fCb136197872EAd9"
+  - &oracleDaemonConfig "0xC01fC1F2787687Bc656EAc0356ba9Db6e6b7afb7"
+  - &postTokenRebaseReceiver "0x072f72BE3AcFE2c52715829F2CD9061A6C8fF019"
+  - &oldDepositSecurityModule "0x045dd46212A178428c088573A7d102B9d89a022A"
+
+
+deployed:
+  l1:
+    - &lidoLocatorImpl "0xa19a59aF0680F6D9676ABD77E1Ba7e4c205F55a0"
+    - &stakingRouterImpl "0x9b5890E950E3Df487Bb64E0A6743cdE791139152"
+    - &nodeOperatorRegistryImpl "0x41646708A7EDbe22BD635Cb838Ff9C0CfA99A3bE"
+    - &simpleDVTImpl "0x41646708A7EDbe22BD635Cb838Ff9C0CfA99A3bE"
+    - &depositSecurityModule "0x808DE3b26Be9438F12E9B45528955EA94C17f217"
+    - &accountingOracleImpl "0x748CE008ac6b15634ceD5a6083796f75695052a2"
+    - &oracleReportSanityChecker "0x80D1B1fF6E84134404abA18A628347960c38ccA7"
+
+roles:
+  - &STAKING_MODULE_UNVETTING_ROLE "0x240525496a9dc32284b17ce03b43e539e4bd81414634ee54395030d793463b57"
+  - &STAKING_MODULE_PAUSE_ROLE "0x00b1e70095ba5bacc3202c3db9faf1f7873186f0ed7b6c84e80c0018dcc6e38e"
+  - &STAKING_MODULE_RESUME_ROLE "0x9a2f67efb89489040f2c48c3b2c38f719fba1276678d2ced3bd9049fb5edc6b2"
+
+l1:
+  rpcUrl: L1_TESTNET_RPC_URL
+  contracts:
+    lidoLocator:
+      name: LidoLocator
+      address: *lidoLocator
+      proxyName: OssifiableProxy
+      implementation: *lidoLocatorImpl
+      proxyChecks:
+        proxy__getImplementation: *lidoLocatorImpl
+        proxy__getAdmin: *agent
+        proxy__getIsOssified: false
+      checks:
+        accountingOracle: *accountingOracle
+        burner: *burner
+        coreComponents: [*elRewardsVault, *oracleReportSanityChecker, *stakingRouter, *treasury, *withdrawalQueue, *withdrawalVault]
+        depositSecurityModule: *depositSecurityModule
+        elRewardsVault: *elRewardsVault
+        legacyOracle: *legacyOracle
+        lido: *lido
+        oracleDaemonConfig: *oracleDaemonConfig
+        oracleReportComponentsForLido: null
+        oracleReportSanityChecker: *oracleReportSanityChecker
+        postTokenRebaseReceiver: *postTokenRebaseReceiver
+        stakingRouter: *stakingRouter
+        treasury: *treasury
+        validatorsExitBusOracle: *validatorsExitBusOracle
+        withdrawalQueue: *withdrawalQueue
+        withdrawalVault: *withdrawalVault
+    stakingRouter:
+      name: StakingRouter
+      address: *stakingRouter
+      proxyName: OssifiableProxy
+      implementation: *stakingRouterImpl
+      proxyChecks:
+        proxy__getImplementation: *stakingRouterImpl
+        proxy__getAdmin: *agent
+        proxy__getIsOssified: false
+      checks:
+        getRoleMember:
+          - args: [ *STAKING_MODULE_UNVETTING_ROLE, 0 ]
+            result: *depositSecurityModule
+          - args: [ *STAKING_MODULE_UNVETTING_ROLE, 1 ]
+            result: []
+            mustRevert: true
+          - args: [ *STAKING_MODULE_PAUSE_ROLE, 0 ]
+            result: []
+            mustRevert: true
+          - args: [ *STAKING_MODULE_RESUME_ROLE, 0 ]
+            result: []
+            mustRevert: true
+        getContractVersion: 2
+    nodeOperatorRegistry:
+      name: nodeOperatorRegistry
+      address: *nodeOperatorRegistry
+      proxyName: OssifiableProxy
+      implementation: *nodeOperatorRegistryImpl
+      proxyChecks:
+        proxy__getImplementation: *nodeOperatorRegistryImpl
+        proxy__getAdmin: *agent
+        proxy__getIsOssified: false
+      checks:
+        getContractVersion: 3

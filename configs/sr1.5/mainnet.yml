@@ -1,0 +1,33 @@
+---
+parameters:
+  - &lidoLocator "0xC1d0b3DE6792Bf6b4b37EccdcC24e45978Cfd2Eb"
+  - &lido "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84"
+  - &stakingRouter: "0xFdDf38947aFB03C621C71b06C9C70bce73f12999"
+  - &nodeOperatorRegistry: "0x55032650b14df07b85bF18A3a3eC8E0Af2e028d5"
+  - &simpleDVT: "0xaE7B191A31f627b4eB1d4DaC64eaB9976995b433"
+  - &accountingOracle: "x852deD011285fe67063a08005c71a85690503Cee"
+
+misc:
+  # TBD
+
+deployed:
+  l1:
+    - &lidoLocatorImpl "0xTBD"
+    - &stakingRouterImpl: "0xTBD"
+    - &nodeOperatorRegistryImpl: "0xTBD"
+    - &simpleDVTImpl: "0xTBD"
+    - &depositSecurityModule: "0xTBD"
+    - &minFirstAllocationStrategy: "0xTBD"
+    - &accountingOracleImpl: "0xTBD"
+    - &oracleReportSanityChecker: "0xTBD"
+
+roles:
+  - &DEFAULT_ADMIN_ROLE "0xTBD"
+
+l1:
+  rpcUrl: L1_MAINNET_RPC_URL
+  contracts:
+    lidoLocator:
+      name: LidoLocator
+      address: *lidoLocator
+      implementation: *lidoLocatorImpl
