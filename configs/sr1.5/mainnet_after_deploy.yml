@@ -1,33 +1,469 @@
 ---
 parameters:
   - &lidoLocator "0xC1d0b3DE6792Bf6b4b37EccdcC24e45978Cfd2Eb"
-  - &lido "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84"
-  - &stakingRouter: "0xFdDf38947aFB03C621C71b06C9C70bce73f12999"
-  - &nodeOperatorRegistry: "0x55032650b14df07b85bF18A3a3eC8E0Af2e028d5"
-  - &simpleDVT: "0xaE7B191A31f627b4eB1d4DaC64eaB9976995b433"
-  - &accountingOracle: "x852deD011285fe67063a08005c71a85690503Cee"
+  - &lido "0x1D920cc5bACf7eE506a271a5259f2417CaDeCE1d"
+  - &stakingRouter "0xFdDf38947aFB03C621C71b06C9C70bce73f12999"
+  - &nodeOperatorRegistry "0x55032650b14df07b85bF18A3a3eC8E0Af2e028d5"
+  - &simpleDVT "0xaE7B191A31f627b4eB1d4DaC64eaB9976995b433"
+  - &accountingOracle "0x852deD011285fe67063a08005c71a85690503Cee"
+  - &agent "0x3e40D73EB977Dc6a537aF587D48316feE66E9C8c"
+  - &elRewardsVault "0x388C818CA8B9251b393131C08a736A67ccB19297"
+  - &legacyOracle "0x442af784A788A5bd6F42A01Ebe9F287a871243fb"
+  - &burner "0xD15a672319Cf0352560eE76d9e89eAB0889046D3"
+  - &treasury "0x3e40D73EB977Dc6a537aF587D48316feE66E9C8c"
+  - &withdrawalQueue "0xc7cc160b58F8Bb0baC94b80847E2CF2800565C50"
+  - &withdrawalVault "0xF0179dEC45a37423EAD4FaD5fCb136197872EAd9"
+  - &oracleDaemonConfig "0xC01fC1F2787687Bc656EAc0356ba9Db6e6b7afb7"
+  - &postTokenRebaseReceiver "0x072f72BE3AcFE2c52715829F2CD9061A6C8fF019"
+  - &DEPOSIT_CONTRACT "0x4242424242424242424242424242424242424242"
+  - &stakingModulesIds [1, 2, 3, 4]
+  - &stakingModulesCount "4"
+  - &lidoWithdrawalCredentials "0x010000000000000000000000f0179dec45a37423ead4fad5fcb136197872ead9"
+  - &curatedType "0x637572617465642d6f6e636861696e2d76310000000000000000000000000000"
+  - &dsmGuardians ["0x711B5fCfeD5A30CA78e0CAC321B060dE9D6f8979", "0xDAaE8C017f1E2a9bEC6111d288f9ebB165e0E163", "0x31fa51343297FFce0CC1E67a50B2D3428057D1b1", "0x43464Fe06c18848a2E2e913194D64c1970f4326a", "0x79A132BE0c25cED09e745629D47cf05e531bb2bb", "0x0bf1B3d1e6f78b12f26204348ABfCA9310259FfA", "0xf060ab3d5dCfdC6a0DFd5ca0645ac569b8f105CA"]
+  - &accountingConsensus "0xa067FC95c22D51c3bC35fd4BE37414Ee8cc890d2"
+  - &validatorsExitBusOracle "0xffDDF7025410412deaa05E3E1cE68FE53208afcb"
+  - &validatorsExitBusOracleImpl "0x210f60EC8A4D020b3e22f15fee2d2364e9b22357"
 
 misc:
-  # TBD
+  - &curatedStakingId 1
+  - &curatedStakingModuleMaxDepositsPerBlock 150
+  - &curatedStakingModuleMinDepositBlockDistance 25
+  - &simpleDVTStakingId 2
+  - &simpleDVTStakingIdMaxDepositsPerBlock 150
+  - &simpleDVTStakingIdMinDepositBlockDistance 25
+  - &depositSecurityModuleMaxOperatorPerUnvetting 200
+  - &oracleReportSanityCheckerMaxValidatorsExits 600
+  - &oracleReportSanityCheckerMaxValidatorsExitsRevert 601
+  - &oracleReportSanityCheckerMaxValidatorsExitsPerDay 9000
+  - &oracleReportSanityCheckerMaxValidatorsExitsPerDayRevert 9001
+  - &oracleReportSanityCheckerExtraDataItemPerTransaction 8
+  - &oracleReportSanityCheckerExtraDataItemPerTransactionRevert 9
+  - &oracleReportSanityCheckerNOPerExtraDataItem 62
+  - &oracleReportSanityCheckerNOPerExtraDataItemRevert 63
+  - &oracleReportSanityCheckerSecondOpinionOracle "0x0000000000000000000000000000000000000000"
+  - &oracleReportSanityCheckerReportLimits [9000,43200,1000,50,600,8,62,7680,750000,1000,101,74]
 
 deployed:
   l1:
-    - &lidoLocatorImpl "0xTBD"
-    - &stakingRouterImpl: "0xTBD"
-    - &nodeOperatorRegistryImpl: "0xTBD"
-    - &simpleDVTImpl: "0xTBD"
-    - &depositSecurityModule: "0xTBD"
-    - &minFirstAllocationStrategy: "0xTBD"
-    - &accountingOracleImpl: "0xTBD"
-    - &oracleReportSanityChecker: "0xTBD"
+    - &lidoLocatorImpl "0xa19a59aF0680F6D9676ABD77E1Ba7e4c205F55a0"
+    - &stakingRouterImpl "0x9b5890E950E3Df487Bb64E0A6743cdE791139152"
+    - &nodeOperatorRegistryImpl "0x41646708A7EDbe22BD635Cb838Ff9C0CfA99A3bE"
+    - &simpleDVTImpl "0x41646708A7EDbe22BD635Cb838Ff9C0CfA99A3bE"
+    - &depositSecurityModule "0x808DE3b26Be9438F12E9B45528955EA94C17f217"
+    - &accountingOracleImpl "0x748CE008ac6b15634ceD5a6083796f75695052a2"
+    - &oracleReportSanityChecker "0x80D1B1fF6E84134404abA18A628347960c38ccA7"
 
 roles:
-  - &DEFAULT_ADMIN_ROLE "0xTBD"
+  - &DEFAULT_ADMIN_ROLE "0x0000000000000000000000000000000000000000000000000000000000000000"
+  - &STAKING_MODULE_UNVETTING_ROLE "0x240525496a9dc32284b17ce03b43e539e4bd81414634ee54395030d793463b57"
+  - &STAKING_MODULE_PAUSE_ROLE "0x00b1e70095ba5bacc3202c3db9faf1f7873186f0ed7b6c84e80c0018dcc6e38e"
+  - &STAKING_MODULE_RESUME_ROLE "0x9a2f67efb89489040f2c48c3b2c38f719fba1276678d2ced3bd9049fb5edc6b2"
+  - &STAKING_ROUTER_ROLE "0xbb75b874360e0bfd87f964eadd8276d8efb7c942134fc329b513032d0803e0c6"
+  - &MANAGE_CONSENSUS_VERSION_ROLE "0xc31b1e4b732c5173dc51d519dfa432bad95550ecc4b0f9a61c2a558a2a8e4341"
+  - &ALL_LIMITS_MANAGER_ROLE "0x5bf88568a012dfc9fe67407ad6775052bddc4ac89902dea1f4373ef5d9f1e35b"
+  - &ANNUAL_BALANCE_INCREASE_LIMIT_MANAGER_ROLE "0x12c02753cd3d584dc4bb965eb0c88392c4c4d7c00433fdb7490d33c61ea57622"
+  - &APPEARED_VALIDATORS_PER_DAY_LIMIT_MANAGER_ROLE "0x14ca7b84baa11a976283347b0159b8ddf2dcf5fd5cf613cc567a3423cf510119"
+  - &EXITED_VALIDATORS_PER_DAY_LIMIT_MANAGER_ROLE "0x60b9982471bc0620c7b74959f48a86c55c92c11876fddc5b0b54d1ec47153e5d"
+  - &INITIAL_SLASHING_AND_PENALTIES_MANAGER_ROLE "0xebfa317a5d279811b024586b17a50f48924bce86f6293b233927322d7209b507"
+  - &MAX_ITEMS_PER_EXTRA_DATA_TRANSACTION_ROLE "0x13445b811594f3a8800b82296d63f371c695d2f86c1069c899ded3d73f523d2e"
+  - &MAX_NODE_OPERATORS_PER_EXTRA_DATA_ITEM_ROLE "0xb3f2d16385bde8a7121e101a021aff43bbe4d4137a587832caf1f583b9d34395"
+  - &MAX_POSITIVE_TOKEN_REBASE_MANAGER_ROLE "0x78de2bab4a3a0c88f50b6bb7c2290e0eb46bc61d575eae694d8bffbc2ca98c92"
+  - &MAX_VALIDATOR_EXIT_REQUESTS_PER_REPORT_ROLE "0x9925400e72399e0a89e9b346878fc47ac0031526d0e060e33ff372d7a5d11ba8"
+  - &REQUEST_TIMESTAMP_MARGIN_MANAGER_ROLE "0x2f8719116fbba3aba2a39759e34dcd29ea3516f7568c8321695aaea208280cd3"
+  - &SECOND_OPINION_MANAGER_ROLE "0xaa0e0f619f5a9368ee035bae759cfe7da8958f44bd71456a05198effc68ea647"
+  - &SHARE_RATE_DEVIATION_LIMIT_MANAGER_ROLE "0x7b21c0949109e9e143f66d6aa1f8a065b3f4ab47ee9f84f6837fd0490eace4d5"
 
 l1:
-  rpcUrl: L1_MAINNET_RPC_URL
+  rpcUrl: L1_TESTNET_RPC_URL
   contracts:
     lidoLocator:
       name: LidoLocator
       address: *lidoLocator
+      proxyName: OssifiableProxy
       implementation: *lidoLocatorImpl
+      proxyChecks:
+        proxy__getImplementation: *lidoLocatorImpl
+        proxy__getAdmin: *agent
+        proxy__getIsOssified: false
+      checks:
+        accountingOracle: *accountingOracle
+        burner: *burner
+        coreComponents: [*elRewardsVault, *oracleReportSanityChecker, *stakingRouter, *treasury, *withdrawalQueue, *withdrawalVault]
+        depositSecurityModule: *depositSecurityModule
+        elRewardsVault: *elRewardsVault
+        legacyOracle: *legacyOracle
+        lido: *lido
+        oracleDaemonConfig: *oracleDaemonConfig
+        oracleReportComponentsForLido: null
+        oracleReportSanityChecker: *oracleReportSanityChecker
+        postTokenRebaseReceiver: *postTokenRebaseReceiver
+        stakingRouter: *stakingRouter
+        treasury: *treasury
+        validatorsExitBusOracle: *validatorsExitBusOracle
+        withdrawalQueue: *withdrawalQueue
+        withdrawalVault: *withdrawalVault
+    stakingRouter:
+      name: StakingRouter
+      address: *stakingRouter
+      proxyName: OssifiableProxy
+      implementation: *stakingRouterImpl
+      proxyChecks:
+        proxy__getImplementation: *stakingRouterImpl
+        proxy__getAdmin: *agent
+        proxy__getIsOssified: false
+      checks:
+        DEFAULT_ADMIN_ROLE: null
+        DEPOSIT_CONTRACT: *DEPOSIT_CONTRACT
+        FEE_PRECISION_POINTS: null
+        MANAGE_WITHDRAWAL_CREDENTIALS_ROLE: null
+        MAX_STAKING_MODULES_COUNT: null
+        MAX_STAKING_MODULE_NAME_LENGTH: null
+        REPORT_EXITED_VALIDATORS_ROLE: null
+        REPORT_REWARDS_MINTED_ROLE: null
+        STAKING_MODULE_MANAGE_ROLE: null
+        STAKING_MODULE_UNVETTING_ROLE: null
+        TOTAL_BASIS_POINTS: null
+        UNSAFE_SET_EXITED_VALIDATORS_ROLE: null
+        getAllNodeOperatorDigests: null
+        getAllStakingModuleDigests: null
+        getContractVersion: 2
+        getDepositsAllocation: null
+        getLido: *lido
+        getNodeOperatorDigests: null
+        getNodeOperatorSummary: null
+        getRoleAdmin:
+          - args: [ *STAKING_MODULE_UNVETTING_ROLE ]
+            result: *DEFAULT_ADMIN_ROLE
+        getRoleMember:
+          - args: [ *STAKING_MODULE_UNVETTING_ROLE, 0 ]
+            result: *depositSecurityModule
+          - args: [ *STAKING_MODULE_UNVETTING_ROLE, 1 ]
+            result: []
+            mustRevert: true
+          - args: [ *STAKING_MODULE_PAUSE_ROLE, 0 ]
+            result: []
+            mustRevert: true
+          - args: [ *STAKING_MODULE_RESUME_ROLE, 0 ]
+            result: []
+            mustRevert: true
+        getRoleMemberCount:
+          - args: [ *STAKING_MODULE_UNVETTING_ROLE ]
+            result: 1
+          - args: [ *DEFAULT_ADMIN_ROLE ]
+            result: 1
+        getStakingFeeAggregateDistribution: null
+        getStakingFeeAggregateDistributionE4Precision: null
+        getStakingModule: null
+        getStakingModuleActiveValidatorsCount: null
+        getStakingModuleDigests: null
+        getStakingModuleIds: *stakingModulesIds
+        getStakingModuleIsActive: null
+        getStakingModuleIsDepositsPaused: null
+        getStakingModuleIsStopped: null
+        getStakingModuleLastDepositBlock: null
+        getStakingModuleMaxDepositsCount: null
+        getStakingModuleMaxDepositsPerBlock:
+          - args: [ *curatedStakingId ]
+            result: *curatedStakingModuleMaxDepositsPerBlock
+          - args: [ *simpleDVTStakingId ]
+            result: *simpleDVTStakingIdMaxDepositsPerBlock
+        getStakingModuleMinDepositBlockDistance:
+          - args: [ *curatedStakingId ]
+            result: *curatedStakingModuleMinDepositBlockDistance
+          - args: [ *simpleDVTStakingId ]
+            result: *simpleDVTStakingIdMinDepositBlockDistance
+        getStakingModuleNonce: null
+        getStakingModuleStatus: null
+        getStakingModuleSummary: null
+        getStakingModules: null
+        getStakingModulesCount: *stakingModulesCount
+        getStakingRewardsDistribution: null
+        getTotalFeeE4Precision: null
+        getWithdrawalCredentials: *lidoWithdrawalCredentials
+        hasRole:
+          - args: [ *STAKING_MODULE_UNVETTING_ROLE, *depositSecurityModule ]
+            result: true
+          - args: [ *DEFAULT_ADMIN_ROLE, *agent ]
+            result: true
+        hasStakingModule: null
+        supportsInterface: null
+    nodeOperatorRegistry:
+      name: NodeOperatorRegistry
+      address: *nodeOperatorRegistry
+      proxyName: AppProxyUpgradeable
+      implementation: *nodeOperatorRegistryImpl
+      proxyChecks:
+        proxyType: null
+        isDepositable: null
+        implementation: *nodeOperatorRegistryImpl
+        appId: null
+        kernel: null
+      checks:
+        MANAGE_NODE_OPERATOR_ROLE: null
+        MANAGE_SIGNING_KEYS: null
+        MAX_NODE_OPERATORS_COUNT: null
+        MAX_NODE_OPERATOR_NAME_LENGTH: null
+        MAX_STUCK_PENALTY_DELAY: null
+        SET_NODE_OPERATOR_LIMIT_ROLE: null
+        STAKING_ROUTER_ROLE: *STAKING_ROUTER_ROLE
+        appId: null
+        allowRecoverability: null
+        canPerform: null
+        getActiveNodeOperatorsCount: null
+        getContractVersion: 3
+        getEVMScriptExecutor: null
+        getEVMScriptRegistry: null
+        getInitializationBlock: null
+        getKeysOpIndex: null
+        getLocator: *lidoLocator
+        getNodeOperator: null
+        getNodeOperatorIds: null
+        getNodeOperatorIsActive: null
+        getNodeOperatorSummary: null
+        getNodeOperatorsCount: null
+        getNonce: null
+        getRecoveryVault: null
+        getRewardDistributionState: null
+        getRewardsDistribution: null
+        getSigningKey: null
+        getSigningKeys: null
+        getStakingModuleSummary: null
+        getStuckPenaltyDelay: null
+        getTotalSigningKeyCount: null
+        getType: *curatedType
+        getUnusedSigningKeyCount: null
+        hasInitialized: null
+        isOperatorPenalized: null
+        isOperatorPenaltyCleared: null
+        isPetrified: null
+        kernel: null
+    simpleDVT:
+      name: SimpleDVT
+      address: *simpleDVT
+      proxyName: AppProxyUpgradeable
+      implementation: *simpleDVTImpl
+      proxyChecks:
+        proxyType: null
+        isDepositable: null
+        implementation: *simpleDVTImpl
+        appId: null
+        kernel: null
+      checks:
+        MANAGE_NODE_OPERATOR_ROLE: null
+        MANAGE_SIGNING_KEYS: null
+        MAX_NODE_OPERATORS_COUNT: null
+        MAX_NODE_OPERATOR_NAME_LENGTH: null
+        MAX_STUCK_PENALTY_DELAY: null
+        SET_NODE_OPERATOR_LIMIT_ROLE: null
+        STAKING_ROUTER_ROLE: *STAKING_ROUTER_ROLE
+        appId: null
+        allowRecoverability: null
+        canPerform: null
+        getActiveNodeOperatorsCount: null
+        getContractVersion: 3
+        getEVMScriptExecutor: null
+        getEVMScriptRegistry: null
+        getInitializationBlock: null
+        getKeysOpIndex: null
+        getLocator: *lidoLocator
+        getNodeOperator: null
+        getNodeOperatorIds: null
+        getNodeOperatorIsActive: null
+        getNodeOperatorSummary: null
+        getNodeOperatorsCount: null
+        getNonce: null
+        getRecoveryVault: null
+        getRewardDistributionState: null
+        getRewardsDistribution: null
+        getSigningKey: null
+        getSigningKeys: null
+        getStakingModuleSummary: null
+        getStuckPenaltyDelay: null
+        getTotalSigningKeyCount: null
+        getType: *curatedType
+        getUnusedSigningKeyCount: null
+        hasInitialized: null
+        isOperatorPenalized: null
+        isOperatorPenaltyCleared: null
+        isPetrified: null
+        kernel: null
+      depositSecurityModule:
+        name: DepositSecurityModule
+        address: *depositSecurityModule
+        checks:
+          ATTEST_MESSAGE_PREFIX: null
+          DEPOSIT_CONTRACT: *DEPOSIT_CONTRACT
+          LIDO: *lido
+          PAUSE_MESSAGE_PREFIX: null
+          STAKING_ROUTER: *stakingRouter
+          UNVET_MESSAGE_PREFIX: null
+          VERSION: 3
+          canDeposit: null
+          getGuardianIndex: null
+          getGuardianQuorum: null
+          getGuardians: *dsmGuardians
+          getLastDepositBlock: null
+          getMaxOperatorsPerUnvetting: *depositSecurityModuleMaxOperatorPerUnvetting
+          getOwner:
+          getPauseIntentValidityPeriodBlocks: null
+          isDepositsPaused: false
+          isGuardian: null
+          isMinDepositDistancePassed: null
+        accountingOracle:
+          name: AccountingOracle
+          address: *accountingOracle
+          proxyName: OssifiableProxy
+          implementation: *accountingOracleImpl
+          proxyChecks:
+            proxy__getImplementation: *accountingOracleImpl
+            proxy__getAdmin: *agent
+            proxy__getIsOssified: false
+          checks:
+            DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+            EXTRA_DATA_FORMAT_EMPTY: null
+            EXTRA_DATA_FORMAT_LIST: null
+            EXTRA_DATA_TYPE_EXITED_VALIDATORS: null
+            EXTRA_DATA_TYPE_STUCK_VALIDATORS: null
+            GENESIS_TIME: null
+            LEGACY_ORACLE: null
+            LIDO: *lido
+            LOCATOR: *lidoLocator
+            MANAGE_CONSENSUS_CONTRACT_ROLE: null
+            MANAGE_CONSENSUS_VERSION_ROLE: null
+            SECONDS_PER_SLOT: null
+            SUBMIT_DATA_ROLE: null
+            getConsensusContract: *accountingConsensus
+            getConsensusReport: null
+            getConsensusVersion: 2
+            getContractVersion: 2
+            getLastProcessingRefSlot: null
+            getProcessingState: null
+            getRoleAdmin: null
+            getRoleMember: null
+            getRoleMemberCount: null
+            hasRole: null
+            supportsInterface: null
+      oracleReportSanityChecker:
+        name: OracleReportSanityChecker
+        address: *oracleReportSanityChecker
+        checks:
+          ALL_LIMITS_MANAGER_ROLE: *ALL_LIMITS_MANAGER_ROLE
+          ANNUAL_BALANCE_INCREASE_LIMIT_MANAGER_ROLE: *ANNUAL_BALANCE_INCREASE_LIMIT_MANAGER_ROLE
+          APPEARED_VALIDATORS_PER_DAY_LIMIT_MANAGER_ROLE: *APPEARED_VALIDATORS_PER_DAY_LIMIT_MANAGER_ROLE
+          DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+          EXITED_VALIDATORS_PER_DAY_LIMIT_MANAGER_ROLE: *EXITED_VALIDATORS_PER_DAY_LIMIT_MANAGER_ROLE
+          INITIAL_SLASHING_AND_PENALTIES_MANAGER_ROLE: *INITIAL_SLASHING_AND_PENALTIES_MANAGER_ROLE
+          MAX_ITEMS_PER_EXTRA_DATA_TRANSACTION_ROLE: *MAX_ITEMS_PER_EXTRA_DATA_TRANSACTION_ROLE
+          MAX_NODE_OPERATORS_PER_EXTRA_DATA_ITEM_ROLE: *MAX_NODE_OPERATORS_PER_EXTRA_DATA_ITEM_ROLE
+          MAX_POSITIVE_TOKEN_REBASE_MANAGER_ROLE: *MAX_POSITIVE_TOKEN_REBASE_MANAGER_ROLE
+          MAX_VALIDATOR_EXIT_REQUESTS_PER_REPORT_ROLE: *MAX_VALIDATOR_EXIT_REQUESTS_PER_REPORT_ROLE
+          REQUEST_TIMESTAMP_MARGIN_MANAGER_ROLE: *REQUEST_TIMESTAMP_MARGIN_MANAGER_ROLE
+          SECOND_OPINION_MANAGER_ROLE: *SECOND_OPINION_MANAGER_ROLE
+          SHARE_RATE_DEVIATION_LIMIT_MANAGER_ROLE: *SHARE_RATE_DEVIATION_LIMIT_MANAGER_ROLE
+          checkExitBusOracleReport:
+            - args: [ *oracleReportSanityCheckerMaxValidatorsExits ]
+              result: []
+            - args: [ *oracleReportSanityCheckerMaxValidatorsExitsRevert ]
+              result: []
+              mustRevert: true
+          checkExitedValidatorsRatePerDay:
+            - args: [ *oracleReportSanityCheckerMaxValidatorsExitsPerDay ]
+              result: [ ]
+            - args: [ *oracleReportSanityCheckerMaxValidatorsExitsPerDayRevert ]
+              mustRevert: true
+              result: [ ]
+          checkExtraDataItemsCountPerTransaction:
+            - args: [ *oracleReportSanityCheckerExtraDataItemPerTransaction ]
+              result: [ ]
+            - args: [ *oracleReportSanityCheckerExtraDataItemPerTransactionRevert ]
+              mustRevert: true
+              result: [ ]
+          checkNodeOperatorsPerExtraDataItemCount:
+            - args: [ 1, *oracleReportSanityCheckerNOPerExtraDataItem ]
+              result: [ ]
+            - args: [ 1, *oracleReportSanityCheckerNOPerExtraDataItemRevert ]
+              mustRevert: true
+              result: [ ]
+          checkSimulatedShareRate: null
+          checkWithdrawalQueueOracleReport: null
+          getLidoLocator: *lidoLocator
+          getMaxPositiveTokenRebase: null
+          getOracleReportLimits:
+            - args: []
+              result: *oracleReportSanityCheckerReportLimits
+          getReportDataCount: null
+          getRoleAdmin: null
+          getRoleMember: null
+          getRoleMemberCount:
+            - args: [ *ALL_LIMITS_MANAGER_ROLE ]
+              result: 0
+            - args: [ *ANNUAL_BALANCE_INCREASE_LIMIT_MANAGER_ROLE ]
+              result: 0
+            - args: [ *APPEARED_VALIDATORS_PER_DAY_LIMIT_MANAGER_ROLE ]
+              result: 0
+            - args: [ *DEFAULT_ADMIN_ROLE ]
+              result: 1
+            - args: [ *EXITED_VALIDATORS_PER_DAY_LIMIT_MANAGER_ROLE ]
+              result: 0
+            - args: [ *INITIAL_SLASHING_AND_PENALTIES_MANAGER_ROLE ]
+              result: 0
+            - args: [ *MAX_ITEMS_PER_EXTRA_DATA_TRANSACTION_ROLE ]
+              result: 0
+            - args: [ *MAX_NODE_OPERATORS_PER_EXTRA_DATA_ITEM_ROLE ]
+              result: 0
+            - args: [ *MAX_POSITIVE_TOKEN_REBASE_MANAGER_ROLE ]
+              result: 0
+            - args: [ *MAX_VALIDATOR_EXIT_REQUESTS_PER_REPORT_ROLE ]
+              result: 0
+            - args: [ *REQUEST_TIMESTAMP_MARGIN_MANAGER_ROLE ]
+              result: 0
+            - args: [ *SECOND_OPINION_MANAGER_ROLE ]
+              result: 0
+            - args: [ *SHARE_RATE_DEVIATION_LIMIT_MANAGER_ROLE ]
+              result: 0
+          hasRole:
+            - args: [ *DEFAULT_ADMIN_ROLE, *agent]
+              result: true
+          reportData: null
+          secondOpinionOracle: *oracleReportSanityCheckerSecondOpinionOracle
+          smoothenTokenRebase: null
+          supportsInterface: null
+      validatorsExitBusOracle:
+        name: ValidatorsExitBusOracle
+        address: *validatorsExitBusOracle
+        proxyName: OssifiableProxy
+        implementation: *validatorsExitBusOracleImpl
+        proxyChecks:
+          proxy__getAdmin: null
+          proxy__getImplementation: null
+          proxy__getIsOssified: null
+        checks:
+          DATA_FORMAT_LIST: null
+          DEFAULT_ADMIN_ROLE: null
+          GENESIS_TIME: null
+          MANAGE_CONSENSUS_CONTRACT_ROLE: null
+          MANAGE_CONSENSUS_VERSION_ROLE: *MANAGE_CONSENSUS_VERSION_ROLE
+          PAUSE_INFINITELY: null
+          PAUSE_ROLE: null
+          RESUME_ROLE: null
+          SECONDS_PER_SLOT: null
+          SUBMIT_DATA_ROLE: null
+          getConsensusContract: null
+          getConsensusReport: null
+          getConsensusVersion: 2
+          getContractVersion: 1
+          getLastProcessingRefSlot: null
+          getLastRequestedValidatorIndices: null
+          getProcessingState: null
+          getResumeSinceTimestamp: null
+          getRoleAdmin: null
+          getRoleMember:
+            - args: [*MANAGE_CONSENSUS_VERSION_ROLE, 0]
+              result: []
+              mustRevert: true
+          getRoleMemberCount: null
+          getTotalRequestsProcessed: null
+          hasRole: null
+          isPaused: null
+          supportsInterface: null
