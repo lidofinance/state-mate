@@ -795,7 +795,7 @@ function parseCmdLineArgs() {
     .argument("<config-path>", "path to .yaml state config file")
     .allowExcessArguments(false)
     .option("-o, --only <check-path>", `only checks to do, e.g. 'l2/proxyAdmin/${Ef.checks}/owner', 'l1', 'l1/controller'`)
-    .option("--generate", "NB: currently, boilerplate generation only works with downloading ABIs from explorer")
+    .option("--generate", "generate a populated config from the seed one")
     .parse();
 
   const configPath = program.args[0];
