@@ -33,26 +33,57 @@ state-mate accepts a yaml file that includes contract addresses, view functions 
 
 ### Usage
 
-1. Install dependencies
+1. Enable modern yarn support
+
+```sh
+corepack enable
+```
+
+2. Install dependencies
 
 ```sh
 yarn install
 ```
 
-2. Specify RPC endpoints for your target networks, e.g.
+3. Specify RPC endpoints for your target networks, e.g.
 
 ```sh
+# config.seed.yaml
+
 export L1_MAINNET_RPC_URL=%YOUR_RPC_URL%
-export L1_TESTNET_RPC_URL=%YOUR_RPC_URL%
 export L2_MAINNET_RPC_URL=%YOUR_RPC_URL%
-export L2_TESTNET_RPC_URL=%YOUR_RPC_URL%
 ```
 
-3. Start the program
+4. Prepare a seed config
+
+```yaml
+---
+deployed:
+  l1:
+    - &l1TokenBridge "0xD0DeA0a3bd8E4D55170943129c025d3fe0493F2A"
+  l2:
+    - &l2TokenBridge "0xb8161F28a5a38cE58f155D9A96bDAc0104985FAc"
+    - &l2Wsteth "0x98f96A4B34D03a2E6f225B28b8f8Cb1279562d81"
+    - &l2GovExecutor "0x2aCeC6D8ABA90685927b61968D84CfFf6192B32C"
+
+l1:
+  rpcUrl: L1_MAINNET_RPC_URL
+  explorerHostname: api.etherscan.io
+  explorerTokenEnv: ETHERSCAN_TOKEN
+
+l2:
+  rpcUrl: L2_MAINNET_RPC_URL
+  explorerHostname: explorer.mode.network
+  # explorerTokenEnv: ETHERSCAN_MODE_TOKEN
+```
+
+4. Start the program to generate a populated config from the seed one
 
 ```sh
-yarn start path/to/config.yaml
+yarn start path/to/config.seed.yaml --generate
 ```
+
+5. Edit the generated config manually
 
 ### Configuration
 
@@ -97,7 +128,7 @@ l1:
 
 ### ABIs
 
-All requried ABIs must be located in the same directory as the config and placed under `abi` folder. See [configs](/configs/).
+All requried ABIs are located in the same directory as the config and placed under `abi` folder being downloaded upon the first launch. See [configs](/configs/).
 
 ## 🔧 Contributing
 
