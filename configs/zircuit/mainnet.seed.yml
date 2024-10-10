@@ -1,0 +1,22 @@
+---
+# Sources:
+# - https://research.lido.fi/t/wsteth-deployment-to-zircuit-and-ownership-acceptance-by-lido-dao/8602
+# - https://docs.zircuit.com/smart-contracts/contract_addresses
+
+deployed:
+  l1:
+    - &l1TokenBridge "0x912C7271a6A3622dfb8B218eb46a6122aB046C79"
+  l2:
+    - &l2TokenBridge "0xF4DC271cA48446a5d2b97Ff41D39918DF8A4Eb0e"
+    - &l2Wsteth "0xf0e673Bc224A8Ca3ff67a61605814666b1234833"
+    - &l2GovExecutor "0x6Bf2cac3ed2481da30aD36Cd3D64325c31065Cc5"
+
+l1:
+  rpcUrl: L1_MAINNET_RPC_URL
+  explorerHostname: api.etherscan.io
+  explorerTokenEnv: ETHERSCAN_TOKEN
+
+l2:
+  rpcUrl: https://zircuit-mainnet.drpc.org
+  explorerHostname: explorer.zircuit.com
+  # explorerTokenEnv: ETHERSCAN_MODE_TOKEN

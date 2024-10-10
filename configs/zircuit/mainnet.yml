@@ -1,0 +1,250 @@
+---
+# Sources:
+# - https://research.lido.fi/t/wsteth-deployment-to-zircuit-and-ownership-acceptance-by-lido-dao/8602
+# - https://docs.zircuit.com/smart-contracts/contract_addresses
+
+deployed:
+  l1:
+    - &l1TokenBridge "0x912C7271a6A3622dfb8B218eb46a6122aB046C79"
+    - &l1TokenBridgeImpl "0x6bc726C993103197C41d787dd72eCd4D2e1614E8"
+  l2:
+    - &l2TokenBridge "0xF4DC271cA48446a5d2b97Ff41D39918DF8A4Eb0e"
+    - &l2TokenBridgeImpl "0x224F00AEDD7A9F10e571898662ad19CD5abd9F2c"
+    - &l2Wsteth "0xf0e673Bc224A8Ca3ff67a61605814666b1234833"
+    - &l2WstethImpl "0x929569e10d9166f31c8284fE3FE5db1C1E56D6b4"
+    - &l2GovExecutor "0x6Bf2cac3ed2481da30aD36Cd3D64325c31065Cc5"
+    - &l2EmergencyBreaksMultisig "0x9Bff79BF7226cB5C16d0Cca9c1dc60450feE560d"
+
+parameters:
+  - &l1EmergencyBreaksMultisig "0x73b047fe6337183A454c5217241D780a932777bD" # https://docs.lido.fi/token-guides/wsteth-bridging-guide/#mainnet
+  - &l1Agent "0x3e40D73EB977Dc6a537aF587D48316feE66E9C8c"
+  - &l1Wsteth "0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0"
+  - &l1CrossDomainMessenger "0x2a721cBE81a128be0F01040e3353c3805A5EA091"
+  - &l2CrossDomainMessenger "0x4200000000000000000000000000000000000007"
+
+roles:
+  - &DEFAULT_ADMIN_ROLE "0x0000000000000000000000000000000000000000000000000000000000000000"
+  - &DEPOSITS_DISABLER_ROLE "0x63f736f21cb2943826cd50b191eb054ebbea670e4e962d0527611f830cd399d6"
+  - &DEPOSITS_ENABLER_ROLE "0x4b43b36766bde12c5e9cbbc37d15f8d1f769f08f54720ab370faeb4ce893753a"
+  - &WITHDRAWALS_DISABLER_ROLE "0x94a954c0bc99227eddbc0715a62a7e1056ed8784cd719c2303b685683908857c"
+  - &WITHDRAWALS_ENABLER_ROLE "0x9ab8816a3dc0b3849ec1ac00483f6ec815b07eee2fd766a353311c823ad59d0d"
+
+misc:
+  - &ZERO_ADDRESS "0x000000000000000000000000000000000000dead"
+  - &ZERO_GUARDIAN "0x0000000000000000000000000000000000000000"
+
+  # Owners of multisig on Mainnet and Mode must be the same (order is arbitrary)
+  - &multisigOwner4 "0xCFfE0F3B089e46D8212408Ba061c425776E64322"
+  - &multisigOwner5 "0xdd19274b614b5ecAcf493Bc43C380ef6B8dfB56c"
+  - &multisigOwner2 "0x59F8D74Fe49d5ebEAc069E3baf07eB4b614BD5A7"
+  - &multisigOwner1 "0x6f5c9B92DC47C89155930E708fBc305b55A5519A"
+  - &multisigOwner3 "0x2a61d3ba5030Ef471C74f612962c7367ECa3a62d"
+
+l1:
+  rpcUrl: L1_MAINNET_RPC_URL
+  explorerHostname: api.etherscan.io
+  explorerTokenEnv: ETHERSCAN_TOKEN
+  contracts:
+    l1TokenBridge:
+      name: L1ERC20TokenBridge
+      address: *l1TokenBridge
+      proxyName: OssifiableProxy
+      implementation: *l1TokenBridgeImpl
+      proxyChecks:
+        proxy__getAdmin: *l1Agent
+        proxy__getImplementation: *l1TokenBridgeImpl
+        proxy__getIsOssified: false
+      ozNonEnumerableAcl:
+        *DEFAULT_ADMIN_ROLE : [ *l1Agent ]
+        *DEPOSITS_DISABLER_ROLE : [ *l1Agent, *l1EmergencyBreaksMultisig ]
+        *DEPOSITS_ENABLER_ROLE : [ *l1Agent ]
+        *WITHDRAWALS_DISABLER_ROLE : [ *l1Agent, *l1EmergencyBreaksMultisig ]
+        *WITHDRAWALS_ENABLER_ROLE : [ *l1Agent ]
+      checks:
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        DEPOSITS_DISABLER_ROLE: *DEPOSITS_DISABLER_ROLE
+        DEPOSITS_ENABLER_ROLE: *DEPOSITS_ENABLER_ROLE
+        WITHDRAWALS_DISABLER_ROLE: *WITHDRAWALS_DISABLER_ROLE
+        WITHDRAWALS_ENABLER_ROLE: *WITHDRAWALS_ENABLER_ROLE
+        getRoleAdmin:
+          - args: [ *DEFAULT_ADMIN_ROLE ]
+            result: *DEFAULT_ADMIN_ROLE
+          - args: [ *DEPOSITS_DISABLER_ROLE ]
+            result: *DEFAULT_ADMIN_ROLE
+          - args: [ *DEPOSITS_ENABLER_ROLE ]
+            result: *DEFAULT_ADMIN_ROLE
+          - args: [ *WITHDRAWALS_DISABLER_ROLE ]
+            result: *DEFAULT_ADMIN_ROLE
+          - args: [ *WITHDRAWALS_ENABLER_ROLE ]
+            result: *DEFAULT_ADMIN_ROLE
+        hasRole: null # checked automatically by ozNonEnumerableAcl section
+        isDepositsEnabled: true
+        isInitialized: true
+        isWithdrawalsEnabled: true
+        l1Token: *l1Wsteth
+        l2Token: *l2Wsteth
+        l2TokenBridge: *l2TokenBridge
+        messenger: *l1CrossDomainMessenger
+        supportsInterface: null
+      implementationChecks:
+        isInitialized: true
+        hasRole:
+          args: [*DEFAULT_ADMIN_ROLE, *ZERO_ADDRESS]
+          result: true
+        isDepositsEnabled: false
+        isWithdrawalsEnabled: false
+        l1Token: *l1Wsteth
+        l2Token: *l2Wsteth
+        l2TokenBridge: *l2TokenBridge
+
+    l1EmergencyBreaksMultisigContract:
+      name: GnosisSafe
+      proxyName: GnosisSafeProxy
+      address: *l1EmergencyBreaksMultisig
+      checks:
+        getOwners:
+          - *multisigOwner4
+          - *multisigOwner5
+          - *multisigOwner2
+          - *multisigOwner1
+          - *multisigOwner3
+        getThreshold: 3
+        VERSION: null
+        approvedHashes: null
+        checkNSignatures: null
+        checkSignatures: null
+        domainSeparator: null
+        encodeTransactionData: null
+        getChainId: null
+        getModulesPaginated: null
+        getStorageAt: null
+        getTransactionHash: null
+        isModuleEnabled: null
+        isOwner: null
+        nonce: null
+        signedMessages: null
+
+l2:
+  rpcUrl: https://zircuit-mainnet.drpc.org
+  explorerHostname: explorer.zircuit.com
+  # explorerTokenEnv: ETHERSCAN_MODE_TOKEN # commented because rate-limit is hit on the public explorer version
+  contracts:
+    l2TokenBridge:
+      name: L2ERC20TokenBridge
+      address: *l2TokenBridge
+      proxyName: OssifiableProxy
+      implementation: *l2TokenBridgeImpl
+      proxyChecks:
+        proxy__getAdmin: *l2GovExecutor
+        proxy__getImplementation: *l2TokenBridgeImpl
+        proxy__getIsOssified: false
+      ozNonEnumerableAcl:
+        *DEFAULT_ADMIN_ROLE : [ *l2GovExecutor ]
+        *DEPOSITS_DISABLER_ROLE : [ *l2GovExecutor, *l2EmergencyBreaksMultisig ]
+        *DEPOSITS_ENABLER_ROLE : [ *l2GovExecutor ]
+        *WITHDRAWALS_DISABLER_ROLE : [ *l2GovExecutor, *l2EmergencyBreaksMultisig ]
+        *WITHDRAWALS_ENABLER_ROLE : [ *l2GovExecutor ]
+      checks:
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        DEPOSITS_DISABLER_ROLE: *DEPOSITS_DISABLER_ROLE
+        DEPOSITS_ENABLER_ROLE: *DEPOSITS_ENABLER_ROLE
+        WITHDRAWALS_DISABLER_ROLE: *WITHDRAWALS_DISABLER_ROLE
+        WITHDRAWALS_ENABLER_ROLE: *WITHDRAWALS_ENABLER_ROLE
+        getRoleAdmin:
+          - args: [ *DEFAULT_ADMIN_ROLE ]
+            result: *DEFAULT_ADMIN_ROLE
+          - args: [ *DEPOSITS_DISABLER_ROLE ]
+            result: *DEFAULT_ADMIN_ROLE
+          - args: [ *DEPOSITS_ENABLER_ROLE ]
+            result: *DEFAULT_ADMIN_ROLE
+          - args: [ *WITHDRAWALS_DISABLER_ROLE ]
+            result: *DEFAULT_ADMIN_ROLE
+          - args: [ *WITHDRAWALS_ENABLER_ROLE ]
+            result: *DEFAULT_ADMIN_ROLE
+        hasRole: null # checked automatically by ozNonEnumerableAcl section
+        isDepositsEnabled: true
+        isInitialized: true
+        isWithdrawalsEnabled: true
+        l1Token: *l1Wsteth
+        l1TokenBridge: *l1TokenBridge
+        l2Token: *l2Wsteth
+        messenger: *l2CrossDomainMessenger
+        supportsInterface: null
+
+      implementationChecks:
+        isInitialized: true
+        hasRole:
+          args: [*DEFAULT_ADMIN_ROLE, *ZERO_ADDRESS]
+          result: true
+        isDepositsEnabled: false
+        isWithdrawalsEnabled: false
+        l1Token: *l1Wsteth
+        l1TokenBridge: *l1TokenBridge
+        l2Token: *l2Wsteth
+
+    l2Wsteth:
+      name: ERC20Bridged
+      address: *l2Wsteth
+      proxyName: OssifiableProxy
+      implementation: *l2WstethImpl
+      proxyChecks:
+        proxy__getAdmin: *l2GovExecutor
+        proxy__getImplementation: *l2WstethImpl
+        proxy__getIsOssified: false
+      checks:
+        allowance: null
+        balanceOf: null
+        bridge: *l2TokenBridge
+        decimals: 18
+        name: Wrapped liquid staked Ether 2.0
+        symbol: wstETH
+        totalSupply: null
+      implementationChecks:
+        bridge: *l2TokenBridge
+        decimals: 18
+        name: Wrapped liquid staked Ether 2.0
+        symbol: wstETH
+        totalSupply: 0
+
+    l2GovExecutor:
+      name: OptimismBridgeExecutor
+      address: *l2GovExecutor
+      checks:
+        OVM_L2_CROSS_DOMAIN_MESSENGER: *l2CrossDomainMessenger
+        getActionsSetById: null
+        getActionsSetCount: 0
+        getCurrentState: null
+        getDelay: 0
+        getEthereumGovernanceExecutor: *l1Agent
+        getGracePeriod: 86400
+        getGuardian: *ZERO_GUARDIAN
+        getMaximumDelay: 1
+        getMinimumDelay: 0
+        isActionQueued: null
+
+    l2EmergencyBreaksMultisigContract:
+      name: GnosisSafeL2
+      proxyName: GnosisSafeProxy
+      address: *l2EmergencyBreaksMultisig
+      checks:
+        getOwners:
+          - *multisigOwner4
+          - *multisigOwner5
+          - *multisigOwner2
+          - *multisigOwner1
+          - *multisigOwner3
+        getThreshold: 3
+        VERSION: null
+        approvedHashes: null
+        checkNSignatures: null
+        checkSignatures: null
+        domainSeparator: null
+        encodeTransactionData: null
+        getChainId: null
+        getModulesPaginated: null
+        getStorageAt: null
+        getTransactionHash: null
+        isModuleEnabled: null
+        isOwner: null
+        nonce: null
+        signedMessages: null
