@@ -3,8 +3,6 @@ parameters:
   - &lidoLocator "0xC1d0b3DE6792Bf6b4b37EccdcC24e45978Cfd2Eb"
   - &lido "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84"
   - &stakingRouter "0xFdDf38947aFB03C621C71b06C9C70bce73f12999"
-  - &nodeOperatorRegistry "0x55032650b14df07b85bF18A3a3eC8E0Af2e028d5"
-  - &simpleDVT "0xaE7B191A31f627b4eB1d4DaC64eaB9976995b433"
   - &accountingOracle "0x852deD011285fe67063a08005c71a85690503Cee"
   - &agent "0x3e40D73EB977Dc6a537aF587D48316feE66E9C8c"
   - &elRewardsVault "0x388C818CA8B9251b393131C08a736A67ccB19297"
@@ -14,19 +12,11 @@ parameters:
   - &withdrawalQueue "0x889edC2eDab5f40e902b864aD4d7AdE8E412F9B1"
   - &withdrawalVault "0xB9D7934878B5FB9610B3fE8A5e441e8fad7E293f"
   - &oracleDaemonConfig "0xbf05A929c3D7885a6aeAd833a992dA6E5ac23b09"
-  - &postTokenRebaseReceiver "0x442af784A788A5bd6F42A01Ebe9F287a871243fb"
+  - &postTokenRebaseReceiver "0xe6793B9e4FbA7DE0ee833F9D02bba7DB5EB27823"
   - &DEPOSIT_CONTRACT "0x00000000219ab540356cBB839Cbe05303d7705Fa"
-  - &accountingConsensus "0xD624B08C83bAECF0807Dd2c6880C3154a5F0B288"
   - &validatorsExitBusOracle "0x0De4Ea0184c2ad0BacA7183356Aea5B8d5Bf5c6e"
-  - &validatorsExitBusOracleImpl "0xA89Ea51FddE660f67d1850e03C9c9862d33Bc42c"
 
 misc:
-  - &curatedStakingId 1
-  - &curatedStakingModuleMaxDepositsPerBlock 150
-  - &curatedStakingModuleMinDepositBlockDistance 25
-  - &simpleDVTStakingId 2
-  - &simpleDVTStakingIdMaxDepositsPerBlock 150
-  - &simpleDVTStakingIdMinDepositBlockDistance 25
   - &depositSecurityModuleMaxOperatorPerUnvetting 200
   - &oracleReportSanityCheckerMaxValidatorsExits 600
   - &oracleReportSanityCheckerMaxValidatorsExitsRevert 601
@@ -37,10 +27,7 @@ misc:
   - &oracleReportSanityCheckerNOPerExtraDataItem 24
   - &oracleReportSanityCheckerNOPerExtraDataItemRevert 25
   - &oracleReportSanityCheckerSecondOpinionOracle "0x0000000000000000000000000000000000000000"
-  - &oracleReportSanityCheckerReportLimits [9000,43200,1000,50,600,8,24,7680,750000,1000,101,74]
-  - &stakingModulesIds [ 1, 2, 3 ]
-  - &stakingModulesCount "3"
-  - &lidoWithdrawalCredentials "0x010000000000000000000000b9d7934878b5fb9610b3fe8a5e441e8fad7e293f"
+  - &oracleReportSanityCheckerReportLimits [9000,43200,1000,50,600,8,24,7680,750000,1000,101,50]
   - &dsmGuardians ["0x5fd0dDbC3351d009eb3f88DE7Cd081a614C519F1", "0x7912Fa976BcDe9c2cf728e213e892AD7588E6AaF", "0x14D5d5B71E048d2D75a39FfC5B407e3a3AB6F314", "0xf82D88217C249297C6037BA77CE34b3d8a90ab43", "0xa56b128Ea2Ea237052b0fA2a96a387C0E43157d8", "0xd4EF84b638B334699bcf5AF4B0410B8CCD71943f"]
   - &stakingModuleCuratedType "0x637572617465642d6f6e636861696e2d76310000000000000000000000000000"
 
@@ -49,18 +36,14 @@ deployed:
     - &lidoLocatorImpl "0x3abc4764f0237923d52056cfba7e9aebf87113d3"
     - &stakingRouterImpl "0x89eda99c0551d4320b56f82dde8df2f8d2ef81aa"
     - &nodeOperatorRegistryImpl "0x1770044a38402e3cfca2fcfa0c84a093c9b42135"
-    - &simpleDVTImpl "0x1770044a38402e3cfca2fcfa0c84a093c9b42135"
-    - &depositSecurityModule "0xffa96d84def2ea035c7ab153d8b991128e3d72fd"
+    - &depositSecurityModule "0xfFA96D84dEF2EA035c7AB153D8B991128e3d72fD"
     - &accountingOracleImpl "0x0e65898527e77210fb0133d00dd4c0e86dc29bc7"
-    - &oracleReportSanityChecker "0x6232397ebac4f5772e53285b26c47914e9461e75"
+    - &oracleReportSanityChecker "0x6232397ebac4f5772e53285B26c47914E9461E75"
 
 roles:
   - &DEFAULT_ADMIN_ROLE "0x0000000000000000000000000000000000000000000000000000000000000000"
   - &STAKING_MODULE_UNVETTING_ROLE "0x240525496a9dc32284b17ce03b43e539e4bd81414634ee54395030d793463b57"
-  - &STAKING_MODULE_PAUSE_ROLE "0x00b1e70095ba5bacc3202c3db9faf1f7873186f0ed7b6c84e80c0018dcc6e38e"
-  - &STAKING_MODULE_RESUME_ROLE "0x9a2f67efb89489040f2c48c3b2c38f719fba1276678d2ced3bd9049fb5edc6b2"
   - &STAKING_ROUTER_ROLE "0xbb75b874360e0bfd87f964eadd8276d8efb7c942134fc329b513032d0803e0c6"
-  - &MANAGE_CONSENSUS_VERSION_ROLE "0xc31b1e4b732c5173dc51d519dfa432bad95550ecc4b0f9a61c2a558a2a8e4341"
   - &ALL_LIMITS_MANAGER_ROLE "0x5bf88568a012dfc9fe67407ad6775052bddc4ac89902dea1f4373ef5d9f1e35b"
   - &ANNUAL_BALANCE_INCREASE_LIMIT_MANAGER_ROLE "0x12c02753cd3d584dc4bb965eb0c88392c4c4d7c00433fdb7490d33c61ea57622"
   - &APPEARED_VALIDATORS_PER_DAY_LIMIT_MANAGER_ROLE "0x14ca7b84baa11a976283347b0159b8ddf2dcf5fd5cf613cc567a3423cf510119"
@@ -79,13 +62,7 @@ l1:
   contracts:
     lidoLocator:
       name: LidoLocator
-      address: *lidoLocator
-      proxyName: OssifiableProxy
-      implementation: *lidoLocatorImpl
-      proxyChecks:
-        proxy__getImplementation: *lidoLocatorImpl
-        proxy__getAdmin: *agent
-        proxy__getIsOssified: false
+      address: *lidoLocatorImpl
       checks:
         accountingOracle: *accountingOracle
         burner: *burner
@@ -103,120 +80,81 @@ l1:
         validatorsExitBusOracle: *validatorsExitBusOracle
         withdrawalQueue: *withdrawalQueue
         withdrawalVault: *withdrawalVault
-    stakingRouter:
-      name: StakingRouter
-      address: *stakingRouter
-      proxyName: OssifiableProxy
-      implementation: *stakingRouterImpl
-      proxyChecks:
-        proxy__getImplementation: *stakingRouterImpl
-        proxy__getAdmin: *agent
-        proxy__getIsOssified: false
+    stakingRouterImpl:
+      name: StakingRouterImpl
+      address: *stakingRouterImpl
       checks:
         DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
         DEPOSIT_CONTRACT: *DEPOSIT_CONTRACT
-        FEE_PRECISION_POINTS: null
-        MANAGE_WITHDRAWAL_CREDENTIALS_ROLE: null
-        MAX_STAKING_MODULES_COUNT: null
-        MAX_STAKING_MODULE_NAME_LENGTH: null
-        REPORT_EXITED_VALIDATORS_ROLE: null
-        REPORT_REWARDS_MINTED_ROLE: null
-        STAKING_MODULE_MANAGE_ROLE: null
-        STAKING_MODULE_UNVETTING_ROLE: null
-        TOTAL_BASIS_POINTS: null
-        UNSAFE_SET_EXITED_VALIDATORS_ROLE: null
+        FEE_PRECISION_POINTS: 100000000000000000000
+        MANAGE_WITHDRAWAL_CREDENTIALS_ROLE: "0xe7c742a54cd11fc9749a47ab34bdcd7327820908e8d0d48b4a5c7f17b0294098"
+        MAX_STAKING_MODULES_COUNT: 32
+        MAX_STAKING_MODULE_NAME_LENGTH: 31
+        REPORT_EXITED_VALIDATORS_ROLE: "0xc23292b191d95d2a7dd94fc6436eb44338fda9e1307d9394fd27c28157c1b33c"
+        REPORT_REWARDS_MINTED_ROLE: "0x779e5c23cb7a5bcb9bfe1e9a5165a00057f12bcdfd13e374540fdf1a1cd91137"
+        STAKING_MODULE_MANAGE_ROLE: "0x3105bcbf19d4417b73ae0e58d508a65ecf75665e46c2622d8521732de6080c48"
+        STAKING_MODULE_UNVETTING_ROLE: "0x240525496a9dc32284b17ce03b43e539e4bd81414634ee54395030d793463b57"
+        TOTAL_BASIS_POINTS: 10000
+        UNSAFE_SET_EXITED_VALIDATORS_ROLE: "0x55180e25fcacf9af017d35d497765476319b23896daa1f9bc2b38fa80b36a163"
         getAllNodeOperatorDigests: null
         getAllStakingModuleDigests: null
-        getContractVersion: 2
+        getContractVersion: null
         getDepositsAllocation: null
-        getLido: *lido
+        getLido: "0x0000000000000000000000000000000000000000"
         getNodeOperatorDigests: null
         getNodeOperatorSummary: null
-        getRoleAdmin:
-          - args: [ *STAKING_MODULE_UNVETTING_ROLE ]
-            result: *DEFAULT_ADMIN_ROLE
-        getRoleMember:
-          - args: [ *STAKING_MODULE_UNVETTING_ROLE, 0 ]
-            result: *depositSecurityModule
-          - args: [ *STAKING_MODULE_UNVETTING_ROLE, 1 ]
-            result: []
-            mustRevert: true
-          - args: [ *STAKING_MODULE_PAUSE_ROLE, 0 ]
-            result: []
-            mustRevert: true
-          - args: [ *STAKING_MODULE_RESUME_ROLE, 0 ]
-            result: []
-            mustRevert: true
+        getRoleAdmin: null
+        getRoleMember: null
         getRoleMemberCount:
           - args: [ *STAKING_MODULE_UNVETTING_ROLE ]
-            result: 1
+            result: 0
           - args: [ *DEFAULT_ADMIN_ROLE ]
-            result: 1
+            result: 0
         getStakingFeeAggregateDistribution: null
         getStakingFeeAggregateDistributionE4Precision: null
         getStakingModule: null
         getStakingModuleActiveValidatorsCount: null
         getStakingModuleDigests: null
-        getStakingModuleIds: *stakingModulesIds
+        getStakingModuleIds: null
         getStakingModuleIsActive: null
         getStakingModuleIsDepositsPaused: null
         getStakingModuleIsStopped: null
         getStakingModuleLastDepositBlock: null
         getStakingModuleMaxDepositsCount: null
-        getStakingModuleMaxDepositsPerBlock:
-          - args: [ *curatedStakingId ]
-            result: *curatedStakingModuleMaxDepositsPerBlock
-          - args: [ *simpleDVTStakingId ]
-            result: *simpleDVTStakingIdMaxDepositsPerBlock
-        getStakingModuleMinDepositBlockDistance:
-          - args: [ *curatedStakingId ]
-            result: *curatedStakingModuleMinDepositBlockDistance
-          - args: [ *simpleDVTStakingId ]
-            result: *simpleDVTStakingIdMinDepositBlockDistance
+        getStakingModuleMaxDepositsPerBlock: null
+        getStakingModuleMinDepositBlockDistance: null
         getStakingModuleNonce: null
         getStakingModuleStatus: null
         getStakingModuleSummary: null
         getStakingModules: null
-        getStakingModulesCount: *stakingModulesCount
+        getStakingModulesCount: null
         getStakingRewardsDistribution: null
         getTotalFeeE4Precision: null
-        getWithdrawalCredentials: *lidoWithdrawalCredentials
-        hasRole:
-          - args: [ *STAKING_MODULE_UNVETTING_ROLE, *depositSecurityModule ]
-            result: true
-          - args: [ *DEFAULT_ADMIN_ROLE, *agent ]
-            result: true
+        getWithdrawalCredentials: "0x0000000000000000000000000000000000000000000000000000000000000000"
+        hasRole: null
         hasStakingModule: null
         supportsInterface: null
-    nodeOperatorRegistry:
-      name: NodeOperatorRegistry
-      address: *nodeOperatorRegistry
-      proxyName: AppProxyUpgradeable
-      implementation: *nodeOperatorRegistryImpl
-      proxyChecks:
-        proxyType: null
-        isDepositable: null
-        implementation: *nodeOperatorRegistryImpl
-        appId: null
-        kernel: null
+    nodeOperatorRegistryImpl:
+      name: NodeOperatorRegistryImpl
+      address: *nodeOperatorRegistryImpl
       checks:
-        MANAGE_NODE_OPERATOR_ROLE: null
-        MANAGE_SIGNING_KEYS: null
-        MAX_NODE_OPERATORS_COUNT: null
-        MAX_NODE_OPERATOR_NAME_LENGTH: null
-        MAX_STUCK_PENALTY_DELAY: null
-        SET_NODE_OPERATOR_LIMIT_ROLE: null
+        MANAGE_NODE_OPERATOR_ROLE: "0x78523850fdd761612f46e844cf5a16bda6b3151d6ae961fd7e8e7b92bfbca7f8"
+        MANAGE_SIGNING_KEYS: "0x75abc64490e17b40ea1e66691c3eb493647b24430b358bd87ec3e5127f1621ee"
+        MAX_NODE_OPERATORS_COUNT: 200
+        MAX_NODE_OPERATOR_NAME_LENGTH: 255
+        MAX_STUCK_PENALTY_DELAY: 31536000
+        SET_NODE_OPERATOR_LIMIT_ROLE: "0x07b39e0faf2521001ae4e58cb9ffd3840a63e205d288dc9c93c3774f0d794754"
         STAKING_ROUTER_ROLE: *STAKING_ROUTER_ROLE
         appId: null
         allowRecoverability: null
         canPerform: null
         getActiveNodeOperatorsCount: null
-        getContractVersion: 3
+        getContractVersion: null
         getEVMScriptExecutor: null
         getEVMScriptRegistry: null
         getInitializationBlock: null
         getKeysOpIndex: null
-        getLocator: *lidoLocator
+        getLocator: null
         getNodeOperator: null
         getNodeOperatorIds: null
         getNodeOperatorIsActive: null
@@ -231,57 +169,7 @@ l1:
         getStakingModuleSummary: null
         getStuckPenaltyDelay: null
         getTotalSigningKeyCount: null
-        getType: *stakingModuleCuratedType
-        getUnusedSigningKeyCount: null
-        hasInitialized: null
-        isOperatorPenalized: null
-        isOperatorPenaltyCleared: null
-        isPetrified: null
-        kernel: null
-    simpleDVT:
-      name: SimpleDVT
-      address: *simpleDVT
-      proxyName: AppProxyUpgradeable
-      implementation: *simpleDVTImpl
-      proxyChecks:
-        proxyType: null
-        isDepositable: null
-        implementation: *simpleDVTImpl
-        appId: null
-        kernel: null
-      checks:
-        MANAGE_NODE_OPERATOR_ROLE: null
-        MANAGE_SIGNING_KEYS: null
-        MAX_NODE_OPERATORS_COUNT: null
-        MAX_NODE_OPERATOR_NAME_LENGTH: null
-        MAX_STUCK_PENALTY_DELAY: null
-        SET_NODE_OPERATOR_LIMIT_ROLE: null
-        STAKING_ROUTER_ROLE: *STAKING_ROUTER_ROLE
-        appId: null
-        allowRecoverability: null
-        canPerform: null
-        getActiveNodeOperatorsCount: null
-        getContractVersion: 3
-        getEVMScriptExecutor: null
-        getEVMScriptRegistry: null
-        getInitializationBlock: null
-        getKeysOpIndex: null
-        getLocator: *lidoLocator
-        getNodeOperator: null
-        getNodeOperatorIds: null
-        getNodeOperatorIsActive: null
-        getNodeOperatorSummary: null
-        getNodeOperatorsCount: null
-        getNonce: null
-        getRecoveryVault: null
-        getRewardDistributionState: null
-        getRewardsDistribution: null
-        getSigningKey: null
-        getSigningKeys: null
-        getStakingModuleSummary: null
-        getStuckPenaltyDelay: null
-        getTotalSigningKeyCount: null
-        getType: *stakingModuleCuratedType
+        getType: *stakingModuleCuratedType  # TODO
         getUnusedSigningKeyCount: null
         hasInitialized: null
         isOperatorPenalized: null
@@ -292,51 +180,45 @@ l1:
         name: DepositSecurityModule
         address: *depositSecurityModule
         checks:
-          ATTEST_MESSAGE_PREFIX: null
+          ATTEST_MESSAGE_PREFIX: null  # TODO
           DEPOSIT_CONTRACT: *DEPOSIT_CONTRACT
           LIDO: *lido
-          PAUSE_MESSAGE_PREFIX: null
+          PAUSE_MESSAGE_PREFIX: null # TODO
           STAKING_ROUTER: *stakingRouter
-          UNVET_MESSAGE_PREFIX: null
+          UNVET_MESSAGE_PREFIX: null  # TODO
           VERSION: 3
           canDeposit: null
           getGuardianIndex: null
-          getGuardianQuorum: null
+          getGuardianQuorum: 4
           getGuardians: *dsmGuardians
           getLastDepositBlock: null
           getMaxOperatorsPerUnvetting: *depositSecurityModuleMaxOperatorPerUnvetting
-          getOwner:
-          getPauseIntentValidityPeriodBlocks: null
+          getOwner: *agent
+          getPauseIntentValidityPeriodBlocks: 6646
           isDepositsPaused: false
           isGuardian: null
           isMinDepositDistancePassed: null
-        accountingOracle:
-          name: AccountingOracle
-          address: *accountingOracle
-          proxyName: OssifiableProxy
-          implementation: *accountingOracleImpl
-          proxyChecks:
-            proxy__getImplementation: *accountingOracleImpl
-            proxy__getAdmin: *agent
-            proxy__getIsOssified: false
+        accountingOracleImpl:
+          name: AccountingOracleImpl
+          address: *accountingOracleImpl
           checks:
             DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
-            EXTRA_DATA_FORMAT_EMPTY: null
-            EXTRA_DATA_FORMAT_LIST: null
-            EXTRA_DATA_TYPE_EXITED_VALIDATORS: null
-            EXTRA_DATA_TYPE_STUCK_VALIDATORS: null
-            GENESIS_TIME: null
-            LEGACY_ORACLE: null
+            EXTRA_DATA_FORMAT_EMPTY: 0
+            EXTRA_DATA_FORMAT_LIST: 1
+            EXTRA_DATA_TYPE_EXITED_VALIDATORS: 2
+            EXTRA_DATA_TYPE_STUCK_VALIDATORS: 1
+            GENESIS_TIME: 1606824023
+            LEGACY_ORACLE: *legacyOracle
             LIDO: *lido
             LOCATOR: *lidoLocator
-            MANAGE_CONSENSUS_CONTRACT_ROLE: null
-            MANAGE_CONSENSUS_VERSION_ROLE: null
-            SECONDS_PER_SLOT: null
-            SUBMIT_DATA_ROLE: null
-            getConsensusContract: *accountingConsensus
+            MANAGE_CONSENSUS_CONTRACT_ROLE: "0x04a0afbbd09d5ad397fc858789da4f8edd59f5ca5098d70faa490babee945c3b"
+            MANAGE_CONSENSUS_VERSION_ROLE: "0xc31b1e4b732c5173dc51d519dfa432bad95550ecc4b0f9a61c2a558a2a8e4341"
+            SECONDS_PER_SLOT: 12
+            SUBMIT_DATA_ROLE: "0x65fa0c17458517c727737e4153dd477fa3e328cf706640b0f68b1a285c5990da"
+            getConsensusContract: "0x0000000000000000000000000000000000000000"
             getConsensusReport: null
-            getConsensusVersion: 2
-            getContractVersion: 2
+            getConsensusVersion: null
+            getContractVersion: null
             getLastProcessingRefSlot: null
             getProcessingState: null
             getRoleAdmin: null
@@ -428,42 +310,4 @@ l1:
           reportData: null
           secondOpinionOracle: *oracleReportSanityCheckerSecondOpinionOracle
           smoothenTokenRebase: null
-          supportsInterface: null
-      validatorsExitBusOracle:
-        name: ValidatorsExitBusOracle
-        address: *validatorsExitBusOracle
-        proxyName: OssifiableProxy
-        implementation: *validatorsExitBusOracleImpl
-        proxyChecks:
-          proxy__getAdmin: null
-          proxy__getImplementation: null
-          proxy__getIsOssified: null
-        checks:
-          DATA_FORMAT_LIST: null
-          DEFAULT_ADMIN_ROLE: null
-          GENESIS_TIME: null
-          MANAGE_CONSENSUS_CONTRACT_ROLE: null
-          MANAGE_CONSENSUS_VERSION_ROLE: *MANAGE_CONSENSUS_VERSION_ROLE
-          PAUSE_INFINITELY: null
-          PAUSE_ROLE: null
-          RESUME_ROLE: null
-          SECONDS_PER_SLOT: null
-          SUBMIT_DATA_ROLE: null
-          getConsensusContract: null
-          getConsensusReport: null
-          getConsensusVersion: 2
-          getContractVersion: 1
-          getLastProcessingRefSlot: null
-          getLastRequestedValidatorIndices: null
-          getProcessingState: null
-          getResumeSinceTimestamp: null
-          getRoleAdmin: null
-          getRoleMember:
-            - args: [*MANAGE_CONSENSUS_VERSION_ROLE, 0]
-              result: []
-              mustRevert: true
-          getRoleMemberCount: null
-          getTotalRequestsProcessed: null
-          hasRole: null
-          isPaused: null
           supportsInterface: null
