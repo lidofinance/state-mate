@@ -269,7 +269,7 @@ l2:
         decimals: 18
         bridge: *l2TokenBridge
         DOMAIN_SEPARATOR: "0xc7078fdc1b0a6dc42aa20237f2c2fe4c9d37d2f61a69811997849b9ca57fe3e9"
-        eip712Domain: ["0x0f","Wrapped liquid staked Ether 2.0","2",10,"0xFe57042De76c8D6B1DF0E9E2047329fd3e2B7334","0x0000000000000000000000000000000000000000000000000000000000000000",[]]
+        eip712Domain: ["0x0f","Wrapped liquid staked Ether 2.0","2",10,"0x1F32b1c2345538c0c6f582fCB022739c4A194Ebb","0x0000000000000000000000000000000000000000000000000000000000000000",[]]
         getContractVersion: 2
         totalSupply: null
         PERMIT_TYPEHASH: null
