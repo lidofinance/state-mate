@@ -15,6 +15,9 @@ parameters:
   - &postTokenRebaseReceiver "0xe6793B9e4FbA7DE0ee833F9D02bba7DB5EB27823"
   - &DEPOSIT_CONTRACT "0x00000000219ab540356cBB839Cbe05303d7705Fa"
   - &validatorsExitBusOracle "0x0De4Ea0184c2ad0BacA7183356Aea5B8d5Bf5c6e"
+  - &updateTargetValidatorLimits "0x161a4552A625844c822954C5AcBac928ee0f399B"
+  - &sdvtModule "0xaE7B191A31f627b4eB1d4DaC64eaB9976995b433"
+  - &sdvtCommittee "0x08637515E85A4633E23dfc7861e2A9f53af640f7"
 
 misc:
   - &depositSecurityModuleMaxOperatorPerUnvetting 200
@@ -27,9 +30,17 @@ misc:
   - &oracleReportSanityCheckerNOPerExtraDataItem 24
   - &oracleReportSanityCheckerNOPerExtraDataItemRevert 25
   - &oracleReportSanityCheckerSecondOpinionOracle "0x0000000000000000000000000000000000000000"
-  - &oracleReportSanityCheckerReportLimits [9000,43200,1000,50,600,8,24,7680,750000,1000,101,50]
-  - &dsmGuardians ["0x5fd0dDbC3351d009eb3f88DE7Cd081a614C519F1", "0x7912Fa976BcDe9c2cf728e213e892AD7588E6AaF", "0x14D5d5B71E048d2D75a39FfC5B407e3a3AB6F314", "0xf82D88217C249297C6037BA77CE34b3d8a90ab43", "0xa56b128Ea2Ea237052b0fA2a96a387C0E43157d8", "0xd4EF84b638B334699bcf5AF4B0410B8CCD71943f"]
-  - &stakingModuleCuratedType "0x637572617465642d6f6e636861696e2d76310000000000000000000000000000"
+  - &oracleReportSanityCheckerReportLimits [9000, 43200, 1000, 50, 600, 8, 24, 7680, 750000, 1000, 101, 50]
+  - &dsmGuardians [
+      "0x5fd0dDbC3351d009eb3f88DE7Cd081a614C519F1",
+      "0x7912Fa976BcDe9c2cf728e213e892AD7588E6AaF",
+      "0x14D5d5B71E048d2D75a39FfC5B407e3a3AB6F314",
+      "0xf82D88217C249297C6037BA77CE34b3d8a90ab43",
+      "0xa56b128Ea2Ea237052b0fA2a96a387C0E43157d8",
+      "0xd4EF84b638B334699bcf5AF4B0410B8CCD71943f",
+    ]
+  - &stakingModuleCuratedType "0x0000000000000000000000000000000000000000000000000000000000000000"
+  - &maxUint256 115792089237316195423570985008687907853269984665640564039457584007913129639935
 
 deployed:
   l1:
@@ -66,7 +77,8 @@ l1:
       checks:
         accountingOracle: *accountingOracle
         burner: *burner
-        coreComponents: [*elRewardsVault, *oracleReportSanityChecker, *stakingRouter, *treasury, *withdrawalQueue, *withdrawalVault]
+        coreComponents:
+          [*elRewardsVault, *oracleReportSanityChecker, *stakingRouter, *treasury, *withdrawalQueue, *withdrawalVault]
         depositSecurityModule: *depositSecurityModule
         elRewardsVault: *elRewardsVault
         legacyOracle: *legacyOracle
@@ -98,7 +110,7 @@ l1:
         UNSAFE_SET_EXITED_VALIDATORS_ROLE: "0x55180e25fcacf9af017d35d497765476319b23896daa1f9bc2b38fa80b36a163"
         getAllNodeOperatorDigests: null
         getAllStakingModuleDigests: null
-        getContractVersion: null
+        getContractVersion: *maxUint256
         getDepositsAllocation: null
         getLido: "0x0000000000000000000000000000000000000000"
         getNodeOperatorDigests: null
@@ -106,9 +118,9 @@ l1:
         getRoleAdmin: null
         getRoleMember: null
         getRoleMemberCount:
-          - args: [ *STAKING_MODULE_UNVETTING_ROLE ]
+          - args: [*STAKING_MODULE_UNVETTING_ROLE]
             result: 0
-          - args: [ *DEFAULT_ADMIN_ROLE ]
+          - args: [*DEFAULT_ADMIN_ROLE]
             result: 0
         getStakingFeeAggregateDistribution: null
         getStakingFeeAggregateDistributionE4Precision: null
@@ -149,10 +161,10 @@ l1:
         allowRecoverability: null
         canPerform: null
         getActiveNodeOperatorsCount: null
-        getContractVersion: null
+        getContractVersion: *maxUint256
         getEVMScriptExecutor: null
         getEVMScriptRegistry: null
-        getInitializationBlock: null
+        getInitializationBlock: *maxUint256
         getKeysOpIndex: null
         getLocator: null
         getNodeOperator: null
@@ -169,145 +181,153 @@ l1:
         getStakingModuleSummary: null
         getStuckPenaltyDelay: null
         getTotalSigningKeyCount: null
-        getType: *stakingModuleCuratedType  # TODO
+        getType: *stakingModuleCuratedType
         getUnusedSigningKeyCount: null
-        hasInitialized: null
+        hasInitialized: false
         isOperatorPenalized: null
         isOperatorPenaltyCleared: null
-        isPetrified: null
+        isPetrified: true
         kernel: null
-      depositSecurityModule:
-        name: DepositSecurityModule
-        address: *depositSecurityModule
-        checks:
-          ATTEST_MESSAGE_PREFIX: null  # TODO
-          DEPOSIT_CONTRACT: *DEPOSIT_CONTRACT
-          LIDO: *lido
-          PAUSE_MESSAGE_PREFIX: null # TODO
-          STAKING_ROUTER: *stakingRouter
-          UNVET_MESSAGE_PREFIX: null  # TODO
-          VERSION: 3
-          canDeposit: null
-          getGuardianIndex: null
-          getGuardianQuorum: 4
-          getGuardians: *dsmGuardians
-          getLastDepositBlock: null
-          getMaxOperatorsPerUnvetting: *depositSecurityModuleMaxOperatorPerUnvetting
-          getOwner: *agent
-          getPauseIntentValidityPeriodBlocks: 6646
-          isDepositsPaused: false
-          isGuardian: null
-          isMinDepositDistancePassed: null
-        accountingOracleImpl:
-          name: AccountingOracleImpl
-          address: *accountingOracleImpl
-          checks:
-            DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
-            EXTRA_DATA_FORMAT_EMPTY: 0
-            EXTRA_DATA_FORMAT_LIST: 1
-            EXTRA_DATA_TYPE_EXITED_VALIDATORS: 2
-            EXTRA_DATA_TYPE_STUCK_VALIDATORS: 1
-            GENESIS_TIME: 1606824023
-            LEGACY_ORACLE: *legacyOracle
-            LIDO: *lido
-            LOCATOR: *lidoLocator
-            MANAGE_CONSENSUS_CONTRACT_ROLE: "0x04a0afbbd09d5ad397fc858789da4f8edd59f5ca5098d70faa490babee945c3b"
-            MANAGE_CONSENSUS_VERSION_ROLE: "0xc31b1e4b732c5173dc51d519dfa432bad95550ecc4b0f9a61c2a558a2a8e4341"
-            SECONDS_PER_SLOT: 12
-            SUBMIT_DATA_ROLE: "0x65fa0c17458517c727737e4153dd477fa3e328cf706640b0f68b1a285c5990da"
-            getConsensusContract: "0x0000000000000000000000000000000000000000"
-            getConsensusReport: null
-            getConsensusVersion: null
-            getContractVersion: null
-            getLastProcessingRefSlot: null
-            getProcessingState: null
-            getRoleAdmin: null
-            getRoleMember: null
-            getRoleMemberCount: null
-            hasRole: null
-            supportsInterface: null
-      oracleReportSanityChecker:
-        name: OracleReportSanityChecker
-        address: *oracleReportSanityChecker
-        checks:
-          ALL_LIMITS_MANAGER_ROLE: *ALL_LIMITS_MANAGER_ROLE
-          ANNUAL_BALANCE_INCREASE_LIMIT_MANAGER_ROLE: *ANNUAL_BALANCE_INCREASE_LIMIT_MANAGER_ROLE
-          APPEARED_VALIDATORS_PER_DAY_LIMIT_MANAGER_ROLE: *APPEARED_VALIDATORS_PER_DAY_LIMIT_MANAGER_ROLE
-          DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
-          EXITED_VALIDATORS_PER_DAY_LIMIT_MANAGER_ROLE: *EXITED_VALIDATORS_PER_DAY_LIMIT_MANAGER_ROLE
-          INITIAL_SLASHING_AND_PENALTIES_MANAGER_ROLE: *INITIAL_SLASHING_AND_PENALTIES_MANAGER_ROLE
-          MAX_ITEMS_PER_EXTRA_DATA_TRANSACTION_ROLE: *MAX_ITEMS_PER_EXTRA_DATA_TRANSACTION_ROLE
-          MAX_NODE_OPERATORS_PER_EXTRA_DATA_ITEM_ROLE: *MAX_NODE_OPERATORS_PER_EXTRA_DATA_ITEM_ROLE
-          MAX_POSITIVE_TOKEN_REBASE_MANAGER_ROLE: *MAX_POSITIVE_TOKEN_REBASE_MANAGER_ROLE
-          MAX_VALIDATOR_EXIT_REQUESTS_PER_REPORT_ROLE: *MAX_VALIDATOR_EXIT_REQUESTS_PER_REPORT_ROLE
-          REQUEST_TIMESTAMP_MARGIN_MANAGER_ROLE: *REQUEST_TIMESTAMP_MARGIN_MANAGER_ROLE
-          SECOND_OPINION_MANAGER_ROLE: *SECOND_OPINION_MANAGER_ROLE
-          SHARE_RATE_DEVIATION_LIMIT_MANAGER_ROLE: *SHARE_RATE_DEVIATION_LIMIT_MANAGER_ROLE
-          checkExitBusOracleReport:
-            - args: [ *oracleReportSanityCheckerMaxValidatorsExits ]
-              result: []
-            - args: [ *oracleReportSanityCheckerMaxValidatorsExitsRevert ]
-              result: []
-              mustRevert: true
-          checkExitedValidatorsRatePerDay:
-            - args: [ *oracleReportSanityCheckerMaxValidatorsExitsPerDay ]
-              result: [ ]
-            - args: [ *oracleReportSanityCheckerMaxValidatorsExitsPerDayRevert ]
-              mustRevert: true
-              result: [ ]
-          checkExtraDataItemsCountPerTransaction:
-            - args: [ *oracleReportSanityCheckerExtraDataItemPerTransaction ]
-              result: [ ]
-            - args: [ *oracleReportSanityCheckerExtraDataItemPerTransactionRevert ]
-              mustRevert: true
-              result: [ ]
-          checkNodeOperatorsPerExtraDataItemCount:
-            - args: [ 1, *oracleReportSanityCheckerNOPerExtraDataItem ]
-              result: [ ]
-            - args: [ 1, *oracleReportSanityCheckerNOPerExtraDataItemRevert ]
-              mustRevert: true
-              result: [ ]
-          checkSimulatedShareRate: null
-          checkWithdrawalQueueOracleReport: null
-          getLidoLocator: *lidoLocator
-          getMaxPositiveTokenRebase: null
-          getOracleReportLimits:
-            - args: []
-              result: *oracleReportSanityCheckerReportLimits
-          getReportDataCount: null
-          getRoleAdmin: null
-          getRoleMember: null
-          getRoleMemberCount:
-            - args: [ *ALL_LIMITS_MANAGER_ROLE ]
-              result: 0
-            - args: [ *ANNUAL_BALANCE_INCREASE_LIMIT_MANAGER_ROLE ]
-              result: 0
-            - args: [ *APPEARED_VALIDATORS_PER_DAY_LIMIT_MANAGER_ROLE ]
-              result: 0
-            - args: [ *DEFAULT_ADMIN_ROLE ]
-              result: 1
-            - args: [ *EXITED_VALIDATORS_PER_DAY_LIMIT_MANAGER_ROLE ]
-              result: 0
-            - args: [ *INITIAL_SLASHING_AND_PENALTIES_MANAGER_ROLE ]
-              result: 0
-            - args: [ *MAX_ITEMS_PER_EXTRA_DATA_TRANSACTION_ROLE ]
-              result: 0
-            - args: [ *MAX_NODE_OPERATORS_PER_EXTRA_DATA_ITEM_ROLE ]
-              result: 0
-            - args: [ *MAX_POSITIVE_TOKEN_REBASE_MANAGER_ROLE ]
-              result: 0
-            - args: [ *MAX_VALIDATOR_EXIT_REQUESTS_PER_REPORT_ROLE ]
-              result: 0
-            - args: [ *REQUEST_TIMESTAMP_MARGIN_MANAGER_ROLE ]
-              result: 0
-            - args: [ *SECOND_OPINION_MANAGER_ROLE ]
-              result: 0
-            - args: [ *SHARE_RATE_DEVIATION_LIMIT_MANAGER_ROLE ]
-              result: 0
-          hasRole:
-            - args: [ *DEFAULT_ADMIN_ROLE, *agent]
-              result: true
-          reportData: null
-          secondOpinionOracle: *oracleReportSanityCheckerSecondOpinionOracle
-          smoothenTokenRebase: null
-          supportsInterface: null
+    depositSecurityModule:
+      name: DepositSecurityModule
+      address: *depositSecurityModule
+      checks:
+        ATTEST_MESSAGE_PREFIX: null
+        DEPOSIT_CONTRACT: *DEPOSIT_CONTRACT
+        LIDO: *lido
+        PAUSE_MESSAGE_PREFIX: null
+        STAKING_ROUTER: *stakingRouter
+        UNVET_MESSAGE_PREFIX: null
+        VERSION: 3
+        canDeposit: null
+        getGuardianIndex: null
+        getGuardianQuorum: 4
+        getGuardians: *dsmGuardians
+        getLastDepositBlock: null
+        getMaxOperatorsPerUnvetting: *depositSecurityModuleMaxOperatorPerUnvetting
+        getOwner: *agent
+        getPauseIntentValidityPeriodBlocks: 6646
+        isDepositsPaused: false
+        isGuardian: null
+        isMinDepositDistancePassed: null
+    accountingOracleImpl:
+      name: AccountingOracleImpl
+      address: *accountingOracleImpl
+      checks:
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        EXTRA_DATA_FORMAT_EMPTY: 0
+        EXTRA_DATA_FORMAT_LIST: 1
+        EXTRA_DATA_TYPE_EXITED_VALIDATORS: 2
+        EXTRA_DATA_TYPE_STUCK_VALIDATORS: 1
+        GENESIS_TIME: 1606824023
+        LEGACY_ORACLE: *legacyOracle
+        LIDO: *lido
+        LOCATOR: *lidoLocator
+        MANAGE_CONSENSUS_CONTRACT_ROLE: "0x04a0afbbd09d5ad397fc858789da4f8edd59f5ca5098d70faa490babee945c3b"
+        MANAGE_CONSENSUS_VERSION_ROLE: "0xc31b1e4b732c5173dc51d519dfa432bad95550ecc4b0f9a61c2a558a2a8e4341"
+        SECONDS_PER_SLOT: 12
+        SUBMIT_DATA_ROLE: "0x65fa0c17458517c727737e4153dd477fa3e328cf706640b0f68b1a285c5990da"
+        getConsensusContract: "0x0000000000000000000000000000000000000000"
+        getConsensusReport: null
+        getConsensusVersion: null
+        getContractVersion: *maxUint256
+        getLastProcessingRefSlot: null
+        getProcessingState: null
+        getRoleAdmin: null
+        getRoleMember: null
+        getRoleMemberCount: null
+        hasRole: null
+        supportsInterface: null
+    oracleReportSanityChecker:
+      name: OracleReportSanityChecker
+      address: *oracleReportSanityChecker
+      checks:
+        ALL_LIMITS_MANAGER_ROLE: *ALL_LIMITS_MANAGER_ROLE
+        ANNUAL_BALANCE_INCREASE_LIMIT_MANAGER_ROLE: *ANNUAL_BALANCE_INCREASE_LIMIT_MANAGER_ROLE
+        APPEARED_VALIDATORS_PER_DAY_LIMIT_MANAGER_ROLE: *APPEARED_VALIDATORS_PER_DAY_LIMIT_MANAGER_ROLE
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        EXITED_VALIDATORS_PER_DAY_LIMIT_MANAGER_ROLE: *EXITED_VALIDATORS_PER_DAY_LIMIT_MANAGER_ROLE
+        INITIAL_SLASHING_AND_PENALTIES_MANAGER_ROLE: *INITIAL_SLASHING_AND_PENALTIES_MANAGER_ROLE
+        MAX_ITEMS_PER_EXTRA_DATA_TRANSACTION_ROLE: *MAX_ITEMS_PER_EXTRA_DATA_TRANSACTION_ROLE
+        MAX_NODE_OPERATORS_PER_EXTRA_DATA_ITEM_ROLE: *MAX_NODE_OPERATORS_PER_EXTRA_DATA_ITEM_ROLE
+        MAX_POSITIVE_TOKEN_REBASE_MANAGER_ROLE: *MAX_POSITIVE_TOKEN_REBASE_MANAGER_ROLE
+        MAX_VALIDATOR_EXIT_REQUESTS_PER_REPORT_ROLE: *MAX_VALIDATOR_EXIT_REQUESTS_PER_REPORT_ROLE
+        REQUEST_TIMESTAMP_MARGIN_MANAGER_ROLE: *REQUEST_TIMESTAMP_MARGIN_MANAGER_ROLE
+        SECOND_OPINION_MANAGER_ROLE: *SECOND_OPINION_MANAGER_ROLE
+        SHARE_RATE_DEVIATION_LIMIT_MANAGER_ROLE: *SHARE_RATE_DEVIATION_LIMIT_MANAGER_ROLE
+        checkExitBusOracleReport:
+          - args: [*oracleReportSanityCheckerMaxValidatorsExits]
+            result: []
+          - args: [*oracleReportSanityCheckerMaxValidatorsExitsRevert]
+            result: []
+            mustRevert: true
+        checkExitedValidatorsRatePerDay:
+          - args: [*oracleReportSanityCheckerMaxValidatorsExitsPerDay]
+            result: []
+          - args: [*oracleReportSanityCheckerMaxValidatorsExitsPerDayRevert]
+            mustRevert: true
+            result: []
+        checkExtraDataItemsCountPerTransaction:
+          - args: [*oracleReportSanityCheckerExtraDataItemPerTransaction]
+            result: []
+          - args: [*oracleReportSanityCheckerExtraDataItemPerTransactionRevert]
+            mustRevert: true
+            result: []
+        checkNodeOperatorsPerExtraDataItemCount:
+          - args: [1, *oracleReportSanityCheckerNOPerExtraDataItem]
+            result: []
+          - args: [1, *oracleReportSanityCheckerNOPerExtraDataItemRevert]
+            mustRevert: true
+            result: []
+        checkSimulatedShareRate: null
+        checkWithdrawalQueueOracleReport: null
+        getLidoLocator: *lidoLocator
+        getMaxPositiveTokenRebase: null
+        getOracleReportLimits:
+          - args: []
+            result: *oracleReportSanityCheckerReportLimits
+        getReportDataCount: null
+        getRoleAdmin: null
+        getRoleMember: null
+        getRoleMemberCount:
+          - args: [*ALL_LIMITS_MANAGER_ROLE]
+            result: 0
+          - args: [*ANNUAL_BALANCE_INCREASE_LIMIT_MANAGER_ROLE]
+            result: 0
+          - args: [*APPEARED_VALIDATORS_PER_DAY_LIMIT_MANAGER_ROLE]
+            result: 0
+          - args: [*DEFAULT_ADMIN_ROLE]
+            result: 1
+          - args: [*EXITED_VALIDATORS_PER_DAY_LIMIT_MANAGER_ROLE]
+            result: 0
+          - args: [*INITIAL_SLASHING_AND_PENALTIES_MANAGER_ROLE]
+            result: 0
+          - args: [*MAX_ITEMS_PER_EXTRA_DATA_TRANSACTION_ROLE]
+            result: 0
+          - args: [*MAX_NODE_OPERATORS_PER_EXTRA_DATA_ITEM_ROLE]
+            result: 0
+          - args: [*MAX_POSITIVE_TOKEN_REBASE_MANAGER_ROLE]
+            result: 0
+          - args: [*MAX_VALIDATOR_EXIT_REQUESTS_PER_REPORT_ROLE]
+            result: 0
+          - args: [*REQUEST_TIMESTAMP_MARGIN_MANAGER_ROLE]
+            result: 0
+          - args: [*SECOND_OPINION_MANAGER_ROLE]
+            result: 0
+          - args: [*SHARE_RATE_DEVIATION_LIMIT_MANAGER_ROLE]
+            result: 0
+        hasRole:
+          - args: [*DEFAULT_ADMIN_ROLE, *agent]
+            result: true
+        reportData: null
+        secondOpinionOracle: *oracleReportSanityCheckerSecondOpinionOracle
+        smoothenTokenRebase: null
+        supportsInterface: null
+    updateTargetValidatorLimits:
+      name: UpdateTargetValidatorLimits
+      address: *updateTargetValidatorLimits
+      checks:
+        trustedCaller: *sdvtCommittee
+        nodeOperatorsRegistry: *sdvtModule
+        createEVMScript: null
+        decodeEVMScriptCallData: null
