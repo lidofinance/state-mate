@@ -437,7 +437,12 @@ async function checkViewFunction(contract: BaseContract, method: string, expecte
   try {
     const actual = await contract.getFunction(signature).staticCall(...args);
     assertEqual(actual, expected);
-    logHandle.success(stringify(actual));
+    if (mustRevert) {
+      logHandle.failure(stringify(actual));
+      g_errors++;
+    } else {
+      logHandle.success(stringify(actual));
+    }
   } catch (error) {
     const errorMessage = `REVERTED with: ${(error as Error).message}`;
     if (mustRevert) {
