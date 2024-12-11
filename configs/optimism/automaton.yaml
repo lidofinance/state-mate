@@ -1,5 +1,5 @@
-# Optimism Testnet Deployment & Configuration
-# Checks state when new contracts were deployed and upgraded.
+# Config for automaton script.
+# Most of these parameters will be replaced in script by main config.
 
 parameters:
   - &lido "0x3e3FE7dBc6B4C189E7128855dD526361c49b40Af"
@@ -115,7 +115,7 @@ l2:
       checks:
         getEthereumGovernanceExecutor: *agent
         getGracePeriod: 86400
-        getGuardian: "0xD06491e4C8B3107B83dC134894C4c96ED8ddbfa2"
+        getGuardian: "0x0000000000000000000000000000000000000000"
         getDelay: 0
         getMinimumDelay: 0
         getMaximumDelay: 1
@@ -185,13 +185,13 @@ l2:
         decimals: 18
         TOKEN_RATE_ORACLE_DECIMALS: 27
         DOMAIN_SEPARATOR: "0xf263bd4a5df4c4a67bcf947a8c87fde73c4df067dca628bd2a0625c557329085"
+        eip712Domain: null
         L2_ERC20_TOKEN_BRIDGE: *l2TokenBridge
         TOKEN_RATE_ORACLE: *l2TokenRateOracle
         TOKEN_TO_WRAP_FROM: *l2WstETH
         getContractVersion: 1
-        getTotalShares: null
-        totalSupply: null
-        eip712Domain: null
+        getTotalShares: 0
+        totalSupply: 0
         nonces: null
         getSharesByTokens: null
         getTokensByShares: null
@@ -215,13 +215,12 @@ l2:
         decimals: 18
         bridge: *l2TokenBridge
         DOMAIN_SEPARATOR: "0xd767e2c73472c3f7e3225b36a5b47efb4b248a17be58dbd15b9e94792e9202b6"
+        eip712Domain: null
         getContractVersion: 2
-        PERMIT_TYPEHASH: null
-        totalSupply: null
+        totalSupply: 0
         allowance: null
         balanceOf: null
         nonces: null
-        eip712Domain: null
       implementationChecks: {}
 
     tokenBridge:
