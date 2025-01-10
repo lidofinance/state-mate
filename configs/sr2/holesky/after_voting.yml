@@ -1,4 +1,7 @@
 ---
+
+# yaml-language-server: $schema=./../../schemas/main-schema.json
+
 parameters:
   - &lidoLocator "0x28FAB2059C713A7F9D8c86Db49f9bb0e96Af1ef8"
   - &lido "0x3F1c547b21f65e10480dE3ad8E19fAAC46C95034"

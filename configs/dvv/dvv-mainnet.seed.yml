@@ -1,4 +1,7 @@
 ---
+
+# yaml-language-server: $schema=./../../schemas/seed-schema.json
+
 deployed:
   l1:
     - &Vault "0xe2D2E90122cb203CF1565a37ef90a256843A825A"

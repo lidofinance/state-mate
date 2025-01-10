@@ -26,6 +26,7 @@ import {
   EthereumAddressFormat,
   EthereumRoleFormat,
   isTypeOfTB,
+  MaxIntFormat,
   NetworkSection,
   NetworkSectionTB,
   SeedDocumentTB,
@@ -93,6 +94,7 @@ function validateJsonWithSchema(
     EthereumRoleFormat.name,
     (value) => typeof value === "string" && EthereumRoleFormat.formatString.test(value),
   );
+  ajv.addFormat(MaxIntFormat.name, (value) => typeof value === "string" && MaxIntFormat.formatString.test(value));
 
   let validate: ReturnType<typeof ajv.compile>;
   try {
@@ -187,9 +189,32 @@ async function checkNetworkSection(sectionTitle: string, section: NetworkSection
   }
 }
 
+function generateBothSchemas() {
+  const schemasPath = path.resolve(path.dirname(__dirname), path.join("schemas"));
+  fs.mkdirSync(schemasPath, { recursive: true });
+
+  const saveSchema = (fileName: string, schema: TObject) => {
+    const schemasFilePath = path.resolve(schemasPath, fileName);
+    try {
+      fs.writeFileSync(schemasFilePath, JSON.stringify(schema, null, 2), "utf8");
+      logHeader1(`The JSON Schema has been saved to ${chalk.green(schemasFilePath)}`);
+    } catch (error) {
+      logErrorAndExit(
+        `Failed to save the JSON Schema to ${chalk.red(schemasFilePath)}:\n\n${chalk.red(printError(error))}`,
+      );
+    }
+  };
+  saveSchema("main-schema.json", EntireDocumentTB);
+  saveSchema("seed-schema.json", SeedDocumentTB);
+}
+
 export async function main() {
   g_Args = parseCmdLineArgs();
   const jsonDoc = loadStateFromYaml(g_Args.configPath);
+  if (g_Args.schemas) {
+    generateBothSchemas();
+    return 1;
+  }
 
   if (g_Args.generate) {
     if (validateJsonWithSchema(jsonDoc, SeedDocumentTB, "SEED")) {

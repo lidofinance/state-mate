@@ -8,6 +8,7 @@ type CheckOnlyOptionType = null | {
   contract: string | null;
   checksType: string | null;
   method: string | null;
+  schemas: string | null;
 };
 
 export function parseCmdLineArgs() {
@@ -20,6 +21,7 @@ export function parseCmdLineArgs() {
     )
     .option("--generate", "generate a populated config from the seed one")
     .option("--abi", "check that the saved ABIs and explorer ABIs are equal")
+    .option("--schemas", "generate main and seed JSON-schemas")
     .parse();
 
   const configPath = program.args[0];
@@ -37,6 +39,7 @@ export function parseCmdLineArgs() {
       contract: checksPath[1],
       checksType: checksPath[2],
       method: checksPath[3],
+      schemas: checksPath[4],
     };
   }
 
@@ -47,5 +50,6 @@ export function parseCmdLineArgs() {
     checkOnlyCmdArg: options.only ? String(options.only) : undefined,
     generate: options.generate ? String(options.generate) : undefined,
     abi: options.abi ? String(options.abi) : undefined,
+    schemas: options.schemas ? String(options.schemas) : undefined,
   };
 }

@@ -11,19 +11,36 @@ export const EthereumRoleFormat = {
   formatString: /^0x[a-fA-F0-9]{64}$/,
 };
 
+export const MaxIntFormat = {
+  name: "max-int",
+  formatString: /^\d{78}$/,
+};
+
 FormatRegistry.Set(
   EthereumAddressFormat.name,
   (value) => typeof value === "string" && EthereumAddressFormat.formatString.test(value),
 );
+
 FormatRegistry.Set(
   EthereumRoleFormat.name,
-  (value) => typeof value === "string" && EthereumAddressFormat.formatString.test(value),
+  (value) => typeof value === "string" && EthereumRoleFormat.formatString.test(value),
 );
 
-const EthAddressStringTB = Type.Readonly(Type.String({ format: EthereumAddressFormat.name }));
-const EthRoleStringTB = Type.Readonly(Type.String({ format: EthereumRoleFormat.name }));
-const EthAddressesArrayTB = Type.Readonly(Type.Array(EthAddressStringTB));
+FormatRegistry.Set(MaxIntFormat.name, (value) => typeof value === "string" && MaxIntFormat.formatString.test(value));
 
+const EthAddressStringTB = Type.Readonly(
+  Type.String({ format: EthereumAddressFormat.name, pattern: EthereumAddressFormat.formatString.source }),
+);
+const EthRoleStringTB = Type.Readonly(
+  Type.String({ format: EthereumRoleFormat.name, pattern: EthereumRoleFormat.formatString.source }),
+);
+
+const MaxIntStringTB = Type.Readonly(
+  Type.String({ format: MaxIntFormat.name, pattern: MaxIntFormat.formatString.source }),
+);
+
+const EthAddressesArrayTB = Type.Readonly(Type.Array(EthAddressStringTB));
+const EthRolesArrayTB = Type.Readonly(Type.Array(EthRoleStringTB));
 export type EntireDocument = Static<typeof EntireDocumentTB>;
 export type ContractEntry = Static<typeof ContractEntryTB>;
 export type ProxyContractEntry = Static<typeof ProxyContractEntryTB>;
@@ -48,8 +65,25 @@ export function isTypeOfTB<T extends TSchema>(value: unknown, schema: T): value 
 const OzNonEnumerableAclTB = Type.Readonly(Type.Record(EthRoleStringTB, EthAddressesArrayTB));
 
 const ViewResultPlainValueTB = Type.Readonly(
-  Type.Union([Type.Null(), Type.String(), Type.Boolean(), Type.Number(), Type.Array(Type.String())]),
+  Type.Union([
+    Type.Null(),
+    Type.String(),
+    Type.Boolean(),
+    Type.Number(),
+    Type.Array(Type.Union([Type.String(), Type.Number(), Type.Boolean()])),
+  ]),
 );
+
+/* const ViewResultPlainValueTB = Type.Readonly(
+  Type.Union([
+    Type.Null(),
+    Type.String(),
+    Type.Boolean(),
+    Type.Number(),
+    Type.Array(Type.String()),
+    Type.Array(Type.Array(Type.Union([Type.String(), Type.Number()]))),
+  ]),
+); */ //configs/bsc/adi-mainnet.yml array of array doesn't check now
 
 const ArbitraryObjectTB = Type.Readonly(Type.Record(Type.String(), ViewResultPlainValueTB));
 
@@ -57,7 +91,7 @@ export const ViewResultTB = Type.Readonly(Type.Union([ViewResultPlainValueTB, Ar
 
 const StaticCallCommon = Type.Readonly(
   Type.Object({
-    args: Type.Optional(Type.Array(Type.String())),
+    args: Type.Optional(Type.Array(Type.Union([Type.String(), Type.Number(), Type.Boolean()]))),
     signature: Type.Optional(Type.String()),
     bigint: Type.Optional(Type.Boolean()),
   }),
@@ -93,9 +127,9 @@ const ChecksEntryValueTB = Type.Readonly(Type.Union([StaticCallCheckTB, ViewResu
 export const ProxyChecksTB = Type.Readonly(
   Type.Object(
     {
-      proxy__getImplementation: EthAddressStringTB,
-      proxy__getAdmin: EthAddressStringTB,
-      proxy__getIsOssified: Type.Boolean(),
+      proxy__getImplementation: Type.Optional(EthAddressStringTB),
+      proxy__getAdmin: Type.Optional(EthAddressStringTB),
+      proxy__getIsOssified: Type.Optional(Type.Boolean()),
     },
     { additionalProperties: false },
   ),
@@ -159,7 +193,7 @@ const DeployedSectionTB = Type.Readonly(
   Type.Object(
     {
       l1: EthAddressesArrayTB,
-      l2: EthAddressesArrayTB,
+      l2: Type.Optional(EthAddressesArrayTB),
     },
     { additionalProperties: false },
   ),
@@ -168,12 +202,18 @@ const DeployedSectionTB = Type.Readonly(
 export const EntireDocumentTB = Type.Readonly(
   Type.Object(
     {
-      parameters: EthAddressesArrayTB,
-      roles: Type.Array(EthRoleStringTB),
-      misc: Type.Optional(EthAddressesArrayTB),
+      parameters: Type.Array(Type.Union([EthAddressStringTB, Type.Literal(0), EthRoleStringTB, MaxIntStringTB])),
+      roles: Type.Optional(Type.Union([Type.Array(EthRoleStringTB), Type.Null()])),
+      misc: Type.Optional(Type.Array(Type.Union([Type.String(), Type.Number()]))),
       deployed: DeployedSectionTB,
+      "deployed-aux": Type.Optional(EthRolesArrayTB),
       l1: NetworkSectionTB,
-      l2: NetworkSectionTB,
+      l2: Type.Optional(NetworkSectionTB),
+      tvl: Type.Optional(Type.Array(Type.Number())),
+      delays: Type.Optional(Type.Array(Type.String())),
+      signers: Type.Optional(Type.Array(Type.Union([EthAddressStringTB, Type.Number()]))),
+      selectors: Type.Optional(Type.Array(Type.String())),
+      validators: Type.Optional(Type.Array(Type.String())),
     },
     { additionalProperties: false },
   ),
@@ -184,7 +224,7 @@ export const SeedDocumentTB = Type.Readonly(
     {
       deployed: DeployedSectionTB,
       l1: ExplorerSectionTB,
-      l2: ExplorerSectionTB,
+      l2: Type.Optional(ExplorerSectionTB),
     },
     { additionalProperties: false },
   ),

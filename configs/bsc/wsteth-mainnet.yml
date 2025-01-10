@@ -1,3 +1,5 @@
+# yaml-language-server: $schema=./../../schemas/main-schema.json
+
 parameters:
   # Already deployed contracts or other parameters
   - &L1_WSTETH "0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0"
@@ -129,7 +131,6 @@ l1:
         pauser: *L1_EMERGENCY_BRAKES
         quoteDeliveryPrice:
           - args: [ *BSC_CHAIN_ID, "0x" ]
-            result: []
             mustRevert: true
         rateLimitDuration: *RATE_LIMIT_DURATION
         token: *L1_WSTETH
@@ -186,7 +187,6 @@ l1:
         pauser: *ZERO_ADDRESS
         quoteDeliveryPrice:
           - args: [ *BSC_CHAIN_ID, "0x" ]
-            result: []
             mustRevert: true
         rateLimitDuration: *RATE_LIMIT_DURATION
         token: *L1_WSTETH
@@ -207,7 +207,6 @@ l1:
         consistencyLevel: 1
         encodeWormholeTransceiverInstruction:
           - args: [ ]
-            result: []
             mustRevert: true
         gasLimit: *GAS_LIMIT
         getMigratesImmutables: false
@@ -247,7 +246,6 @@ l1:
         pauser: *L1_EMERGENCY_BRAKES
         quoteDeliveryPrice:
           - args: [ *BSC_CHAIN_ID, "0x" ]
-            result: []
             mustRevert: true
         specialRelayer: *L1_L2_WORMHOLE_SPECIAL_RELAYER # unused
         wormhole: *L1_L2_WORMHOLE
@@ -257,7 +255,6 @@ l1:
         consistencyLevel: 1
         encodeWormholeTransceiverInstruction:
           - args: [ ]
-            result: []
             mustRevert: true
         gasLimit: *GAS_LIMIT
         getMigratesImmutables: false
@@ -297,7 +294,6 @@ l1:
         pauser: *ZERO_ADDRESS
         quoteDeliveryPrice:
           - args: [ *BSC_CHAIN_ID, "0x" ]
-            result: []
             mustRevert: true
         specialRelayer: *L1_L2_WORMHOLE_SPECIAL_RELAYER # unused
         wormhole: *L1_L2_WORMHOLE
@@ -323,7 +319,6 @@ l1:
         pauser: *L1_EMERGENCY_BRAKES
         quoteDeliveryPrice:
           - args: [ *BSC_CHAIN_ID, "0x" ]
-            result: []
             mustRevert: true
       implementationChecks:
         AXELAR_TRANSCEIVER_VERSION: *NTT_MANAGER_VERSION
@@ -340,7 +335,6 @@ l1:
         pauser: *ZERO_ADDRESS
         quoteDeliveryPrice:
           - args: [ *BSC_CHAIN_ID, "0x" ]
-            result: []
             mustRevert: true
 
 l2:
@@ -364,7 +358,6 @@ l2:
             result: 0
         burnFrom:
           - args: [ *ZERO_ADDRESS, 0 ]
-            result: []
             mustRevert: true # unimplemented method
         decimals: *DECIMALS
         minter: *l2NttManager
@@ -372,7 +365,6 @@ l2:
         owner: *BSC_ADI_EXECUTOR
         proxiableUUID:
           - args: []
-            result: []
             mustRevert: true
         symbol: *TOKEN_SYMBOL
         totalSupply:
@@ -386,7 +378,6 @@ l2:
             result: 0
         burnFrom:
           - args: [ *ZERO_ADDRESS, 0 ]
-            result: []
             mustRevert: true # unimplemented method
         decimals: *DECIMALS
         minter: *ZERO_ADDRESS
@@ -446,7 +437,6 @@ l2:
         pauser: *L2_EMERGENCY_BRAKES
         quoteDeliveryPrice:
           - args: [ *ETH_CHAIN_ID, "0x" ]
-            result: []
             mustRevert: true
         rateLimitDuration: *RATE_LIMIT_DURATION
         token: *l2wstETHToken
@@ -503,7 +493,6 @@ l2:
         pauser: *ZERO_ADDRESS
         quoteDeliveryPrice:
           - args: [ *ETH_CHAIN_ID, "0x" ]
-            result: []
             mustRevert: true
         rateLimitDuration: *RATE_LIMIT_DURATION
         token: *l2wstETHToken
@@ -524,7 +513,6 @@ l2:
         consistencyLevel: 15
         encodeWormholeTransceiverInstruction:
           - args: [ ]
-            result: []
             mustRevert: true
         gasLimit: *GAS_LIMIT
         getMigratesImmutables: false
@@ -564,7 +552,6 @@ l2:
         pauser: *L2_EMERGENCY_BRAKES
         quoteDeliveryPrice:
           - args: [ *BSC_CHAIN_ID, "0x" ]
-            result: []
             mustRevert: true
         specialRelayer: *L1_L2_WORMHOLE_SPECIAL_RELAYER
         wormhole: *L1_L2_WORMHOLE
@@ -574,7 +561,6 @@ l2:
         consistencyLevel: 15
         encodeWormholeTransceiverInstruction:
           - args: [ ]
-            result: []
             mustRevert: true
         gasLimit: *GAS_LIMIT
         getMigratesImmutables: false
@@ -614,7 +600,6 @@ l2:
         pauser: *ZERO_ADDRESS
         quoteDeliveryPrice:
           - args: [ *BSC_CHAIN_ID, "0x" ]
-            result: []
             mustRevert: true
         specialRelayer: *L1_L2_WORMHOLE_SPECIAL_RELAYER # unused
         wormhole: *L1_L2_WORMHOLE
@@ -640,7 +625,6 @@ l2:
         pauser: *L2_EMERGENCY_BRAKES
         quoteDeliveryPrice:
           - args: [ *BSC_CHAIN_ID, "0x" ]
-            result: []
             mustRevert: true
       implementationChecks:
         AXELAR_TRANSCEIVER_VERSION: *NTT_MANAGER_VERSION
@@ -657,5 +641,4 @@ l2:
         pauser: *ZERO_ADDRESS
         quoteDeliveryPrice:
           - args: [ *BSC_CHAIN_ID, "0x" ]
-            result: []
             mustRevert: true

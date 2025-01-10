@@ -1,0 +1,73 @@
+{
+  "additionalProperties": false,
+  "type": "object",
+  "properties": {
+    "deployed": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "l1": {
+          "type": "array",
+          "items": {
+            "format": "ethereum-address",
+            "pattern": "^0x[a-fA-F0-9]{40}$",
+            "type": "string"
+          }
+        },
+        "l2": {
+          "type": "array",
+          "items": {
+            "format": "ethereum-address",
+            "pattern": "^0x[a-fA-F0-9]{40}$",
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "l1"
+      ]
+    },
+    "l1": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "rpcUrl": {
+          "type": "string"
+        },
+        "explorerHostname": {
+          "type": "string"
+        },
+        "explorerTokenEnv": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "rpcUrl",
+        "explorerHostname"
+      ]
+    },
+    "l2": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "rpcUrl": {
+          "type": "string"
+        },
+        "explorerHostname": {
+          "type": "string"
+        },
+        "explorerTokenEnv": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "rpcUrl",
+        "explorerHostname"
+      ]
+    }
+  },
+  "required": [
+    "deployed",
+    "l1"
+  ]
+}

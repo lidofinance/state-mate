@@ -1,0 +1,2605 @@
+{
+  "additionalProperties": false,
+  "type": "object",
+  "properties": {
+    "parameters": {
+      "type": "array",
+      "items": {
+        "anyOf": [
+          {
+            "format": "ethereum-address",
+            "pattern": "^0x[a-fA-F0-9]{40}$",
+            "type": "string"
+          },
+          {
+            "const": 0,
+            "type": "number"
+          },
+          {
+            "format": "ethereum-role",
+            "pattern": "^0x[a-fA-F0-9]{64}$",
+            "type": "string"
+          },
+          {
+            "format": "max-int",
+            "pattern": "^\\d{78}$",
+            "type": "string"
+          }
+        ]
+      }
+    },
+    "roles": {
+      "anyOf": [
+        {
+          "type": "array",
+          "items": {
+            "format": "ethereum-role",
+            "pattern": "^0x[a-fA-F0-9]{64}$",
+            "type": "string"
+          }
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "misc": {
+      "type": "array",
+      "items": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "number"
+          }
+        ]
+      }
+    },
+    "deployed": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "l1": {
+          "type": "array",
+          "items": {
+            "format": "ethereum-address",
+            "pattern": "^0x[a-fA-F0-9]{40}$",
+            "type": "string"
+          }
+        },
+        "l2": {
+          "type": "array",
+          "items": {
+            "format": "ethereum-address",
+            "pattern": "^0x[a-fA-F0-9]{40}$",
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "l1"
+      ]
+    },
+    "deployed-aux": {
+      "type": "array",
+      "items": {
+        "format": "ethereum-role",
+        "pattern": "^0x[a-fA-F0-9]{64}$",
+        "type": "string"
+      }
+    },
+    "l1": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "rpcUrl": {
+          "type": "string"
+        },
+        "explorerHostname": {
+          "type": "string"
+        },
+        "explorerTokenEnv": {
+          "type": "string"
+        },
+        "contracts": {
+          "type": "object",
+          "patternProperties": {
+            "^(.*)$": {
+              "anyOf": [
+                {
+                  "additionalProperties": false,
+                  "type": "object",
+                  "properties": {
+                    "address": {
+                      "format": "ethereum-address",
+                      "pattern": "^0x[a-fA-F0-9]{40}$",
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "checks": {
+                      "type": "object",
+                      "patternProperties": {
+                        "^(.*)$": {
+                          "anyOf": [
+                            {
+                              "anyOf": [
+                                {
+                                  "additionalProperties": false,
+                                  "type": "object",
+                                  "properties": {
+                                    "args": {
+                                      "type": "array",
+                                      "items": {
+                                        "anyOf": [
+                                          {
+                                            "type": "string"
+                                          },
+                                          {
+                                            "type": "number"
+                                          },
+                                          {
+                                            "type": "boolean"
+                                          }
+                                        ]
+                                      }
+                                    },
+                                    "signature": {
+                                      "type": "string"
+                                    },
+                                    "bigint": {
+                                      "type": "boolean"
+                                    },
+                                    "result": {
+                                      "anyOf": [
+                                        {
+                                          "anyOf": [
+                                            {
+                                              "type": "null"
+                                            },
+                                            {
+                                              "type": "string"
+                                            },
+                                            {
+                                              "type": "boolean"
+                                            },
+                                            {
+                                              "type": "number"
+                                            },
+                                            {
+                                              "type": "array",
+                                              "items": {
+                                                "anyOf": [
+                                                  {
+                                                    "type": "string"
+                                                  },
+                                                  {
+                                                    "type": "number"
+                                                  },
+                                                  {
+                                                    "type": "boolean"
+                                                  }
+                                                ]
+                                              }
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": "object",
+                                          "patternProperties": {
+                                            "^(.*)$": {
+                                              "anyOf": [
+                                                {
+                                                  "type": "null"
+                                                },
+                                                {
+                                                  "type": "string"
+                                                },
+                                                {
+                                                  "type": "boolean"
+                                                },
+                                                {
+                                                  "type": "number"
+                                                },
+                                                {
+                                                  "type": "array",
+                                                  "items": {
+                                                    "anyOf": [
+                                                      {
+                                                        "type": "string"
+                                                      },
+                                                      {
+                                                        "type": "number"
+                                                      },
+                                                      {
+                                                        "type": "boolean"
+                                                      }
+                                                    ]
+                                                  }
+                                                }
+                                              ]
+                                            }
+                                          }
+                                        }
+                                      ]
+                                    }
+                                  },
+                                  "required": [
+                                    "result"
+                                  ]
+                                },
+                                {
+                                  "additionalProperties": false,
+                                  "type": "object",
+                                  "properties": {
+                                    "args": {
+                                      "type": "array",
+                                      "items": {
+                                        "anyOf": [
+                                          {
+                                            "type": "string"
+                                          },
+                                          {
+                                            "type": "number"
+                                          },
+                                          {
+                                            "type": "boolean"
+                                          }
+                                        ]
+                                      }
+                                    },
+                                    "signature": {
+                                      "type": "string"
+                                    },
+                                    "bigint": {
+                                      "type": "boolean"
+                                    },
+                                    "mustRevert": {
+                                      "const": true,
+                                      "type": "boolean"
+                                    }
+                                  },
+                                  "required": [
+                                    "mustRevert"
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "anyOf": [
+                                {
+                                  "anyOf": [
+                                    {
+                                      "type": "null"
+                                    },
+                                    {
+                                      "type": "string"
+                                    },
+                                    {
+                                      "type": "boolean"
+                                    },
+                                    {
+                                      "type": "number"
+                                    },
+                                    {
+                                      "type": "array",
+                                      "items": {
+                                        "anyOf": [
+                                          {
+                                            "type": "string"
+                                          },
+                                          {
+                                            "type": "number"
+                                          },
+                                          {
+                                            "type": "boolean"
+                                          }
+                                        ]
+                                      }
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "object",
+                                  "patternProperties": {
+                                    "^(.*)$": {
+                                      "anyOf": [
+                                        {
+                                          "type": "null"
+                                        },
+                                        {
+                                          "type": "string"
+                                        },
+                                        {
+                                          "type": "boolean"
+                                        },
+                                        {
+                                          "type": "number"
+                                        },
+                                        {
+                                          "type": "array",
+                                          "items": {
+                                            "anyOf": [
+                                              {
+                                                "type": "string"
+                                              },
+                                              {
+                                                "type": "number"
+                                              },
+                                              {
+                                                "type": "boolean"
+                                              }
+                                            ]
+                                          }
+                                        }
+                                      ]
+                                    }
+                                  }
+                                }
+                              ]
+                            },
+                            {
+                              "type": "array",
+                              "items": {
+                                "anyOf": [
+                                  {
+                                    "additionalProperties": false,
+                                    "type": "object",
+                                    "properties": {
+                                      "args": {
+                                        "type": "array",
+                                        "items": {
+                                          "anyOf": [
+                                            {
+                                              "type": "string"
+                                            },
+                                            {
+                                              "type": "number"
+                                            },
+                                            {
+                                              "type": "boolean"
+                                            }
+                                          ]
+                                        }
+                                      },
+                                      "signature": {
+                                        "type": "string"
+                                      },
+                                      "bigint": {
+                                        "type": "boolean"
+                                      },
+                                      "result": {
+                                        "anyOf": [
+                                          {
+                                            "anyOf": [
+                                              {
+                                                "type": "null"
+                                              },
+                                              {
+                                                "type": "string"
+                                              },
+                                              {
+                                                "type": "boolean"
+                                              },
+                                              {
+                                                "type": "number"
+                                              },
+                                              {
+                                                "type": "array",
+                                                "items": {
+                                                  "anyOf": [
+                                                    {
+                                                      "type": "string"
+                                                    },
+                                                    {
+                                                      "type": "number"
+                                                    },
+                                                    {
+                                                      "type": "boolean"
+                                                    }
+                                                  ]
+                                                }
+                                              }
+                                            ]
+                                          },
+                                          {
+                                            "type": "object",
+                                            "patternProperties": {
+                                              "^(.*)$": {
+                                                "anyOf": [
+                                                  {
+                                                    "type": "null"
+                                                  },
+                                                  {
+                                                    "type": "string"
+                                                  },
+                                                  {
+                                                    "type": "boolean"
+                                                  },
+                                                  {
+                                                    "type": "number"
+                                                  },
+                                                  {
+                                                    "type": "array",
+                                                    "items": {
+                                                      "anyOf": [
+                                                        {
+                                                          "type": "string"
+                                                        },
+                                                        {
+                                                          "type": "number"
+                                                        },
+                                                        {
+                                                          "type": "boolean"
+                                                        }
+                                                      ]
+                                                    }
+                                                  }
+                                                ]
+                                              }
+                                            }
+                                          }
+                                        ]
+                                      }
+                                    },
+                                    "required": [
+                                      "result"
+                                    ]
+                                  },
+                                  {
+                                    "additionalProperties": false,
+                                    "type": "object",
+                                    "properties": {
+                                      "args": {
+                                        "type": "array",
+                                        "items": {
+                                          "anyOf": [
+                                            {
+                                              "type": "string"
+                                            },
+                                            {
+                                              "type": "number"
+                                            },
+                                            {
+                                              "type": "boolean"
+                                            }
+                                          ]
+                                        }
+                                      },
+                                      "signature": {
+                                        "type": "string"
+                                      },
+                                      "bigint": {
+                                        "type": "boolean"
+                                      },
+                                      "mustRevert": {
+                                        "const": true,
+                                        "type": "boolean"
+                                      }
+                                    },
+                                    "required": [
+                                      "mustRevert"
+                                    ]
+                                  }
+                                ]
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    },
+                    "ozNonEnumerableAcl": {
+                      "type": "object",
+                      "patternProperties": {
+                        "^0x[a-fA-F0-9]{64}$": {
+                          "type": "array",
+                          "items": {
+                            "format": "ethereum-address",
+                            "pattern": "^0x[a-fA-F0-9]{40}$",
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "required": [
+                    "address",
+                    "name",
+                    "checks"
+                  ]
+                },
+                {
+                  "additionalProperties": false,
+                  "type": "object",
+                  "properties": {
+                    "address": {
+                      "format": "ethereum-address",
+                      "pattern": "^0x[a-fA-F0-9]{40}$",
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "checks": {
+                      "type": "object",
+                      "patternProperties": {
+                        "^(.*)$": {
+                          "anyOf": [
+                            {
+                              "anyOf": [
+                                {
+                                  "additionalProperties": false,
+                                  "type": "object",
+                                  "properties": {
+                                    "args": {
+                                      "type": "array",
+                                      "items": {
+                                        "anyOf": [
+                                          {
+                                            "type": "string"
+                                          },
+                                          {
+                                            "type": "number"
+                                          },
+                                          {
+                                            "type": "boolean"
+                                          }
+                                        ]
+                                      }
+                                    },
+                                    "signature": {
+                                      "type": "string"
+                                    },
+                                    "bigint": {
+                                      "type": "boolean"
+                                    },
+                                    "result": {
+                                      "anyOf": [
+                                        {
+                                          "anyOf": [
+                                            {
+                                              "type": "null"
+                                            },
+                                            {
+                                              "type": "string"
+                                            },
+                                            {
+                                              "type": "boolean"
+                                            },
+                                            {
+                                              "type": "number"
+                                            },
+                                            {
+                                              "type": "array",
+                                              "items": {
+                                                "anyOf": [
+                                                  {
+                                                    "type": "string"
+                                                  },
+                                                  {
+                                                    "type": "number"
+                                                  },
+                                                  {
+                                                    "type": "boolean"
+                                                  }
+                                                ]
+                                              }
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": "object",
+                                          "patternProperties": {
+                                            "^(.*)$": {
+                                              "anyOf": [
+                                                {
+                                                  "type": "null"
+                                                },
+                                                {
+                                                  "type": "string"
+                                                },
+                                                {
+                                                  "type": "boolean"
+                                                },
+                                                {
+                                                  "type": "number"
+                                                },
+                                                {
+                                                  "type": "array",
+                                                  "items": {
+                                                    "anyOf": [
+                                                      {
+                                                        "type": "string"
+                                                      },
+                                                      {
+                                                        "type": "number"
+                                                      },
+                                                      {
+                                                        "type": "boolean"
+                                                      }
+                                                    ]
+                                                  }
+                                                }
+                                              ]
+                                            }
+                                          }
+                                        }
+                                      ]
+                                    }
+                                  },
+                                  "required": [
+                                    "result"
+                                  ]
+                                },
+                                {
+                                  "additionalProperties": false,
+                                  "type": "object",
+                                  "properties": {
+                                    "args": {
+                                      "type": "array",
+                                      "items": {
+                                        "anyOf": [
+                                          {
+                                            "type": "string"
+                                          },
+                                          {
+                                            "type": "number"
+                                          },
+                                          {
+                                            "type": "boolean"
+                                          }
+                                        ]
+                                      }
+                                    },
+                                    "signature": {
+                                      "type": "string"
+                                    },
+                                    "bigint": {
+                                      "type": "boolean"
+                                    },
+                                    "mustRevert": {
+                                      "const": true,
+                                      "type": "boolean"
+                                    }
+                                  },
+                                  "required": [
+                                    "mustRevert"
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "anyOf": [
+                                {
+                                  "anyOf": [
+                                    {
+                                      "type": "null"
+                                    },
+                                    {
+                                      "type": "string"
+                                    },
+                                    {
+                                      "type": "boolean"
+                                    },
+                                    {
+                                      "type": "number"
+                                    },
+                                    {
+                                      "type": "array",
+                                      "items": {
+                                        "anyOf": [
+                                          {
+                                            "type": "string"
+                                          },
+                                          {
+                                            "type": "number"
+                                          },
+                                          {
+                                            "type": "boolean"
+                                          }
+                                        ]
+                                      }
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "object",
+                                  "patternProperties": {
+                                    "^(.*)$": {
+                                      "anyOf": [
+                                        {
+                                          "type": "null"
+                                        },
+                                        {
+                                          "type": "string"
+                                        },
+                                        {
+                                          "type": "boolean"
+                                        },
+                                        {
+                                          "type": "number"
+                                        },
+                                        {
+                                          "type": "array",
+                                          "items": {
+                                            "anyOf": [
+                                              {
+                                                "type": "string"
+                                              },
+                                              {
+                                                "type": "number"
+                                              },
+                                              {
+                                                "type": "boolean"
+                                              }
+                                            ]
+                                          }
+                                        }
+                                      ]
+                                    }
+                                  }
+                                }
+                              ]
+                            },
+                            {
+                              "type": "array",
+                              "items": {
+                                "anyOf": [
+                                  {
+                                    "additionalProperties": false,
+                                    "type": "object",
+                                    "properties": {
+                                      "args": {
+                                        "type": "array",
+                                        "items": {
+                                          "anyOf": [
+                                            {
+                                              "type": "string"
+                                            },
+                                            {
+                                              "type": "number"
+                                            },
+                                            {
+                                              "type": "boolean"
+                                            }
+                                          ]
+                                        }
+                                      },
+                                      "signature": {
+                                        "type": "string"
+                                      },
+                                      "bigint": {
+                                        "type": "boolean"
+                                      },
+                                      "result": {
+                                        "anyOf": [
+                                          {
+                                            "anyOf": [
+                                              {
+                                                "type": "null"
+                                              },
+                                              {
+                                                "type": "string"
+                                              },
+                                              {
+                                                "type": "boolean"
+                                              },
+                                              {
+                                                "type": "number"
+                                              },
+                                              {
+                                                "type": "array",
+                                                "items": {
+                                                  "anyOf": [
+                                                    {
+                                                      "type": "string"
+                                                    },
+                                                    {
+                                                      "type": "number"
+                                                    },
+                                                    {
+                                                      "type": "boolean"
+                                                    }
+                                                  ]
+                                                }
+                                              }
+                                            ]
+                                          },
+                                          {
+                                            "type": "object",
+                                            "patternProperties": {
+                                              "^(.*)$": {
+                                                "anyOf": [
+                                                  {
+                                                    "type": "null"
+                                                  },
+                                                  {
+                                                    "type": "string"
+                                                  },
+                                                  {
+                                                    "type": "boolean"
+                                                  },
+                                                  {
+                                                    "type": "number"
+                                                  },
+                                                  {
+                                                    "type": "array",
+                                                    "items": {
+                                                      "anyOf": [
+                                                        {
+                                                          "type": "string"
+                                                        },
+                                                        {
+                                                          "type": "number"
+                                                        },
+                                                        {
+                                                          "type": "boolean"
+                                                        }
+                                                      ]
+                                                    }
+                                                  }
+                                                ]
+                                              }
+                                            }
+                                          }
+                                        ]
+                                      }
+                                    },
+                                    "required": [
+                                      "result"
+                                    ]
+                                  },
+                                  {
+                                    "additionalProperties": false,
+                                    "type": "object",
+                                    "properties": {
+                                      "args": {
+                                        "type": "array",
+                                        "items": {
+                                          "anyOf": [
+                                            {
+                                              "type": "string"
+                                            },
+                                            {
+                                              "type": "number"
+                                            },
+                                            {
+                                              "type": "boolean"
+                                            }
+                                          ]
+                                        }
+                                      },
+                                      "signature": {
+                                        "type": "string"
+                                      },
+                                      "bigint": {
+                                        "type": "boolean"
+                                      },
+                                      "mustRevert": {
+                                        "const": true,
+                                        "type": "boolean"
+                                      }
+                                    },
+                                    "required": [
+                                      "mustRevert"
+                                    ]
+                                  }
+                                ]
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    },
+                    "ozNonEnumerableAcl": {
+                      "type": "object",
+                      "patternProperties": {
+                        "^0x[a-fA-F0-9]{64}$": {
+                          "type": "array",
+                          "items": {
+                            "format": "ethereum-address",
+                            "pattern": "^0x[a-fA-F0-9]{40}$",
+                            "type": "string"
+                          }
+                        }
+                      }
+                    },
+                    "proxyName": {
+                      "type": "string"
+                    },
+                    "implementation": {
+                      "format": "ethereum-address",
+                      "pattern": "^0x[a-fA-F0-9]{40}$",
+                      "type": "string"
+                    },
+                    "proxyChecks": {
+                      "additionalProperties": false,
+                      "type": "object",
+                      "properties": {
+                        "proxy__getImplementation": {
+                          "format": "ethereum-address",
+                          "pattern": "^0x[a-fA-F0-9]{40}$",
+                          "type": "string"
+                        },
+                        "proxy__getAdmin": {
+                          "format": "ethereum-address",
+                          "pattern": "^0x[a-fA-F0-9]{40}$",
+                          "type": "string"
+                        },
+                        "proxy__getIsOssified": {
+                          "type": "boolean"
+                        }
+                      }
+                    },
+                    "implementationChecks": {
+                      "type": "object",
+                      "patternProperties": {
+                        "^(.*)$": {
+                          "anyOf": [
+                            {
+                              "anyOf": [
+                                {
+                                  "additionalProperties": false,
+                                  "type": "object",
+                                  "properties": {
+                                    "args": {
+                                      "type": "array",
+                                      "items": {
+                                        "anyOf": [
+                                          {
+                                            "type": "string"
+                                          },
+                                          {
+                                            "type": "number"
+                                          },
+                                          {
+                                            "type": "boolean"
+                                          }
+                                        ]
+                                      }
+                                    },
+                                    "signature": {
+                                      "type": "string"
+                                    },
+                                    "bigint": {
+                                      "type": "boolean"
+                                    },
+                                    "result": {
+                                      "anyOf": [
+                                        {
+                                          "anyOf": [
+                                            {
+                                              "type": "null"
+                                            },
+                                            {
+                                              "type": "string"
+                                            },
+                                            {
+                                              "type": "boolean"
+                                            },
+                                            {
+                                              "type": "number"
+                                            },
+                                            {
+                                              "type": "array",
+                                              "items": {
+                                                "anyOf": [
+                                                  {
+                                                    "type": "string"
+                                                  },
+                                                  {
+                                                    "type": "number"
+                                                  },
+                                                  {
+                                                    "type": "boolean"
+                                                  }
+                                                ]
+                                              }
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": "object",
+                                          "patternProperties": {
+                                            "^(.*)$": {
+                                              "anyOf": [
+                                                {
+                                                  "type": "null"
+                                                },
+                                                {
+                                                  "type": "string"
+                                                },
+                                                {
+                                                  "type": "boolean"
+                                                },
+                                                {
+                                                  "type": "number"
+                                                },
+                                                {
+                                                  "type": "array",
+                                                  "items": {
+                                                    "anyOf": [
+                                                      {
+                                                        "type": "string"
+                                                      },
+                                                      {
+                                                        "type": "number"
+                                                      },
+                                                      {
+                                                        "type": "boolean"
+                                                      }
+                                                    ]
+                                                  }
+                                                }
+                                              ]
+                                            }
+                                          }
+                                        }
+                                      ]
+                                    }
+                                  },
+                                  "required": [
+                                    "result"
+                                  ]
+                                },
+                                {
+                                  "additionalProperties": false,
+                                  "type": "object",
+                                  "properties": {
+                                    "args": {
+                                      "type": "array",
+                                      "items": {
+                                        "anyOf": [
+                                          {
+                                            "type": "string"
+                                          },
+                                          {
+                                            "type": "number"
+                                          },
+                                          {
+                                            "type": "boolean"
+                                          }
+                                        ]
+                                      }
+                                    },
+                                    "signature": {
+                                      "type": "string"
+                                    },
+                                    "bigint": {
+                                      "type": "boolean"
+                                    },
+                                    "mustRevert": {
+                                      "const": true,
+                                      "type": "boolean"
+                                    }
+                                  },
+                                  "required": [
+                                    "mustRevert"
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "anyOf": [
+                                {
+                                  "anyOf": [
+                                    {
+                                      "type": "null"
+                                    },
+                                    {
+                                      "type": "string"
+                                    },
+                                    {
+                                      "type": "boolean"
+                                    },
+                                    {
+                                      "type": "number"
+                                    },
+                                    {
+                                      "type": "array",
+                                      "items": {
+                                        "anyOf": [
+                                          {
+                                            "type": "string"
+                                          },
+                                          {
+                                            "type": "number"
+                                          },
+                                          {
+                                            "type": "boolean"
+                                          }
+                                        ]
+                                      }
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "object",
+                                  "patternProperties": {
+                                    "^(.*)$": {
+                                      "anyOf": [
+                                        {
+                                          "type": "null"
+                                        },
+                                        {
+                                          "type": "string"
+                                        },
+                                        {
+                                          "type": "boolean"
+                                        },
+                                        {
+                                          "type": "number"
+                                        },
+                                        {
+                                          "type": "array",
+                                          "items": {
+                                            "anyOf": [
+                                              {
+                                                "type": "string"
+                                              },
+                                              {
+                                                "type": "number"
+                                              },
+                                              {
+                                                "type": "boolean"
+                                              }
+                                            ]
+                                          }
+                                        }
+                                      ]
+                                    }
+                                  }
+                                }
+                              ]
+                            },
+                            {
+                              "type": "array",
+                              "items": {
+                                "anyOf": [
+                                  {
+                                    "additionalProperties": false,
+                                    "type": "object",
+                                    "properties": {
+                                      "args": {
+                                        "type": "array",
+                                        "items": {
+                                          "anyOf": [
+                                            {
+                                              "type": "string"
+                                            },
+                                            {
+                                              "type": "number"
+                                            },
+                                            {
+                                              "type": "boolean"
+                                            }
+                                          ]
+                                        }
+                                      },
+                                      "signature": {
+                                        "type": "string"
+                                      },
+                                      "bigint": {
+                                        "type": "boolean"
+                                      },
+                                      "result": {
+                                        "anyOf": [
+                                          {
+                                            "anyOf": [
+                                              {
+                                                "type": "null"
+                                              },
+                                              {
+                                                "type": "string"
+                                              },
+                                              {
+                                                "type": "boolean"
+                                              },
+                                              {
+                                                "type": "number"
+                                              },
+                                              {
+                                                "type": "array",
+                                                "items": {
+                                                  "anyOf": [
+                                                    {
+                                                      "type": "string"
+                                                    },
+                                                    {
+                                                      "type": "number"
+                                                    },
+                                                    {
+                                                      "type": "boolean"
+                                                    }
+                                                  ]
+                                                }
+                                              }
+                                            ]
+                                          },
+                                          {
+                                            "type": "object",
+                                            "patternProperties": {
+                                              "^(.*)$": {
+                                                "anyOf": [
+                                                  {
+                                                    "type": "null"
+                                                  },
+                                                  {
+                                                    "type": "string"
+                                                  },
+                                                  {
+                                                    "type": "boolean"
+                                                  },
+                                                  {
+                                                    "type": "number"
+                                                  },
+                                                  {
+                                                    "type": "array",
+                                                    "items": {
+                                                      "anyOf": [
+                                                        {
+                                                          "type": "string"
+                                                        },
+                                                        {
+                                                          "type": "number"
+                                                        },
+                                                        {
+                                                          "type": "boolean"
+                                                        }
+                                                      ]
+                                                    }
+                                                  }
+                                                ]
+                                              }
+                                            }
+                                          }
+                                        ]
+                                      }
+                                    },
+                                    "required": [
+                                      "result"
+                                    ]
+                                  },
+                                  {
+                                    "additionalProperties": false,
+                                    "type": "object",
+                                    "properties": {
+                                      "args": {
+                                        "type": "array",
+                                        "items": {
+                                          "anyOf": [
+                                            {
+                                              "type": "string"
+                                            },
+                                            {
+                                              "type": "number"
+                                            },
+                                            {
+                                              "type": "boolean"
+                                            }
+                                          ]
+                                        }
+                                      },
+                                      "signature": {
+                                        "type": "string"
+                                      },
+                                      "bigint": {
+                                        "type": "boolean"
+                                      },
+                                      "mustRevert": {
+                                        "const": true,
+                                        "type": "boolean"
+                                      }
+                                    },
+                                    "required": [
+                                      "mustRevert"
+                                    ]
+                                  }
+                                ]
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  },
+                  "required": [
+                    "address",
+                    "name",
+                    "checks",
+                    "proxyName"
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      },
+      "required": [
+        "rpcUrl",
+        "explorerHostname",
+        "contracts"
+      ]
+    },
+    "l2": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "rpcUrl": {
+          "type": "string"
+        },
+        "explorerHostname": {
+          "type": "string"
+        },
+        "explorerTokenEnv": {
+          "type": "string"
+        },
+        "contracts": {
+          "type": "object",
+          "patternProperties": {
+            "^(.*)$": {
+              "anyOf": [
+                {
+                  "additionalProperties": false,
+                  "type": "object",
+                  "properties": {
+                    "address": {
+                      "format": "ethereum-address",
+                      "pattern": "^0x[a-fA-F0-9]{40}$",
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "checks": {
+                      "type": "object",
+                      "patternProperties": {
+                        "^(.*)$": {
+                          "anyOf": [
+                            {
+                              "anyOf": [
+                                {
+                                  "additionalProperties": false,
+                                  "type": "object",
+                                  "properties": {
+                                    "args": {
+                                      "type": "array",
+                                      "items": {
+                                        "anyOf": [
+                                          {
+                                            "type": "string"
+                                          },
+                                          {
+                                            "type": "number"
+                                          },
+                                          {
+                                            "type": "boolean"
+                                          }
+                                        ]
+                                      }
+                                    },
+                                    "signature": {
+                                      "type": "string"
+                                    },
+                                    "bigint": {
+                                      "type": "boolean"
+                                    },
+                                    "result": {
+                                      "anyOf": [
+                                        {
+                                          "anyOf": [
+                                            {
+                                              "type": "null"
+                                            },
+                                            {
+                                              "type": "string"
+                                            },
+                                            {
+                                              "type": "boolean"
+                                            },
+                                            {
+                                              "type": "number"
+                                            },
+                                            {
+                                              "type": "array",
+                                              "items": {
+                                                "anyOf": [
+                                                  {
+                                                    "type": "string"
+                                                  },
+                                                  {
+                                                    "type": "number"
+                                                  },
+                                                  {
+                                                    "type": "boolean"
+                                                  }
+                                                ]
+                                              }
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": "object",
+                                          "patternProperties": {
+                                            "^(.*)$": {
+                                              "anyOf": [
+                                                {
+                                                  "type": "null"
+                                                },
+                                                {
+                                                  "type": "string"
+                                                },
+                                                {
+                                                  "type": "boolean"
+                                                },
+                                                {
+                                                  "type": "number"
+                                                },
+                                                {
+                                                  "type": "array",
+                                                  "items": {
+                                                    "anyOf": [
+                                                      {
+                                                        "type": "string"
+                                                      },
+                                                      {
+                                                        "type": "number"
+                                                      },
+                                                      {
+                                                        "type": "boolean"
+                                                      }
+                                                    ]
+                                                  }
+                                                }
+                                              ]
+                                            }
+                                          }
+                                        }
+                                      ]
+                                    }
+                                  },
+                                  "required": [
+                                    "result"
+                                  ]
+                                },
+                                {
+                                  "additionalProperties": false,
+                                  "type": "object",
+                                  "properties": {
+                                    "args": {
+                                      "type": "array",
+                                      "items": {
+                                        "anyOf": [
+                                          {
+                                            "type": "string"
+                                          },
+                                          {
+                                            "type": "number"
+                                          },
+                                          {
+                                            "type": "boolean"
+                                          }
+                                        ]
+                                      }
+                                    },
+                                    "signature": {
+                                      "type": "string"
+                                    },
+                                    "bigint": {
+                                      "type": "boolean"
+                                    },
+                                    "mustRevert": {
+                                      "const": true,
+                                      "type": "boolean"
+                                    }
+                                  },
+                                  "required": [
+                                    "mustRevert"
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "anyOf": [
+                                {
+                                  "anyOf": [
+                                    {
+                                      "type": "null"
+                                    },
+                                    {
+                                      "type": "string"
+                                    },
+                                    {
+                                      "type": "boolean"
+                                    },
+                                    {
+                                      "type": "number"
+                                    },
+                                    {
+                                      "type": "array",
+                                      "items": {
+                                        "anyOf": [
+                                          {
+                                            "type": "string"
+                                          },
+                                          {
+                                            "type": "number"
+                                          },
+                                          {
+                                            "type": "boolean"
+                                          }
+                                        ]
+                                      }
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "object",
+                                  "patternProperties": {
+                                    "^(.*)$": {
+                                      "anyOf": [
+                                        {
+                                          "type": "null"
+                                        },
+                                        {
+                                          "type": "string"
+                                        },
+                                        {
+                                          "type": "boolean"
+                                        },
+                                        {
+                                          "type": "number"
+                                        },
+                                        {
+                                          "type": "array",
+                                          "items": {
+                                            "anyOf": [
+                                              {
+                                                "type": "string"
+                                              },
+                                              {
+                                                "type": "number"
+                                              },
+                                              {
+                                                "type": "boolean"
+                                              }
+                                            ]
+                                          }
+                                        }
+                                      ]
+                                    }
+                                  }
+                                }
+                              ]
+                            },
+                            {
+                              "type": "array",
+                              "items": {
+                                "anyOf": [
+                                  {
+                                    "additionalProperties": false,
+                                    "type": "object",
+                                    "properties": {
+                                      "args": {
+                                        "type": "array",
+                                        "items": {
+                                          "anyOf": [
+                                            {
+                                              "type": "string"
+                                            },
+                                            {
+                                              "type": "number"
+                                            },
+                                            {
+                                              "type": "boolean"
+                                            }
+                                          ]
+                                        }
+                                      },
+                                      "signature": {
+                                        "type": "string"
+                                      },
+                                      "bigint": {
+                                        "type": "boolean"
+                                      },
+                                      "result": {
+                                        "anyOf": [
+                                          {
+                                            "anyOf": [
+                                              {
+                                                "type": "null"
+                                              },
+                                              {
+                                                "type": "string"
+                                              },
+                                              {
+                                                "type": "boolean"
+                                              },
+                                              {
+                                                "type": "number"
+                                              },
+                                              {
+                                                "type": "array",
+                                                "items": {
+                                                  "anyOf": [
+                                                    {
+                                                      "type": "string"
+                                                    },
+                                                    {
+                                                      "type": "number"
+                                                    },
+                                                    {
+                                                      "type": "boolean"
+                                                    }
+                                                  ]
+                                                }
+                                              }
+                                            ]
+                                          },
+                                          {
+                                            "type": "object",
+                                            "patternProperties": {
+                                              "^(.*)$": {
+                                                "anyOf": [
+                                                  {
+                                                    "type": "null"
+                                                  },
+                                                  {
+                                                    "type": "string"
+                                                  },
+                                                  {
+                                                    "type": "boolean"
+                                                  },
+                                                  {
+                                                    "type": "number"
+                                                  },
+                                                  {
+                                                    "type": "array",
+                                                    "items": {
+                                                      "anyOf": [
+                                                        {
+                                                          "type": "string"
+                                                        },
+                                                        {
+                                                          "type": "number"
+                                                        },
+                                                        {
+                                                          "type": "boolean"
+                                                        }
+                                                      ]
+                                                    }
+                                                  }
+                                                ]
+                                              }
+                                            }
+                                          }
+                                        ]
+                                      }
+                                    },
+                                    "required": [
+                                      "result"
+                                    ]
+                                  },
+                                  {
+                                    "additionalProperties": false,
+                                    "type": "object",
+                                    "properties": {
+                                      "args": {
+                                        "type": "array",
+                                        "items": {
+                                          "anyOf": [
+                                            {
+                                              "type": "string"
+                                            },
+                                            {
+                                              "type": "number"
+                                            },
+                                            {
+                                              "type": "boolean"
+                                            }
+                                          ]
+                                        }
+                                      },
+                                      "signature": {
+                                        "type": "string"
+                                      },
+                                      "bigint": {
+                                        "type": "boolean"
+                                      },
+                                      "mustRevert": {
+                                        "const": true,
+                                        "type": "boolean"
+                                      }
+                                    },
+                                    "required": [
+                                      "mustRevert"
+                                    ]
+                                  }
+                                ]
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    },
+                    "ozNonEnumerableAcl": {
+                      "type": "object",
+                      "patternProperties": {
+                        "^0x[a-fA-F0-9]{64}$": {
+                          "type": "array",
+                          "items": {
+                            "format": "ethereum-address",
+                            "pattern": "^0x[a-fA-F0-9]{40}$",
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "required": [
+                    "address",
+                    "name",
+                    "checks"
+                  ]
+                },
+                {
+                  "additionalProperties": false,
+                  "type": "object",
+                  "properties": {
+                    "address": {
+                      "format": "ethereum-address",
+                      "pattern": "^0x[a-fA-F0-9]{40}$",
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "checks": {
+                      "type": "object",
+                      "patternProperties": {
+                        "^(.*)$": {
+                          "anyOf": [
+                            {
+                              "anyOf": [
+                                {
+                                  "additionalProperties": false,
+                                  "type": "object",
+                                  "properties": {
+                                    "args": {
+                                      "type": "array",
+                                      "items": {
+                                        "anyOf": [
+                                          {
+                                            "type": "string"
+                                          },
+                                          {
+                                            "type": "number"
+                                          },
+                                          {
+                                            "type": "boolean"
+                                          }
+                                        ]
+                                      }
+                                    },
+                                    "signature": {
+                                      "type": "string"
+                                    },
+                                    "bigint": {
+                                      "type": "boolean"
+                                    },
+                                    "result": {
+                                      "anyOf": [
+                                        {
+                                          "anyOf": [
+                                            {
+                                              "type": "null"
+                                            },
+                                            {
+                                              "type": "string"
+                                            },
+                                            {
+                                              "type": "boolean"
+                                            },
+                                            {
+                                              "type": "number"
+                                            },
+                                            {
+                                              "type": "array",
+                                              "items": {
+                                                "anyOf": [
+                                                  {
+                                                    "type": "string"
+                                                  },
+                                                  {
+                                                    "type": "number"
+                                                  },
+                                                  {
+                                                    "type": "boolean"
+                                                  }
+                                                ]
+                                              }
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": "object",
+                                          "patternProperties": {
+                                            "^(.*)$": {
+                                              "anyOf": [
+                                                {
+                                                  "type": "null"
+                                                },
+                                                {
+                                                  "type": "string"
+                                                },
+                                                {
+                                                  "type": "boolean"
+                                                },
+                                                {
+                                                  "type": "number"
+                                                },
+                                                {
+                                                  "type": "array",
+                                                  "items": {
+                                                    "anyOf": [
+                                                      {
+                                                        "type": "string"
+                                                      },
+                                                      {
+                                                        "type": "number"
+                                                      },
+                                                      {
+                                                        "type": "boolean"
+                                                      }
+                                                    ]
+                                                  }
+                                                }
+                                              ]
+                                            }
+                                          }
+                                        }
+                                      ]
+                                    }
+                                  },
+                                  "required": [
+                                    "result"
+                                  ]
+                                },
+                                {
+                                  "additionalProperties": false,
+                                  "type": "object",
+                                  "properties": {
+                                    "args": {
+                                      "type": "array",
+                                      "items": {
+                                        "anyOf": [
+                                          {
+                                            "type": "string"
+                                          },
+                                          {
+                                            "type": "number"
+                                          },
+                                          {
+                                            "type": "boolean"
+                                          }
+                                        ]
+                                      }
+                                    },
+                                    "signature": {
+                                      "type": "string"
+                                    },
+                                    "bigint": {
+                                      "type": "boolean"
+                                    },
+                                    "mustRevert": {
+                                      "const": true,
+                                      "type": "boolean"
+                                    }
+                                  },
+                                  "required": [
+                                    "mustRevert"
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "anyOf": [
+                                {
+                                  "anyOf": [
+                                    {
+                                      "type": "null"
+                                    },
+                                    {
+                                      "type": "string"
+                                    },
+                                    {
+                                      "type": "boolean"
+                                    },
+                                    {
+                                      "type": "number"
+                                    },
+                                    {
+                                      "type": "array",
+                                      "items": {
+                                        "anyOf": [
+                                          {
+                                            "type": "string"
+                                          },
+                                          {
+                                            "type": "number"
+                                          },
+                                          {
+                                            "type": "boolean"
+                                          }
+                                        ]
+                                      }
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "object",
+                                  "patternProperties": {
+                                    "^(.*)$": {
+                                      "anyOf": [
+                                        {
+                                          "type": "null"
+                                        },
+                                        {
+                                          "type": "string"
+                                        },
+                                        {
+                                          "type": "boolean"
+                                        },
+                                        {
+                                          "type": "number"
+                                        },
+                                        {
+                                          "type": "array",
+                                          "items": {
+                                            "anyOf": [
+                                              {
+                                                "type": "string"
+                                              },
+                                              {
+                                                "type": "number"
+                                              },
+                                              {
+                                                "type": "boolean"
+                                              }
+                                            ]
+                                          }
+                                        }
+                                      ]
+                                    }
+                                  }
+                                }
+                              ]
+                            },
+                            {
+                              "type": "array",
+                              "items": {
+                                "anyOf": [
+                                  {
+                                    "additionalProperties": false,
+                                    "type": "object",
+                                    "properties": {
+                                      "args": {
+                                        "type": "array",
+                                        "items": {
+                                          "anyOf": [
+                                            {
+                                              "type": "string"
+                                            },
+                                            {
+                                              "type": "number"
+                                            },
+                                            {
+                                              "type": "boolean"
+                                            }
+                                          ]
+                                        }
+                                      },
+                                      "signature": {
+                                        "type": "string"
+                                      },
+                                      "bigint": {
+                                        "type": "boolean"
+                                      },
+                                      "result": {
+                                        "anyOf": [
+                                          {
+                                            "anyOf": [
+                                              {
+                                                "type": "null"
+                                              },
+                                              {
+                                                "type": "string"
+                                              },
+                                              {
+                                                "type": "boolean"
+                                              },
+                                              {
+                                                "type": "number"
+                                              },
+                                              {
+                                                "type": "array",
+                                                "items": {
+                                                  "anyOf": [
+                                                    {
+                                                      "type": "string"
+                                                    },
+                                                    {
+                                                      "type": "number"
+                                                    },
+                                                    {
+                                                      "type": "boolean"
+                                                    }
+                                                  ]
+                                                }
+                                              }
+                                            ]
+                                          },
+                                          {
+                                            "type": "object",
+                                            "patternProperties": {
+                                              "^(.*)$": {
+                                                "anyOf": [
+                                                  {
+                                                    "type": "null"
+                                                  },
+                                                  {
+                                                    "type": "string"
+                                                  },
+                                                  {
+                                                    "type": "boolean"
+                                                  },
+                                                  {
+                                                    "type": "number"
+                                                  },
+                                                  {
+                                                    "type": "array",
+                                                    "items": {
+                                                      "anyOf": [
+                                                        {
+                                                          "type": "string"
+                                                        },
+                                                        {
+                                                          "type": "number"
+                                                        },
+                                                        {
+                                                          "type": "boolean"
+                                                        }
+                                                      ]
+                                                    }
+                                                  }
+                                                ]
+                                              }
+                                            }
+                                          }
+                                        ]
+                                      }
+                                    },
+                                    "required": [
+                                      "result"
+                                    ]
+                                  },
+                                  {
+                                    "additionalProperties": false,
+                                    "type": "object",
+                                    "properties": {
+                                      "args": {
+                                        "type": "array",
+                                        "items": {
+                                          "anyOf": [
+                                            {
+                                              "type": "string"
+                                            },
+                                            {
+                                              "type": "number"
+                                            },
+                                            {
+                                              "type": "boolean"
+                                            }
+                                          ]
+                                        }
+                                      },
+                                      "signature": {
+                                        "type": "string"
+                                      },
+                                      "bigint": {
+                                        "type": "boolean"
+                                      },
+                                      "mustRevert": {
+                                        "const": true,
+                                        "type": "boolean"
+                                      }
+                                    },
+                                    "required": [
+                                      "mustRevert"
+                                    ]
+                                  }
+                                ]
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    },
+                    "ozNonEnumerableAcl": {
+                      "type": "object",
+                      "patternProperties": {
+                        "^0x[a-fA-F0-9]{64}$": {
+                          "type": "array",
+                          "items": {
+                            "format": "ethereum-address",
+                            "pattern": "^0x[a-fA-F0-9]{40}$",
+                            "type": "string"
+                          }
+                        }
+                      }
+                    },
+                    "proxyName": {
+                      "type": "string"
+                    },
+                    "implementation": {
+                      "format": "ethereum-address",
+                      "pattern": "^0x[a-fA-F0-9]{40}$",
+                      "type": "string"
+                    },
+                    "proxyChecks": {
+                      "additionalProperties": false,
+                      "type": "object",
+                      "properties": {
+                        "proxy__getImplementation": {
+                          "format": "ethereum-address",
+                          "pattern": "^0x[a-fA-F0-9]{40}$",
+                          "type": "string"
+                        },
+                        "proxy__getAdmin": {
+                          "format": "ethereum-address",
+                          "pattern": "^0x[a-fA-F0-9]{40}$",
+                          "type": "string"
+                        },
+                        "proxy__getIsOssified": {
+                          "type": "boolean"
+                        }
+                      }
+                    },
+                    "implementationChecks": {
+                      "type": "object",
+                      "patternProperties": {
+                        "^(.*)$": {
+                          "anyOf": [
+                            {
+                              "anyOf": [
+                                {
+                                  "additionalProperties": false,
+                                  "type": "object",
+                                  "properties": {
+                                    "args": {
+                                      "type": "array",
+                                      "items": {
+                                        "anyOf": [
+                                          {
+                                            "type": "string"
+                                          },
+                                          {
+                                            "type": "number"
+                                          },
+                                          {
+                                            "type": "boolean"
+                                          }
+                                        ]
+                                      }
+                                    },
+                                    "signature": {
+                                      "type": "string"
+                                    },
+                                    "bigint": {
+                                      "type": "boolean"
+                                    },
+                                    "result": {
+                                      "anyOf": [
+                                        {
+                                          "anyOf": [
+                                            {
+                                              "type": "null"
+                                            },
+                                            {
+                                              "type": "string"
+                                            },
+                                            {
+                                              "type": "boolean"
+                                            },
+                                            {
+                                              "type": "number"
+                                            },
+                                            {
+                                              "type": "array",
+                                              "items": {
+                                                "anyOf": [
+                                                  {
+                                                    "type": "string"
+                                                  },
+                                                  {
+                                                    "type": "number"
+                                                  },
+                                                  {
+                                                    "type": "boolean"
+                                                  }
+                                                ]
+                                              }
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": "object",
+                                          "patternProperties": {
+                                            "^(.*)$": {
+                                              "anyOf": [
+                                                {
+                                                  "type": "null"
+                                                },
+                                                {
+                                                  "type": "string"
+                                                },
+                                                {
+                                                  "type": "boolean"
+                                                },
+                                                {
+                                                  "type": "number"
+                                                },
+                                                {
+                                                  "type": "array",
+                                                  "items": {
+                                                    "anyOf": [
+                                                      {
+                                                        "type": "string"
+                                                      },
+                                                      {
+                                                        "type": "number"
+                                                      },
+                                                      {
+                                                        "type": "boolean"
+                                                      }
+                                                    ]
+                                                  }
+                                                }
+                                              ]
+                                            }
+                                          }
+                                        }
+                                      ]
+                                    }
+                                  },
+                                  "required": [
+                                    "result"
+                                  ]
+                                },
+                                {
+                                  "additionalProperties": false,
+                                  "type": "object",
+                                  "properties": {
+                                    "args": {
+                                      "type": "array",
+                                      "items": {
+                                        "anyOf": [
+                                          {
+                                            "type": "string"
+                                          },
+                                          {
+                                            "type": "number"
+                                          },
+                                          {
+                                            "type": "boolean"
+                                          }
+                                        ]
+                                      }
+                                    },
+                                    "signature": {
+                                      "type": "string"
+                                    },
+                                    "bigint": {
+                                      "type": "boolean"
+                                    },
+                                    "mustRevert": {
+                                      "const": true,
+                                      "type": "boolean"
+                                    }
+                                  },
+                                  "required": [
+                                    "mustRevert"
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "anyOf": [
+                                {
+                                  "anyOf": [
+                                    {
+                                      "type": "null"
+                                    },
+                                    {
+                                      "type": "string"
+                                    },
+                                    {
+                                      "type": "boolean"
+                                    },
+                                    {
+                                      "type": "number"
+                                    },
+                                    {
+                                      "type": "array",
+                                      "items": {
+                                        "anyOf": [
+                                          {
+                                            "type": "string"
+                                          },
+                                          {
+                                            "type": "number"
+                                          },
+                                          {
+                                            "type": "boolean"
+                                          }
+                                        ]
+                                      }
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "object",
+                                  "patternProperties": {
+                                    "^(.*)$": {
+                                      "anyOf": [
+                                        {
+                                          "type": "null"
+                                        },
+                                        {
+                                          "type": "string"
+                                        },
+                                        {
+                                          "type": "boolean"
+                                        },
+                                        {
+                                          "type": "number"
+                                        },
+                                        {
+                                          "type": "array",
+                                          "items": {
+                                            "anyOf": [
+                                              {
+                                                "type": "string"
+                                              },
+                                              {
+                                                "type": "number"
+                                              },
+                                              {
+                                                "type": "boolean"
+                                              }
+                                            ]
+                                          }
+                                        }
+                                      ]
+                                    }
+                                  }
+                                }
+                              ]
+                            },
+                            {
+                              "type": "array",
+                              "items": {
+                                "anyOf": [
+                                  {
+                                    "additionalProperties": false,
+                                    "type": "object",
+                                    "properties": {
+                                      "args": {
+                                        "type": "array",
+                                        "items": {
+                                          "anyOf": [
+                                            {
+                                              "type": "string"
+                                            },
+                                            {
+                                              "type": "number"
+                                            },
+                                            {
+                                              "type": "boolean"
+                                            }
+                                          ]
+                                        }
+                                      },
+                                      "signature": {
+                                        "type": "string"
+                                      },
+                                      "bigint": {
+                                        "type": "boolean"
+                                      },
+                                      "result": {
+                                        "anyOf": [
+                                          {
+                                            "anyOf": [
+                                              {
+                                                "type": "null"
+                                              },
+                                              {
+                                                "type": "string"
+                                              },
+                                              {
+                                                "type": "boolean"
+                                              },
+                                              {
+                                                "type": "number"
+                                              },
+                                              {
+                                                "type": "array",
+                                                "items": {
+                                                  "anyOf": [
+                                                    {
+                                                      "type": "string"
+                                                    },
+                                                    {
+                                                      "type": "number"
+                                                    },
+                                                    {
+                                                      "type": "boolean"
+                                                    }
+                                                  ]
+                                                }
+                                              }
+                                            ]
+                                          },
+                                          {
+                                            "type": "object",
+                                            "patternProperties": {
+                                              "^(.*)$": {
+                                                "anyOf": [
+                                                  {
+                                                    "type": "null"
+                                                  },
+                                                  {
+                                                    "type": "string"
+                                                  },
+                                                  {
+                                                    "type": "boolean"
+                                                  },
+                                                  {
+                                                    "type": "number"
+                                                  },
+                                                  {
+                                                    "type": "array",
+                                                    "items": {
+                                                      "anyOf": [
+                                                        {
+                                                          "type": "string"
+                                                        },
+                                                        {
+                                                          "type": "number"
+                                                        },
+                                                        {
+                                                          "type": "boolean"
+                                                        }
+                                                      ]
+                                                    }
+                                                  }
+                                                ]
+                                              }
+                                            }
+                                          }
+                                        ]
+                                      }
+                                    },
+                                    "required": [
+                                      "result"
+                                    ]
+                                  },
+                                  {
+                                    "additionalProperties": false,
+                                    "type": "object",
+                                    "properties": {
+                                      "args": {
+                                        "type": "array",
+                                        "items": {
+                                          "anyOf": [
+                                            {
+                                              "type": "string"
+                                            },
+                                            {
+                                              "type": "number"
+                                            },
+                                            {
+                                              "type": "boolean"
+                                            }
+                                          ]
+                                        }
+                                      },
+                                      "signature": {
+                                        "type": "string"
+                                      },
+                                      "bigint": {
+                                        "type": "boolean"
+                                      },
+                                      "mustRevert": {
+                                        "const": true,
+                                        "type": "boolean"
+                                      }
+                                    },
+                                    "required": [
+                                      "mustRevert"
+                                    ]
+                                  }
+                                ]
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  },
+                  "required": [
+                    "address",
+                    "name",
+                    "checks",
+                    "proxyName"
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      },
+      "required": [
+        "rpcUrl",
+        "explorerHostname",
+        "contracts"
+      ]
+    },
+    "tvl": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    },
+    "delays": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "signers": {
+      "type": "array",
+      "items": {
+        "anyOf": [
+          {
+            "format": "ethereum-address",
+            "pattern": "^0x[a-fA-F0-9]{40}$",
+            "type": "string"
+          },
+          {
+            "type": "number"
+          }
+        ]
+      }
+    },
+    "selectors": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "validators": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "parameters",
+    "deployed",
+    "l1"
+  ]
+}
