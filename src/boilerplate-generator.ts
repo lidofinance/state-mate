@@ -9,20 +9,20 @@ import { getNonMutables, readUrlOrFromEnv } from "./common";
 import { logErrorAndExit } from "./logger";
 
 import { g_Args } from "./state-mate";
-import { ContractEntry, EntireDocument, ExplorerSectionTB, isTypeOfTB, NetworkSection } from "./typebox";
+import { ContractEntry, EntireDocument, ExplorerSectionTB, isTypeOfTB, NetworkSection, SeedDocument } from "./typebox";
 import { MethodCallResults } from "./types";
 
 import { Contract, JsonRpcProvider } from "ethers";
 
 import { Abi } from "./types";
 
-import { loadAbiFromFile, loadContract } from "./abi-provider";
+import { loadAbiFromFile } from "./abi-provider";
 
 import { Ef } from "./common";
 import { log } from "./logger";
 
 import chalk from "chalk";
-import { collectStaticCallResults, loadContractInfoFromExplorer } from "./explorer-provider";
+import { collectStaticCallResults, loadContract, loadContractInfoFromExplorer } from "./explorer-provider";
 
 const REPLACE_ME_PLACEHOLDER = "REPLACEME";
 const YML = "yml";
@@ -44,16 +44,16 @@ export type DeployedAddressInfo = Pick<NetworkSection, "explorerHostname" | "rpc
     [Key in keyof Pick<NetworkSection, "explorerTokenEnv"> as `explorerKey`]: string;
   } & { deployedNode: YAML.Scalar } & { sectionName: string };
 
-export async function iterateDeployedAddresses(
+export async function iterateDeployedAddresses<T extends EntireDocument | SeedDocument>(
   seedDoc: YAML.Document,
-  jsonDoc: EntireDocument,
+  jsonDoc: T,
   callback: (ctx: DeployedAddressInfo) => Promise<void>,
 ) {
   const abiDirPath = path.resolve(path.dirname(g_Args.configPath), "abi");
   fs.mkdirSync(abiDirPath, { recursive: true });
 
-  for (const [networkSectionKey, addresses] of Object.entries(jsonDoc.deployed)) {
-    const networkSection = jsonDoc[networkSectionKey as keyof EntireDocument];
+  for (const [explorerSectionKey, addresses] of Object.entries(jsonDoc.deployed)) {
+    const networkSection = jsonDoc[explorerSectionKey as keyof T];
 
     if (isTypeOfTB(networkSection, ExplorerSectionTB)) {
       const { explorerHostname, explorerTokenEnv } = networkSection;
@@ -72,7 +72,7 @@ export async function iterateDeployedAddresses(
             explorerKey,
             rpcUrl,
             deployedNode,
-            sectionName: networkSectionKey,
+            sectionName: explorerSectionKey,
           });
         } else {
           logErrorAndExit(`Couldn't to find the anchor for ${address} in the seed YAML file`);
@@ -95,9 +95,7 @@ function _getScalarsForAnchors(doc: YAML.Document): YAML.Scalar[] {
   return scalars;
 }
 
-async function makeBoilerplateForAllNonMutableFunctions(abi: Abi, contract: Contract, contractName: string, ef: Ef) {
-  log(`Generating YAML for contract ${contractName}'s non-mutable function values for section ${chalk.yellow(ef)} ...`);
-
+async function makeBoilerplateForAllNonMutableFunctions(abi: Abi, contract: Contract) {
   const nonMutables = getNonMutables(abi);
 
   const staticCallsResults = await collectStaticCallResults(nonMutables, contract);
@@ -107,7 +105,7 @@ async function makeBoilerplateForAllNonMutableFunctions(abi: Abi, contract: Cont
   return boilerplate;
 }
 
-export async function doGenerateBoilerplate(seedConfigPath: string, jsonDoc: EntireDocument) {
+export async function doGenerateBoilerplate(seedConfigPath: string, jsonDoc: SeedDocument) {
   const seedDoc = YAML.parseDocument(fs.readFileSync(seedConfigPath, "utf-8"));
   const doc = new YAML.Document(seedDoc);
 
@@ -118,30 +116,31 @@ export async function doGenerateBoilerplate(seedConfigPath: string, jsonDoc: Ent
     const provider = new JsonRpcProvider(rpcUrl);
     let contractEntryIfProxy = null;
     let contractEntryIfRegular = null;
-
+    const logOperation = (section: Ef) => {
+      log(
+        `Generating YAML for non-mutable function values for contract ${chalk.magenta(`${contractName}-${address}`)}, section ${chalk.yellow(section)} ...`,
+      );
+    };
     if (implementation) {
       const proxyAbi = loadAbiFromFile(contractName, address);
+      const proxyContract = loadContract(address, proxyAbi, provider);
+
+      const abi = loadAbiFromFile(implementation.contractName, address);
+      const contract = loadContract(address, abi, provider);
+
       const implementationAbi = loadAbiFromFile(implementation.contractName, implementation.address);
-      const proxyContract = loadContract(contractName, address, provider);
-      const contract = loadContract(implementation.contractName, address, provider);
-      const implementationContract = loadContract(implementation.contractName, implementation.address, provider);
-      const proxyChecks = await makeBoilerplateForAllNonMutableFunctions(
-        proxyAbi,
-        proxyContract,
-        contractName,
-        Ef.proxyChecks,
-      );
-      const checks = await makeBoilerplateForAllNonMutableFunctions(
-        implementationAbi,
-        contract,
-        contractName,
-        Ef.checks,
-      );
+      const implementationContract = loadContract(implementation.address, implementationAbi, provider);
+
+      logOperation(Ef.checks);
+      const checks = await makeBoilerplateForAllNonMutableFunctions(implementationAbi, contract);
+
+      logOperation(Ef.proxyChecks);
+      const proxyChecks = await makeBoilerplateForAllNonMutableFunctions(proxyAbi, proxyContract);
+
+      logOperation(Ef.implementationChecks);
       const implementationChecks = await makeBoilerplateForAllNonMutableFunctions(
         implementationAbi,
         implementationContract,
-        contractName,
-        Ef.implementationChecks,
       );
       contractEntryIfProxy = {
         [Ef.name]: implementation.contractName,
@@ -154,8 +153,9 @@ export async function doGenerateBoilerplate(seedConfigPath: string, jsonDoc: Ent
       };
     } else {
       const abi = loadAbiFromFile(contractName, address);
-      const contract = loadContract(contractName, address, provider);
-      const checks = await makeBoilerplateForAllNonMutableFunctions(abi, contract, contractName, Ef.checks);
+      const contract = loadContract(address, abi, provider);
+      logOperation(Ef.checks);
+      const checks = await makeBoilerplateForAllNonMutableFunctions(abi, contract);
       contractEntryIfRegular = {
         name: contractName,
         address: doc.createAlias(deployedNode),

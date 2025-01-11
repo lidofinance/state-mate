@@ -1,6 +1,6 @@
 import { BaseContract, JsonRpcProvider } from "ethers";
-import { loadContract } from "../abi-provider";
-import { CheckLevel, needCheck } from "../common";
+import { loadAbiFromFile } from "../abi-provider";
+import { CheckLevel, Ef, needCheck } from "../common";
 import { logErrorAndExit } from "../logger";
 import {
   ArrayOfStaticCallCheckTB,
@@ -11,15 +11,18 @@ import {
   ViewResultTB,
 } from "../typebox";
 import { SectionValidatorBase } from "./base";
+import { loadContract } from "../explorer-provider";
 
 export class ChecksSectionValidator extends SectionValidatorBase {
-  constructor(provider: JsonRpcProvider) {
-    super(provider);
+  constructor(provider: JsonRpcProvider, sectionName: Ef = Ef.checks) {
+    super(provider, sectionName);
   }
 
-  override async validateSection({ address, name, checks }: ContractEntry) {
-    const contract = loadContract(name, address, this.provider);
+  override async validateSection({ name, address, checks }: ContractEntry, contractAlias: string) {
+    const abi = loadAbiFromFile(name, address);
+    this._reportNonCoveredNonMutableChecks(contractAlias, abi, Object.keys(checks));
 
+    const contract = loadContract(address, abi, this.provider);
     for (const [method, checkEntryValue] of Object.entries(checks)) {
       if (!needCheck(CheckLevel.method, method)) continue;
 
@@ -30,8 +33,12 @@ export class ChecksSectionValidator extends SectionValidatorBase {
   private async _validateSubsection(contract: BaseContract, method: string, checkEntryValue: ChecksEntryValue) {
     if (isTypeOfTB(checkEntryValue, ArrayOfStaticCallCheckTB) /* && checkEntryValue !== null */) {
       //todo check without  checkEntryValue !== null
-      for (const argsResult of checkEntryValue) {
-        await this._checkViewFunction(contract, method, argsResult);
+      if (!checkEntryValue.length) {
+        await this._checkViewFunction(contract, method, { result: [] });
+      } else {
+        for (const argsResult of checkEntryValue) {
+          await this._checkViewFunction(contract, method, argsResult);
+        }
       }
     } else if (isTypeOfTB(checkEntryValue, StaticCallCheckTB)) {
       await this._checkViewFunction(contract, method, checkEntryValue);

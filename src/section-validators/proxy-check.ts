@@ -1,23 +1,25 @@
-import chalk from "chalk";
 import { BaseContract, JsonRpcProvider } from "ethers";
-import { loadContract } from "../abi-provider";
+import { loadAbiFromFile } from "../abi-provider";
 import { CheckLevel, Ef, needCheck } from "../common";
 import { logErrorAndExit, logHeader2 } from "../logger";
 import { ChecksEntryValue, ContractEntry, isTypeOfTB, ProxyContractEntryTB, ViewResultTB } from "../typebox";
 import { SectionValidatorBase } from "./base";
+import { loadContract } from "../explorer-provider";
 
 export class ProxyCheckSectionValidator extends SectionValidatorBase {
   constructor(provider: JsonRpcProvider) {
-    super(provider);
+    super(provider, Ef.proxyChecks);
   }
-  override async validateSection(contractEntry: ContractEntry) {
+  override async validateSection(contractEntry: ContractEntry, contractAlias: string) {
     if (isTypeOfTB(contractEntry, ProxyContractEntryTB) && contractEntry.proxyChecks) {
-      logHeader2(Ef.proxyChecks);
+      logHeader2(this.sectionName);
+
       const { address, proxyName, proxyChecks } = contractEntry;
 
-      console.log(`Checking contract ${chalk.yellow(proxyName)} at address ${chalk.yellow(address)}...`);
-      const contract = loadContract(proxyName, address, this.provider);
+      const abi = loadAbiFromFile(proxyName, address);
+      this._reportNonCoveredNonMutableChecks(contractAlias, abi, Object.keys(proxyChecks));
 
+      const contract = loadContract(address, abi, this.provider);
       for (const [method, checkEntryValue] of Object.entries(proxyChecks)) {
         if (!needCheck(CheckLevel.method, method)) continue;
         await this._validateSubsection(contract, method, checkEntryValue);

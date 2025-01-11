@@ -42,6 +42,7 @@ const MaxIntStringTB = Type.Readonly(
 const EthAddressesArrayTB = Type.Readonly(Type.Array(EthAddressStringTB));
 const EthRolesArrayTB = Type.Readonly(Type.Array(EthRoleStringTB));
 export type EntireDocument = Static<typeof EntireDocumentTB>;
+export type SeedDocument = Static<typeof SeedDocumentTB>;
 export type ContractEntry = Static<typeof ContractEntryTB>;
 export type ProxyContractEntry = Static<typeof ProxyContractEntryTB>;
 export type RegularContractEntry = Static<typeof RegularContractEntryTB>;
@@ -64,30 +65,14 @@ export function isTypeOfTB<T extends TSchema>(value: unknown, schema: T): value 
 
 const OzNonEnumerableAclTB = Type.Readonly(Type.Record(EthRoleStringTB, EthAddressesArrayTB));
 
-const ViewResultPlainValueTB = Type.Readonly(
-  Type.Union([
-    Type.Null(),
-    Type.String(),
-    Type.Boolean(),
-    Type.Number(),
-    Type.Array(Type.Union([Type.String(), Type.Number(), Type.Boolean()])),
-  ]),
-);
-
-/* const ViewResultPlainValueTB = Type.Readonly(
-  Type.Union([
-    Type.Null(),
-    Type.String(),
-    Type.Boolean(),
-    Type.Number(),
-    Type.Array(Type.String()),
-    Type.Array(Type.Array(Type.Union([Type.String(), Type.Number()]))),
-  ]),
-); */ //configs/bsc/adi-mainnet.yml array of array doesn't check now
+const ViewResultPlainValueTB = Type.Readonly(Type.Union([Type.Null(), Type.String(), Type.Boolean(), Type.Number()]));
+const ArrayPlainValue = Type.Readonly(Type.Array(Type.Union([Type.String(), Type.Number(), Type.Boolean()])));
 
 const ArbitraryObjectTB = Type.Readonly(Type.Record(Type.String(), ViewResultPlainValueTB));
 
-export const ViewResultTB = Type.Readonly(Type.Union([ViewResultPlainValueTB, ArbitraryObjectTB]));
+export const ViewResultTB = Type.Readonly(
+  Type.Union([ViewResultPlainValueTB, ArbitraryObjectTB, ArrayPlainValue, Type.Array(ArrayPlainValue)]),
+);
 
 const StaticCallCommon = Type.Readonly(
   Type.Object({

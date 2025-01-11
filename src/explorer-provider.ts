@@ -12,11 +12,15 @@ import {
   Abi,
 } from "./types";
 
-import { Contract } from "ethers";
+import { Contract, JsonRpcProvider } from "ethers";
 import { AbiArgsLength } from "./types";
 
 import { EtherscanHandler } from "./explorers/etherscan";
 import { ModeHandler } from "./explorers/mode";
+
+export function loadContract(address: string, abi: Abi, provider: JsonRpcProvider) {
+  return new Contract(address, abi as unknown as string, provider);
+}
 
 export interface IExplorerHandler {
   requestWithRateLimit?: RateLimitHandler;
@@ -93,7 +97,7 @@ export async function loadContractInfo(
 
   let sourcesResponse = await httpGetAsync(sourcesUrl);
   if (isResponseBad(sourcesResponse) && explorer.requestWithRateLimit) {
-    sourcesResponse = explorer.requestWithRateLimit(sourcesResponse, sourcesUrl, explorerHostname);
+    sourcesResponse = await explorer.requestWithRateLimit(sourcesResponse, sourcesUrl, explorerHostname);
     if (isResponseBad(sourcesResponse)) {
       logErrorAndExit(
         `Failed to download contract info from ${explorerHostname}: ${sourcesResponse.message}\n${JSON.stringify(sourcesResponse, null, 2)}`,

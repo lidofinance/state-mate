@@ -1,6 +1,6 @@
 import { BaseContract, JsonRpcProvider } from "ethers";
-import { printError } from "../common";
-import { LogCommand, logErrorAndExit, logMethodSkipped } from "../logger";
+import { Ef, getNonMutables, printError } from "../common";
+import { LogCommand, logError, logErrorAndExit, logMethodSkipped } from "../logger";
 import { assertEqual, stringify } from "../statements-functions";
 import {
   ContractEntry,
@@ -11,6 +11,8 @@ import {
   StaticCallResult,
   StaticCallResultTB,
 } from "../typebox";
+import { Abi, AbiArgsLength } from "../types";
+import chalk from "chalk";
 
 export let g_errors: number = 0;
 
@@ -19,9 +21,12 @@ export function incErrors(): void {
 }
 
 export abstract class SectionValidatorBase {
-  constructor(protected provider: JsonRpcProvider) {}
+  constructor(
+    protected provider: JsonRpcProvider,
+    protected sectionName: Ef,
+  ) {}
 
-  public abstract validateSection(contractEntry: ContractEntry): Promise<void>;
+  public abstract validateSection(contractEntry: ContractEntry, contractAlias: string): Promise<void>;
 
   protected async _checkViewFunction(contract: BaseContract, method: string, staticCallCheck: StaticCallCheck) {
     if (isTypeOfTB(staticCallCheck, StaticCallResultTB)) {
@@ -70,6 +75,19 @@ export abstract class SectionValidatorBase {
       g_errors++;
     } catch (error) {
       logHandle.success(`REVERTED with: ${printError(error)}`);
+    }
+  }
+
+  protected _reportNonCoveredNonMutableChecks(contractAlias: string, abi: Abi, checks: string[]) {
+    const nonMutableFromAbi = getNonMutables(abi);
+    const nonCovered = nonMutableFromAbi
+      .filter((x) => !checks.includes(x.name))
+      .map((x) => (x.name ? x.name : x)) as AbiArgsLength;
+    if (nonCovered.length) {
+      logError(
+        `Section ${contractAlias} ${this.sectionName} does not cover these non-mutable function from ABI: ${chalk.red(nonCovered.join(", "))}`,
+      );
+      incErrors();
     }
   }
 }

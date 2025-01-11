@@ -485,6 +485,22 @@
                                   }
                                 ]
                               }
+                            },
+                            {
+                              "type": "array",
+                              "items": {
+                                "type": "array",
+                                "items": {
+                                  "anyOf": [
+                                    {
+                                      "type": "boolean"
+                                    },
+                                    {
+                                      "type": "number"
+                                    }
+                                  ]
+                                }
+                              }
                             }
                           ]
                         }
@@ -887,6 +903,22 @@
                                     ]
                                   }
                                 ]
+                              }
+                            },
+                            {
+                              "type": "array",
+                              "items": {
+                                "type": "array",
+                                "items": {
+                                  "anyOf": [
+                                    {
+                                      "type": "boolean"
+                                    },
+                                    {
+                                      "type": "number"
+                                    }
+                                  ]
+                                }
                               }
                             }
                           ]
@@ -1298,6 +1330,22 @@
                                     ]
                                   }
                                 ]
+                              }
+                            },
+                            {
+                              "type": "array",
+                              "items": {
+                                "type": "array",
+                                "items": {
+                                  "anyOf": [
+                                    {
+                                      "type": "boolean"
+                                    },
+                                    {
+                                      "type": "number"
+                                    }
+                                  ]
+                                }
                               }
                             }
                           ]
@@ -1719,6 +1767,22 @@
                                   }
                                 ]
                               }
+                            },
+                            {
+                              "type": "array",
+                              "items": {
+                                "type": "array",
+                                "items": {
+                                  "anyOf": [
+                                    {
+                                      "type": "boolean"
+                                    },
+                                    {
+                                      "type": "number"
+                                    }
+                                  ]
+                                }
+                              }
                             }
                           ]
                         }
@@ -2121,6 +2185,22 @@
                                     ]
                                   }
                                 ]
+                              }
+                            },
+                            {
+                              "type": "array",
+                              "items": {
+                                "type": "array",
+                                "items": {
+                                  "anyOf": [
+                                    {
+                                      "type": "boolean"
+                                    },
+                                    {
+                                      "type": "number"
+                                    }
+                                  ]
+                                }
                               }
                             }
                           ]
@@ -2532,6 +2612,22 @@
                                     ]
                                   }
                                 ]
+                              }
+                            },
+                            {
+                              "type": "array",
+                              "items": {
+                                "type": "array",
+                                "items": {
+                                  "anyOf": [
+                                    {
+                                      "type": "boolean"
+                                    },
+                                    {
+                                      "type": "number"
+                                    }
+                                  ]
+                                }
                               }
                             }
                           ]

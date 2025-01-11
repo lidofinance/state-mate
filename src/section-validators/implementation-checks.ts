@@ -7,10 +7,10 @@ import { loadAbiFromFile } from "../abi-provider";
 
 export class ImplementationChecksSectionValidator extends ChecksSectionValidator {
   constructor(provider: JsonRpcProvider) {
-    super(provider);
+    super(provider, Ef.implementationChecks);
   }
 
-  override async validateSection(contractEntry: ContractEntry) {
+  override async validateSection(contractEntry: ContractEntry, contractAlias: string) {
     if (isTypeOfTB(contractEntry, ProxyContractEntryTB) && contractEntry.implementation) {
       logHeader2(Ef.implementationChecks);
       const { implementation, name, implementationChecks } = contractEntry;
@@ -18,12 +18,14 @@ export class ImplementationChecksSectionValidator extends ChecksSectionValidator
       const allNonMutable = getNonMutables(loadAbiFromFile(name, implementation));
       const skippedChecks: RegularChecks = {};
       allNonMutable.reduce((acc, x) => ((acc[x.name] = null), acc), skippedChecks);
-
-      await super.validateSection({
-        checks: { ...skippedChecks, ...implementationChecks },
-        name: name,
-        address: implementation,
-      });
+      await super.validateSection(
+        {
+          checks: { ...skippedChecks, ...implementationChecks },
+          name: name,
+          address: implementation,
+        },
+        contractAlias,
+      );
     }
   }
 }

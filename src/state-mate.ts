@@ -25,14 +25,16 @@ import {
   EntireDocumentTB,
   EthereumAddressFormat,
   EthereumRoleFormat,
+  ExplorerSectionTB,
   isTypeOfTB,
   MaxIntFormat,
   NetworkSection,
   NetworkSectionTB,
+  SeedDocument,
   SeedDocumentTB,
 } from "./typebox";
 
-import { TObject } from "@sinclair/typebox";
+import { Static, TObject, TSchema } from "@sinclair/typebox";
 
 import addFormats from "ajv-formats";
 import { doGenerateBoilerplate } from "./boilerplate-generator";
@@ -76,11 +78,11 @@ function loadStateFromYaml(configPath: string): unknown {
   }
 }
 
-function validateJsonWithSchema(
+function validateJsonWithSchema<T extends TSchema>(
   jsonDoc: unknown,
-  schemaPrototype: TObject,
+  schemaPrototype: T,
   fileTypeName: "MAIN" | "SEED",
-): jsonDoc is EntireDocument {
+): jsonDoc is Static<T> {
   logHeader1(
     `The ${chalk.yellow(fileTypeName)} YAML file at ${chalk.yellow(g_Args.configPath)} will be validated against the ${chalk.yellow(fileTypeName)} JSON Schema`,
   );
@@ -140,7 +142,7 @@ async function doChecks(jsonDoc: EntireDocument) {
   }
 }
 
-async function downloadAndSaveAbis(jsonDoc: EntireDocument) {
+async function downloadAndSaveAbis(jsonDoc: SeedDocument) {
   const abiDirPath = path.resolve(path.dirname(g_Args.configPath), "abi");
   fs.mkdirSync(abiDirPath, { recursive: true });
 
@@ -152,20 +154,22 @@ async function downloadAndCheckAbis(jsonDoc: EntireDocument) {
   await iterateLoadedContracts(jsonDoc, checkAllAbiDiffs);
 }
 
-async function iterateLoadedContracts(
-  jsonDoc: EntireDocument,
+async function iterateLoadedContracts<T extends EntireDocument | SeedDocument>(
+  jsonDoc: T,
   callback: (contractInfo: ContractInfo) => Promise<void> | void,
 ) {
   const abiDirPath = path.resolve(path.dirname(g_Args.configPath), "abi");
   fs.mkdirSync(abiDirPath, { recursive: true });
 
-  for (const [networkSectionKey, addresses] of Object.entries(jsonDoc.deployed)) {
-    const networkSection = jsonDoc[networkSectionKey as keyof EntireDocument];
+  for (const [explorerSectionKey, addresses] of Object.entries(jsonDoc.deployed)) {
+    const explorerSection = jsonDoc[explorerSectionKey as keyof T];
 
-    if (isTypeOfTB(networkSection, NetworkSectionTB)) {
-      const { explorerHostname, explorerTokenEnv } = networkSection;
+    if (isTypeOfTB(explorerSection, ExplorerSectionTB) || isTypeOfTB(explorerSection, NetworkSectionTB)) {
+      const { explorerHostname, explorerTokenEnv } = explorerSection;
 
       const explorerKey = explorerTokenEnv ? process.env[explorerTokenEnv] : "";
+      if (!explorerKey)
+        console.log(`\n${WARNING_MARK} ${chalk.yellow(`The env var ${explorerTokenEnv} is not set`)}\n`);
 
       for (const address of addresses) {
         const contractInfo = await loadContractInfoFromExplorer(address, explorerHostname, explorerKey);

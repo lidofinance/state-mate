@@ -3,6 +3,7 @@ import { Ef } from "../common";
 import { ChecksSectionValidator } from "./checks";
 import { OzNonEnumerableAclSectionValidator } from "./oz-non-enumerable-acl";
 import { ProxyCheckSectionValidator } from "./proxy-check";
+import { ImplementationChecksSectionValidator } from "./implementation-checks";
 
 export class ValidatorFactory {
   static getValidator(ef: Ef, provider: JsonRpcProvider) {
@@ -14,7 +15,7 @@ export class ValidatorFactory {
       case Ef.ozNonEnumerableAcl:
         return new OzNonEnumerableAclSectionValidator(provider);
       case Ef.implementationChecks:
-        return new OzNonEnumerableAclSectionValidator(provider);
+        return new ImplementationChecksSectionValidator(provider);
       default:
         //@ts-expect-error trick to detect compile-time errors when a new section is added
         // eslint-disable-next-line @typescript-eslint/no-unused-vars

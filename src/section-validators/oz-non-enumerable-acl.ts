@@ -1,11 +1,16 @@
 import { assert } from "chai";
-import { loadContract } from "../abi-provider";
+import { loadAbiFromFile } from "../abi-provider";
 import { Ef } from "../common";
 import { log, LogCommand, logHeader2, WARNING_MARK } from "../logger";
 import { ContractEntry } from "../typebox";
 import { incErrors, SectionValidatorBase } from "./base";
+import { JsonRpcProvider } from "ethers";
+import { loadContract } from "../explorer-provider";
 
 export class OzNonEnumerableAclSectionValidator extends SectionValidatorBase {
+  constructor(provider: JsonRpcProvider) {
+    super(provider, Ef.ozNonEnumerableAcl);
+  }
   override async validateSection(contractEntry: ContractEntry) {
     if (contractEntry.ozNonEnumerableAcl) {
       logHeader2(Ef.ozNonEnumerableAcl);
@@ -14,7 +19,8 @@ export class OzNonEnumerableAclSectionValidator extends SectionValidatorBase {
   }
 
   protected async _validate(contractEntry: ContractEntry) {
-    const contract = loadContract(contractEntry.name, contractEntry.address, this.provider); //TODO to move out from this method
+    const abi = loadAbiFromFile(contractEntry.name, contractEntry.address);
+    const contract = loadContract(contractEntry.address, abi, this.provider); //TODO to move out from this method
 
     log(
       `${WARNING_MARK}: Non-enumerable OZ Acl means it is impossible to check absence of an arbitrary role holder ` +

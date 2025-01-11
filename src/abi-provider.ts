@@ -4,16 +4,10 @@ import { Abi, ContractInfo, isValidAbi } from "./types";
 
 import { confirm as askUserToConfirm } from "@inquirer/prompts";
 import chalk from "chalk";
-import { Contract, JsonRpcProvider } from "ethers";
 import jsonDiff from "json-diff";
+import { printError } from "./common";
 import { log, LogCommand, logErrorAndExit, WARNING_MARK } from "./logger";
 import { g_Args } from "./state-mate";
-import { printError } from "./common";
-
-export function loadContract(contractName: string, address: string, provider: JsonRpcProvider) {
-  const abi = loadAbiFromFile(contractName, address);
-  return new Contract(address, abi as unknown as string, provider);
-}
 
 export function loadAbiFromFile(contractName: string, contractAddress: string): Abi | never {
   let abiPath = undefined;
@@ -158,7 +152,7 @@ function findAbiPath(
 function getAbiFilePathByDefault(contractName: string, address?: string) {
   const abiFileName = address ? `${contractName}-${address}.json` : `${contractName}.json`;
 
-  return path.resolve(g_Args.abiDirPath, abiFileName);
+  return path.join(g_Args.abiDirPath, abiFileName);
 }
 
 function generateAbiNotFoundError(abiVariantsName: string[] /* abiVariantsRegex: RegExp[] */): never {

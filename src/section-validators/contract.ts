@@ -22,19 +22,19 @@ export class ContractSectionValidator {
 
     if (needCheck(CheckLevel.checksType, Ef.checks)) {
       logHeader2(Ef.checks);
-      await this.map.get(Ef.checks)!.validateSection(contractEntry);
+      await this.map.get(Ef.checks)!.validateSection(contractEntry, contractAlias);
     }
 
     if (needCheck(CheckLevel.checksType, Ef.proxyChecks)) {
-      await this.map.get(Ef.proxyChecks)!.validateSection(contractEntry);
+      await this.map.get(Ef.proxyChecks)!.validateSection(contractEntry, contractAlias);
     }
 
     if (needCheck(CheckLevel.checksType, Ef.ozNonEnumerableAcl)) {
-      await this.map.get(Ef.ozNonEnumerableAcl)!.validateSection(contractEntry);
+      await this.map.get(Ef.ozNonEnumerableAcl)!.validateSection(contractEntry, contractAlias);
     }
 
     if (needCheck(CheckLevel.checksType, Ef.implementationChecks)) {
-      await this.map.get(Ef.implementationChecks)!.validateSection(contractEntry);
+      await this.map.get(Ef.implementationChecks)!.validateSection(contractEntry, contractAlias);
     }
   }
 }
