@@ -190,41 +190,6 @@
                                               ]
                                             }
                                           }
-                                        },
-                                        {
-                                          "type": "array",
-                                          "items": {
-                                            "anyOf": [
-                                              {
-                                                "type": "string"
-                                              },
-                                              {
-                                                "type": "number"
-                                              },
-                                              {
-                                                "type": "boolean"
-                                              }
-                                            ]
-                                          }
-                                        },
-                                        {
-                                          "type": "array",
-                                          "items": {
-                                            "type": "array",
-                                            "items": {
-                                              "anyOf": [
-                                                {
-                                                  "type": "string"
-                                                },
-                                                {
-                                                  "type": "number"
-                                                },
-                                                {
-                                                  "type": "boolean"
-                                                }
-                                              ]
-                                            }
-                                          }
                                         }
                                       ]
                                     }
@@ -308,43 +273,50 @@
                                       ]
                                     }
                                   }
-                                },
-                                {
-                                  "type": "array",
-                                  "items": {
+                                }
+                              ]
+                            },
+                            {
+                              "type": "array",
+                              "items": {
+                                "anyOf": [
+                                  {
                                     "anyOf": [
+                                      {
+                                        "type": "null"
+                                      },
                                       {
                                         "type": "string"
                                       },
                                       {
-                                        "type": "number"
+                                        "type": "boolean"
                                       },
                                       {
-                                        "type": "boolean"
+                                        "type": "number"
                                       }
                                     ]
-                                  }
-                                },
-                                {
-                                  "type": "array",
-                                  "items": {
+                                  },
+                                  {
                                     "type": "array",
                                     "items": {
                                       "anyOf": [
                                         {
+                                          "type": "null"
+                                        },
+                                        {
                                           "type": "string"
                                         },
                                         {
-                                          "type": "number"
+                                          "type": "boolean"
                                         },
                                         {
-                                          "type": "boolean"
+                                          "type": "number"
                                         }
                                       ]
                                     }
                                   }
-                                }
-                              ]
+                                ]
+                              }
                             },
                             {
                               "type": "array",
@@ -410,41 +382,6 @@
                                                   },
                                                   {
                                                     "type": "number"
-                                                  }
-                                                ]
-                                              }
-                                            }
-                                          },
-                                          {
-                                            "type": "array",
-                                            "items": {
-                                              "anyOf": [
-                                                {
-                                                  "type": "string"
-                                                },
-                                                {
-                                                  "type": "number"
-                                                },
-                                                {
-                                                  "type": "boolean"
-                                                }
-                                              ]
-                                            }
-                                          },
-                                          {
-                                            "type": "array",
-                                            "items": {
-                                              "type": "array",
-                                              "items": {
-                                                "anyOf": [
-                                                  {
-                                                    "type": "string"
-                                                  },
-                                                  {
-                                                    "type": "number"
-                                                  },
-                                                  {
-                                                    "type": "boolean"
                                                   }
                                                 ]
                                               }
@@ -602,41 +539,6 @@
                                               ]
                                             }
                                           }
-                                        },
-                                        {
-                                          "type": "array",
-                                          "items": {
-                                            "anyOf": [
-                                              {
-                                                "type": "string"
-                                              },
-                                              {
-                                                "type": "number"
-                                              },
-                                              {
-                                                "type": "boolean"
-                                              }
-                                            ]
-                                          }
-                                        },
-                                        {
-                                          "type": "array",
-                                          "items": {
-                                            "type": "array",
-                                            "items": {
-                                              "anyOf": [
-                                                {
-                                                  "type": "string"
-                                                },
-                                                {
-                                                  "type": "number"
-                                                },
-                                                {
-                                                  "type": "boolean"
-                                                }
-                                              ]
-                                            }
-                                          }
                                         }
                                       ]
                                     }
@@ -720,43 +622,50 @@
                                       ]
                                     }
                                   }
-                                },
-                                {
-                                  "type": "array",
-                                  "items": {
+                                }
+                              ]
+                            },
+                            {
+                              "type": "array",
+                              "items": {
+                                "anyOf": [
+                                  {
                                     "anyOf": [
+                                      {
+                                        "type": "null"
+                                      },
                                       {
                                         "type": "string"
                                       },
                                       {
-                                        "type": "number"
+                                        "type": "boolean"
                                       },
                                       {
-                                        "type": "boolean"
+                                        "type": "number"
                                       }
                                     ]
-                                  }
-                                },
-                                {
-                                  "type": "array",
-                                  "items": {
+                                  },
+                                  {
                                     "type": "array",
                                     "items": {
                                       "anyOf": [
                                         {
+                                          "type": "null"
+                                        },
+                                        {
                                           "type": "string"
                                         },
                                         {
-                                          "type": "number"
+                                          "type": "boolean"
                                         },
                                         {
-                                          "type": "boolean"
+                                          "type": "number"
                                         }
                                       ]
                                     }
                                   }
-                                }
-                              ]
+                                ]
+                              }
                             },
                             {
                               "type": "array",
@@ -822,41 +731,6 @@
                                                   },
                                                   {
                                                     "type": "number"
-                                                  }
-                                                ]
-                                              }
-                                            }
-                                          },
-                                          {
-                                            "type": "array",
-                                            "items": {
-                                              "anyOf": [
-                                                {
-                                                  "type": "string"
-                                                },
-                                                {
-                                                  "type": "number"
-                                                },
-                                                {
-                                                  "type": "boolean"
-                                                }
-                                              ]
-                                            }
-                                          },
-                                          {
-                                            "type": "array",
-                                            "items": {
-                                              "type": "array",
-                                              "items": {
-                                                "anyOf": [
-                                                  {
-                                                    "type": "string"
-                                                  },
-                                                  {
-                                                    "type": "number"
-                                                  },
-                                                  {
-                                                    "type": "boolean"
                                                   }
                                                 ]
                                               }
@@ -1022,41 +896,6 @@
                                               ]
                                             }
                                           }
-                                        },
-                                        {
-                                          "type": "array",
-                                          "items": {
-                                            "anyOf": [
-                                              {
-                                                "type": "string"
-                                              },
-                                              {
-                                                "type": "number"
-                                              },
-                                              {
-                                                "type": "boolean"
-                                              }
-                                            ]
-                                          }
-                                        },
-                                        {
-                                          "type": "array",
-                                          "items": {
-                                            "type": "array",
-                                            "items": {
-                                              "anyOf": [
-                                                {
-                                                  "type": "string"
-                                                },
-                                                {
-                                                  "type": "number"
-                                                },
-                                                {
-                                                  "type": "boolean"
-                                                }
-                                              ]
-                                            }
-                                          }
                                         }
                                       ]
                                     }
@@ -1140,43 +979,50 @@
                                       ]
                                     }
                                   }
-                                },
-                                {
-                                  "type": "array",
-                                  "items": {
+                                }
+                              ]
+                            },
+                            {
+                              "type": "array",
+                              "items": {
+                                "anyOf": [
+                                  {
                                     "anyOf": [
+                                      {
+                                        "type": "null"
+                                      },
                                       {
                                         "type": "string"
                                       },
                                       {
-                                        "type": "number"
+                                        "type": "boolean"
                                       },
                                       {
-                                        "type": "boolean"
+                                        "type": "number"
                                       }
                                     ]
-                                  }
-                                },
-                                {
-                                  "type": "array",
-                                  "items": {
+                                  },
+                                  {
                                     "type": "array",
                                     "items": {
                                       "anyOf": [
                                         {
+                                          "type": "null"
+                                        },
+                                        {
                                           "type": "string"
                                         },
                                         {
-                                          "type": "number"
+                                          "type": "boolean"
                                         },
                                         {
-                                          "type": "boolean"
+                                          "type": "number"
                                         }
                                       ]
                                     }
                                   }
-                                }
-                              ]
+                                ]
+                              }
                             },
                             {
                               "type": "array",
@@ -1242,41 +1088,6 @@
                                                   },
                                                   {
                                                     "type": "number"
-                                                  }
-                                                ]
-                                              }
-                                            }
-                                          },
-                                          {
-                                            "type": "array",
-                                            "items": {
-                                              "anyOf": [
-                                                {
-                                                  "type": "string"
-                                                },
-                                                {
-                                                  "type": "number"
-                                                },
-                                                {
-                                                  "type": "boolean"
-                                                }
-                                              ]
-                                            }
-                                          },
-                                          {
-                                            "type": "array",
-                                            "items": {
-                                              "type": "array",
-                                              "items": {
-                                                "anyOf": [
-                                                  {
-                                                    "type": "string"
-                                                  },
-                                                  {
-                                                    "type": "number"
-                                                  },
-                                                  {
-                                                    "type": "boolean"
                                                   }
                                                 ]
                                               }
@@ -1450,41 +1261,6 @@
                                               ]
                                             }
                                           }
-                                        },
-                                        {
-                                          "type": "array",
-                                          "items": {
-                                            "anyOf": [
-                                              {
-                                                "type": "string"
-                                              },
-                                              {
-                                                "type": "number"
-                                              },
-                                              {
-                                                "type": "boolean"
-                                              }
-                                            ]
-                                          }
-                                        },
-                                        {
-                                          "type": "array",
-                                          "items": {
-                                            "type": "array",
-                                            "items": {
-                                              "anyOf": [
-                                                {
-                                                  "type": "string"
-                                                },
-                                                {
-                                                  "type": "number"
-                                                },
-                                                {
-                                                  "type": "boolean"
-                                                }
-                                              ]
-                                            }
-                                          }
                                         }
                                       ]
                                     }
@@ -1568,43 +1344,50 @@
                                       ]
                                     }
                                   }
-                                },
-                                {
-                                  "type": "array",
-                                  "items": {
+                                }
+                              ]
+                            },
+                            {
+                              "type": "array",
+                              "items": {
+                                "anyOf": [
+                                  {
                                     "anyOf": [
+                                      {
+                                        "type": "null"
+                                      },
                                       {
                                         "type": "string"
                                       },
                                       {
-                                        "type": "number"
+                                        "type": "boolean"
                                       },
                                       {
-                                        "type": "boolean"
+                                        "type": "number"
                                       }
                                     ]
-                                  }
-                                },
-                                {
-                                  "type": "array",
-                                  "items": {
+                                  },
+                                  {
                                     "type": "array",
                                     "items": {
                                       "anyOf": [
                                         {
+                                          "type": "null"
+                                        },
+                                        {
                                           "type": "string"
                                         },
                                         {
-                                          "type": "number"
+                                          "type": "boolean"
                                         },
                                         {
-                                          "type": "boolean"
+                                          "type": "number"
                                         }
                                       ]
                                     }
                                   }
-                                }
-                              ]
+                                ]
+                              }
                             },
                             {
                               "type": "array",
@@ -1670,41 +1453,6 @@
                                                   },
                                                   {
                                                     "type": "number"
-                                                  }
-                                                ]
-                                              }
-                                            }
-                                          },
-                                          {
-                                            "type": "array",
-                                            "items": {
-                                              "anyOf": [
-                                                {
-                                                  "type": "string"
-                                                },
-                                                {
-                                                  "type": "number"
-                                                },
-                                                {
-                                                  "type": "boolean"
-                                                }
-                                              ]
-                                            }
-                                          },
-                                          {
-                                            "type": "array",
-                                            "items": {
-                                              "type": "array",
-                                              "items": {
-                                                "anyOf": [
-                                                  {
-                                                    "type": "string"
-                                                  },
-                                                  {
-                                                    "type": "number"
-                                                  },
-                                                  {
-                                                    "type": "boolean"
                                                   }
                                                 ]
                                               }
@@ -1862,41 +1610,6 @@
                                               ]
                                             }
                                           }
-                                        },
-                                        {
-                                          "type": "array",
-                                          "items": {
-                                            "anyOf": [
-                                              {
-                                                "type": "string"
-                                              },
-                                              {
-                                                "type": "number"
-                                              },
-                                              {
-                                                "type": "boolean"
-                                              }
-                                            ]
-                                          }
-                                        },
-                                        {
-                                          "type": "array",
-                                          "items": {
-                                            "type": "array",
-                                            "items": {
-                                              "anyOf": [
-                                                {
-                                                  "type": "string"
-                                                },
-                                                {
-                                                  "type": "number"
-                                                },
-                                                {
-                                                  "type": "boolean"
-                                                }
-                                              ]
-                                            }
-                                          }
                                         }
                                       ]
                                     }
@@ -1980,43 +1693,50 @@
                                       ]
                                     }
                                   }
-                                },
-                                {
-                                  "type": "array",
-                                  "items": {
+                                }
+                              ]
+                            },
+                            {
+                              "type": "array",
+                              "items": {
+                                "anyOf": [
+                                  {
                                     "anyOf": [
+                                      {
+                                        "type": "null"
+                                      },
                                       {
                                         "type": "string"
                                       },
                                       {
-                                        "type": "number"
+                                        "type": "boolean"
                                       },
                                       {
-                                        "type": "boolean"
+                                        "type": "number"
                                       }
                                     ]
-                                  }
-                                },
-                                {
-                                  "type": "array",
-                                  "items": {
+                                  },
+                                  {
                                     "type": "array",
                                     "items": {
                                       "anyOf": [
                                         {
+                                          "type": "null"
+                                        },
+                                        {
                                           "type": "string"
                                         },
                                         {
-                                          "type": "number"
+                                          "type": "boolean"
                                         },
                                         {
-                                          "type": "boolean"
+                                          "type": "number"
                                         }
                                       ]
                                     }
                                   }
-                                }
-                              ]
+                                ]
+                              }
                             },
                             {
                               "type": "array",
@@ -2082,41 +1802,6 @@
                                                   },
                                                   {
                                                     "type": "number"
-                                                  }
-                                                ]
-                                              }
-                                            }
-                                          },
-                                          {
-                                            "type": "array",
-                                            "items": {
-                                              "anyOf": [
-                                                {
-                                                  "type": "string"
-                                                },
-                                                {
-                                                  "type": "number"
-                                                },
-                                                {
-                                                  "type": "boolean"
-                                                }
-                                              ]
-                                            }
-                                          },
-                                          {
-                                            "type": "array",
-                                            "items": {
-                                              "type": "array",
-                                              "items": {
-                                                "anyOf": [
-                                                  {
-                                                    "type": "string"
-                                                  },
-                                                  {
-                                                    "type": "number"
-                                                  },
-                                                  {
-                                                    "type": "boolean"
                                                   }
                                                 ]
                                               }
@@ -2282,41 +1967,6 @@
                                               ]
                                             }
                                           }
-                                        },
-                                        {
-                                          "type": "array",
-                                          "items": {
-                                            "anyOf": [
-                                              {
-                                                "type": "string"
-                                              },
-                                              {
-                                                "type": "number"
-                                              },
-                                              {
-                                                "type": "boolean"
-                                              }
-                                            ]
-                                          }
-                                        },
-                                        {
-                                          "type": "array",
-                                          "items": {
-                                            "type": "array",
-                                            "items": {
-                                              "anyOf": [
-                                                {
-                                                  "type": "string"
-                                                },
-                                                {
-                                                  "type": "number"
-                                                },
-                                                {
-                                                  "type": "boolean"
-                                                }
-                                              ]
-                                            }
-                                          }
                                         }
                                       ]
                                     }
@@ -2400,43 +2050,50 @@
                                       ]
                                     }
                                   }
-                                },
-                                {
-                                  "type": "array",
-                                  "items": {
+                                }
+                              ]
+                            },
+                            {
+                              "type": "array",
+                              "items": {
+                                "anyOf": [
+                                  {
                                     "anyOf": [
+                                      {
+                                        "type": "null"
+                                      },
                                       {
                                         "type": "string"
                                       },
                                       {
-                                        "type": "number"
+                                        "type": "boolean"
                                       },
                                       {
-                                        "type": "boolean"
+                                        "type": "number"
                                       }
                                     ]
-                                  }
-                                },
-                                {
-                                  "type": "array",
-                                  "items": {
+                                  },
+                                  {
                                     "type": "array",
                                     "items": {
                                       "anyOf": [
                                         {
+                                          "type": "null"
+                                        },
+                                        {
                                           "type": "string"
                                         },
                                         {
-                                          "type": "number"
+                                          "type": "boolean"
                                         },
                                         {
-                                          "type": "boolean"
+                                          "type": "number"
                                         }
                                       ]
                                     }
                                   }
-                                }
-                              ]
+                                ]
+                              }
                             },
                             {
                               "type": "array",
@@ -2502,41 +2159,6 @@
                                                   },
                                                   {
                                                     "type": "number"
-                                                  }
-                                                ]
-                                              }
-                                            }
-                                          },
-                                          {
-                                            "type": "array",
-                                            "items": {
-                                              "anyOf": [
-                                                {
-                                                  "type": "string"
-                                                },
-                                                {
-                                                  "type": "number"
-                                                },
-                                                {
-                                                  "type": "boolean"
-                                                }
-                                              ]
-                                            }
-                                          },
-                                          {
-                                            "type": "array",
-                                            "items": {
-                                              "type": "array",
-                                              "items": {
-                                                "anyOf": [
-                                                  {
-                                                    "type": "string"
-                                                  },
-                                                  {
-                                                    "type": "number"
-                                                  },
-                                                  {
-                                                    "type": "boolean"
                                                   }
                                                 ]
                                               }

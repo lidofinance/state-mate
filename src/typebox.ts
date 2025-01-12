@@ -65,14 +65,18 @@ export function isTypeOfTB<T extends TSchema>(value: unknown, schema: T): value 
 
 const OzNonEnumerableAclTB = Type.Readonly(Type.Record(EthRoleStringTB, EthAddressesArrayTB));
 
-const ViewResultPlainValueTB = Type.Readonly(Type.Union([Type.Null(), Type.String(), Type.Boolean(), Type.Number()]));
-const ArrayPlainValue = Type.Readonly(Type.Array(Type.Union([Type.String(), Type.Number(), Type.Boolean()])));
+export const ViewResultPlainValueTB = Type.Readonly(
+  Type.Union([Type.Null(), Type.String(), Type.Boolean(), Type.Number()]),
+);
+export const ArrayViewResultPlainValueTB = Type.Array(ViewResultPlainValueTB);
+
+export const ArrayPlainValueTB = Type.Readonly(
+  Type.Array(Type.Union([ViewResultPlainValueTB, ArrayViewResultPlainValueTB])),
+);
 
 const ArbitraryObjectTB = Type.Readonly(Type.Record(Type.String(), ViewResultPlainValueTB));
 
-export const ViewResultTB = Type.Readonly(
-  Type.Union([ViewResultPlainValueTB, ArbitraryObjectTB, ArrayPlainValue, Type.Array(ArrayPlainValue)]),
-);
+export const ViewResultTB = Type.Readonly(Type.Union([ViewResultPlainValueTB, ArbitraryObjectTB]));
 
 const StaticCallCommon = Type.Readonly(
   Type.Object({
@@ -107,7 +111,9 @@ export const StaticCallCheckTB = Type.Readonly(Type.Union([StaticCallResultTB, S
 
 export const ArrayOfStaticCallCheckTB = Type.Readonly(Type.Array(StaticCallCheckTB));
 
-const ChecksEntryValueTB = Type.Readonly(Type.Union([StaticCallCheckTB, ViewResultTB, ArrayOfStaticCallCheckTB]));
+const ChecksEntryValueTB = Type.Readonly(
+  Type.Union([StaticCallCheckTB, ViewResultTB, ArrayPlainValueTB, ArrayOfStaticCallCheckTB]),
+);
 
 export const ProxyChecksTB = Type.Readonly(
   Type.Object(

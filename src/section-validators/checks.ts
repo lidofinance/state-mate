@@ -1,17 +1,20 @@
 import { BaseContract, JsonRpcProvider } from "ethers";
 import { loadAbiFromFile } from "../abi-provider";
 import { CheckLevel, Ef, needCheck } from "../common";
+import { loadContract } from "../explorer-provider";
 import { logErrorAndExit } from "../logger";
 import {
   ArrayOfStaticCallCheckTB,
+  ArrayPlainValueTB,
+  ArrayViewResultPlainValueTB,
   ChecksEntryValue,
   ContractEntry,
   isTypeOfTB,
   StaticCallCheckTB,
+  ViewResultPlainValueTB,
   ViewResultTB,
 } from "../typebox";
 import { SectionValidatorBase } from "./base";
-import { loadContract } from "../explorer-provider";
 
 export class ChecksSectionValidator extends SectionValidatorBase {
   constructor(provider: JsonRpcProvider, sectionName: Ef = Ef.checks) {
@@ -34,7 +37,7 @@ export class ChecksSectionValidator extends SectionValidatorBase {
     if (isTypeOfTB(checkEntryValue, ArrayOfStaticCallCheckTB) /* && checkEntryValue !== null */) {
       //todo check without  checkEntryValue !== null
       if (!checkEntryValue.length) {
-        await this._checkViewFunction(contract, method, { result: [] });
+        await this._checkViewFunction(contract, method, { result: "" });
       } else {
         for (const argsResult of checkEntryValue) {
           await this._checkViewFunction(contract, method, argsResult);
@@ -44,6 +47,16 @@ export class ChecksSectionValidator extends SectionValidatorBase {
       await this._checkViewFunction(contract, method, checkEntryValue);
     } else if (isTypeOfTB(checkEntryValue, ViewResultTB)) {
       await this._checkViewFunction(contract, method, { result: checkEntryValue });
+    } else if (isTypeOfTB(checkEntryValue, ArrayPlainValueTB)) {
+      for (const plainValueOrArray of checkEntryValue) {
+        if (isTypeOfTB(plainValueOrArray, ViewResultPlainValueTB)) {
+          await this._checkViewFunction(contract, method, { result: plainValueOrArray });
+        } else if (isTypeOfTB(plainValueOrArray, ArrayViewResultPlainValueTB)) {
+          for (const plainValue of plainValueOrArray) {
+            await this._checkViewFunction(contract, method, { result: plainValue });
+          }
+        }
+      }
     } else {
       logErrorAndExit(`Unknown check type: ${JSON.stringify(checkEntryValue)}`);
     }

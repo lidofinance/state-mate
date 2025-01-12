@@ -12,7 +12,7 @@ export class ImplementationChecksSectionValidator extends ChecksSectionValidator
 
   override async validateSection(contractEntry: ContractEntry, contractAlias: string) {
     if (isTypeOfTB(contractEntry, ProxyContractEntryTB) && contractEntry.implementation) {
-      logHeader2(Ef.implementationChecks);
+      logHeader2(this.sectionName);
       const { implementation, name, implementationChecks } = contractEntry;
 
       const allNonMutable = getNonMutables(loadAbiFromFile(name, implementation));
