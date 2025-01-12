@@ -59,6 +59,7 @@ export type ChecksEntryValue = Static<typeof ChecksEntryValueTB>;
 export type ContractSection = Static<typeof ContractSectionTB>;
 export type DeployedSection = Static<typeof DeployedSectionTB>;
 export type EthAddressString = Static<typeof EthAddressStringTB>;
+export type OzAclChecks = Static<typeof OzAclChecksTB>;
 export function isTypeOfTB<T extends TSchema>(value: unknown, schema: T): value is Static<typeof schema> {
   return Value.Check(schema, value);
 }
@@ -141,7 +142,9 @@ export const RegularContractEntryTB = Type.Readonly(
     { additionalProperties: false },
   ),
 );
-
+export const OzAclChecksTB = Type.Readonly(
+  Type.Record(Type.String(), EthAddressesArrayTB, { additionalProperties: false }),
+);
 export const ProxyContractEntryTB = Type.Readonly(
   Type.Object(
     {
@@ -150,6 +153,7 @@ export const ProxyContractEntryTB = Type.Readonly(
       implementation: Type.Optional(EthAddressStringTB),
       proxyChecks: Type.Optional(ProxyChecksTB),
       implementationChecks: ImplementationChecksTB,
+      ozAcl: Type.Optional(OzAclChecksTB),
     },
     { additionalProperties: false },
   ),

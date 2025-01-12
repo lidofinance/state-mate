@@ -1141,6 +1141,20 @@
                           ]
                         }
                       }
+                    },
+                    "ozAcl": {
+                      "additionalProperties": false,
+                      "type": "object",
+                      "patternProperties": {
+                        "^(.*)$": {
+                          "type": "array",
+                          "items": {
+                            "format": "ethereum-address",
+                            "pattern": "^0x[a-fA-F0-9]{40}$",
+                            "type": "string"
+                          }
+                        }
+                      }
                     }
                   },
                   "required": [
@@ -2210,6 +2224,20 @@
                               }
                             }
                           ]
+                        }
+                      }
+                    },
+                    "ozAcl": {
+                      "additionalProperties": false,
+                      "type": "object",
+                      "patternProperties": {
+                        "^(.*)$": {
+                          "type": "array",
+                          "items": {
+                            "format": "ethereum-address",
+                            "pattern": "^0x[a-fA-F0-9]{40}$",
+                            "type": "string"
+                          }
                         }
                       }
                     }

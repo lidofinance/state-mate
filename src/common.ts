@@ -10,6 +10,7 @@ export enum Ef {
   proxyChecks = "proxyChecks",
   implementationChecks = "implementationChecks",
   ozNonEnumerableAcl = "ozNonEnumerableAcl",
+  ozAcl = "ozAcl",
   result = "result",
   contracts = "contracts",
   explorerHostname = "explorerHostname",

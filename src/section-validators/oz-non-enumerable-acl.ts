@@ -13,7 +13,7 @@ export class OzNonEnumerableAclSectionValidator extends SectionValidatorBase {
   }
   override async validateSection(contractEntry: ContractEntry) {
     if (contractEntry.ozNonEnumerableAcl) {
-      logHeader2(Ef.ozNonEnumerableAcl);
+      logHeader2(this.sectionName);
       await this._validate(contractEntry);
     }
   }
