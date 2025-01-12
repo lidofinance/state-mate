@@ -9,11 +9,12 @@ import { printError } from "./common";
 import { log, LogCommand, logErrorAndExit, WARNING_MARK } from "./logger";
 import { g_Args } from "./state-mate";
 
-export function loadAbiFromFile(contractName: string, contractAddress: string): Abi | never {
+export function loadAbiFromFile(contractName: string, address: string): Abi | never {
+  address = address.toLowerCase();
   let abiPath = undefined;
 
   try {
-    abiPath = findAbiPath(contractName, contractAddress, { shouldThrow: true });
+    abiPath = findAbiPath(contractName, address, { shouldThrow: true });
   } catch (error) {
     logErrorAndExit(`Error finding ABI file for contract 
         ${contractName} in ${g_Args.abiDirPath}: ${printError(error)}`);
@@ -42,7 +43,8 @@ export async function saveAllAbi(contractInfo: ContractInfo) {
 }
 
 async function saveAbiIfNotExist(contractName: string, address: string, abiFromExplorer: Abi): Promise<void> {
-  const abiPath = findAbiPath(contractName, address, { shouldThrow: false });
+  address = address.toLowerCase();
+  const abiPath = findAbiPath(contractName, address);
 
   if (abiPath) {
     const differences: string = getJsonDiff(abiPath, abiFromExplorer);
@@ -89,6 +91,7 @@ function getJsonDiff(abiPath: string, abiFromExplorer: Abi): string {
 }
 
 export function checkOneAbiDiffs(contractName: string, address: string, abiFromExplorer: Abi) {
+  address = address.toLowerCase();
   const logHandle = new LogCommand(`${contractName.padEnd(30)} (${address})`);
 
   try {
@@ -119,6 +122,7 @@ function findAbiPath(
 ): string | undefined {
   if (!contractName || !g_Args.abiDirPath) return undefined;
 
+  contractAddress = contractAddress.toLowerCase();
   // prettier-ignore
   const abiVariantsName = [
     `${contractName}.json`,
