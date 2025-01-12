@@ -65,12 +65,11 @@ function formatAjvErrors(errors: ValidateFunction["errors"]) {
 }
 
 function loadStateFromYaml(configPath: string): unknown {
-  const file = path.resolve(configPath);
-  const configContent = fs.readFileSync(file, "utf-8");
   const reviver = (_: unknown, v: unknown) => {
     return typeof v === "bigint" ? String(v) : v;
   };
-
+  const file = path.resolve(configPath);
+  const configContent = fs.readFileSync(file, "utf-8");
   try {
     return YAML.parse(configContent, reviver, { schema: "core", intAsBigInt: true });
   } catch (error) {
@@ -81,11 +80,11 @@ function loadStateFromYaml(configPath: string): unknown {
 function validateJsonWithSchema<T extends TSchema>(
   jsonDoc: unknown,
   schemaPrototype: T,
-  fileTypeName: "MAIN" | "SEED",
+  { silent }: { silent: boolean } = { silent: false },
 ): jsonDoc is Static<T> {
-  logHeader1(
-    `The ${chalk.yellow(fileTypeName)} YAML file at ${chalk.yellow(g_Args.configPath)} will be validated against the ${chalk.yellow(fileTypeName)} JSON Schema`,
-  );
+  if (!silent)
+    logHeader1(`The YAML file at ${chalk.yellow(g_Args.configPath)} will be validated against the JSON Schema`);
+
   const ajv = new Ajv({ verbose: true, allErrors: true });
   addFormats(ajv);
   ajv.addFormat(
@@ -102,20 +101,23 @@ function validateJsonWithSchema<T extends TSchema>(
   try {
     validate = ajv.compile(schemaPrototype);
   } catch (error) {
+    if (silent) return false;
     logErrorAndExit(
       `Failed to compile schema in Ajv (Most likely, the errors are in the Typebox types):\n\n${chalk.red(printError(error))}`,
     );
   }
   const valid = validate(jsonDoc);
   if (!valid) {
+    if (silent) return false;
     logErrorAndExit(
       `The YAML file ${chalk.magenta(g_Args!.configPath)} contains errors that do not comply with the JSON schema. ` +
         `Please correct them and try again\n\n${formatAjvErrors(validate.errors)} `,
     );
   }
-  logHeader1(
-    `The ${chalk.yellow(fileTypeName)} YAML file at ${chalk.yellow(g_Args.configPath)} has successfully passed validation against the ${chalk.yellow(fileTypeName)} JSON Schema`,
-  );
+  if (!silent)
+    logHeader1(
+      `The YAML file at ${chalk.yellow(g_Args.configPath)} has successfully passed validation against the JSON Schema`,
+    );
   return true;
 }
 
@@ -149,7 +151,7 @@ async function downloadAndSaveAbis(jsonDoc: SeedDocument) {
   await iterateLoadedContracts(jsonDoc, saveAllAbi);
 }
 
-async function downloadAndCheckAbis(jsonDoc: EntireDocument) {
+async function downloadAndCheckAbis<T extends EntireDocument | SeedDocument>(jsonDoc: T) {
   logHeader1(`ABI checking has been activated`);
   await iterateLoadedContracts(jsonDoc, checkAllAbiDiffs);
 }
@@ -214,24 +216,31 @@ function generateBothSchemas() {
 
 export async function main() {
   g_Args = parseCmdLineArgs();
-  const jsonDoc = loadStateFromYaml(g_Args.configPath);
+
   if (g_Args.schemas) {
     generateBothSchemas();
     return 1;
   }
 
+  const jsonDoc = loadStateFromYaml(g_Args.configPath);
+
   if (g_Args.generate) {
-    if (validateJsonWithSchema(jsonDoc, SeedDocumentTB, "SEED")) {
+    if (validateJsonWithSchema(jsonDoc, EntireDocumentTB, { silent: true })) {
+      logErrorAndExit(chalk.yellow(`A main YAML was specified, but a seed YAML was expected: ${g_Args.configPath}`));
+    }
+    if (validateJsonWithSchema(jsonDoc, SeedDocumentTB)) {
       await downloadAndSaveAbis(jsonDoc);
       await doGenerateBoilerplate(g_Args.configPath, jsonDoc);
     }
   } else {
-    if (validateJsonWithSchema(jsonDoc, EntireDocumentTB, "MAIN")) {
+    if (validateJsonWithSchema(jsonDoc, SeedDocumentTB, { silent: true })) {
+      logErrorAndExit(chalk.yellow(`A seed YAML was specified, but a main YAML was expected: ${g_Args.configPath}`));
+    }
+    if (validateJsonWithSchema(jsonDoc, EntireDocumentTB)) {
       if (g_Args.abi) {
-        await downloadAndCheckAbis(jsonDoc);
-      } else {
-        await doChecks(jsonDoc);
+        downloadAndCheckAbis(jsonDoc);
       }
+      await doChecks(jsonDoc);
     }
   }
 }
