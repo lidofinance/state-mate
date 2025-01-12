@@ -77,7 +77,7 @@ export const ArrayPlainValueTB = Type.Readonly(
 
 const ArbitraryObjectTB = Type.Readonly(Type.Record(Type.String(), ViewResultPlainValueTB));
 
-export const ViewResultTB = Type.Readonly(Type.Union([ViewResultPlainValueTB, ArbitraryObjectTB]));
+export const ViewResultTB = Type.Readonly(Type.Union([ViewResultPlainValueTB, ArrayPlainValueTB, ArbitraryObjectTB]));
 
 const StaticCallCommon = Type.Readonly(
   Type.Object({

@@ -47,16 +47,6 @@ export class ChecksSectionValidator extends SectionValidatorBase {
       await this._checkViewFunction(contract, method, checkEntryValue);
     } else if (isTypeOfTB(checkEntryValue, ViewResultTB)) {
       await this._checkViewFunction(contract, method, { result: checkEntryValue });
-    } else if (isTypeOfTB(checkEntryValue, ArrayPlainValueTB)) {
-      for (const plainValueOrArray of checkEntryValue) {
-        if (isTypeOfTB(plainValueOrArray, ViewResultPlainValueTB)) {
-          await this._checkViewFunction(contract, method, { result: plainValueOrArray });
-        } else if (isTypeOfTB(plainValueOrArray, ArrayViewResultPlainValueTB)) {
-          for (const plainValue of plainValueOrArray) {
-            await this._checkViewFunction(contract, method, { result: plainValue });
-          }
-        }
-      }
     } else {
       logErrorAndExit(`Unknown check type: ${JSON.stringify(checkEntryValue)}`);
     }
