@@ -53,12 +53,12 @@ export async function collectStaticCallResults(
     if (numArgs === 0) {
       try {
         const result: unknown = await viewFunction.staticCall();
-        staticCallResult = String(result);
+        staticCallResult = ` ${result}`;
       } catch (error) {
-        staticCallResult = "View call reverted";
+        staticCallResult = " view call reverted";
       }
     } else {
-      staticCallResult = "Need to specify args";
+      staticCallResult = " need to specify args";
     }
     results.push({ methodName, staticCallResult });
   }

@@ -53,15 +53,14 @@ export async function iterateDeployedAddresses<T extends EntireDocument | SeedDo
   fs.mkdirSync(abiDirPath, { recursive: true });
 
   for (const [explorerSectionKey, addresses] of Object.entries(jsonDoc.deployed)) {
-    const networkSection = jsonDoc[explorerSectionKey as keyof T];
+    const explorerSection = jsonDoc[explorerSectionKey as keyof T];
 
-    if (isTypeOfTB(networkSection, ExplorerSectionTB)) {
-      const { explorerHostname, explorerTokenEnv } = networkSection;
-      const rpcUrl = readUrlOrFromEnv(networkSection.rpcUrl);
+    if (isTypeOfTB(explorerSection, ExplorerSectionTB)) {
+      const { explorerHostname, explorerTokenEnv } = explorerSection;
+      const rpcUrl = readUrlOrFromEnv(explorerSection.rpcUrl);
       const explorerKey = explorerTokenEnv ? process.env[explorerTokenEnv] : "";
-
+      const scalars: YAML.Scalar[] = getScalarsWithAnchors(seedDoc, explorerSectionKey);
       for (const address of addresses) {
-        const scalars: YAML.Scalar[] = _getScalarsForAnchors(seedDoc);
         const deployedNode = scalars.find((scalar) => {
           return (scalar.value as string) === address;
         });
@@ -82,17 +81,20 @@ export async function iterateDeployedAddresses<T extends EntireDocument | SeedDo
   }
 }
 
-function _getScalarsForAnchors(doc: YAML.Document): YAML.Scalar[] {
-  const deployedSection = doc.get("deployed") as YAML.YAMLMap;
-  const scalars: YAML.Scalar[] = [];
-  {
-    for (const deployedSectionNode of deployedSection.items) {
-      for (const deployedNode of (deployedSectionNode.value as YAML.YAMLMap).items) {
-        scalars.push(deployedNode as unknown as YAML.Scalar);
-      }
+function getScalarsWithAnchors(doc: YAML.Document, explorerSectionKey: string): YAML.Scalar[] {
+  const section = doc.getIn(["deployed", explorerSectionKey]);
+
+  if (YAML.isSeq(section)) {
+    if (
+      section.items.every((item) => {
+        return YAML.isScalar(item);
+      })
+    ) {
+      return section.items;
     }
   }
-  return scalars;
+
+  return [];
 }
 
 async function makeBoilerplateForAllNonMutableFunctions(abi: Abi, contract: Contract) {
