@@ -42,8 +42,7 @@
         }
       },
       "required": [
-        "rpcUrl",
-        "explorerHostname"
+        "rpcUrl"
       ]
     },
     "l2": {
@@ -61,8 +60,7 @@
         }
       },
       "required": [
-        "rpcUrl",
-        "explorerHostname"
+        "rpcUrl"
       ]
     }
   },

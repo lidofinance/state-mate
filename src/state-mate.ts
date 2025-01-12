@@ -168,7 +168,11 @@ async function iterateLoadedContracts<T extends EntireDocument | SeedDocument>(
 
     if (isTypeOfTB(explorerSection, ExplorerSectionTB) || isTypeOfTB(explorerSection, NetworkSectionTB)) {
       const { explorerHostname, explorerTokenEnv } = explorerSection;
-
+      if (!explorerHostname) {
+        logErrorAndExit(
+          `The field ${chalk.magenta(explorerHostname)} is required in the ${chalk.magenta(g_Args.configPath)}`,
+        );
+      }
       const explorerKey = explorerTokenEnv ? process.env[explorerTokenEnv] : "";
       if (!explorerKey && explorerTokenEnv)
         console.log(`\n${WARNING_MARK} ${chalk.yellow(`The env var ${explorerTokenEnv} is not set`)}\n`);

@@ -113,6 +113,11 @@ export async function doGenerateBoilerplate(seedConfigPath: string, jsonDoc: See
 
   await iterateDeployedAddresses(doc, jsonDoc, async (ctx: DeployedAddressInfo) => {
     const { address, deployedNode, explorerHostname, rpcUrl, sectionName, explorerKey } = ctx;
+    if (!explorerHostname) {
+      logErrorAndExit(
+        `The field ${chalk.magenta(explorerHostname)} is required in the ${chalk.magenta(g_Args.configPath)}`,
+      );
+    }
     const { contractName, implementation } = await loadContractInfoFromExplorer(address, explorerHostname, explorerKey);
 
     const provider = new JsonRpcProvider(rpcUrl);

@@ -155,7 +155,7 @@ export const ExplorerSectionTB = Type.Readonly(
   Type.Object(
     {
       rpcUrl: Type.String(),
-      explorerHostname: Type.String(),
+      explorerHostname: Type.Optional(Type.String()),
       explorerTokenEnv: Type.Optional(Type.String()),
     },
     { additionalProperties: false },
