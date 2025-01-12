@@ -132,22 +132,24 @@ function findAbiPath(
     ] : [])
   ];
 
-  //It's unclear why we need search by address only. It provides false positive results
-  // prettier-ignore
-  // const abiVariantsRegex = [
-  //   ... (contractAddress ? [
-  //     new RegExp(`-${contractAddress}\.json$`),
-  //   ] : [])
-  // ];
+  let abiFileName = abiVariantsName.find((variantPath) => fs.existsSync(path.join(g_Args.abiDirPath, variantPath)));
+  if (!abiFileName) {
+    const abiDirContent = fs.readdirSync(g_Args.abiDirPath);
+    abiFileName = abiDirContent.find((fileName) => {
+      const match = fileName.match(/0x[0-9a-fA-F]{40}/);
+      if (!match) return;
 
-  const abiFileName = abiVariantsName.find(variantPath => fs.existsSync(path.join(g_Args.abiDirPath, variantPath)));
-  //
-  // if (!abiFileName) {
-  //   const abiDirContent = fs.readdirSync(g_Args.abiDirPath);
-  //   abiFileName = abiDirContent.find(fileName => abiVariantsRegex.some(regex => regex.test(fileName)));
-  // }
+      const address = match[0];
+
+      const newFileName = fileName.replace(address, address.toLowerCase());
+      //Is renaming required?
+      return abiVariantsName.find((variantName) => {
+        return newFileName === variantName;
+      });
+    });
+  }
   if (!abiFileName && shouldThrow) {
-    return generateAbiNotFoundError(abiVariantsName /* , abiVariantsRegex */);
+    return generateAbiNotFoundError(abiVariantsName);
   }
 
   return abiFileName ? path.join(g_Args.abiDirPath, abiFileName) : undefined;

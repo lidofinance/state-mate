@@ -170,7 +170,7 @@ async function iterateLoadedContracts<T extends EntireDocument | SeedDocument>(
       const { explorerHostname, explorerTokenEnv } = explorerSection;
 
       const explorerKey = explorerTokenEnv ? process.env[explorerTokenEnv] : "";
-      if (!explorerKey)
+      if (!explorerKey && explorerTokenEnv)
         console.log(`\n${WARNING_MARK} ${chalk.yellow(`The env var ${explorerTokenEnv} is not set`)}\n`);
 
       for (const address of addresses) {
