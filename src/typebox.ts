@@ -3,12 +3,11 @@ import { Value } from "@sinclair/typebox/value";
 
 export const EthereumAddressFormat = {
   name: "ethereum-address",
-  formatString: /^0x[a-fA-F0-9]{40}$/,
+  formatString: /^(0|[1-9]|0x[a-fA-F0-9]{40})$/,
 };
-
 export const EthereumRoleFormat = {
   name: "ethereum-role",
-  formatString: /^0x[a-fA-F0-9]{64}$/,
+  formatString: /(0|^0x[a-fA-F0-9]{64})$/,
 };
 
 export const MaxIntFormat = {
@@ -47,7 +46,7 @@ export type ContractEntry = Static<typeof ContractEntryTB>;
 export type ProxyContractEntry = Static<typeof ProxyContractEntryTB>;
 export type RegularContractEntry = Static<typeof RegularContractEntryTB>;
 export type StaticCallCheck = Static<typeof StaticCallCheckTB>;
-export type ViewResultPlainValue = Static<typeof ViewResultPlainValueTB>;
+export type ViewResultPlainValue = Static<typeof PlainValueTB>;
 export type ArbitraryObject = Static<typeof ArbitraryObjectTB>;
 export type ViewResult = Static<typeof ViewResultTB>;
 // export type ExplorerSection = Static<typeof ExplorerSectionTB>
@@ -66,22 +65,18 @@ export function isTypeOfTB<T extends TSchema>(value: unknown, schema: T): value 
 
 const OzNonEnumerableAclTB = Type.Readonly(Type.Record(EthRoleStringTB, EthAddressesArrayTB));
 
-export const ViewResultPlainValueTB = Type.Readonly(
-  Type.Union([Type.Null(), Type.String(), Type.Boolean(), Type.Number()]),
-);
-export const ArrayViewResultPlainValueTB = Type.Array(ViewResultPlainValueTB);
+export const PlainValueTB = Type.Readonly(Type.Union([Type.Null(), Type.String(), Type.Boolean(), Type.Number()]));
+export const PlainValueOrArrayTB = Type.Array(PlainValueTB);
 
-export const ArrayPlainValueTB = Type.Readonly(
-  Type.Array(Type.Union([ViewResultPlainValueTB, ArrayViewResultPlainValueTB])),
-);
+export const ArrayOfPlainValueOrArrayTB = Type.Readonly(Type.Array(Type.Union([PlainValueTB, PlainValueOrArrayTB])));
 
-const ArbitraryObjectTB = Type.Readonly(Type.Record(Type.String(), ViewResultPlainValueTB));
+const ArbitraryObjectTB = Type.Readonly(Type.Record(Type.String(), PlainValueTB));
 
-export const ViewResultTB = Type.Readonly(Type.Union([ViewResultPlainValueTB, ArrayPlainValueTB, ArbitraryObjectTB]));
+export const ViewResultTB = Type.Readonly(Type.Union([PlainValueTB, ArrayOfPlainValueOrArrayTB, ArbitraryObjectTB]));
 
 const StaticCallCommon = Type.Readonly(
   Type.Object({
-    args: Type.Optional(Type.Array(Type.Union([Type.String(), Type.Number(), Type.Boolean()]))),
+    args: Type.Optional(ArrayOfPlainValueOrArrayTB),
     signature: Type.Optional(Type.String()),
     bigint: Type.Optional(Type.Boolean()),
   }),
@@ -113,7 +108,7 @@ export const StaticCallCheckTB = Type.Readonly(Type.Union([StaticCallResultTB, S
 export const ArrayOfStaticCallCheckTB = Type.Readonly(Type.Array(StaticCallCheckTB));
 
 const ChecksEntryValueTB = Type.Readonly(
-  Type.Union([StaticCallCheckTB, ViewResultTB, ArrayPlainValueTB, ArrayOfStaticCallCheckTB]),
+  Type.Union([StaticCallCheckTB, ViewResultTB, ArrayOfPlainValueOrArrayTB, ArrayOfStaticCallCheckTB]),
 );
 
 export const ProxyChecksTB = Type.Readonly(
@@ -197,14 +192,14 @@ const DeployedSectionTB = Type.Readonly(
 export const EntireDocumentTB = Type.Readonly(
   Type.Object(
     {
-      parameters: Type.Array(Type.Union([EthAddressStringTB, Type.Literal(0), EthRoleStringTB, MaxIntStringTB])),
+      parameters: Type.Array(Type.Union([EthAddressStringTB, EthRoleStringTB, MaxIntStringTB, Type.Literal(0)])),
       roles: Type.Optional(Type.Union([Type.Array(EthRoleStringTB), Type.Null()])),
       misc: Type.Optional(Type.Array(Type.Union([Type.String(), Type.Number()]))),
       deployed: DeployedSectionTB,
       "deployed-aux": Type.Optional(EthRolesArrayTB),
       l1: NetworkSectionTB,
       l2: Type.Optional(NetworkSectionTB),
-      tvl: Type.Optional(Type.Array(Type.Number())),
+      tvl: Type.Optional(Type.Array(Type.Union([Type.Number(), Type.String()]))),
       delays: Type.Optional(Type.Array(Type.String())),
       signers: Type.Optional(Type.Array(Type.Union([EthAddressStringTB, Type.Number()]))),
       selectors: Type.Optional(Type.Array(Type.String())),

@@ -1,6 +1,6 @@
 ---
 
-# yaml-language-server: $schema=./../../schemas/main-schema.json
+# yaml-language-server: $schema=./../../../schemas/main-schema.json
 
 parameters:
   - &lidoLocator "0x28FAB2059C713A7F9D8c86Db49f9bb0e96Af1ef8"
@@ -142,13 +142,10 @@ l1:
           - args: [ *STAKING_MODULE_UNVETTING_ROLE, 0 ]
             result: *depositSecurityModule
           - args: [ *STAKING_MODULE_UNVETTING_ROLE, 1 ]
-            result: []
             mustRevert: true
           - args: [ *STAKING_MODULE_PAUSE_ROLE, 0 ]
-            result: []
             mustRevert: true
           - args: [ *STAKING_MODULE_RESUME_ROLE, 0 ]
-            result: []
             mustRevert: true
         getRoleMemberCount:
           - args: [ *STAKING_MODULE_UNVETTING_ROLE ]

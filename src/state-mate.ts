@@ -223,7 +223,6 @@ export async function main() {
 
   if (g_Args.schemas) {
     generateBothSchemas();
-    return 1;
   }
 
   const jsonDoc = loadStateFromYaml(g_Args.configPath);

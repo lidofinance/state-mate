@@ -1,6 +1,6 @@
 ---
 
-# yaml-language-server: $schema=./../../schemas/main-schema.json
+# yaml-language-server: $schema=./../../../schemas/main-schema.json
 
 parameters:
   - &lidoLocator "0xC1d0b3DE6792Bf6b4b37EccdcC24e45978Cfd2Eb"
@@ -161,13 +161,10 @@ l1:
           - args: [*STAKING_MODULE_UNVETTING_ROLE, 0]
             result: *depositSecurityModule
           - args: [*STAKING_MODULE_UNVETTING_ROLE, 1]
-            result: []
             mustRevert: true
           - args: [*STAKING_MODULE_PAUSE_ROLE, 0]
-            result: []
             mustRevert: true
           - args: [*STAKING_MODULE_RESUME_ROLE, 0]
-            result: []
             mustRevert: true
         getRoleMemberCount:
           - args: [*STAKING_MODULE_UNVETTING_ROLE]
@@ -391,26 +388,22 @@ l1:
           - args: [*oracleReportSanityCheckerMaxValidatorsExits]
             result: []
           - args: [*oracleReportSanityCheckerMaxValidatorsExitsRevert]
-            result: []
             mustRevert: true
         checkExitedValidatorsRatePerDay:
           - args: [*oracleReportSanityCheckerMaxValidatorsExitsPerDay]
             result: []
           - args: [*oracleReportSanityCheckerMaxValidatorsExitsPerDayRevert]
             mustRevert: true
-            result: []
         checkExtraDataItemsCountPerTransaction:
           - args: [*oracleReportSanityCheckerExtraDataItemPerTransaction]
             result: []
           - args: [*oracleReportSanityCheckerExtraDataItemPerTransactionRevert]
             mustRevert: true
-            result: []
         checkNodeOperatorsPerExtraDataItemCount:
           - args: [1, *oracleReportSanityCheckerNOPerExtraDataItem]
             result: []
           - args: [1, *oracleReportSanityCheckerNOPerExtraDataItemRevert]
             mustRevert: true
-            result: []
         checkSimulatedShareRate: null
         checkWithdrawalQueueOracleReport: null
         getLidoLocator: *lidoLocator
@@ -486,7 +479,6 @@ l1:
         getRoleAdmin: null
         getRoleMember:
           - args: [*MANAGE_CONSENSUS_VERSION_ROLE, 0]
-            result: []
             mustRevert: true
         getRoleMemberCount: null
         getTotalRequestsProcessed: null

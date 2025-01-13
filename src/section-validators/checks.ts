@@ -5,13 +5,10 @@ import { loadContract } from "../explorer-provider";
 import { logErrorAndExit } from "../logger";
 import {
   ArrayOfStaticCallCheckTB,
-  ArrayPlainValueTB,
-  ArrayViewResultPlainValueTB,
   ChecksEntryValue,
   ContractEntry,
   isTypeOfTB,
   StaticCallCheckTB,
-  ViewResultPlainValueTB,
   ViewResultTB,
 } from "../typebox";
 import { SectionValidatorBase } from "./base";
@@ -37,7 +34,7 @@ export class ChecksSectionValidator extends SectionValidatorBase {
     if (isTypeOfTB(checkEntryValue, ArrayOfStaticCallCheckTB) /* && checkEntryValue !== null */) {
       //todo check without  checkEntryValue !== null
       if (!checkEntryValue.length) {
-        await this._checkViewFunction(contract, method, { result: "" });
+        await this._checkViewFunction(contract, method, { result: [] });
       } else {
         for (const argsResult of checkEntryValue) {
           await this._checkViewFunction(contract, method, argsResult);

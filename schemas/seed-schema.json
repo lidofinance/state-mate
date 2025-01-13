@@ -10,7 +10,7 @@
           "type": "array",
           "items": {
             "format": "ethereum-address",
-            "pattern": "^0x[a-fA-F0-9]{40}$",
+            "pattern": "^(0|[1-9]|0x[a-fA-F0-9]{40})$",
             "type": "string"
           }
         },
@@ -18,7 +18,7 @@
           "type": "array",
           "items": {
             "format": "ethereum-address",
-            "pattern": "^0x[a-fA-F0-9]{40}$",
+            "pattern": "^(0|[1-9]|0x[a-fA-F0-9]{40})$",
             "type": "string"
           }
         }

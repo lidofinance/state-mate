@@ -1,0 +1,137 @@
+=======================================================================================================
+===== Contract (l1): tokenBridge (L1ERC20TokenBridge, 0x2D001d79E5aF5F65a939781FE228B267a8Ed468B) =====
+=======================================================================================================
+
+===== checks =====
+✔ .isInitialized: true
+✔ .isDepositsEnabled: true
+✔ .isWithdrawalsEnabled: true
+✔ .l1Token: 0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0
+✔ .l2Token: 0x458ed78EB972a369799fb278c0243b25e5242A83
+✔ .l2TokenBridge: 0x9c46560D6209743968cC24150893631A39AfDe4d
+✔ .messenger: 0x676A795fe6E43C17c668de16730c3F690FEB7120
+✔ .DEFAULT_ADMIN_ROLE: 0x0000000000000000000000000000000000000000000000000000000000000000
+✔ .DEPOSITS_DISABLER_ROLE: 0x63f736f21cb2943826cd50b191eb054ebbea670e4e962d0527611f830cd399d6
+✔ .DEPOSITS_ENABLER_ROLE: 0x4b43b36766bde12c5e9cbbc37d15f8d1f769f08f54720ab370faeb4ce893753a
+✔ .WITHDRAWALS_DISABLER_ROLE: 0x94a954c0bc99227eddbc0715a62a7e1056ed8784cd719c2303b685683908857c
+✔ .WITHDRAWALS_ENABLER_ROLE: 0x9ab8816a3dc0b3849ec1ac00483f6ec815b07eee2fd766a353311c823ad59d0d
+⚠ .getRoleAdmin: skipped
+⚠ .hasRole: skipped
+⚠ .supportsInterface: skipped
+
+===== proxyChecks =====
+✔ .proxy__getImplementation: 0x6fBBe1Af52D22557D7F161Dc5952E306F4742e23
+✔ .proxy__getAdmin: 0x3e40D73EB977Dc6a537aF587D48316feE66E9C8c
+✔ .proxy__getIsOssified: false
+
+===== implementationChecks =====
+⚠ .DEFAULT_ADMIN_ROLE: skipped
+⚠ .DEPOSITS_DISABLER_ROLE: skipped
+⚠ .DEPOSITS_ENABLER_ROLE: skipped
+⚠ .WITHDRAWALS_DISABLER_ROLE: skipped
+⚠ .WITHDRAWALS_ENABLER_ROLE: skipped
+⚠ .getRoleAdmin: skipped
+✔ .hasRole(0x0000000000000000000000000000000000000000000000000000000000000000,0x0000000000000000000000000000000000000000): true
+✔ .isDepositsEnabled: false
+✔ .isInitialized: true
+✔ .isWithdrawalsEnabled: false
+⚠ .l1Token: skipped
+⚠ .l2Token: skipped
+⚠ .l2TokenBridge: skipped
+⚠ .messenger: skipped
+⚠ .supportsInterface: skipped
+
+==================================================================================================================
+===== Contract (l2): governanceExecutor (OptimismBridgeExecutor, 0x3a7B055BF88CdC59D20D0245809C6E6B3c5819dd) =====
+==================================================================================================================
+
+===== checks =====
+✔ .getEthereumGovernanceExecutor: 0x3e40D73EB977Dc6a537aF587D48316feE66E9C8c
+✔ .getGracePeriod: 86400
+✔ .getGuardian: 0x0000000000000000000000000000000000000000
+✔ .getDelay: 0
+✔ .getMinimumDelay: 0
+✔ .getMaximumDelay: 1
+✔ .getActionsSetCount: 0
+⚠ .OVM_L2_CROSS_DOMAIN_MESSENGER: skipped
+⚠ .getActionsSetById: skipped
+⚠ .getCurrentState: skipped
+⚠ .isActionQueued: skipped
+
+============================================================================================
+===== Contract (l2): wstETH (ERC20Bridged, 0x458ed78EB972a369799fb278c0243b25e5242A83) =====
+============================================================================================
+
+===== checks =====
+✔ .name: Wrapped liquid staked Ether 2.0
+✔ .symbol: wstETH
+✔ .decimals: 18
+✔ .bridge: 0x9c46560D6209743968cC24150893631A39AfDe4d
+✔ .version: 1
+⚠ .DOMAIN_SEPARATOR: skipped
+⚠ .PERMIT_TYPEHASH: skipped
+⚠ .allowance: skipped
+⚠ .balanceOf: skipped
+⚠ .nonces: skipped
+⚠ .totalSupply: skipped
+
+===== proxyChecks =====
+✔ .proxy__getImplementation: 0x1FaBaAec88198291A4efCc85Cabb33a3785165ba
+✔ .proxy__getAdmin: 0x3a7B055BF88CdC59D20D0245809C6E6B3c5819dd
+✔ .proxy__getIsOssified: false
+
+===== implementationChecks =====
+⚠ .DOMAIN_SEPARATOR: skipped
+⚠ .PERMIT_TYPEHASH: skipped
+⚠ .allowance: skipped
+⚠ .balanceOf: skipped
+⚠ .bridge: skipped
+⚠ .decimals: skipped
+⚠ .name: skipped
+⚠ .nonces: skipped
+⚠ .symbol: skipped
+⚠ .totalSupply: skipped
+⚠ .version: skipped
+
+=======================================================================================================
+===== Contract (l2): tokenBridge (L2ERC20TokenBridge, 0x9c46560D6209743968cC24150893631A39AfDe4d) =====
+=======================================================================================================
+
+===== checks =====
+✔ .isDepositsEnabled: true
+✔ .isWithdrawalsEnabled: true
+✔ .isInitialized: true
+✔ .l1Token: 0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0
+✔ .l2Token: 0x458ed78EB972a369799fb278c0243b25e5242A83
+✔ .l1TokenBridge: 0x2D001d79E5aF5F65a939781FE228B267a8Ed468B
+✔ .messenger: 0x4200000000000000000000000000000000000007
+✔ .DEFAULT_ADMIN_ROLE: 0x0000000000000000000000000000000000000000000000000000000000000000
+✔ .DEPOSITS_DISABLER_ROLE: 0x63f736f21cb2943826cd50b191eb054ebbea670e4e962d0527611f830cd399d6
+✔ .DEPOSITS_ENABLER_ROLE: 0x4b43b36766bde12c5e9cbbc37d15f8d1f769f08f54720ab370faeb4ce893753a
+✔ .WITHDRAWALS_DISABLER_ROLE: 0x94a954c0bc99227eddbc0715a62a7e1056ed8784cd719c2303b685683908857c
+✔ .WITHDRAWALS_ENABLER_ROLE: 0x9ab8816a3dc0b3849ec1ac00483f6ec815b07eee2fd766a353311c823ad59d0d
+⚠ .getRoleAdmin: skipped
+⚠ .hasRole: skipped
+⚠ .supportsInterface: skipped
+
+===== proxyChecks =====
+✔ .proxy__getImplementation: 0xf10A7ffC613a9b23Abc36167925A375bf5986181
+✔ .proxy__getAdmin: 0x3a7B055BF88CdC59D20D0245809C6E6B3c5819dd
+✔ .proxy__getIsOssified: false
+
+===== implementationChecks =====
+⚠ .DEFAULT_ADMIN_ROLE: skipped
+⚠ .DEPOSITS_DISABLER_ROLE: skipped
+⚠ .DEPOSITS_ENABLER_ROLE: skipped
+⚠ .WITHDRAWALS_DISABLER_ROLE: skipped
+⚠ .WITHDRAWALS_ENABLER_ROLE: skipped
+⚠ .getRoleAdmin: skipped
+✔ .hasRole(0x0000000000000000000000000000000000000000000000000000000000000000,0x0000000000000000000000000000000000000000): true
+✔ .isDepositsEnabled: false
+✔ .isInitialized: true
+✔ .isWithdrawalsEnabled: false
+⚠ .l1Token: skipped
+⚠ .l1TokenBridge: skipped
+⚠ .l2Token: skipped
+⚠ .messenger: skipped
+⚠ .supportsInterface: skipped

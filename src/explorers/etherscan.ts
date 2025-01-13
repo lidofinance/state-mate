@@ -13,7 +13,7 @@ export class EtherscanHandler implements IExplorerHandler {
   getContractInfo: GetContractInfoCallback = etherGetContractInfoCallback;
 }
 
-const RATE_LIMIT_TIMEOUT = 6 * 1000; // 5 seconds is not enough for BscScan free tier
+const RATE_LIMIT_TIMEOUT_MS = 6 * 1000; // 5 seconds is not enough for BscScan free tier
 
 async function sleep(timeoutMs: number) {
   await new Promise((resolve) => setTimeout(resolve, timeoutMs));
@@ -35,8 +35,8 @@ async function etherRateLimitHandler(
   const isRateLimit = sourcesResponse.result.includes("rate limit") || sourcesResponse.message.includes("rate limit");
 
   if (isRateLimit) {
-    log(`Reached rate limit ${explorerHostname}, waiting for ${RATE_LIMIT_TIMEOUT} seconds...`);
-    await sleep(RATE_LIMIT_TIMEOUT);
+    log(`Reached rate limit ${explorerHostname}, waiting for ${RATE_LIMIT_TIMEOUT_MS} ms...`);
+    await sleep(RATE_LIMIT_TIMEOUT_MS);
     return httpGetAsync(sourcesUrl);
   }
 

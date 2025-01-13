@@ -48,7 +48,7 @@ misc:
 
 tvl:
   - &WSTETH_TVL 0
-  - &WETH_TVL 6700010000000000
+  - &WETH_TVL "6700010000000000"
 
 delays:
   - &MAX_DELAY "31536000" # 365 days
@@ -461,10 +461,8 @@ l1:
           - args: [ *AdminMsig, *TransparentUpgradeableProxy, *SIG_VAULT_DELEGATE_CALL ]
             result: []
           - args: [ *CURATOR_OPERATOR_EOA, *TransparentUpgradeableProxy, *SIG_VAULT_DELEGATE_CALL ]
-            result: []
             mustRevert: true
           - args: [ *DEPLOYER, *TransparentUpgradeableProxy, *SIG_VAULT_DELEGATE_CALL ]
-            result: []
             mustRevert: true
 
           # VAULT can call any method from StakingModule
