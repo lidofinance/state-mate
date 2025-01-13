@@ -1,3 +1,6 @@
+
+# yaml-language-server: $schema=./../../schemas/main-schema.json
+
 parameters:
   - &WETH "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
   - &STETH "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84"
@@ -45,7 +48,7 @@ misc:
 
 tvl:
   - &WSTETH_TVL 0
-  - &WETH_TVL 6700010000000000
+  - &WETH_TVL "6700010000000000"
 
 delays:
   - &MAX_DELAY "31536000" # 365 days
@@ -155,12 +158,10 @@ l1:
             result: *ADMIN_DELEGATE_ROLE
         getRoleMember:
           - args: [ *DEFAULT_ADMIN_ROLE, 0 ]
-            result: []
             mustRevert: true
           - args: [ *ADMIN_ROLE, 0 ]
             result: *Initializer
           - args: [ *ADMIN_DELEGATE_ROLE, 0 ]
-            result: []
             mustRevert: true
           - args: [ *OPERATOR, 0 ]
             result: *Initializer
@@ -195,13 +196,11 @@ l1:
         name: "Initializer"
         requireAdmin:
           - args: [ *DEPLOYER ]
-            result: []
             mustRevert: true
           - args: [ *Initializer ]
             result: []
         requireAtLeastOperator:
           - args: [ *DEPLOYER ]
-            result: []
             mustRevert: true
           - args: [ *Initializer ]
             result: []
@@ -254,7 +253,6 @@ l1:
           - args: [ *TransparentUpgradeableProxy, *WETH ]
             result: [ *ONE_RATIO, *DECIMALS ]
           - args: [ *TransparentUpgradeableProxy, *STETH ]
-            result: []
             mustRevert: true
         priceX96:
           - args: [ *TransparentUpgradeableProxy, *WSTETH ]
@@ -262,7 +260,6 @@ l1:
           - args: [ *TransparentUpgradeableProxy, *WETH ]
             result: *Q96
           - args: [ *TransparentUpgradeableProxy, *STETH ]
-            result: 0
             mustRevert: true
     ConstantAggregatorV3:
       name: ConstantAggregatorV3
@@ -417,10 +414,8 @@ l1:
           - args: [ *AdminMsig, *TransparentUpgradeableProxy, *SIG_VAULT_DELEGATE_CALL ]
             result: []
           - args: [ *CURATOR_OPERATOR_EOA, *TransparentUpgradeableProxy, *SIG_VAULT_DELEGATE_CALL ]
-            result: []
             mustRevert: true
           - args: [ *DEPLOYER, *TransparentUpgradeableProxy, *SIG_VAULT_DELEGATE_CALL ]
-            result: []
             mustRevert: true
 
           # VAULT can call any method from StakingModule
@@ -429,7 +424,6 @@ l1:
           - args: [ *AdminMsig, *StakingModule, *SIG_DUMMY ]
             result: []
           - args: [ *DEPLOYER, *StakingModule, *SIG_DUMMY ]
-            result: []
             mustRevert: true
         userRoles: # with grantRole
           - args: [ *AdminMsig ]
@@ -467,10 +461,8 @@ l1:
           - args: [ *AdminMsig, *TransparentUpgradeableProxy, *SIG_VAULT_DELEGATE_CALL ]
             result: []
           - args: [ *CURATOR_OPERATOR_EOA, *TransparentUpgradeableProxy, *SIG_VAULT_DELEGATE_CALL ]
-            result: []
             mustRevert: true
           - args: [ *DEPLOYER, *TransparentUpgradeableProxy, *SIG_VAULT_DELEGATE_CALL ]
-            result: []
             mustRevert: true
 
           # VAULT can call any method from StakingModule
@@ -479,7 +471,6 @@ l1:
           - args: [ *AdminMsig, *StakingModule, *SIG_DUMMY ]
             result: []
           - args: [ *DEPLOYER, *StakingModule, *SIG_DUMMY ]
-            result: []
             mustRevert: true
     SimpleDVTStakingStrategy:
       name: SimpleDVTStakingStrategy
@@ -500,12 +491,10 @@ l1:
             result: *ADMIN_DELEGATE_ROLE
         getRoleMember:
           - args: [ *DEFAULT_ADMIN_ROLE, 0 ]
-            result: []
             mustRevert: true
           - args: [ *ADMIN_ROLE, 0 ]
             result: *AdminMsig
           - args: [ *ADMIN_DELEGATE_ROLE, 0 ]
-            result: []
             mustRevert: true
           - args: [ *OPERATOR, 0 ]
             result: *CURATOR_OPERATOR_EOA
@@ -540,13 +529,11 @@ l1:
         maxAllowedRemainder: *MAX_ALLOWED_REMAINDER
         requireAdmin:
           - args: [ *DEPLOYER ]
-            result: []
             mustRevert: true
           - args: [ *AdminMsig ]
             result: []
         requireAtLeastOperator:
           - args: [ *DEPLOYER ]
-            result: []
             mustRevert: true
           - args: [ *CURATOR_OPERATOR_EOA ]
             result: []
@@ -596,12 +583,10 @@ l1:
             result: *ADMIN_DELEGATE_ROLE
         getRoleMember:
           - args: [ *DEFAULT_ADMIN_ROLE, 0 ]
-            result: []
             mustRevert: true
           - args: [ *ADMIN_ROLE, 0 ]
             result: *AdminMsig
           - args: [ *ADMIN_DELEGATE_ROLE, 0 ]
-            result: []
             mustRevert: true
           - args: [ *OPERATOR, 0 ]
             result: *CuratorAdminMsig
@@ -649,13 +634,11 @@ l1:
         pendingWithdrawersCount: 1
         requireAdmin:
           - args: [ *DEPLOYER ]
-            result: []
             mustRevert: true
           - args: [ *AdminMsig ]
             result: []
         requireAtLeastOperator:
           - args: [ *DEPLOYER ]
-            result: []
             mustRevert: true
           - args: [ *CuratorAdminMsig ]
             result: []
@@ -705,12 +688,10 @@ l1:
             result: *ADMIN_DELEGATE_ROLE
         getRoleMember:
           - args: [ *DEFAULT_ADMIN_ROLE, 0 ]
-            result: []
             mustRevert: true
           - args: [ *ADMIN_ROLE, 0 ]
             result: *DEAD_ADDRESS
           - args: [ *ADMIN_DELEGATE_ROLE, 0 ]
-            result: []
             mustRevert: true
           - args: [ *OPERATOR, 0 ]
             result: *DEAD_ADDRESS
@@ -756,13 +737,11 @@ l1:
         pendingWithdrawersCount: 0
         requireAdmin:
           - args: [ *DEPLOYER ]
-            result: []
             mustRevert: true
           - args: [ *DEAD_ADDRESS ]
             result: []
         requireAtLeastOperator:
           - args: [ *DEPLOYER ]
-            result: []
             mustRevert: true
           - args: [ *DEAD_ADDRESS ]
             result: []
@@ -812,7 +791,6 @@ l1:
         VERSION: *GNOSIS_VERSION
         getOwners:
           - args: []
-            result: []
             mustRevert: true
         nonce: 0
     AdminMsig:
@@ -842,7 +820,6 @@ l1:
         VERSION: *GNOSIS_VERSION
         getOwners:
           - args: []
-            result: []
             mustRevert: true
         nonce: 0
     CuratorAdminMsig:
@@ -872,6 +849,5 @@ l1:
         VERSION: *GNOSIS_VERSION
         getOwners:
           - args: []
-            result: []
             mustRevert: true
         nonce: 0

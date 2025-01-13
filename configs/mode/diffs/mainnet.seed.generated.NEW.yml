@@ -1,0 +1,143 @@
+# yaml-language-server: $schema=./../../schemas/seed-schema.json
+
+deployed:
+  l1:
+    - &l1TokenBridge "0xD0DeA0a3bd8E4D55170943129c025d3fe0493F2A"
+  l2:
+    - &l2TokenBridge "0xb8161F28a5a38cE58f155D9A96bDAc0104985FAc"
+    - &l2Wsteth "0x98f96A4B34D03a2E6f225B28b8f8Cb1279562d81"
+    - &l2GovExecutor "0x2aCeC6D8ABA90685927b61968D84CfFf6192B32C"
+
+l1:
+  rpcUrl: L1_MAINNET_RPC_URL
+  explorerHostname: api.etherscan.io
+  explorerTokenEnv: ETHERSCAN_TOKEN
+  contracts:
+    l1TokenBridge:
+      name: L1ERC20TokenBridge
+      address: *l1TokenBridge
+      proxyName: OssifiableProxy
+      implementation: "0xe6a4ed59ec73ed78ae3a10294c99f0ee18a6bf76"
+      proxyChecks:
+        proxy__getAdmin: REPLACEME # 0x3e40D73EB977Dc6a537aF587D48316feE66E9C8c
+        proxy__getImplementation: REPLACEME # 0xE6A4ED59Ec73eD78aE3A10294c99F0EE18A6bF76
+        proxy__getIsOssified: REPLACEME # false
+      checks:
+        DEFAULT_ADMIN_ROLE: REPLACEME # 0x0000000000000000000000000000000000000000000000000000000000000000
+        DEPOSITS_DISABLER_ROLE: REPLACEME # 0x63f736f21cb2943826cd50b191eb054ebbea670e4e962d0527611f830cd399d6
+        DEPOSITS_ENABLER_ROLE: REPLACEME # 0x4b43b36766bde12c5e9cbbc37d15f8d1f769f08f54720ab370faeb4ce893753a
+        WITHDRAWALS_DISABLER_ROLE: REPLACEME # 0x94a954c0bc99227eddbc0715a62a7e1056ed8784cd719c2303b685683908857c
+        WITHDRAWALS_ENABLER_ROLE: REPLACEME # 0x9ab8816a3dc0b3849ec1ac00483f6ec815b07eee2fd766a353311c823ad59d0d
+        getRoleAdmin: REPLACEME # need to specify args
+        hasRole: REPLACEME # need to specify args
+        isDepositsEnabled: REPLACEME # true
+        isInitialized: REPLACEME # true
+        isWithdrawalsEnabled: REPLACEME # true
+        l1Token: REPLACEME # 0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0
+        l2Token: REPLACEME # 0x98f96A4B34D03a2E6f225B28b8f8Cb1279562d81
+        l2TokenBridge: REPLACEME # 0xb8161F28a5a38cE58f155D9A96bDAc0104985FAc
+        messenger: REPLACEME # 0x95bDCA6c8EdEB69C98Bd5bd17660BaCef1298A6f
+        supportsInterface: REPLACEME # need to specify args
+      implementationChecks:
+        DEFAULT_ADMIN_ROLE: REPLACEME # 0x0000000000000000000000000000000000000000000000000000000000000000
+        DEPOSITS_DISABLER_ROLE: REPLACEME # 0x63f736f21cb2943826cd50b191eb054ebbea670e4e962d0527611f830cd399d6
+        DEPOSITS_ENABLER_ROLE: REPLACEME # 0x4b43b36766bde12c5e9cbbc37d15f8d1f769f08f54720ab370faeb4ce893753a
+        WITHDRAWALS_DISABLER_ROLE: REPLACEME # 0x94a954c0bc99227eddbc0715a62a7e1056ed8784cd719c2303b685683908857c
+        WITHDRAWALS_ENABLER_ROLE: REPLACEME # 0x9ab8816a3dc0b3849ec1ac00483f6ec815b07eee2fd766a353311c823ad59d0d
+        getRoleAdmin: REPLACEME # need to specify args
+        hasRole: REPLACEME # need to specify args
+        isDepositsEnabled: REPLACEME # false
+        isInitialized: REPLACEME # true
+        isWithdrawalsEnabled: REPLACEME # false
+        l1Token: REPLACEME # 0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0
+        l2Token: REPLACEME # 0x98f96A4B34D03a2E6f225B28b8f8Cb1279562d81
+        l2TokenBridge: REPLACEME # 0xb8161F28a5a38cE58f155D9A96bDAc0104985FAc
+        messenger: REPLACEME # 0x95bDCA6c8EdEB69C98Bd5bd17660BaCef1298A6f
+        supportsInterface: REPLACEME # need to specify args
+
+l2:
+  rpcUrl: https://mainnet.mode.network
+  explorerHostname: explorer.mode.network
+  contracts:
+    l2TokenBridge:
+      name: L2ERC20TokenBridge
+      address: *l2TokenBridge
+      proxyName: OssifiableProxy
+      implementation: "0x488cdb57e9a1006ab77730fc8b19e1bb76e1cb97"
+      proxyChecks:
+        proxy__getAdmin: REPLACEME # 0x2aCeC6D8ABA90685927b61968D84CfFf6192B32C
+        proxy__getImplementation: REPLACEME # 0x488cDB57E9a1006ab77730fC8b19e1BB76e1cB97
+        proxy__getIsOssified: REPLACEME # false
+      checks:
+        DEFAULT_ADMIN_ROLE: REPLACEME # 0x0000000000000000000000000000000000000000000000000000000000000000
+        DEPOSITS_DISABLER_ROLE: REPLACEME # 0x63f736f21cb2943826cd50b191eb054ebbea670e4e962d0527611f830cd399d6
+        DEPOSITS_ENABLER_ROLE: REPLACEME # 0x4b43b36766bde12c5e9cbbc37d15f8d1f769f08f54720ab370faeb4ce893753a
+        WITHDRAWALS_DISABLER_ROLE: REPLACEME # 0x94a954c0bc99227eddbc0715a62a7e1056ed8784cd719c2303b685683908857c
+        WITHDRAWALS_ENABLER_ROLE: REPLACEME # 0x9ab8816a3dc0b3849ec1ac00483f6ec815b07eee2fd766a353311c823ad59d0d
+        getRoleAdmin: REPLACEME # need to specify args
+        hasRole: REPLACEME # need to specify args
+        isDepositsEnabled: REPLACEME # true
+        isInitialized: REPLACEME # true
+        isWithdrawalsEnabled: REPLACEME # true
+        l1Token: REPLACEME # 0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0
+        l1TokenBridge: REPLACEME # 0xD0DeA0a3bd8E4D55170943129c025d3fe0493F2A
+        l2Token: REPLACEME # 0x98f96A4B34D03a2E6f225B28b8f8Cb1279562d81
+        messenger: REPLACEME # 0x4200000000000000000000000000000000000007
+        supportsInterface: REPLACEME # need to specify args
+      implementationChecks:
+        DEFAULT_ADMIN_ROLE: REPLACEME # 0x0000000000000000000000000000000000000000000000000000000000000000
+        DEPOSITS_DISABLER_ROLE: REPLACEME # 0x63f736f21cb2943826cd50b191eb054ebbea670e4e962d0527611f830cd399d6
+        DEPOSITS_ENABLER_ROLE: REPLACEME # 0x4b43b36766bde12c5e9cbbc37d15f8d1f769f08f54720ab370faeb4ce893753a
+        WITHDRAWALS_DISABLER_ROLE: REPLACEME # 0x94a954c0bc99227eddbc0715a62a7e1056ed8784cd719c2303b685683908857c
+        WITHDRAWALS_ENABLER_ROLE: REPLACEME # 0x9ab8816a3dc0b3849ec1ac00483f6ec815b07eee2fd766a353311c823ad59d0d
+        getRoleAdmin: REPLACEME # need to specify args
+        hasRole: REPLACEME # need to specify args
+        isDepositsEnabled: REPLACEME # false
+        isInitialized: REPLACEME # true
+        isWithdrawalsEnabled: REPLACEME # false
+        l1Token: REPLACEME # 0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0
+        l1TokenBridge: REPLACEME # 0xD0DeA0a3bd8E4D55170943129c025d3fe0493F2A
+        l2Token: REPLACEME # 0x98f96A4B34D03a2E6f225B28b8f8Cb1279562d81
+        messenger: REPLACEME # 0x4200000000000000000000000000000000000007
+        supportsInterface: REPLACEME # need to specify args
+    l2Wsteth:
+      name: ERC20Bridged
+      address: *l2Wsteth
+      proxyName: OssifiableProxy
+      implementation: "0xf27b1b121e55a13047d66dc4aaa8c17ba72c762a"
+      proxyChecks:
+        proxy__getAdmin: REPLACEME # 0x2aCeC6D8ABA90685927b61968D84CfFf6192B32C
+        proxy__getImplementation: REPLACEME # 0xF27b1B121e55A13047d66dC4AAA8c17BA72c762A
+        proxy__getIsOssified: REPLACEME # false
+      checks:
+        allowance: REPLACEME # need to specify args
+        balanceOf: REPLACEME # need to specify args
+        bridge: REPLACEME # 0xb8161F28a5a38cE58f155D9A96bDAc0104985FAc
+        decimals: REPLACEME # 18
+        name: REPLACEME # Wrapped liquid staked Ether 2.0
+        symbol: REPLACEME # wstETH
+        totalSupply: REPLACEME # 11229167700000000
+      implementationChecks:
+        allowance: REPLACEME # need to specify args
+        balanceOf: REPLACEME # need to specify args
+        bridge: REPLACEME # 0xb8161F28a5a38cE58f155D9A96bDAc0104985FAc
+        decimals: REPLACEME # 18
+        name: REPLACEME # Wrapped liquid staked Ether 2.0
+        symbol: REPLACEME # wstETH
+        totalSupply: REPLACEME # 0
+    l2GovExecutor:
+      name: OptimismBridgeExecutor
+      address: *l2GovExecutor
+      checks:
+        OVM_L2_CROSS_DOMAIN_MESSENGER: REPLACEME # 0x4200000000000000000000000000000000000007
+        getActionsSetById: REPLACEME # need to specify args
+        getActionsSetCount: REPLACEME # 0
+        getCurrentState: REPLACEME # need to specify args
+        getDelay: REPLACEME # 0
+        getEthereumGovernanceExecutor: REPLACEME # 0x3e40D73EB977Dc6a537aF587D48316feE66E9C8c
+        getGracePeriod: REPLACEME # 86400
+        getGuardian: REPLACEME # 0x0000000000000000000000000000000000000000
+        getMaximumDelay: REPLACEME # 1
+        getMinimumDelay: REPLACEME # 0
+        isActionQueued: REPLACEME # need to specify args
+  # explorerTokenEnv: ETHERSCAN_MODE_TOKEN

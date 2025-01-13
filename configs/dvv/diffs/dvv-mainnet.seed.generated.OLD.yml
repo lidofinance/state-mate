@@ -1,0 +1,402 @@
+deployed:
+  l1:
+    - &Vault "0xe2D2E90122cb203CF1565a37ef90a256843A825A"
+    - &ERC20TvlModule "0x2c73350310C2b8c721d8192bd7620D1DCB1219ce"
+    - &Initializer "0x969A0c7699ad0AC38fE05117c81D662762443E07"
+    - &StakingModule "0xD570E16E3B62F05EcF3ff2706D331B7f56453adA"
+    - &ManagedRatiosOracle "0xFeAFe509fae65962EF81555E3f078D58aF7ca3e9"
+    - &ChainlinkOracle "0x39D5F9aEbBEcba99ED5d707b11d790387B5acB63"
+    - &ConstantAggregatorV3 "0x278798AE6ea76ae75b381eA0D8DF140C1D5a7712"
+    - &WStethRatiosAggregatorV3 "0x966a3b1c9d477D113630290F037b12349649d1bd"
+    - &DefaultProxyImplementation "0xB8eF363E1909665c18BF0CB72Cba9a8152413A2E"
+    - &VaultConfigurator "0xDee41701310f48744e6Bb4A5df6B5e714cE49133"
+    - &ManagedValidator "0xA1b3a352c3fC7cfcBD36381CC2D0b157d6843473"
+    - &SimpleDVTStakingStrategy "0x078b1C03d14652bfeeDFadf7985fdf2D8a2e8108"
+    - &TransparentUpgradeableProxy "0x5E362eb2c0706Bd1d134689eC75176018385430B"
+    - &ProxyAdmin "0x8E6C80c41450D3fA7B1Fd0196676b99Bfb34bF48"
+    - &ProxyAdminMsig "0x81698f87C6482bF1ce9bFcfC0F103C4A0Adf0Af0"
+    - &AdminMsig "0x9437B2a8cF3b69D782a61f9814baAbc172f72003"
+    - &CuratorAdminMsig "0x2E93913A796a6C6b2bB76F41690E78a2E206Be54"
+
+l1:
+  rpcUrl: https://ethereum-rpc.publicnode.com
+  explorerHostname: api.etherscan.io
+  explorerTokenEnv: ETHERSCAN_TOKEN
+  contracts:
+    Vault:
+      name: Vault
+      address: *Vault
+      checks:
+        ADMIN_DELEGATE_ROLE: REPLACEME # 0xc171260023d22a25a00a2789664c9334017843b831138c8ef03cc8897e5873d7
+        ADMIN_ROLE: REPLACEME # 0xf23ec0bb4210edd5cba85afd05127efcd2fc6a781bfed49188da1081670b22d8
+        D9: REPLACEME # 1000000000
+        DEFAULT_ADMIN_ROLE: REPLACEME # 0x0000000000000000000000000000000000000000000000000000000000000000
+        OPERATOR: REPLACEME # 0x46a52cf33029de9f84853745a87af28464c80bf0346df1b32e205fc73319f622
+        Q96: REPLACEME # 79228162514264337593543950336
+        allowance: REPLACEME # need to specify args
+        analyzeRequest: REPLACEME # need to specify args
+        balanceOf: REPLACEME # need to specify args
+        baseTvl: REPLACEME # ,
+        calculateStack: REPLACEME # view call reverted
+        configurator: REPLACEME # 0x7C28a258078274DE9f3799f84676CeB8079ca0B9
+        decimals: REPLACEME # 18
+        getRoleAdmin: REPLACEME # need to specify args
+        getRoleMember: REPLACEME # need to specify args
+        getRoleMemberCount: REPLACEME # need to specify args
+        hasRole: REPLACEME # need to specify args
+        isAdmin: REPLACEME # need to specify args
+        isOperator: REPLACEME # need to specify args
+        isUnderlyingToken: REPLACEME # need to specify args
+        name: REPLACEME #
+        pendingWithdrawers: REPLACEME #
+        pendingWithdrawersCount: REPLACEME # 0
+        requireAdmin: REPLACEME # need to specify args
+        requireAtLeastOperator: REPLACEME # need to specify args
+        supportsInterface: REPLACEME # need to specify args
+        symbol: REPLACEME #
+        totalSupply: REPLACEME # 0
+        tvlModules: REPLACEME #
+        underlyingTokens: REPLACEME #
+        underlyingTvl: REPLACEME # ,
+        withdrawalRequest: REPLACEME # need to specify args
+    ERC20TvlModule:
+      name: ERC20TvlModule
+      address: *ERC20TvlModule
+      checks:
+        tvl: REPLACEME # need to specify args
+    Initializer:
+      name: Initializer
+      address: *Initializer
+      checks:
+        ADMIN_DELEGATE_ROLE: REPLACEME # 0xc171260023d22a25a00a2789664c9334017843b831138c8ef03cc8897e5873d7
+        ADMIN_ROLE: REPLACEME # 0xf23ec0bb4210edd5cba85afd05127efcd2fc6a781bfed49188da1081670b22d8
+        DEFAULT_ADMIN_ROLE: REPLACEME # 0x0000000000000000000000000000000000000000000000000000000000000000
+        OPERATOR: REPLACEME # 0x46a52cf33029de9f84853745a87af28464c80bf0346df1b32e205fc73319f622
+        allowance: REPLACEME # need to specify args
+        balanceOf: REPLACEME # need to specify args
+        configurator: REPLACEME # 0x0000000000000000000000000000000000000000
+        decimals: REPLACEME # 18
+        getRoleAdmin: REPLACEME # need to specify args
+        getRoleMember: REPLACEME # need to specify args
+        getRoleMemberCount: REPLACEME # need to specify args
+        hasRole: REPLACEME # need to specify args
+        isAdmin: REPLACEME # need to specify args
+        isOperator: REPLACEME # need to specify args
+        name: REPLACEME # Initializer
+        requireAdmin: REPLACEME # need to specify args
+        requireAtLeastOperator: REPLACEME # need to specify args
+        supportsInterface: REPLACEME # need to specify args
+        symbol: REPLACEME # init
+        totalSupply: REPLACEME # 0
+    StakingModule:
+      name: StakingModule
+      address: *StakingModule
+      checks:
+        lidoLocator: REPLACEME # 0xC1d0b3DE6792Bf6b4b37EccdcC24e45978Cfd2Eb
+        stakingModuleId: REPLACEME # 2
+        steth: REPLACEME # 0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84
+        weth: REPLACEME # 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2
+        withdrawalQueue: REPLACEME # 0x889edC2eDab5f40e902b864aD4d7AdE8E412F9B1
+        wsteth: REPLACEME # 0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0
+    ManagedRatiosOracle:
+      name: ManagedRatiosOracle
+      address: *ManagedRatiosOracle
+      checks:
+        Q96: REPLACEME # 79228162514264337593543950336
+        getTargetRatiosX96: REPLACEME # need to specify args
+        vaultToData: REPLACEME # need to specify args
+    ChainlinkOracle:
+      name: ChainlinkOracle
+      address: *ChainlinkOracle
+      checks:
+        Q96: REPLACEME # 79228162514264337593543950336
+        aggregatorsData: REPLACEME # need to specify args
+        baseTokens: REPLACEME # need to specify args
+        getPrice: REPLACEME # need to specify args
+        priceX96: REPLACEME # need to specify args
+    ConstantAggregatorV3:
+      name: ConstantAggregatorV3
+      address: *ConstantAggregatorV3
+      checks:
+        answer: REPLACEME # 1000000000000000000
+        decimals: REPLACEME # 18
+        latestRoundData: REPLACEME # 0,1000000000000000000,1736806343,1736806343,0
+    WStethRatiosAggregatorV3:
+      name: WStethRatiosAggregatorV3
+      address: *WStethRatiosAggregatorV3
+      checks:
+        decimals: REPLACEME # 18
+        getAnswer: REPLACEME # 1190552272293593742
+        latestRoundData: REPLACEME # 0,1190552272293593742,1736806355,1736806355,0
+        wsteth: REPLACEME # 0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0
+    DefaultProxyImplementation:
+      name: DefaultProxyImplementation
+      address: *DefaultProxyImplementation
+      checks:
+        allowance: REPLACEME # need to specify args
+        balanceOf: REPLACEME # need to specify args
+        decimals: REPLACEME # 18
+        name: REPLACEME #
+        symbol: REPLACEME #
+        totalSupply: REPLACEME # 0
+    VaultConfigurator:
+      name: VaultConfigurator
+      address: *VaultConfigurator
+      checks:
+        MAX_DELAY: REPLACEME # 31536000
+        MAX_WITHDRAWAL_FEE: REPLACEME # 50000000
+        areTransfersLocked: REPLACEME # false
+        areTransfersLockedDelay: REPLACEME # 31536000
+        baseDelay: REPLACEME # 2592000
+        delegateModuleApprovalDelay: REPLACEME # 86400
+        depositCallback: REPLACEME # 0x0000000000000000000000000000000000000000
+        depositCallbackDelay: REPLACEME # 86400
+        emergencyWithdrawalDelay: REPLACEME # 7776000
+        isDelegateModuleApproved: REPLACEME # need to specify args
+        isDepositLocked: REPLACEME # false
+        isDepositLockedDelay: REPLACEME # 3600
+        maximalTotalSupply: REPLACEME # 13750000000000000000000
+        maximalTotalSupplyDelay: REPLACEME # 14400
+        priceOracle: REPLACEME # 0x39D5F9aEbBEcba99ED5d707b11d790387B5acB63
+        priceOracleDelay: REPLACEME # 2592000
+        ratiosOracle: REPLACEME # 0xFeAFe509fae65962EF81555E3f078D58aF7ca3e9
+        ratiosOracleDelay: REPLACEME # 2592000
+        validator: REPLACEME # 0xA1b3a352c3fC7cfcBD36381CC2D0b157d6843473
+        validatorDelay: REPLACEME # 2592000
+        vault: REPLACEME # 0x5E362eb2c0706Bd1d134689eC75176018385430B
+        withdrawalCallback: REPLACEME # 0x0000000000000000000000000000000000000000
+        withdrawalCallbackDelay: REPLACEME # 86400
+        withdrawalFeeD9: REPLACEME # 0
+        withdrawalFeeD9Delay: REPLACEME # 2592000
+    ManagedValidator:
+      name: ManagedValidator
+      address: *ManagedValidator
+      checks:
+        ADMIN_ROLE_MASK: REPLACEME # 57896044618658097711785492504343953926634992332820282019728792003956564819968
+        STORAGE_POSITION: REPLACEME # 0xc5d9a5dc0c3dbbd4debebdb870fda826372ee5f5ea588d9114d28c33a7f08b39
+        allowAllSignaturesRoles: REPLACEME # need to specify args
+        allowSignatureRoles: REPLACEME # need to specify args
+        customValidator: REPLACEME # need to specify args
+        hasPermission: REPLACEME # need to specify args
+        publicRoles: REPLACEME # 1
+        requirePermission: REPLACEME # need to specify args
+        userRoles: REPLACEME # need to specify args
+        validate: REPLACEME # need to specify args
+    SimpleDVTStakingStrategy:
+      name: SimpleDVTStakingStrategy
+      address: *SimpleDVTStakingStrategy
+      checks:
+        ADMIN_DELEGATE_ROLE: REPLACEME # 0xc171260023d22a25a00a2789664c9334017843b831138c8ef03cc8897e5873d7
+        ADMIN_ROLE: REPLACEME # 0xf23ec0bb4210edd5cba85afd05127efcd2fc6a781bfed49188da1081670b22d8
+        DEFAULT_ADMIN_ROLE: REPLACEME # 0x0000000000000000000000000000000000000000000000000000000000000000
+        OPERATOR: REPLACEME # 0x46a52cf33029de9f84853745a87af28464c80bf0346df1b32e205fc73319f622
+        getRoleAdmin: REPLACEME # need to specify args
+        getRoleMember: REPLACEME # need to specify args
+        getRoleMemberCount: REPLACEME # need to specify args
+        hasRole: REPLACEME # need to specify args
+        isAdmin: REPLACEME # need to specify args
+        isOperator: REPLACEME # need to specify args
+        maxAllowedRemainder: REPLACEME # 1000000000000000000
+        requireAdmin: REPLACEME # need to specify args
+        requireAtLeastOperator: REPLACEME # need to specify args
+        stakingModule: REPLACEME # 0xD570E16E3B62F05EcF3ff2706D331B7f56453adA
+        supportsInterface: REPLACEME # need to specify args
+        vault: REPLACEME # 0x5E362eb2c0706Bd1d134689eC75176018385430B
+    TransparentUpgradeableProxy:
+      name: Vault
+      address: *TransparentUpgradeableProxy
+      proxyName: TransparentUpgradeableProxy
+      implementation: "0xe2d2e90122cb203cf1565a37ef90a256843a825a"
+      proxyChecks: {}
+      checks:
+        ADMIN_DELEGATE_ROLE: REPLACEME # 0xc171260023d22a25a00a2789664c9334017843b831138c8ef03cc8897e5873d7
+        ADMIN_ROLE: REPLACEME # 0xf23ec0bb4210edd5cba85afd05127efcd2fc6a781bfed49188da1081670b22d8
+        D9: REPLACEME # 1000000000
+        DEFAULT_ADMIN_ROLE: REPLACEME # 0x0000000000000000000000000000000000000000000000000000000000000000
+        OPERATOR: REPLACEME # 0x46a52cf33029de9f84853745a87af28464c80bf0346df1b32e205fc73319f622
+        Q96: REPLACEME # 79228162514264337593543950336
+        allowance: REPLACEME # need to specify args
+        analyzeRequest: REPLACEME # need to specify args
+        balanceOf: REPLACEME # need to specify args
+        baseTvl: REPLACEME # 0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0,0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2,5912823551497894031792,196182291220672054348
+        calculateStack: REPLACEME # 0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0,0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2,79228162514264337593543950336,0,5912823551497894031792,196182291220672054348,7160052957994137848176,7235707806127566789383,94325268911003532234915757855,1736806367,0,0x018398ce8790e11b884ffc900fe0a0f030a9792a9763e0fa6887ea3b5c12a49c
+        configurator: REPLACEME # 0xDee41701310f48744e6Bb4A5df6B5e714cE49133
+        decimals: REPLACEME # 18
+        getRoleAdmin: REPLACEME # need to specify args
+        getRoleMember: REPLACEME # need to specify args
+        getRoleMemberCount: REPLACEME # need to specify args
+        hasRole: REPLACEME # need to specify args
+        isAdmin: REPLACEME # need to specify args
+        isOperator: REPLACEME # need to specify args
+        isUnderlyingToken: REPLACEME # need to specify args
+        name: REPLACEME # Decentralized Validator Token
+        pendingWithdrawers: REPLACEME # 0xe0B536a468496F9E9590f62e3b97f4A085b30283,0xE7DbDE2EDfBf9bF3117Fc2C49c524DbFF2bfD76e,0x4C764eD0cF2Ad12c105D9E2D6DE0b4320A9de3cB,0xa0F58396B63a259999daA855dBd170E508Fa09C7,0x1eDA941302B77e90b694CF31d942024a370eF493,0xA3268eDfd84415472D9c30eCdEBa487f865Ee063,0x232832F88e98e4680A12c03D12eF1FDA22ED7122,0x18b4318DaEC8c90a3f3912c8cC561F7AEDE15D1A,0x810baffA7695cbD5fFfdfa1f57C0251d5932496f,0x77242fCd23214AA72Ce28307fe5ebcB14F1A44DC,0xA3ef240800a701B964412B9C66Ac0FfDB19242Ec,0xa803faDe0Aa1347Dba290D0864D8c0B3CfA80392,0xcEcBc13Bd8C90597A33794470fca118eB0B0e45c,0x3C4da3d4B594Cb990Ea6Ae54CC76F58085e8b288,0x2F26C1D10456b6256460517AE912B5785E395794,0xcbDE64320158990F62cB72E920085Ee827c6d19b,0x2F0d5918Af0D12631Df3fd45270AC3153C48f38B,0x285bE1Ed5f6C2B75F8c6871B46F56F9A72e55565,0x4514ea6c765079EAB11b3B731c2a46C8264c998b,0x98C1251652dEC16c7d32BD8682F357261f72F5db,0x6BD4e0A50d0206be420FcE0667D178328af874BB,0x2A7cEc58D92DEEfCfAD55dE3Bf5699b44b79Dcb2,0xd2EA8868B155420C324b863Cdd3d309D39c96041,0x5CB5aC3dA7Ec2d183c954325ae45f1cAB83b398e,0x2c57EF47F10bC3Ce20C4E0E7fff193BE3a038dE9
+        pendingWithdrawersCount: REPLACEME # 25
+        requireAdmin: REPLACEME # need to specify args
+        requireAtLeastOperator: REPLACEME # need to specify args
+        supportsInterface: REPLACEME # need to specify args
+        symbol: REPLACEME # DVstETH
+        totalSupply: REPLACEME # 7160052957994137848176
+        tvlModules: REPLACEME # 0x2c73350310C2b8c721d8192bd7620D1DCB1219ce
+        underlyingTokens: REPLACEME # 0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0,0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2
+        underlyingTvl: REPLACEME # 0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0,0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2,5912823551497894031792,196182291220672054348
+        withdrawalRequest: REPLACEME # need to specify args
+      implementationChecks:
+        ADMIN_DELEGATE_ROLE: REPLACEME # 0xc171260023d22a25a00a2789664c9334017843b831138c8ef03cc8897e5873d7
+        ADMIN_ROLE: REPLACEME # 0xf23ec0bb4210edd5cba85afd05127efcd2fc6a781bfed49188da1081670b22d8
+        D9: REPLACEME # 1000000000
+        DEFAULT_ADMIN_ROLE: REPLACEME # 0x0000000000000000000000000000000000000000000000000000000000000000
+        OPERATOR: REPLACEME # 0x46a52cf33029de9f84853745a87af28464c80bf0346df1b32e205fc73319f622
+        Q96: REPLACEME # 79228162514264337593543950336
+        allowance: REPLACEME # need to specify args
+        analyzeRequest: REPLACEME # need to specify args
+        balanceOf: REPLACEME # need to specify args
+        baseTvl: REPLACEME # ,
+        calculateStack: REPLACEME # view call reverted
+        configurator: REPLACEME # 0x7C28a258078274DE9f3799f84676CeB8079ca0B9
+        decimals: REPLACEME # 18
+        getRoleAdmin: REPLACEME # need to specify args
+        getRoleMember: REPLACEME # need to specify args
+        getRoleMemberCount: REPLACEME # need to specify args
+        hasRole: REPLACEME # need to specify args
+        isAdmin: REPLACEME # need to specify args
+        isOperator: REPLACEME # need to specify args
+        isUnderlyingToken: REPLACEME # need to specify args
+        name: REPLACEME #
+        pendingWithdrawers: REPLACEME #
+        pendingWithdrawersCount: REPLACEME # 0
+        requireAdmin: REPLACEME # need to specify args
+        requireAtLeastOperator: REPLACEME # need to specify args
+        supportsInterface: REPLACEME # need to specify args
+        symbol: REPLACEME #
+        totalSupply: REPLACEME # 0
+        tvlModules: REPLACEME #
+        underlyingTokens: REPLACEME #
+        underlyingTvl: REPLACEME # ,
+        withdrawalRequest: REPLACEME # need to specify args
+    ProxyAdmin:
+      name: ProxyAdmin
+      address: *ProxyAdmin
+      checks:
+        UPGRADE_INTERFACE_VERSION: REPLACEME # 5.0.0
+        owner: REPLACEME # 0x81698f87C6482bF1ce9bFcfC0F103C4A0Adf0Af0
+    ProxyAdminMsig:
+      name: GnosisSafe
+      address: *ProxyAdminMsig
+      proxyName: GnosisSafeProxy
+      implementation: "0xd9db270c1b5e3bd161e8c8503c55ceabee709552"
+      proxyChecks: {}
+      checks:
+        VERSION: REPLACEME # 1.3.0
+        approvedHashes: REPLACEME # need to specify args
+        checkNSignatures: REPLACEME # need to specify args
+        checkSignatures: REPLACEME # need to specify args
+        domainSeparator: REPLACEME # 0x90468bd6f3155511c3cb7b455a07664de4779c3a328ac577fdd4cc584ee815d0
+        encodeTransactionData: REPLACEME # need to specify args
+        getChainId: REPLACEME # 1
+        getModulesPaginated: REPLACEME # need to specify args
+        getOwners: REPLACEME # 0xEA685f0AF4A0BF5E7D6729b2C63eDF574D3EE27f,0xa94e4ADceC38074967b17F6e8856AB12368686B5,0xFB864C1127ff77215d0A8e652bB632F526A4A89f,0x59F8D74Fe49d5ebEAc069E3baf07eB4b614BD5A7,0x185111c113d9B19Ea4C424D3cD8628A1ee09Be6A,0x06C3992a6067bEA8FB3Af7F004EdEbC13656761F,0x44A388BBD782AE1D7f4542aEb6C3569E2CfdF5a1,0x8888843c607F4Bbd6aD72128F478085256Bdd15D
+        getStorageAt: REPLACEME # need to specify args
+        getThreshold: REPLACEME # 5
+        getTransactionHash: REPLACEME # need to specify args
+        isModuleEnabled: REPLACEME # need to specify args
+        isOwner: REPLACEME # need to specify args
+        nonce: REPLACEME # 2
+        signedMessages: REPLACEME # need to specify args
+      implementationChecks:
+        VERSION: REPLACEME # 1.3.0
+        approvedHashes: REPLACEME # need to specify args
+        checkNSignatures: REPLACEME # need to specify args
+        checkSignatures: REPLACEME # need to specify args
+        domainSeparator: REPLACEME # 0xb0d1bc5d61a96b7e642e23eb0d9f7d3d53a1e9b75f5b28b8e68b1bdb8e9faecb
+        encodeTransactionData: REPLACEME # need to specify args
+        getChainId: REPLACEME # 1
+        getModulesPaginated: REPLACEME # need to specify args
+        getOwners: REPLACEME # view call reverted
+        getStorageAt: REPLACEME # need to specify args
+        getThreshold: REPLACEME # 1
+        getTransactionHash: REPLACEME # need to specify args
+        isModuleEnabled: REPLACEME # need to specify args
+        isOwner: REPLACEME # need to specify args
+        nonce: REPLACEME # 0
+        signedMessages: REPLACEME # need to specify args
+    AdminMsig:
+      name: GnosisSafe
+      address: *AdminMsig
+      proxyName: GnosisSafeProxy
+      implementation: "0xd9db270c1b5e3bd161e8c8503c55ceabee709552"
+      proxyChecks: {}
+      checks:
+        VERSION: REPLACEME # 1.3.0
+        approvedHashes: REPLACEME # need to specify args
+        checkNSignatures: REPLACEME # need to specify args
+        checkSignatures: REPLACEME # need to specify args
+        domainSeparator: REPLACEME # 0xb878d052f30ee1f255ef929297b38293fe1f43b47dfd27415997d75abae4d6c2
+        encodeTransactionData: REPLACEME # need to specify args
+        getChainId: REPLACEME # 1
+        getModulesPaginated: REPLACEME # need to specify args
+        getOwners: REPLACEME # 0xEA685f0AF4A0BF5E7D6729b2C63eDF574D3EE27f,0xa94e4ADceC38074967b17F6e8856AB12368686B5,0xFB864C1127ff77215d0A8e652bB632F526A4A89f,0x59F8D74Fe49d5ebEAc069E3baf07eB4b614BD5A7,0x185111c113d9B19Ea4C424D3cD8628A1ee09Be6A,0x06C3992a6067bEA8FB3Af7F004EdEbC13656761F,0x44A388BBD782AE1D7f4542aEb6C3569E2CfdF5a1,0x8888843c607F4Bbd6aD72128F478085256Bdd15D
+        getStorageAt: REPLACEME # need to specify args
+        getThreshold: REPLACEME # 5
+        getTransactionHash: REPLACEME # need to specify args
+        isModuleEnabled: REPLACEME # need to specify args
+        isOwner: REPLACEME # need to specify args
+        nonce: REPLACEME # 37
+        signedMessages: REPLACEME # need to specify args
+      implementationChecks:
+        VERSION: REPLACEME # 1.3.0
+        approvedHashes: REPLACEME # need to specify args
+        checkNSignatures: REPLACEME # need to specify args
+        checkSignatures: REPLACEME # need to specify args
+        domainSeparator: REPLACEME # 0xb0d1bc5d61a96b7e642e23eb0d9f7d3d53a1e9b75f5b28b8e68b1bdb8e9faecb
+        encodeTransactionData: REPLACEME # need to specify args
+        getChainId: REPLACEME # 1
+        getModulesPaginated: REPLACEME # need to specify args
+        getOwners: REPLACEME # view call reverted
+        getStorageAt: REPLACEME # need to specify args
+        getThreshold: REPLACEME # 1
+        getTransactionHash: REPLACEME # need to specify args
+        isModuleEnabled: REPLACEME # need to specify args
+        isOwner: REPLACEME # need to specify args
+        nonce: REPLACEME # 0
+        signedMessages: REPLACEME # need to specify args
+    CuratorAdminMsig:
+      name: GnosisSafeL2
+      address: *CuratorAdminMsig
+      proxyName: GnosisSafeProxy
+      implementation: "0xfb1bffc9d739b8d520daf37df666da4c687191ea"
+      proxyChecks: {}
+      checks:
+        VERSION: REPLACEME # 1.3.0
+        approvedHashes: REPLACEME # need to specify args
+        checkNSignatures: REPLACEME # need to specify args
+        checkSignatures: REPLACEME # need to specify args
+        domainSeparator: REPLACEME # 0x2a3cc9ddbc237b44ca712255e07850c855cbc761ac61ea3c5e0e7229409e8c57
+        encodeTransactionData: REPLACEME # need to specify args
+        getChainId: REPLACEME # 1
+        getModulesPaginated: REPLACEME # need to specify args
+        getOwners: REPLACEME # 0x8F9c7173F120011bb9C31Dc67f650F39d31F9356,0xa9f8D7E123784ED914724B8d11D5e669De5cC4d8,0x0D61C8b6CA9669A36F351De3AE335e9689dd9C5b,0xe516F2D240F891815bf864DD4AE008007B901885,0x2afc096981c2CFe3501bE4054160048718F6C0C8,0xcC771952fdE840E30C6802734e5ad20479c2959f
+        getStorageAt: REPLACEME # need to specify args
+        getThreshold: REPLACEME # 2
+        getTransactionHash: REPLACEME # need to specify args
+        isModuleEnabled: REPLACEME # need to specify args
+        isOwner: REPLACEME # need to specify args
+        nonce: REPLACEME # 17
+        signedMessages: REPLACEME # need to specify args
+      implementationChecks:
+        VERSION: REPLACEME # 1.3.0
+        approvedHashes: REPLACEME # need to specify args
+        checkNSignatures: REPLACEME # need to specify args
+        checkSignatures: REPLACEME # need to specify args
+        domainSeparator: REPLACEME # 0x74e43f072d5fedd010a3e39632fc72e2df3a821c530d09aadff1bb18762e785b
+        encodeTransactionData: REPLACEME # need to specify args
+        getChainId: REPLACEME # 1
+        getModulesPaginated: REPLACEME # need to specify args
+        getOwners: REPLACEME # view call reverted
+        getStorageAt: REPLACEME # need to specify args
+        getThreshold: REPLACEME # 1
+        getTransactionHash: REPLACEME # need to specify args
+        isModuleEnabled: REPLACEME # need to specify args
+        isOwner: REPLACEME # need to specify args
+        nonce: REPLACEME # 0
+        signedMessages: REPLACEME # need to specify args

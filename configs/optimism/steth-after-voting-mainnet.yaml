@@ -1,6 +1,8 @@
 # Optimism Mainnet Deployment & Configuration
 # New contracts were deployed and upgraded.
 
+# yaml-language-server: $schema=./../../schemas/main-schema.json
+
 parameters:
   - &lido "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84"
   - &lidoLocator "0xC1d0b3DE6792Bf6b4b37EccdcC24e45978Cfd2Eb"

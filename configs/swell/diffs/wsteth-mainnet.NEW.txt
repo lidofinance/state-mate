@@ -1,0 +1,143 @@
+=======================================================================================================
+===== Contract (l1): tokenBridge (L1ERC20TokenBridge, 0xecf3376512EDAcA4FBB63d2c67d12a0397d24121) =====
+=======================================================================================================
+
+===== checks =====
+✔ .isInitialized: true
+✔ .isDepositsEnabled: true
+✔ .isWithdrawalsEnabled: true
+✔ .l1Token: 0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0
+✔ .l2Token: 0x7c98E0779EB5924b3ba8cE3B17648539ed5b0Ecc
+✔ .l2TokenBridge: 0x8311496799B8C2C7f13bC32c123ac4Eea068e6F0
+✔ .messenger: 0xe6a99Ef12995DeFC5ff47EC0e13252f0E6903759
+✔ .DEFAULT_ADMIN_ROLE: 0x0000000000000000000000000000000000000000000000000000000000000000
+✔ .DEPOSITS_DISABLER_ROLE: 0x63f736f21cb2943826cd50b191eb054ebbea670e4e962d0527611f830cd399d6
+✔ .DEPOSITS_ENABLER_ROLE: 0x4b43b36766bde12c5e9cbbc37d15f8d1f769f08f54720ab370faeb4ce893753a
+✔ .WITHDRAWALS_DISABLER_ROLE: 0x94a954c0bc99227eddbc0715a62a7e1056ed8784cd719c2303b685683908857c
+✔ .WITHDRAWALS_ENABLER_ROLE: 0x9ab8816a3dc0b3849ec1ac00483f6ec815b07eee2fd766a353311c823ad59d0d
+⚠ .getRoleAdmin: skipped
+⚠ .hasRole: skipped
+⚠ .supportsInterface: skipped
+
+===== proxyChecks =====
+✔ .proxy__getImplementation: 0x7e97935FbDF2a27EA35c4fdDdaCf5ACd685e65A2
+✔ .proxy__getAdmin: 0x3e40D73EB977Dc6a537aF587D48316feE66E9C8c
+✔ .proxy__getIsOssified: false
+
+===== ozNonEnumerableAcl =====
+⚠: Non-enumerable OZ Acl means it is impossible to check absence of an arbitrary role holder only by means of calling view function. Current version of state-mate does what it can at most: for all the role holders specified checks they do not hold roles they are not described to have among all the roles mentioned.
+✔ .hasRole(0x0000000000000000000000000000000000000000000000000000000000000000, 0x3e40D73EB977Dc6a537aF587D48316feE66E9C8c): true
+✔ .hasRole(0x4b43b36766bde12c5e9cbbc37d15f8d1f769f08f54720ab370faeb4ce893753a, 0x3e40D73EB977Dc6a537aF587D48316feE66E9C8c): true
+✔ .hasRole(0x63f736f21cb2943826cd50b191eb054ebbea670e4e962d0527611f830cd399d6, 0x3e40D73EB977Dc6a537aF587D48316feE66E9C8c): true
+✔ .hasRole(0x63f736f21cb2943826cd50b191eb054ebbea670e4e962d0527611f830cd399d6, 0x73b047fe6337183A454c5217241D780a932777bD): true
+✔ .hasRole(0x9ab8816a3dc0b3849ec1ac00483f6ec815b07eee2fd766a353311c823ad59d0d, 0x3e40D73EB977Dc6a537aF587D48316feE66E9C8c): true
+✔ .hasRole(0x94a954c0bc99227eddbc0715a62a7e1056ed8784cd719c2303b685683908857c, 0x3e40D73EB977Dc6a537aF587D48316feE66E9C8c): true
+✔ .hasRole(0x94a954c0bc99227eddbc0715a62a7e1056ed8784cd719c2303b685683908857c, 0x73b047fe6337183A454c5217241D780a932777bD): true
+✔ .hasRole(0x0000000000000000000000000000000000000000000000000000000000000000, 0x73b047fe6337183A454c5217241D780a932777bD): false
+✔ .hasRole(0x4b43b36766bde12c5e9cbbc37d15f8d1f769f08f54720ab370faeb4ce893753a, 0x73b047fe6337183A454c5217241D780a932777bD): false
+✔ .hasRole(0x9ab8816a3dc0b3849ec1ac00483f6ec815b07eee2fd766a353311c823ad59d0d, 0x73b047fe6337183A454c5217241D780a932777bD): false
+
+===== implementationChecks =====
+⚠ .DEFAULT_ADMIN_ROLE: skipped
+⚠ .DEPOSITS_DISABLER_ROLE: skipped
+⚠ .DEPOSITS_ENABLER_ROLE: skipped
+⚠ .WITHDRAWALS_DISABLER_ROLE: skipped
+⚠ .WITHDRAWALS_ENABLER_ROLE: skipped
+⚠ .getRoleAdmin: skipped
+⚠ .hasRole: skipped
+✔ .isDepositsEnabled: false
+✔ .isInitialized: true
+✔ .isWithdrawalsEnabled: false
+⚠ .l1Token: skipped
+⚠ .l2Token: skipped
+⚠ .l2TokenBridge: skipped
+⚠ .messenger: skipped
+⚠ .supportsInterface: skipped
+
+==================================================================================================================
+===== Contract (l2): governanceExecutor (OptimismBridgeExecutor, 0xFF22ea467301010F1364fc154c13e0c86Fcfb077) =====
+==================================================================================================================
+
+===== checks =====
+✔ .getEthereumGovernanceExecutor: 0x3e40D73EB977Dc6a537aF587D48316feE66E9C8c
+✔ .getGracePeriod: 86400
+✔ .getGuardian: 0x0000000000000000000000000000000000000000
+✔ .getDelay: 0
+✔ .getMinimumDelay: 0
+✔ .getMaximumDelay: 1
+✔ .getActionsSetCount: 0
+✔ .OVM_L2_CROSS_DOMAIN_MESSENGER: 0x4200000000000000000000000000000000000007
+⚠ .getActionsSetById: skipped
+⚠ .getCurrentState: skipped
+⚠ .isActionQueued: skipped
+
+============================================================================================
+===== Contract (l2): wstETH (ERC20Bridged, 0x7c98E0779EB5924b3ba8cE3B17648539ed5b0Ecc) =====
+============================================================================================
+
+===== checks =====
+✔ .name: Wrapped liquid staked Ether 2.0
+✔ .symbol: wstETH
+✔ .decimals: 18
+✔ .bridge: 0x8311496799B8C2C7f13bC32c123ac4Eea068e6F0
+⚠ .allowance: skipped
+⚠ .balanceOf: skipped
+⚠ .nonces: skipped
+⚠ .totalSupply: skipped
+
+===== proxyChecks =====
+✔ .proxy__getImplementation: 0xa1A3257813eD45d91e9c45E03C66FcDD54B4e7c1
+✔ .proxy__getAdmin: 0xFF22ea467301010F1364fc154c13e0c86Fcfb077
+✔ .proxy__getIsOssified: false
+
+===== implementationChecks =====
+⚠ .allowance: skipped
+⚠ .balanceOf: skipped
+⚠ .bridge: skipped
+⚠ .decimals: skipped
+⚠ .name: skipped
+⚠ .symbol: skipped
+⚠ .totalSupply: skipped
+
+=======================================================================================================
+===== Contract (l2): tokenBridge (L2ERC20TokenBridge, 0x8311496799B8C2C7f13bC32c123ac4Eea068e6F0) =====
+=======================================================================================================
+
+===== checks =====
+✔ .isDepositsEnabled: true
+✔ .isWithdrawalsEnabled: true
+✔ .isInitialized: true
+✔ .l1Token: 0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0
+✔ .l2Token: 0x7c98E0779EB5924b3ba8cE3B17648539ed5b0Ecc
+✔ .l1TokenBridge: 0xecf3376512EDAcA4FBB63d2c67d12a0397d24121
+✔ .messenger: 0x4200000000000000000000000000000000000007
+✔ .DEFAULT_ADMIN_ROLE: 0x0000000000000000000000000000000000000000000000000000000000000000
+✔ .DEPOSITS_DISABLER_ROLE: 0x63f736f21cb2943826cd50b191eb054ebbea670e4e962d0527611f830cd399d6
+✔ .DEPOSITS_ENABLER_ROLE: 0x4b43b36766bde12c5e9cbbc37d15f8d1f769f08f54720ab370faeb4ce893753a
+✔ .WITHDRAWALS_DISABLER_ROLE: 0x94a954c0bc99227eddbc0715a62a7e1056ed8784cd719c2303b685683908857c
+✔ .WITHDRAWALS_ENABLER_ROLE: 0x9ab8816a3dc0b3849ec1ac00483f6ec815b07eee2fd766a353311c823ad59d0d
+⚠ .getRoleAdmin: skipped
+⚠ .hasRole: skipped
+⚠ .supportsInterface: skipped
+
+===== proxyChecks =====
+✔ .proxy__getImplementation: 0x66ca84bC3C2dB33b6bd7B8994C033444C72b8ADE
+✔ .proxy__getAdmin: 0xFF22ea467301010F1364fc154c13e0c86Fcfb077
+✔ .proxy__getIsOssified: false
+
+===== implementationChecks =====
+⚠ .DEFAULT_ADMIN_ROLE: skipped
+⚠ .DEPOSITS_DISABLER_ROLE: skipped
+⚠ .DEPOSITS_ENABLER_ROLE: skipped
+⚠ .WITHDRAWALS_DISABLER_ROLE: skipped
+⚠ .WITHDRAWALS_ENABLER_ROLE: skipped
+⚠ .getRoleAdmin: skipped
+⚠ .hasRole: skipped
+✔ .isDepositsEnabled: false
+✔ .isInitialized: true
+✔ .isWithdrawalsEnabled: false
+⚠ .l1Token: skipped
+⚠ .l1TokenBridge: skipped
+⚠ .l2Token: skipped
+⚠ .messenger: skipped
+⚠ .supportsInterface: skipped
