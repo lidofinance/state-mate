@@ -1,5 +1,7 @@
-import { BaseContract, JsonRpcProvider } from "ethers";
+import chalk from "chalk";
+import { Contract, JsonRpcProvider } from "ethers";
 import { Ef, getNonMutables, printError } from "../common";
+import { safeGetFunction } from "../explorer-provider";
 import { LogCommand, logError, logErrorAndExit, logMethodSkipped } from "../logger";
 import { assertEqual, stringify } from "../statements-functions";
 import {
@@ -12,7 +14,6 @@ import {
   StaticCallResultTB,
 } from "../typebox";
 import { Abi, AbiArgsLength } from "../types";
-import chalk from "chalk";
 
 export let g_errors: number = 0;
 
@@ -28,7 +29,7 @@ export abstract class SectionValidatorBase {
 
   public abstract validateSection(contractEntry: ContractEntry, contractAlias: string): Promise<void>;
 
-  protected async _checkViewFunction(contract: BaseContract, method: string, staticCallCheck: StaticCallCheck) {
+  protected async _checkViewFunction(contract: Contract, method: string, staticCallCheck: StaticCallCheck) {
     if (isTypeOfTB(staticCallCheck, StaticCallResultTB)) {
       await this._checkViewResult(contract, method, staticCallCheck);
     } else if (isTypeOfTB(staticCallCheck, StaticCallMustRevertTB)) {
@@ -38,7 +39,7 @@ export abstract class SectionValidatorBase {
     }
   }
 
-  protected async _checkViewResult(contract: BaseContract, method: string, staticCallResult: StaticCallResult) {
+  protected async _checkViewResult(contract: Contract, method: string, staticCallResult: StaticCallResult) {
     if (staticCallResult.result === null) {
       logMethodSkipped(method);
       return;
@@ -48,9 +49,9 @@ export abstract class SectionValidatorBase {
 
     const argsStr = args ? `(${args.toString()})` : "";
     const logHandle = new LogCommand(`.${signature}${argsStr}`);
-
+    const contractFunction = await safeGetFunction(contract, signature);
     try {
-      const actual: unknown = await contract.getFunction(signature).staticCall(...(args || ""));
+      const actual: unknown = await contractFunction.staticCall(...(args || ""));
       assertEqual(actual, expected);
       logHandle.success(stringify(actual));
     } catch (error) {
@@ -59,18 +60,14 @@ export abstract class SectionValidatorBase {
     }
   }
 
-  protected async _checkViewMustRevert(
-    contract: BaseContract,
-    method: string,
-    staticCallMustRevert: StaticCallMustRevert,
-  ) {
+  protected async _checkViewMustRevert(contract: Contract, method: string, staticCallMustRevert: StaticCallMustRevert) {
     const { args, signature = method } = staticCallMustRevert;
 
     const argsStr = args ? `(${args.toString()})` : "";
     const logHandle = new LogCommand(`.${signature}${argsStr}`);
-
+    const contractFunction = await safeGetFunction(contract, signature);
     try {
-      const actual: unknown = await contract.getFunction(signature).staticCall(...(args ?? ""));
+      const actual: unknown = await contractFunction.staticCall(...(args || ""));
       logHandle.failure(stringify(actual));
       g_errors++;
     } catch (error) {

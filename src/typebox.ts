@@ -1,13 +1,9 @@
 import { FormatRegistry, Static, TSchema, Type } from "@sinclair/typebox";
 import { Value } from "@sinclair/typebox/value";
 
-export const EthereumAddressFormat = {
-  name: "ethereum-address",
-  formatString: /^(0|[1-9]|0x[a-fA-F0-9]{40})$/,
-};
-export const EthereumRoleFormat = {
-  name: "ethereum-role",
-  formatString: /(0|^0x[a-fA-F0-9]{64})$/,
+export const EthereumStringFormat = {
+  name: "ethereum-string",
+  formatString: /^(0x[a-fA-F0-9]{40}|0x[a-fA-F0-9]{64}|.+)$/,
 };
 
 export const MaxIntFormat = {
@@ -16,30 +12,18 @@ export const MaxIntFormat = {
 };
 
 FormatRegistry.Set(
-  EthereumAddressFormat.name,
-  (value) => typeof value === "string" && EthereumAddressFormat.formatString.test(value),
-);
-
-FormatRegistry.Set(
-  EthereumRoleFormat.name,
-  (value) => typeof value === "string" && EthereumRoleFormat.formatString.test(value),
+  EthereumStringFormat.name,
+  (value) => typeof value === "string" && EthereumStringFormat.formatString.test(value),
 );
 
 FormatRegistry.Set(MaxIntFormat.name, (value) => typeof value === "string" && MaxIntFormat.formatString.test(value));
 
-const EthAddressStringTB = Type.Readonly(
-  Type.String({ format: EthereumAddressFormat.name, pattern: EthereumAddressFormat.formatString.source }),
-);
-const EthRoleStringTB = Type.Readonly(
-  Type.String({ format: EthereumRoleFormat.name, pattern: EthereumRoleFormat.formatString.source }),
+const EthereumStringTB = Type.Readonly(
+  Type.String({ format: EthereumStringFormat.name, pattern: EthereumStringFormat.formatString.source }),
 );
 
-const MaxIntStringTB = Type.Readonly(
-  Type.String({ format: MaxIntFormat.name, pattern: MaxIntFormat.formatString.source }),
-);
+const EthereumStringArrayTB = Type.Readonly(Type.Array(EthereumStringTB));
 
-const EthAddressesArrayTB = Type.Readonly(Type.Array(EthAddressStringTB));
-const EthRolesArrayTB = Type.Readonly(Type.Array(EthRoleStringTB));
 export type EntireDocument = Static<typeof EntireDocumentTB>;
 export type SeedDocument = Static<typeof SeedDocumentTB>;
 export type ContractEntry = Static<typeof ContractEntryTB>;
@@ -57,26 +41,27 @@ export type RegularChecks = Static<typeof RegularChecksTB>;
 export type ChecksEntryValue = Static<typeof ChecksEntryValueTB>;
 export type ContractSection = Static<typeof ContractSectionTB>;
 export type DeployedSection = Static<typeof DeployedSectionTB>;
-export type EthAddressString = Static<typeof EthAddressStringTB>;
+export type EthAddressString = Static<typeof EthereumStringTB>;
 export type OzAclChecks = Static<typeof OzAclChecksTB>;
 export function isTypeOfTB<T extends TSchema>(value: unknown, schema: T): value is Static<typeof schema> {
   return Value.Check(schema, value);
 }
 
-const OzNonEnumerableAclTB = Type.Readonly(Type.Record(EthRoleStringTB, EthAddressesArrayTB));
+const OzNonEnumerableAclTB = Type.Readonly(Type.Record(EthereumStringTB, EthereumStringArrayTB));
 
 export const PlainValueTB = Type.Readonly(Type.Union([Type.Null(), Type.String(), Type.Boolean(), Type.Number()]));
-export const PlainValueOrArrayTB = Type.Array(PlainValueTB);
+export const PlainValueArrayTB = Type.Array(PlainValueTB);
+const PlainValueOrArray = Type.Array(Type.Union([PlainValueTB, Type.Array(PlainValueTB)]));
 
-export const ArrayOfPlainValueOrArrayTB = Type.Readonly(Type.Array(Type.Union([PlainValueTB, PlainValueOrArrayTB])));
+export const ArgumentsTB = Type.Readonly(Type.Array(Type.Union([PlainValueTB, PlainValueArrayTB])));
 
 const ArbitraryObjectTB = Type.Readonly(Type.Record(Type.String(), PlainValueTB));
 
-export const ViewResultTB = Type.Readonly(Type.Union([PlainValueTB, ArrayOfPlainValueOrArrayTB, ArbitraryObjectTB]));
+export const ViewResultTB = Type.Readonly(Type.Union([PlainValueTB, ArgumentsTB, ArbitraryObjectTB]));
 
 const StaticCallCommon = Type.Readonly(
   Type.Object({
-    args: Type.Optional(ArrayOfPlainValueOrArrayTB),
+    args: Type.Optional(ArgumentsTB),
     signature: Type.Optional(Type.String()),
     bigint: Type.Optional(Type.Boolean()),
   }),
@@ -108,15 +93,28 @@ export const StaticCallCheckTB = Type.Readonly(Type.Union([StaticCallResultTB, S
 export const ArrayOfStaticCallCheckTB = Type.Readonly(Type.Array(StaticCallCheckTB));
 
 const ChecksEntryValueTB = Type.Readonly(
-  Type.Union([StaticCallCheckTB, ViewResultTB, ArrayOfPlainValueOrArrayTB, ArrayOfStaticCallCheckTB]),
+  Type.Union([StaticCallCheckTB, ViewResultTB, ArgumentsTB, ArrayOfStaticCallCheckTB]),
 );
 
 export const ProxyChecksTB = Type.Readonly(
   Type.Object(
     {
-      proxy__getImplementation: Type.Optional(EthAddressStringTB),
-      proxy__getAdmin: Type.Optional(EthAddressStringTB),
-      proxy__getIsOssified: Type.Optional(Type.Boolean()),
+      proxy__getImplementation: Type.Optional(Type.Union([EthereumStringTB, Type.Null()])),
+      proxy__getAdmin: Type.Optional(Type.Union([EthereumStringTB, Type.Null()])),
+      proxy__getIsOssified: Type.Optional(Type.Union([Type.Boolean(), Type.Null()])),
+    },
+    { additionalProperties: false },
+  ),
+);
+
+export const Sr2ProxyChecksTB = Type.Readonly(
+  Type.Object(
+    {
+      proxyType: PlainValueTB,
+      isDepositable: PlainValueTB,
+      implementation: EthereumStringTB,
+      appId: PlainValueTB,
+      kernel: PlainValueTB,
     },
     { additionalProperties: false },
   ),
@@ -129,7 +127,7 @@ const ImplementationChecksTB = Type.Optional(RegularChecksTB);
 export const RegularContractEntryTB = Type.Readonly(
   Type.Object(
     {
-      address: EthAddressStringTB,
+      address: EthereumStringTB,
       name: Type.String(),
       checks: RegularChecksTB,
       ozNonEnumerableAcl: Type.Optional(OzNonEnumerableAclTB),
@@ -138,15 +136,15 @@ export const RegularContractEntryTB = Type.Readonly(
   ),
 );
 export const OzAclChecksTB = Type.Readonly(
-  Type.Record(Type.String(), EthAddressesArrayTB, { additionalProperties: false }),
+  Type.Record(Type.String(), EthereumStringArrayTB, { additionalProperties: false }),
 );
 export const ProxyContractEntryTB = Type.Readonly(
   Type.Object(
     {
       ...RegularContractEntryTB.properties,
       proxyName: Type.String(),
-      implementation: Type.Optional(EthAddressStringTB),
-      proxyChecks: Type.Optional(ProxyChecksTB),
+      implementation: Type.Optional(EthereumStringTB),
+      proxyChecks: Type.Optional(Type.Union([ProxyChecksTB, Sr2ProxyChecksTB])),
       implementationChecks: ImplementationChecksTB,
       ozAcl: Type.Optional(OzAclChecksTB),
     },
@@ -182,8 +180,8 @@ export const NetworkSectionTB = Type.Readonly(
 const DeployedSectionTB = Type.Readonly(
   Type.Object(
     {
-      l1: EthAddressesArrayTB,
-      l2: Type.Optional(EthAddressesArrayTB),
+      l1: EthereumStringArrayTB,
+      l2: Type.Optional(EthereumStringArrayTB),
     },
     { additionalProperties: false },
   ),
@@ -192,18 +190,18 @@ const DeployedSectionTB = Type.Readonly(
 export const EntireDocumentTB = Type.Readonly(
   Type.Object(
     {
-      parameters: Type.Array(Type.Union([EthAddressStringTB, EthRoleStringTB, MaxIntStringTB, Type.Literal(0)])),
-      roles: Type.Optional(Type.Union([Type.Array(EthRoleStringTB), Type.Null()])),
-      misc: Type.Optional(Type.Array(Type.Union([Type.String(), Type.Number()]))),
+      parameters: PlainValueOrArray,
+      roles: Type.Optional(Type.Union([EthereumStringArrayTB, Type.Null()])),
+      misc: Type.Optional(PlainValueOrArray),
       deployed: DeployedSectionTB,
-      "deployed-aux": Type.Optional(EthRolesArrayTB),
+      "deployed-aux": Type.Optional(EthereumStringArrayTB),
       l1: NetworkSectionTB,
       l2: Type.Optional(NetworkSectionTB),
-      tvl: Type.Optional(Type.Array(Type.Union([Type.Number(), Type.String()]))),
-      delays: Type.Optional(Type.Array(Type.String())),
-      signers: Type.Optional(Type.Array(Type.Union([EthAddressStringTB, Type.Number()]))),
-      selectors: Type.Optional(Type.Array(Type.String())),
-      validators: Type.Optional(Type.Array(Type.String())),
+      tvl: Type.Optional(PlainValueOrArray),
+      delays: Type.Optional(PlainValueOrArray),
+      signers: Type.Optional(PlainValueOrArray),
+      selectors: Type.Optional(PlainValueOrArray),
+      validators: Type.Optional(PlainValueOrArray),
     },
     { additionalProperties: false },
   ),

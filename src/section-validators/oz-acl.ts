@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { JsonRpcProvider } from "ethers";
 import { Ef } from "../common";
 import { ContractEntry } from "../typebox";
@@ -9,7 +10,7 @@ export class OzAclSectionValidator extends SectionValidatorBase {
   }
 
   override async validateSection({ name, address, checks }: ContractEntry, contractAlias: string) {
-    logHeader2(this.sectionName);
     //TODO
+    //logHeader2(this.sectionName);
   }
 }

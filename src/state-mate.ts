@@ -23,8 +23,7 @@ import { loadContractInfoFromExplorer } from "./explorer-provider";
 import {
   EntireDocument,
   EntireDocumentTB,
-  EthereumAddressFormat,
-  EthereumRoleFormat,
+  EthereumStringFormat,
   ExplorerSectionTB,
   isTypeOfTB,
   MaxIntFormat,
@@ -88,12 +87,8 @@ function validateJsonWithSchema<T extends TSchema>(
   const ajv = new Ajv({ verbose: true, allErrors: true });
   addFormats(ajv);
   ajv.addFormat(
-    EthereumAddressFormat.name,
-    (value) => typeof value === "string" && EthereumAddressFormat.formatString.test(value),
-  );
-  ajv.addFormat(
-    EthereumRoleFormat.name,
-    (value) => typeof value === "string" && EthereumRoleFormat.formatString.test(value),
+    EthereumStringFormat.name,
+    (value) => typeof value === "string" && EthereumStringFormat.formatString.test(value),
   );
   ajv.addFormat(MaxIntFormat.name, (value) => typeof value === "string" && MaxIntFormat.formatString.test(value));
 
@@ -170,7 +165,7 @@ async function iterateLoadedContracts<T extends EntireDocument | SeedDocument>(
       const { explorerHostname, explorerTokenEnv } = explorerSection;
       if (!explorerHostname) {
         logErrorAndExit(
-          `The field ${chalk.magenta(explorerHostname)} is required in the ${chalk.magenta(g_Args.configPath)}`,
+          `The field ${chalk.magenta(`explorerHostname`)} is required in the ${chalk.magenta(g_Args.configPath)}`,
         );
       }
       const explorerKey = explorerTokenEnv ? process.env[explorerTokenEnv] : "";
@@ -195,7 +190,7 @@ async function checkNetworkSection(sectionTitle: string, section: NetworkSection
 
   for (const contractAlias in section.contracts) {
     const contractEntry = section.contracts[contractAlias];
-    await contractSectionChecker.see(contractEntry, section, sectionTitle, contractAlias);
+    await contractSectionChecker.see(contractEntry, sectionTitle, contractAlias);
   }
 }
 

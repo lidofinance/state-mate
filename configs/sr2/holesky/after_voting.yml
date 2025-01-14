@@ -79,6 +79,8 @@ roles:
 
 l1:
   rpcUrl: L1_TESTNET_RPC_URL
+  explorerHostname: api.etherscan.io
+  explorerTokenEnv: ETHERSCAN_TOKEN
   contracts:
     lidoLocator:
       name: LidoLocator
@@ -288,182 +290,177 @@ l1:
         isOperatorPenaltyCleared: null
         isPetrified: null
         kernel: null
-      depositSecurityModule:
-        name: DepositSecurityModule
-        address: *depositSecurityModule
-        checks:
-          ATTEST_MESSAGE_PREFIX: null
-          DEPOSIT_CONTRACT: *DEPOSIT_CONTRACT
-          LIDO: *lido
-          PAUSE_MESSAGE_PREFIX: null
-          STAKING_ROUTER: *stakingRouter
-          UNVET_MESSAGE_PREFIX: null
-          VERSION: 3
-          canDeposit: null
-          getGuardianIndex: null
-          getGuardianQuorum: null
-          getGuardians: *dsmGuardians
-          getLastDepositBlock: null
-          getMaxOperatorsPerUnvetting: *depositSecurityModuleMaxOperatorPerUnvetting
-          getOwner:
-          getPauseIntentValidityPeriodBlocks: null
-          isDepositsPaused: false
-          isGuardian: null
-          isMinDepositDistancePassed: null
-        accountingOracle:
-          name: AccountingOracle
-          address: *accountingOracle
-          proxyName: OssifiableProxy
-          implementation: *accountingOracleImpl
-          proxyChecks:
-            proxy__getImplementation: *accountingOracleImpl
-            proxy__getAdmin: *agent
-            proxy__getIsOssified: false
-          checks:
-            DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
-            EXTRA_DATA_FORMAT_EMPTY: null
-            EXTRA_DATA_FORMAT_LIST: null
-            EXTRA_DATA_TYPE_EXITED_VALIDATORS: null
-            EXTRA_DATA_TYPE_STUCK_VALIDATORS: null
-            GENESIS_TIME: null
-            LEGACY_ORACLE: null
-            LIDO: *lido
-            LOCATOR: *lidoLocator
-            MANAGE_CONSENSUS_CONTRACT_ROLE: null
-            MANAGE_CONSENSUS_VERSION_ROLE: null
-            SECONDS_PER_SLOT: null
-            SUBMIT_DATA_ROLE: null
-            getConsensusContract: *accountingConsensus
-            getConsensusReport: null
-            getConsensusVersion: 2
-            getContractVersion: 2
-            getLastProcessingRefSlot: null
-            getProcessingState: null
-            getRoleAdmin: null
-            getRoleMember: null
-            getRoleMemberCount: null
-            hasRole: null
-            supportsInterface: null
-      oracleReportSanityChecker:
-        name: OracleReportSanityChecker
-        address: *oracleReportSanityChecker
-        checks:
-          ALL_LIMITS_MANAGER_ROLE: *ALL_LIMITS_MANAGER_ROLE
-          ANNUAL_BALANCE_INCREASE_LIMIT_MANAGER_ROLE: *ANNUAL_BALANCE_INCREASE_LIMIT_MANAGER_ROLE
-          APPEARED_VALIDATORS_PER_DAY_LIMIT_MANAGER_ROLE: *APPEARED_VALIDATORS_PER_DAY_LIMIT_MANAGER_ROLE
-          DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
-          EXITED_VALIDATORS_PER_DAY_LIMIT_MANAGER_ROLE: *EXITED_VALIDATORS_PER_DAY_LIMIT_MANAGER_ROLE
-          INITIAL_SLASHING_AND_PENALTIES_MANAGER_ROLE: *INITIAL_SLASHING_AND_PENALTIES_MANAGER_ROLE
-          MAX_ITEMS_PER_EXTRA_DATA_TRANSACTION_ROLE: *MAX_ITEMS_PER_EXTRA_DATA_TRANSACTION_ROLE
-          MAX_NODE_OPERATORS_PER_EXTRA_DATA_ITEM_ROLE: *MAX_NODE_OPERATORS_PER_EXTRA_DATA_ITEM_ROLE
-          MAX_POSITIVE_TOKEN_REBASE_MANAGER_ROLE: *MAX_POSITIVE_TOKEN_REBASE_MANAGER_ROLE
-          MAX_VALIDATOR_EXIT_REQUESTS_PER_REPORT_ROLE: *MAX_VALIDATOR_EXIT_REQUESTS_PER_REPORT_ROLE
-          REQUEST_TIMESTAMP_MARGIN_MANAGER_ROLE: *REQUEST_TIMESTAMP_MARGIN_MANAGER_ROLE
-          SECOND_OPINION_MANAGER_ROLE: *SECOND_OPINION_MANAGER_ROLE
-          SHARE_RATE_DEVIATION_LIMIT_MANAGER_ROLE: *SHARE_RATE_DEVIATION_LIMIT_MANAGER_ROLE
-          checkExitBusOracleReport:
-            - args: [ *oracleReportSanityCheckerMaxValidatorsExits ]
-              result: []
-            - args: [ *oracleReportSanityCheckerMaxValidatorsExitsRevert ]
-              result: []
-              mustRevert: true
-          checkExitedValidatorsRatePerDay:
-            - args: [ *oracleReportSanityCheckerMaxValidatorsExitsPerDay ]
-              result: [ ]
-            - args: [ *oracleReportSanityCheckerMaxValidatorsExitsPerDayRevert ]
-              mustRevert: true
-              result: [ ]
-          checkExtraDataItemsCountPerTransaction:
-            - args: [ *oracleReportSanityCheckerExtraDataItemPerTransaction ]
-              result: [ ]
-            - args: [ *oracleReportSanityCheckerExtraDataItemPerTransactionRevert ]
-              mustRevert: true
-              result: [ ]
-          checkNodeOperatorsPerExtraDataItemCount:
-            - args: [ 1, *oracleReportSanityCheckerNOPerExtraDataItem ]
-              result: [ ]
-            - args: [ 1, *oracleReportSanityCheckerNOPerExtraDataItemRevert ]
-              mustRevert: true
-              result: [ ]
-          checkSimulatedShareRate: null
-          checkWithdrawalQueueOracleReport: null
-          getLidoLocator: *lidoLocator
-          getMaxPositiveTokenRebase: null
-          getOracleReportLimits:
-            - args: []
-              result: *oracleReportSanityCheckerReportLimits
-          getReportDataCount: null
-          getRoleAdmin: null
-          getRoleMember: null
-          getRoleMemberCount:
-            - args: [ *ALL_LIMITS_MANAGER_ROLE ]
-              result: 0
-            - args: [ *ANNUAL_BALANCE_INCREASE_LIMIT_MANAGER_ROLE ]
-              result: 0
-            - args: [ *APPEARED_VALIDATORS_PER_DAY_LIMIT_MANAGER_ROLE ]
-              result: 0
-            - args: [ *DEFAULT_ADMIN_ROLE ]
-              result: 1
-            - args: [ *EXITED_VALIDATORS_PER_DAY_LIMIT_MANAGER_ROLE ]
-              result: 0
-            - args: [ *INITIAL_SLASHING_AND_PENALTIES_MANAGER_ROLE ]
-              result: 0
-            - args: [ *MAX_ITEMS_PER_EXTRA_DATA_TRANSACTION_ROLE ]
-              result: 0
-            - args: [ *MAX_NODE_OPERATORS_PER_EXTRA_DATA_ITEM_ROLE ]
-              result: 0
-            - args: [ *MAX_POSITIVE_TOKEN_REBASE_MANAGER_ROLE ]
-              result: 0
-            - args: [ *MAX_VALIDATOR_EXIT_REQUESTS_PER_REPORT_ROLE ]
-              result: 0
-            - args: [ *REQUEST_TIMESTAMP_MARGIN_MANAGER_ROLE ]
-              result: 0
-            - args: [ *SECOND_OPINION_MANAGER_ROLE ]
-              result: 0
-            - args: [ *SHARE_RATE_DEVIATION_LIMIT_MANAGER_ROLE ]
-              result: 0
-          hasRole:
-            - args: [ *DEFAULT_ADMIN_ROLE, *agent]
-              result: true
-          reportData: null
-          secondOpinionOracle: *oracleReportSanityCheckerSecondOpinionOracle
-          smoothenTokenRebase: null
-          supportsInterface: null
-      validatorsExitBusOracle:
-        name: ValidatorsExitBusOracle
-        address: *validatorsExitBusOracle
-        proxyName: OssifiableProxy
-        implementation: *validatorsExitBusOracleImpl
-        proxyChecks:
-          proxy__getAdmin: null
-          proxy__getImplementation: null
-          proxy__getIsOssified: null
-        checks:
-          DATA_FORMAT_LIST: null
-          DEFAULT_ADMIN_ROLE: null
-          GENESIS_TIME: null
-          MANAGE_CONSENSUS_CONTRACT_ROLE: null
-          MANAGE_CONSENSUS_VERSION_ROLE: *MANAGE_CONSENSUS_VERSION_ROLE
-          PAUSE_INFINITELY: null
-          PAUSE_ROLE: null
-          RESUME_ROLE: null
-          SECONDS_PER_SLOT: null
-          SUBMIT_DATA_ROLE: null
-          getConsensusContract: null
-          getConsensusReport: null
-          getConsensusVersion: 2
-          getContractVersion: 1
-          getLastProcessingRefSlot: null
-          getLastRequestedValidatorIndices: null
-          getProcessingState: null
-          getResumeSinceTimestamp: null
-          getRoleAdmin: null
-          getRoleMember:
-            - args: [*MANAGE_CONSENSUS_VERSION_ROLE, 0]
-              result: []
-              mustRevert: true
-          getRoleMemberCount: null
-          getTotalRequestsProcessed: null
-          hasRole: null
-          isPaused: null
-          supportsInterface: null
+    depositSecurityModule:
+      name: DepositSecurityModule
+      address: *depositSecurityModule
+      checks:
+        ATTEST_MESSAGE_PREFIX: null
+        DEPOSIT_CONTRACT: *DEPOSIT_CONTRACT
+        LIDO: *lido
+        PAUSE_MESSAGE_PREFIX: null
+        STAKING_ROUTER: *stakingRouter
+        UNVET_MESSAGE_PREFIX: null
+        VERSION: 3
+        canDeposit: null
+        getGuardianIndex: null
+        getGuardianQuorum: null
+        getGuardians: *dsmGuardians
+        getLastDepositBlock: null
+        getMaxOperatorsPerUnvetting: *depositSecurityModuleMaxOperatorPerUnvetting
+        getOwner:
+        getPauseIntentValidityPeriodBlocks: null
+        isDepositsPaused: false
+        isGuardian: null
+        isMinDepositDistancePassed: null
+    accountingOracle:
+      name: AccountingOracle
+      address: *accountingOracle
+      proxyName: OssifiableProxy
+      implementation: *accountingOracleImpl
+      proxyChecks:
+        proxy__getImplementation: *accountingOracleImpl
+        proxy__getAdmin: *agent
+        proxy__getIsOssified: false
+      checks:
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        EXTRA_DATA_FORMAT_EMPTY: null
+        EXTRA_DATA_FORMAT_LIST: null
+        EXTRA_DATA_TYPE_EXITED_VALIDATORS: null
+        EXTRA_DATA_TYPE_STUCK_VALIDATORS: null
+        GENESIS_TIME: null
+        LEGACY_ORACLE: null
+        LIDO: *lido
+        LOCATOR: *lidoLocator
+        MANAGE_CONSENSUS_CONTRACT_ROLE: null
+        MANAGE_CONSENSUS_VERSION_ROLE: null
+        SECONDS_PER_SLOT: null
+        SUBMIT_DATA_ROLE: null
+        getConsensusContract: *accountingConsensus
+        getConsensusReport: null
+        getConsensusVersion: 2
+        getContractVersion: 2
+        getLastProcessingRefSlot: null
+        getProcessingState: null
+        getRoleAdmin: null
+        getRoleMember: null
+        getRoleMemberCount: null
+        hasRole: null
+        supportsInterface: null
+    oracleReportSanityChecker:
+      name: OracleReportSanityChecker
+      address: *oracleReportSanityChecker
+      checks:
+        ALL_LIMITS_MANAGER_ROLE: *ALL_LIMITS_MANAGER_ROLE
+        ANNUAL_BALANCE_INCREASE_LIMIT_MANAGER_ROLE: *ANNUAL_BALANCE_INCREASE_LIMIT_MANAGER_ROLE
+        APPEARED_VALIDATORS_PER_DAY_LIMIT_MANAGER_ROLE: *APPEARED_VALIDATORS_PER_DAY_LIMIT_MANAGER_ROLE
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        EXITED_VALIDATORS_PER_DAY_LIMIT_MANAGER_ROLE: *EXITED_VALIDATORS_PER_DAY_LIMIT_MANAGER_ROLE
+        INITIAL_SLASHING_AND_PENALTIES_MANAGER_ROLE: *INITIAL_SLASHING_AND_PENALTIES_MANAGER_ROLE
+        MAX_ITEMS_PER_EXTRA_DATA_TRANSACTION_ROLE: *MAX_ITEMS_PER_EXTRA_DATA_TRANSACTION_ROLE
+        MAX_NODE_OPERATORS_PER_EXTRA_DATA_ITEM_ROLE: *MAX_NODE_OPERATORS_PER_EXTRA_DATA_ITEM_ROLE
+        MAX_POSITIVE_TOKEN_REBASE_MANAGER_ROLE: *MAX_POSITIVE_TOKEN_REBASE_MANAGER_ROLE
+        MAX_VALIDATOR_EXIT_REQUESTS_PER_REPORT_ROLE: *MAX_VALIDATOR_EXIT_REQUESTS_PER_REPORT_ROLE
+        REQUEST_TIMESTAMP_MARGIN_MANAGER_ROLE: *REQUEST_TIMESTAMP_MARGIN_MANAGER_ROLE
+        SECOND_OPINION_MANAGER_ROLE: *SECOND_OPINION_MANAGER_ROLE
+        SHARE_RATE_DEVIATION_LIMIT_MANAGER_ROLE: *SHARE_RATE_DEVIATION_LIMIT_MANAGER_ROLE
+        checkExitBusOracleReport:
+          - args: [ *oracleReportSanityCheckerMaxValidatorsExits ]
+            result: []
+          - args: [ *oracleReportSanityCheckerMaxValidatorsExitsRevert ]
+            mustRevert: true
+        checkExitedValidatorsRatePerDay:
+          - args: [ *oracleReportSanityCheckerMaxValidatorsExitsPerDay ]
+            result: [ ]
+          - args: [ *oracleReportSanityCheckerMaxValidatorsExitsPerDayRevert ]
+            mustRevert: true
+        checkExtraDataItemsCountPerTransaction:
+          - args: [ *oracleReportSanityCheckerExtraDataItemPerTransaction ]
+            result: [ ]
+          - args: [ *oracleReportSanityCheckerExtraDataItemPerTransactionRevert ]
+            mustRevert: true
+        checkNodeOperatorsPerExtraDataItemCount:
+          - args: [ 1, *oracleReportSanityCheckerNOPerExtraDataItem ]
+            result: [ ]
+          - args: [ 1, *oracleReportSanityCheckerNOPerExtraDataItemRevert ]
+            mustRevert: true
+        checkSimulatedShareRate: null
+        checkWithdrawalQueueOracleReport: null
+        getLidoLocator: *lidoLocator
+        getMaxPositiveTokenRebase: null
+        getOracleReportLimits:
+          - args: []
+            result: *oracleReportSanityCheckerReportLimits
+        getReportDataCount: null
+        getRoleAdmin: null
+        getRoleMember: null
+        getRoleMemberCount:
+          - args: [ *ALL_LIMITS_MANAGER_ROLE ]
+            result: 0
+          - args: [ *ANNUAL_BALANCE_INCREASE_LIMIT_MANAGER_ROLE ]
+            result: 0
+          - args: [ *APPEARED_VALIDATORS_PER_DAY_LIMIT_MANAGER_ROLE ]
+            result: 0
+          - args: [ *DEFAULT_ADMIN_ROLE ]
+            result: 1
+          - args: [ *EXITED_VALIDATORS_PER_DAY_LIMIT_MANAGER_ROLE ]
+            result: 0
+          - args: [ *INITIAL_SLASHING_AND_PENALTIES_MANAGER_ROLE ]
+            result: 0
+          - args: [ *MAX_ITEMS_PER_EXTRA_DATA_TRANSACTION_ROLE ]
+            result: 0
+          - args: [ *MAX_NODE_OPERATORS_PER_EXTRA_DATA_ITEM_ROLE ]
+            result: 0
+          - args: [ *MAX_POSITIVE_TOKEN_REBASE_MANAGER_ROLE ]
+            result: 0
+          - args: [ *MAX_VALIDATOR_EXIT_REQUESTS_PER_REPORT_ROLE ]
+            result: 0
+          - args: [ *REQUEST_TIMESTAMP_MARGIN_MANAGER_ROLE ]
+            result: 0
+          - args: [ *SECOND_OPINION_MANAGER_ROLE ]
+            result: 0
+          - args: [ *SHARE_RATE_DEVIATION_LIMIT_MANAGER_ROLE ]
+            result: 0
+        hasRole:
+          - args: [ *DEFAULT_ADMIN_ROLE, *agent]
+            result: true
+        reportData: null
+        secondOpinionOracle: *oracleReportSanityCheckerSecondOpinionOracle
+        smoothenTokenRebase: null
+        supportsInterface: null
+    validatorsExitBusOracle:
+      name: ValidatorsExitBusOracle
+      address: *validatorsExitBusOracle
+      proxyName: OssifiableProxy
+      implementation: *validatorsExitBusOracleImpl
+      proxyChecks:
+        proxy__getAdmin: null
+        proxy__getImplementation: null
+        proxy__getIsOssified: null
+      checks:
+        DATA_FORMAT_LIST: null
+        DEFAULT_ADMIN_ROLE: null
+        GENESIS_TIME: null
+        MANAGE_CONSENSUS_CONTRACT_ROLE: null
+        MANAGE_CONSENSUS_VERSION_ROLE: *MANAGE_CONSENSUS_VERSION_ROLE
+        PAUSE_INFINITELY: null
+        PAUSE_ROLE: null
+        RESUME_ROLE: null
+        SECONDS_PER_SLOT: null
+        SUBMIT_DATA_ROLE: null
+        getConsensusContract: null
+        getConsensusReport: null
+        getConsensusVersion: 2
+        getContractVersion: 1
+        getLastProcessingRefSlot: null
+        getLastRequestedValidatorIndices: null
+        getProcessingState: null
+        getResumeSinceTimestamp: null
+        getRoleAdmin: null
+        getRoleMember:
+          - args: [*MANAGE_CONSENSUS_VERSION_ROLE, 0]
+            mustRevert: true
+        getRoleMemberCount: null
+        getTotalRequestsProcessed: null
+        hasRole: null
+        isPaused: null
+        supportsInterface: null

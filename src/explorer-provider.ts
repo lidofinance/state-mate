@@ -1,20 +1,22 @@
-import { logErrorAndExit, logReplaceLine } from "./logger";
+import { log, logError, logErrorAndExit, logReplaceLine, WARNING_MARK } from "./logger";
 
 import {
+  Abi,
   ContractInfo,
-  isResponseOk,
+  isCommonResponseOkResult,
   isResponseBad,
+  isResponseOk,
+  isValidAbi,
   MethodCallResults,
   ResponseBad,
   ResponseOk,
-  isCommonResponseOkResult,
-  isValidAbi,
-  Abi,
 } from "./types";
 
 import { Contract, JsonRpcProvider } from "ethers";
 import { AbiArgsLength } from "./types";
 
+import chalk from "chalk";
+import { printError } from "./common";
 import { EtherscanHandler } from "./explorers/etherscan";
 import { ModeHandler } from "./explorers/mode";
 
@@ -40,6 +42,31 @@ export type GetContractInfoCallback = (
   explorerKey?: string,
 ) => Promise<ContractInfo>;
 
+export async function safeGetFunction(
+  contract: Contract,
+  functionName: string,
+): Promise<ReturnType<typeof contract.getFunction>> {
+  try {
+    return contract.getFunction(functionName);
+  } catch (error) {
+    logErrorAndExit(`Failed to call function ${chalk.yellow(functionName)}`);
+  }
+}
+
+export async function safeStaticCall(contract: Contract, functionName: string, ...args: unknown[]): Promise<unknown> {
+  try {
+    const contractFunction = contract.getFunction(functionName);
+
+    const result = await contractFunction.staticCall(...args);
+
+    return result;
+  } catch (error) {
+    logErrorAndExit(
+      `Failed to call function ${chalk.yellow(functionName)} with args:\n ${chalk.yellow(JSON.stringify(args))}:\n ${printError(error)}`,
+    );
+  }
+}
+
 export async function collectStaticCallResults(
   nonMutables: AbiArgsLength,
   contract: Contract,
@@ -47,7 +74,12 @@ export async function collectStaticCallResults(
   const results: MethodCallResults = [];
 
   for (const { name: methodName, numArgs } of nonMutables) {
-    const viewFunction = contract.getFunction(methodName);
+    let viewFunction: ReturnType<typeof contract.getFunction>;
+    try {
+      viewFunction = contract.getFunction(methodName);
+    } catch (error) {
+      logErrorAndExit(`Failed to get method ${chalk.yellow(methodName)} from contract`);
+    }
     let staticCallResult: string;
     logReplaceLine(`${methodName}...`);
     if (numArgs === 0) {
@@ -83,7 +115,7 @@ function parseJson(response: string): unknown {
   try {
     return JSON.parse(response);
   } catch (error) {
-    logErrorAndExit(`Failed to parse JSON: ${error instanceof Error ? error.message : String(error)}`);
+    logError(`Failed to parse JSON: ${printError(error)}`);
   }
 }
 
@@ -94,6 +126,8 @@ export async function loadContractInfo(
   explorerKey?: string,
 ) {
   const sourcesUrl = getExplorerApiUrl(explorerHostname, address, explorerKey);
+
+  if (!explorerKey) log(`${WARNING_MARK} ${chalk.yellow("explorerKey")} is not set`);
 
   let sourcesResponse = await httpGetAsync(sourcesUrl);
   if (isResponseBad(sourcesResponse) && explorer.requestWithRateLimit) {
@@ -116,7 +150,7 @@ export async function loadContractInfo(
   const abi: unknown = parseJson(sourcesResponse.result[0].ABI);
 
   if (!isValidAbi(abi)) {
-    logErrorAndExit(`ABI for contract ${address} is not valid (type mismatch):\n${JSON.stringify(abi)}`);
+    logErrorAndExit(`ABI for contract ${chalk.yellow(address)} is not valid (type mismatch):\n${JSON.stringify(abi)}`);
   }
 
   const contractInfo = explorer.getContractInfo(explorer, abi, sourcesResponse, address, explorerHostname, explorerKey);
@@ -132,7 +166,7 @@ export async function httpGetAsync<T>(url: string): Promise<T> | never {
     }
     return response.json() as Promise<T>;
   } catch (error) {
-    throw new Error(`Failed to fetch contract source code: ${error instanceof Error ? error.message : String(error)}`);
+    throw new Error(`Failed to fetch contract source code: ${printError(error)}`);
   }
 }
 

@@ -5,7 +5,7 @@ import { log, LogCommand, logHeader2, WARNING_MARK } from "../logger";
 import { ContractEntry } from "../typebox";
 import { incErrors, SectionValidatorBase } from "./base";
 import { JsonRpcProvider } from "ethers";
-import { loadContract } from "../explorer-provider";
+import { loadContract, safeStaticCall } from "../explorer-provider";
 
 export class OzNonEnumerableAclSectionValidator extends SectionValidatorBase {
   constructor(provider: JsonRpcProvider) {
@@ -35,7 +35,7 @@ export class OzNonEnumerableAclSectionValidator extends SectionValidatorBase {
           rolesByHolders.set(holder, new Set<string>());
         }
         rolesByHolders.get(holder)?.add(role);
-        const isRoleOnHolder: unknown = await contract.getFunction("hasRole").staticCall(role, holder);
+        const isRoleOnHolder: unknown = await safeStaticCall(contract, "hasRole", role, holder);
         const logHandle = new LogCommand(`.hasRole(${role}, ${holder})`);
         try {
           assert.isTrue(isRoleOnHolder);
@@ -50,7 +50,7 @@ export class OzNonEnumerableAclSectionValidator extends SectionValidatorBase {
     for (const [holder, rolesExpectedOnTheHolder] of rolesByHolders) {
       for (const role in contractEntry.ozNonEnumerableAcl) {
         if (!rolesExpectedOnTheHolder.has(role)) {
-          const isRoleOnHolder: unknown = await contract.getFunction("hasRole").staticCall(role, holder);
+          const isRoleOnHolder: unknown = await safeStaticCall(contract, "hasRole", role, holder); //await contract.getFunction("hasRole").staticCall(role, holder);
           const logHandle = new LogCommand(`.hasRole(${role}, ${holder})`);
           try {
             assert.isFalse(isRoleOnHolder);

@@ -9,16 +9,16 @@
         "l1": {
           "type": "array",
           "items": {
-            "format": "ethereum-address",
-            "pattern": "^(0|[1-9]|0x[a-fA-F0-9]{40})$",
+            "format": "ethereum-string",
+            "pattern": "^(0x[a-fA-F0-9]{40}|0x[a-fA-F0-9]{64}|.+)$",
             "type": "string"
           }
         },
         "l2": {
           "type": "array",
           "items": {
-            "format": "ethereum-address",
-            "pattern": "^(0|[1-9]|0x[a-fA-F0-9]{40})$",
+            "format": "ethereum-string",
+            "pattern": "^(0x[a-fA-F0-9]{40}|0x[a-fA-F0-9]{64}|.+)$",
             "type": "string"
           }
         }

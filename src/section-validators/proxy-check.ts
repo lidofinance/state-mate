@@ -1,10 +1,10 @@
-import { BaseContract, JsonRpcProvider } from "ethers";
+import { Contract, JsonRpcProvider } from "ethers";
 import { loadAbiFromFile } from "../abi-provider";
 import { CheckLevel, Ef, needCheck } from "../common";
+import { loadContract } from "../explorer-provider";
 import { logErrorAndExit, logHeader2 } from "../logger";
 import { ChecksEntryValue, ContractEntry, isTypeOfTB, ProxyContractEntryTB, ViewResultTB } from "../typebox";
 import { SectionValidatorBase } from "./base";
-import { loadContract } from "../explorer-provider";
 
 export class ProxyCheckSectionValidator extends SectionValidatorBase {
   constructor(provider: JsonRpcProvider) {
@@ -27,7 +27,7 @@ export class ProxyCheckSectionValidator extends SectionValidatorBase {
     }
   }
 
-  private async _validateSubsection(contract: BaseContract, method: string, checkEntryValue: ChecksEntryValue) {
+  private async _validateSubsection(contract: Contract, method: string, checkEntryValue: ChecksEntryValue) {
     if (isTypeOfTB(checkEntryValue, ViewResultTB)) {
       await this._checkViewFunction(contract, method, { result: checkEntryValue });
     } else {
