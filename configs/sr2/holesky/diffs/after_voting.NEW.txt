@@ -1,0 +1,326 @@
+================================================================================================
+===== Contract (l1): lidoLocator (LidoLocator, 0x28FAB2059C713A7F9D8c86Db49f9bb0e96Af1ef8) =====
+================================================================================================
+
+===== checks =====
+✔ .accountingOracle: 0x4E97A3972ce8511D87F334dA17a2C332542a5246
+✔ .burner: 0x4E46BD7147ccf666E1d73A3A456fC7a68de82eCA
+✔ .coreComponents: ["0xE73a3602b99f1f913e72F8bdcBC235e206794Ac8","0x80D1B1fF6E84134404abA18A628347960c38ccA7","0xd6EbF043D30A7fe46D1Db32BA90a0A51207FE229","0xE92329EC7ddB11D25e25b3c21eeBf11f15eB325d","0xc7cc160b58F8Bb0baC94b80847E2CF2800565C50","0xF0179dEC45a37423EAD4FaD5fCb136197872EAd9"]
+✔ .depositSecurityModule: 0x808DE3b26Be9438F12E9B45528955EA94C17f217
+✔ .elRewardsVault: 0xE73a3602b99f1f913e72F8bdcBC235e206794Ac8
+✔ .legacyOracle: 0x072f72BE3AcFE2c52715829F2CD9061A6C8fF019
+✔ .lido: 0x3F1c547b21f65e10480dE3ad8E19fAAC46C95034
+✔ .oracleDaemonConfig: 0xC01fC1F2787687Bc656EAc0356ba9Db6e6b7afb7
+⚠ .oracleReportComponentsForLido: skipped
+✔ .oracleReportSanityChecker: 0x80D1B1fF6E84134404abA18A628347960c38ccA7
+✔ .postTokenRebaseReceiver: 0x072f72BE3AcFE2c52715829F2CD9061A6C8fF019
+✔ .stakingRouter: 0xd6EbF043D30A7fe46D1Db32BA90a0A51207FE229
+✔ .treasury: 0xE92329EC7ddB11D25e25b3c21eeBf11f15eB325d
+✔ .validatorsExitBusOracle: 0xffDDF7025410412deaa05E3E1cE68FE53208afcb
+✔ .withdrawalQueue: 0xc7cc160b58F8Bb0baC94b80847E2CF2800565C50
+✔ .withdrawalVault: 0xF0179dEC45a37423EAD4FaD5fCb136197872EAd9
+
+===== proxyChecks =====
+✔ .proxy__getImplementation: 0xa19a59aF0680F6D9676ABD77E1Ba7e4c205F55a0
+✔ .proxy__getAdmin: 0xE92329EC7ddB11D25e25b3c21eeBf11f15eB325d
+✔ .proxy__getIsOssified: false
+
+====================================================================================================
+===== Contract (l1): stakingRouter (StakingRouter, 0xd6EbF043D30A7fe46D1Db32BA90a0A51207FE229) =====
+====================================================================================================
+
+===== checks =====
+⚠ .DEFAULT_ADMIN_ROLE: skipped
+✔ .DEPOSIT_CONTRACT: 0x4242424242424242424242424242424242424242
+⚠ .FEE_PRECISION_POINTS: skipped
+⚠ .MANAGE_WITHDRAWAL_CREDENTIALS_ROLE: skipped
+⚠ .MAX_STAKING_MODULES_COUNT: skipped
+⚠ .MAX_STAKING_MODULE_NAME_LENGTH: skipped
+⚠ .REPORT_EXITED_VALIDATORS_ROLE: skipped
+⚠ .REPORT_REWARDS_MINTED_ROLE: skipped
+⚠ .STAKING_MODULE_MANAGE_ROLE: skipped
+⚠ .STAKING_MODULE_UNVETTING_ROLE: skipped
+⚠ .TOTAL_BASIS_POINTS: skipped
+⚠ .UNSAFE_SET_EXITED_VALIDATORS_ROLE: skipped
+⚠ .getAllNodeOperatorDigests: skipped
+⚠ .getAllStakingModuleDigests: skipped
+✔ .getContractVersion: 2
+⚠ .getDepositsAllocation: skipped
+✔ .getLido: 0x3F1c547b21f65e10480dE3ad8E19fAAC46C95034
+⚠ .getNodeOperatorDigests: skipped
+⚠ .getNodeOperatorSummary: skipped
+✔ .getRoleAdmin(0x240525496a9dc32284b17ce03b43e539e4bd81414634ee54395030d793463b57): 0x0000000000000000000000000000000000000000000000000000000000000000
+✔ .getRoleMember(0x240525496a9dc32284b17ce03b43e539e4bd81414634ee54395030d793463b57,0): 0x808DE3b26Be9438F12E9B45528955EA94C17f217
+✔ .getRoleMember(0x240525496a9dc32284b17ce03b43e539e4bd81414634ee54395030d793463b57,1): REVERTED with: execution reverted: Panic due to ARRAY_RANGE_ERROR(50) (action="call", data="0x4e487b710000000000000000000000000000000000000000000000000000000000000032", reason="Panic due to ARRAY_RANGE_ERROR(50)", transaction={ "data": "0x9010d07c240525496a9dc32284b17ce03b43e539e4bd81414634ee54395030d793463b570000000000000000000000000000000000000000000000000000000000000001", "to": "0xd6EbF043D30A7fe46D1Db32BA90a0A51207FE229" }, invocation=null, revert={ "args": [ 50 ], "name": "Panic", "signature": "Panic(uint256)" }, code=CALL_EXCEPTION, version=6.13.4)
+✔ .getRoleMember(0x00b1e70095ba5bacc3202c3db9faf1f7873186f0ed7b6c84e80c0018dcc6e38e,0): REVERTED with: execution reverted: Panic due to ARRAY_RANGE_ERROR(50) (action="call", data="0x4e487b710000000000000000000000000000000000000000000000000000000000000032", reason="Panic due to ARRAY_RANGE_ERROR(50)", transaction={ "data": "0x9010d07c00b1e70095ba5bacc3202c3db9faf1f7873186f0ed7b6c84e80c0018dcc6e38e0000000000000000000000000000000000000000000000000000000000000000", "to": "0xd6EbF043D30A7fe46D1Db32BA90a0A51207FE229" }, invocation=null, revert={ "args": [ 50 ], "name": "Panic", "signature": "Panic(uint256)" }, code=CALL_EXCEPTION, version=6.13.4)
+✔ .getRoleMember(0x9a2f67efb89489040f2c48c3b2c38f719fba1276678d2ced3bd9049fb5edc6b2,0): REVERTED with: execution reverted: Panic due to ARRAY_RANGE_ERROR(50) (action="call", data="0x4e487b710000000000000000000000000000000000000000000000000000000000000032", reason="Panic due to ARRAY_RANGE_ERROR(50)", transaction={ "data": "0x9010d07c9a2f67efb89489040f2c48c3b2c38f719fba1276678d2ced3bd9049fb5edc6b20000000000000000000000000000000000000000000000000000000000000000", "to": "0xd6EbF043D30A7fe46D1Db32BA90a0A51207FE229" }, invocation=null, revert={ "args": [ 50 ], "name": "Panic", "signature": "Panic(uint256)" }, code=CALL_EXCEPTION, version=6.13.4)
+✔ .getRoleMemberCount(0x240525496a9dc32284b17ce03b43e539e4bd81414634ee54395030d793463b57): 1
+✔ .getRoleMemberCount(0x0000000000000000000000000000000000000000000000000000000000000000): 1
+⚠ .getStakingFeeAggregateDistribution: skipped
+⚠ .getStakingFeeAggregateDistributionE4Precision: skipped
+⚠ .getStakingModule: skipped
+⚠ .getStakingModuleActiveValidatorsCount: skipped
+⚠ .getStakingModuleDigests: skipped
+✔ .getStakingModuleIds: [1,2,3,4]
+⚠ .getStakingModuleIsActive: skipped
+⚠ .getStakingModuleIsDepositsPaused: skipped
+⚠ .getStakingModuleIsStopped: skipped
+⚠ .getStakingModuleLastDepositBlock: skipped
+⚠ .getStakingModuleMaxDepositsCount: skipped
+✔ .getStakingModuleMaxDepositsPerBlock(1): 150
+✔ .getStakingModuleMaxDepositsPerBlock(2): 150
+✔ .getStakingModuleMinDepositBlockDistance(1): 25
+✔ .getStakingModuleMinDepositBlockDistance(2): 25
+⚠ .getStakingModuleNonce: skipped
+⚠ .getStakingModuleStatus: skipped
+⚠ .getStakingModuleSummary: skipped
+⚠ .getStakingModules: skipped
+✔ .getStakingModulesCount: 4
+⚠ .getStakingRewardsDistribution: skipped
+⚠ .getTotalFeeE4Precision: skipped
+✔ .getWithdrawalCredentials: 0x010000000000000000000000f0179dec45a37423ead4fad5fcb136197872ead9
+✔ .hasRole(0x240525496a9dc32284b17ce03b43e539e4bd81414634ee54395030d793463b57,0x808DE3b26Be9438F12E9B45528955EA94C17f217): true
+✔ .hasRole(0x0000000000000000000000000000000000000000000000000000000000000000,0xE92329EC7ddB11D25e25b3c21eeBf11f15eB325d): true
+⚠ .hasStakingModule: skipped
+⚠ .supportsInterface: skipped
+
+===== proxyChecks =====
+✔ .proxy__getImplementation: 0x9b5890E950E3Df487Bb64E0A6743cdE791139152
+✔ .proxy__getAdmin: 0xE92329EC7ddB11D25e25b3c21eeBf11f15eB325d
+✔ .proxy__getIsOssified: false
+
+==================================================================================================================
+===== Contract (l1): nodeOperatorRegistry (NodeOperatorRegistry, 0x595F64Ddc3856a3b5Ff4f4CC1d1fb4B46cFd2bAC) =====
+==================================================================================================================
+
+===== checks =====
+⚠ .MANAGE_NODE_OPERATOR_ROLE: skipped
+⚠ .MANAGE_SIGNING_KEYS: skipped
+⚠ .MAX_NODE_OPERATORS_COUNT: skipped
+⚠ .MAX_NODE_OPERATOR_NAME_LENGTH: skipped
+⚠ .MAX_STUCK_PENALTY_DELAY: skipped
+⚠ .SET_NODE_OPERATOR_LIMIT_ROLE: skipped
+✔ .STAKING_ROUTER_ROLE: 0xbb75b874360e0bfd87f964eadd8276d8efb7c942134fc329b513032d0803e0c6
+⚠ .appId: skipped
+⚠ .allowRecoverability: skipped
+⚠ .canPerform: skipped
+⚠ .getActiveNodeOperatorsCount: skipped
+✔ .getContractVersion: 3
+⚠ .getEVMScriptExecutor: skipped
+⚠ .getEVMScriptRegistry: skipped
+⚠ .getInitializationBlock: skipped
+⚠ .getKeysOpIndex: skipped
+✔ .getLocator: 0x28FAB2059C713A7F9D8c86Db49f9bb0e96Af1ef8
+⚠ .getNodeOperator: skipped
+⚠ .getNodeOperatorIds: skipped
+⚠ .getNodeOperatorIsActive: skipped
+⚠ .getNodeOperatorSummary: skipped
+⚠ .getNodeOperatorsCount: skipped
+⚠ .getNonce: skipped
+⚠ .getRecoveryVault: skipped
+⚠ .getRewardDistributionState: skipped
+⚠ .getRewardsDistribution: skipped
+⚠ .getSigningKey: skipped
+⚠ .getSigningKeys: skipped
+⚠ .getStakingModuleSummary: skipped
+⚠ .getStuckPenaltyDelay: skipped
+⚠ .getTotalSigningKeyCount: skipped
+✔ .getType: 0x637572617465642d6f6e636861696e2d76310000000000000000000000000000
+⚠ .getUnusedSigningKeyCount: skipped
+⚠ .hasInitialized: skipped
+⚠ .isOperatorPenalized: skipped
+⚠ .isOperatorPenaltyCleared: skipped
+⚠ .isPetrified: skipped
+⚠ .kernel: skipped
+
+===== proxyChecks =====
+⚠ .proxyType: skipped
+⚠ .isDepositable: skipped
+✔ .implementation: 0x41646708A7EDbe22BD635Cb838Ff9C0CfA99A3bE
+⚠ .appId: skipped
+⚠ .kernel: skipped
+
+============================================================================================
+===== Contract (l1): simpleDVT (SimpleDVT, 0x11a93807078f8BB880c1BD0ee4C387537de4b4b6) =====
+============================================================================================
+
+===== checks =====
+⚠ .MANAGE_NODE_OPERATOR_ROLE: skipped
+⚠ .MANAGE_SIGNING_KEYS: skipped
+⚠ .MAX_NODE_OPERATORS_COUNT: skipped
+⚠ .MAX_NODE_OPERATOR_NAME_LENGTH: skipped
+⚠ .MAX_STUCK_PENALTY_DELAY: skipped
+⚠ .SET_NODE_OPERATOR_LIMIT_ROLE: skipped
+✔ .STAKING_ROUTER_ROLE: 0xbb75b874360e0bfd87f964eadd8276d8efb7c942134fc329b513032d0803e0c6
+⚠ .appId: skipped
+⚠ .allowRecoverability: skipped
+⚠ .canPerform: skipped
+⚠ .getActiveNodeOperatorsCount: skipped
+✔ .getContractVersion: 3
+⚠ .getEVMScriptExecutor: skipped
+⚠ .getEVMScriptRegistry: skipped
+⚠ .getInitializationBlock: skipped
+⚠ .getKeysOpIndex: skipped
+✔ .getLocator: 0x28FAB2059C713A7F9D8c86Db49f9bb0e96Af1ef8
+⚠ .getNodeOperator: skipped
+⚠ .getNodeOperatorIds: skipped
+⚠ .getNodeOperatorIsActive: skipped
+⚠ .getNodeOperatorSummary: skipped
+⚠ .getNodeOperatorsCount: skipped
+⚠ .getNonce: skipped
+⚠ .getRecoveryVault: skipped
+⚠ .getRewardDistributionState: skipped
+⚠ .getRewardsDistribution: skipped
+⚠ .getSigningKey: skipped
+⚠ .getSigningKeys: skipped
+⚠ .getStakingModuleSummary: skipped
+⚠ .getStuckPenaltyDelay: skipped
+⚠ .getTotalSigningKeyCount: skipped
+✔ .getType: 0x637572617465642d6f6e636861696e2d76310000000000000000000000000000
+⚠ .getUnusedSigningKeyCount: skipped
+⚠ .hasInitialized: skipped
+⚠ .isOperatorPenalized: skipped
+⚠ .isOperatorPenaltyCleared: skipped
+⚠ .isPetrified: skipped
+⚠ .kernel: skipped
+
+===== proxyChecks =====
+⚠ .proxyType: skipped
+⚠ .isDepositable: skipped
+✔ .implementation: 0x41646708A7EDbe22BD635Cb838Ff9C0CfA99A3bE
+⚠ .appId: skipped
+⚠ .kernel: skipped
+
+====================================================================================================================
+===== Contract (l1): depositSecurityModule (DepositSecurityModule, 0x808DE3b26Be9438F12E9B45528955EA94C17f217) =====
+====================================================================================================================
+
+===== checks =====
+⚠ .ATTEST_MESSAGE_PREFIX: skipped
+✔ .DEPOSIT_CONTRACT: 0x4242424242424242424242424242424242424242
+✔ .LIDO: 0x3F1c547b21f65e10480dE3ad8E19fAAC46C95034
+⚠ .PAUSE_MESSAGE_PREFIX: skipped
+✔ .STAKING_ROUTER: 0xd6EbF043D30A7fe46D1Db32BA90a0A51207FE229
+⚠ .UNVET_MESSAGE_PREFIX: skipped
+✔ .VERSION: 3
+⚠ .canDeposit: skipped
+⚠ .getGuardianIndex: skipped
+⚠ .getGuardianQuorum: skipped
+✔ .getGuardians: ["0x711B5fCfeD5A30CA78e0CAC321B060dE9D6f8979","0xDAaE8C017f1E2a9bEC6111d288f9ebB165e0E163","0x31fa51343297FFce0CC1E67a50B2D3428057D1b1","0x43464Fe06c18848a2E2e913194D64c1970f4326a","0x79A132BE0c25cED09e745629D47cf05e531bb2bb","0x0bf1B3d1e6f78b12f26204348ABfCA9310259FfA","0xf060ab3d5dCfdC6a0DFd5ca0645ac569b8f105CA"]
+⚠ .getLastDepositBlock: skipped
+✔ .getMaxOperatorsPerUnvetting: 200
+⚠ .getOwner: skipped
+⚠ .getPauseIntentValidityPeriodBlocks: skipped
+✔ .isDepositsPaused: false
+⚠ .isGuardian: skipped
+⚠ .isMinDepositDistancePassed: skipped
+
+==========================================================================================================
+===== Contract (l1): accountingOracle (AccountingOracle, 0x4E97A3972ce8511D87F334dA17a2C332542a5246) =====
+==========================================================================================================
+
+===== checks =====
+✔ .DEFAULT_ADMIN_ROLE: 0x0000000000000000000000000000000000000000000000000000000000000000
+⚠ .EXTRA_DATA_FORMAT_EMPTY: skipped
+⚠ .EXTRA_DATA_FORMAT_LIST: skipped
+⚠ .EXTRA_DATA_TYPE_EXITED_VALIDATORS: skipped
+⚠ .EXTRA_DATA_TYPE_STUCK_VALIDATORS: skipped
+⚠ .GENESIS_TIME: skipped
+⚠ .LEGACY_ORACLE: skipped
+✔ .LIDO: 0x3F1c547b21f65e10480dE3ad8E19fAAC46C95034
+✔ .LOCATOR: 0x28FAB2059C713A7F9D8c86Db49f9bb0e96Af1ef8
+⚠ .MANAGE_CONSENSUS_CONTRACT_ROLE: skipped
+⚠ .MANAGE_CONSENSUS_VERSION_ROLE: skipped
+⚠ .SECONDS_PER_SLOT: skipped
+⚠ .SUBMIT_DATA_ROLE: skipped
+✔ .getConsensusContract: 0xa067FC95c22D51c3bC35fd4BE37414Ee8cc890d2
+⚠ .getConsensusReport: skipped
+✔ .getConsensusVersion: 2
+✔ .getContractVersion: 2
+⚠ .getLastProcessingRefSlot: skipped
+⚠ .getProcessingState: skipped
+⚠ .getRoleAdmin: skipped
+⚠ .getRoleMember: skipped
+⚠ .getRoleMemberCount: skipped
+⚠ .hasRole: skipped
+⚠ .supportsInterface: skipped
+
+===== proxyChecks =====
+✔ .proxy__getImplementation: 0x748CE008ac6b15634ceD5a6083796f75695052a2
+✔ .proxy__getAdmin: 0xE92329EC7ddB11D25e25b3c21eeBf11f15eB325d
+✔ .proxy__getIsOssified: false
+
+============================================================================================================================
+===== Contract (l1): oracleReportSanityChecker (OracleReportSanityChecker, 0x80D1B1fF6E84134404abA18A628347960c38ccA7) =====
+============================================================================================================================
+
+===== checks =====
+✔ .ALL_LIMITS_MANAGER_ROLE: 0x5bf88568a012dfc9fe67407ad6775052bddc4ac89902dea1f4373ef5d9f1e35b
+✔ .ANNUAL_BALANCE_INCREASE_LIMIT_MANAGER_ROLE: 0x12c02753cd3d584dc4bb965eb0c88392c4c4d7c00433fdb7490d33c61ea57622
+✔ .APPEARED_VALIDATORS_PER_DAY_LIMIT_MANAGER_ROLE: 0x14ca7b84baa11a976283347b0159b8ddf2dcf5fd5cf613cc567a3423cf510119
+✔ .DEFAULT_ADMIN_ROLE: 0x0000000000000000000000000000000000000000000000000000000000000000
+✔ .EXITED_VALIDATORS_PER_DAY_LIMIT_MANAGER_ROLE: 0x60b9982471bc0620c7b74959f48a86c55c92c11876fddc5b0b54d1ec47153e5d
+✔ .INITIAL_SLASHING_AND_PENALTIES_MANAGER_ROLE: 0xebfa317a5d279811b024586b17a50f48924bce86f6293b233927322d7209b507
+✔ .MAX_ITEMS_PER_EXTRA_DATA_TRANSACTION_ROLE: 0x13445b811594f3a8800b82296d63f371c695d2f86c1069c899ded3d73f523d2e
+✔ .MAX_NODE_OPERATORS_PER_EXTRA_DATA_ITEM_ROLE: 0xb3f2d16385bde8a7121e101a021aff43bbe4d4137a587832caf1f583b9d34395
+✔ .MAX_POSITIVE_TOKEN_REBASE_MANAGER_ROLE: 0x78de2bab4a3a0c88f50b6bb7c2290e0eb46bc61d575eae694d8bffbc2ca98c92
+✔ .MAX_VALIDATOR_EXIT_REQUESTS_PER_REPORT_ROLE: 0x9925400e72399e0a89e9b346878fc47ac0031526d0e060e33ff372d7a5d11ba8
+✔ .REQUEST_TIMESTAMP_MARGIN_MANAGER_ROLE: 0x2f8719116fbba3aba2a39759e34dcd29ea3516f7568c8321695aaea208280cd3
+✔ .SECOND_OPINION_MANAGER_ROLE: 0xaa0e0f619f5a9368ee035bae759cfe7da8958f44bd71456a05198effc68ea647
+✔ .SHARE_RATE_DEVIATION_LIMIT_MANAGER_ROLE: 0x7b21c0949109e9e143f66d6aa1f8a065b3f4ab47ee9f84f6837fd0490eace4d5
+✔ .checkExitBusOracleReport(600): []
+✔ .checkExitBusOracleReport(601): REVERTED with: execution reverted: IncorrectNumberOfExitRequestsPerReport(uint256)
+✔ .checkExitedValidatorsRatePerDay(9000): []
+✘ .checkExitedValidatorsRatePerDay(9001): []
+✔ .checkExtraDataItemsCountPerTransaction(8): []
+✔ .checkExtraDataItemsCountPerTransaction(9): REVERTED with: execution reverted: TooManyItemsPerExtraDataTransaction(uint256,uint256)
+✔ .checkNodeOperatorsPerExtraDataItemCount(1,62): []
+✔ .checkNodeOperatorsPerExtraDataItemCount(1,63): REVERTED with: execution reverted: TooManyNodeOpsPerExtraDataItem(uint256,uint256)
+⚠ .checkSimulatedShareRate: skipped
+⚠ .checkWithdrawalQueueOracleReport: skipped
+✔ .getLidoLocator: 0x28FAB2059C713A7F9D8c86Db49f9bb0e96Af1ef8
+⚠ .getMaxPositiveTokenRebase: skipped
+✘ .getOracleReportLimits(): REVERTED with: Actual value '9016,43200,1000,50,600,8,62,7680,750000,1000,101,74 is not equal to expected array '[9000,43200,1000,50,600,8,62,7680,750000,1000,101,74]
+⚠ .getReportDataCount: skipped
+⚠ .getRoleAdmin: skipped
+⚠ .getRoleMember: skipped
+✔ .getRoleMemberCount(0x5bf88568a012dfc9fe67407ad6775052bddc4ac89902dea1f4373ef5d9f1e35b): 0
+✔ .getRoleMemberCount(0x12c02753cd3d584dc4bb965eb0c88392c4c4d7c00433fdb7490d33c61ea57622): 0
+✔ .getRoleMemberCount(0x14ca7b84baa11a976283347b0159b8ddf2dcf5fd5cf613cc567a3423cf510119): 0
+✔ .getRoleMemberCount(0x0000000000000000000000000000000000000000000000000000000000000000): 1
+✘ .getRoleMemberCount(0x60b9982471bc0620c7b74959f48a86c55c92c11876fddc5b0b54d1ec47153e5d): REVERTED with: Expected "0" to equal actual "1"
+✔ .getRoleMemberCount(0xebfa317a5d279811b024586b17a50f48924bce86f6293b233927322d7209b507): 0
+✔ .getRoleMemberCount(0x13445b811594f3a8800b82296d63f371c695d2f86c1069c899ded3d73f523d2e): 0
+✔ .getRoleMemberCount(0xb3f2d16385bde8a7121e101a021aff43bbe4d4137a587832caf1f583b9d34395): 0
+✔ .getRoleMemberCount(0x78de2bab4a3a0c88f50b6bb7c2290e0eb46bc61d575eae694d8bffbc2ca98c92): 0
+✔ .getRoleMemberCount(0x9925400e72399e0a89e9b346878fc47ac0031526d0e060e33ff372d7a5d11ba8): 0
+✔ .getRoleMemberCount(0x2f8719116fbba3aba2a39759e34dcd29ea3516f7568c8321695aaea208280cd3): 0
+✔ .getRoleMemberCount(0xaa0e0f619f5a9368ee035bae759cfe7da8958f44bd71456a05198effc68ea647): 0
+✔ .getRoleMemberCount(0x7b21c0949109e9e143f66d6aa1f8a065b3f4ab47ee9f84f6837fd0490eace4d5): 0
+✔ .hasRole(0x0000000000000000000000000000000000000000000000000000000000000000,0xE92329EC7ddB11D25e25b3c21eeBf11f15eB325d): true
+⚠ .reportData: skipped
+✔ .secondOpinionOracle: 0x0000000000000000000000000000000000000000
+⚠ .smoothenTokenRebase: skipped
+⚠ .supportsInterface: skipped
+
+========================================================================================================================
+===== Contract (l1): validatorsExitBusOracle (ValidatorsExitBusOracle, 0xffDDF7025410412deaa05E3E1cE68FE53208afcb) =====
+========================================================================================================================
+
+===== checks =====
+ERROR: Error finding ABI file for contract 
+        ValidatorsExitBusOracle in configs/sr2/holesky/abi: Could not find ABI file. The following combinations were tried:
+configs/sr2/holesky/abi/ValidatorsExitBusOracle.json
+configs/sr2/holesky/abi/ValidatorsExitBusOracle.sol/ValidatorsExitBusOracle.json
+configs/sr2/holesky/abi/ValidatorsExitBusOracle-0xffddf7025410412deaa05e3e1ce68fe53208afcb.json
+
+Trace
+    at logError (/home/alex/projects/state-mate-typed/src/logger.ts:66:11)
+    at logErrorAndExit (/home/alex/projects/state-mate-typed/src/logger.ts:70:3)
+    at loadAbiFromFile (/home/alex/projects/state-mate-typed/src/abi-provider.ts:19:20)
+    at ChecksSectionValidator.validateSection (/home/alex/projects/state-mate-typed/src/section-validators/checks.ts:22:32)
+    at ContractSectionValidator.see (/home/alex/projects/state-mate-typed/src/section-validators/contract.ts:25:38)
+    at checkNetworkSection (/home/alex/projects/state-mate-typed/src/state-mate.ts:193:34)
+    at processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async doChecks (/home/alex/projects/state-mate-typed/src/state-mate.ts:127:48)
+    at async main (/home/alex/projects/state-mate-typed/src/state-mate.ts:241:7)
