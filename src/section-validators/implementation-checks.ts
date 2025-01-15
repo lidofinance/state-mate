@@ -11,7 +11,11 @@ export class ImplementationChecksSectionValidator extends ChecksSectionValidator
   }
 
   override async validateSection(contractEntry: ContractEntry, contractAlias: string) {
-    if (isTypeOfTB(contractEntry, ProxyContractEntryTB) && contractEntry.implementation) {
+    if (
+      isTypeOfTB(contractEntry, ProxyContractEntryTB) &&
+      contractEntry.implementation &&
+      contractEntry.implementationChecks
+    ) {
       logHeader2(this.sectionName);
       const { implementation, name, implementationChecks } = contractEntry;
 
