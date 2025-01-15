@@ -9,6 +9,7 @@ import * as YAML from "yaml";
 import chalk from "chalk";
 import { program } from "commander";
 import { confirm as askUserToConfirm } from "@inquirer/prompts";
+import * as readline from 'node:readline'
 
 const SUCCESS_MARK = chalk.green("✔");
 const FAILURE_MARK = chalk.red("✘");
@@ -140,8 +141,8 @@ class LogCommand {
 
   public printResult(success: boolean, result: string): void {
     const statusSymbol = success ? SUCCESS_MARK : FAILURE_MARK;
-    process.stdout.cursorTo(0);
-    process.stdout.clearLine(0);
+    readline.cursorTo(process.stdout, 0);
+    readline.clearLine(process.stdout, 0);
     process.stdout.write(`${statusSymbol} ${this.description}: ${chalk.yellow(result)}\n`);
   }
 
