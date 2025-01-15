@@ -115,7 +115,7 @@ function parseJson(response: string): unknown {
   try {
     return JSON.parse(response);
   } catch (error) {
-    logError(`Failed to parse JSON: ${printError(error)}`);
+    logError(`Failed to parse JSON: ${printError(error)} \nResponse: ${chalk.yellow(response)}`);
   }
 }
 
