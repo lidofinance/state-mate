@@ -1,9 +1,9 @@
 import chalk from "chalk";
 import { Contract, JsonRpcProvider } from "ethers";
-import { Ef, getNonMutables, printError } from "../common";
-import { safeGetFunction } from "../explorer-provider";
-import { LogCommand, logError, logErrorAndExit, logMethodSkipped } from "../logger";
-import { assertEqual, stringify } from "../statements-functions";
+import { Ef, getNonMutables, printError } from "src/common";
+import { safeGetFunction } from "src/explorer-provider";
+import { LogCommand, logError, logErrorAndExit, logMethodSkipped } from "src/logger";
+import { assertEqual, stringify } from "src/statements-functions";
 import {
   ContractEntry,
   isTypeOfTB,
@@ -12,8 +12,8 @@ import {
   StaticCallMustRevertTB,
   StaticCallResult,
   StaticCallResultTB,
-} from "../typebox";
-import { Abi, AbiArgsLength } from "../types";
+} from "src/typebox";
+import { Abi, AbiArgsLength } from "src/types";
 
 export let g_errors: number = 0;
 

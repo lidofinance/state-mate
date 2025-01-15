@@ -1,6 +1,6 @@
-import { GetContractInfoCallback, IExplorerHandler, loadContractInfo } from "../explorer-provider";
-import { logErrorAndExit } from "../logger";
-import { Abi, CommonResponseOkResult, ContractInfo, isCommonResponseOkResult, ResponseOk } from "../types";
+import { GetContractInfoCallback, IExplorerHandler, loadContractInfo } from "src/explorer-provider";
+import { logErrorAndExit } from "src/logger";
+import { Abi, CommonResponseOkResult, ContractInfo, isCommonResponseOkResult, ResponseOk } from "src/types";
 
 export class ModeHandler implements IExplorerHandler {
   getContractInfo: GetContractInfoCallback = modeGetContractInfoCallback;

@@ -1,11 +1,11 @@
 import { assert } from "chai";
-import { loadAbiFromFile } from "../abi-provider";
-import { Ef } from "../common";
-import { log, LogCommand, logHeader2, WARNING_MARK } from "../logger";
-import { ContractEntry } from "../typebox";
+import { loadAbiFromFile } from "src/abi-provider";
+import { Ef } from "src/common";
+import { log, LogCommand, logHeader2, WARNING_MARK } from "src/logger";
+import { ContractEntry } from "src/typebox";
 import { incErrors, SectionValidatorBase } from "./base";
 import { JsonRpcProvider } from "ethers";
-import { loadContract, safeStaticCall } from "../explorer-provider";
+import { loadContract, safeStaticCall } from "src/explorer-provider";
 
 export class OzNonEnumerableAclSectionValidator extends SectionValidatorBase {
   constructor(provider: JsonRpcProvider) {

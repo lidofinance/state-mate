@@ -1,9 +1,9 @@
 import { Contract, JsonRpcProvider } from "ethers";
-import { loadAbiFromFile } from "../abi-provider";
-import { CheckLevel, Ef, needCheck } from "../common";
-import { loadContract } from "../explorer-provider";
-import { logErrorAndExit, logHeader2 } from "../logger";
-import { ChecksEntryValue, ContractEntry, isTypeOfTB, ProxyContractEntryTB, ViewResultTB } from "../typebox";
+import { loadAbiFromFile } from "src/abi-provider";
+import { CheckLevel, Ef, needCheck } from "src/common";
+import { loadContract } from "src/explorer-provider";
+import { logErrorAndExit, logHeader2 } from "src/logger";
+import { ChecksEntryValue, ContractEntry, isTypeOfTB, ProxyContractEntryTB, ViewResultTB } from "src/typebox";
 import { SectionValidatorBase } from "./base";
 
 export class ProxyCheckSectionValidator extends SectionValidatorBase {

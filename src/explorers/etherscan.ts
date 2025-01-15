@@ -4,9 +4,16 @@ import {
   RateLimitHandler,
   httpGetAsync,
   loadContractInfo,
-} from "../explorer-provider";
-import { log, logErrorAndExit } from "../logger";
-import { Abi, CommonResponseOkResult, ContractInfo, isCommonResponseOkResult, ResponseBad, ResponseOk } from "../types";
+} from "src/explorer-provider";
+import { log, logErrorAndExit } from "src/logger";
+import {
+  Abi,
+  CommonResponseOkResult,
+  ContractInfo,
+  isCommonResponseOkResult,
+  ResponseBad,
+  ResponseOk,
+} from "src/types";
 
 export class EtherscanHandler implements IExplorerHandler {
   requestWithRateLimit: RateLimitHandler = etherRateLimitHandler;

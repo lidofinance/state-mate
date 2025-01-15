@@ -10,7 +10,7 @@
   "packageManager": "yarn@4.3.1",
   "scripts": {
     "build": "tsc",
-    "start": "ts-node src/state-mate.ts",
+    "start": "ts-node -r tsconfig-paths/register src/state-mate.ts",
     "lint": "eslint . --max-warnings=0",
     "lint:fix": "yarn lint --fix",
     "format": "prettier . --ignore-path .gitignore --check",
@@ -59,6 +59,7 @@
     "dotenv": "^16.4.5",
     "ethers": "^6.13.0",
     "json-diff": "^1.0.6",
+    "tsconfig-paths": "^4.2.0",
     "yaml": "^2.3.4"
   }
 }

@@ -1,5 +1,5 @@
 import { JsonRpcProvider } from "ethers";
-import { Ef } from "../common";
+import { Ef } from "src/common";
 import { ChecksSectionValidator } from "./checks";
 import { OzNonEnumerableAclSectionValidator } from "./oz-non-enumerable-acl";
 import { ProxyCheckSectionValidator } from "./proxy-check";
