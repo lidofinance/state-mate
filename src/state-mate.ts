@@ -9,7 +9,7 @@ import * as YAML from "yaml";
 import chalk from "chalk";
 import { program } from "commander";
 import { confirm as askUserToConfirm } from "@inquirer/prompts";
-import * as readline from 'readline'
+import * as readline from 'node:readline'
 
 const SUCCESS_MARK = chalk.green("✔");
 const FAILURE_MARK = chalk.red("✘");
