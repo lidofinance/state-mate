@@ -11,20 +11,20 @@ parameters:
 
 deployed:
   l1:
-    - &l1TokenBridge "0x357B588c1Af30F96316D8bf654307d836C5aB389"
-    - &l1TokenBridgeImpl "0xb87d752aB3a06913Dfe5E435Cd68346DedF3fA60"
-    - &l1OpStackTokenRatePusher "0x5adFceef8A3282d44f517005f2215b33D1406e7d"
+    - &l1TokenBridge "0x3982e730E1813FA385331e491bb75c42Ab07d780"
+    - &l1TokenBridgeImpl "0x84f32114140a3313147291281648AaC037Bbe4B4"
+    - &l1OpStackTokenRatePusher "0xd0E719f172430c2B22fA6252a0217469bCCecBB9"
 
   l2:
-    - &l2GovernanceExecutor "0xd96377d45821a80b98788Bacf8E962b6eD7af8a2"
-    - &l2TokenBridge "0xf6b656eB997D270Fe5d036268352EFff503E6a32"
-    - &l2TokenBridgeImpl "0xbE74958c9aef2648c58d1Cd4939Bc751f43BD934"
-    - &l2WstETH "0x6fd4a7E7503B8538Af886A67D71e567A60b16B16"
-    - &l2WstETHImpl "0x26DD42A1780e468Eb1Aad94198E6D81af82232bf"
-    - &l2StETH "0xCF0dd9F490CD9A07182217ffadA336FDc80B92E4"
-    - &l2StETHImpl "0xdEF300F0324C3Dc981Aa037ac43549FEb22f0901"
-    - &l2TokenRateOracle "0xC5a7dD785c194Ee19372Fb74c6A40540f983a811"
-    - &l2TokenRateOracleImpl "0xf23bE346a2796306e2B0aea814331759dE284135"
+    - &l2GovernanceExecutor "0xded8560057e5AAb75803d440Fff46fF22Dd98cfE"
+    - &l2TokenBridge "0xc58bAe09a7A681555D7cE0F71d5b14792aca9825"
+    - &l2TokenBridgeImpl "0x2bda94eD0d580758DC03641E0710D07f5Ac791Bd"
+    - &l2WstETH "0xf7489b8d220DCf33bAe6b594C070061E4da9fDa9"
+    - &l2WstETHImpl "0x1DDcF5BDc10a7d47537E4e2C8FD82c7b7EDF2fcd"
+    - &l2StETH "0x4e55E2d4c83df2E0083f1D616AFf007ac420b110"
+    - &l2StETHImpl "0x2746640A14A77e68167E3B51eC6ee348A23473ab"
+    - &l2TokenRateOracle "0xDBD42a02D4DE52A58fe005dE2DD88B3379a50165"
+    - &l2TokenRateOracleImpl "0x116DbC8E6742d9506349a70F1A9ddB89844E9B11"
 
 roles:
   - &DEFAULT_ADMIN_ROLE "0x0000000000000000000000000000000000000000000000000000000000000000"
@@ -51,7 +51,7 @@ l1:
         SECONDS_PER_SLOT: 12
         TOKEN_RATE_DECIMALS: 27
         supportsInterface:
-          - args: ["0x01ffc9a7"] # IERC165
+          - args: [ "0x01ffc9a7" ] # IERC165
             result: true
     tokenBridge:
       name: L1LidoTokensBridge
@@ -84,23 +84,28 @@ l1:
         TOKEN_RATE_DECIMALS: 27
         getContractVersion: 2
         supportsInterface:
-          - args: ["0x01ffc9a7"] # IERC165
+          - args: [ "0x01ffc9a7" ] # IERC165
             result: true
         hasRole: null
         getRoleAdmin: null
       ozNonEnumerableAcl:
-        *DEFAULT_ADMIN_ROLE : [*agent]
-        *DEPOSITS_ENABLER_ROLE : [*agent]
-        *DEPOSITS_DISABLER_ROLE: [*agent, *l1EmergencyBreaksMultisig]
-        *WITHDRAWALS_ENABLER_ROLE : [*agent]
-        *WITHDRAWALS_DISABLER_ROLE : [*agent, *l1EmergencyBreaksMultisig]
+        ? *DEFAULT_ADMIN_ROLE
+        : [ *agent ]
+        ? *DEPOSITS_ENABLER_ROLE
+        : [ *agent ]
+        ? *DEPOSITS_DISABLER_ROLE
+        : [ *agent, *l1EmergencyBreaksMultisig ]
+        ? *WITHDRAWALS_ENABLER_ROLE
+        : [ *agent ]
+        ? *WITHDRAWALS_DISABLER_ROLE
+        : [ *agent, *l1EmergencyBreaksMultisig ]
       implementationChecks:
         getContractVersion: 115792089237316195423570985008687907853269984665640564039457584007913129639935
         isInitialized: false
         isDepositsEnabled: false
         isWithdrawalsEnabled: false
         hasRole:
-          args: [*DEFAULT_ADMIN_ROLE, "0x0000000000000000000000000000000000000000"]
+          args: [ *DEFAULT_ADMIN_ROLE, "0x0000000000000000000000000000000000000000" ]
           result: false
 
 l2:
@@ -121,6 +126,7 @@ l2:
         getActionsSetById: null
         getCurrentState: null
         isActionQueued: null
+
     tokenRateOracle:
       name: TokenRateOracle
       address: *l2TokenRateOracle
@@ -151,20 +157,22 @@ l2:
         isLikelyOutdated: null
         isTokenRateUpdatesPaused: false
         supportsInterface:
-          - args: ["0x01ffc9a7"] # IERC165
+          - args: [ "0x01ffc9a7" ] # IERC165
             result: true
         hasRole:
-          - args: [*DEFAULT_ADMIN_ROLE, "0x0000000000000000000000000000000000000000"]
+          - args: [ *DEFAULT_ADMIN_ROLE, "0x0000000000000000000000000000000000000000" ]
             result: false
-          - args: [*RATE_UPDATE_ENABLER_ROLE, *l2EmergencyBreaksMultisig]
+          - args: [ *RATE_UPDATE_ENABLER_ROLE, *l2EmergencyBreaksMultisig ]
             result: false
         getRoleAdmin: null
         getTokenRateByIndex: null
         latestAnswer: null
         latestRoundData: null
       ozNonEnumerableAcl:
-        *RATE_UPDATE_ENABLER_ROLE : [*l2GovernanceExecutor]
-        *RATE_UPDATE_DISABLER_ROLE : [*l2GovernanceExecutor, *l2EmergencyBreaksMultisig]
+        ? *RATE_UPDATE_ENABLER_ROLE
+        : [ *l2GovernanceExecutor ]
+        ? *RATE_UPDATE_DISABLER_ROLE
+        : [ *l2GovernanceExecutor, *l2EmergencyBreaksMultisig ]
 
     stETH:
       name: ERC20RebasableBridgedPermit
@@ -180,13 +188,13 @@ l2:
         symbol: stETH
         decimals: 18
         TOKEN_RATE_ORACLE_DECIMALS: 27
-        DOMAIN_SEPARATOR: "0xe1cce4d942aab785ae88a96f48f6909fc8d1494a3901a1535606bf2e6edc01ef"
+        DOMAIN_SEPARATOR: "0x26ab9ddb6eddec1a21e20dce3c8fceef6efbee753b48eadfff30f996541d3980"
         eip712Domain:
           - "0x0f"
           - Liquid staked Ether 2.0
           - "1"
           - 1946
-          - "0xCF0dd9F490CD9A07182217ffadA336FDc80B92E4"
+          - "0x4e55E2d4c83df2E0083f1D616AFf007ac420b110"
           - "0x0000000000000000000000000000000000000000000000000000000000000000"
           - []
         L2_ERC20_TOKEN_BRIDGE: *l2TokenBridge
@@ -217,13 +225,13 @@ l2:
         symbol: wstETH
         decimals: 18
         bridge: *l2TokenBridge
-        DOMAIN_SEPARATOR: "0xa2b19bf1e21f0c68e2f0c8800d6ea203afab0414543fe67e40384a2f6a2e6c1c"
+        DOMAIN_SEPARATOR: "0x97025fcb2e9784fbf816a79029cc776da78c8f515d7cc3241b803f46a93ef9a5"
         eip712Domain:
           - "0x0f"
           - Wrapped liquid staked Ether 2.0
           - "2"
           - 1946
-          - "0x6fd4a7E7503B8538Af886A67D71e567A60b16B16"
+          - "0xf7489b8d220DCf33bAe6b594C070061E4da9fDa9"
           - "0x0000000000000000000000000000000000000000000000000000000000000000"
           - []
         getContractVersion: 2
@@ -259,27 +267,32 @@ l2:
         WITHDRAWALS_ENABLER_ROLE: *WITHDRAWALS_ENABLER_ROLE
         getContractVersion: 2
         supportsInterface:
-          - args: ["0x01ffc9a7"] # IERC165
+          - args: [ "0x01ffc9a7" ] # IERC165
             result: true
         getRoleAdmin: null
         hasRole:
-          - args: [*DEFAULT_ADMIN_ROLE, "0x0000000000000000000000000000000000000000"]
+          - args: [ *DEFAULT_ADMIN_ROLE, "0x0000000000000000000000000000000000000000" ]
             result: false
-          - args: [*DEPOSITS_ENABLER_ROLE, *l2EmergencyBreaksMultisig]
+          - args: [ *DEPOSITS_ENABLER_ROLE, *l2EmergencyBreaksMultisig ]
             result: false
-          - args: [*WITHDRAWALS_ENABLER_ROLE, *l2EmergencyBreaksMultisig]
+          - args: [ *WITHDRAWALS_ENABLER_ROLE, *l2EmergencyBreaksMultisig ]
             result: false
       ozNonEnumerableAcl:
-        *DEFAULT_ADMIN_ROLE : [*l2GovernanceExecutor]
-        *DEPOSITS_ENABLER_ROLE : [*l2GovernanceExecutor]
-        *DEPOSITS_DISABLER_ROLE : [*l2GovernanceExecutor, *l2EmergencyBreaksMultisig]
-        *WITHDRAWALS_ENABLER_ROLE : [*l2GovernanceExecutor]
-        *WITHDRAWALS_DISABLER_ROLE : [*l2GovernanceExecutor, *l2EmergencyBreaksMultisig]
+        ? *DEFAULT_ADMIN_ROLE
+        : [ *l2GovernanceExecutor ]
+        ? *DEPOSITS_ENABLER_ROLE
+        : [ *l2GovernanceExecutor ]
+        ? *DEPOSITS_DISABLER_ROLE
+        : [ *l2GovernanceExecutor, *l2EmergencyBreaksMultisig ]
+        ? *WITHDRAWALS_ENABLER_ROLE
+        : [ *l2GovernanceExecutor ]
+        ? *WITHDRAWALS_DISABLER_ROLE
+        : [ *l2GovernanceExecutor, *l2EmergencyBreaksMultisig ]
       implementationChecks:
         getContractVersion: 115792089237316195423570985008687907853269984665640564039457584007913129639935
         isInitialized: false
         isDepositsEnabled: false
         isWithdrawalsEnabled: false
         hasRole:
-          args: [*DEFAULT_ADMIN_ROLE, "0x0000000000000000000000000000000000000000"]
+          args: [ *DEFAULT_ADMIN_ROLE, "0x0000000000000000000000000000000000000000" ]
           result: false
