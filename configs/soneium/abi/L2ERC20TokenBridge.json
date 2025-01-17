@@ -1,0 +1,310 @@
+[
+  {
+    "type": "constructor",
+    "stateMutability": "nonpayable",
+    "inputs": [
+      { "type": "address", "name": "messenger_", "internalType": "address" },
+      { "type": "address", "name": "l1TokenBridge_", "internalType": "address" },
+      { "type": "address", "name": "l1Token_", "internalType": "address" },
+      { "type": "address", "name": "l2Token_", "internalType": "address" }
+    ]
+  },
+  { "type": "error", "name": "ErrorAccountIsZeroAddress", "inputs": [] },
+  { "type": "error", "name": "ErrorAlreadyInitialized", "inputs": [] },
+  { "type": "error", "name": "ErrorDepositsDisabled", "inputs": [] },
+  { "type": "error", "name": "ErrorDepositsEnabled", "inputs": [] },
+  { "type": "error", "name": "ErrorSenderNotEOA", "inputs": [] },
+  { "type": "error", "name": "ErrorUnauthorizedMessenger", "inputs": [] },
+  { "type": "error", "name": "ErrorUnsupportedL1Token", "inputs": [] },
+  { "type": "error", "name": "ErrorUnsupportedL2Token", "inputs": [] },
+  { "type": "error", "name": "ErrorWithdrawalsDisabled", "inputs": [] },
+  { "type": "error", "name": "ErrorWithdrawalsEnabled", "inputs": [] },
+  { "type": "error", "name": "ErrorWrongCrossDomainSender", "inputs": [] },
+  {
+    "type": "event",
+    "name": "DepositFailed",
+    "inputs": [
+      { "type": "address", "name": "_l1Token", "internalType": "address", "indexed": true },
+      { "type": "address", "name": "_l2Token", "internalType": "address", "indexed": true },
+      { "type": "address", "name": "_from", "internalType": "address", "indexed": true },
+      { "type": "address", "name": "_to", "internalType": "address", "indexed": false },
+      { "type": "uint256", "name": "_amount", "internalType": "uint256", "indexed": false },
+      { "type": "bytes", "name": "_data", "internalType": "bytes", "indexed": false }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "DepositFinalized",
+    "inputs": [
+      { "type": "address", "name": "_l1Token", "internalType": "address", "indexed": true },
+      { "type": "address", "name": "_l2Token", "internalType": "address", "indexed": true },
+      { "type": "address", "name": "_from", "internalType": "address", "indexed": true },
+      { "type": "address", "name": "_to", "internalType": "address", "indexed": false },
+      { "type": "uint256", "name": "_amount", "internalType": "uint256", "indexed": false },
+      { "type": "bytes", "name": "_data", "internalType": "bytes", "indexed": false }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "DepositsDisabled",
+    "inputs": [{ "type": "address", "name": "disabler", "internalType": "address", "indexed": true }],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "DepositsEnabled",
+    "inputs": [{ "type": "address", "name": "enabler", "internalType": "address", "indexed": true }],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "Initialized",
+    "inputs": [{ "type": "address", "name": "admin", "internalType": "address", "indexed": true }],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "RoleAdminChanged",
+    "inputs": [
+      { "type": "bytes32", "name": "role", "internalType": "bytes32", "indexed": true },
+      { "type": "bytes32", "name": "previousAdminRole", "internalType": "bytes32", "indexed": true },
+      { "type": "bytes32", "name": "newAdminRole", "internalType": "bytes32", "indexed": true }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "RoleGranted",
+    "inputs": [
+      { "type": "bytes32", "name": "role", "internalType": "bytes32", "indexed": true },
+      { "type": "address", "name": "account", "internalType": "address", "indexed": true },
+      { "type": "address", "name": "sender", "internalType": "address", "indexed": true }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "RoleRevoked",
+    "inputs": [
+      { "type": "bytes32", "name": "role", "internalType": "bytes32", "indexed": true },
+      { "type": "address", "name": "account", "internalType": "address", "indexed": true },
+      { "type": "address", "name": "sender", "internalType": "address", "indexed": true }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "WithdrawalInitiated",
+    "inputs": [
+      { "type": "address", "name": "_l1Token", "internalType": "address", "indexed": true },
+      { "type": "address", "name": "_l2Token", "internalType": "address", "indexed": true },
+      { "type": "address", "name": "_from", "internalType": "address", "indexed": true },
+      { "type": "address", "name": "_to", "internalType": "address", "indexed": false },
+      { "type": "uint256", "name": "_amount", "internalType": "uint256", "indexed": false },
+      { "type": "bytes", "name": "_data", "internalType": "bytes", "indexed": false }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "WithdrawalsDisabled",
+    "inputs": [{ "type": "address", "name": "disabler", "internalType": "address", "indexed": true }],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "WithdrawalsEnabled",
+    "inputs": [{ "type": "address", "name": "enabler", "internalType": "address", "indexed": true }],
+    "anonymous": false
+  },
+  {
+    "type": "function",
+    "stateMutability": "view",
+    "outputs": [{ "type": "bytes32", "name": "", "internalType": "bytes32" }],
+    "name": "DEFAULT_ADMIN_ROLE",
+    "inputs": []
+  },
+  {
+    "type": "function",
+    "stateMutability": "view",
+    "outputs": [{ "type": "bytes32", "name": "", "internalType": "bytes32" }],
+    "name": "DEPOSITS_DISABLER_ROLE",
+    "inputs": []
+  },
+  {
+    "type": "function",
+    "stateMutability": "view",
+    "outputs": [{ "type": "bytes32", "name": "", "internalType": "bytes32" }],
+    "name": "DEPOSITS_ENABLER_ROLE",
+    "inputs": []
+  },
+  {
+    "type": "function",
+    "stateMutability": "view",
+    "outputs": [{ "type": "bytes32", "name": "", "internalType": "bytes32" }],
+    "name": "WITHDRAWALS_DISABLER_ROLE",
+    "inputs": []
+  },
+  {
+    "type": "function",
+    "stateMutability": "view",
+    "outputs": [{ "type": "bytes32", "name": "", "internalType": "bytes32" }],
+    "name": "WITHDRAWALS_ENABLER_ROLE",
+    "inputs": []
+  },
+  { "type": "function", "stateMutability": "nonpayable", "outputs": [], "name": "disableDeposits", "inputs": [] },
+  { "type": "function", "stateMutability": "nonpayable", "outputs": [], "name": "disableWithdrawals", "inputs": [] },
+  { "type": "function", "stateMutability": "nonpayable", "outputs": [], "name": "enableDeposits", "inputs": [] },
+  { "type": "function", "stateMutability": "nonpayable", "outputs": [], "name": "enableWithdrawals", "inputs": [] },
+  {
+    "type": "function",
+    "stateMutability": "nonpayable",
+    "outputs": [],
+    "name": "finalizeDeposit",
+    "inputs": [
+      { "type": "address", "name": "l1Token_", "internalType": "address" },
+      { "type": "address", "name": "l2Token_", "internalType": "address" },
+      { "type": "address", "name": "from_", "internalType": "address" },
+      { "type": "address", "name": "to_", "internalType": "address" },
+      { "type": "uint256", "name": "amount_", "internalType": "uint256" },
+      { "type": "bytes", "name": "data_", "internalType": "bytes" }
+    ]
+  },
+  {
+    "type": "function",
+    "stateMutability": "view",
+    "outputs": [{ "type": "bytes32", "name": "", "internalType": "bytes32" }],
+    "name": "getRoleAdmin",
+    "inputs": [{ "type": "bytes32", "name": "role", "internalType": "bytes32" }]
+  },
+  {
+    "type": "function",
+    "stateMutability": "nonpayable",
+    "outputs": [],
+    "name": "grantRole",
+    "inputs": [
+      { "type": "bytes32", "name": "role", "internalType": "bytes32" },
+      { "type": "address", "name": "account", "internalType": "address" }
+    ]
+  },
+  {
+    "type": "function",
+    "stateMutability": "view",
+    "outputs": [{ "type": "bool", "name": "", "internalType": "bool" }],
+    "name": "hasRole",
+    "inputs": [
+      { "type": "bytes32", "name": "role", "internalType": "bytes32" },
+      { "type": "address", "name": "account", "internalType": "address" }
+    ]
+  },
+  {
+    "type": "function",
+    "stateMutability": "nonpayable",
+    "outputs": [],
+    "name": "initialize",
+    "inputs": [{ "type": "address", "name": "admin_", "internalType": "address" }]
+  },
+  {
+    "type": "function",
+    "stateMutability": "view",
+    "outputs": [{ "type": "bool", "name": "", "internalType": "bool" }],
+    "name": "isDepositsEnabled",
+    "inputs": []
+  },
+  {
+    "type": "function",
+    "stateMutability": "view",
+    "outputs": [{ "type": "bool", "name": "", "internalType": "bool" }],
+    "name": "isInitialized",
+    "inputs": []
+  },
+  {
+    "type": "function",
+    "stateMutability": "view",
+    "outputs": [{ "type": "bool", "name": "", "internalType": "bool" }],
+    "name": "isWithdrawalsEnabled",
+    "inputs": []
+  },
+  {
+    "type": "function",
+    "stateMutability": "view",
+    "outputs": [{ "type": "address", "name": "", "internalType": "address" }],
+    "name": "l1Token",
+    "inputs": []
+  },
+  {
+    "type": "function",
+    "stateMutability": "view",
+    "outputs": [{ "type": "address", "name": "", "internalType": "address" }],
+    "name": "l1TokenBridge",
+    "inputs": []
+  },
+  {
+    "type": "function",
+    "stateMutability": "view",
+    "outputs": [{ "type": "address", "name": "", "internalType": "address" }],
+    "name": "l2Token",
+    "inputs": []
+  },
+  {
+    "type": "function",
+    "stateMutability": "view",
+    "outputs": [{ "type": "address", "name": "", "internalType": "contract ICrossDomainMessenger" }],
+    "name": "messenger",
+    "inputs": []
+  },
+  {
+    "type": "function",
+    "stateMutability": "nonpayable",
+    "outputs": [],
+    "name": "renounceRole",
+    "inputs": [
+      { "type": "bytes32", "name": "role", "internalType": "bytes32" },
+      { "type": "address", "name": "account", "internalType": "address" }
+    ]
+  },
+  {
+    "type": "function",
+    "stateMutability": "nonpayable",
+    "outputs": [],
+    "name": "revokeRole",
+    "inputs": [
+      { "type": "bytes32", "name": "role", "internalType": "bytes32" },
+      { "type": "address", "name": "account", "internalType": "address" }
+    ]
+  },
+  {
+    "type": "function",
+    "stateMutability": "view",
+    "outputs": [{ "type": "bool", "name": "", "internalType": "bool" }],
+    "name": "supportsInterface",
+    "inputs": [{ "type": "bytes4", "name": "interfaceId", "internalType": "bytes4" }]
+  },
+  {
+    "type": "function",
+    "stateMutability": "nonpayable",
+    "outputs": [],
+    "name": "withdraw",
+    "inputs": [
+      { "type": "address", "name": "l2Token_", "internalType": "address" },
+      { "type": "uint256", "name": "amount_", "internalType": "uint256" },
+      { "type": "uint32", "name": "l1Gas_", "internalType": "uint32" },
+      { "type": "bytes", "name": "data_", "internalType": "bytes" }
+    ]
+  },
+  {
+    "type": "function",
+    "stateMutability": "nonpayable",
+    "outputs": [],
+    "name": "withdrawTo",
+    "inputs": [
+      { "type": "address", "name": "l2Token_", "internalType": "address" },
+      { "type": "address", "name": "to_", "internalType": "address" },
+      { "type": "uint256", "name": "amount_", "internalType": "uint256" },
+      { "type": "uint32", "name": "l1Gas_", "internalType": "uint32" },
+      { "type": "bytes", "name": "data_", "internalType": "bytes" }
+    ]
+  }
+]
