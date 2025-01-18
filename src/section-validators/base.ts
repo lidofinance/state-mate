@@ -1,11 +1,12 @@
+import { assert, AssertionError } from "chai";
 import chalk from "chalk";
-import { Contract, JsonRpcProvider } from "ethers";
+import { Contract, JsonRpcProvider, Result } from "ethers";
 
 import { Ef, getNonMutables, printError } from "src/common";
 import { safeGetFunction } from "src/explorer-provider";
 import { LogCommand, logError, logErrorAndExit, logMethodSkipped } from "src/logger";
-import { assertEqual, stringify } from "src/statements-functions";
 import {
+  ArbitraryObject,
   ContractEntry,
   isTypeOfTB,
   StaticCallCheck,
@@ -13,6 +14,7 @@ import {
   StaticCallMustRevertTB,
   StaticCallResult,
   StaticCallResultTB,
+  ViewResult,
 } from "src/typebox";
 import { Abi, AbiArgsLength } from "src/types";
 
@@ -53,8 +55,8 @@ export abstract class SectionValidatorBase {
     const contractFunction = await safeGetFunction(contract, signature);
     try {
       const actual: unknown = await contractFunction.staticCall(...(args || ""));
-      assertEqual(actual, expected);
-      logHandle.success(stringify(actual));
+      _assertEqual(actual, expected);
+      logHandle.success(_stringify(actual));
     } catch (error) {
       logHandle.failure(`REVERTED with: ${printError(error)}`);
       g_errors++;
@@ -69,7 +71,7 @@ export abstract class SectionValidatorBase {
     const contractFunction = await safeGetFunction(contract, signature);
     try {
       const actual: unknown = await contractFunction.staticCall(...(args || ""));
-      logHandle.failure(stringify(actual));
+      logHandle.failure(_stringify(actual));
       g_errors++;
     } catch (error) {
       logHandle.success(`REVERTED with: ${printError(error)}`);
@@ -87,5 +89,68 @@ export abstract class SectionValidatorBase {
       );
       incErrors();
     }
+  }
+}
+
+function _stringify(value: unknown) {
+  if (value instanceof Object) {
+    return JSON.stringify(value);
+  } else {
+    return `${String(value)}`;
+  }
+}
+
+function _assertEqual(actual: unknown, expected: ViewResult, errorMessage?: string) {
+  if (typeof actual === "bigint") {
+    assert(typeof expected === "string" || typeof expected === "bigint");
+    _equalOrThrow(actual, BigInt(expected), errorMessage);
+  } else if (Array.isArray(expected)) {
+    _equalOrThrow(
+      (actual as unknown[]).length,
+      expected.length,
+      `Array length differ: actual = '${String(actual)}', expected = '${String(expected)}'`,
+    );
+    if (!errorMessage) {
+      errorMessage = `Actual value '${String(actual)} is not equal to expected array '[${String(expected)}]`;
+    }
+    for (let i = 0; i < (actual as unknown[]).length; ++i) {
+      _assertEqual((actual as unknown[])[i], expected[i], errorMessage);
+    }
+  } else if (typeof expected === "object") {
+    _assertEqualStruct(expected, actual as Result);
+  } else {
+    _equalOrThrow(actual, expected, errorMessage);
+  }
+}
+
+function _assertEqualStruct(expected: null | ArbitraryObject, actual: Result) {
+  if (expected === null) {
+    return;
+  }
+
+  const actualAsObject = actual.toObject();
+  const errorMessage = `expected ${_stringify(actualAsObject)} to equal ${_stringify(expected)}`;
+
+  _equalOrThrow(Object.keys(actualAsObject).length, Object.keys(expected).length, errorMessage);
+  for (const field in actualAsObject) {
+    const expectedValue = expected[field];
+    if (expectedValue === null) {
+      continue;
+    }
+    let actualValue: unknown = actualAsObject[field];
+    const errorMessageDetailed = errorMessage + ` but fields "${field}" differ`;
+    if (actualValue instanceof Result && (expectedValue as unknown) instanceof Array) {
+      actualValue = actualValue.toArray();
+    }
+    _assertEqual(actualValue, expectedValue, errorMessageDetailed);
+  }
+}
+
+function _equalOrThrow(actual: unknown, expected: unknown, errorMessage?: string) {
+  if (actual !== expected) {
+    if (!errorMessage) {
+      errorMessage = `Expected "${_stringify(expected)}" to equal actual "${_stringify(actual)}"`;
+    }
+    throw new AssertionError(errorMessage);
   }
 }
