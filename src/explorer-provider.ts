@@ -40,18 +40,11 @@ export type GetContractInfoCallback = (
   explorerKey?: string,
 ) => Promise<ContractInfo>;
 
-export async function safeGetFunction(
+export async function safeStaticCall(
   contract: Contract,
   functionName: string,
-): Promise<ReturnType<typeof contract.getFunction>> {
-  try {
-    return contract.getFunction(functionName);
-  } catch (error) {
-    logErrorAndExit(`Failed to call function ${chalk.yellow(functionName)}`);
-  }
-}
-
-export async function safeStaticCall(contract: Contract, functionName: string, ...args: unknown[]): Promise<unknown> {
+  ...arguments_: unknown[]
+): Promise<unknown> {
   try {
     const contractFunction = contract.getFunction(functionName);
 

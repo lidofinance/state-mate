@@ -3,7 +3,6 @@ import chalk from "chalk";
 import { Contract, JsonRpcProvider, Result } from "ethers";
 
 import { Ef, getNonMutables, printError } from "src/common";
-import { safeGetFunction } from "src/explorer-provider";
 import { LogCommand, logError, logErrorAndExit, logMethodSkipped } from "src/logger";
 import { g_Args } from "src/state-mate";
 import {
@@ -66,9 +65,16 @@ export abstract class SectionValidatorBase {
 
     const { args, result: expected, signature = method } = staticCallResult;
 
-    const argsStr = args ? `(${args.toString()})` : "";
-    const logHandle = new LogCommand(`.${signature}${argsStr}`);
-    const contractFunction = await safeGetFunction(contract, signature);
+    const argumentsString = args ? `(${args.toString()})` : "";
+    const logHandle = new LogCommand(`.${signature}${argumentsString}`);
+    let contractFunction: ReturnType<typeof contract.getFunction>;
+    try {
+      contractFunction = contract.getFunction(signature);
+    } catch (error) {
+      logHandle.failure(printError(error));
+      g_errors++;
+      return;
+    }
     try {
       const actual: unknown = await contractFunction.staticCall(...(args || ""));
       _assertEqual(actual, expected);
@@ -82,9 +88,16 @@ export abstract class SectionValidatorBase {
   protected async _checkViewMustRevert(contract: Contract, method: string, staticCallMustRevert: StaticCallMustRevert) {
     const { args, signature = method } = staticCallMustRevert;
 
-    const argsStr = args ? `(${args.toString()})` : "";
-    const logHandle = new LogCommand(`.${signature}${argsStr}`);
-    const contractFunction = await safeGetFunction(contract, signature);
+    const argumentsString = args ? `(${args.toString()})` : "";
+    const logHandle = new LogCommand(`.${signature}${argumentsString}`);
+    let contractFunction: ReturnType<typeof contract.getFunction>;
+    try {
+      contractFunction = contract.getFunction(signature);
+    } catch (error) {
+      logHandle.failure(printError(error));
+      g_errors++;
+      return;
+    }
     try {
       const actual: unknown = await contractFunction.staticCall(...(args || ""));
       logHandle.failure(_stringify(actual));
