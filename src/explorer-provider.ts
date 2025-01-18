@@ -110,8 +110,6 @@ export async function loadContractInfo(
 ) {
   const sourcesUrl = _getExplorerApiUrl(explorerHostname, address, explorerKey);
 
-  if (!explorerKey) log(`${WARNING_MARK} ${chalk.yellow("explorerKey")} is not set`);
-
   let sourcesResponse = await httpGetAsync(sourcesUrl);
   if (isResponseBad(sourcesResponse) && explorer.requestWithRateLimit) {
     sourcesResponse = await explorer.requestWithRateLimit(sourcesResponse, sourcesUrl, explorerHostname);

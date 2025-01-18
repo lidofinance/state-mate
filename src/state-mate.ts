@@ -163,9 +163,14 @@ async function iterateLoadedContracts<T extends EntireDocument | SeedDocument>(
         );
       }
       const explorerKey = explorerTokenEnv ? process.env[explorerTokenEnv] : "";
-      if (!explorerKey && explorerTokenEnv)
-        console.log(`\n${WARNING_MARK} ${chalk.yellow(`The env var ${explorerTokenEnv} is not set`)}\n`);
 
+      if (!explorerTokenEnv) {
+        log(
+          `${WARNING_MARK} ${chalk.yellow("explorerTokenEnv")} is not set in the ${chalk.magenta(g_Arguments.configPath)}, the section ${chalk.magenta(explorerSectionKey)}`,
+        );
+      } else if (!explorerKey) {
+        log(`\n${WARNING_MARK} ${chalk.yellow(`The env var ${explorerTokenEnv} is not set`)}\n`);
+      }
       for (const address of addresses) {
         const contractInfo = await loadContractInfoFromExplorer(address, explorerHostname, explorerKey);
         await callback(contractInfo);
