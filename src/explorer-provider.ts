@@ -109,21 +109,13 @@ export async function loadContractInfoFromExplorer(
   }
 }
 
-function parseJson(response: string): unknown {
-  try {
-    return JSON.parse(response);
-  } catch (error) {
-    logError(`Failed to parse JSON: ${printError(error)} \nResponse: ${chalk.yellow(response)}`);
-  }
-}
-
 export async function loadContractInfo(
   explorer: IExplorerHandler,
   address: string,
   explorerHostname: string,
   explorerKey?: string,
 ) {
-  const sourcesUrl = getExplorerApiUrl(explorerHostname, address, explorerKey);
+  const sourcesUrl = _getExplorerApiUrl(explorerHostname, address, explorerKey);
 
   if (!explorerKey) log(`${WARNING_MARK} ${chalk.yellow("explorerKey")} is not set`);
 
@@ -145,7 +137,7 @@ export async function loadContractInfo(
     logErrorAndExit(`It seems, explorer response has changed:\n${JSON.stringify(sourcesResponse)}`);
   }
 
-  const abi: unknown = parseJson(sourcesResponse.result[0].ABI);
+  const abi: unknown = _parseJson(sourcesResponse.result[0].ABI);
 
   if (!isValidAbi(abi)) {
     logErrorAndExit(`ABI for contract ${chalk.yellow(address)} is not valid (type mismatch):\n${JSON.stringify(abi)}`);
@@ -168,10 +160,18 @@ export async function httpGetAsync<T>(url: string): Promise<T> | never {
   }
 }
 
-function getExplorerApiUrl(explorerHostname: string, address: string, explorerKey?: string) {
+function _getExplorerApiUrl(explorerHostname: string, address: string, explorerKey?: string) {
   let url = `https://${explorerHostname}/api?module=contract&action=getsourcecode&address=${address}`;
   if (explorerKey) {
     url = `${url}&apikey=${explorerKey}`;
   }
   return url;
+}
+
+function _parseJson(response: string): unknown {
+  try {
+    return JSON.parse(response);
+  } catch (error) {
+    logError(`Failed to parse JSON: ${printError(error)} \nResponse: ${chalk.yellow(response)}`);
+  }
 }

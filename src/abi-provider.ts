@@ -15,7 +15,7 @@ export function loadAbiFromFile(contractName: string, address: string): Abi | ne
   let abiPath = undefined;
 
   try {
-    abiPath = findAbiPath(contractName, address, { shouldThrow: true });
+    abiPath = _findAbiPath(contractName, address, { shouldThrow: true });
   } catch (error) {
     logErrorAndExit(`Error finding ABI file for contract 
         ${contractName} in ${g_Args.abiDirPath}: ${printError(error)}`);
@@ -36,19 +36,19 @@ export function loadAbiFromFile(contractName: string, address: string): Abi | ne
 
 export async function saveAllAbi(contractInfo: ContractInfo) {
   const { contractName, address, abi, implementation } = contractInfo;
-  await saveAbiIfNotExist(contractName, address, abi);
+  await _saveAbiIfNotExist(contractName, address, abi);
   if (implementation) {
-    await saveAbiIfNotExist(implementation.contractName, address, implementation.abi);
-    await saveAbiIfNotExist(implementation.contractName, implementation.address, implementation.abi);
+    await _saveAbiIfNotExist(implementation.contractName, address, implementation.abi);
+    await _saveAbiIfNotExist(implementation.contractName, implementation.address, implementation.abi);
   }
 }
 
-async function saveAbiIfNotExist(contractName: string, address: string, abiFromExplorer: Abi): Promise<void> {
+async function _saveAbiIfNotExist(contractName: string, address: string, abiFromExplorer: Abi): Promise<void> {
   address = address.toLowerCase();
-  const abiPath = findAbiPath(contractName, address);
+  const abiPath = _findAbiPath(contractName, address);
 
   if (abiPath) {
-    const differences: string = getJsonDiff(abiPath, abiFromExplorer);
+    const differences: string = _getJsonDiff(abiPath, abiFromExplorer);
     if (!differences) {
       log(
         `The ABI already exists and fully matches the one from the explorer: ${chalk.magenta(path.basename(abiPath))} `,
@@ -67,7 +67,7 @@ async function saveAbiIfNotExist(contractName: string, address: string, abiFromE
       return;
     }
   }
-  const abiFileName = abiPath || getAbiFilePathByDefault(contractName, address);
+  const abiFileName = abiPath || _getAbiFilePathByDefault(contractName, address);
   try {
     fs.writeFileSync(abiFileName, JSON.stringify(abiFromExplorer, null, 2));
     log(`The ABI has been saved at ${chalk.magenta(abiFileName)}`);
@@ -76,28 +76,22 @@ async function saveAbiIfNotExist(contractName: string, address: string, abiFromE
   }
 }
 
-export function checkAllAbiDiffs(contractInfo: ContractInfo) {
+export function checkAllAbiForDiffs(contractInfo: ContractInfo) {
   const { contractName, address, abi, implementation } = contractInfo;
-  checkOneAbiDiffs(contractName, address, abi);
+  _checkOneAbiForDiffs(contractName, address, abi);
   if (implementation) {
-    checkOneAbiDiffs(implementation.contractName, address, implementation.abi);
-    checkOneAbiDiffs(implementation.contractName, implementation.address, implementation.abi);
+    _checkOneAbiForDiffs(implementation.contractName, address, implementation.abi);
+    _checkOneAbiForDiffs(implementation.contractName, implementation.address, implementation.abi);
   }
 }
 
-function getJsonDiff(abiPath: string, abiFromExplorer: Abi): string {
-  const abiFile = fs.readFileSync(abiPath, "utf-8");
-  const savedAbi: unknown = JSON.parse(abiFile);
-  return jsonDiff.diffString(savedAbi, abiFromExplorer);
-}
-
-export function checkOneAbiDiffs(contractName: string, address: string, abiFromExplorer: Abi) {
+export function _checkOneAbiForDiffs(contractName: string, address: string, abiFromExplorer: Abi) {
   address = address.toLowerCase();
   const logHandle = new LogCommand(`${contractName.padEnd(30)} (${address})`);
 
   try {
-    const abiPath = findAbiPath(contractName, address, { shouldThrow: true });
-    const diff: string = getJsonDiff(abiPath, abiFromExplorer);
+    const abiPath = _findAbiPath(contractName, address, { shouldThrow: true });
+    const diff: string = _getJsonDiff(abiPath, abiFromExplorer);
     if (diff) {
       logHandle.warning(`FAILED\n${diff}`);
     } else {
@@ -108,15 +102,21 @@ export function checkOneAbiDiffs(contractName: string, address: string, abiFromE
   }
 }
 
-function findAbiPath(contractName: string, contractAddress: string, shouldThrow: { shouldThrow: true }): string;
+function _getJsonDiff(abiPath: string, abiFromExplorer: Abi): string {
+  const abiFile = fs.readFileSync(abiPath, "utf-8");
+  const savedAbi: unknown = JSON.parse(abiFile);
+  return jsonDiff.diffString(savedAbi, abiFromExplorer);
+}
 
-function findAbiPath(
+function _findAbiPath(contractName: string, contractAddress: string, shouldThrow: { shouldThrow: true }): string;
+
+function _findAbiPath(
   contractName: string,
   contractAddress: string,
   shouldThrow?: { shouldThrow: false },
 ): string | undefined;
 
-function findAbiPath(
+function _findAbiPath(
   contractName: string,
   contractAddress: string,
   { shouldThrow }: { shouldThrow?: boolean } = { shouldThrow: false },
@@ -150,24 +150,19 @@ function findAbiPath(
     });
   }
   if (!abiFileName && shouldThrow) {
-    return generateAbiNotFoundError(abiVariantsName);
+    return _generateAbiNotFoundError(abiVariantsName);
   }
 
   return abiFileName ? path.join(g_Args.abiDirPath, abiFileName) : undefined;
 }
 
-function getAbiFilePathByDefault(contractName: string, address?: string) {
+function _getAbiFilePathByDefault(contractName: string, address?: string) {
   const abiFileName = address ? `${contractName}-${address}.json` : `${contractName}.json`;
 
   return path.join(g_Args.abiDirPath, abiFileName);
 }
 
-function generateAbiNotFoundError(abiVariantsName: string[] /* abiVariantsRegex: RegExp[] */): never {
+function _generateAbiNotFoundError(abiVariantsName: string[]): never {
   const variantsName: string = abiVariantsName.map((name) => path.join(g_Args.abiDirPath, name)).join("\n");
-  // const variantsRegex: string = abiVariantsRegex.map(regex => regex.toString()).join('\n');
-  throw new Error(
-    `Could not find ABI file. The following combinations were tried:\n` +
-      variantsName /* `By exact match of the file name:\n${variantsName}\n` +
-    `By regular expression in ${variantsRegex}` */,
-  );
+  throw new Error(`Could not find ABI file. The following combinations were tried:\n` + variantsName);
 }

@@ -1,7 +1,6 @@
 import chalk from "chalk";
 
 import { logErrorAndExit } from "./logger";
-import { g_Args } from "./state-mate";
 import { Abi, AbiArgsLength } from "./types";
 
 export enum Ef {
@@ -19,13 +18,6 @@ export enum Ef {
   rpcUrl = "rpcUrl",
 }
 
-export enum CheckLevel {
-  section = "section",
-  contract = "contract",
-  checksType = "checksType",
-  method = "method",
-}
-
 function isUrl(maybeUrl: string) {
   try {
     new URL(maybeUrl);
@@ -37,14 +29,6 @@ function isUrl(maybeUrl: string) {
 
 export function printError(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
-}
-
-export function needCheck(level: CheckLevel, name: string) {
-  if (g_Args.checkOnly === null) {
-    return true;
-  }
-  const checkOnTheLevel = g_Args.checkOnly[level];
-  return checkOnTheLevel === null || checkOnTheLevel === undefined || name === checkOnTheLevel;
 }
 
 export function readUrlOrFromEnv(urlOrEnvVarName: string) {

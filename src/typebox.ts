@@ -27,22 +27,15 @@ const EthereumStringArrayTB = Type.Readonly(Type.Array(EthereumStringTB));
 export type EntireDocument = Static<typeof EntireDocumentTB>;
 export type SeedDocument = Static<typeof SeedDocumentTB>;
 export type ContractEntry = Static<typeof ContractEntryTB>;
-export type ProxyContractEntry = Static<typeof ProxyContractEntryTB>;
-export type RegularContractEntry = Static<typeof RegularContractEntryTB>;
 export type StaticCallCheck = Static<typeof StaticCallCheckTB>;
-export type ViewResultPlainValue = Static<typeof PlainValueTB>;
 export type ArbitraryObject = Static<typeof ArbitraryObjectTB>;
 export type ViewResult = Static<typeof ViewResultTB>;
-// export type ExplorerSection = Static<typeof ExplorerSectionTB>
 export type NetworkSection = Static<typeof NetworkSectionTB>;
 export type StaticCallMustRevert = Static<typeof StaticCallMustRevertTB>;
 export type StaticCallResult = Static<typeof StaticCallResultTB>;
 export type RegularChecks = Static<typeof RegularChecksTB>;
 export type ChecksEntryValue = Static<typeof ChecksEntryValueTB>;
-export type ContractSection = Static<typeof ContractSectionTB>;
-export type DeployedSection = Static<typeof DeployedSectionTB>;
-export type EthAddressString = Static<typeof EthereumStringTB>;
-export type OzAclChecks = Static<typeof OzAclChecksTB>;
+
 export function isTypeOfTB<T extends TSchema>(value: unknown, schema: T): value is Static<typeof schema> {
   return Value.Check(schema, value);
 }
@@ -50,8 +43,8 @@ export function isTypeOfTB<T extends TSchema>(value: unknown, schema: T): value 
 const OzNonEnumerableAclTB = Type.Readonly(Type.Record(EthereumStringTB, EthereumStringArrayTB));
 
 export const PlainValueTB = Type.Readonly(Type.Union([Type.Null(), Type.String(), Type.Boolean(), Type.Number()]));
-export const PlainValueArrayTB = Type.Array(PlainValueTB);
-const PlainValueOrArray = Type.Array(Type.Union([PlainValueTB, Type.Array(PlainValueTB)]));
+export const PlainValueArrayTB = Type.Readonly(Type.Array(PlainValueTB));
+const PlainValueOrArray = Type.Readonly(Type.Array(Type.Union([PlainValueTB, PlainValueArrayTB])));
 
 export const ArgumentsTB = Type.Readonly(Type.Array(Type.Union([PlainValueTB, PlainValueArrayTB])));
 
@@ -96,7 +89,7 @@ const ChecksEntryValueTB = Type.Readonly(
   Type.Union([StaticCallCheckTB, ViewResultTB, ArgumentsTB, ArrayOfStaticCallCheckTB]),
 );
 
-export const ProxyChecksTB = Type.Readonly(
+const ProxyChecksTB = Type.Readonly(
   Type.Object(
     {
       proxy__getImplementation: Type.Optional(Type.Union([EthereumStringTB, Type.Null()])),
@@ -107,7 +100,7 @@ export const ProxyChecksTB = Type.Readonly(
   ),
 );
 
-export const Sr2ProxyChecksTB = Type.Readonly(
+const Sr2ProxyChecksTB = Type.Readonly(
   Type.Object(
     {
       proxyType: PlainValueTB,
@@ -120,11 +113,11 @@ export const Sr2ProxyChecksTB = Type.Readonly(
   ),
 );
 
-export const RegularChecksTB = Type.Readonly(Type.Record(Type.String(), ChecksEntryValueTB));
+const RegularChecksTB = Type.Readonly(Type.Record(Type.String(), ChecksEntryValueTB));
 
 const ImplementationChecksTB = Type.Optional(RegularChecksTB);
 
-export const RegularContractEntryTB = Type.Readonly(
+const RegularContractEntryTB = Type.Readonly(
   Type.Object(
     {
       address: EthereumStringTB,
@@ -135,9 +128,7 @@ export const RegularContractEntryTB = Type.Readonly(
     { additionalProperties: false },
   ),
 );
-export const OzAclChecksTB = Type.Readonly(
-  Type.Record(Type.String(), EthereumStringArrayTB, { additionalProperties: false }),
-);
+const OzAclChecksTB = Type.Readonly(Type.Record(Type.String(), EthereumStringArrayTB, { additionalProperties: false }));
 export const ProxyContractEntryTB = Type.Readonly(
   Type.Object(
     {
@@ -152,7 +143,7 @@ export const ProxyContractEntryTB = Type.Readonly(
   ),
 );
 
-export const ContractEntryTB = Type.Readonly(Type.Union([RegularContractEntryTB, ProxyContractEntryTB]));
+const ContractEntryTB = Type.Readonly(Type.Union([RegularContractEntryTB, ProxyContractEntryTB]));
 
 export const ExplorerSectionTB = Type.Readonly(
   Type.Object(

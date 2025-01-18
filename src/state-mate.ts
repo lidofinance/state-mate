@@ -11,7 +11,7 @@ import chalk from "chalk";
 import { JsonRpcProvider } from "ethers";
 import * as YAML from "yaml";
 
-import { checkAllAbiDiffs, saveAllAbi } from "./abi-provider";
+import { checkAllAbiForDiffs, saveAllAbi } from "./abi-provider";
 import { doGenerateBoilerplate } from "./boilerplate-generator";
 import { parseCmdLineArgs } from "./cli-parser";
 import { printError, readUrlOrFromEnv } from "./common";
@@ -141,7 +141,7 @@ async function downloadAndSaveAbis(jsonDoc: SeedDocument) {
 
 async function downloadAndCheckAbis<T extends EntireDocument | SeedDocument>(jsonDoc: T) {
   logHeader1(`ABI checking has been activated`);
-  await iterateLoadedContracts(jsonDoc, checkAllAbiDiffs);
+  await iterateLoadedContracts(jsonDoc, checkAllAbiForDiffs);
 }
 
 async function iterateLoadedContracts<T extends EntireDocument | SeedDocument>(

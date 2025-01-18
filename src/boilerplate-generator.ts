@@ -18,91 +18,11 @@ import { MethodCallResults, Abi } from "./types";
 const REPLACE_ME_PLACEHOLDER = "REPLACEME";
 const YML = "yml";
 
-export function makeBoilerplate(methodCallResults: MethodCallResults): { [key: string]: YAML.Scalar } {
-  const result: { [key: string]: YAML.Scalar } = {};
-
-  for (const { methodName, staticCallResult } of methodCallResults) {
-    const value = new YAML.Scalar(REPLACE_ME_PLACEHOLDER);
-    value.comment = staticCallResult;
-    result[methodName] = value;
-  }
-
-  return result;
-}
-
-export type DeployedAddressInfo = Pick<NetworkSection, "explorerHostname" | "rpcUrl"> &
-  Pick<ContractEntry, "address"> & {
-    [Key in keyof Pick<NetworkSection, "explorerTokenEnv"> as `explorerKey`]: string;
-  } & { deployedNode: YAML.Scalar } & { sectionName: string };
-
-export async function iterateDeployedAddresses<T extends EntireDocument | SeedDocument>(
-  seedDoc: YAML.Document,
-  jsonDoc: T,
-  callback: (ctx: DeployedAddressInfo) => Promise<void>,
-) {
-  const abiDirPath = path.resolve(path.dirname(g_Args.configPath), "abi");
-  fs.mkdirSync(abiDirPath, { recursive: true });
-
-  for (const [explorerSectionKey, addresses] of Object.entries(jsonDoc.deployed)) {
-    const explorerSection = jsonDoc[explorerSectionKey as keyof T];
-
-    if (isTypeOfTB(explorerSection, ExplorerSectionTB)) {
-      const { explorerHostname, explorerTokenEnv } = explorerSection;
-      const rpcUrl = readUrlOrFromEnv(explorerSection.rpcUrl);
-      const explorerKey = explorerTokenEnv ? process.env[explorerTokenEnv] : "";
-      const scalars: YAML.Scalar[] = getScalarsWithAnchors(seedDoc, explorerSectionKey);
-      for (const address of addresses) {
-        const deployedNode = scalars.find((scalar) => {
-          return (scalar.value as string) === address;
-        });
-        if (deployedNode) {
-          await callback({
-            address,
-            explorerHostname,
-            explorerKey,
-            rpcUrl,
-            deployedNode,
-            sectionName: explorerSectionKey,
-          });
-        } else {
-          logErrorAndExit(`Couldn't to find the anchor for ${address} in the seed YAML file`);
-        }
-      }
-    }
-  }
-}
-
-function getScalarsWithAnchors(doc: YAML.Document, explorerSectionKey: string): YAML.Scalar[] {
-  const section = doc.getIn(["deployed", explorerSectionKey]);
-
-  if (YAML.isSeq(section)) {
-    if (
-      section.items.every((item) => {
-        return YAML.isScalar(item);
-      })
-    ) {
-      return section.items;
-    }
-  }
-
-  return [];
-}
-
-async function makeBoilerplateForAllNonMutableFunctions(abi: Abi, contract: Contract) {
-  const nonMutables = getNonMutables(abi);
-
-  const staticCallsResults = await collectStaticCallResults(nonMutables, contract);
-
-  const boilerplate = makeBoilerplate(staticCallsResults);
-
-  return boilerplate;
-}
-
 export async function doGenerateBoilerplate(seedConfigPath: string, jsonDoc: SeedDocument) {
   const seedDoc = YAML.parseDocument(fs.readFileSync(seedConfigPath, "utf-8"));
   const doc = new YAML.Document(seedDoc);
 
-  await iterateDeployedAddresses(doc, jsonDoc, async (ctx: DeployedAddressInfo) => {
+  await _iterateDeployedAddresses(doc, jsonDoc, async (ctx: DeployedAddressInfo) => {
     const { address, deployedNode, explorerHostname, rpcUrl, sectionName, explorerKey } = ctx;
     if (!explorerHostname) {
       logErrorAndExit(
@@ -130,13 +50,13 @@ export async function doGenerateBoilerplate(seedConfigPath: string, jsonDoc: See
       const implementationContract = loadContract(implementation.address, implementationAbi, provider);
 
       logOperation(Ef.checks);
-      const checks = await makeBoilerplateForAllNonMutableFunctions(implementationAbi, contract);
+      const checks = await _makeBoilerplateForAllNonMutableFunctions(implementationAbi, contract);
 
       logOperation(Ef.proxyChecks);
-      const proxyChecks = await makeBoilerplateForAllNonMutableFunctions(proxyAbi, proxyContract);
+      const proxyChecks = await _makeBoilerplateForAllNonMutableFunctions(proxyAbi, proxyContract);
 
       logOperation(Ef.implementationChecks);
-      const implementationChecks = await makeBoilerplateForAllNonMutableFunctions(
+      const implementationChecks = await _makeBoilerplateForAllNonMutableFunctions(
         implementationAbi,
         implementationContract,
       );
@@ -153,7 +73,7 @@ export async function doGenerateBoilerplate(seedConfigPath: string, jsonDoc: See
       const abi = loadAbiFromFile(contractName, address);
       const contract = loadContract(address, abi, provider);
       logOperation(Ef.checks);
-      const checks = await makeBoilerplateForAllNonMutableFunctions(abi, contract);
+      const checks = await _makeBoilerplateForAllNonMutableFunctions(abi, contract);
       contractEntryIfRegular = {
         name: contractName,
         address: doc.createAlias(deployedNode),
@@ -172,4 +92,78 @@ export async function doGenerateBoilerplate(seedConfigPath: string, jsonDoc: See
   );
   fs.writeFileSync(generatedFilePath, doc.toString());
   log(`Generated state config: ${chalk.bold(generatedFilePath)}`);
+}
+
+type DeployedAddressInfo = Pick<NetworkSection, "explorerHostname" | "rpcUrl"> &
+  Pick<ContractEntry, "address"> & {
+    [Key in keyof Pick<NetworkSection, "explorerTokenEnv"> as `explorerKey`]: string;
+  } & { deployedNode: YAML.Scalar } & { sectionName: string };
+
+async function _iterateDeployedAddresses<T extends EntireDocument | SeedDocument>(
+  seedDoc: YAML.Document,
+  jsonDoc: T,
+  callback: (ctx: DeployedAddressInfo) => Promise<void>,
+) {
+  const abiDirPath = path.resolve(path.dirname(g_Args.configPath), "abi");
+  fs.mkdirSync(abiDirPath, { recursive: true });
+
+  for (const [explorerSectionKey, addresses] of Object.entries(jsonDoc.deployed)) {
+    const explorerSection = jsonDoc[explorerSectionKey as keyof T];
+
+    if (isTypeOfTB(explorerSection, ExplorerSectionTB)) {
+      const { explorerHostname, explorerTokenEnv } = explorerSection;
+      const rpcUrl = readUrlOrFromEnv(explorerSection.rpcUrl);
+      const explorerKey = explorerTokenEnv ? process.env[explorerTokenEnv] : "";
+      const scalars: YAML.Scalar[] = _getScalarsWithAnchors(seedDoc, explorerSectionKey);
+      for (const address of addresses) {
+        const deployedNode = scalars.find((scalar) => {
+          return (scalar.value as string) === address;
+        });
+        if (deployedNode) {
+          await callback({
+            address,
+            explorerHostname,
+            explorerKey,
+            rpcUrl,
+            deployedNode,
+            sectionName: explorerSectionKey,
+          });
+        } else {
+          logErrorAndExit(`Couldn't to find the anchor for ${address} in the seed YAML file`);
+        }
+      }
+    }
+  }
+}
+
+function _getScalarsWithAnchors(doc: YAML.Document, explorerSectionKey: string): YAML.Scalar[] {
+  const section = doc.getIn(["deployed", explorerSectionKey]);
+
+  if (YAML.isSeq(section) && section.items.every(YAML.isScalar)) {
+    return section.items;
+  }
+
+  return [];
+}
+
+async function _makeBoilerplateForAllNonMutableFunctions(abi: Abi, contract: Contract) {
+  const nonMutables = getNonMutables(abi);
+
+  const staticCallsResults = await collectStaticCallResults(nonMutables, contract);
+
+  const boilerplate = _makeBoilerplate(staticCallsResults);
+
+  return boilerplate;
+}
+
+function _makeBoilerplate(methodCallResults: MethodCallResults): { [key: string]: YAML.Scalar } {
+  const result: { [key: string]: YAML.Scalar } = {};
+
+  for (const { methodName, staticCallResult } of methodCallResults) {
+    const value = new YAML.Scalar(REPLACE_ME_PLACEHOLDER);
+    value.comment = staticCallResult;
+    result[methodName] = value;
+  }
+
+  return result;
 }

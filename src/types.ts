@@ -1,16 +1,6 @@
 import { JsonFragment } from "ethers";
-import { Scalar } from "yaml";
 
 export type MethodCallResults = { methodName: string; staticCallResult: string }[];
-
-export type DeployedAddressInfo = {
-  deployedNode: Scalar;
-  sectionName: string;
-  address: string;
-  rpcUrl: string;
-  explorerHostname: string;
-  explorerKey?: string;
-};
 
 export type ContractInfo = {
   contractName: string;
@@ -25,7 +15,11 @@ type AbiEntry<T extends RequiredAbiKeys = RequiredAbiKeys> = T;
 
 type RequiredAbiKeys = Required<Readonly<Pick<JsonFragment, "name" | "type" | "stateMutability" | "inputs">>>;
 
-function isValidAbiEntry(entry: unknown): entry is AbiEntry {
+export function isValidAbi(abi: unknown): abi is Abi {
+  return Array.isArray(abi) && abi.every(_isValidAbiEntry);
+}
+
+function _isValidAbiEntry(entry: unknown): entry is AbiEntry {
   if (typeof entry !== "object" || entry === null) return false;
 
   const obj = entry as Partial<AbiEntry>;
@@ -35,10 +29,6 @@ function isValidAbiEntry(entry: unknown): entry is AbiEntry {
     (typeof obj.name === "string" || obj.name === undefined) &&
     (Array.isArray(obj.inputs) || obj.inputs === undefined)
   );
-}
-
-export function isValidAbi(abi: unknown): abi is Abi {
-  return Array.isArray(abi) && abi.every(isValidAbiEntry);
 }
 
 export type AbiArgsLength<T extends AbiKeysForCover = AbiKeysForCover> = {

@@ -5,6 +5,7 @@ import { Contract, JsonRpcProvider, Result } from "ethers";
 import { Ef, getNonMutables, printError } from "src/common";
 import { safeGetFunction } from "src/explorer-provider";
 import { LogCommand, logError, logErrorAndExit, logMethodSkipped } from "src/logger";
+import { g_Args } from "src/state-mate";
 import {
   ArbitraryObject,
   ContractEntry,
@@ -22,6 +23,21 @@ export let g_errors: number = 0;
 
 export function incErrors(): void {
   g_errors += 1;
+}
+
+export enum CheckLevel {
+  section = "section",
+  contract = "contract",
+  checksType = "checksType",
+  method = "method",
+}
+
+export function needCheck(level: CheckLevel, name: string) {
+  if (g_Args.checkOnly === null) {
+    return true;
+  }
+  const checkOnTheLevel = g_Args.checkOnly[level];
+  return checkOnTheLevel === null || checkOnTheLevel === undefined || name === checkOnTheLevel;
 }
 
 export abstract class SectionValidatorBase {

@@ -1,7 +1,7 @@
 import { Contract, JsonRpcProvider } from "ethers";
 
 import { loadAbiFromFile } from "src/abi-provider";
-import { CheckLevel, Ef, needCheck } from "src/common";
+import { Ef } from "src/common";
 import { loadContract } from "src/explorer-provider";
 import { logErrorAndExit } from "src/logger";
 import {
@@ -13,7 +13,7 @@ import {
   ViewResultTB,
 } from "src/typebox";
 
-import { SectionValidatorBase } from "./base";
+import { CheckLevel, needCheck, SectionValidatorBase } from "./base";
 
 export class ChecksSectionValidator extends SectionValidatorBase {
   constructor(provider: JsonRpcProvider, sectionName: Ef = Ef.checks) {
@@ -33,8 +33,7 @@ export class ChecksSectionValidator extends SectionValidatorBase {
   }
 
   private async _validateSubsection(contract: Contract, method: string, checkEntryValue: ChecksEntryValue) {
-    if (isTypeOfTB(checkEntryValue, ArrayOfStaticCallCheckTB) /* && checkEntryValue !== null */) {
-      //todo check without  checkEntryValue !== null
+    if (isTypeOfTB(checkEntryValue, ArrayOfStaticCallCheckTB)) {
       if (!checkEntryValue.length) {
         await this._checkViewFunction(contract, method, { result: [] });
       } else {
