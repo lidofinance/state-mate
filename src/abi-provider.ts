@@ -1,13 +1,14 @@
 import fs from "node:fs";
 import path from "node:path";
-import { Abi, ContractInfo, isValidAbi } from "./types";
 
 import { confirm as askUserToConfirm } from "@inquirer/prompts";
 import chalk from "chalk";
 import jsonDiff from "json-diff";
+
 import { printError } from "./common";
 import { log, LogCommand, logErrorAndExit, WARNING_MARK } from "./logger";
 import { g_Args } from "./state-mate";
+import { Abi, ContractInfo, isValidAbi } from "./types";
 
 export function loadAbiFromFile(contractName: string, address: string): Abi | never {
   address = address.toLowerCase();

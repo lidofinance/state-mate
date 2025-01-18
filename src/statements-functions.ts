@@ -1,6 +1,7 @@
 import { assert, AssertionError } from "chai";
-import { ArbitraryObject, ViewResult } from "./typebox";
 import { Result } from "ethers";
+
+import { ArbitraryObject, ViewResult } from "./typebox";
 
 // Supports bigint as object values
 export function stringify(value: unknown) {

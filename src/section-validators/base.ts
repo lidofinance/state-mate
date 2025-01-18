@@ -1,5 +1,6 @@
 import chalk from "chalk";
 import { Contract, JsonRpcProvider } from "ethers";
+
 import { Ef, getNonMutables, printError } from "src/common";
 import { safeGetFunction } from "src/explorer-provider";
 import { LogCommand, logError, logErrorAndExit, logMethodSkipped } from "src/logger";

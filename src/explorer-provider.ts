@@ -1,5 +1,10 @@
-import { log, logError, logErrorAndExit, logReplaceLine, WARNING_MARK } from "./logger";
+import chalk from "chalk";
+import { Contract, JsonRpcProvider } from "ethers";
 
+import { printError } from "./common";
+import { EtherscanHandler } from "./explorers/etherscan";
+import { ModeHandler } from "./explorers/mode";
+import { log, logError, logErrorAndExit, logReplaceLine, WARNING_MARK } from "./logger";
 import {
   Abi,
   ContractInfo,
@@ -10,15 +15,8 @@ import {
   MethodCallResults,
   ResponseBad,
   ResponseOk,
+  AbiArgsLength,
 } from "./types";
-
-import { Contract, JsonRpcProvider } from "ethers";
-import { AbiArgsLength } from "./types";
-
-import chalk from "chalk";
-import { printError } from "./common";
-import { EtherscanHandler } from "./explorers/etherscan";
-import { ModeHandler } from "./explorers/mode";
 
 export function loadContract(address: string, abi: Abi, provider: JsonRpcProvider) {
   return new Contract(address, abi as unknown as string, provider);

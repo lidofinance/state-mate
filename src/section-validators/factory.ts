@@ -1,10 +1,12 @@
 import { JsonRpcProvider } from "ethers";
+
 import { Ef } from "src/common";
+
 import { ChecksSectionValidator } from "./checks";
-import { OzNonEnumerableAclSectionValidator } from "./oz-non-enumerable-acl";
-import { ProxyCheckSectionValidator } from "./proxy-check";
 import { ImplementationChecksSectionValidator } from "./implementation-checks";
 import { OzAclSectionValidator } from "./oz-acl";
+import { OzNonEnumerableAclSectionValidator } from "./oz-non-enumerable-acl";
+import { ProxyCheckSectionValidator } from "./proxy-check";
 
 export class ValidatorFactory {
   static getValidator(ef: Ef, provider: JsonRpcProvider) {

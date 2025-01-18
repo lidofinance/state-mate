@@ -1,11 +1,13 @@
 import { assert } from "chai";
+import { JsonRpcProvider } from "ethers";
+
 import { loadAbiFromFile } from "src/abi-provider";
 import { Ef } from "src/common";
+import { loadContract, safeStaticCall } from "src/explorer-provider";
 import { log, LogCommand, logHeader2, WARNING_MARK } from "src/logger";
 import { ContractEntry } from "src/typebox";
+
 import { incErrors, SectionValidatorBase } from "./base";
-import { JsonRpcProvider } from "ethers";
-import { loadContract, safeStaticCall } from "src/explorer-provider";
 
 export class OzNonEnumerableAclSectionValidator extends SectionValidatorBase {
   constructor(provider: JsonRpcProvider) {

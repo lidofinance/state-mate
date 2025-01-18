@@ -1,4 +1,5 @@
 import chalk from "chalk";
+
 import { logErrorAndExit } from "./logger";
 import { g_Args } from "./state-mate";
 import { Abi, AbiArgsLength } from "./types";

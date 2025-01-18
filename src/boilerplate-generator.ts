@@ -3,26 +3,17 @@ import path from "node:path";
 
 import "dotenv/config";
 
+import chalk from "chalk";
+import { Contract, JsonRpcProvider } from "ethers";
 import * as YAML from "yaml";
 
-import { getNonMutables, readUrlOrFromEnv } from "./common";
-import { logErrorAndExit } from "./logger";
-
+import { loadAbiFromFile } from "./abi-provider";
+import { getNonMutables, readUrlOrFromEnv, Ef } from "./common";
+import { collectStaticCallResults, loadContract, loadContractInfoFromExplorer } from "./explorer-provider";
+import { logErrorAndExit, log } from "./logger";
 import { g_Args } from "./state-mate";
 import { ContractEntry, EntireDocument, ExplorerSectionTB, isTypeOfTB, NetworkSection, SeedDocument } from "./typebox";
-import { MethodCallResults } from "./types";
-
-import { Contract, JsonRpcProvider } from "ethers";
-
-import { Abi } from "./types";
-
-import { loadAbiFromFile } from "./abi-provider";
-
-import { Ef } from "./common";
-import { log } from "./logger";
-
-import chalk from "chalk";
-import { collectStaticCallResults, loadContract, loadContractInfoFromExplorer } from "./explorer-provider";
+import { MethodCallResults, Abi } from "./types";
 
 const REPLACE_ME_PLACEHOLDER = "REPLACEME";
 const YML = "yml";

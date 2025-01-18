@@ -3,23 +3,22 @@ import path from "node:path";
 
 import "dotenv/config";
 
+import { confirm as askUserToConfirm } from "@inquirer/prompts";
+import { Static, TObject, TSchema } from "@sinclair/typebox";
+import Ajv, { ValidateFunction } from "ajv";
+import addFormats from "ajv-formats";
 import chalk from "chalk";
 import { JsonRpcProvider } from "ethers";
 import * as YAML from "yaml";
 
-import { confirm as askUserToConfirm } from "@inquirer/prompts";
-import { ContractInfo } from "./types";
-
-import Ajv, { ValidateFunction } from "ajv";
-import { parseCmdLineArgs } from "./cli-parser";
-
 import { checkAllAbiDiffs, saveAllAbi } from "./abi-provider";
-
+import { doGenerateBoilerplate } from "./boilerplate-generator";
+import { parseCmdLineArgs } from "./cli-parser";
 import { printError, readUrlOrFromEnv } from "./common";
-import { FAILURE_MARK, log, logError, logErrorAndExit, logHeader1, WARNING_MARK } from "./logger";
-
 import { loadContractInfoFromExplorer } from "./explorer-provider";
-
+import { FAILURE_MARK, log, logError, logErrorAndExit, logHeader1, WARNING_MARK } from "./logger";
+import { g_errors } from "./section-validators/base";
+import { ContractSectionValidator } from "./section-validators/contract";
 import {
   EntireDocument,
   EntireDocumentTB,
@@ -32,13 +31,7 @@ import {
   SeedDocument,
   SeedDocumentTB,
 } from "./typebox";
-
-import { Static, TObject, TSchema } from "@sinclair/typebox";
-
-import addFormats from "ajv-formats";
-import { doGenerateBoilerplate } from "./boilerplate-generator";
-import { g_errors } from "./section-validators/base";
-import { ContractSectionValidator } from "./section-validators/contract";
+import { ContractInfo } from "./types";
 
 export let g_Args: ReturnType<typeof parseCmdLineArgs>;
 

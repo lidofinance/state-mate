@@ -1,4 +1,5 @@
 import { Contract, JsonRpcProvider } from "ethers";
+
 import { loadAbiFromFile } from "src/abi-provider";
 import { CheckLevel, Ef, needCheck } from "src/common";
 import { loadContract } from "src/explorer-provider";
@@ -11,6 +12,7 @@ import {
   StaticCallCheckTB,
   ViewResultTB,
 } from "src/typebox";
+
 import { SectionValidatorBase } from "./base";
 
 export class ChecksSectionValidator extends SectionValidatorBase {
