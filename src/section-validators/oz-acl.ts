@@ -3,7 +3,7 @@ import { JsonRpcProvider } from "ethers";
 
 import { Ef } from "src/common";
 import { logHeader2 } from "src/logger";
-import { ContractEntry } from "src/typebox";
+import { ContractEntry, isTypeOfTB, ProxyContractEntryTB } from "src/typebox";
 
 import { SectionValidatorBase } from "./base";
 export class OzAclSectionValidator extends SectionValidatorBase {
@@ -11,8 +11,10 @@ export class OzAclSectionValidator extends SectionValidatorBase {
     super(provider, sectionName);
   }
 
-  override async validateSection({ name, address, checks }: ContractEntry, contractAlias: string) {
-    //TODO
-    //logHeader2(this.sectionName);
+  override async validateSection(contractEntry: ContractEntry, contractAlias: string) {
+    if (isTypeOfTB(contractEntry, ProxyContractEntryTB) && contractEntry.ozAcl) {
+      logHeader2(this.sectionName);
+      //TODO
+    }
   }
 }
