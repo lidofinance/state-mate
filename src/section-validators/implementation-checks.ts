@@ -23,7 +23,11 @@ export class ImplementationChecksSectionValidator extends ChecksSectionValidator
 
       const allNonMutable = getNonMutables(loadAbiFromFile(name, implementation));
       const skippedChecks: RegularChecks = {};
-      allNonMutable.reduce((acc, x) => ((acc[x.name] = null), acc), skippedChecks);
+
+      for (const x of allNonMutable) {
+        // eslint-disable-next-line unicorn/no-null
+        skippedChecks[x.name] = null;
+      }
       await super.validateSection(
         {
           checks: { ...skippedChecks, ...implementationChecks },

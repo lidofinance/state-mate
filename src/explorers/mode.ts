@@ -10,11 +10,12 @@ type ModeResponseOkResult = CommonResponseOkResult & {
   ImplementationAddress: string;
 };
 
-function isModeResponseOkResult(obj: unknown): obj is ModeResponseOkResult {
+function isModeResponseOkResult(object: unknown): object is ModeResponseOkResult {
   return (
-    isCommonResponseOkResult(obj) &&
-    "IsProxy" in obj &&
-    (obj.IsProxy === "false" || ("ImplementationAddress" in obj && typeof obj.ImplementationAddress === "string"))
+    isCommonResponseOkResult(object) &&
+    "IsProxy" in object &&
+    (object.IsProxy === "false" ||
+      ("ImplementationAddress" in object && typeof object.ImplementationAddress === "string"))
   );
 }
 

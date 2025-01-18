@@ -8,32 +8,32 @@ import { Contract, JsonRpcProvider } from "ethers";
 import * as YAML from "yaml";
 
 import { loadAbiFromFile } from "./abi-provider";
-import { getNonMutables, readUrlOrFromEnv, Ef } from "./common";
+import { getNonMutables, readUrlOrFromEnvironment as readUrlOrFromEnvironment, Ef } from "./common";
 import { collectStaticCallResults, loadContract, loadContractInfoFromExplorer } from "./explorer-provider";
 import { logErrorAndExit, log } from "./logger";
-import { g_Args } from "./state-mate";
+import { g_Arguments as g_Arguments } from "./state-mate";
 import { ContractEntry, EntireDocument, ExplorerSectionTB, isTypeOfTB, NetworkSection, SeedDocument } from "./typebox";
 import { MethodCallResults, Abi } from "./types";
 
 const REPLACE_ME_PLACEHOLDER = "REPLACEME";
 const YML = "yml";
 
-export async function doGenerateBoilerplate(seedConfigPath: string, jsonDoc: SeedDocument) {
-  const seedDoc = YAML.parseDocument(fs.readFileSync(seedConfigPath, "utf-8"));
-  const doc = new YAML.Document(seedDoc);
+export async function doGenerateBoilerplate(seedConfigPath: string, jsonDocument: SeedDocument) {
+  const seedDocument = YAML.parseDocument(fs.readFileSync(seedConfigPath, "utf8"));
+  const document = new YAML.Document(seedDocument);
 
-  await _iterateDeployedAddresses(doc, jsonDoc, async (ctx: DeployedAddressInfo) => {
-    const { address, deployedNode, explorerHostname, rpcUrl, sectionName, explorerKey } = ctx;
+  await _iterateDeployedAddresses(document, jsonDocument, async (context: DeployedAddressInfo) => {
+    const { address, deployedNode, explorerHostname, rpcUrl, sectionName, explorerKey } = context;
     if (!explorerHostname) {
       logErrorAndExit(
-        `The field ${chalk.magenta(`explorerHostname`)} is required in the ${chalk.magenta(g_Args.configPath)}`,
+        `The field ${chalk.magenta(`explorerHostname`)} is required in the ${chalk.magenta(g_Arguments.configPath)}`,
       );
     }
     const { contractName, implementation } = await loadContractInfoFromExplorer(address, explorerHostname, explorerKey);
 
     const provider = new JsonRpcProvider(rpcUrl);
-    let contractEntryIfProxy = null;
-    let contractEntryIfRegular = null;
+    let contractEntryIfProxy;
+    let contractEntryIfRegular;
     const logOperation = (section: Ef) => {
       log(
         `Generating YAML for non-mutable function values for contract ${chalk.magenta(`${contractName}-${address}`)}, section ${chalk.yellow(section)} ...`,
@@ -62,7 +62,7 @@ export async function doGenerateBoilerplate(seedConfigPath: string, jsonDoc: See
       );
       contractEntryIfProxy = {
         [Ef.name]: implementation.contractName,
-        [Ef.address]: doc.createAlias(deployedNode),
+        [Ef.address]: document.createAlias(deployedNode),
         proxyName: contractName,
         implementation: implementation.address,
         [Ef.proxyChecks]: proxyChecks,
@@ -76,21 +76,21 @@ export async function doGenerateBoilerplate(seedConfigPath: string, jsonDoc: See
       const checks = await _makeBoilerplateForAllNonMutableFunctions(abi, contract);
       contractEntryIfRegular = {
         name: contractName,
-        address: doc.createAlias(deployedNode),
+        address: document.createAlias(deployedNode),
         checks: checks,
       };
     }
 
-    const sectionNode = doc.get(sectionName) as YAML.YAMLMap;
+    const sectionNode = document.get(sectionName) as YAML.YAMLMap;
     const contractEntry = implementation ? contractEntryIfProxy : contractEntryIfRegular;
-    sectionNode.addIn([Ef.contracts], new YAML.Pair(ctx.deployedNode.anchor, contractEntry));
+    sectionNode.addIn([Ef.contracts], new YAML.Pair(context.deployedNode.anchor, contractEntry));
   });
 
   const generatedFilePath = path.join(
     path.dirname(seedConfigPath),
     `${path.basename(seedConfigPath, "." + YML)}.generated.${YML}`,
   );
-  fs.writeFileSync(generatedFilePath, doc.toString());
+  fs.writeFileSync(generatedFilePath, document.toString());
   log(`Generated state config: ${chalk.bold(generatedFilePath)}`);
 }
 
@@ -100,21 +100,21 @@ type DeployedAddressInfo = Pick<NetworkSection, "explorerHostname" | "rpcUrl"> &
   } & { deployedNode: YAML.Scalar } & { sectionName: string };
 
 async function _iterateDeployedAddresses<T extends EntireDocument | SeedDocument>(
-  seedDoc: YAML.Document,
-  jsonDoc: T,
-  callback: (ctx: DeployedAddressInfo) => Promise<void>,
+  seedDocument: YAML.Document,
+  jsonDocument: T,
+  callback: (context: DeployedAddressInfo) => Promise<void>,
 ) {
-  const abiDirPath = path.resolve(path.dirname(g_Args.configPath), "abi");
-  fs.mkdirSync(abiDirPath, { recursive: true });
+  const abiDirectoryPath = path.resolve(path.dirname(g_Arguments.configPath), "abi");
+  fs.mkdirSync(abiDirectoryPath, { recursive: true });
 
-  for (const [explorerSectionKey, addresses] of Object.entries(jsonDoc.deployed)) {
-    const explorerSection = jsonDoc[explorerSectionKey as keyof T];
+  for (const [explorerSectionKey, addresses] of Object.entries(jsonDocument.deployed)) {
+    const explorerSection = jsonDocument[explorerSectionKey as keyof T];
 
     if (isTypeOfTB(explorerSection, ExplorerSectionTB)) {
       const { explorerHostname, explorerTokenEnv } = explorerSection;
-      const rpcUrl = readUrlOrFromEnv(explorerSection.rpcUrl);
+      const rpcUrl = readUrlOrFromEnvironment(explorerSection.rpcUrl);
       const explorerKey = explorerTokenEnv ? process.env[explorerTokenEnv] : "";
-      const scalars: YAML.Scalar[] = _getScalarsWithAnchors(seedDoc, explorerSectionKey);
+      const scalars: YAML.Scalar[] = _getScalarsWithAnchors(seedDocument, explorerSectionKey);
       for (const address of addresses) {
         const deployedNode = scalars.find((scalar) => {
           return (scalar.value as string) === address;
@@ -136,10 +136,10 @@ async function _iterateDeployedAddresses<T extends EntireDocument | SeedDocument
   }
 }
 
-function _getScalarsWithAnchors(doc: YAML.Document, explorerSectionKey: string): YAML.Scalar[] {
-  const section = doc.getIn(["deployed", explorerSectionKey]);
+function _getScalarsWithAnchors(document: YAML.Document, explorerSectionKey: string): YAML.Scalar[] {
+  const section = document.getIn(["deployed", explorerSectionKey]);
 
-  if (YAML.isSeq(section) && section.items.every(YAML.isScalar)) {
+  if (YAML.isSeq(section) && section.items.every((element) => YAML.isScalar(element))) {
     return section.items;
   }
 

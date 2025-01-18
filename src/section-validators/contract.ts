@@ -12,9 +12,9 @@ export class ContractSectionValidator {
 
   constructor(provider: JsonRpcProvider) {
     const sections = [Ef.checks, Ef.proxyChecks, Ef.ozNonEnumerableAcl, Ef.implementationChecks, Ef.ozAcl];
-    sections.forEach((section) => {
+    for (const section of sections) {
       this.map.set(section, ValidatorFactory.getValidator(section, provider));
-    });
+    }
   }
 
   public async see(contractEntry: ContractEntry, sectionTitle: string, contractAlias: string) {

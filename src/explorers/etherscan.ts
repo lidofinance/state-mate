@@ -26,8 +26,8 @@ async function sleep(timeoutMs: number) {
   await new Promise((resolve) => setTimeout(resolve, timeoutMs));
 }
 
-function isEtherResponseOkResult(obj: unknown): obj is EtherResponseOkResult {
-  return isCommonResponseOkResult(obj) && "Implementation" in obj && typeof obj.Implementation === "string";
+function isEtherResponseOkResult(object: unknown): object is EtherResponseOkResult {
+  return isCommonResponseOkResult(object) && "Implementation" in object && typeof object.Implementation === "string";
 }
 
 type EtherResponseOkResult = CommonResponseOkResult & {

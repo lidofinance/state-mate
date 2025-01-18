@@ -1,7 +1,7 @@
 import chalk from "chalk";
 
 import { logErrorAndExit } from "./logger";
-import { Abi, AbiArgsLength } from "./types";
+import { Abi, AbiArgumentsLength as AbiArgumentsLength } from "./types";
 
 export enum Ef {
   name = "name",
@@ -14,7 +14,7 @@ export enum Ef {
   result = "result",
   contracts = "contracts",
   explorerHostname = "explorerHostname",
-  explorerTokenEnv = "explorerTokenEnv",
+  explorerTokenEnvironment = "explorerTokenEnv",
   rpcUrl = "rpcUrl",
 }
 
@@ -22,7 +22,7 @@ function isUrl(maybeUrl: string) {
   try {
     new URL(maybeUrl);
     return true;
-  } catch (_) {
+  } catch {
     return false;
   }
 }
@@ -31,21 +31,23 @@ export function printError(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
 }
 
-export function readUrlOrFromEnv(urlOrEnvVarName: string) {
-  if (isUrl(urlOrEnvVarName)) {
-    return urlOrEnvVarName;
+export function readUrlOrFromEnvironment(urlOrEnvironmentVariableName: string) {
+  if (isUrl(urlOrEnvironmentVariableName)) {
+    return urlOrEnvironmentVariableName;
   }
-  const valueFromEnv = process.env[urlOrEnvVarName];
-  if (!valueFromEnv) {
-    logErrorAndExit(`Env var ${chalk.yellow(urlOrEnvVarName)} must be set`);
+  const valueFromEnvironment = process.env[urlOrEnvironmentVariableName];
+  if (!valueFromEnvironment) {
+    logErrorAndExit(`Env var ${chalk.yellow(urlOrEnvironmentVariableName)} is not set`);
   }
-  if (!isUrl(valueFromEnv)) {
-    logErrorAndExit(`Env var ${chalk.yellow(urlOrEnvVarName)} is not a valid RPC url: ${chalk.yellow(valueFromEnv)}`);
+  if (!isUrl(valueFromEnvironment)) {
+    logErrorAndExit(
+      `Env var ${chalk.yellow(urlOrEnvironmentVariableName)} is not a valid RPC url: ${chalk.yellow(valueFromEnvironment)}`,
+    );
   }
-  return valueFromEnv;
+  return valueFromEnvironment;
 }
 
-export function getNonMutables(abi: Abi): AbiArgsLength {
+export function getNonMutables(abi: Abi): AbiArgumentsLength {
   return abi
     .filter(
       ({ type, stateMutability }) =>

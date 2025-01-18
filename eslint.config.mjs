@@ -22,6 +22,7 @@ export default [
     "plugin:prettier/recommended",
     "plugin:import/recommended",
     "plugin:import/typescript",
+    "plugin:unicorn/recommended",
   ),
 
   includeIgnoreFile(gitignorePath),
@@ -39,6 +40,10 @@ export default [
       },
     },
     rules: {
+      "unicorn/prefer-module": "off",
+      "unicorn/no-process-exit": "off",
+      "unicorn/no-object-as-default-parameter": "off",
+      "unicorn/consistent-function-scoping": "off",
       "@typescript-eslint/no-explicit-any": ["warn"],
       "@typescript-eslint/no-unused-vars": ["warn"],
       "import/no-unresolved": ["warn"],

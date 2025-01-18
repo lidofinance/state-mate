@@ -16,22 +16,22 @@ type AbiEntry<T extends RequiredAbiKeys = RequiredAbiKeys> = T;
 type RequiredAbiKeys = Required<Readonly<Pick<JsonFragment, "name" | "type" | "stateMutability" | "inputs">>>;
 
 export function isValidAbi(abi: unknown): abi is Abi {
-  return Array.isArray(abi) && abi.every(_isValidAbiEntry);
+  return Array.isArray(abi) && abi.every((entry) => _isValidAbiEntry(entry));
 }
 
 function _isValidAbiEntry(entry: unknown): entry is AbiEntry {
   if (typeof entry !== "object" || entry === null) return false;
 
-  const obj = entry as Partial<AbiEntry>;
+  const object = entry as Partial<AbiEntry>;
   return (
-    (typeof obj.type === "string" || obj.type === undefined) &&
-    (typeof obj.stateMutability === "string" || obj.stateMutability === undefined) &&
-    (typeof obj.name === "string" || obj.name === undefined) &&
-    (Array.isArray(obj.inputs) || obj.inputs === undefined)
+    (typeof object.type === "string" || object.type === undefined) &&
+    (typeof object.stateMutability === "string" || object.stateMutability === undefined) &&
+    (typeof object.name === "string" || object.name === undefined) &&
+    (Array.isArray(object.inputs) || object.inputs === undefined)
   );
 }
 
-export type AbiArgsLength<T extends AbiKeysForCover = AbiKeysForCover> = {
+export type AbiArgumentsLength<T extends AbiKeysForCover = AbiKeysForCover> = {
   name: T["name"];
   numArgs: T["inputs"] extends { length: number } ? number : never;
 }[];
@@ -68,14 +68,14 @@ export function isResponseOk(response: unknown): response is ResponseOk {
   );
 }
 
-export function isCommonResponseOkResult(obj: unknown): obj is CommonResponseOkResult {
+export function isCommonResponseOkResult(object: unknown): object is CommonResponseOkResult {
   return (
-    typeof obj === "object" &&
-    obj !== null &&
-    "ContractName" in obj &&
-    typeof obj.ContractName === "string" &&
-    "ABI" in obj &&
-    typeof obj.ABI === "string"
+    typeof object === "object" &&
+    object !== null &&
+    "ContractName" in object &&
+    typeof object.ContractName === "string" &&
+    "ABI" in object &&
+    typeof object.ABI === "string"
   );
 }
 

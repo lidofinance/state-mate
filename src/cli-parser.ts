@@ -5,15 +5,17 @@ import { program } from "commander";
 import { Ef } from "./common";
 import { logErrorAndExit } from "./logger";
 
-type CheckOnlyOptionType = null | {
-  section: string;
-  contract: string | null;
-  checksType: string | null;
-  method: string | null;
-  schemas: string | null;
-};
+type CheckOnlyOptionType =
+  | undefined
+  | {
+      section: string;
+      contract?: string;
+      checksType?: string;
+      method?: string;
+      schemas?: string;
+    };
 
-export function parseCmdLineArgs() {
+export function parseCmdLineArguments() {
   program
     .argument("<config-path>", "path to .yaml state config file")
     .allowExcessArguments(false)
@@ -28,10 +30,10 @@ export function parseCmdLineArgs() {
 
   const configPath = program.args[0];
   const options = program.opts();
-  let checkOnly: CheckOnlyOptionType = null;
+  let checkOnly: CheckOnlyOptionType;
   if (options.only) {
     const checksPath = String(options.only).split("/");
-    if (checksPath.length < 1 || checksPath.length > 4) {
+    if (checksPath.length === 0 || checksPath.length > 4) {
       logErrorAndExit(
         `Invalid checkOnly argument format, must be <section>/[<contractName>]/[<checks|proxyChecks|implementationChecks>]/<method>`,
       );

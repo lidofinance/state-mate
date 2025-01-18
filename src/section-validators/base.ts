@@ -4,7 +4,7 @@ import { Contract, JsonRpcProvider, Result } from "ethers";
 
 import { Ef, getNonMutables, printError } from "src/common";
 import { LogCommand, logError, logErrorAndExit, logMethodSkipped } from "src/logger";
-import { g_Args } from "src/state-mate";
+import { g_Arguments } from "src/state-mate";
 import {
   ArbitraryObject,
   ContractEntry,
@@ -16,7 +16,7 @@ import {
   StaticCallResultTB,
   ViewResult,
 } from "src/typebox";
-import { Abi, AbiArgsLength } from "src/types";
+import { Abi, AbiArgumentsLength } from "src/types";
 
 export let g_errors: number = 0;
 
@@ -32,10 +32,10 @@ export enum CheckLevel {
 }
 
 export function needCheck(level: CheckLevel, name: string) {
-  if (g_Args.checkOnly === null) {
+  if (!g_Arguments.checkOnly) {
     return true;
   }
-  const checkOnTheLevel = g_Args.checkOnly[level];
+  const checkOnTheLevel = g_Arguments.checkOnly[level];
   return checkOnTheLevel === null || checkOnTheLevel === undefined || name === checkOnTheLevel;
 }
 
@@ -111,8 +111,8 @@ export abstract class SectionValidatorBase {
     const nonMutableFromAbi = getNonMutables(abi);
     const nonCovered = nonMutableFromAbi
       .filter((x) => !checks.includes(x.name))
-      .map((x) => (x.name ? x.name : x)) as AbiArgsLength;
-    if (nonCovered.length) {
+      .map((x) => x.name || x) as AbiArgumentsLength;
+    if (nonCovered.length > 0) {
       logError(
         `Section ${contractAlias} ${this.sectionName} does not cover these non-mutable function from ABI: ${chalk.red(nonCovered.join(", "))}`,
       );
@@ -122,11 +122,7 @@ export abstract class SectionValidatorBase {
 }
 
 function _stringify(value: unknown) {
-  if (value instanceof Object) {
-    return JSON.stringify(value);
-  } else {
-    return `${String(value)}`;
-  }
+  return value instanceof Object ? JSON.stringify(value) : `${String(value)}`;
 }
 
 function _assertEqual(actual: unknown, expected: ViewResult, errorMessage?: string) {
@@ -142,8 +138,8 @@ function _assertEqual(actual: unknown, expected: ViewResult, errorMessage?: stri
     if (!errorMessage) {
       errorMessage = `Actual value '${String(actual)} is not equal to expected array '[${String(expected)}]`;
     }
-    for (let i = 0; i < (actual as unknown[]).length; ++i) {
-      _assertEqual((actual as unknown[])[i], expected[i], errorMessage);
+    for (let index = 0; index < (actual as unknown[]).length; ++index) {
+      _assertEqual((actual as unknown[])[index], expected[index], errorMessage);
     }
   } else if (typeof expected === "object") {
     _assertEqualStruct(expected, actual as Result);
@@ -168,7 +164,7 @@ function _assertEqualStruct(expected: null | ArbitraryObject, actual: Result) {
     }
     let actualValue: unknown = actualAsObject[field];
     const errorMessageDetailed = errorMessage + ` but fields "${field}" differ`;
-    if (actualValue instanceof Result && (expectedValue as unknown) instanceof Array) {
+    if (actualValue instanceof Result && Array.isArray(expectedValue as unknown)) {
       actualValue = actualValue.toArray();
     }
     _assertEqual(actualValue, expectedValue, errorMessageDetailed);

@@ -35,38 +35,38 @@ export class LogCommand {
   }
 }
 
-export function logHeader1(arg: string) {
-  const length = "=====  =====".length + arg.length;
-  const middleLine = chalk.grey(`===== ${chalk.blueBright(arg)} =====`);
+export function logHeader1(argument: string) {
+  const length = "=====  =====".length + argument.length;
+  const middleLine = chalk.grey(`===== ${chalk.blueBright(argument)} =====`);
   const headerFooter = chalk.grey("=".repeat(length));
   log(`\n${headerFooter}\n${middleLine}\n${headerFooter}`);
 }
 
-export function logHeader2(arg: unknown) {
-  log(chalk.gray(`\n===== ${chalk.magenta(arg)} =====`));
+export function logHeader2(argument: unknown) {
+  log(chalk.gray(`\n===== ${chalk.magenta(argument)} =====`));
 }
 
 export function logMethodSkipped(methodName: string) {
   log(`${WARNING_MARK} .${methodName}: ${chalk.yellow("skipped")}`);
 }
 
-export function log(arg: unknown) {
-  console.log(arg);
+export function log(argument: unknown) {
+  console.log(argument);
 }
 
-export function logReplaceLine(arg: unknown) {
+export function logReplaceLine(argument: unknown) {
   process.stdout.clearLine(0);
   process.stdout.cursorTo(0);
-  process.stdout.write(`${String(arg)}`);
+  process.stdout.write(`${String(argument)}`);
 }
 
-export function logError(arg: unknown) {
-  console.error(`ERROR: ${String(arg)}`);
+export function logError(argument: unknown) {
+  console.error(`ERROR: ${String(argument)}`);
   console.error();
   console.trace();
 }
 
-export function logErrorAndExit(arg: unknown): never {
-  logError(arg);
+export function logErrorAndExit(argument: unknown): never {
+  logError(argument);
   process.exit(1);
 }

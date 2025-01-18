@@ -15,7 +15,7 @@ import {
   MethodCallResults,
   ResponseBad,
   ResponseOk,
-  AbiArgsLength,
+  AbiArgumentsLength,
 } from "./types";
 
 export function loadContract(address: string, abi: Abi, provider: JsonRpcProvider) {
@@ -48,18 +48,18 @@ export async function safeStaticCall(
   try {
     const contractFunction = contract.getFunction(functionName);
 
-    const result = await contractFunction.staticCall(...args);
+    const result = await contractFunction.staticCall(...arguments_);
 
     return result;
   } catch (error) {
     logErrorAndExit(
-      `Failed to call function ${chalk.yellow(functionName)} with args:\n ${chalk.yellow(JSON.stringify(args))}:\n ${printError(error)}`,
+      `Failed to call function ${chalk.yellow(functionName)} with args:\n ${chalk.yellow(JSON.stringify(arguments_))}:\n ${printError(error)}`,
     );
   }
 }
 
 export async function collectStaticCallResults(
-  nonMutables: AbiArgsLength,
+  nonMutables: AbiArgumentsLength,
   contract: Contract,
 ): Promise<MethodCallResults> {
   const results: MethodCallResults = [];
@@ -68,7 +68,7 @@ export async function collectStaticCallResults(
     let viewFunction: ReturnType<typeof contract.getFunction>;
     try {
       viewFunction = contract.getFunction(methodName);
-    } catch (error) {
+    } catch {
       logErrorAndExit(`Failed to get method ${chalk.yellow(methodName)} from contract`);
     }
     let staticCallResult: string;
@@ -77,7 +77,7 @@ export async function collectStaticCallResults(
       try {
         const result: unknown = await viewFunction.staticCall();
         staticCallResult = ` ${result}`;
-      } catch (error) {
+      } catch {
         staticCallResult = " view call reverted";
       }
     } else {
@@ -94,12 +94,12 @@ export async function loadContractInfoFromExplorer(
   explorerHostname: string,
   explorerKey?: string,
 ): Promise<ContractInfo> {
-  if (explorerHostname.indexOf("mode.network") > -1) {
-    return loadContractInfo(new ModeHandler(), address, explorerHostname, explorerKey);
-  } else {
-    // At least same for: api.etherscan.io, api.bscscan.com
-    return loadContractInfo(new EtherscanHandler(), address, explorerHostname, explorerKey);
-  }
+  return loadContractInfo(
+    explorerHostname.includes("mode.network") ? new ModeHandler() : new EtherscanHandler(),
+    address,
+    explorerHostname,
+    explorerKey,
+  );
 }
 
 export async function loadContractInfo(
@@ -117,7 +117,7 @@ export async function loadContractInfo(
     sourcesResponse = await explorer.requestWithRateLimit(sourcesResponse, sourcesUrl, explorerHostname);
     if (isResponseBad(sourcesResponse)) {
       logErrorAndExit(
-        `Failed to download contract info from ${explorerHostname}: ${sourcesResponse.message}\n${JSON.stringify(sourcesResponse, null, 2)}`,
+        `Failed to download contract info from ${explorerHostname}: ${sourcesResponse.message}\n${JSON.stringify(sourcesResponse, undefined, 2)}`,
       );
     }
   }

@@ -34,11 +34,11 @@ export class ChecksSectionValidator extends SectionValidatorBase {
 
   private async _validateSubsection(contract: Contract, method: string, checkEntryValue: ChecksEntryValue) {
     if (isTypeOfTB(checkEntryValue, ArrayOfStaticCallCheckTB)) {
-      if (!checkEntryValue.length) {
+      if (checkEntryValue.length === 0) {
         await this._checkViewFunction(contract, method, { result: [] });
       } else {
-        for (const argsResult of checkEntryValue) {
-          await this._checkViewFunction(contract, method, argsResult);
+        for (const argumentsResult of checkEntryValue) {
+          await this._checkViewFunction(contract, method, argumentsResult);
         }
       }
     } else if (isTypeOfTB(checkEntryValue, StaticCallCheckTB)) {

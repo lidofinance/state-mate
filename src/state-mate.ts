@@ -13,8 +13,8 @@ import * as YAML from "yaml";
 
 import { checkAllAbiForDiffs, saveAllAbi } from "./abi-provider";
 import { doGenerateBoilerplate } from "./boilerplate-generator";
-import { parseCmdLineArgs } from "./cli-parser";
-import { printError, readUrlOrFromEnv } from "./common";
+import { parseCmdLineArguments as parseCmdLineArguments } from "./cli-parser";
+import { printError, readUrlOrFromEnvironment as readUrlOrFromEnvironment } from "./common";
 import { loadContractInfoFromExplorer } from "./explorer-provider";
 import { FAILURE_MARK, log, logError, logErrorAndExit, logHeader1, WARNING_MARK } from "./logger";
 import { g_errors } from "./section-validators/base";
@@ -33,7 +33,7 @@ import {
 } from "./typebox";
 import { ContractInfo } from "./types";
 
-export let g_Args: ReturnType<typeof parseCmdLineArgs>;
+export let g_Arguments: ReturnType<typeof parseCmdLineArguments>;
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore: Unreachable code error
@@ -61,7 +61,7 @@ function loadStateFromYaml(configPath: string): unknown {
     return typeof v === "bigint" ? String(v) : v;
   };
   const file = path.resolve(configPath);
-  const configContent = fs.readFileSync(file, "utf-8");
+  const configContent = fs.readFileSync(file, "utf8");
   try {
     return YAML.parse(configContent, reviver, { schema: "core", intAsBigInt: true });
   } catch (error) {
@@ -70,12 +70,12 @@ function loadStateFromYaml(configPath: string): unknown {
 }
 
 function validateJsonWithSchema<T extends TSchema>(
-  jsonDoc: unknown,
+  jsonDocument: unknown,
   schemaPrototype: T,
   { silent }: { silent: boolean } = { silent: false },
-): jsonDoc is Static<T> {
+): jsonDocument is Static<T> {
   if (!silent)
-    logHeader1(`The YAML file at ${chalk.yellow(g_Args.configPath)} will be validated against the JSON Schema`);
+    logHeader1(`The YAML file at ${chalk.yellow(g_Arguments.configPath)} will be validated against the JSON Schema`);
 
   const ajv = new Ajv({ verbose: true, allErrors: true });
   addFormats(ajv);
@@ -94,29 +94,30 @@ function validateJsonWithSchema<T extends TSchema>(
       `Failed to compile schema in Ajv (Most likely, the errors are in the Typebox types):\n\n${chalk.red(printError(error))}`,
     );
   }
-  const valid = validate(jsonDoc);
+  const valid = validate(jsonDocument);
   if (!valid) {
     if (silent) return false;
     logErrorAndExit(
-      `The YAML file ${chalk.magenta(g_Args!.configPath)} contains errors that do not comply with the JSON schema. ` +
+      `The YAML file ${chalk.magenta(g_Arguments!.configPath)} contains errors that do not comply with the JSON schema. ` +
         `Please correct them and try again\n\n${formatAjvErrors(validate.errors)} `,
     );
   }
   if (!silent)
     logHeader1(
-      `The YAML file at ${chalk.yellow(g_Args.configPath)} has successfully passed validation against the JSON Schema`,
+      `The YAML file at ${chalk.yellow(g_Arguments.configPath)} has successfully passed validation against the JSON Schema`,
     );
   return true;
 }
 
-async function doChecks(jsonDoc: EntireDocument) {
-  if (!fs.existsSync(g_Args.abiDirPath)) {
-    if (await askUserToConfirm({ message: `No ABI directory found at ${g_Args.abiDirPath}.Download ? ` })) {
-      await downloadAndSaveAbis(jsonDoc);
-    }
+async function doChecks(jsonDocument: EntireDocument) {
+  if (
+    !fs.existsSync(g_Arguments.abiDirPath) &&
+    (await askUserToConfirm({ message: `No ABI directory found at ${g_Arguments.abiDirPath}.Download ? ` }))
+  ) {
+    await downloadAndSaveAbis(jsonDocument);
   }
 
-  for (const [sectionTitle, section] of Object.entries(jsonDoc)) {
+  for (const [sectionTitle, section] of Object.entries(jsonDocument)) {
     if (isTypeOfTB(section, NetworkSectionTB)) await checkNetworkSection(sectionTitle, section);
   }
 
@@ -125,40 +126,40 @@ async function doChecks(jsonDoc: EntireDocument) {
     process.exit(2);
   }
 
-  if (g_Args.checkOnly) {
+  if (g_Arguments.checkOnly) {
     log(
-      `\n${WARNING_MARK}${WARNING_MARK}${WARNING_MARK} Checks run only for "${chalk.bold(chalk.blue(g_Args.checkOnlyCmdArg))}"\n`,
+      `\n${WARNING_MARK}${WARNING_MARK}${WARNING_MARK} Checks run only for "${chalk.bold(chalk.blue(g_Arguments.checkOnlyCmdArg))}"\n`,
     );
   }
 }
 
-async function downloadAndSaveAbis(jsonDoc: SeedDocument) {
-  const abiDirPath = path.resolve(path.dirname(g_Args.configPath), "abi");
-  fs.mkdirSync(abiDirPath, { recursive: true });
+async function downloadAndSaveAbis(jsonDocument: SeedDocument) {
+  const abiDirectoryPath = path.resolve(path.dirname(g_Arguments.configPath), "abi");
+  fs.mkdirSync(abiDirectoryPath, { recursive: true });
 
-  await iterateLoadedContracts(jsonDoc, saveAllAbi);
+  await iterateLoadedContracts(jsonDocument, saveAllAbi);
 }
 
-async function downloadAndCheckAbis<T extends EntireDocument | SeedDocument>(jsonDoc: T) {
+async function downloadAndCheckAbis<T extends EntireDocument | SeedDocument>(jsonDocument: T) {
   logHeader1(`ABI checking has been activated`);
-  await iterateLoadedContracts(jsonDoc, checkAllAbiForDiffs);
+  await iterateLoadedContracts(jsonDocument, checkAllAbiForDiffs);
 }
 
 async function iterateLoadedContracts<T extends EntireDocument | SeedDocument>(
-  jsonDoc: T,
+  jsonDocument: T,
   callback: (contractInfo: ContractInfo) => Promise<void> | void,
 ) {
-  const abiDirPath = path.resolve(path.dirname(g_Args.configPath), "abi");
-  fs.mkdirSync(abiDirPath, { recursive: true });
+  const abiDirectoryPath = path.resolve(path.dirname(g_Arguments.configPath), "abi");
+  fs.mkdirSync(abiDirectoryPath, { recursive: true });
 
-  for (const [explorerSectionKey, addresses] of Object.entries(jsonDoc.deployed)) {
-    const explorerSection = jsonDoc[explorerSectionKey as keyof T];
+  for (const [explorerSectionKey, addresses] of Object.entries(jsonDocument.deployed)) {
+    const explorerSection = jsonDocument[explorerSectionKey as keyof T];
 
     if (isTypeOfTB(explorerSection, ExplorerSectionTB) || isTypeOfTB(explorerSection, NetworkSectionTB)) {
       const { explorerHostname, explorerTokenEnv } = explorerSection;
       if (!explorerHostname) {
         logErrorAndExit(
-          `The field ${chalk.magenta(`explorerHostname`)} is required in the ${chalk.magenta(g_Args.configPath)}`,
+          `The field ${chalk.magenta(`explorerHostname`)} is required in the ${chalk.magenta(g_Arguments.configPath)}`,
         );
       }
       const explorerKey = explorerTokenEnv ? process.env[explorerTokenEnv] : "";
@@ -174,10 +175,10 @@ async function iterateLoadedContracts<T extends EntireDocument | SeedDocument>(
 }
 
 async function checkNetworkSection(sectionTitle: string, section: NetworkSection) {
-  if (g_Args.checkOnly && g_Args.checkOnly.section !== sectionTitle) {
+  if (g_Arguments.checkOnly && g_Arguments.checkOnly.section !== sectionTitle) {
     return;
   }
-  const rpcUrl = readUrlOrFromEnv(section.rpcUrl);
+  const rpcUrl = readUrlOrFromEnvironment(section.rpcUrl);
   const provider = new JsonRpcProvider(rpcUrl);
   const contractSectionChecker = new ContractSectionValidator(provider);
 
@@ -194,7 +195,7 @@ function generateBothSchemas() {
   const saveSchema = (fileName: string, schema: TObject) => {
     const schemasFilePath = path.resolve(schemasPath, fileName);
     try {
-      fs.writeFileSync(schemasFilePath, JSON.stringify(schema, null, 2), "utf8");
+      fs.writeFileSync(schemasFilePath, JSON.stringify(schema, undefined, 2), "utf8");
       logHeader1(`The JSON Schema has been saved to ${chalk.green(schemasFilePath)}`);
     } catch (error) {
       logErrorAndExit(
@@ -207,35 +208,44 @@ function generateBothSchemas() {
 }
 
 export async function main() {
-  g_Args = parseCmdLineArgs();
+  g_Arguments = parseCmdLineArguments();
 
-  if (g_Args.schemas) {
+  if (g_Arguments.schemas) {
     generateBothSchemas();
   }
 
-  const jsonDoc = loadStateFromYaml(g_Args.configPath);
+  const jsonDocument = loadStateFromYaml(g_Arguments.configPath);
 
-  if (g_Args.generate) {
-    if (validateJsonWithSchema(jsonDoc, EntireDocumentTB, { silent: true })) {
-      logErrorAndExit(chalk.yellow(`A main YAML was specified, but a seed YAML was expected: ${g_Args.configPath}`));
+  if (g_Arguments.generate) {
+    if (validateJsonWithSchema(jsonDocument, EntireDocumentTB, { silent: true })) {
+      logErrorAndExit(
+        chalk.yellow(
+          `A main YAML was specified, but a seed YAML was expected: ${g_Arguments.configPath}\n` +
+            chalk.yellow("Alternatively, the `--generate` parameter was specified for the main YAML"),
+        ),
+      );
     }
-    if (validateJsonWithSchema(jsonDoc, SeedDocumentTB)) {
-      await downloadAndSaveAbis(jsonDoc);
-      await doGenerateBoilerplate(g_Args.configPath, jsonDoc);
+    if (validateJsonWithSchema(jsonDocument, SeedDocumentTB)) {
+      await downloadAndSaveAbis(jsonDocument);
+      await doGenerateBoilerplate(g_Arguments.configPath, jsonDocument);
     }
   } else {
-    if (validateJsonWithSchema(jsonDoc, SeedDocumentTB, { silent: true })) {
-      logErrorAndExit(chalk.yellow(`A seed YAML was specified, but a main YAML was expected: ${g_Args.configPath}`));
+    if (validateJsonWithSchema(jsonDocument, SeedDocumentTB, { silent: true })) {
+      logErrorAndExit(
+        chalk.yellow(`A seed YAML was specified, but a main YAML was expected: ${g_Arguments.configPath}\n`) +
+          chalk.yellow("Alternatively, the `--generate` parameter was not specified for the seed YAML"),
+      );
     }
-    if (validateJsonWithSchema(jsonDoc, EntireDocumentTB)) {
-      if (g_Args.abi) {
-        downloadAndCheckAbis(jsonDoc);
+    if (validateJsonWithSchema(jsonDocument, EntireDocumentTB)) {
+      if (g_Arguments.abi) {
+        downloadAndCheckAbis(jsonDocument);
       }
-      await doChecks(jsonDoc);
+      await doChecks(jsonDocument);
     }
   }
 }
 
+// eslint-disable-next-line unicorn/prefer-top-level-await
 main().catch((error) => {
   logError(error);
   process.exitCode = 1;
