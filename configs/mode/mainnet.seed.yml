@@ -18,4 +18,4 @@ l1:
 l2:
   rpcUrl: https://mainnet.mode.network
   explorerHostname: explorer.mode.network
-  # explorerTokenEnv: ETHERSCAN_MODE_TOKEN
+  explorerTokenEnv: ETHERSCAN_MODE_TOKEN
