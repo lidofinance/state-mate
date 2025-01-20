@@ -137,19 +137,17 @@ function _findAbiPath(
     fs.existsSync(path.join(g_Arguments.abiDirPath, variantPath)),
   );
   if (!abiFileName) {
-    const abiDirectoryContent = fs.readdirSync(g_Arguments.abiDirPath);
-    abiFileName = abiDirectoryContent.find((fileName) => {
-      const match = fileName.match(/0x[0-9a-fA-F]{40}/);
-      if (!match) return;
+    try {
+      const abiDirectoryContent = fs.readdirSync(g_Arguments.abiDirPath);
 
-      const address = match[0];
-
-      const newFileName = fileName.replace(address, address.toLowerCase());
-      //Is renaming required?
-      return abiVariantsName.find((variantName) => {
-        return newFileName === variantName;
+      abiFileName = abiDirectoryContent.find((fileName) => {
+        return abiVariantsName.find((variantName) => {
+          return fileName === variantName;
+        });
       });
-    });
+    } catch (error) {
+      logErrorAndExit(`Failed to read ${chalk.yellow(g_Arguments.abiDirPath)}:\n ${printError(error)}`);
+    }
   }
   if (!abiFileName && shouldThrow) {
     return _generateAbiNotFoundError(abiVariantsName);
@@ -157,7 +155,37 @@ function _findAbiPath(
 
   return abiFileName ? path.join(g_Arguments.abiDirPath, abiFileName) : undefined;
 }
+export function renameAllAbiToLowerCase() {
+  try {
+    const abiDirectoryContent = fs.readdirSync(g_Arguments.abiDirPath);
 
+    for (const fileName of abiDirectoryContent) {
+      _renameAbiIfNeed(fileName);
+    }
+  } catch (error) {
+    logErrorAndExit(`Failed to read ${chalk.yellow(g_Arguments.abiDirPath)}:\n ${printError(error)}`);
+  }
+}
+
+function _renameAbiIfNeed(fileName: string): void {
+  const match = fileName.match(/0x[0-9a-fA-F]{40}/);
+  if (!match) return;
+
+  const address = match[0];
+
+  const newFileName = fileName.replace(address, address.toLowerCase());
+
+  if (fileName !== newFileName) {
+    try {
+      fs.renameSync(path.resolve(g_Arguments.abiDirPath, fileName), path.resolve(g_Arguments.abiDirPath, newFileName));
+      log(`The ABI successfully was renamed from ${chalk.yellow(fileName)} to ${chalk.yellow(newFileName)}`);
+    } catch (error) {
+      logError(
+        `Failed to rename the ABI ${chalk.yellow(fileName)} to ${chalk.yellow(newFileName)}:\n${printError(error)}`,
+      );
+    }
+  }
+}
 function _getAbiFilePathByDefault(contractName: string, address?: string) {
   const abiFileName = address ? `${contractName}-${address}.json` : `${contractName}.json`;
 

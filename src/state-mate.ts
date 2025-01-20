@@ -11,7 +11,7 @@ import chalk from "chalk";
 import { JsonRpcProvider } from "ethers";
 import * as YAML from "yaml";
 
-import { checkAllAbiForDiffs, saveAllAbi } from "./abi-provider";
+import { checkAllAbiForDiffs, renameAllAbiToLowerCase, saveAllAbi } from "./abi-provider";
 import { doGenerateBoilerplate } from "./boilerplate-generator";
 import { parseCmdLineArguments as parseCmdLineArguments } from "./cli-parser";
 import { printError, readUrlOrFromEnvironment as readUrlOrFromEnvironment } from "./common";
@@ -218,7 +218,7 @@ export async function main() {
   if (g_Arguments.schemas) {
     generateBothSchemas();
   }
-
+  renameAllAbiToLowerCase();
   const jsonDocument = loadStateFromYaml(g_Arguments.configPath);
 
   if (g_Arguments.generate) {
