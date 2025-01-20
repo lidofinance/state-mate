@@ -15,7 +15,7 @@
     "lint:fix": "yarn lint --fix",
     "format": "prettier . --ignore-path .gitignore --check",
     "format:fix": "prettier . --ignore-path .gitignore --write",
-    "prepare": "husky"
+    "postinstall": "husky"
   },
   "lint-staged": {
     "./**.{ts,md,json}": [
