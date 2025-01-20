@@ -8,7 +8,7 @@ import { Contract, JsonRpcProvider } from "ethers";
 import * as YAML from "yaml";
 
 import { loadAbiFromFile } from "./abi-provider";
-import { getNonMutables, readUrlOrFromEnvironment as readUrlOrFromEnvironment, Ef } from "./common";
+import { getNonMutables, readUrlOrFromEnvironment as readUrlOrFromEnvironment, Ef, printError } from "./common";
 import { collectStaticCallResults, loadContract, loadContractInfoFromExplorer } from "./explorer-provider";
 import { logErrorAndExit, log } from "./logger";
 import { g_Arguments as g_Arguments } from "./state-mate";
@@ -19,7 +19,12 @@ const REPLACE_ME_PLACEHOLDER = "REPLACEME";
 const YML = "yml";
 
 export async function doGenerateBoilerplate(seedConfigPath: string, jsonDocument: SeedDocument) {
-  const seedDocument = YAML.parseDocument(fs.readFileSync(seedConfigPath, "utf8"));
+  let seedDocument: unknown;
+  try {
+    seedDocument = YAML.parseDocument(fs.readFileSync(seedConfigPath, "utf8"));
+  } catch (error) {
+    logErrorAndExit(`Failed to read ${chalk.yellow(seedConfigPath)}\n: ${printError(error)}`);
+  }
   const document = new YAML.Document(seedDocument);
 
   await _iterateDeployedAddresses(document, jsonDocument, async (context: DeployedAddressInfo) => {

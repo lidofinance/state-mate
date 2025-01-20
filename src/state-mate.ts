@@ -61,8 +61,9 @@ function loadStateFromYaml(configPath: string): unknown {
     return typeof v === "bigint" ? String(v) : v;
   };
   const file = path.resolve(configPath);
-  const configContent = fs.readFileSync(file, "utf8");
   try {
+    const configContent = fs.readFileSync(file, "utf8");
+
     return YAML.parse(configContent, reviver, { schema: "core", intAsBigInt: true });
   } catch (error) {
     logErrorAndExit(`Failed to convert the YAML file ${chalk.magenta(configPath)} to JSON:\n${printError(error)}`);

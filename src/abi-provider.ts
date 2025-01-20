@@ -6,7 +6,7 @@ import chalk from "chalk";
 import jsonDiff from "json-diff";
 
 import { printError } from "./common";
-import { log, LogCommand, logErrorAndExit, WARNING_MARK } from "./logger";
+import { log, LogCommand, logError, logErrorAndExit, WARNING_MARK } from "./logger";
 import { g_Arguments } from "./state-mate";
 import { Abi, ContractInfo, isValidAbi } from "./types";
 
@@ -48,7 +48,7 @@ async function _saveAbiIfNotExist(contractName: string, address: string, abiFrom
   const abiPath = _findAbiPath(contractName, address);
 
   if (abiPath) {
-    const differences: string = _getJsonDiff(abiPath, abiFromExplorer);
+    const differences = _getJsonDiff(abiPath, abiFromExplorer);
     if (!differences) {
       log(
         `The ABI already exists and fully matches the one from the explorer: ${chalk.magenta(path.basename(abiPath))} `,
@@ -91,7 +91,7 @@ export function _checkOneAbiForDiffs(contractName: string, address: string, abiF
 
   try {
     const abiPath = _findAbiPath(contractName, address, { shouldThrow: true });
-    const diff: string = _getJsonDiff(abiPath, abiFromExplorer);
+    const diff = _getJsonDiff(abiPath, abiFromExplorer);
     if (diff) {
       logHandle.warning(`FAILED\n${diff}`);
     } else {
@@ -102,10 +102,15 @@ export function _checkOneAbiForDiffs(contractName: string, address: string, abiF
   }
 }
 
-function _getJsonDiff(abiPath: string, abiFromExplorer: Abi): string {
-  const abiFile = fs.readFileSync(abiPath, "utf8");
-  const savedAbi: unknown = JSON.parse(abiFile);
-  return jsonDiff.diffString(savedAbi, abiFromExplorer);
+function _getJsonDiff(abiPath: string, abiFromExplorer: Abi): string | undefined {
+  try {
+    const abiFile = fs.readFileSync(abiPath, "utf8");
+    const savedAbi: unknown = JSON.parse(abiFile);
+    return jsonDiff.diffString(savedAbi, abiFromExplorer);
+  } catch (error) {
+    logError(`Failed to read ${chalk.yellow(abiPath)}:\n${printError(error)}`);
+    return undefined;
+  }
 }
 
 function _findAbiPath(contractName: string, contractAddress: string, shouldThrow: { shouldThrow: true }): string;
