@@ -4,7 +4,7 @@ import { Contract, JsonRpcProvider } from "ethers";
 import { printError } from "./common";
 import { EtherscanHandler } from "./explorers/etherscan";
 import { ModeHandler } from "./explorers/mode";
-import { log, logError, logErrorAndExit, logReplaceLine, WARNING_MARK } from "./logger";
+import { logError, logErrorAndExit, logReplaceLine } from "./logger";
 import {
   Abi,
   ContractInfo,
