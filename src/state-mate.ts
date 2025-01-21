@@ -111,13 +111,6 @@ function validateJsonWithSchema<T extends TSchema>(
 }
 
 async function doChecks(jsonDocument: EntireDocument) {
-  if (
-    !fs.existsSync(g_Arguments.abiDirPath) &&
-    (await askUserToConfirm({ message: `No ABI directory found at ${g_Arguments.abiDirPath}.Download ? ` }))
-  ) {
-    await downloadAndCheckAllAbi(jsonDocument);
-  }
-
   for (const [sectionTitle, section] of Object.entries(jsonDocument)) {
     if (isTypeOfTB(section, NetworkSectionTB)) await checkNetworkSection(sectionTitle, section);
   }

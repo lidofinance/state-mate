@@ -86,7 +86,7 @@ async function _checkAbi(contractName: string, address: string, abiFromExplorer:
 
 async function _askUserToOverwrite(abiPath: string, differences: string) {
   const question =
-    `\nThe ABI already exists: ${chalk.magenta(path.basename(abiPath))}` +
+    `\nThe ABI already exists: ${chalk.magenta(path.basename(abiPath))} ` +
     `but it differs from the one from the explorer:\n${differences}\nOverwrite? `;
 
   const userAgreedToOverwrite = await askUserToConfirm({ message: question });
@@ -150,6 +150,7 @@ function _findAbiPath(
   return abiFileName ? path.join(g_Arguments.abiDirPath, abiFileName) : undefined;
 }
 export function renameAllAbiToLowerCase() {
+  if (!fs.existsSync(g_Arguments.abiDirPath)) return;
   try {
     const abiDirectoryContent = fs.readdirSync(g_Arguments.abiDirPath);
 
