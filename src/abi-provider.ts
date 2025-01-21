@@ -6,20 +6,11 @@ import chalk from "chalk";
 import jsonDiff from "json-diff";
 
 import { printError } from "./common";
-import { log, LogCommand, logError, logErrorAndExit, WARNING_MARK } from "./logger";
+import { log, LogCommand, logError, logErrorAndExit } from "./logger";
 import { g_Arguments } from "./state-mate";
 import { Abi, ContractInfo, isValidAbi } from "./types";
 
-export function loadAbiFromFile(contractName: string, address: string): Abi | never {
-  address = address.toLowerCase();
-  let abiPath = undefined;
-
-  try {
-    abiPath = _findAbiPath(contractName, address, { shouldThrow: true });
-  } catch (error) {
-    logErrorAndExit(`Error finding ABI file for contract 
-        ${contractName} in ${g_Arguments.abiDirPath}: ${printError(error)}`);
-  }
+function loadAbiFromAbiPath(abiPath: string): Abi | never {
   try {
     const abiFileContent = fs.readFileSync(abiPath, "utf8");
     const abiJson: unknown = JSON.parse(abiFileContent);
@@ -34,82 +25,77 @@ export function loadAbiFromFile(contractName: string, address: string): Abi | ne
   }
 }
 
-export async function saveAllAbi(contractInfo: ContractInfo) {
+export function loadAbiFromFile(contractName: string, address: string): Abi | never {
+  address = address.toLowerCase();
+  let abiPath = undefined;
+
+  try {
+    abiPath = _findAbiPath(contractName, address, { shouldThrow: true });
+  } catch (error) {
+    logErrorAndExit(`Error finding ABI file for contract 
+        ${contractName} in ${g_Arguments.abiDirPath}: ${printError(error)}`);
+  }
+  return loadAbiFromAbiPath(abiPath);
+}
+
+export async function checkAllAbi(contractInfo: ContractInfo) {
   const { contractName, address, abi, implementation } = contractInfo;
-  await _saveAbiIfNotExist(contractName, address, abi);
+  await _checkAbi(contractName, address, abi);
   if (implementation) {
-    await _saveAbiIfNotExist(implementation.contractName, address, implementation.abi);
-    await _saveAbiIfNotExist(implementation.contractName, implementation.address, implementation.abi);
+    await _checkAbi(implementation.contractName, address, implementation.abi);
+    await _checkAbi(implementation.contractName, implementation.address, implementation.abi);
   }
 }
 
-async function _saveAbiIfNotExist(contractName: string, address: string, abiFromExplorer: Abi): Promise<void> {
+async function _checkAbi(contractName: string, address: string, abiFromExplorer: Abi): Promise<void> {
   address = address.toLowerCase();
-  const abiPath = _findAbiPath(contractName, address);
+  const logHandler = new LogCommand(`ABI ${chalk.magenta(`${contractName}-${address}.json`)}`);
+  let isNeededToSaveAbi = true;
+  const abiExistedPath = _findAbiPath(contractName, address, { shouldThrow: false });
 
-  if (abiPath) {
-    const differences = _getJsonDiff(abiPath, abiFromExplorer);
-    if (!differences) {
-      log(
-        `The ABI already exists and fully matches the one from the explorer: ${chalk.magenta(path.basename(abiPath))} `,
-      );
-      return;
-    }
-    if (
-      !(await askUserToConfirm({
-        message: `The ABI already exists: ${chalk.magenta(path.basename(abiPath))}, but it differs from the one from the explorer. Overwrite?`,
-      }))
-    ) {
-      log(
-        `\n ${WARNING_MARK}${WARNING_MARK}${WARNING_MARK} ` +
-          `${chalk.yellow(`The ABI ${path.basename(abiPath)} will not be overwritten as per user's decision`)}\n`,
-      );
-      return;
-    }
+  if (abiExistedPath) {
+    isNeededToSaveAbi = await _isNeededToOverwriteExistedAbi(abiExistedPath, abiFromExplorer);
   }
-  const abiFileName = abiPath || _getAbiFilePathByDefault(contractName, address);
+
+  if (isNeededToSaveAbi) {
+    const abiFileNameToSave = abiExistedPath || _defaultAbiFilePath(contractName, address);
+    _saveAbi(abiFileNameToSave, abiFromExplorer);
+    logHandler.success(abiExistedPath ? "Overwritten" : "Saved");
+  }
+  async function _isNeededToOverwriteExistedAbi(abiExistedPath: string, abiFromExplorer: Abi): Promise<boolean> {
+    let isNeededToOverwriteAbi = false;
+
+    const savedAbi = loadAbiFromAbiPath(abiExistedPath);
+    const differences = jsonDiff.diffString(savedAbi, abiFromExplorer);
+
+    if (differences) {
+      isNeededToOverwriteAbi = await _askUserToOverwrite(abiExistedPath, differences);
+      if (!isNeededToOverwriteAbi) {
+        logHandler.warning("Overwriting was skipped by user");
+      }
+    } else {
+      logHandler.success("Matched");
+    }
+
+    return isNeededToOverwriteAbi;
+  }
+}
+
+async function _askUserToOverwrite(abiPath: string, differences: string) {
+  const question =
+    `\nThe ABI already exists: ${chalk.magenta(path.basename(abiPath))}` +
+    `but it differs from the one from the explorer:\n${differences}\nOverwrite? `;
+
+  const userAgreedToOverwrite = await askUserToConfirm({ message: question });
+
+  return userAgreedToOverwrite;
+}
+
+function _saveAbi(abiFileName: string, abiFromExplorer: Abi) {
   try {
     fs.writeFileSync(abiFileName, JSON.stringify(abiFromExplorer, undefined, 2));
-    log(`The ABI has been saved at ${chalk.magenta(abiFileName)}`);
   } catch (error) {
     logErrorAndExit(`Error writing file at ${chalk.magenta(abiFileName)}:" ${printError(error)}`);
-  }
-}
-
-export function checkAllAbiForDiffs(contractInfo: ContractInfo) {
-  const { contractName, address, abi, implementation } = contractInfo;
-  _checkOneAbiForDiffs(contractName, address, abi);
-  if (implementation) {
-    _checkOneAbiForDiffs(implementation.contractName, address, implementation.abi);
-    _checkOneAbiForDiffs(implementation.contractName, implementation.address, implementation.abi);
-  }
-}
-
-export function _checkOneAbiForDiffs(contractName: string, address: string, abiFromExplorer: Abi) {
-  address = address.toLowerCase();
-  const logHandle = new LogCommand(`${contractName.padEnd(30)} (${address})`);
-
-  try {
-    const abiPath = _findAbiPath(contractName, address, { shouldThrow: true });
-    const diff = _getJsonDiff(abiPath, abiFromExplorer);
-    if (diff) {
-      logHandle.warning(`FAILED\n${diff}`);
-    } else {
-      logHandle.success("OK");
-    }
-  } catch (error) {
-    logHandle.failure(`Failed\n${printError(error)}`);
-  }
-}
-
-function _getJsonDiff(abiPath: string, abiFromExplorer: Abi): string | undefined {
-  try {
-    const abiFile = fs.readFileSync(abiPath, "utf8");
-    const savedAbi: unknown = JSON.parse(abiFile);
-    return jsonDiff.diffString(savedAbi, abiFromExplorer);
-  } catch (error) {
-    logError(`Failed to read ${chalk.yellow(abiPath)}:\n${printError(error)}`);
-    return undefined;
   }
 }
 
@@ -191,7 +177,7 @@ function _renameAbiIfNeed(fileName: string): void {
     }
   }
 }
-function _getAbiFilePathByDefault(contractName: string, address?: string) {
+function _defaultAbiFilePath(contractName: string, address?: string) {
   const abiFileName = address ? `${contractName}-${address}.json` : `${contractName}.json`;
 
   return path.join(g_Arguments.abiDirPath, abiFileName);

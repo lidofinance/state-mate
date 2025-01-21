@@ -11,7 +11,7 @@ import chalk from "chalk";
 import { JsonRpcProvider } from "ethers";
 import * as YAML from "yaml";
 
-import { checkAllAbiForDiffs, renameAllAbiToLowerCase, saveAllAbi } from "./abi-provider";
+import { renameAllAbiToLowerCase, checkAllAbi } from "./abi-provider";
 import { doGenerateBoilerplate } from "./boilerplate-generator";
 import { parseCmdLineArguments as parseCmdLineArguments } from "./cli-parser";
 import { printError, readUrlOrFromEnvironment as readUrlOrFromEnvironment } from "./common";
@@ -115,7 +115,7 @@ async function doChecks(jsonDocument: EntireDocument) {
     !fs.existsSync(g_Arguments.abiDirPath) &&
     (await askUserToConfirm({ message: `No ABI directory found at ${g_Arguments.abiDirPath}.Download ? ` }))
   ) {
-    await downloadAndSaveAbis(jsonDocument);
+    await downloadAndCheckAllAbi(jsonDocument);
   }
 
   for (const [sectionTitle, section] of Object.entries(jsonDocument)) {
@@ -134,16 +134,11 @@ async function doChecks(jsonDocument: EntireDocument) {
   }
 }
 
-async function downloadAndSaveAbis(jsonDocument: SeedDocument) {
+async function downloadAndCheckAllAbi(jsonDocument: SeedDocument) {
   const abiDirectoryPath = path.resolve(path.dirname(g_Arguments.configPath), "abi");
   fs.mkdirSync(abiDirectoryPath, { recursive: true });
-
-  await iterateLoadedContracts(jsonDocument, saveAllAbi);
-}
-
-async function downloadAndCheckAbis<T extends EntireDocument | SeedDocument>(jsonDocument: T) {
-  logHeader1(`ABI checking has been activated`);
-  await iterateLoadedContracts(jsonDocument, checkAllAbiForDiffs);
+  logHeader1("ABI checking");
+  await iterateLoadedContracts(jsonDocument, checkAllAbi);
 }
 
 async function iterateLoadedContracts<T extends EntireDocument | SeedDocument>(
@@ -216,6 +211,8 @@ function generateBothSchemas() {
 export async function main() {
   g_Arguments = parseCmdLineArguments();
 
+  renameAllAbiToLowerCase();
+
   if (g_Arguments.schemas) {
     generateBothSchemas();
   }
@@ -232,7 +229,7 @@ export async function main() {
       );
     }
     if (validateJsonWithSchema(jsonDocument, SeedDocumentTB)) {
-      await downloadAndSaveAbis(jsonDocument);
+      await downloadAndCheckAllAbi(jsonDocument);
       await doGenerateBoilerplate(g_Arguments.configPath, jsonDocument);
     }
   } else {
@@ -243,10 +240,7 @@ export async function main() {
       );
     }
     if (validateJsonWithSchema(jsonDocument, EntireDocumentTB)) {
-      if (g_Arguments.abi) {
-        renameAllAbiToLowerCase();
-        downloadAndCheckAbis(jsonDocument);
-      }
+      await downloadAndCheckAllAbi(jsonDocument);
       await doChecks(jsonDocument);
     }
   }
