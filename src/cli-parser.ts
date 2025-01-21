@@ -24,6 +24,7 @@ export function parseCmdLineArguments() {
       `only checks to do, e.g. 'l2/proxyAdmin/${Ef.checks}/owner', 'l1', 'l1/controller'`,
     )
     .option("--generate", "generate a populated config from the seed one")
+    .option("--abi", "check that the saved ABIs and explorer ABIs are equal")
     .option("--schemas", "generate main and seed JSON-schemas")
     .parse();
 
@@ -52,6 +53,7 @@ export function parseCmdLineArguments() {
     checkOnly,
     checkOnlyCmdArg: options.only ? String(options.only) : undefined,
     generate: options.generate ? String(options.generate) : undefined,
+    abi: options.abi ? String(options.abi) : undefined,
     schemas: options.schemas ? String(options.schemas) : undefined,
   };
 }

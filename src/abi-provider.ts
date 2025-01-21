@@ -32,8 +32,11 @@ export function loadAbiFromFile(contractName: string, address: string): Abi | ne
   try {
     abiPath = _findAbiPath(contractName, address, { shouldThrow: true });
   } catch (error) {
-    logErrorAndExit(`Error finding ABI file for contract 
-        ${contractName} in ${g_Arguments.abiDirPath}: ${printError(error)}`);
+    logErrorAndExit(
+      `Error finding ABI file for contract 
+        ${contractName} in ${g_Arguments.abiDirPath}: ${printError(error)}\n\n` +
+        chalk.yellow.bold(`Try running with the 'abi' option to download the unnecessary ABI`),
+    );
   }
   return loadAbiFromAbiPath(abiPath);
 }

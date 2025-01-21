@@ -134,7 +134,7 @@ async function doChecks(jsonDocument: EntireDocument) {
   }
 }
 
-async function downloadAndCheckAllAbi(jsonDocument: SeedDocument) {
+async function downloadAndCheckAllAbi<T extends EntireDocument | SeedDocument>(jsonDocument: T) {
   const abiDirectoryPath = path.resolve(path.dirname(g_Arguments.configPath), "abi");
   fs.mkdirSync(abiDirectoryPath, { recursive: true });
   logHeader1("ABI checking");
@@ -240,7 +240,9 @@ export async function main() {
       );
     }
     if (validateJsonWithSchema(jsonDocument, EntireDocumentTB)) {
-      await downloadAndCheckAllAbi(jsonDocument);
+      if (g_Arguments.abi) {
+        await downloadAndCheckAllAbi(jsonDocument);
+      }
       await doChecks(jsonDocument);
     }
   }
