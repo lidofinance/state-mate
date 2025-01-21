@@ -181,7 +181,7 @@ const DeployedSectionTB = Type.Readonly(
 export const EntireDocumentTB = Type.Readonly(
   Type.Object(
     {
-      parameters: PlainValueOrArray,
+      parameters: Type.Optional(PlainValueOrArray),
       roles: Type.Optional(Type.Union([EthereumStringArrayTB, Type.Null()])),
       misc: Type.Optional(PlainValueOrArray),
       deployed: DeployedSectionTB,

@@ -4110,7 +4110,6 @@
     }
   },
   "required": [
-    "parameters",
     "deployed",
     "l1"
   ]
