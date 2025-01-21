@@ -3,7 +3,6 @@ import path from "node:path";
 
 import "dotenv/config";
 
-import { confirm as askUserToConfirm } from "@inquirer/prompts";
 import { Static, TObject, TSchema } from "@sinclair/typebox";
 import Ajv, { ValidateFunction } from "ajv";
 import addFormats from "ajv-formats";
