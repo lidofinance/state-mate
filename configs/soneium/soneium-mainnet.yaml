@@ -104,7 +104,7 @@ l1:
           result: false
 
 l2:
-  rpcUrl: L2_MAINNET_RPC_URL
+  rpcUrl: SONEIUM_MAINNET_RPC_URL
   contracts:
     governanceExecutor:
       name: OptimismBridgeExecutor
