@@ -10,22 +10,25 @@ import * as YAML from "yaml";
 import { loadAbiFromFile } from "./abi-provider";
 import { getNonMutables, readUrlOrFromEnvironment as readUrlOrFromEnvironment, Ef, printError } from "./common";
 import { collectStaticCallResults, loadContract, loadContractInfoFromExplorer } from "./explorer-provider";
-import { logErrorAndExit, log } from "./logger";
+import { logErrorAndExit, log, logError } from "./logger";
 import { g_Arguments as g_Arguments } from "./state-mate";
 import { ContractEntry, EntireDocument, ExplorerSectionTB, isTypeOfTB, NetworkSection, SeedDocument } from "./typebox";
 import { MethodCallResults, Abi } from "./types";
 
 const REPLACE_ME_PLACEHOLDER = "REPLACEME";
 const YML = "yml";
+const MAIN_SCHEMA_NAME = "main-schema.json";
 
 export async function doGenerateBoilerplate(seedConfigPath: string, jsonDocument: SeedDocument) {
-  let seedDocument: unknown;
+  let seedYaml: unknown;
   try {
-    seedDocument = YAML.parseDocument(fs.readFileSync(seedConfigPath, "utf8"));
+    const seedDocument = fs.readFileSync(seedConfigPath, "utf8");
+
+    seedYaml = YAML.parseDocument(seedDocument);
   } catch (error) {
     logErrorAndExit(`Failed to read ${chalk.yellow(seedConfigPath)}\n: ${printError(error)}`);
   }
-  const document = new YAML.Document(seedDocument);
+  const document = new YAML.Document(seedYaml);
 
   await _iterateDeployedAddresses(document, jsonDocument, async (context: DeployedAddressInfo) => {
     const { address, deployedNode, explorerHostname, rpcUrl, sectionName, explorerKey } = context;
@@ -95,8 +98,28 @@ export async function doGenerateBoilerplate(seedConfigPath: string, jsonDocument
     path.dirname(seedConfigPath),
     `${path.basename(seedConfigPath, "." + YML)}.generated.${YML}`,
   );
-  fs.writeFileSync(generatedFilePath, document.toString());
-  log(`Generated state config: ${chalk.bold(generatedFilePath)}`);
+  writeGeneratedYaml(generatedFilePath, document.toString());
+}
+
+function writeGeneratedYaml(filePath: string, fileContent: string) {
+  const generatedDocument = addSchemaIntoYaml(filePath, fileContent.toString());
+  try {
+    fs.writeFileSync(filePath, generatedDocument);
+    log(`Generated state config: ${chalk.bold(filePath)}`);
+  } catch (error) {
+    logError(`Failed to write generated YAML-file ${chalk.yellow(filePath)}:\n${printError(error)}`);
+  }
+}
+
+function addSchemaIntoYaml(filePath: string, fileContent: string): string {
+  const schemaPath = path.join(path.dirname(__dirname), "schemas");
+  const relativePathToMainSchema = path.join(path.relative(path.dirname(filePath), schemaPath), MAIN_SCHEMA_NAME);
+  const regex = /\$schema=.*/;
+  fileContent = regex.test(fileContent)
+    ? fileContent.replace(regex, `$schema=${relativePathToMainSchema}`)
+    : `# yaml-language-server: $schema=${relativePathToMainSchema}\n` + fileContent;
+
+  return fileContent;
 }
 
 type DeployedAddressInfo = Pick<NetworkSection, "explorerHostname" | "rpcUrl"> &
