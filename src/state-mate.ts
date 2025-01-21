@@ -219,7 +219,7 @@ export async function main() {
   if (g_Arguments.schemas) {
     generateBothSchemas();
   }
-  renameAllAbiToLowerCase();
+
   const jsonDocument = loadStateFromYaml(g_Arguments.configPath);
 
   if (g_Arguments.generate) {
@@ -244,6 +244,7 @@ export async function main() {
     }
     if (validateJsonWithSchema(jsonDocument, EntireDocumentTB)) {
       if (g_Arguments.abi) {
+        renameAllAbiToLowerCase();
         downloadAndCheckAbis(jsonDocument);
       }
       await doChecks(jsonDocument);
