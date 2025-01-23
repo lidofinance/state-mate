@@ -203,7 +203,9 @@ function generateBothSchemas() {
 export async function main() {
   g_Arguments = parseCmdLineArguments();
 
-  renameAllAbiToLowerCase();
+  if (g_Arguments.abi) {
+    renameAllAbiToLowerCase();
+  }
 
   if (g_Arguments.schemas) {
     generateBothSchemas();
