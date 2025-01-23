@@ -9,6 +9,8 @@ artifacts
 
 # IDE
 .vscode
+!.vscode/settings.json
+!.vscode/extensions.json
 
 # MacOS
 .DS_store
