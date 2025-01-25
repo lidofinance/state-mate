@@ -33,7 +33,7 @@ async function modeGetContractInfoCallback(
 
   const { ContractName, ImplementationAddress } = response.result[0];
 
-  let implementation = undefined;
+  let implementation;
   if (ImplementationAddress) {
     implementation = await loadContractInfo(explorer, ImplementationAddress, explorerHostname, explorerKey);
   }

@@ -25,7 +25,6 @@ export class ImplementationChecksSectionValidator extends ChecksSectionValidator
       const skippedChecks: RegularChecks = {};
 
       for (const x of allNonMutable) {
-        // eslint-disable-next-line unicorn/no-null
         skippedChecks[x.name] = null;
       }
       await super.validateSection(

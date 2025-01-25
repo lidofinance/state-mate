@@ -47,7 +47,7 @@ async function etherRateLimitHandler(
     return httpGetAsync(sourcesUrl);
   }
 
-  return undefined;
+  return null;
 }
 
 async function etherGetContractInfoCallback(
@@ -64,7 +64,7 @@ async function etherGetContractInfoCallback(
 
   const { ContractName, Implementation: implementationAddress } = response.result[0];
 
-  let implementation = undefined;
+  let implementation;
   if (implementationAddress) {
     implementation = await loadContractInfo(explorer, implementationAddress, explorerHostname, explorerKey);
   }

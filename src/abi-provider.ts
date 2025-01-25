@@ -27,13 +27,13 @@ function loadAbiFromAbiPath(abiPath: string): Abi | never {
 
 export function loadAbiFromFile(contractName: string, address: string): Abi | never {
   address = address.toLowerCase();
-  let abiPath = undefined;
+  let abiPath;
 
   try {
     abiPath = _findAbiPath(contractName, address, { shouldThrow: true });
   } catch (error) {
     logErrorAndExit(
-      `Error finding ABI file for contract 
+      `Error finding ABI file for contract
         ${contractName} in ${g_Arguments.abiDirPath}: ${printError(error)}\n\n` +
         chalk.yellow.bold(`Try running with the 'abi' option to download the unnecessary ABI`),
     );
@@ -96,7 +96,7 @@ async function _askUserToOverwrite(abiPath: string, differences: string) {
 
 function _saveAbi(abiFileName: string, abiFromExplorer: Abi) {
   try {
-    fs.writeFileSync(abiFileName, JSON.stringify(abiFromExplorer, undefined, 2));
+    fs.writeFileSync(abiFileName, JSON.stringify(abiFromExplorer, null, 2));
   } catch (error) {
     logErrorAndExit(`Error writing file at ${chalk.magenta(abiFileName)}:" ${printError(error)}`);
   }
@@ -108,14 +108,14 @@ function _findAbiPath(
   contractName: string,
   contractAddress: string,
   shouldThrow?: { shouldThrow: false },
-): string | undefined;
+): string | null;
 
 function _findAbiPath(
   contractName: string,
   contractAddress: string,
   { shouldThrow }: { shouldThrow?: boolean } = { shouldThrow: false },
-): string | undefined {
-  if (!contractName || !g_Arguments.abiDirPath) return undefined;
+): string | null {
+  if (!contractName || !g_Arguments.abiDirPath) return null;
 
   contractAddress = contractAddress.toLowerCase();
   // prettier-ignore
@@ -147,7 +147,7 @@ function _findAbiPath(
     return _generateAbiNotFoundError(abiVariantsName);
   }
 
-  return abiFileName ? path.join(g_Arguments.abiDirPath, abiFileName) : undefined;
+  return abiFileName ? path.join(g_Arguments.abiDirPath, abiFileName) : null;
 }
 export function renameAllAbiToLowerCase() {
   if (!fs.existsSync(g_Arguments.abiDirPath)) return;

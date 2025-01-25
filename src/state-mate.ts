@@ -188,7 +188,7 @@ function generateBothSchemas() {
   const saveSchema = (fileName: string, schema: TObject) => {
     const schemasFilePath = path.resolve(schemasPath, fileName);
     try {
-      fs.writeFileSync(schemasFilePath, JSON.stringify(schema, undefined, 2), "utf8");
+      fs.writeFileSync(schemasFilePath, JSON.stringify(schema, null, 2), "utf8");
       logHeader1(`The JSON Schema has been saved to ${chalk.green(schemasFilePath)}`);
     } catch (error) {
       logErrorAndExit(

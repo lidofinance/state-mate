@@ -5,15 +5,13 @@ import { program } from "commander";
 import { Ef } from "./common";
 import { logErrorAndExit } from "./logger";
 
-type CheckOnlyOptionType =
-  | undefined
-  | {
-      section: string;
-      contract?: string;
-      checksType?: string;
-      method?: string;
-      schemas?: string;
-    };
+type CheckOnlyOptionType = null | {
+  section: string;
+  contract?: string;
+  checksType?: string;
+  method?: string;
+  schemas?: string;
+};
 
 export function parseCmdLineArguments() {
   program
@@ -30,7 +28,7 @@ export function parseCmdLineArguments() {
 
   const configPath = program.args[0];
   const options = program.opts();
-  let checkOnly: CheckOnlyOptionType;
+  let checkOnly: CheckOnlyOptionType = null;
   if (options.only) {
     const checksPath = String(options.only).split("/");
     if (checksPath.length === 0 || checksPath.length > 4) {
@@ -51,9 +49,9 @@ export function parseCmdLineArguments() {
     configPath,
     abiDirPath: path.join(path.dirname(configPath), "abi"),
     checkOnly,
-    checkOnlyCmdArg: options.only ? String(options.only) : undefined,
-    generate: options.generate ? String(options.generate) : undefined,
-    abi: options.abi ? String(options.abi) : undefined,
-    schemas: options.schemas ? String(options.schemas) : undefined,
+    checkOnlyCmdArg: options.only,
+    generate: options.generate,
+    abi: options.abi,
+    schemas: options.schemas,
   };
 }

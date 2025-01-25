@@ -97,7 +97,7 @@ export async function loadContractInfo(
     sourcesResponse = await explorer.requestWithRateLimit(sourcesResponse, sourcesUrl, explorerHostname);
     if (isResponseBad(sourcesResponse)) {
       logErrorAndExit(
-        `Failed to download contract info from ${explorerHostname}: ${sourcesResponse.message}\n${JSON.stringify(sourcesResponse, undefined, 2)}`,
+        `Failed to download contract info from ${explorerHostname}: ${sourcesResponse.message}\n${JSON.stringify(sourcesResponse, null, 2)}`,
       );
     }
   }

@@ -40,6 +40,7 @@ export default [
       },
     },
     rules: {
+      "unicorn/no-null": "off",
       "unicorn/prefer-module": "off",
       "unicorn/no-process-exit": "off",
       "unicorn/no-object-as-default-parameter": "off",
