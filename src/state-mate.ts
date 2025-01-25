@@ -16,7 +16,7 @@ import { parseCmdLineArguments as parseCmdLineArguments } from "./cli-parser";
 import { printError, readUrlOrFromEnvironment as readUrlOrFromEnvironment } from "./common";
 import { loadContractInfoFromExplorer } from "./explorer-provider";
 import { FAILURE_MARK, log, logError, logErrorAndExit, logHeader1, WARNING_MARK } from "./logger";
-import { g_errors } from "./section-validators/base";
+import { g_total_checks, g_errors } from "./section-validators/base";
 import { ContractSectionValidator } from "./section-validators/contract";
 import {
   EntireDocument,
@@ -113,7 +113,7 @@ async function doChecks(jsonDocument: EntireDocument) {
   for (const [sectionTitle, section] of Object.entries(jsonDocument)) {
     if (isTypeOfTB(section, NetworkSectionTB)) await checkNetworkSection(sectionTitle, section);
   }
-
+  log(chalk.bold(`\n${g_total_checks} checks performed.`));
   if (g_errors) {
     log(`\n${FAILURE_MARK} ${chalk.bold(`${g_errors} errors found!`)} `);
     process.exit(2);

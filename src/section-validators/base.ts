@@ -19,9 +19,14 @@ import {
 import { Abi, AbiArgumentsLength } from "src/types";
 
 export let g_errors: number = 0;
+export let g_total_checks: number = 0;
 
 export function incErrors(): void {
   g_errors += 1;
+}
+
+export function incChecks(): void {
+  g_total_checks += 1;
 }
 
 export enum CheckLevel {
@@ -48,6 +53,7 @@ export abstract class SectionValidatorBase {
   public abstract validateSection(contractEntry: ContractEntry, contractAlias: string): Promise<void>;
 
   protected async _checkViewFunction(contract: Contract, method: string, staticCallCheck: StaticCallCheck) {
+    incChecks();
     if (isTypeOfTB(staticCallCheck, StaticCallResultTB)) {
       await this._checkViewResult(contract, method, staticCallCheck);
     } else if (isTypeOfTB(staticCallCheck, StaticCallMustRevertTB)) {

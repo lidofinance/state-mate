@@ -7,7 +7,7 @@ import { loadContract } from "src/explorer-provider";
 import { log, LogCommand, logHeader2, WARNING_MARK } from "src/logger";
 import { ContractEntry } from "src/typebox";
 
-import { incErrors, SectionValidatorBase } from "./base";
+import { g_total_checks, incChecks, incErrors, SectionValidatorBase } from "./base";
 
 export class OzNonEnumerableAclSectionValidator extends SectionValidatorBase {
   constructor(provider: JsonRpcProvider) {
@@ -33,6 +33,7 @@ export class OzNonEnumerableAclSectionValidator extends SectionValidatorBase {
     const rolesByHolders = new Map<string, Set<string>>();
     for (const role in contractEntry.ozNonEnumerableAcl) {
       for (const holder of contractEntry.ozNonEnumerableAcl[role]) {
+        incChecks();
         if (!rolesByHolders.has(holder)) {
           rolesByHolders.set(holder, new Set<string>());
         }
@@ -52,6 +53,7 @@ export class OzNonEnumerableAclSectionValidator extends SectionValidatorBase {
     for (const [holder, rolesExpectedOnTheHolder] of rolesByHolders) {
       for (const role in contractEntry.ozNonEnumerableAcl) {
         if (!rolesExpectedOnTheHolder.has(role)) {
+          incChecks();
           const logHandle = new LogCommand(`.hasRole(${role}, ${holder})`);
           try {
             const isRoleOnHolder: unknown = await contract.getFunction("hasRole").staticCall(role, holder);
