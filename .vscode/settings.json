@@ -6,5 +6,18 @@
   },
   "files.trimTrailingWhitespace": true,
   "typescript.validate.enable": true,
-  "cSpell.words": ["apikey", "bscscan", "esbenp", "Mutables", "Ossifiable", "REPLACEME", "typebox", "Depositable"]
+  "cSpell.words": [
+    "apikey",
+    "bscscan",
+    "Depositable",
+    "esbenp",
+    "IERC165",
+    "minato",
+    "Mutables",
+    "Ossifiable",
+    "REBASABLE",
+    "REPLACEME",
+    "SONEIUM",
+    "typebox"
+  ]
 }
