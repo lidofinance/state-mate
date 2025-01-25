@@ -1,5 +1,6 @@
-import chalk from "chalk";
+import * as readline from "node:readline";
 
+import chalk from "chalk";
 export const SUCCESS_MARK = chalk.green("✔");
 export const FAILURE_MARK = chalk.red("✘");
 export const WARNING_MARK = chalk.yellow("⚠");
@@ -12,8 +13,8 @@ export class LogCommand {
   }
 
   public printResult(statusSymbol: string, result: string): void {
-    process.stdout.cursorTo(0);
-    process.stdout.clearLine(0);
+    readline.cursorTo(process.stdout, 0);
+    readline.clearLine(process.stdout, 0);
     process.stdout.write(`${statusSymbol} ${this.description}: ${chalk.yellow(result)}\n`);
   }
 
