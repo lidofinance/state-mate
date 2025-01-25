@@ -4,7 +4,7 @@ import { Contract, JsonRpcProvider } from "ethers";
 import { printError } from "./common";
 import { EtherscanHandler } from "./explorers/etherscan";
 import { ModeHandler } from "./explorers/mode";
-import { logError, logErrorAndExit, logReplaceLine } from "./logger";
+import { log, logError, logErrorAndExit, logReplaceLine } from "./logger";
 import {
   Abi,
   ContractInfo,
@@ -39,24 +39,6 @@ export type GetContractInfoCallback = (
   explorerHostname: string,
   explorerKey?: string,
 ) => Promise<ContractInfo>;
-
-export async function safeStaticCall(
-  contract: Contract,
-  functionName: string,
-  ...arguments_: unknown[]
-): Promise<unknown> {
-  try {
-    const contractFunction = contract.getFunction(functionName);
-
-    const result = await contractFunction.staticCall(...arguments_);
-
-    return result;
-  } catch (error) {
-    logErrorAndExit(
-      `Failed to call function ${chalk.yellow(functionName)} with args:\n ${chalk.yellow(JSON.stringify(arguments_))}:\n ${printError(error)}`,
-    );
-  }
-}
 
 export async function collectStaticCallResults(
   nonMutables: AbiArgumentsLength,

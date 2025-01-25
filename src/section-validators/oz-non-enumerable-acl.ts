@@ -3,7 +3,7 @@ import { JsonRpcProvider } from "ethers";
 
 import { loadAbiFromFile } from "src/abi-provider";
 import { Ef } from "src/common";
-import { loadContract, safeStaticCall } from "src/explorer-provider";
+import { loadContract } from "src/explorer-provider";
 import { log, LogCommand, logHeader2, WARNING_MARK } from "src/logger";
 import { ContractEntry } from "src/typebox";
 
@@ -37,9 +37,9 @@ export class OzNonEnumerableAclSectionValidator extends SectionValidatorBase {
           rolesByHolders.set(holder, new Set<string>());
         }
         rolesByHolders.get(holder)?.add(role);
-        const isRoleOnHolder: unknown = await safeStaticCall(contract, "hasRole", role, holder);
         const logHandle = new LogCommand(`.hasRole(${role}, ${holder})`);
         try {
+          const isRoleOnHolder: unknown = await contract.getFunction("hasRole").staticCall(role, holder);
           assert.isTrue(isRoleOnHolder);
           logHandle.success(`${isRoleOnHolder}`);
         } catch (error) {
@@ -52,9 +52,9 @@ export class OzNonEnumerableAclSectionValidator extends SectionValidatorBase {
     for (const [holder, rolesExpectedOnTheHolder] of rolesByHolders) {
       for (const role in contractEntry.ozNonEnumerableAcl) {
         if (!rolesExpectedOnTheHolder.has(role)) {
-          const isRoleOnHolder: unknown = await safeStaticCall(contract, "hasRole", role, holder); //await contract.getFunction("hasRole").staticCall(role, holder);
           const logHandle = new LogCommand(`.hasRole(${role}, ${holder})`);
           try {
+            const isRoleOnHolder: unknown = await contract.getFunction("hasRole").staticCall(role, holder);
             assert.isFalse(isRoleOnHolder);
             logHandle.success(`${isRoleOnHolder}`);
           } catch (error) {
