@@ -50,7 +50,7 @@ export default [
       "import/no-unresolved": ["warn"],
       "import/no-absolute-path": ["warn"],
       "import/no-duplicates": ["warn"],
-      "@typescript-eslint/no-unused-vars": ["warn", { argsIgnorePattern: "^_" }],
+      "@typescript-eslint/no-unused-vars": ["warn", { varsIgnorePattern: "^_" }],
       "import/order": [
         "warn",
         {
