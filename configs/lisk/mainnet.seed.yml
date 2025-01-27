@@ -1,0 +1,21 @@
+---
+deployed:
+  l1:
+    - &l1TokenBridge "0x9348AF23B01F2B517AFE8f29B3183d2Bb7d69Fcf"
+    - &l1TokenBridgeImpl "0xC7315f4FaaB2F700fc6b4704BB801c46ff6327AC"
+  l2:
+    - &l2TokenBridge "0xca498Ee83eD3546321d4DC25e2789B0624F15f68"
+    - &l2TokenBridgeImpl "0xE766BE7B76E3F4d06551CB169Dd69B10a58ba91D"
+    - &l2Wsteth "0x76D8de471F54aAA87784119c60Df1bbFc852C415"
+    - &l2WstethImpl "0x16B8006b49db9022BF5457BD2de0144a7d0F970b"
+    - &l2GovExecutor "0xfD050cDa025f6378e54ab5fd5Da377D242Ed74d3"
+    - &l2EmergencyBreaksMultisig "0x1356C0b19c2531bBf0Dd23E585b7C7f7096EeC39"
+
+l1:
+  rpcUrl: L1_MAINNET_RPC_URL
+  explorerHostname: api.etherscan.io
+  explorerTokenEnv: ETHERSCAN_TOKEN
+
+l2:
+  rpcUrl: https://rpc.api.lisk.com
+  explorerHostname: blockscout.lisk.com
