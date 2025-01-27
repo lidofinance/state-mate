@@ -9,10 +9,54 @@ import { log, LogCommand, logHeader1, logHeader2 } from "./logger";
 
 dotenv.config();
 
-type Result = { checks: number; errors: number };
+class Result {
+  private checks: number;
+  private errors: number;
 
-const CURRENT_REPO_OPTIONS = undefined; // --abi, --schemas, --generate, -o l1
-const OTHER_REPO_OPTIONS = undefined; // --generate, -o l1
+  constructor(response: string) {
+    const checksMatch = response.match(/(\d+) checks performed/);
+    const errorsMatch = response.match(/(\d+) errors found/);
+
+    this.checks = checksMatch ? Number.parseInt(checksMatch[1], 10) : 0;
+    this.errors = errorsMatch ? Number.parseInt(errorsMatch[1], 10) : 0;
+  }
+
+  succeededChecks(): number {
+    return this.checks - this.errors;
+  }
+
+  toString(): string {
+    return `${this.checks - this.errors}/${this.checks}`;
+  }
+
+  equals(other: Result | null): boolean {
+    if (!other) return false;
+    return this.checks === other.checks && this.errors === other.errors;
+  }
+}
+
+class ResultsMatcher {
+  constructor(
+    private currentResult: Result | null,
+    private otherResult: Result | null,
+  ) {}
+  areMatched(): boolean {
+    return this.currentResult !== null && this.otherResult !== null && this.currentResult.equals(this.otherResult);
+  }
+  toString(): string {
+    let formattedReport: string = "";
+    if (this.currentResult !== null && this.otherResult !== null) {
+      const currentSucceededChecks = this.currentResult.succeededChecks();
+      const otherSucceededChecks = this.otherResult.succeededChecks();
+      const report = `${currentSucceededChecks} vs ${otherSucceededChecks}`;
+      formattedReport =
+        `Succeeded checks: ` +
+        `${currentSucceededChecks === otherSucceededChecks ? chalk.green(report) : chalk.red(report)}`;
+    }
+    return formattedReport;
+  }
+}
+
 
 const ENV_VARS: Record<string, Record<string, string>> = {
   common: {
@@ -38,24 +82,6 @@ function getAllYamlFiles(repoPath: string, folder: string): string[] {
   return fs
     .readdirSync(folderPath)
     .filter((file) => [".yml", ".yaml"].some((extension) => file.endsWith(extension)) && !file.includes("seed"));
-}
-function parseResult(output: string): Result {
-  const checksMatch = output.match(/(\d+) checks performed/);
-  const errorsMatch = output.match(/(\d+) errors found/);
-
-  const checks = checksMatch ? Number.parseInt(checksMatch[1], 10) : 0;
-  const errors = errorsMatch ? Number.parseInt(errorsMatch[1], 10) : 0;
-
-  return { checks, errors };
-}
-function isResultsMatched(currentResult: Result | null, otherResult: Result | null): boolean {
-  const result = !!(
-    currentResult &&
-    otherResult &&
-    currentResult.checks === otherResult.checks &&
-    currentResult.errors === otherResult.errors
-  );
-  return result;
 }
 
 async function main() {
@@ -88,12 +114,11 @@ async function main() {
       const otherResult: Result | null = runStateMate(otherRepoPath, folder, yamlFile, OTHER_REPO_OPTIONS);
 
       const logHandler = new LogCommand(path.join(folder, yamlFile));
-
-      const isMatched = isResultsMatched(currentResult, otherResult);
-      if (isMatched) {
-        logHandler.success(`Matched`);
+      const resultsMatcher = new ResultsMatcher(currentResult, otherResult);
+      if (resultsMatcher.areMatched()) {
+        logHandler.success(`Matched ${resultsMatcher.toString()}`);
       } else {
-        logHandler.failure(`Unmatched`);
+        logHandler.failure(`Unmatched ${resultsMatcher.toString()}`);
       }
     }
   }
@@ -104,16 +129,16 @@ function runStateMate(repoPath: string, folder: string, yamlFile: string, option
   const yamlFilePath = path.relative(repoPath, path.join("configs", folder, yamlFile));
   const command = `yarn run start ${yamlFilePath}${options ? ` ${options}` : ""}`;
   const logHandler = new LogCommand(`Calling ${chalk.magenta(command)} in ${chalk.magenta(repoPath)}`);
-  let result: Result | null = null;
+
   try {
     const output = execSync(command, { stdio: ["ignore", "pipe", "ignore"] }).toString();
-    result = parseResult(output);
-    logHandler.success(`Success (${result.checks}/${result.errors})`);
+    const result = new Result(output);
+    logHandler.success(`Done (${result.toString()})`);
     return result;
   } catch (error) {
-    if (error instanceof Error && "stdout" in error && error.stdout && typeof error.stdout == "string") {
-      result = parseResult(error.stdout);
-      logHandler.success(`Success (${result.checks}/${result.errors})`);
+    if (error instanceof Error && "stdout" in error && error.stdout) {
+      const result = new Result(String(error.stdout));
+      logHandler.success(`Done (${result.toString()})`);
       return result;
     }
     logHandler.failure("Failed");
