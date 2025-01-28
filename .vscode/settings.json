@@ -1,0 +1,23 @@
+{
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "always"
+  },
+  "files.trimTrailingWhitespace": true,
+  "typescript.validate.enable": true,
+  "cSpell.words": [
+    "apikey",
+    "bscscan",
+    "Depositable",
+    "esbenp",
+    "IERC165",
+    "minato",
+    "Mutables",
+    "Ossifiable",
+    "REBASABLE",
+    "REPLACEME",
+    "SONEIUM",
+    "typebox"
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "recommendations": [
+    "esbenp.prettier-vscode",
+    "dbaeumer.vscode-eslint",
+    "streetsidesoftware.code-spell-checker",
+    "dskwrk.vscode-generate-getter-setter",
+    "redhat.vscode-yaml"
+  ]
+}

@@ -1,6 +1,8 @@
 # Optimism Testnet Deployment & Configuration
 # Checks state when new contracts were deployed but no upgrade happened
 
+# yaml-language-server: $schema=./../../schemas/main-schema.json
+
 parameters:
   - &lido "0x3e3FE7dBc6B4C189E7128855dD526361c49b40Af"
   - &accountingOracle "0xd497Be005638efCf09F6BFC8DAFBBB0BB72cD991"

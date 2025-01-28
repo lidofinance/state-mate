@@ -1,5 +1,7 @@
 # Mantle Mainnet Deployment & Configuration
 
+# yaml-language-server: $schema=./../../schemas/main-schema.json
+
 parameters:
   - &wstETH "0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0"
   - &agent "0x3e40D73EB977Dc6a537aF587D48316feE66E9C8c"
