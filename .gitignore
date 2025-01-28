@@ -17,6 +17,7 @@ artifacts
 
 #
 .env
+reports
 
 # pycharm
 .idea
