@@ -16,7 +16,7 @@
     "format": "prettier . --ignore-path .gitignore --check",
     "format:fix": "prettier . --ignore-path .gitignore --write",
     "postinstall": "husky",
-    "test": "ts-node src/test-util.ts"
+    "test": "ts-node src/test-util/app.ts"
   },
   "lint-staged": {
     "./**.{ts,md,json}": [
