@@ -73,8 +73,8 @@ class ResultsMatcher {
   }
 }
 
-const FORK_REPO_OPTIONS = "-o l1"; // --abi, --schemas, --generate, -o l1
-const ORIGIN_REPO_OPTIONS = "-o l1"; // --generate, -o l1
+const FORK_REPO_OPTIONS = undefined; // --abi, --schemas, --generate, -o l1
+const ORIGIN_REPO_OPTIONS = undefined; // --generate, -o l1
 const FORK_REPO_PATH: string = process.cwd();
 let ORIGIN_REPO_PATH: string;
 
