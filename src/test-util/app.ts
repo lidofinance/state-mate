@@ -186,11 +186,11 @@ function runStateMate(yamlFileAbsolutePath: string, options?: string): Response 
 
 function run(command: string): string | null {
   try {
-    const output = execSync(command, { stdio: ["ignore", "pipe", "ignore"] }).toString();
+    const output = execSync(command, { stdio: ["ignore", "pipe", "pipe"] }).toString();
     return output;
   } catch (error) {
-    if (error instanceof Error && "stdout" in error && error.stdout) {
-      const output = String(error.stdout);
+    if (error instanceof Error && "stdout" in error && error.stdout && "stderr" in error && error.stderr) {
+      const output = String(error.stdout) + String(error.stderr);
       return output;
     }
     return null;
