@@ -204,7 +204,7 @@ export async function main() {
   g_Arguments = parseCmdLineArguments();
 
   if (g_Arguments.abi) {
-    // renameAllAbiToLowerCase();
+    renameAllAbiToLowerCase();
   }
 
   if (g_Arguments.schemas) {

@@ -51,12 +51,13 @@ export async function checkAllAbi(contractInfo: ContractInfo) {
 }
 
 async function _checkAbi(contractName: string, address: string, abiFromExplorer: Abi): Promise<void> {
+  address = address.toLowerCase();
   const logHandler = new LogCommand(`ABI ${chalk.magenta(`${contractName}-${address}.json`)}`);
-  const isNeededToSaveAbi = true;
+  let isNeededToSaveAbi = true;
   const abiExistedPath = _findAbiPath(contractName, address, { shouldThrow: false });
 
   if (abiExistedPath) {
-    // isNeededToSaveAbi = await _isNeededToOverwriteExistedAbi(abiExistedPath, abiFromExplorer); TODO need to revert when all required ABI will be downloaded (for legacy)
+    isNeededToSaveAbi = await _isNeededToOverwriteExistedAbi(abiExistedPath, abiFromExplorer);
   }
 
   if (isNeededToSaveAbi) {
@@ -134,7 +135,7 @@ function _findAbiPath(
 
       abiFileName = abiDirectoryContent.find((fileName) => {
         return abiVariantsName.find((variantName) => {
-          return toLowerCase(fileName) === variantName;
+          return toLowerCaseAddress(fileName) === variantName;
         });
       });
     } catch (error) {
@@ -160,7 +161,7 @@ export function renameAllAbiToLowerCase() {
   }
 }
 
-function toLowerCase(fileName: string): string {
+function toLowerCaseAddress(fileName: string): string {
   const match = fileName.match(/0x[0-9a-fA-F]{40}/);
   if (!match) return fileName;
 
@@ -170,7 +171,7 @@ function toLowerCase(fileName: string): string {
 }
 
 function _renameAbiIfNeed(fileName: string): void {
-  const newFileName = toLowerCase(fileName);
+  const newFileName = toLowerCaseAddress(fileName);
 
   if (fileName !== newFileName) {
     try {
