@@ -47,7 +47,7 @@ async function etherRateLimitHandler(
     return httpGetAsync(sourcesUrl);
   }
 
-  return null;
+  return sourcesResponse;
 }
 
 async function etherGetContractInfoCallback(
