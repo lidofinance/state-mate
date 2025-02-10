@@ -95,11 +95,11 @@ export async function loadContractInfo(
   let sourcesResponse = await httpGetAsync(sourcesUrl);
   if (isResponseBad(sourcesResponse) && explorer.requestWithRateLimit) {
     sourcesResponse = await explorer.requestWithRateLimit(sourcesResponse, sourcesUrl, explorerHostname);
-    if (isResponseBad(sourcesResponse)) {
-      logErrorAndExit(
-        `Failed to download contract info from ${explorerHostname}: ${sourcesResponse.message}\n${JSON.stringify(sourcesResponse, null, 2)}`,
-      );
-    }
+  }
+  if (isResponseBad(sourcesResponse)) {
+    logErrorAndExit(
+      `Failed to download contract info from ${explorerHostname}: ${sourcesResponse.message}\n${JSON.stringify(sourcesResponse, null, 2)}`,
+    );
   }
 
   if (!isResponseOk(sourcesResponse)) {
