@@ -148,6 +148,7 @@ function _findAbiPath(
 
   return abiFileName ? path.join(g_Arguments.abiDirPath, abiFileName) : null;
 }
+
 export function renameAllAbiToLowerCase() {
   if (!fs.existsSync(g_Arguments.abiDirPath)) return;
   try {
