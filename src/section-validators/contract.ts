@@ -5,7 +5,11 @@ import { logHeader1, logHeader2 } from "src/logger";
 import { ContractEntry } from "src/typebox";
 
 import { CheckLevel, needCheck, SectionValidatorBase } from "./base";
-import { ValidatorFactory } from "./factory";
+import { ChecksSectionValidator } from "./checks";
+import { ImplementationChecksSectionValidator } from "./implementation-checks";
+import { OzAclSectionValidator } from "./oz-acl";
+import { OzNonEnumerableAclSectionValidator } from "./oz-non-enumerable-acl";
+import { ProxyCheckSectionValidator } from "./proxy-check";
 
 export class ContractSectionValidator {
   private map: Map<EntryField, SectionValidatorBase> = new Map();
@@ -19,7 +23,33 @@ export class ContractSectionValidator {
       EntryField.ozAcl,
     ];
     for (const section of sections) {
-      this.map.set(section, ValidatorFactory.getValidator(section, provider));
+      switch (section) {
+        case EntryField.checks: {
+          this.map.set(section, new ChecksSectionValidator(provider, section));
+          break;
+        }
+        case EntryField.proxyChecks: {
+          this.map.set(section, new ProxyCheckSectionValidator(provider));
+          break;
+        }
+        case EntryField.ozNonEnumerableAcl: {
+          this.map.set(section, new OzNonEnumerableAclSectionValidator(provider));
+          break;
+        }
+        case EntryField.implementationChecks: {
+          this.map.set(section, new ImplementationChecksSectionValidator(provider));
+          break;
+        }
+        case EntryField.ozAcl: {
+          this.map.set(section, new OzAclSectionValidator(provider));
+          break;
+        }
+        default: {
+          //@ts-expect-error trick to detect compile-time errors when a new section is added
+          const _: never = entryField;
+          throw new Error("Unknown label section");
+        }
+      }
     }
   }
 
