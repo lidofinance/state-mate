@@ -52,6 +52,5 @@ export function parseCmdLineArguments() {
     checkOnlyCmdArg: options.only,
     generate: options.generate,
     abi: options.abi,
-    schemas: options.schemas,
   };
 }

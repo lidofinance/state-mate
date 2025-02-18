@@ -3,20 +3,20 @@ import path from "node:path";
 
 import "dotenv/config";
 
-import { Static, TObject, TSchema } from "@sinclair/typebox";
+import { Static, TSchema } from "@sinclair/typebox";
 import Ajv, { ValidateFunction } from "ajv";
 import addFormats from "ajv-formats";
 import chalk from "chalk";
 import { JsonRpcProvider } from "ethers";
 import * as YAML from "yaml";
 
-import { renameAllAbiToLowerCase, checkAllAbi } from "./abi-provider";
+import { checkAllAbi, renameAllAbiToLowerCase } from "./abi-provider";
 import { doGenerateBoilerplate } from "./boilerplate-generator";
-import { parseCmdLineArguments as parseCmdLineArguments } from "./cli-parser";
-import { printError, readUrlOrFromEnvironment as readUrlOrFromEnvironment } from "./common";
+import { parseCmdLineArguments } from "./cli-parser";
+import { printError, readUrlOrFromEnvironment } from "./common";
 import { loadContractInfoFromExplorer } from "./explorer-provider";
 import { FAILURE_MARK, log, logError, logErrorAndExit, logHeader1, WARNING_MARK } from "./logger";
-import { g_total_checks, g_errors } from "./section-validators/base";
+import { g_errors, g_total_checks } from "./section-validators/base";
 import { ContractSectionValidator } from "./section-validators/contract";
 import {
   EntireDocument,
@@ -181,34 +181,11 @@ async function checkNetworkSection(sectionTitle: string, section: NetworkSection
   }
 }
 
-function generateBothSchemas() {
-  const schemasPath = path.resolve(path.dirname(__dirname), path.join("schemas"));
-  fs.mkdirSync(schemasPath, { recursive: true });
-
-  const saveSchema = (fileName: string, schema: TObject) => {
-    const schemasFilePath = path.resolve(schemasPath, fileName);
-    try {
-      fs.writeFileSync(schemasFilePath, JSON.stringify(schema, null, 2), "utf8");
-      logHeader1(`The JSON Schema has been saved to ${chalk.green(schemasFilePath)}`);
-    } catch (error) {
-      logErrorAndExit(
-        `Failed to save the JSON Schema to ${chalk.red(schemasFilePath)}:\n\n${chalk.red(printError(error))}`,
-      );
-    }
-  };
-  saveSchema("main-schema.json", EntireDocumentTB);
-  saveSchema("seed-schema.json", SeedDocumentTB);
-}
-
 export async function main() {
   g_Arguments = parseCmdLineArguments();
 
   if (g_Arguments.abi) {
     renameAllAbiToLowerCase();
-  }
-
-  if (g_Arguments.schemas) {
-    generateBothSchemas();
   }
 
   const jsonDocument = loadStateFromYaml(g_Arguments.configPath);
