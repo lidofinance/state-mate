@@ -10,7 +10,6 @@ type CheckOnlyOptionType = null | {
   contract?: string;
   checksType?: string;
   method?: string;
-  schemas?: string;
 };
 
 export function parseCmdLineArguments() {
@@ -40,7 +39,6 @@ export function parseCmdLineArguments() {
       contract: checksPath[1],
       checksType: checksPath[2],
       method: checksPath[3],
-      schemas: checksPath[4],
     };
   }
 
@@ -50,6 +48,6 @@ export function parseCmdLineArguments() {
     checkOnly,
     checkOnlyCmdArg: options.only,
     generate: options.generate,
-    abi: options.abi,
+    updateAbi: options.updateAbi,
   };
 }

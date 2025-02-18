@@ -3,6 +3,7 @@ import chalk from "chalk";
 import { logErrorAndExit } from "./logger";
 import { Abi, AbiArgumentsLength as AbiArgumentsLength } from "./types";
 
+// Contract entry fields
 export enum Ef {
   name = "name",
   address = "address",

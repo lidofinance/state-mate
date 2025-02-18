@@ -184,7 +184,7 @@ async function checkNetworkSection(sectionTitle: string, section: NetworkSection
 export async function main() {
   g_Arguments = parseCmdLineArguments();
 
-  if (g_Arguments.abi) {
+  if (g_Arguments.updateAbi) {
     renameAllAbiToLowerCase();
   }
 
@@ -211,9 +211,7 @@ export async function main() {
       );
     }
     if (validateJsonWithSchema(jsonDocument, EntireDocumentTB)) {
-      if (g_Arguments.abi) {
-        await downloadAndCheckAllAbi(jsonDocument);
-      }
+      await downloadAndCheckAllAbi(jsonDocument);
       await doChecks(jsonDocument);
     }
   }

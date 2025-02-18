@@ -53,45 +53,24 @@ export async function checkAllAbi(contractInfo: ContractInfo) {
 async function _checkAbi(contractName: string, address: string, abiFromExplorer: Abi): Promise<void> {
   address = address.toLowerCase();
   const logHandler = new LogCommand(`ABI ${chalk.magenta(`${contractName}-${address}.json`)}`);
-  let isNeededToSaveAbi = true;
   const abiExistedPath = _findAbiPath(contractName, address, { shouldThrow: false });
 
   if (abiExistedPath) {
-    isNeededToSaveAbi = await _isNeededToOverwriteExistedAbi(abiExistedPath, abiFromExplorer);
-  }
-
-  if (isNeededToSaveAbi) {
-    const abiFileNameToSave = abiExistedPath || _defaultAbiFilePath(contractName, address);
-    _saveAbi(abiFileNameToSave, abiFromExplorer);
-    logHandler.success(abiExistedPath ? "Overwritten" : "Saved");
-  }
-  async function _isNeededToOverwriteExistedAbi(abiExistedPath: string, abiFromExplorer: Abi): Promise<boolean> {
-    let isNeededToOverwriteAbi = false;
-
     const savedAbi = loadAbiFromAbiPath(abiExistedPath);
-    const differences = jsonDiff.diffString(savedAbi, abiFromExplorer);
-
-    if (differences) {
-      isNeededToOverwriteAbi = await _askUserToOverwrite(abiExistedPath, differences);
-      if (!isNeededToOverwriteAbi) {
-        logHandler.warning("Overwriting was skipped by user");
-      }
-    } else {
+    if (!jsonDiff.diffString(savedAbi, abiFromExplorer)) {
       logHandler.success("Matched");
+      return;
     }
 
-    return isNeededToOverwriteAbi;
+    if (!g_Arguments.updateAbi) {
+      logHandler.warning("Unmatched");
+      return;
+    }
   }
-}
 
-async function _askUserToOverwrite(abiPath: string, differences: string) {
-  const question =
-    `\nThe ABI already exists: ${chalk.magenta(path.basename(abiPath))} ` +
-    `but it differs from the one from the explorer:\n${differences}\nOverwrite? `;
-
-  const userAgreedToOverwrite = await askUserToConfirm({ message: question });
-
-  return userAgreedToOverwrite;
+  const abiFileNameToSave = abiExistedPath || _defaultAbiFilePath(contractName, address);
+  _saveAbi(abiFileNameToSave, abiFromExplorer);
+  logHandler.success(abiExistedPath ? "Overwritten" : "Saved");
 }
 
 function _saveAbi(abiFileName: string, abiFromExplorer: Abi) {
