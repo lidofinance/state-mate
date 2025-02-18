@@ -4,9 +4,10 @@ import { Contract, JsonRpcProvider } from "ethers";
 import { printError } from "./common";
 import { EtherscanHandler } from "./explorers/etherscan";
 import { ModeHandler } from "./explorers/mode";
-import { log, logError, logErrorAndExit, logReplaceLine } from "./logger";
+import { logError, logErrorAndExit, logReplaceLine } from "./logger";
 import {
   Abi,
+  AbiArgumentsLength,
   ContractInfo,
   isCommonResponseOkResult,
   isResponseBad,
@@ -15,22 +16,14 @@ import {
   MethodCallResults,
   ResponseBad,
   ResponseOk,
-  AbiArgumentsLength,
 } from "./types";
 
-export function loadContract(address: string, abi: Abi, provider: JsonRpcProvider) {
-  return new Contract(address, abi as unknown as string, provider);
-}
-
-export interface IExplorerHandler {
-  requestWithRateLimit?: RateLimitHandler;
-  getContractInfo: GetContractInfoCallback;
-}
 export type RateLimitHandler = (
   response: ResponseBad,
   sourcesUrl: string,
   explorerHostname: string,
 ) => Promise<unknown>;
+
 export type GetContractInfoCallback = (
   explorer: IExplorerHandler,
   abi: Abi,
@@ -39,6 +32,15 @@ export type GetContractInfoCallback = (
   explorerHostname: string,
   explorerKey?: string,
 ) => Promise<ContractInfo>;
+
+export interface IExplorerHandler {
+  requestWithRateLimit?: RateLimitHandler;
+  getContractInfo: GetContractInfoCallback;
+}
+
+export function loadContract(address: string, abi: Abi, provider: JsonRpcProvider) {
+  return new Contract(address, abi as unknown as string, provider);
+}
 
 export async function collectStaticCallResults(
   nonMutables: AbiArgumentsLength,

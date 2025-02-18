@@ -8,7 +8,7 @@ import { Contract, JsonRpcProvider } from "ethers";
 import * as YAML from "yaml";
 
 import { loadAbiFromFile } from "./abi-provider";
-import { getNonMutables, readUrlOrFromEnvironment as readUrlOrFromEnvironment, Ef, printError } from "./common";
+import { getNonMutables, readUrlOrFromEnvironment, EntryField, printError } from "./common";
 import { collectStaticCallResults, loadContract, loadContractInfoFromExplorer } from "./explorer-provider";
 import { logErrorAndExit, log, logError } from "./logger";
 import { g_Arguments as g_Arguments } from "./state-mate";
@@ -42,7 +42,7 @@ export async function doGenerateBoilerplate(seedConfigPath: string, jsonDocument
     const provider = new JsonRpcProvider(rpcUrl);
     let contractEntryIfProxy;
     let contractEntryIfRegular;
-    const logOperation = (section: Ef) => {
+    const logOperation = (section: EntryField) => {
       log(
         `Generating YAML for non-mutable function values for contract ${chalk.magenta(`${contractName}-${address}`)}, section ${chalk.yellow(section)} ...`,
       );
@@ -57,30 +57,30 @@ export async function doGenerateBoilerplate(seedConfigPath: string, jsonDocument
       const implementationAbi = loadAbiFromFile(implementation.contractName, implementation.address);
       const implementationContract = loadContract(implementation.address, implementationAbi, provider);
 
-      logOperation(Ef.checks);
+      logOperation(EntryField.checks);
       const checks = await _makeBoilerplateForAllNonMutableFunctions(implementationAbi, contract);
 
-      logOperation(Ef.proxyChecks);
+      logOperation(EntryField.proxyChecks);
       const proxyChecks = await _makeBoilerplateForAllNonMutableFunctions(proxyAbi, proxyContract);
 
-      logOperation(Ef.implementationChecks);
+      logOperation(EntryField.implementationChecks);
       const implementationChecks = await _makeBoilerplateForAllNonMutableFunctions(
         implementationAbi,
         implementationContract,
       );
       contractEntryIfProxy = {
-        [Ef.name]: implementation.contractName,
-        [Ef.address]: document.createAlias(deployedNode),
+        [EntryField.name]: implementation.contractName,
+        [EntryField.address]: document.createAlias(deployedNode),
         proxyName: contractName,
         implementation: implementation.address,
-        [Ef.proxyChecks]: proxyChecks,
-        [Ef.checks]: checks,
-        [Ef.implementationChecks]: implementationChecks,
+        [EntryField.proxyChecks]: proxyChecks,
+        [EntryField.checks]: checks,
+        [EntryField.implementationChecks]: implementationChecks,
       };
     } else {
       const abi = loadAbiFromFile(contractName, address);
       const contract = loadContract(address, abi, provider);
-      logOperation(Ef.checks);
+      logOperation(EntryField.checks);
       const checks = await _makeBoilerplateForAllNonMutableFunctions(abi, contract);
       contractEntryIfRegular = {
         name: contractName,
@@ -91,7 +91,7 @@ export async function doGenerateBoilerplate(seedConfigPath: string, jsonDocument
 
     const sectionNode = document.get(sectionName) as YAML.YAMLMap;
     const contractEntry = implementation ? contractEntryIfProxy : contractEntryIfRegular;
-    sectionNode.addIn([Ef.contracts], new YAML.Pair(context.deployedNode.anchor, contractEntry));
+    sectionNode.addIn([EntryField.contracts], new YAML.Pair(context.deployedNode.anchor, contractEntry));
   });
 
   const generatedFilePath = path.join(

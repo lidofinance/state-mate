@@ -1,7 +1,7 @@
 import { Contract, JsonRpcProvider } from "ethers";
 
 import { loadAbiFromFile } from "src/abi-provider";
-import { Ef } from "src/common";
+import { EntryField } from "src/common";
 import { loadContract } from "src/explorer-provider";
 import { logErrorAndExit } from "src/logger";
 import {
@@ -16,7 +16,7 @@ import {
 import { CheckLevel, needCheck, SectionValidatorBase } from "./base";
 
 export class ChecksSectionValidator extends SectionValidatorBase {
-  constructor(provider: JsonRpcProvider, sectionName: Ef = Ef.checks) {
+  constructor(provider: JsonRpcProvider, sectionName: EntryField = EntryField.checks) {
     super(provider, sectionName);
   }
 

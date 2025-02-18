@@ -4,7 +4,7 @@ import { logErrorAndExit } from "./logger";
 import { Abi, AbiArgumentsLength as AbiArgumentsLength } from "./types";
 
 // Contract entry fields
-export enum Ef {
+export enum EntryField {
   name = "name",
   address = "address",
   checks = "checks",
@@ -17,15 +17,6 @@ export enum Ef {
   explorerHostname = "explorerHostname",
   explorerTokenEnvironment = "explorerTokenEnv",
   rpcUrl = "rpcUrl",
-}
-
-function isUrl(maybeUrl: string) {
-  try {
-    new URL(maybeUrl);
-    return true;
-  } catch {
-    return false;
-  }
 }
 
 export function printError(error: unknown): string {
@@ -58,4 +49,13 @@ export function getNonMutables(abi: Abi): AbiArgumentsLength {
       name: name ?? "",
       numArgs: Array.isArray(inputs) ? inputs.length : 0,
     }));
+}
+
+function isUrl(maybeUrl: string) {
+  try {
+    new URL(maybeUrl);
+    return true;
+  } catch {
+    return false;
+  }
 }

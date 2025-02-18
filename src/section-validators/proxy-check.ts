@@ -1,7 +1,7 @@
 import { Contract, JsonRpcProvider } from "ethers";
 
 import { loadAbiFromFile } from "src/abi-provider";
-import { Ef } from "src/common";
+import { EntryField } from "src/common";
 import { loadContract } from "src/explorer-provider";
 import { logErrorAndExit, logHeader2 } from "src/logger";
 import { ChecksEntryValue, ContractEntry, isTypeOfTB, ProxyContractEntryTB, ViewResultTB } from "src/typebox";
@@ -10,7 +10,7 @@ import { CheckLevel, needCheck, SectionValidatorBase } from "./base";
 
 export class ProxyCheckSectionValidator extends SectionValidatorBase {
   constructor(provider: JsonRpcProvider) {
-    super(provider, Ef.proxyChecks);
+    super(provider, EntryField.proxyChecks);
   }
   override async validateSection(contractEntry: ContractEntry, contractAlias: string) {
     if (isTypeOfTB(contractEntry, ProxyContractEntryTB) && contractEntry.proxyChecks) {

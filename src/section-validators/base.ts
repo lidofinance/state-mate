@@ -2,7 +2,7 @@ import { assert, AssertionError } from "chai";
 import chalk from "chalk";
 import { Contract, JsonRpcProvider, Result } from "ethers";
 
-import { Ef, getNonMutables, printError } from "src/common";
+import { EntryField, getNonMutables, printError } from "src/common";
 import { LogCommand, logError, logErrorAndExit, logMethodSkipped } from "src/logger";
 import { g_Arguments } from "src/state-mate";
 import {
@@ -47,7 +47,7 @@ export function needCheck(level: CheckLevel, name: string) {
 export abstract class SectionValidatorBase {
   constructor(
     protected provider: JsonRpcProvider,
-    protected sectionName: Ef,
+    protected sectionName: EntryField,
   ) {}
 
   public abstract validateSection(contractEntry: ContractEntry, contractAlias: string): Promise<void>;

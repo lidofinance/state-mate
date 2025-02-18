@@ -1,7 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
 
-import { confirm as askUserToConfirm } from "@inquirer/prompts";
 import chalk from "chalk";
 import jsonDiff from "json-diff";
 
@@ -9,21 +8,6 @@ import { printError } from "./common";
 import { log, LogCommand, logError, logErrorAndExit } from "./logger";
 import { g_Arguments } from "./state-mate";
 import { Abi, ContractInfo, isValidAbi } from "./types";
-
-function loadAbiFromAbiPath(abiPath: string): Abi | never {
-  try {
-    const abiFileContent = fs.readFileSync(abiPath, "utf8");
-    const abiJson: unknown = JSON.parse(abiFileContent);
-
-    const abi: unknown = abiJson instanceof Object && "abi" in abiJson ? abiJson.abi : abiJson;
-    if (!isValidAbi(abi)) {
-      logErrorAndExit(`ABI file ${abiPath} does not contain valid ABI`);
-    }
-    return abi;
-  } catch (error) {
-    logErrorAndExit(`Failed to read ABI file at ${abiPath}: ${printError(error)} `);
-  }
-}
 
 export function loadAbiFromFile(contractName: string, address: string): Abi | never {
   address = address.toLowerCase();
@@ -47,6 +31,34 @@ export async function checkAllAbi(contractInfo: ContractInfo) {
   if (implementation) {
     await _checkAbi(implementation.contractName, address, implementation.abi);
     await _checkAbi(implementation.contractName, implementation.address, implementation.abi);
+  }
+}
+
+export function renameAllAbiToLowerCase() {
+  if (!fs.existsSync(g_Arguments.abiDirPath)) return;
+  try {
+    const abiDirectoryContent = fs.readdirSync(g_Arguments.abiDirPath);
+
+    for (const fileName of abiDirectoryContent) {
+      _renameAbiIfNeed(fileName);
+    }
+  } catch (error) {
+    logErrorAndExit(`Failed to read ${chalk.yellow(g_Arguments.abiDirPath)}:\n ${printError(error)}`);
+  }
+}
+
+function loadAbiFromAbiPath(abiPath: string): Abi | never {
+  try {
+    const abiFileContent = fs.readFileSync(abiPath, "utf8");
+    const abiJson: unknown = JSON.parse(abiFileContent);
+
+    const abi: unknown = abiJson instanceof Object && "abi" in abiJson ? abiJson.abi : abiJson;
+    if (!isValidAbi(abi)) {
+      logErrorAndExit(`ABI file ${abiPath} does not contain valid ABI`);
+    }
+    return abi;
+  } catch (error) {
+    logErrorAndExit(`Failed to read ABI file at ${abiPath}: ${printError(error)} `);
   }
 }
 
@@ -126,19 +138,6 @@ function _findAbiPath(
   }
 
   return abiFileName ? path.join(g_Arguments.abiDirPath, abiFileName) : null;
-}
-
-export function renameAllAbiToLowerCase() {
-  if (!fs.existsSync(g_Arguments.abiDirPath)) return;
-  try {
-    const abiDirectoryContent = fs.readdirSync(g_Arguments.abiDirPath);
-
-    for (const fileName of abiDirectoryContent) {
-      _renameAbiIfNeed(fileName);
-    }
-  } catch (error) {
-    logErrorAndExit(`Failed to read ${chalk.yellow(g_Arguments.abiDirPath)}:\n ${printError(error)}`);
-  }
 }
 
 function toLowerCaseAddress(fileName: string): string {

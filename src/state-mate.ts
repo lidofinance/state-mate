@@ -181,7 +181,7 @@ async function checkNetworkSection(sectionTitle: string, section: NetworkSection
   }
 }
 
-export async function main() {
+async function main() {
   g_Arguments = parseCmdLineArguments();
 
   if (g_Arguments.updateAbi) {

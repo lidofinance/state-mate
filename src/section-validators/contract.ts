@@ -1,6 +1,6 @@
 import { JsonRpcProvider } from "ethers";
 
-import { Ef } from "src/common";
+import { EntryField } from "src/common";
 import { logHeader1, logHeader2 } from "src/logger";
 import { ContractEntry } from "src/typebox";
 
@@ -8,10 +8,16 @@ import { CheckLevel, needCheck, SectionValidatorBase } from "./base";
 import { ValidatorFactory } from "./factory";
 
 export class ContractSectionValidator {
-  private map: Map<Ef, SectionValidatorBase> = new Map();
+  private map: Map<EntryField, SectionValidatorBase> = new Map();
 
   constructor(provider: JsonRpcProvider) {
-    const sections = [Ef.checks, Ef.proxyChecks, Ef.ozNonEnumerableAcl, Ef.implementationChecks, Ef.ozAcl];
+    const sections = [
+      EntryField.checks,
+      EntryField.proxyChecks,
+      EntryField.ozNonEnumerableAcl,
+      EntryField.implementationChecks,
+      EntryField.ozAcl,
+    ];
     for (const section of sections) {
       this.map.set(section, ValidatorFactory.getValidator(section, provider));
     }
@@ -22,25 +28,25 @@ export class ContractSectionValidator {
 
     logHeader1(`Contract (${sectionTitle}): ${contractAlias} (${contractEntry.name}, ${contractEntry.address})`);
 
-    if (needCheck(CheckLevel.checksType, Ef.checks)) {
-      logHeader2(Ef.checks);
-      await this.map.get(Ef.checks)!.validateSection(contractEntry, contractAlias);
+    if (needCheck(CheckLevel.checksType, EntryField.checks)) {
+      logHeader2(EntryField.checks);
+      await this.map.get(EntryField.checks)!.validateSection(contractEntry, contractAlias);
     }
 
-    if (needCheck(CheckLevel.checksType, Ef.proxyChecks)) {
-      await this.map.get(Ef.proxyChecks)!.validateSection(contractEntry, contractAlias);
+    if (needCheck(CheckLevel.checksType, EntryField.proxyChecks)) {
+      await this.map.get(EntryField.proxyChecks)!.validateSection(contractEntry, contractAlias);
     }
 
-    if (needCheck(CheckLevel.checksType, Ef.ozNonEnumerableAcl)) {
-      await this.map.get(Ef.ozNonEnumerableAcl)!.validateSection(contractEntry, contractAlias);
+    if (needCheck(CheckLevel.checksType, EntryField.ozNonEnumerableAcl)) {
+      await this.map.get(EntryField.ozNonEnumerableAcl)!.validateSection(contractEntry, contractAlias);
     }
 
-    if (needCheck(CheckLevel.checksType, Ef.implementationChecks)) {
-      await this.map.get(Ef.implementationChecks)!.validateSection(contractEntry, contractAlias);
+    if (needCheck(CheckLevel.checksType, EntryField.implementationChecks)) {
+      await this.map.get(EntryField.implementationChecks)!.validateSection(contractEntry, contractAlias);
     }
 
-    if (needCheck(CheckLevel.checksType, Ef.ozAcl)) {
-      await this.map.get(Ef.ozAcl)!.validateSection(contractEntry, contractAlias);
+    if (needCheck(CheckLevel.checksType, EntryField.ozAcl)) {
+      await this.map.get(EntryField.ozAcl)!.validateSection(contractEntry, contractAlias);
     }
   }
 }

@@ -1,7 +1,7 @@
 import { JsonRpcProvider } from "ethers";
 
 import { loadAbiFromFile } from "src/abi-provider";
-import { Ef, getNonMutables } from "src/common";
+import { EntryField, getNonMutables } from "src/common";
 import { logHeader2 } from "src/logger";
 import { ContractEntry, isTypeOfTB, ProxyContractEntryTB, RegularChecks } from "src/typebox";
 
@@ -9,7 +9,7 @@ import { ChecksSectionValidator } from "./checks";
 
 export class ImplementationChecksSectionValidator extends ChecksSectionValidator {
   constructor(provider: JsonRpcProvider) {
-    super(provider, Ef.implementationChecks);
+    super(provider, EntryField.implementationChecks);
   }
 
   override async validateSection(contractEntry: ContractEntry, contractAlias: string) {

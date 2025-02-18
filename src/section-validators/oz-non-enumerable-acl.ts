@@ -2,16 +2,16 @@ import { assert } from "chai";
 import { JsonRpcProvider } from "ethers";
 
 import { loadAbiFromFile } from "src/abi-provider";
-import { Ef } from "src/common";
+import { EntryField } from "src/common";
 import { loadContract } from "src/explorer-provider";
 import { log, LogCommand, logHeader2, WARNING_MARK } from "src/logger";
 import { ContractEntry } from "src/typebox";
 
-import { g_total_checks, incChecks, incErrors, SectionValidatorBase } from "./base";
+import { incChecks, incErrors, SectionValidatorBase } from "./base";
 
 export class OzNonEnumerableAclSectionValidator extends SectionValidatorBase {
   constructor(provider: JsonRpcProvider) {
-    super(provider, Ef.ozNonEnumerableAcl);
+    super(provider, EntryField.ozNonEnumerableAcl);
   }
   override async validateSection(contractEntry: ContractEntry) {
     if (contractEntry.ozNonEnumerableAcl) {

@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { JsonRpcProvider } from "ethers";
 
-import { Ef } from "src/common";
+import { EntryField } from "src/common";
 import { logHeader2 } from "src/logger";
 import { ContractEntry, isTypeOfTB, ProxyContractEntryTB } from "src/typebox";
 
 import { SectionValidatorBase } from "./base";
 export class OzAclSectionValidator extends SectionValidatorBase {
-  constructor(provider: JsonRpcProvider, sectionName: Ef = Ef.ozAcl) {
+  constructor(provider: JsonRpcProvider, sectionName: EntryField = EntryField.ozAcl) {
     super(provider, sectionName);
   }
 

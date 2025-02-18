@@ -2,7 +2,7 @@ import path from "node:path";
 
 import { program } from "commander";
 
-import { Ef } from "./common";
+import { EntryField } from "./common";
 import { logErrorAndExit } from "./logger";
 
 type CheckOnlyOptionType = null | {
@@ -18,7 +18,7 @@ export function parseCmdLineArguments() {
     .allowExcessArguments(false)
     .option(
       "-o, --only <check-path>",
-      `only checks to do, e.g. 'l2/proxyAdmin/${Ef.checks}/owner', 'l1', 'l1/controller'`,
+      `only checks to do, e.g. 'l2/proxyAdmin/${EntryField.checks}/owner', 'l1', 'l1/controller'`,
     )
     .option("--generate", "generate a populated config from the seed one")
     .option("--update-abi", "download all ABIs replacing existing files")
