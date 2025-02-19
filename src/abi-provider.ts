@@ -19,7 +19,7 @@ export function loadAbiFromFile(contractName: string, address: string): Abi | ne
     logErrorAndExit(
       `Error finding ABI file for contract
         ${contractName} in ${g_Arguments.abiDirPath}: ${printError(error)}\n\n` +
-        chalk.yellow.bold(`Try running with the 'abi' option to download the unnecessary ABI`),
+        chalk.yellow.bold(`Try running with the 'abi-update' option to download the unnecessary ABI`),
     );
   }
   return loadAbiFromAbiPath(abiPath);
@@ -71,11 +71,6 @@ async function _checkAbi(contractName: string, address: string, abiFromExplorer:
     const savedAbi = loadAbiFromAbiPath(abiExistedPath);
     if (!jsonDiff.diffString(savedAbi, abiFromExplorer)) {
       logHandler.success("Matched");
-      return;
-    }
-
-    if (!g_Arguments.updateAbi) {
-      logHandler.warning("Unmatched");
       return;
     }
   }

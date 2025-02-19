@@ -200,7 +200,9 @@ async function main() {
       );
     }
     if (validateJsonWithSchema(jsonDocument, SeedDocumentTB)) {
-      await downloadAndCheckAllAbi(jsonDocument);
+      if (g_Arguments.updateAbi) {
+        await downloadAndCheckAllAbi(jsonDocument);
+      }
       await doGenerateBoilerplate(g_Arguments.configPath, jsonDocument);
     }
   } else {
@@ -211,7 +213,9 @@ async function main() {
       );
     }
     if (validateJsonWithSchema(jsonDocument, EntireDocumentTB)) {
-      await downloadAndCheckAllAbi(jsonDocument);
+      if (g_Arguments.updateAbi) {
+        await downloadAndCheckAllAbi(jsonDocument);
+      }
       await doChecks(jsonDocument);
     }
   }
