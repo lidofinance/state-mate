@@ -81,10 +81,10 @@ l1:
         messenger: *l1CrossDomainMessenger
         supportsInterface: null
       implementationChecks:
-        isInitialized: false
+        isInitialized: true
         hasRole:
           args: [*DEFAULT_ADMIN_ROLE, *ZERO_ADDRESS]
-          result: false
+          result: true
         isDepositsEnabled: false
         isWithdrawalsEnabled: false
         l1Token: *l1Wsteth
@@ -165,10 +165,10 @@ l2:
         supportsInterface: null
 
       implementationChecks:
-        isInitialized: false
+        isInitialized: true
         hasRole:
           args: [*DEFAULT_ADMIN_ROLE, *ZERO_ADDRESS]
-          result: false
+          result: true
         isDepositsEnabled: false
         isWithdrawalsEnabled: false
         l1Token: *l1Wsteth
