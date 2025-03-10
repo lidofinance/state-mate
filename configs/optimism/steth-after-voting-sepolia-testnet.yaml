@@ -1,6 +1,8 @@
 # Optimism Testnet Deployment & Configuration
 # Checks state when new contracts were deployed and upgraded.
 
+# yaml-language-server: $schema=./../../schemas/main-schema.json
+
 parameters:
   - &lido "0x3e3FE7dBc6B4C189E7128855dD526361c49b40Af"
   - &lidoLocator "0x8f6254332f69557A72b0DA2D5F0Bc07d4CA991E7"
