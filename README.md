@@ -130,11 +130,7 @@ l1:
 
 All required ABIs are located in the same directory as the config and placed under `abi` folder being downloaded upon the first launch. See [configs](/configs/).
 
-Use the --update-abi option to download all ABIs overwriting existing files 
-
-### For developers
-
-Use the --schemas option to generate new JSON schemas in the 'schemas' folder
+Use the --update-abi option to download all ABIs overwriting existing files
 
 ## 🔧 Contributing
 
