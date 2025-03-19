@@ -3,6 +3,8 @@
 # - https://research.lido.fi/t/wsteth-deployment-to-zircuit-and-ownership-acceptance-by-lido-dao/8602
 # - https://docs.zircuit.com/smart-contracts/contract_addresses
 
+# yaml-language-server: $schema=./../../schemas/main-schema.json
+
 deployed:
   l1:
     - &l1TokenBridge "0x912C7271a6A3622dfb8B218eb46a6122aB046C79"

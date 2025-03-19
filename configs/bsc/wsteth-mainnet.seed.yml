@@ -1,4 +1,6 @@
 ---
+# yaml-language-server: $schema=./../../schemas/seed-schema.json
+
 deployed:
   l1:
     - &l1NttManager "0xb948a93827d68a82F6513Ad178964Da487fe2BD9"
