@@ -3,6 +3,8 @@
 # - https://research.lido.fi/t/wsteth-deployment-on-mode/7365
 # - https://docs.mode.network/general-info/mainnet-contract-addresses/l1-l2-contracts
 
+# yaml-language-server: $schema=./../../schemas/main-schema.json
+
 deployed:
   l1:
     - &l1TokenBridge "0xD0DeA0a3bd8E4D55170943129c025d3fe0493F2A"
@@ -124,7 +126,7 @@ l1:
         signedMessages: null
 
 l2:
-  rpcUrl: https://mainnet.mode.network
+  rpcUrl: https://mode.drpc.org # https://mainnet.mode.network is unavailable now
   explorerHostname: explorer.mode.network
   # explorerTokenEnv: ETHERSCAN_MODE_TOKEN # commented because rate-limit is hit on the public explorer version
   contracts:

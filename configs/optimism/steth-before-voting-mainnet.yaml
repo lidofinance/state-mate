@@ -1,6 +1,8 @@
 # Optimism Mainnet Deployment & Configuration
 # Checks state when new contracts were deployed but no upgrade happened
 
+# yaml-language-server: $schema=./../../schemas/main-schema.json
+
 parameters:
   - &lido "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84"
   - &accountingOracle "0x852deD011285fe67063a08005c71a85690503Cee"

@@ -1,5 +1,7 @@
 # Testnets Deployment & Configuration
 
+# yaml-language-server: $schema=./../../schemas/main-schema.json
+
 parameters:
   # Already deployed contracts or other parameters
   - &ETH_DAO_AGENT_MOCK "0x184d39300f2fA4419d04998e9C58Cb5De586d879"
@@ -376,7 +378,6 @@ l2:
             ]
         getCurrentState:
           - args: [ 0 ]
-            result: 0
             mustRevert: true
         isActionQueued:
           - args: [ *ZERO_BYTES32 ] # want to skip this for now as it's too complex to verify and not worth it, tbh

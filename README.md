@@ -128,7 +128,9 @@ l1:
 
 ### ABIs
 
-All requried ABIs are located in the same directory as the config and placed under `abi` folder being downloaded upon the first launch. See [configs](/configs/).
+All required ABIs are located in the same directory as the config and placed under `abi` folder being downloaded upon the first launch. See [configs](/configs/).
+
+Use the --update-abi option to download all ABIs overwriting existing files
 
 ## 🔧 Contributing
 
