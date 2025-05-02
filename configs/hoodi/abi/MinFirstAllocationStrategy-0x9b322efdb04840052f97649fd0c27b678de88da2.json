@@ -1,0 +1,36 @@
+[
+  {
+    "inputs": [
+      {
+        "internalType": "uint256[]",
+        "name": "buckets",
+        "type": "uint256[]"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "capacities",
+        "type": "uint256[]"
+      },
+      {
+        "internalType": "uint256",
+        "name": "allocationSize",
+        "type": "uint256"
+      }
+    ],
+    "name": "allocate",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "allocated",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "",
+        "type": "uint256[]"
+      }
+    ],
+    "stateMutability": "pure",
+    "type": "function"
+  }
+]
