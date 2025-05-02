@@ -1,0 +1,34 @@
+# yaml-language-server: $schema=./../../schemas/seed-schema.json
+deployed:
+  l1:
+    - &OssifiableProxy1 "0xbE861866E2Ca8f401e2b51b2cFb36A61B0Bf6840"
+    - &AppProxyUpgradeable "0x04d160820C0f2E2C693D9Eb26078189D10A1a3e1"
+    - &OssifiableProxy2 "0x7d7EcCE45cAc6eF043f34e8049399b4b03044F97"
+    - &LidoTemplate "0xEC39F7ea18BC1c1bf3C0617fb6110dfC62d1e888"
+    - &MinFirstAllocationStrategy "0x9b322efdB04840052f97649fd0C27b678De88DA2"
+    - &OssifiableProxy3 "0xccb86588b776743CCCB6572D2a6eAFd466012191"
+    - &OperatorGrid "0x7FC784952EE7e96e9A8C3f271712805fc439dfD7"
+    - &OracleDaemonConfig "0x2c2e8fE09a2449aB93D9eAD68f987D33189E6168"
+    - &OracleReportSanityChecker "0x4077619FBAdB002fDC125171c8daf6a149C71166"
+    - &OssifiableProxy4 "0x4C003D5586B32359Df5f37B42A2E717E24817Ec2"
+    - &PredepositGuarantee "0xb92681d60E4314F0f9DEdFcCC3C0A4E156080357"
+    - &OssifiableProxy5 "0xf320D34b55E89826631C2bb1b3c5b50932cCaB3C"
+    - &StakingRouter "0xad7a77F8eB03ac02dfb913e5A757F543CBb2F76c"
+    - &UpgradeableBeacon "0xAF5bf52E784361f4eBBA86f2e918fFDd6A31453A"
+    - &VaultFactory "0xBf18618d1Ba07cCcA63d3D74f6a9056762Eac3cA"
+    - &StakingVault "0x7ade83C09A0Aa0FEA45695840067438a9dC96361"
+    - &OssifiableProxy6 "0xaf41922d0b9677e8CF21D72a318C72a5188dd9f1"
+    - &ValidatorsExitBusOracle "0x2F09B020505e833a523A87e8A7EA238C40771214"
+    - &OssifiableProxy7 "0xDfA0B34F28b1b6735d2df150a99048139302a80E"
+    - &VaultHub "0xd075E66A593779994dfcA9dd0A9a12aAbC2d3B65"
+    - &OssifiableProxy8 "0xe41d78740A1009029c44E43618Fe09C8f368851F"
+    - &WithdrawalQueueERC721 "0x15D5365e4061DA45BA2aeD01ba149d40ddCB1c78"
+    - &WithdrawalsManagerProxy "0x79e52DbA27718B1b618FC519A8F05a1386F4A8d2"
+    - &WithdrawalVault "0xb37ef8776e07f40cE146b83A5C36C2185755C40D"
+    - &WstETH "0xDFD55388020a8CEDADCe0B177DF5EF1E11553b43"
+    - &PinnedBeaconProxy "0xF19E48C5Ad2F8aBB452F5A6AB9cb104E70495e08"
+
+l1:
+  rpcUrl: https://ethereum-hoodi-rpc.publicnode.com
+  explorerHostname: api-hoodi.etherscan.io
+  explorerTokenEnv: ETHERSCAN_TOKEN
