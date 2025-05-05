@@ -113,16 +113,15 @@ async function doChecks(jsonDocument: EntireDocument) {
   for (const [sectionTitle, section] of Object.entries(jsonDocument)) {
     if (isTypeOfTB(section, NetworkSectionTB)) await checkNetworkSection(sectionTitle, section);
   }
-  log(chalk.bold(`\n${g_total_checks} checks performed.`));
-  if (g_errors) {
-    log(`\n${FAILURE_MARK} ${chalk.bold(`${g_errors} errors found!`)} `);
-    process.exit(2);
-  }
-
   if (g_Arguments.checkOnly) {
     log(
       `\n${WARNING_MARK}${WARNING_MARK}${WARNING_MARK} Checks run only for "${chalk.bold(chalk.blue(g_Arguments.checkOnlyCmdArg))}"\n`,
     );
+  }
+  log(chalk.bold(`\n${g_total_checks} checks performed.`));
+  if (g_errors) {
+    log(`\n${FAILURE_MARK} ${chalk.bold(`${g_errors} errors found!`)} `);
+    process.exit(2);
   }
 }
 
