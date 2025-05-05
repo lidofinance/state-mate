@@ -1,0 +1,1311 @@
+# yaml-language-server: $schema=../../schemas/main-schema.json
+roles:
+  - &DEFAULT_ADMIN_ROLE "0x2cE254Fd852d6B5023b1B2355ae96A8d752a47cf"
+  - &MANAGE_CONSENSUS_CONTRACT_ROLE "0x04a0afbbd09d5ad397fc858789da4f8edd59f5ca5098d70faa490babee945c3b"
+  - &MANAGE_CONSENSUS_VERSION_ROLE "0xc31b1e4b732c5173dc51d519dfa432bad95550ecc4b0f9a61c2a558a2a8e4341"
+  - &SUBMIT_DATA_ROLE "0x65fa0c17458517c727737e4153dd477fa3e328cf706640b0f68b1a285c5990da"
+  - &STAKING_CONTROL_ROLE "0xa42eee1333c0758ba72be38e728b6dadb32ea767de5b4ddbaea1dae85b1b051f"
+  - &RESUME_ROLE "0x2fc10cc8ae19568712f7a176fb4978616a610650813c9d05326c34abb62749c7"
+  - &PAUSE_ROLE "0x139c2898040ef16910dc9f44dc697df79363da767d8bc92f2e310312b816e46d"
+
+misc:
+  - &ZERO_ADDRESS "0x0000000000000000000000000000000000000000"
+  - &ZERO_BYTES32 "0x0000000000000000000000000000000000000000000000000000000000000000"
+  - &APP_ID "0x701a4fd1f5174d12a0f1d9ad2c88d0ad11ab6aad0ac72b7d9ce621815f8016a9"
+  - &registryBase "0x13f43DCe264695D4118Cbc8Adb8691ABaEa0562d"
+  - &DEPOSIT_CONTRACT "0x00000000219ab540356cBB839Cbe05303d7705Fa"
+deployed:
+  l1:
+    - &accounting "0x7d7EcCE45cAc6eF043f34e8049399b4b03044F97"
+    - &accountingOracle "0xaBDf9686e4fbC7eEFff91621df82457dAb300168"
+    - &apmRegistryFactory "0xcA98541C98bCd77123eE74C4a37b8BDfd792C4b6"
+    - &app:aragon-agent "0x2cE254Fd852d6B5023b1B2355ae96A8d752a47cf"
+    - &app:aragon-finance "0x973bD4e3F387F1BBF1576c5B12101450328F067f"
+    - &app:aragon-token-manager "0x32Ea1c8Df51BCAd93309DB159E54415951782992"
+    - &app:aragon-voting "0xd401Bf29751aE77cF5A479b22fbAaB30cD027dD6"
+    - &app:lido "0x04d160820C0f2E2C693D9Eb26078189D10A1a3e1"
+    - &app:node-operators-registry "0x94bd69Be2711205F4eBAA084c34cEf29E24A8E59"
+    - &app:simple-dvt "0x90106946d5525003385310D8e3e123cA6CFCf5Cd"
+    - &aragon-acl "0x428d6E1C384B743b1D6bed40b3a01F5357Ec24A9"
+    - &aragon-apm-registry "0x85C4e347Cba194Ce2237fD19865cf9EE89A6Bb43"
+    - &aragon-evm-script-registry "0x49335f718631a7aA201B459B499AFfdc1d8Ca774"
+    - &aragon-kernel "0xf5591B4CA4De7f3e339248bbA35b0A02Ef9939c2"
+    - &aragon-repo-base "0xD03e828844AA4eF31566F984Fe2A1693e7d5aF38"
+    - &aragonID "0xAa3dFDDA2670A3d2A5B9cd6669ce1E4cF99258D9"
+    - &burner "0x87d699cBC410511216BC88E8c8523A8EFf41102b"
+    - &callsScript "0x207474d0f0Ba51A28ce911C2e77d6c93e231E8FD"
+    - &daoFactory "0xb1833a044f74d4b37d8230941eBA11368999e057"
+    - &dashboardImpl "0x5667f7477325F85C1b5E324387545C5045A57E2b"
+    - &deployer "0x26EDb7f0f223A25EE390aCCccb577F3a31edDfC5"
+    - &depositSecurityModule "0xfF772cd178D04F0B4b1EFB730c5F2B9683B31611"
+    - &dummyEmptyContract "0x7c625913A9c1dcCeB0799c62C0D3dfd2C21dBbE9"
+    - &eip712StETH "0x53520A0F043Bf005009588fcbb8Ef19bd0B98BC1"
+    - &ens "0x5A8bF7fe99a69c2b34B540eA09d4a48c6ae78C21"
+    - &ensFactory "0xf04b96fcE598C75EEAF8D517D569DE812B78683E"
+    - &evmScriptRegistryFactory "0x8F002279D8A3147230dc948fB892F5BC2FfEf5d5"
+    - &executionLayerRewardsVault "0xA60b3AF9244D7AF1e844d714fDc0E3796CC4390d"
+    - &hashConsensusForAccountingOracle "0x9F1c37DBCb2e01537786aEB2e6b4d6106dd81234"
+    - &hashConsensusForValidatorsExitBusOracle "0xF1BbbB0749736cC0c39eA1a1EDAA7fD36E2924d1"
+    - &ldo "0x0E9Fa6947804c5573796aE211898f7a652e58d1f"
+    - &lidoApm "0x2F78689e4534b1461F4c35C2fC65b53205f6e50f"
+    - &lidoLocator "0xbE861866E2Ca8f401e2b51b2cFb36A61B0Bf6840"
+    - &lidoTemplate "0xEC39F7ea18BC1c1bf3C0617fb6110dfC62d1e888"
+    - &minFirstAllocationStrategy "0x9b322efdB04840052f97649fD0C27B678De88DA2"
+    - &miniMeTokenFactory "0x4d0E05677c1005C4C808cb5e824abE99b2b39497"
+    - &operatorGrid "0xccb86588b776743CCCB6572D2a6eAFd466012191"
+    - &oracleDaemonConfig "0x2c2e8fE09a2449aB93D9eAD68f987D33189E6168"
+    - &oracleReportSanityChecker "0x4077619FBAdB002fDC125171c8daf6a149C71166"
+    - &predepositGuarantee "0x4C003D5586B32359Df5f37B42A2E717E24817Ec2"
+    - &stakingRouter "0xf320D34b55E89826631C2bb1b3c5b50932cCaB3C"
+    - &stakingVaultBeacon "0xAF5bf52E784361f4eBBA86f2e918fFDd6A31453A"
+    - &stakingVaultFactory "0xBf18618d1Ba07cCcA63d3D74f6a9056762Eac3cA"
+    - &stakingVaultImpl "0x7ade83C09A0Aa0FEA45695840067438a9dC96361"
+    - &validatorsExitBusOracle "0xaf41922d0b9677e8CF21D72a318C72a5188dd9f1"
+    - &vaultHub "0xDfA0B34F28b1b6735d2df150a99048139302a80E"
+    - &withdrawalQueueERC721 "0xe41d78740A1009029c44E43618Fe09C8f368851F"
+    - &withdrawalVault "0x79e52DbA27718B1b618FC519A8F05a1386F4A8d2"
+    - &wstETH "0xDFD55388020a8CEDADCe0B177DF5EF1E11553b43"
+    - &pinnedBeaconProxy "0xF19E48C5Ad2F8aBB452F5A6AB9cb104E70495e08"
+
+l1:
+  rpcUrl: https://ethereum-hoodi-rpc.publicnode.com
+  explorerHostname: api-hoodi.etherscan.io
+  explorerTokenEnv: ETHERSCAN_TOKEN
+  contracts:
+    accounting:
+      name: OssifiableProxy
+      address: *accounting
+      checks:
+        proxy__getAdmin: *deployer # NEED TO VERIFY
+        proxy__getImplementation: "0xE633f4758B17c004656Bf33aac5ED9F14E713246" # NEED TO VERIFY
+        proxy__getIsOssified: false # NEED TO VERIFY
+    accountingOracle:
+      name: AccountingOracle
+      address: *accountingOracle
+      proxyName: OssifiableProxy
+      implementation: "0x380c81b8f087f29aed8920ef12b510a182c4031c"
+      proxyChecks:
+        proxy__getAdmin: *DEFAULT_ADMIN_ROLE # NEED TO VERIFY
+        proxy__getImplementation: "0x380c81B8f087f29AED8920EF12b510a182C4031C" # NEED TO VERIFY
+        proxy__getIsOssified: false # NEED TO VERIFY
+      checks:
+        DEFAULT_ADMIN_ROLE: *ZERO_BYTES32 # NEED TO VERIFY
+        EXTRA_DATA_FORMAT_EMPTY: 0 # NEED TO VERIFY
+        EXTRA_DATA_FORMAT_LIST: 1 # NEED TO VERIFY
+        EXTRA_DATA_TYPE_EXITED_VALIDATORS: 2 # NEED TO VERIFY
+        EXTRA_DATA_TYPE_STUCK_VALIDATORS: 1 # NEED TO VERIFY
+        GENESIS_TIME: 1742213400 # NEED TO VERIFY
+        LOCATOR: *lidoLocator # NEED TO VERIFY
+        MANAGE_CONSENSUS_CONTRACT_ROLE: *MANAGE_CONSENSUS_CONTRACT_ROLE # NEED TO VERIFY
+        MANAGE_CONSENSUS_VERSION_ROLE: *MANAGE_CONSENSUS_VERSION_ROLE # NEED TO VERIFY
+        SECONDS_PER_SLOT: 12 # NEED TO VERIFY
+        SUBMIT_DATA_ROLE: *SUBMIT_DATA_ROLE # NEED TO VERIFY
+        getConsensusContract: *hashConsensusForAccountingOracle # NEED TO VERIFY
+        getConsensusReport:
+          - "0x62db301ef1d45d47c9dd6dd0fee3a97fe9cf8d88bb212bc787b6a1cb0033e56f"
+          - 352607
+          - 1746449292
+          - true
+        getConsensusVersion: 3 # NEED TO VERIFY
+        getContractVersion: 3 # NEED TO VERIFY
+        getLastProcessingRefSlot: 352607 # NEED TO VERIFY
+        getProcessingState:
+          - 352991
+          - 0
+          - "0x0000000000000000000000000000000000000000000000000000000000000000"
+          - false
+          - "0x0000000000000000000000000000000000000000000000000000000000000000"
+          - 0
+          - false
+          - 0
+          - 0
+        getRoleAdmin: REPLACEME # need to specify args
+        getRoleMember: REPLACEME # need to specify args
+        getRoleMemberCount: REPLACEME # need to specify args
+        hasRole: REPLACEME # need to specify args
+        supportsInterface: REPLACEME # need to specify args
+      implementationChecks:
+        DEFAULT_ADMIN_ROLE: *ZERO_BYTES32 # NEED TO VERIFY
+        EXTRA_DATA_FORMAT_EMPTY: 0 # NEED TO VERIFY
+        EXTRA_DATA_FORMAT_LIST: 1 # NEED TO VERIFY
+        EXTRA_DATA_TYPE_EXITED_VALIDATORS: 2 # NEED TO VERIFY
+        EXTRA_DATA_TYPE_STUCK_VALIDATORS: 1 # NEED TO VERIFY
+        GENESIS_TIME: 1742213400 # NEED TO VERIFY
+        LOCATOR: *lidoLocator # NEED TO VERIFY
+        MANAGE_CONSENSUS_CONTRACT_ROLE: *MANAGE_CONSENSUS_CONTRACT_ROLE # NEED TO VERIFY
+        MANAGE_CONSENSUS_VERSION_ROLE: *MANAGE_CONSENSUS_VERSION_ROLE # NEED TO VERIFY
+        SECONDS_PER_SLOT: 12 # NEED TO VERIFY
+        SUBMIT_DATA_ROLE: *SUBMIT_DATA_ROLE # NEED TO VERIFY
+        getConsensusContract: *ZERO_ADDRESS # NEED TO VERIFY
+        getConsensusReport:
+          - *ZERO_BYTES32
+          - 0
+          - 0
+          - false # NEED TO VERIFY
+        getConsensusVersion: 0 # NEED TO VERIFY
+        getContractVersion: 115792089237316195423570985008687907853269984665640564039457584007913129639935 # NEED TO VERIFY
+        getLastProcessingRefSlot: 0 # NEED TO VERIFY
+        getProcessingState: REPLACEME # view call reverted
+        getRoleAdmin: REPLACEME # need to specify args
+        getRoleMember: REPLACEME # need to specify args
+        getRoleMemberCount: REPLACEME # need to specify args
+        hasRole: REPLACEME # need to specify args
+        supportsInterface: REPLACEME # need to specify args
+    apmRegistryFactory:
+      name: APMRegistryFactory
+      address: *apmRegistryFactory
+      checks:
+        registryBase: *registryBase # NEED TO VERIFY
+        ensSubdomainRegistrarBase: "0x5ED5661F744E11A2076865810B0d7553b74468D2" # NEED TO VERIFY
+        ens: *ens # NEED TO VERIFY
+        daoFactory: *daoFactory # NEED TO VERIFY
+        repoBase: *aragon-repo-base # NEED TO VERIFY
+    app:aragon-agent:
+      name: AppProxyUpgradeable
+      address: *app:aragon-agent
+      checks:
+        proxyType: 2 # NEED TO VERIFY
+        isDepositable: true # NEED TO VERIFY
+        implementation: "0x3e4a509BBE76EC3F553D1f73131cF7E1896814A1" # NEED TO VERIFY
+        appId: "0x701a4fd1f5174d12a0f1d9ad2c88d0ad11ab6aad0ac72b7d9ce621815f8016a9" # NEED TO VERIFY
+        kernel: *aragon-kernel # NEED TO VERIFY
+    app:aragon-finance:
+      name: AppProxyUpgradeable
+      address: *app:aragon-finance
+      checks:
+        proxyType: 2 # NEED TO VERIFY
+        isDepositable: false # NEED TO VERIFY
+        implementation: "0x9C7d4c81BfdDc76F916bf724829029bFCCd1Aefb" # NEED TO VERIFY
+        appId: "0x5c9918c99c4081ca9459c178381be71d9da40e49e151687da55099c49a4237f1" # NEED TO VERIFY
+        kernel: *aragon-kernel # NEED TO VERIFY
+    app:aragon-token-manager:
+      name: AppProxyUpgradeable
+      address: *app:aragon-token-manager
+      checks:
+        proxyType: 2 # NEED TO VERIFY
+        isDepositable: false # NEED TO VERIFY
+        implementation: "0x3cBDFd1C852Ea9B31226d3108d5948E2a21103A8" # NEED TO VERIFY
+        appId: "0xcd567bdf93dd0f6acc3bc7f2155f83244d56a65abbfbefb763e015420102c67b" # NEED TO VERIFY
+        kernel: *aragon-kernel # NEED TO VERIFY
+    app:aragon-voting:
+      name: AppProxyUpgradeable
+      address: *app:aragon-voting
+      checks:
+        proxyType: 2 # NEED TO VERIFY
+        isDepositable: false # NEED TO VERIFY
+        implementation: "0xC4943D7877936c0dAa1C3E23Bb3c179D15a489B3" # NEED TO VERIFY
+        appId: "0x0abcd104777321a82b010357f20887d61247493d89d2e987ff57bcecbde00e1e" # NEED TO VERIFY
+        kernel: *aragon-kernel # NEED TO VERIFY
+    app:lido:
+      name: Lido
+      address: *app:lido
+      proxyName: AppProxyUpgradeable
+      implementation: "0x9260beb3c7876443c625c92a6f57aed4652eb2a2"
+      proxyChecks:
+        proxyType: 2 # NEED TO VERIFY
+        isDepositable: false # NEED TO VERIFY
+        implementation: "0x9260beB3c7876443C625c92A6f57AeD4652eB2a2" # NEED TO VERIFY
+        appId: "0x3ca7c3e38968823ccb4c78ea688df41356f182ae1d159e4ee608d30d68cef320" # NEED TO VERIFY
+        kernel: *aragon-kernel # NEED TO VERIFY
+      checks:
+        getPooledEthBySharesRoundUp: REPLACEME # need to specify args
+        name: Liquid staked Ether 2.0 # NEED TO VERIFY
+        hasInitialized: true # NEED TO VERIFY
+        STAKING_CONTROL_ROLE: *STAKING_CONTROL_ROLE # NEED TO VERIFY
+        totalSupply: 3223825752768621707110 # NEED TO VERIFY
+        getSharesByPooledEth: REPLACEME # need to specify args
+        isStakingPaused: false # NEED TO VERIFY
+        getEVMScriptExecutor: REPLACEME # need to specify args
+        RESUME_ROLE: *RESUME_ROLE # NEED TO VERIFY
+        decimals: 18 # NEED TO VERIFY
+        getRecoveryVault: *DEFAULT_ADMIN_ROLE # NEED TO VERIFY
+        DOMAIN_SEPARATOR: "0x1d71fb0eab9b3ce61d0c245669877c7caeb4af9175f17892ec695f05f4f1ce96" # NEED TO VERIFY
+        getTotalPooledEther: 3223825752768621707110 # NEED TO VERIFY
+        PAUSE_ROLE: *PAUSE_ROLE # NEED TO VERIFY
+        getTreasury: *DEFAULT_ADMIN_ROLE # NEED TO VERIFY
+        isStopped: false # NEED TO VERIFY
+        getBufferedEther: 17900000000000000010 # NEED TO VERIFY
+        getWithdrawalCredentials: "0x01000000000000000000000079e52dba27718b1b618fc519a8f05a1386f4a8d2" # NEED TO VERIFY
+        getCurrentStakeLimit: 150000000000000000000000 # NEED TO VERIFY
+        getExternalShares: 5907337799950767336 # NEED TO VERIFY
+        getStakeLimitFullInfo:
+          - false
+          - true
+          - 150000000000000000000000
+          - 150000000000000000000000
+          - 7200
+          - 149999000000000000000000
+          - 280685
+        balanceOf: REPLACEME # need to specify args
+        getFeeDistribution:
+          - 5000
+          - 0
+          - 5000 # NEED TO VERIFY
+        getPooledEthByShares: REPLACEME # need to specify args
+        allowRecoverability: REPLACEME # need to specify args
+        nonces: REPLACEME # need to specify args
+        appId: "0x3ca7c3e38968823ccb4c78ea688df41356f182ae1d159e4ee608d30d68cef320" # NEED TO VERIFY
+        eip712Domain:
+          - "Liquid staked Ether 2.0"
+          - 2
+          - 560048
+          - "0x04d160820C0f2E2C693D9Eb26078189D10A1a3e1" # NEED TO VERIFY
+        getMaxMintableExternalShares: 3201992662200049232674 # NEED TO VERIFY
+        getContractVersion: 3 # NEED TO VERIFY
+        getInitializationBlock: 213132 # NEED TO VERIFY
+        symbol: stETH # NEED TO VERIFY
+        getEIP712StETH: *eip712StETH # NEED TO VERIFY
+        getMaxExternalRatioBP: 5000 # NEED TO VERIFY
+        canPerform: REPLACEME # need to specify args
+        getEVMScriptRegistry: *aragon-evm-script-registry # NEED TO VERIFY
+        UNSAFE_CHANGE_DEPOSITED_VALIDATORS_ROLE: "0xe6dc5d79630c61871e99d341ad72c5a052bed2fc8c79e5a4480a7cd31117576c" # NEED TO VERIFY
+        getBeaconStat:
+          - 100
+          - 0
+          - 0 # NEED TO VERIFY
+        getFee: 1000 # NEED TO VERIFY
+        kernel: *aragon-kernel # NEED TO VERIFY
+        getTotalShares: 3213807337799950767346 # NEED TO VERIFY
+        allowance: REPLACEME # need to specify args
+        isPetrified: false # NEED TO VERIFY
+        getExternalEther: 5925752768621707101 # NEED TO VERIFY
+        getLidoLocator: *lidoLocator # NEED TO VERIFY
+        canDeposit: true # NEED TO VERIFY
+        STAKING_PAUSE_ROLE: "0x84ea57490227bc2be925c684e2a367071d69890b629590198f4125a018eb1de8" # NEED TO VERIFY
+        getDepositableEther: 17900000000000000010 # NEED TO VERIFY
+        sharesOf: REPLACEME # need to specify args
+        getTotalELRewardsCollected: 10000000000000000000 # NEED TO VERIFY
+      implementationChecks:
+        getPooledEthBySharesRoundUp: REPLACEME # need to specify args
+        name: Liquid staked Ether 2.0 # NEED TO VERIFY
+        hasInitialized: false # NEED TO VERIFY
+        STAKING_CONTROL_ROLE: *STAKING_CONTROL_ROLE # NEED TO VERIFY
+        totalSupply: 3223825752768621707111 # NEED TO VERIFY
+        getSharesByPooledEth: REPLACEME # need to specify args
+        isStakingPaused: true # NEED TO VERIFY
+        getEVMScriptExecutor: REPLACEME # need to specify args
+        RESUME_ROLE: *RESUME_ROLE # NEED TO VERIFY
+        decimals: 18 # NEED TO VERIFY
+        getRecoveryVault: REPLACEME # view call reverted
+        DOMAIN_SEPARATOR: REPLACEME # view call reverted
+        getTotalPooledEther: REPLACEME # view call reverted
+        PAUSE_ROLE: *PAUSE_ROLE # NEED TO VERIFY
+        getTreasury: REPLACEME # view call reverted
+        isStopped: true # NEED TO VERIFY
+        getBufferedEther: 0 # NEED TO VERIFY
+        getWithdrawalCredentials: REPLACEME # view call reverted
+        getCurrentStakeLimit: 0 # NEED TO VERIFY
+        getExternalShares: 0 # NEED TO VERIFY
+        getStakeLimitFullInfo:
+          - true
+          - false
+          - 0
+          - 0
+          - 0
+          - 0
+          - 0 # NEED TO VERIFY
+        balanceOf: REPLACEME # need to specify args
+        getFeeDistribution:
+          - 5000
+          - 0
+          - 5000 # NEED TO VERIFY
+        getPooledEthByShares: REPLACEME # need to specify args
+        allowRecoverability: REPLACEME # need to specify args
+        nonces: REPLACEME # need to specify args
+        appId: *ZERO_BYTES32 # NEED TO VERIFY
+        eip712Domain: REPLACEME # view call reverted
+        getMaxMintableExternalShares: 0 # NEED TO VERIFY
+        getContractVersion: 115792089237316195423570985008687907853269984665640564039457584007913129639935 # NEED TO VERIFY
+        getInitializationBlock: 115792089237316195423570985008687907853269984665640564039457584007913129639935 # NEED TO VERIFY
+        symbol: stETH # NEED TO VERIFY
+        getEIP712StETH: *ZERO_ADDRESS # NEED TO VERIFY
+        getMaxExternalRatioBP: 0 # NEED TO VERIFY
+        canPerform: REPLACEME # need to specify args
+        getEVMScriptRegistry: REPLACEME # view call reverted
+        UNSAFE_CHANGE_DEPOSITED_VALIDATORS_ROLE: "0xe6dc5d79630c61871e99d341ad72c5a052bed2fc8c79e5a4480a7cd31117576c" # NEED TO VERIFY
+        getBeaconStat:
+          - 0
+          - 0
+          - 0 # NEED TO VERIFY
+        getFee: REPLACEME # view call reverted
+        kernel: *ZERO_ADDRESS # NEED TO VERIFY
+        getTotalShares: 0 # NEED TO VERIFY
+        allowance: REPLACEME # need to specify args
+        isPetrified: true # NEED TO VERIFY
+        getExternalEther: REPLACEME # view call reverted
+        getLidoLocator: *ZERO_ADDRESS # NEED TO VERIFY
+        canDeposit: REPLACEME # view call reverted
+        STAKING_PAUSE_ROLE: "0x84ea57490227bc2be925c684e2a367071d69890b629590198f4125a018eb1de8" # NEED TO VERIFY
+        getDepositableEther: REPLACEME # view call reverted
+        sharesOf: REPLACEME # need to specify args
+        getTotalELRewardsCollected: 0 # NEED TO VERIFY
+    app:node-operators-registry:
+      name: NodeOperatorsRegistry
+      address: *app:node-operators-registry
+      proxyName: AppProxyUpgradeable
+      implementation: "0x6a3b5315c13a07270e80cee23df99adeb7469194"
+      proxyChecks:
+        proxyType: 2 # NEED TO VERIFY
+        isDepositable: false # NEED TO VERIFY
+        implementation: "0x6A3b5315C13A07270E80Cee23df99adeb7469194" # NEED TO VERIFY
+        appId: "0x7071f283424072341f856ac9e947e7ec0eb68719f757a7e785979b6b8717579d" # NEED TO VERIFY
+        kernel: *aragon-kernel # NEED TO VERIFY
+      checks:
+        hasInitialized: true # NEED TO VERIFY
+        getType: "0x637572617465642d6f6e636861696e2d76310000000000000000000000000000" # NEED TO VERIFY
+        getEVMScriptExecutor: REPLACEME # need to specify args
+        getRecoveryVault: *DEFAULT_ADMIN_ROLE # NEED TO VERIFY
+        getNodeOperatorIds: REPLACEME # need to specify args
+        getSigningKeys: REPLACEME # need to specify args
+        getNodeOperatorIsActive: REPLACEME # need to specify args
+        getRewardsDistribution: REPLACEME # need to specify args
+        getStuckPenaltyDelay: 172800 # NEED TO VERIFY
+        getRewardDistributionState: 1 # NEED TO VERIFY
+        isOperatorPenalized: REPLACEME # need to specify args
+        allowRecoverability: REPLACEME # need to specify args
+        STAKING_ROUTER_ROLE: "0xbb75b874360e0bfd87f964eadd8276d8efb7c942134fc329b513032d0803e0c6" # NEED TO VERIFY
+        appId: "0x7071f283424072341f856ac9e947e7ec0eb68719f757a7e785979b6b8717579d" # NEED TO VERIFY
+        getActiveNodeOperatorsCount: 1 # NEED TO VERIFY
+        getContractVersion: 3 # NEED TO VERIFY
+        getInitializationBlock: 213130 # NEED TO VERIFY
+        getUnusedSigningKeyCount: REPLACEME # need to specify args
+        MANAGE_NODE_OPERATOR_ROLE: "0x78523850fdd761612f46e844cf5a16bda6b3151d6ae961fd7e8e7b92bfbca7f8" # NEED TO VERIFY
+        getNodeOperator: REPLACEME # need to specify args
+        getStakingModuleSummary:
+          - 0
+          - 100
+          - 0 # NEED TO VERIFY
+        canPerform: REPLACEME # need to specify args
+        getEVMScriptRegistry: *aragon-evm-script-registry # NEED TO VERIFY
+        getNodeOperatorsCount: 1 # NEED TO VERIFY
+        getNodeOperatorSummary: REPLACEME # need to specify args
+        getSigningKey: REPLACEME # need to specify args
+        MAX_NODE_OPERATOR_NAME_LENGTH: 255 # NEED TO VERIFY
+        getKeysOpIndex: 4 # NEED TO VERIFY
+        getNonce: 4 # NEED TO VERIFY
+        kernel: *aragon-kernel # NEED TO VERIFY
+        getLocator: *lidoLocator # NEED TO VERIFY
+        SET_NODE_OPERATOR_LIMIT_ROLE: "0x07b39e0faf2521001ae4e58cb9ffd3840a63e205d288dc9c93c3774f0d794754" # NEED TO VERIFY
+        getTotalSigningKeyCount: REPLACEME # need to specify args
+        isPetrified: false # NEED TO VERIFY
+        MAX_STUCK_PENALTY_DELAY: 31536000 # NEED TO VERIFY
+        MAX_NODE_OPERATORS_COUNT: 200 # NEED TO VERIFY
+        MANAGE_SIGNING_KEYS: "0x75abc64490e17b40ea1e66691c3eb493647b24430b358bd87ec3e5127f1621ee" # NEED TO VERIFY
+        isOperatorPenaltyCleared: REPLACEME # need to specify args
+      implementationChecks:
+        hasInitialized: false # NEED TO VERIFY
+        getType: *ZERO_BYTES32 # NEED TO VERIFY
+        getEVMScriptExecutor: REPLACEME # need to specify args
+        getRecoveryVault: REPLACEME # view call reverted
+        getNodeOperatorIds: REPLACEME # need to specify args
+        getSigningKeys: REPLACEME # need to specify args
+        getNodeOperatorIsActive: REPLACEME # need to specify args
+        getRewardsDistribution: REPLACEME # need to specify args
+        getStuckPenaltyDelay: 0 # NEED TO VERIFY
+        getRewardDistributionState: 0 # NEED TO VERIFY
+        isOperatorPenalized: REPLACEME # need to specify args
+        allowRecoverability: REPLACEME # need to specify args
+        STAKING_ROUTER_ROLE: "0xbb75b874360e0bfd87f964eadd8276d8efb7c942134fc329b513032d0803e0c6" # NEED TO VERIFY
+        appId: *ZERO_BYTES32 # NEED TO VERIFY
+        getActiveNodeOperatorsCount: 0 # NEED TO VERIFY
+        getContractVersion: 115792089237316195423570985008687907853269984665640564039457584007913129639935 # NEED TO VERIFY
+        getInitializationBlock: 115792089237316195423570985008687907853269984665640564039457584007913129639935 # NEED TO VERIFY
+        getUnusedSigningKeyCount: REPLACEME # need to specify args
+        MANAGE_NODE_OPERATOR_ROLE: "0x78523850fdd761612f46e844cf5a16bda6b3151d6ae961fd7e8e7b92bfbca7f8" # NEED TO VERIFY
+        getNodeOperator: REPLACEME # need to specify args
+        getStakingModuleSummary:
+          - 0
+          - 0
+          - 0 # NEED TO VERIFY
+        canPerform: REPLACEME # need to specify args
+        getEVMScriptRegistry: REPLACEME # view call reverted
+        getNodeOperatorsCount: 0 # NEED TO VERIFY
+        getNodeOperatorSummary: REPLACEME # need to specify args
+        getSigningKey: REPLACEME # need to specify args
+        MAX_NODE_OPERATOR_NAME_LENGTH: 255 # NEED TO VERIFY
+        getKeysOpIndex: 0 # NEED TO VERIFY
+        getNonce: 0 # NEED TO VERIFY
+        kernel: *ZERO_ADDRESS # NEED TO VERIFY
+        getLocator: *ZERO_ADDRESS # NEED TO VERIFY
+        SET_NODE_OPERATOR_LIMIT_ROLE: "0x07b39e0faf2521001ae4e58cb9ffd3840a63e205d288dc9c93c3774f0d794754" # NEED TO VERIFY
+        getTotalSigningKeyCount: REPLACEME # need to specify args
+        isPetrified: true # NEED TO VERIFY
+        MAX_STUCK_PENALTY_DELAY: 31536000 # NEED TO VERIFY
+        MAX_NODE_OPERATORS_COUNT: 200 # NEED TO VERIFY
+        MANAGE_SIGNING_KEYS: "0x75abc64490e17b40ea1e66691c3eb493647b24430b358bd87ec3e5127f1621ee" # NEED TO VERIFY
+        isOperatorPenaltyCleared: REPLACEME # need to specify args
+    app:simple-dvt:
+      name: AppProxyUpgradeable
+      address: *app:simple-dvt
+      checks:
+        proxyType: 2 # NEED TO VERIFY
+        isDepositable: false # NEED TO VERIFY
+        implementation: "0x6A3b5315C13A07270E80Cee23df99adeb7469194" # NEED TO VERIFY
+        appId: "0xe1635b63b5f7b5e545f2a637558a4029dea7905361a2f0fc28c66e9136cf86a4" # NEED TO VERIFY
+        kernel: *aragon-kernel # NEED TO VERIFY
+    aragon-acl:
+      name: AppProxyUpgradeable
+      address: *aragon-acl
+      checks:
+        proxyType: 2 # NEED TO VERIFY
+        isDepositable: false # NEED TO VERIFY
+        implementation: "0x866Ad4D7283C4dcF00A01c1884DCDa98c2F1aE0A" # NEED TO VERIFY
+        appId: "0xe3262375f45a6e2026b7e7b18c2b807434f2508fe1a2a3dfb493c7df8f4aad6a" # NEED TO VERIFY
+        kernel: *aragon-kernel # NEED TO VERIFY
+    aragon-apm-registry:
+      name: AppProxyUpgradeable
+      address: *aragon-apm-registry
+      checks:
+        proxyType: 2 # NEED TO VERIFY
+        isDepositable: false # NEED TO VERIFY
+        implementation: *registryBase # NEED TO VERIFY
+        appId: "0x9089af016eb74d66811e1c39c1eef86fdcdb84b5665a4884ebf62339c2613991" # NEED TO VERIFY
+        kernel: "0x9b5213bf160413bf5F6c2B783B3E9Ce5099200a4" # NEED TO VERIFY
+    aragon-kernel:
+      name: KernelProxy
+      address: *aragon-kernel
+      checks:
+        proxyType: 2 # NEED TO VERIFY
+        apps: REPLACEME # need to specify args
+        isDepositable: false # NEED TO VERIFY
+        implementation: "0x14dDb33F1D85997Bc35546e7E8CC306F5A7B9DD1" # NEED TO VERIFY
+        recoveryVaultAppId: "0x701a4fd1f5174d12a0f1d9ad2c88d0ad11ab6aad0ac72b7d9ce621815f8016a9" # NEED TO VERIFY
+    aragon-repo-base:
+      name: Repo
+      address: *aragon-repo-base
+      checks:
+        hasInitialized: false # NEED TO VERIFY
+        getEVMScriptExecutor: REPLACEME # need to specify args
+        getRecoveryVault: REPLACEME # view call reverted
+        getBySemanticVersion: REPLACEME # need to specify args
+        getByVersionId: REPLACEME # need to specify args
+        allowRecoverability: REPLACEME # need to specify args
+        appId: *ZERO_BYTES32 # NEED TO VERIFY
+        getInitializationBlock: 115792089237316195423570985008687907853269984665640564039457584007913129639935 # NEED TO VERIFY
+        getLatestForContractAddress: REPLACEME # need to specify args
+        canPerform: REPLACEME # need to specify args
+        getEVMScriptRegistry: REPLACEME # view call reverted
+        isValidBump: REPLACEME # need to specify args
+        CREATE_VERSION_ROLE: 0x1f56cfecd3595a2e6cc1a7e6cb0b20df84cdbd92eff2fee554e70e4e45a9a7d8 # NEED TO VERIFY
+        getLatest: REPLACEME # view call reverted
+        getVersionsCount: 115792089237316195423570985008687907853269984665640564039457584007913129639935 # NEED TO VERIFY
+        kernel: *ZERO_ADDRESS # NEED TO VERIFY
+        isPetrified: true # NEED TO VERIFY
+    aragonID:
+      name: FIFSResolvingRegistrar
+      address: *aragonID
+      checks:
+        rootNode: "0x7e74a86b6e146964fb965db04dc2590516da77f720bb6759337bf5632415fd86" # NEED TO VERIFY
+    burner:
+      name: Burner
+      address: *burner
+      checks:
+        DEFAULT_ADMIN_ROLE: *ZERO_BYTES32 # NEED TO VERIFY
+        LIDO: *app:lido # NEED TO VERIFY
+        LOCATOR: *lidoLocator # NEED TO VERIFY
+        REQUEST_BURN_MY_STETH_ROLE: "0x28186f938b759084eea36948ef1cd8b40ec8790a98d5f1a09b70879fe054e5cc" # NEED TO VERIFY
+        REQUEST_BURN_SHARES_ROLE: "0x4be29e0e4eb91f98f709d98803cba271592782e293b84a625e025cbb40197ba8" # NEED TO VERIFY
+        getCoverSharesBurnt: 0 # NEED TO VERIFY
+        getExcessStETH: 0 # NEED TO VERIFY
+        getNonCoverSharesBurnt: 110000000000000000 # NEED TO VERIFY
+        getRoleAdmin: REPLACEME # need to specify args
+        getRoleMember: REPLACEME # need to specify args
+        getRoleMemberCount: REPLACEME # need to specify args
+        getSharesRequestedToBurn:
+          - 0
+          - 0 # NEED TO VERIFY
+        hasRole: REPLACEME # need to specify args
+        supportsInterface: REPLACEME # need to specify args
+    callsScript:
+      name: CallsScript
+      address: *callsScript
+      checks:
+        hasInitialized: false # NEED TO VERIFY
+        executorType: "0x2dc858a00f3e417be1394b87c07158e989ec681ce8cc68a9093680ac1a870302" # NEED TO VERIFY
+        getInitializationBlock: 115792089237316195423570985008687907853269984665640564039457584007913129639935 # NEED TO VERIFY
+        isPetrified: true # NEED TO VERIFY
+    daoFactory:
+      name: DAOFactory
+      address: *daoFactory
+      checks:
+        baseACL: "0x866Ad4D7283C4dcF00A01c1884DCDa98c2F1aE0A" # NEED TO VERIFY
+        regFactory: *evmScriptRegistryFactory # NEED TO VERIFY
+        baseKernel: "0x14dDb33F1D85997Bc35546e7E8CC306F5A7B9DD1" # NEED TO VERIFY
+    dashboardImpl:
+      name: Dashboard
+      address: *dashboardImpl
+      checks:
+        BURN_ROLE: "0x689f0a569be0c9b6cd2c11c81cb0add722272abdae6b649fdb1e05f1d9bb8a2f" # NEED TO VERIFY
+        DEFAULT_ADMIN_ROLE: *ZERO_BYTES32 # NEED TO VERIFY
+        ETH: "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE" # NEED TO VERIFY
+        FUND_ROLE: "0x933b7d5c112a4d05b489cea0b2ced98acb27d3d0fc9827c92cdacb2d6c5559c2" # NEED TO VERIFY
+        LIDO_VAULTHUB_AUTHORIZATION_ROLE: "0x12721d7ec843176aec149b06f8f88034866537c4b8a2fc38014f2daaba6f1563" # NEED TO VERIFY
+        LIDO_VAULTHUB_DEAUTHORIZATION_ROLE: "0x956303b84cebe7f6d4c573121d1d147af67b9f1048630d8dba50a3e6f41a738c" # NEED TO VERIFY
+        LOCK_ROLE: "0xaf5678186f680e15e8b3e8a8679bdd61c0eb1aaded90254c3e1b5b6b3fed62af" # NEED TO VERIFY
+        MANUAL_ACCRUED_REWARDS_ADJUSTMENT_LIMIT: "10000000000000000000000000" # NEED TO VERIFY
+        MAX_CONFIRM_EXPIRY: "2592000" # NEED TO VERIFY
+        MINT_ROLE: "0xe996ac9b332538bb1fa3cd6743aa47011623cdb94bd964a494ee9d371e4a27d3" # NEED TO VERIFY
+        MIN_CONFIRM_EXPIRY: "86400" # NEED TO VERIFY
+        NODE_OPERATOR_FEE_CLAIM_ROLE: "0x24633f096579ea9942f9f4de94a59d0fd90e22436d62e831fc27ea6f0cbba5a0" # NEED TO VERIFY
+        NODE_OPERATOR_MANAGER_ROLE: "0x59783a4ae82167eefad593739a5430c1d9e896a16c35f1e5285ddd0c0980885c" # NEED TO VERIFY
+        NODE_OPERATOR_REWARDS_ADJUST_ROLE: "0xe0b9915a7819e810f29b50730662441fec3443eb363b7e7c90c77fada416f276" # NEED TO VERIFY
+        OSSIFY_ROLE: "0x6a77c9119dc50d7dc957a0b6bec3e9899530f9a3df66bb8addb7f073f678f2f2" # NEED TO VERIFY
+        PAUSE_BEACON_CHAIN_DEPOSITS_ROLE: "0xa90c7030a27f389f9fc8ed21a0556f40c88130cc14a80db936bed68261819b2c" # NEED TO VERIFY
+        PDG_COMPENSATE_PREDEPOSIT_ROLE: "0x17960a6b137243c888669d93712b617414dd6d1ab55d5eca488ccb1d0894cd5c" # NEED TO VERIFY
+        PDG_PROVE_VALIDATOR_ROLE: "0xb850402129bccae797798069a8cf3147a0cb7c3193f70558a75f7df0b8651c30" # NEED TO VERIFY
+        REBALANCE_ROLE: "0x3f82ecf462ddac43fc17ba11472c35f18b7760b4f5a5fc50b9625f9b5a22cf62" # NEED TO VERIFY
+        RECOVER_ASSETS_ROLE: "0xa38b301640bddfd3e6a9d2a11d13551d53ef81526347ff09d798738fcc5a49d4" # NEED TO VERIFY
+        REQUEST_TIER_CHANGE_ROLE: "0xd0d885b3f66154d15e918afc9fcd5eb37aea7fbf993c32b18a84a0be97d13276" # NEED TO VERIFY
+        REQUEST_VALIDATOR_EXIT_ROLE: "0x32d0d6546e21c13ff633616141dc9daad87d248d1d37c56bf493d06d627ecb7b" # NEED TO VERIFY
+        RESET_LOCKED_ROLE: "0xec7606002753a83f3033806d5596d2cf315f8f3836c68f2fabbbc3ed9b6f1ac4" # NEED TO VERIFY
+        RESUME_BEACON_CHAIN_DEPOSITS_ROLE: "0x59d005e32db662b94335d6bedfeb453fd2202b9f0cc7a6ed498d9098171744b0" # NEED TO VERIFY
+        SET_DEPOSITOR_ROLE: "0x49fd147dcd655645beca3a7658e351ec884fb6dfffceb007c33e3cb733af2adb" # NEED TO VERIFY
+        STETH: *app:lido # NEED TO VERIFY
+        TRIGGER_VALIDATOR_WITHDRAWAL_ROLE: "0xea19d3b23bd90fdd52445ad672f2b6fb1fef7230d49c6a827c1cd288d02994d5" # NEED TO VERIFY
+        UNGUARANTEED_BEACON_CHAIN_DEPOSIT_ROLE: "0xea6487df651bb740150364c496e1c7403dd62063c96e44906cc98c6a919a9d88" # NEED TO VERIFY
+        VAULT_HUB: *vaultHub # NEED TO VERIFY
+        VOLUNTARY_DISCONNECT_ROLE: "0x9586321ac05f110e4b4a0a42aba899709345af0ca78910e8832ddfd71fed2bf4" # NEED TO VERIFY
+        WITHDRAW_ROLE: "0x355caf1c2580ed8185acb5ea3573b71f85186b41bdf69e3eb8f1fcd122a562df" # NEED TO VERIFY
+        WSTETH: *wstETH # NEED TO VERIFY
+        accruedRewardsAdjustment: 0 # NEED TO VERIFY
+        confirmations: REPLACEME # need to specify args
+        confirmingRoles:
+          - *ZERO_BYTES32
+          - "0x59783a4ae82167eefad593739a5430c1d9e896a16c35f1e5285ddd0c0980885c" # NEED TO VERIFY
+        forcedRebalanceThresholdBP: 0 # NEED TO VERIFY
+        getConfirmExpiry: 86400 # NEED TO VERIFY
+        getRoleAdmin: REPLACEME # need to specify args
+        getRoleMember: REPLACEME # need to specify args
+        getRoleMemberCount: REPLACEME # need to specify args
+        getRoleMembers: REPLACEME # need to specify args
+        hasRole: REPLACEME # need to specify args
+        initialized: false # NEED TO VERIFY
+        liabilityShares: 0 # NEED TO VERIFY
+        nodeOperatorFeeBP: 0 # NEED TO VERIFY
+        nodeOperatorFeeClaimedReport:
+          - 0
+          - 0
+          - 0 # NEED TO VERIFY
+        nodeOperatorUnclaimedFee: REPLACEME # view call reverted
+        remainingMintingCapacity: REPLACEME # need to specify args
+        reserveRatioBP: 0 # NEED TO VERIFY
+        shareLimit: 0 # NEED TO VERIFY
+        stakingVault: "0x11610083578063f3feF3a3146111BB578063F634" # NEED TO VERIFY
+        supportsInterface: REPLACEME # need to specify args
+        totalMintingCapacity: REPLACEME # view call reverted
+        totalValue: REPLACEME # view call reverted
+        treasuryFeeBP: 0 # NEED TO VERIFY
+        unreserved: REPLACEME # view call reverted
+        vaultSocket:
+          - *ZERO_ADDRESS
+          - 0
+          - 0
+          - 0
+          - 0
+          - 0
+          - false
+          - 0 # NEED TO VERIFY
+        withdrawableEther: REPLACEME # view call reverted
+    dummyEmptyContract:
+      name: DummyEmptyContract
+      address: *dummyEmptyContract
+      checks: {}
+    eip712StETH:
+      name: EIP712StETH
+      address: *eip712StETH
+      checks:
+        domainSeparatorV4: REPLACEME # need to specify args
+        eip712Domain: REPLACEME # need to specify args
+        hashTypedDataV4: REPLACEME # need to specify args
+    ensFactory:
+      name: ENSFactory
+      address: *ensFactory
+      checks: {}
+    evmScriptRegistryFactory:
+      name: EVMScriptRegistryFactory
+      address: *evmScriptRegistryFactory
+      checks:
+        baseReg: "0xA75A76Ca92068c8fe1fA2665795805aA4610999E" # NEED TO VERIFY
+        baseCallScript: *callsScript # NEED TO VERIFY
+    executionLayerRewardsVault:
+      name: LidoExecutionLayerRewardsVault
+      address: *executionLayerRewardsVault
+      checks:
+        LIDO: *app:lido # NEED TO VERIFY
+        TREASURY: *DEFAULT_ADMIN_ROLE # NEED TO VERIFY
+    hashConsensusForAccountingOracle:
+      name: HashConsensus
+      address: *hashConsensusForAccountingOracle
+      checks:
+        DEFAULT_ADMIN_ROLE: *ZERO_BYTES32 # NEED TO VERIFY
+        DISABLE_CONSENSUS_ROLE: "0x10b016346186602d93fc7a27ace09ba944baf9453611b186d36acd3d3d667dc0" # NEED TO VERIFY
+        MANAGE_FAST_LANE_CONFIG_ROLE: "0x4af6faa30fabb2c4d8d567d06168f9be8adb583156c1ecb424b4832a7e4d6717" # NEED TO VERIFY
+        MANAGE_FRAME_CONFIG_ROLE: "0x921f40f434e049d23969cbe68d9cf3ac1013fbe8945da07963af6f3142de6afe" # NEED TO VERIFY
+        MANAGE_MEMBERS_AND_QUORUM_ROLE: "0x66a484cf1a3c6ef8dfd59d24824943d2853a29d96f34a01271efc55774452a51" # NEED TO VERIFY
+        MANAGE_REPORT_PROCESSOR_ROLE: "0xc5219a8d2d0107a57aad00b22081326d173df87bad251126f070df2659770c3e" # NEED TO VERIFY
+        getChainConfig:
+          - 32
+          - 12
+          - 1742213400 # NEED TO VERIFY
+        getConsensusState:
+          - 353247
+          - "0x0000000000000000000000000000000000000000000000000000000000000000"
+          - false # NEED TO VERIFY
+        getConsensusStateForMember: REPLACEME # need to specify args
+        getCurrentFrame:
+          - 352991
+          - 353375 # NEED TO VERIFY
+        getFastLaneMembers:
+          - 0x0f30c4ceBE7F3057e81949B0Ab1591FC256226b5
+          - 0x44e3996629a9026BF95C4Be3c1a38242D1E64a01
+          - 339551
+          - 339551 # NEED TO VERIFY
+        getFrameConfig:
+          - 7275
+          - 12
+          - 10 # NEED TO VERIFY
+        getInitialRefSlot: 232799 # NEED TO VERIFY
+        getIsFastLaneMember: REPLACEME # need to specify args
+        getIsMember: REPLACEME # need to specify args
+        getMembers:
+          - "0x0f30c4ceBE7F3057e81949B0Ab1591FC256226b5"
+          - "0x44e3996629a9026BF95C4Be3c1a38242D1E64a01"
+          - 339551
+          - 339551 # NEED TO VERIFY
+        getQuorum: 2 # NEED TO VERIFY
+        getReportProcessor: *accountingOracle # NEED TO VERIFY
+        getReportVariants:
+          - 0x7112404d9a0751b906814b5dcf02c799af08d2d03c526e2e1195dc9a02e330f4
+          - 2 # NEED TO VERIFY
+        getRoleAdmin: REPLACEME # need to specify args
+        getRoleMember: REPLACEME # need to specify args
+        getRoleMemberCount: REPLACEME # need to specify args
+        hasRole: REPLACEME # need to specify args
+        supportsInterface: REPLACEME # need to specify args
+    hashConsensusForValidatorsExitBusOracle:
+      name: HashConsensus
+      address: *hashConsensusForValidatorsExitBusOracle
+      checks:
+        DEFAULT_ADMIN_ROLE: *ZERO_BYTES32 # NEED TO VERIFY
+        DISABLE_CONSENSUS_ROLE: "0x10b016346186602d93fc7a27ace09ba944baf9453611b186d36acd3d3d667dc0" # NEED TO VERIFY
+        MANAGE_FAST_LANE_CONFIG_ROLE: "0x4af6faa30fabb2c4d8d567d06168f9be8adb583156c1ecb424b4832a7e4d6717" # NEED TO VERIFY
+        MANAGE_FRAME_CONFIG_ROLE: "0x921f40f434e049d23969cbe68d9cf3ac1013fbe8945da07963af6f3142de6afe" # NEED TO VERIFY
+        MANAGE_MEMBERS_AND_QUORUM_ROLE: "0x66a484cf1a3c6ef8dfd59d24824943d2853a29d96f34a01271efc55774452a51" # NEED TO VERIFY
+        MANAGE_REPORT_PROCESSOR_ROLE: "0xc5219a8d2d0107a57aad00b22081326d173df87bad251126f070df2659770c3e" # NEED TO VERIFY
+        getChainConfig:
+          - 32
+          - 12
+          - 1742213400 # NEED TO VERIFY
+        getConsensusState:
+          - 353759
+          - *ZERO_BYTES32
+          - false # NEED TO VERIFY
+        getConsensusStateForMember: REPLACEME # need to specify args
+        getCurrentFrame:
+          - 353887
+          - 354015 # NEED TO VERIFY
+        getFastLaneMembers:
+          - "0xFf7a3858c77133E3B0cd7cC1478e0b25F2c60211"
+          - "0x92938052A9a2f2a0d38A468fc0bB5f4242844b7D"
+          - 316383
+          - 316383 # NEED TO VERIFY
+        getFrameConfig:
+          - 7275
+          - 4
+          - 10 # NEED TO VERIFY
+        getInitialRefSlot: 232799 # NEED TO VERIFY
+        getIsFastLaneMember: REPLACEME # need to specify args
+        getIsMember: REPLACEME # need to specify args
+        getMembers:
+          - "0xFf7a3858c77133E3B0cd7cC1478e0b25F2c60211"
+          - "0x92938052A9a2f2a0d38A468fc0bB5f4242844b7D"
+          - 316383
+          - 316383 # NEED TO VERIFY
+        getQuorum: 2 # NEED TO VERIFY
+        getReportProcessor: *validatorsExitBusOracle # NEED TO VERIFY
+        getReportVariants: REPLACEME
+        getRoleAdmin: REPLACEME # need to specify args
+        getRoleMember: REPLACEME # need to specify args
+        getRoleMemberCount: REPLACEME # need to specify args
+        hasRole: REPLACEME # need to specify args
+        supportsInterface: REPLACEME # need to specify args
+    ldo:
+      name: MiniMeToken
+      address: *ldo
+      checks:
+        name: TEST Lido DAO Token # NEED TO VERIFY
+        creationBlock: 213093 # NEED TO VERIFY
+        totalSupply: 1000000000000000000000000 # NEED TO VERIFY
+        decimals: 18 # NEED TO VERIFY
+        balanceOfAt: REPLACEME # need to specify args
+        version: MMT_0.1 # NEED TO VERIFY
+        balanceOf: REPLACEME # need to specify args
+        parentToken: *ZERO_ADDRESS # NEED TO VERIFY
+        symbol: TLDO # NEED TO VERIFY
+        totalSupplyAt: REPLACEME # need to specify args
+        transfersEnabled: true # NEED TO VERIFY
+        parentSnapShotBlock: 0 # NEED TO VERIFY
+        allowance: REPLACEME # need to specify args
+        tokenFactory: *miniMeTokenFactory # NEED TO VERIFY
+        controller: *app:aragon-token-manager # NEED TO VERIFY
+    lidoApm:
+      name: AppProxyUpgradeable
+      address: *lidoApm
+      checks:
+        proxyType: 2 # NEED TO VERIFY
+        isDepositable: false # NEED TO VERIFY
+        implementation: *registryBase # NEED TO VERIFY
+        appId: "0xc95d34302dc847b668b330533aa705a57718eab1060b8549df38040633554bcd" # NEED TO VERIFY
+        kernel: "0xe4fAd5232489Fe4E403918cbF45aA71EEB7e93D4" # NEED TO VERIFY
+    lidoLocator:
+      name: LidoLocator
+      address: *lidoLocator
+      proxyName: OssifiableProxy
+      implementation: "0xc293ea75f11c0d77416d0afdf903d88a3891d16b"
+      proxyChecks:
+        proxy__getAdmin: *DEFAULT_ADMIN_ROLE # NEED TO VERIFY
+        proxy__getImplementation: "0xC293Ea75F11C0D77416D0AFdf903d88a3891d16b" # NEED TO VERIFY
+        proxy__getIsOssified: false # NEED TO VERIFY
+      checks:
+        accounting: *accounting # NEED TO VERIFY
+        accountingOracle: *accountingOracle # NEED TO VERIFY
+        burner: *burner # NEED TO VERIFY
+        coreComponents:
+          - *executionLayerRewardsVault
+          - *oracleReportSanityChecker
+          - *stakingRouter
+          - *DEFAULT_ADMIN_ROLE
+          - *withdrawalQueueERC721
+          - *withdrawalVault # NEED TO VERIFY
+        depositSecurityModule: *depositSecurityModule # NEED TO VERIFY
+        elRewardsVault: *executionLayerRewardsVault # NEED TO VERIFY
+        lido: *app:lido # NEED TO VERIFY
+        operatorGrid: *operatorGrid # NEED TO VERIFY
+        oracleDaemonConfig: *oracleDaemonConfig # NEED TO VERIFY
+        oracleReportComponents:
+          - *accountingOracle
+          - *oracleReportSanityChecker
+          - *burner
+          - *withdrawalQueueERC721
+          - *ZERO_ADDRESS
+          - *stakingRouter
+          - *vaultHub # NEED TO VERIFY
+        oracleReportSanityChecker: *oracleReportSanityChecker # NEED TO VERIFY
+        postTokenRebaseReceiver: *ZERO_ADDRESS # NEED TO VERIFY
+        predepositGuarantee: *predepositGuarantee # NEED TO VERIFY
+        stakingRouter: *stakingRouter # NEED TO VERIFY
+        treasury: *DEFAULT_ADMIN_ROLE # NEED TO VERIFY
+        validatorsExitBusOracle: *validatorsExitBusOracle # NEED TO VERIFY
+        vaultHub: *vaultHub # NEED TO VERIFY
+        withdrawalQueue: *withdrawalQueueERC721 # NEED TO VERIFY
+        withdrawalVault: *withdrawalVault # NEED TO VERIFY
+        wstETH: *wstETH # NEED TO VERIFY
+      implementationChecks:
+        accounting: *accounting # NEED TO VERIFY
+        accountingOracle: *accountingOracle # NEED TO VERIFY
+        burner: *burner # NEED TO VERIFY
+        coreComponents:
+          - *executionLayerRewardsVault
+          - *oracleReportSanityChecker
+          - *stakingRouter
+          - *DEFAULT_ADMIN_ROLE
+          - *withdrawalQueueERC721
+          - *withdrawalVault # NEED TO VERIFY
+        depositSecurityModule: *depositSecurityModule # NEED TO VERIFY
+        elRewardsVault: *executionLayerRewardsVault # NEED TO VERIFY
+        lido: *app:lido # NEED TO VERIFY
+        operatorGrid: *operatorGrid # NEED TO VERIFY
+        oracleDaemonConfig: *oracleDaemonConfig # NEED TO VERIFY
+        oracleReportComponents:
+          - *accountingOracle
+          - *oracleReportSanityChecker
+          - *burner
+          - *withdrawalQueueERC721
+          - *ZERO_ADDRESS
+          - *stakingRouter
+          - *vaultHub # NEED TO VERIFY
+        oracleReportSanityChecker: *oracleReportSanityChecker # NEED TO VERIFY
+        postTokenRebaseReceiver: *ZERO_ADDRESS # NEED TO VERIFY
+        predepositGuarantee: *predepositGuarantee # NEED TO VERIFY
+        stakingRouter: *stakingRouter # NEED TO VERIFY
+        treasury: *DEFAULT_ADMIN_ROLE # NEED TO VERIFY
+        validatorsExitBusOracle: *validatorsExitBusOracle # NEED TO VERIFY
+        vaultHub: *vaultHub # NEED TO VERIFY
+        withdrawalQueue: *withdrawalQueueERC721 # NEED TO VERIFY
+        withdrawalVault: *withdrawalVault # NEED TO VERIFY
+        wstETH: *wstETH # NEED TO VERIFY
+    lidoTemplate:
+      name: LidoTemplate
+      address: *lidoTemplate
+      checks:
+        getConfig:
+          - *deployer
+          - *daoFactory
+          - *ens
+          - *miniMeTokenFactory
+          - *aragonID
+          - *apmRegistryFactory # NEED TO VERIFY
+    minFirstAllocationStrategy:
+      name: MinFirstAllocationStrategy
+      address: *minFirstAllocationStrategy
+      checks:
+        allocate: REPLACEME # need to specify args
+    operatorGrid:
+      name: OperatorGrid
+      address: *operatorGrid
+      proxyName: OssifiableProxy
+      implementation: "0x7fc784952ee7e96e9a8c3f271712805fc439dfd7"
+      proxyChecks:
+        proxy__getAdmin: *DEFAULT_ADMIN_ROLE # NEED TO VERIFY
+        proxy__getImplementation: "0x7FC784952EE7e96e9A8C3f271712805fc439dfD7" # NEED TO VERIFY
+        proxy__getIsOssified: false # NEED TO VERIFY
+      checks:
+        DEFAULT_ADMIN_ROLE: *ZERO_BYTES32 # NEED TO VERIFY
+        DEFAULT_TIER_ID: 0 # NEED TO VERIFY
+        DEFAULT_TIER_OPERATOR: "0xFFfFfFffFFfffFFfFFfFFFFFffFFFffffFfFFFfF" # NEED TO VERIFY
+        LIDO_LOCATOR: *lidoLocator # NEED TO VERIFY
+        REGISTRY_ROLE: "0xa495a3428837724c7f7648cda02eb83c9c4c778c8688d6f254c7f3f80c154d55" # NEED TO VERIFY
+        getRoleAdmin: REPLACEME # need to specify args
+        getRoleMember: REPLACEME # need to specify args
+        getRoleMemberCount: REPLACEME # need to specify args
+        getRoleMembers: REPLACEME # need to specify args
+        group: REPLACEME # need to specify args
+        hasRole: REPLACEME # need to specify args
+        nodeOperatorAddress: REPLACEME # need to specify args
+        nodeOperatorCount: 0 # NEED TO VERIFY
+        pendingRequest: REPLACEME # need to specify args
+        pendingRequests: REPLACEME # need to specify args
+        pendingRequestsCount: REPLACEME # need to specify args
+        supportsInterface: REPLACEME # need to specify args
+        tier: REPLACEME # need to specify args
+        vaultInfo: REPLACEME # need to specify args
+      implementationChecks:
+        DEFAULT_ADMIN_ROLE: *ZERO_BYTES32 # NEED TO VERIFY
+        DEFAULT_TIER_ID: 0 # NEED TO VERIFY
+        DEFAULT_TIER_OPERATOR: "0xFFfFfFffFFfffFFfFFfFFFFFffFFFffffFfFFFfF" # NEED TO VERIFY
+        LIDO_LOCATOR: *lidoLocator # NEED TO VERIFY
+        REGISTRY_ROLE: "0xa495a3428837724c7f7648cda02eb83c9c4c778c8688d6f254c7f3f80c154d55" # NEED TO VERIFY
+        getRoleAdmin: REPLACEME # need to specify args
+        getRoleMember: REPLACEME # need to specify args
+        getRoleMemberCount: REPLACEME # need to specify args
+        getRoleMembers: REPLACEME # need to specify args
+        group: REPLACEME # need to specify args
+        hasRole: REPLACEME # need to specify args
+        nodeOperatorAddress: REPLACEME # need to specify args
+        nodeOperatorCount: 0 # NEED TO VERIFY
+        pendingRequest: REPLACEME # need to specify args
+        pendingRequests: REPLACEME # need to specify args
+        pendingRequestsCount: REPLACEME # need to specify args
+        supportsInterface: REPLACEME # need to specify args
+        tier: REPLACEME # need to specify args
+        vaultInfo: REPLACEME # need to specify args
+    oracleDaemonConfig:
+      name: OracleDaemonConfig
+      address: *oracleDaemonConfig
+      checks:
+        CONFIG_MANAGER_ROLE: "0xbbfb55d933c2bfa638763473275b1d84c4418e58d26cf9d2cd5758237756d9f0" # NEED TO VERIFY
+        DEFAULT_ADMIN_ROLE: *ZERO_BYTES32 # NEED TO VERIFY
+        get: REPLACEME # need to specify args
+        getList: REPLACEME # need to specify args
+        getRoleAdmin: REPLACEME # need to specify args
+        getRoleMember: REPLACEME # need to specify args
+        getRoleMemberCount: REPLACEME # need to specify args
+        hasRole: REPLACEME # need to specify args
+        supportsInterface: REPLACEME # need to specify args
+    oracleReportSanityChecker:
+      name: OracleReportSanityChecker
+      address: *oracleReportSanityChecker
+      checks:
+        ALL_LIMITS_MANAGER_ROLE: "0x5bf88568a012dfc9fe67407ad6775052bddc4ac89902dea1f4373ef5d9f1e35b" # NEED TO VERIFY
+        ANNUAL_BALANCE_INCREASE_LIMIT_MANAGER_ROLE: "0x12c02753cd3d584dc4bb965eb0c88392c4c4d7c00433fdb7490d33c61ea57622" # NEED TO VERIFY
+        APPEARED_VALIDATORS_PER_DAY_LIMIT_MANAGER_ROLE: "0x14ca7b84baa11a976283347b0159b8ddf2dcf5fd5cf613cc567a3423cf510119" # NEED TO VERIFY
+        DEFAULT_ADMIN_ROLE: *ZERO_BYTES32 # NEED TO VERIFY
+        EXITED_VALIDATORS_PER_DAY_LIMIT_MANAGER_ROLE: "0x60b9982471bc0620c7b74959f48a86c55c92c11876fddc5b0b54d1ec47153e5d" # NEED TO VERIFY
+        INITIAL_SLASHING_AND_PENALTIES_MANAGER_ROLE: "0xebfa317a5d279811b024586b17a50f48924bce86f6293b233927322d7209b507" # NEED TO VERIFY
+        MAX_ITEMS_PER_EXTRA_DATA_TRANSACTION_ROLE: "0x13445b811594f3a8800b82296d63f371c695d2f86c1069c899ded3d73f523d2e" # NEED TO VERIFY
+        MAX_NODE_OPERATORS_PER_EXTRA_DATA_ITEM_ROLE: "0xb3f2d16385bde8a7121e101a021aff43bbe4d4137a587832caf1f583b9d34395" # NEED TO VERIFY
+        MAX_POSITIVE_TOKEN_REBASE_MANAGER_ROLE: "0x78de2bab4a3a0c88f50b6bb7c2290e0eb46bc61d575eae694d8bffbc2ca98c92" # NEED TO VERIFY
+        MAX_VALIDATOR_EXIT_REQUESTS_PER_REPORT_ROLE: "0x9925400e72399e0a89e9b346878fc47ac0031526d0e060e33ff372d7a5d11ba8" # NEED TO VERIFY
+        REQUEST_TIMESTAMP_MARGIN_MANAGER_ROLE: "0x2f8719116fbba3aba2a39759e34dcd29ea3516f7568c8321695aaea208280cd3" # NEED TO VERIFY
+        SECOND_OPINION_MANAGER_ROLE: "0xaa0e0f619f5a9368ee035bae759cfe7da8958f44bd71456a05198effc68ea647" # NEED TO VERIFY
+        SHARE_RATE_DEVIATION_LIMIT_MANAGER_ROLE: "0x7b21c0949109e9e143f66d6aa1f8a065b3f4ab47ee9f84f6837fd0490eace4d5" # NEED TO VERIFY
+        checkExitBusOracleReport: REPLACEME # need to specify args
+        checkExitedValidatorsRatePerDay: REPLACEME # need to specify args
+        checkExtraDataItemsCountPerTransaction: REPLACEME # need to specify args
+        checkNodeOperatorsPerExtraDataItemCount: REPLACEME # need to specify args
+        checkWithdrawalQueueOracleReport: REPLACEME # need to specify args
+        getLidoLocator: *lidoLocator # NEED TO VERIFY
+        getMaxPositiveTokenRebase: 750000 # NEED TO VERIFY
+        getOracleReportLimits:
+          - 9000
+          - 43200
+          - 1000
+          - 600
+          - 8
+          - 24
+          - 128
+          - 750000
+          - 1000
+          - 101
+          - 50 # NEED TO VERIFY
+        getReportDataCount: 264 # NEED TO VERIFY
+        getRoleAdmin: REPLACEME # need to specify args
+        getRoleMember: REPLACEME # need to specify args
+        getRoleMemberCount: REPLACEME # need to specify args
+        hasRole: REPLACEME # need to specify args
+        reportData: REPLACEME # need to specify args
+        secondOpinionOracle: *ZERO_ADDRESS # NEED TO VERIFY
+        smoothenTokenRebase: REPLACEME # need to specify args
+        supportsInterface: REPLACEME # need to specify args
+    predepositGuarantee:
+      name: OssifiableProxy
+      address: *predepositGuarantee
+      checks:
+        proxy__getAdmin: *DEFAULT_ADMIN_ROLE # NEED TO VERIFY
+        proxy__getImplementation: "0x306F410c6b238348fa098761a860CAf571d84F41" # NEED TO VERIFY
+        proxy__getIsOssified: false # NEED TO VERIFY
+    stakingRouter:
+      name: StakingRouter
+      address: *stakingRouter
+      proxyName: OssifiableProxy
+      implementation: "0xad7a77f8eb03ac02dfb913e5a757f543cbb2f76c"
+      proxyChecks:
+        proxy__getAdmin: *DEFAULT_ADMIN_ROLE # NEED TO VERIFY
+        proxy__getImplementation: "0xad7a77F8eB03ac02dfb913e5A757F543CBb2F76c" # NEED TO VERIFY
+        proxy__getIsOssified: false # NEED TO VERIFY
+      checks:
+        DEFAULT_ADMIN_ROLE: *ZERO_BYTES32 # NEED TO VERIFY
+        DEPOSIT_CONTRACT: *DEPOSIT_CONTRACT # NEED TO VERIFY
+        FEE_PRECISION_POINTS: 100000000000000000000 # NEED TO VERIFY
+        MANAGE_WITHDRAWAL_CREDENTIALS_ROLE: "0xe7c742a54cd11fc9749a47ab34bdcd7327820908e8d0d48b4a5c7f17b0294098" # NEED TO VERIFY
+        MAX_STAKING_MODULES_COUNT: 32 # NEED TO VERIFY
+        MAX_STAKING_MODULE_NAME_LENGTH: 31 # NEED TO VERIFY
+        REPORT_EXITED_VALIDATORS_ROLE: "0xc23292b191d95d2a7dd94fc6436eb44338fda9e1307d9394fd27c28157c1b33c" # NEED TO VERIFY
+        REPORT_REWARDS_MINTED_ROLE: "0x779e5c23cb7a5bcb9bfe1e9a5165a00057f12bcdfd13e374540fdf1a1cd91137" # NEED TO VERIFY
+        STAKING_MODULE_MANAGE_ROLE: "0x3105bcbf19d4417b73ae0e58d508a65ecf75665e46c2622d8521732de6080c48" # NEED TO VERIFY
+        STAKING_MODULE_UNVETTING_ROLE: "0x240525496a9dc32284b17ce03b43e539e4bd81414634ee54395030d793463b57" # NEED TO VERIFY
+        TOTAL_BASIS_POINTS: 10000 # NEED TO VERIFY
+        UNSAFE_SET_EXITED_VALIDATORS_ROLE: "0x55180e25fcacf9af017d35d497765476319b23896daa1f9bc2b38fa80b36a163" # NEED TO VERIFY
+        getAllNodeOperatorDigests: REPLACEME # need to specify args
+        getAllStakingModuleDigests:
+          - 1
+          - 1
+          - 1
+          - *app:node-operators-registry
+          - 500
+          - 500
+          - 10000
+          - 0
+          - Curated
+          - 1745485536
+          - 253033
+          - 0
+          - 10000
+          - 150
+          - 25
+          - 0
+          - 100
+          - 0
+          - 0
+          - 0
+          - 2
+          - *app:simple-dvt
+          - 800
+          - 200
+          - 400
+          - 0
+          - SimpleDVT
+          - 1744992816
+          - 213166
+          - 0
+          - 10000
+          - 150
+          - 25
+          - 0
+          - 0
+          - 0 # NEED TO VERIFY
+        getContractVersion: 2 # NEED TO VERIFY
+        getDepositsAllocation: REPLACEME # need to specify args
+        getLido: *app:lido # NEED TO VERIFY
+        getNodeOperatorDigests: REPLACEME # need to specify args
+        getNodeOperatorSummary: REPLACEME # need to specify args
+        getRoleAdmin: REPLACEME # need to specify args
+        getRoleMember: REPLACEME # need to specify args
+        getRoleMemberCount: REPLACEME # need to specify args
+        getStakingFeeAggregateDistribution:
+          - 5000000000000000000
+          - 5000000000000000000
+          - 100000000000000000000 # NEED TO VERIFY
+        getStakingFeeAggregateDistributionE4Precision:
+          - 500
+          - 500 # NEED TO VERIFY
+        getStakingModule: REPLACEME # need to specify args
+        getStakingModuleActiveValidatorsCount: REPLACEME # need to specify args
+        getStakingModuleDigests: REPLACEME # need to specify args
+        getStakingModuleIds:
+          - 1
+          - 2 # NEED TO VERIFY
+        getStakingModuleIsActive: REPLACEME # need to specify args
+        getStakingModuleIsDepositsPaused: REPLACEME # need to specify args
+        getStakingModuleIsStopped: REPLACEME # need to specify args
+        getStakingModuleLastDepositBlock: REPLACEME # need to specify args
+        getStakingModuleMaxDepositsCount: REPLACEME # need to specify args
+        getStakingModuleMaxDepositsPerBlock: REPLACEME # need to specify args
+        getStakingModuleMinDepositBlockDistance: REPLACEME # need to specify args
+        getStakingModuleNonce: REPLACEME # need to specify args
+        getStakingModuleStatus: REPLACEME # need to specify args
+        getStakingModuleSummary: REPLACEME # need to specify args
+        getStakingModules:
+          - 1
+          - *app:node-operators-registry
+          - 500
+          - 500
+          - 10000
+          - 0
+          - Curated
+          - 1745485536
+          - 253033
+          - 0
+          - 10000
+          - 150
+          - 25
+          - 2
+          - *app:simple-dvt
+          - 800
+          - 200
+          - 400
+          - 0
+          - SimpleDVT
+          - 1744992816
+          - 213166
+          - 0
+          - 10000
+          - 150
+          - 25 # NEED TO VERIFY
+        getStakingModulesCount: 2 # NEED TO VERIFY
+        getStakingRewardsDistribution:
+          - *app:node-operators-registry
+          - 1
+          - 5000000000000000000
+          - 10000000000000000000
+          - 100000000000000000000 # NEED TO VERIFY
+        getTotalFeeE4Precision: 1000 # NEED TO VERIFY
+        getWithdrawalCredentials: "0x01000000000000000000000079e52dba27718b1b618fc519a8f05a1386f4a8d2" # NEED TO VERIFY
+        hasRole: REPLACEME # need to specify args
+        hasStakingModule: REPLACEME # need to specify args
+        supportsInterface: REPLACEME # need to specify args
+      implementationChecks:
+        DEFAULT_ADMIN_ROLE: *ZERO_BYTES32 # NEED TO VERIFY
+        DEPOSIT_CONTRACT: *DEPOSIT_CONTRACT # NEED TO VERIFY
+        FEE_PRECISION_POINTS: 100000000000000000000 # NEED TO VERIFY
+        MANAGE_WITHDRAWAL_CREDENTIALS_ROLE: "0xe7c742a54cd11fc9749a47ab34bdcd7327820908e8d0d48b4a5c7f17b0294098" # NEED TO VERIFY
+        MAX_STAKING_MODULES_COUNT: 32 # NEED TO VERIFY
+        MAX_STAKING_MODULE_NAME_LENGTH: 31 # NEED TO VERIFY
+        REPORT_EXITED_VALIDATORS_ROLE: "0xc23292b191d95d2a7dd94fc6436eb44338fda9e1307d9394fd27c28157c1b33c" # NEED TO VERIFY
+        REPORT_REWARDS_MINTED_ROLE: "0x779e5c23cb7a5bcb9bfe1e9a5165a00057f12bcdfd13e374540fdf1a1cd91137" # NEED TO VERIFY
+        STAKING_MODULE_MANAGE_ROLE: "0x3105bcbf19d4417b73ae0e58d508a65ecf75665e46c2622d8521732de6080c48" # NEED TO VERIFY
+        STAKING_MODULE_UNVETTING_ROLE: "0x240525496a9dc32284b17ce03b43e539e4bd81414634ee54395030d793463b57" # NEED TO VERIFY
+        TOTAL_BASIS_POINTS: 10000 # NEED TO VERIFY
+        UNSAFE_SET_EXITED_VALIDATORS_ROLE: "0x55180e25fcacf9af017d35d497765476319b23896daa1f9bc2b38fa80b36a163" # NEED TO VERIFY
+        getAllNodeOperatorDigests: REPLACEME # need to specify args
+        getAllStakingModuleDigests: null # NEED TO VERIFY
+        getContractVersion: 115792089237316195423570985008687907853269984665640564039457584007913129639935 # NEED TO VERIFY
+        getDepositsAllocation: REPLACEME # need to specify args
+        getLido: *ZERO_ADDRESS # NEED TO VERIFY
+        getNodeOperatorDigests: REPLACEME # need to specify args
+        getNodeOperatorSummary: REPLACEME # need to specify args
+        getRoleAdmin: REPLACEME # need to specify args
+        getRoleMember: REPLACEME # need to specify args
+        getRoleMemberCount: REPLACEME # need to specify args
+        getStakingFeeAggregateDistribution:
+          - 0
+          - 0
+          - 100000000000000000000 # NEED TO VERIFY
+        getStakingFeeAggregateDistributionE4Precision:
+          - 0
+          - 0 # NEED TO VERIFY
+        getStakingModule: REPLACEME # need to specify args
+        getStakingModuleActiveValidatorsCount: REPLACEME # need to specify args
+        getStakingModuleDigests: REPLACEME # need to specify args
+        getStakingModuleIds: [0] # NEED TO VERIFY
+        getStakingModuleIsActive: REPLACEME # need to specify args
+        getStakingModuleIsDepositsPaused: REPLACEME # need to specify args
+        getStakingModuleIsStopped: REPLACEME # need to specify args
+        getStakingModuleLastDepositBlock: REPLACEME # need to specify args
+        getStakingModuleMaxDepositsCount: REPLACEME # need to specify args
+        getStakingModuleMaxDepositsPerBlock: REPLACEME # need to specify args
+        getStakingModuleMinDepositBlockDistance: REPLACEME # need to specify args
+        getStakingModuleNonce: REPLACEME # need to specify args
+        getStakingModuleStatus: null # need to specify args
+        getStakingModuleSummary: REPLACEME # need to specify args
+        getStakingModules: REPLACEME #
+        getStakingModulesCount: 0 # NEED TO VERIFY
+        getStakingRewardsDistribution:
+          - null
+          - null
+          - null
+          - 0
+          - 100000000000000000000 # NEED TO VERIFY
+        getTotalFeeE4Precision: 0 # NEED TO VERIFY
+        getWithdrawalCredentials: *ZERO_BYTES32 # NEED TO VERIFY
+        hasRole: REPLACEME # need to specify args
+        hasStakingModule: REPLACEME # need to specify args
+        supportsInterface: REPLACEME # need to specify args
+    stakingVaultBeacon:
+      name: UpgradeableBeacon
+      address: *stakingVaultBeacon
+      checks:
+        implementation: *stakingVaultImpl # NEED TO VERIFY
+        owner: *deployer # NEED TO VERIFY
+    stakingVaultFactory:
+      name: VaultFactory
+      address: *stakingVaultFactory
+      checks:
+        BEACON: *stakingVaultBeacon # NEED TO VERIFY
+        DASHBOARD_IMPL: *dashboardImpl # NEED TO VERIFY
+        LIDO_LOCATOR: *lidoLocator # NEED TO VERIFY
+    stakingVaultImpl:
+      name: StakingVault
+      address: *stakingVaultImpl
+      checks:
+        DEPOSIT_CONTRACT: *DEPOSIT_CONTRACT # NEED TO VERIFY
+        PUBLIC_KEY_LENGTH: 48 # NEED TO VERIFY
+        beaconChainDepositsPaused: false # NEED TO VERIFY
+        calculateValidatorWithdrawalFee: REPLACEME # need to specify args
+        depositor: *ZERO_ADDRESS # NEED TO VERIFY
+        getInitializedVersion: 18446744073709551615 # NEED TO VERIFY
+        inOutDelta: 0 # NEED TO VERIFY
+        isReportFresh: true # NEED TO VERIFY
+        latestReport:
+          - 0
+          - 0
+          - 0 # NEED TO VERIFY
+        locked: 0 # NEED TO VERIFY
+        nodeOperator: *ZERO_ADDRESS # NEED TO VERIFY
+        ossified: false # NEED TO VERIFY
+        owner: *ZERO_ADDRESS # NEED TO VERIFY
+        totalValue: 0 # NEED TO VERIFY
+        unlocked: 0 # NEED TO VERIFY
+        vaultHub: *vaultHub # NEED TO VERIFY
+        vaultHubAuthorized: false # NEED TO VERIFY
+        version: 1 # NEED TO VERIFY
+        withdrawalCredentials: "0x0200000000000000000000007ade83c09a0aa0fea45695840067438a9dc96361" # NEED TO VERIFY
+    validatorsExitBusOracle:
+      name: OssifiableProxy
+      address: *validatorsExitBusOracle
+      checks:
+        proxy__getAdmin: *DEFAULT_ADMIN_ROLE # NEED TO VERIFY
+        proxy__getImplementation: "0x2F09B020505e833a523A87e8A7EA238C40771214" # NEED TO VERIFY
+        proxy__getIsOssified: false # NEED TO VERIFY
+    vaultHub:
+      name: VaultHub
+      address: *vaultHub
+      proxyName: OssifiableProxy
+      implementation: "0xd075e66a593779994dfca9dd0a9a12aabc2d3b65"
+      proxyChecks:
+        proxy__getAdmin: *DEFAULT_ADMIN_ROLE # NEED TO VERIFY
+        proxy__getImplementation: "0xd075E66A593779994dfcA9dd0A9a12aAbC2d3B65" # NEED TO VERIFY
+        proxy__getIsOssified: false # NEED TO VERIFY
+      checks:
+        CONNECT_DEPOSIT: 1000000000000000000 # NEED TO VERIFY
+        DEFAULT_ADMIN_ROLE: *ZERO_BYTES32 # NEED TO VERIFY
+        LIDO: *app:lido # NEED TO VERIFY
+        LIDO_LOCATOR: *lidoLocator # NEED TO VERIFY
+        PAUSE_INFINITELY: 115792089237316195423570985008687907853269984665640564039457584007913129639935 # NEED TO VERIFY
+        PAUSE_ROLE: "0x8d0e4ae4847b49935b55c99f9c3ce025c87e7c4604c35b7ae56929bd32fa5a78" # NEED TO VERIFY
+        REPORT_FRESHNESS_DELTA: 86400 # NEED TO VERIFY
+        RESUME_ROLE: "0xa79a6aede309e0d48bf2ef0f71355c06ad317956d4c0da2deb0dc47cc34f826c" # NEED TO VERIFY
+        VAULT_MASTER_ROLE: "0x30093811282617f5aa2eaee280bf1446734ff9c1973edb3f45b455fe8d71dab5" # NEED TO VERIFY
+        VAULT_REGISTRY_ROLE: "0xeb0a9f61937ee79c98f577dbb4d3832abbad74e3f10502b060c64762d2b075f8" # NEED TO VERIFY
+        batchVaultsInfo: REPLACEME # need to specify args
+        getResumeSinceTimestamp: 0 # NEED TO VERIFY
+        getRoleAdmin: REPLACEME # need to specify args
+        getRoleMember: REPLACEME # need to specify args
+        getRoleMemberCount: REPLACEME # need to specify args
+        getRoleMembers: REPLACEME # need to specify args
+        hasRole: REPLACEME # need to specify args
+        isPaused: false # NEED TO VERIFY
+        isVaultHealthyAsOfLatestReport: REPLACEME # need to specify args
+        latestReportData:
+          - 1746288012
+          - 0xcaab5c638a2818f90141e6873c74570306c496c564278d6574cb23b1011187b2
+          - QmeopcVWUBq79EpBuDRT9oHeVxv9tmndvWDUAX1KjXkNqf # NEED TO VERIFY
+        operatorGrid: *operatorGrid # NEED TO VERIFY
+        rebalanceShortfall: REPLACEME # need to specify args
+        supportsInterface: REPLACEME # need to specify args
+        vault: REPLACEME # need to specify args
+        vaultSocket: REPLACEME # need to specify args
+        vaultsCount: 29 # NEED TO VERIFY
+      implementationChecks:
+        CONNECT_DEPOSIT: 1000000000000000000 # NEED TO VERIFY
+        DEFAULT_ADMIN_ROLE: *ZERO_BYTES32 # NEED TO VERIFY
+        LIDO: *app:lido # NEED TO VERIFY
+        LIDO_LOCATOR: *lidoLocator # NEED TO VERIFY
+        PAUSE_INFINITELY: 115792089237316195423570985008687907853269984665640564039457584007913129639935 # NEED TO VERIFY
+        PAUSE_ROLE: "0x8d0e4ae4847b49935b55c99f9c3ce025c87e7c4604c35b7ae56929bd32fa5a78" # NEED TO VERIFY
+        REPORT_FRESHNESS_DELTA: 86400 # NEED TO VERIFY
+        RESUME_ROLE: "0xa79a6aede309e0d48bf2ef0f71355c06ad317956d4c0da2deb0dc47cc34f826c" # NEED TO VERIFY
+        VAULT_MASTER_ROLE: "0x30093811282617f5aa2eaee280bf1446734ff9c1973edb3f45b455fe8d71dab5" # NEED TO VERIFY
+        VAULT_REGISTRY_ROLE: "0xeb0a9f61937ee79c98f577dbb4d3832abbad74e3f10502b060c64762d2b075f8" # NEED TO VERIFY
+        batchVaultsInfo: REPLACEME # need to specify args
+        getResumeSinceTimestamp: 0 # NEED TO VERIFY
+        getRoleAdmin: REPLACEME # need to specify args
+        getRoleMember: REPLACEME # need to specify args
+        getRoleMemberCount: REPLACEME # need to specify args
+        getRoleMembers: REPLACEME # need to specify args
+        hasRole: REPLACEME # need to specify args
+        isPaused: false # NEED TO VERIFY
+        isVaultHealthyAsOfLatestReport: REPLACEME # need to specify args
+        latestReportData: 0,*ZERO_BYTES32, # NEED TO VERIFY
+        operatorGrid: *operatorGrid # NEED TO VERIFY
+        rebalanceShortfall: REPLACEME # need to specify args
+        supportsInterface: REPLACEME # need to specify args
+        vault: REPLACEME # need to specify args
+        vaultSocket: REPLACEME # need to specify args
+        vaultsCount: REPLACEME # view call reverted
+    withdrawalQueueERC721:
+      name: OssifiableProxy
+      address: *withdrawalQueueERC721
+      checks:
+        proxy__getAdmin: *DEFAULT_ADMIN_ROLE # NEED TO VERIFY
+        proxy__getImplementation: "0x15D5365e4061DA45BA2aeD01ba149d40ddCB1c78" # NEED TO VERIFY
+        proxy__getIsOssified: false # NEED TO VERIFY
+    withdrawalVault:
+      name: WithdrawalVault
+      address: *withdrawalVault
+      proxyName: WithdrawalsManagerProxy
+      implementation: "0xb37ef8776e07f40ce146b83a5c36c2185755c40d"
+      proxyChecks:
+        implementation: "0xb37ef8776e07f40cE146b83A5C36C2185755C40D" # NEED TO VERIFY
+        proxy_getAdmin: *app:aragon-voting # NEED TO VERIFY
+        proxy_getIsOssified: false # NEED TO VERIFY
+      checks:
+        LIDO: *app:lido # NEED TO VERIFY
+        TREASURY: *DEFAULT_ADMIN_ROLE # NEED TO VERIFY
+        getContractVersion: 0 # NEED TO VERIFY
+      implementationChecks:
+        LIDO: *app:lido # NEED TO VERIFY
+        TREASURY: *DEFAULT_ADMIN_ROLE # NEED TO VERIFY
+        getContractVersion: 115792089237316195423570985008687907853269984665640564039457584007913129639935 # NEED TO VERIFY
+    wstETH:
+      name: WstETH
+      address: *wstETH
+      checks:
+        DOMAIN_SEPARATOR: "0x0880a27a4bd63bfef69b1d0e03a743faf4b9c3fffd1510750af6f8b657114e6f" # NEED TO VERIFY
+        allowance: REPLACEME # need to specify args
+        balanceOf: REPLACEME # need to specify args
+        decimals: 18 # NEED TO VERIFY
+        getStETHByWstETH: REPLACEME # need to specify args
+        getWstETHByStETH: REPLACEME # need to specify args
+        name: Wrapped liquid staked Ether 2.0 # NEED TO VERIFY
+        nonces: REPLACEME # need to specify args
+        stETH: *app:lido # NEED TO VERIFY
+        stEthPerToken: 1003117304155366439 # NEED TO VERIFY
+        symbol: wstETH # NEED TO VERIFY
+        tokensPerStEth: 996892383231299916 # NEED TO VERIFY
+        totalSupply: 2760000000000000001 # NEED TO VERIFY
+    pinnedBeaconProxy:
+      name: PinnedBeaconProxy
+      address: *pinnedBeaconProxy
+      checks:
+        implementation: *stakingVaultImpl # NEED TO VERIFY
