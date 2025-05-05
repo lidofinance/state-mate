@@ -90,14 +90,24 @@ const ChecksEntryValueTB = Type.Readonly(
 );
 
 const ProxyChecksTB = Type.Readonly(
-  Type.Object(
-    {
-      proxy__getImplementation: Type.Optional(Type.Union([EthereumStringTB, Type.Null()])),
-      proxy__getAdmin: Type.Optional(Type.Union([EthereumStringTB, Type.Null()])),
-      proxy__getIsOssified: Type.Optional(Type.Union([Type.Boolean(), Type.Null()])),
-    },
-    { additionalProperties: false },
-  ),
+  Type.Union([
+    Type.Object(
+      {
+        proxy__getImplementation: Type.Optional(Type.Union([EthereumStringTB, Type.Null()])),
+        proxy__getAdmin: Type.Optional(Type.Union([EthereumStringTB, Type.Null()])),
+        proxy__getIsOssified: Type.Optional(Type.Union([Type.Boolean(), Type.Null()])),
+      },
+      { additionalProperties: false },
+    ),
+    Type.Object(
+      {
+        implementation: Type.Optional(Type.Union([EthereumStringTB, Type.Null()])),
+        proxy_getAdmin: Type.Optional(Type.Union([EthereumStringTB, Type.Null()])),
+        proxy_getIsOssified: Type.Optional(Type.Union([Type.Boolean(), Type.Null()])),
+      },
+      { additionalProperties: false },
+    ),
+  ]),
 );
 
 const Sr2ProxyChecksTB = Type.Readonly(
