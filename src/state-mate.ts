@@ -116,7 +116,7 @@ async function doChecks(jsonDocument: EntireDocument) {
   log(chalk.bold(`\n${g_total_checks} checks performed.`));
   if (g_errors) {
     log(`\n${FAILURE_MARK} ${chalk.bold(`${g_errors} errors found!`)} `);
-    process.exit(2);
+    process.exit(g_errors);
   }
 
   if (g_Arguments.checkOnly) {
