@@ -160,6 +160,9 @@ async function iterateLoadedContracts<T extends EntireDocument | SeedDocument>(
       }
       for (const address of addresses) {
         const contractInfo = await loadContractInfoFromExplorer(address, explorerHostname, explorerKey);
+        if (!contractInfo) {
+          continue;
+        }
         await callback(contractInfo);
       }
     }
