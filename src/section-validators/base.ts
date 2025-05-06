@@ -15,7 +15,6 @@ import {
   StaticCallResult,
   StaticCallResultTB,
   ViewResult,
-  ViewResultTB,
 } from "src/typebox";
 import { Abi, AbiArgumentsLength } from "src/types";
 
@@ -136,22 +135,17 @@ function _assertEqual(actual: unknown, expected: ViewResult, errorMessage?: stri
   if (typeof actual === "bigint") {
     assert(typeof expected === "string" || typeof expected === "bigint");
     _equalOrThrow(actual, BigInt(expected), errorMessage);
-  } else if (Array.isArray(expected) || Array.isArray(actual)) {
-    const flatActual = Array.isArray(actual) ? actual.flat(Infinity) : actual;
-    const flatExpected = Array.isArray(expected) ? expected.flat(Infinity) : expected;
-    if (!errorMessage) {
-      errorMessage = `Actual type: ${Array.isArray(actual) ? "array" : typeof actual} (${String(flatActual)}), expected type: ${Array.isArray(expected) ? "array" : typeof expected} (${String(flatExpected)}) — values do not match`;
-    }
-    assert(Array.isArray(flatActual) && Array.isArray(flatExpected), errorMessage);
+  } else if (Array.isArray(expected)) {
     _equalOrThrow(
-      flatActual.length,
-      flatExpected.length,
-      `Array length differ: actual = '${String(flatActual)}', expected = '${String(flatExpected)}'`,
+      (actual as unknown[]).length,
+      expected.length,
+      `Array length differ: actual = '${String(actual)}', expected = '${String(expected)}'`,
     );
-
-    for (const [index, element] of flatActual.entries()) {
-      assert(isTypeOfTB(flatExpected[index], ViewResultTB));
-      _assertEqual(element, flatExpected[index], errorMessage);
+    if (!errorMessage) {
+      errorMessage = `Actual value '${String(actual)} is not equal to expected array '[${String(expected)}]`;
+    }
+    for (let index = 0; index < (actual as unknown[]).length; ++index) {
+      _assertEqual((actual as unknown[])[index], expected[index], errorMessage);
     }
   } else if (typeof expected === "object") {
     _assertEqualStruct(expected, actual as Result);
@@ -184,7 +178,7 @@ function _assertEqualStruct(expected: null | ArbitraryObject, actual: Result) {
 }
 
 function _equalOrThrow(actual: unknown, expected: unknown, errorMessage?: string) {
-  if (actual !== expected && actual !== Number(expected)) {
+  if (actual !== expected) {
     if (!errorMessage) {
       errorMessage = `Expected "${_stringify(expected)}" to equal actual "${_stringify(actual)}"`;
     }
