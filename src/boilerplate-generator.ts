@@ -37,11 +37,7 @@ export async function doGenerateBoilerplate(seedConfigPath: string, jsonDocument
         `The field ${chalk.magenta(`explorerHostname`)} is required in the ${chalk.magenta(g_Arguments.configPath)}`,
       );
     }
-    const contractInfo = await loadContractInfoFromExplorer(address, explorerHostname, explorerKey);
-    if (!contractInfo) {
-      return;
-    }
-    const { contractName, implementation } = contractInfo;
+    const { contractName, implementation } = await loadContractInfoFromExplorer(address, explorerHostname, explorerKey);
 
     const provider = new JsonRpcProvider(rpcUrl);
     let contractEntryIfProxy;

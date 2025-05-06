@@ -4,7 +4,7 @@ import { Contract, JsonRpcProvider } from "ethers";
 import { printError } from "./common";
 import { EtherscanHandler } from "./explorers/etherscan";
 import { ModeHandler } from "./explorers/mode";
-import { LogCommand, logError, logErrorAndExit, logReplaceLine } from "./logger";
+import { logError, logErrorAndExit, logReplaceLine } from "./logger";
 import {
   Abi,
   AbiArgumentsLength,
@@ -77,7 +77,7 @@ export async function loadContractInfoFromExplorer(
   address: string,
   explorerHostname: string,
   explorerKey?: string,
-): Promise<ContractInfo | undefined> {
+): Promise<ContractInfo> {
   return loadContractInfo(
     explorerHostname.includes("mode.network") ? new ModeHandler() : new EtherscanHandler(),
     address,
@@ -112,32 +112,15 @@ export async function loadContractInfo(
     logErrorAndExit(`It seems, explorer response has changed:\n${JSON.stringify(sourcesResponse)}`);
   }
 
-  try {
-    const abi: unknown = JSON.parse(sourcesResponse.result[0].ABI);
+  const abi: unknown = _parseJson(sourcesResponse.result[0].ABI);
 
-    if (!isValidAbi(abi)) {
-      logErrorAndExit(
-        `ABI for contract ${chalk.yellow(address)} is not valid (type mismatch):\n${JSON.stringify(abi)}`,
-      );
-    }
-
-    const contractInfo = explorer.getContractInfo(
-      explorer,
-      abi,
-      sourcesResponse,
-      address,
-      explorerHostname,
-      explorerKey,
-    );
-
-    return contractInfo;
-  } catch {
-    const logHandler = new LogCommand(`ABI ${chalk.magenta(`${address}`)}`);
-    logHandler.failure(
-      `Failed to parse contract source code (${chalk.yellow(sourcesResponse.result[0].ABI)}). Maybe EOF?`,
-    );
-    return;
+  if (!isValidAbi(abi)) {
+    logErrorAndExit(`ABI for contract ${chalk.yellow(address)} is not valid (type mismatch):\n${JSON.stringify(abi)}`);
   }
+
+  const contractInfo = explorer.getContractInfo(explorer, abi, sourcesResponse, address, explorerHostname, explorerKey);
+
+  return contractInfo;
 }
 
 export async function httpGetAsync<T>(url: string): Promise<T> | never {
