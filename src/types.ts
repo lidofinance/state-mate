@@ -7,11 +7,14 @@ export type ContractInfo = {
   abi: Abi;
   address: string;
   implementation?: ContractInfo;
+  proxyType?: string;
+  proxy?: string;
+  similarMatch?: string;
 };
 
 export type Abi = AbiEntry[];
 
-type AbiEntry<T extends RequiredAbiKeys = RequiredAbiKeys> = T;
+export type AbiEntry<T extends RequiredAbiKeys = RequiredAbiKeys> = T;
 
 type RequiredAbiKeys = Required<Readonly<Pick<JsonFragment, "name" | "type" | "stateMutability" | "inputs">>>;
 

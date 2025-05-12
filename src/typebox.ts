@@ -90,14 +90,24 @@ const ChecksEntryValueTB = Type.Readonly(
 );
 
 const ProxyChecksTB = Type.Readonly(
-  Type.Object(
-    {
-      proxy__getImplementation: Type.Optional(Type.Union([EthereumStringTB, Type.Null()])),
-      proxy__getAdmin: Type.Optional(Type.Union([EthereumStringTB, Type.Null()])),
-      proxy__getIsOssified: Type.Optional(Type.Union([Type.Boolean(), Type.Null()])),
-    },
-    { additionalProperties: false },
-  ),
+  Type.Union([
+    Type.Object(
+      {
+        proxy__getImplementation: Type.Optional(Type.Union([EthereumStringTB, Type.Null()])),
+        proxy__getAdmin: Type.Optional(Type.Union([EthereumStringTB, Type.Null()])),
+        proxy__getIsOssified: Type.Optional(Type.Union([Type.Boolean(), Type.Null()])),
+      },
+      { additionalProperties: false },
+    ),
+    Type.Object(
+      {
+        implementation: Type.Optional(Type.Union([EthereumStringTB, Type.Null()])),
+        proxy_getAdmin: Type.Optional(Type.Union([EthereumStringTB, Type.Null()])),
+        proxy_getIsOssified: Type.Optional(Type.Union([Type.Boolean(), Type.Null()])),
+      },
+      { additionalProperties: false },
+    ),
+  ]),
 );
 
 const Sr2ProxyChecksTB = Type.Readonly(
@@ -184,6 +194,7 @@ export const EntireDocumentTB = Type.Readonly(
       parameters: Type.Optional(PlainValueOrArray),
       roles: Type.Optional(Type.Union([EthereumStringArrayTB, Type.Null()])),
       misc: Type.Optional(PlainValueOrArray),
+      eoa: Type.Optional(EthereumStringArrayTB),
       deployed: DeployedSectionTB,
       "deployed-aux": Type.Optional(EthereumStringArrayTB),
       l1: NetworkSectionTB,
@@ -204,6 +215,9 @@ export const SeedDocumentTB = Type.Readonly(
       deployed: DeployedSectionTB,
       l1: ExplorerSectionTB,
       l2: Type.Optional(ExplorerSectionTB),
+      eoa: Type.Optional(EthereumStringArrayTB),
+      roles: Type.Optional(Type.Union([EthereumStringArrayTB, Type.Null()])),
+      misc: Type.Optional(PlainValueOrArray),
     },
     { additionalProperties: false },
   ),
