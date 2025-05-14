@@ -329,7 +329,7 @@ l1:
         stEthPerToken: null
         symbol: "wstETH"
         tokensPerStEth: null
-        totalSupply: 2657336870404953690
+        totalSupply: null
     eip712StETH:
       name: EIP712StETH
       address: *eip712StETH
