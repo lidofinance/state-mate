@@ -254,7 +254,7 @@ l1:
         isPetrified: false
         getExternalEther: null
         getLidoLocator: *lidoLocator
-        canDeposit: true
+        canDeposit: null
         STAKING_PAUSE_ROLE: "0x84ea57490227bc2be925c684e2a367071d69890b629590198f4125a018eb1de8"
         getDepositableEther: null
         sharesOf: null
