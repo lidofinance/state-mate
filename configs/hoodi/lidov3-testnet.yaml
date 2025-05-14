@@ -65,6 +65,10 @@ deployed:
     - &stakingVaultImpl "0x7ade83C09A0Aa0FEA45695840067438a9dC96361"
     - &dashboardImpl "0x5667f7477325F85C1b5E324387545C5045A57E2b"
 
+    # --- Easy Track ---
+    - &EasyTrack "0x9A2029735Bd14C8b17fd03FE05D5F04F7AF797c2"
+    - &EVMScriptExecutor "0x0b6de69562CADa4dBFdCA7e448fdc71D3542A590"
+
     # ------
     - &apmRegistryFactory "0xcA98541C98bCd77123eE74C4A37b8BDfd792C4b6"
     - &callsScript "0x207474d0f0Ba51A28ce911C2e77d6c93e231E8FD"
@@ -85,7 +89,8 @@ roles:
   - &STAKING_CONTROL_ROLE "0xa42eee1333c0758ba72be38e728b6dadb32ea767de5b4ddbaea1dae85b1b051f"
   - &RESUME_ROLE "0x2fc10cc8ae19568712f7a176fb4978616a610650813c9d05326c34abb62749c7"
   - &PAUSE_ROLE "0x139c2898040ef16910dc9f44dc697df79363da767d8bc92f2e310312b816e46d"
-
+  - &CANCEL_ROLE "0x9f959e00d95122f5cbd677010436cf273ef535b86b056afc172852144b9491d7"
+  - &UNPAUSE_ROLE "0x265b220c5a8891efdd9e1b1b7fa72f257bd5169f8d87e319cf3dad6ff52b94ae"
 misc:
   - &ZERO_ADDRESS "0x0000000000000000000000000000000000000000"
   - &ZERO_BYTES32 "0x0000000000000000000000000000000000000000000000000000000000000000"
@@ -1914,3 +1919,39 @@ l1:
     #     vaultHubAuthorized: false
     #     version: 1
     #     withdrawalCredentials: "0x0200000000000000000000007ade83c09a0aa0fea45695840067438a9dc96361"
+    EasyTrack:
+      name: EasyTrack
+      address: *EasyTrack
+      checks:
+        CANCEL_ROLE: *CANCEL_ROLE
+        DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
+        MAX_MOTIONS_LIMIT: 255
+        MAX_OBJECTIONS_THRESHOLD: 1000
+        MIN_MOTION_DURATION: 60
+        PAUSE_ROLE: *PAUSE_ROLE
+        UNPAUSE_ROLE: *UNPAUSE_ROLE
+        canObjectToMotion: null
+        evmScriptExecutor: *EVMScriptExecutor
+        evmScriptFactories: null
+        evmScriptFactoryPermissions: null
+        getEVMScriptFactories: null
+        getMotion: null
+        getMotions: null
+        getRoleAdmin: null
+        governanceToken: *ldo
+        hasRole: null
+        isEVMScriptFactory: null
+        motionDuration: 600
+        motions: null
+        motionsCountLimit: 24
+        objections: null
+        objectionsThreshold: 500
+        paused: false
+        supportsInterface: null
+    EVMScriptExecutor:
+      name: EVMScriptExecutor
+      address: *EVMScriptExecutor
+      checks:
+        callsScript: *callsScript
+        easyTrack: *EasyTrack
+        owner: *aragonVoting
