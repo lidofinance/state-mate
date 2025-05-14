@@ -3,67 +3,67 @@ deployed:
   l1:
     # --- Core protocol ---
     - &lidoLocator "0xbE861866E2Ca8f401e2b51b2cFb36A61B0Bf6840"
-    - &lidoLocatorImpl "0xC293Ea75F11C0D77416D0AFdf903d88a3891d16b"
+    - &lidoLocatorImplAddress "0xC293Ea75F11C0D77416D0AFdf903d88a3891d16b"
     - &lido "0x04d160820C0f2E2C693D9Eb26078189D10A1a3e1"
-    - &lidoImpl "0x9260beB3c7876443C625c92A6f57AeD4652eB2a2"
+    - &lidoImplAddress "0x9260beB3c7876443C625c92A6f57AeD4652eB2a2"
     - &wstETH "0xDFD55388020a8CEDADCe0B177DF5EF1E11553b43"
     - &eip712StETH "0x53520A0F043Bf005009588fcbb8Ef19bd0B98BC1"
     - &stakingRouter "0xf320D34b55E89826631C2bb1b3c5b50932cCaB3C"
-    - &stakingRouterImpl "0xad7a77F8eB03ac02dfb913e5A757F543CBb2F76c"
+    - &stakingRouterImplAddress "0xad7a77F8eB03ac02dfb913e5A757F543CBb2F76c"
     - &executionLayerRewardsVault "0xA60b3AF9244D7AF1e844d714fDc0E3796CC4390d"
     - &withdrawalQueueERC721 "0xe41d78740A1009029c44E43618Fe09C8f368851F"
-    - &withdrawalQueueERC721Impl "0x15D5365e4061DA45BA2aeD01ba149d40ddCB1c78"
+    - &withdrawalQueueERC721ImplAddress "0x15D5365e4061DA45BA2aeD01ba149d40ddCB1c78"
     - &withdrawalVault "0x79e52DbA27718B1b618FC519A8F05a1386F4A8d2"
-    - &withdrawalVaultImpl "0xb37ef8776e07f40cE146b83A5C36C2185755C40D"
+    - &withdrawalVaultImplAddress "0xb37ef8776e07f40cE146b83A5C36C2185755C40D"
     - &burner "0x87d699cBC410511216BC88E8c8523A8EFf41102b"
     - &minFirstAllocationStrategy "0x9b322efdB04840052f97649fD0C27B678De88DA2"
     - &accounting "0x7d7EcCE45cAc6eF043f34e8049399b4b03044F97"
-    - &accountingImpl "0xE633f4758B17c004656Bf33aac5ED9F14E713246"
+    - &accountingImplAddress "0xE633f4758B17c004656Bf33aac5ED9F14E713246"
     - &vaultHub "0xDfA0B34F28b1b6735d2df150a99048139302a80E"
-    - &vaultHubImpl "0xd075E66A593779994dfcA9dd0A9a12aAbC2d3B65"
+    - &vaultHubImplAddress "0xd075E66A593779994dfcA9dd0A9a12aAbC2d3B65"
     - &operatorGrid "0xccb86588b776743CCCB6572D2a6eAFd466012191"
-    - &operatorGridImpl "0x7FC784952EE7e96e9A8C3f271712805fc439dfD7"
+    - &operatorGridImplAddress "0x7FC784952EE7e96e9A8C3f271712805fc439dfD7"
     - &predepositGuarantee "0x4C003D5586B32359Df5f37B42A2E717E24817Ec2"
 
     # --- Oracle contracts ---
     - &accountingOracle "0xaBDf9686e4fbC7eEFff91621df82457dAb300168"
-    - &accountingOracleImpl "0x380c81B8f087f29AED8920EF12b510a182C4031C"
+    - &accountingOracleImplAddress "0x380c81B8f087f29AED8920EF12b510a182C4031C"
     - &hashConsensusForAccountingOracle "0x9F1c37DBCb2e01537786aEB2e6b4d6106dd81234"
     - &validatorsExitBusOracle "0xaf41922d0b9677e8CF21D72a318C72a5188dd9f1"
-    - &validatorsExitBusOracleImpl "0x2F09B020505e833a523A87e8A7EA238C40771214"
+    - &validatorsExitBusOracleImplAddress "0x2F09B020505e833a523A87e8A7EA238C40771214"
     - &hashConsensusForValidatorsExitBusOracle "0xF1BbbB0749736cC0c39eA1a1EDAA7fD36E2924d1"
     - &oracleReportSanityChecker "0x4077619FBAdB002fDC125171c8daf6a149C71166"
     - &oracleDaemonConfig "0x2c2e8fE09a2449aB93D9eAD68f987D33189E6168"
 
     # --- DAO & Aragon apps ---
     - &aragonKernel "0xf5591B4CA4De7f3e339248bbA35b0A02Ef9939c2"
-    - &aragonKernelImpl "0x14dDb33F1D85997Bc35546e7E8CC306F5A7B9DD1"
+    - &aragonKernelImplAddress "0x14dDb33F1D85997Bc35546e7E8CC306F5A7B9DD1"
     - &ldo "0x0E9Fa6947804c5573796aE211898f7a652e58d1f"
     - &aragonVoting "0xd401Bf29751aE77cF5A479b22fbAaB30cD027dD6"
-    - &aragonVotingImpl "0xC4943D7877936c0dAa1C3E23Bb3c179D15a489B3"
+    - &aragonVotingImplAddress "0xC4943D7877936c0dAa1C3E23Bb3c179D15a489B3"
     - &aragonTokenManager "0x32Ea1c8Df51BCAd93309DB159E54415951782992"
-    - &aragonTokenManagerImpl "0x3cBDFd1C852Ea9B31226d3108d5948E2a21103A8"
+    - &aragonTokenManagerImplAddress "0x3cBDFd1C852Ea9B31226d3108d5948E2a21103A8"
     - &aragonFinance "0x973bD4e3F387F1BBF1576c5B12101450328F067f"
     - &aragonAgent "0x2cE254Fd852d6B5023b1B2355ae96A8d752a47cf"
     - &aragonAcl "0x428d6E1C384B743b1D6bed40b3a01F5357Ec24A9"
-    - &aragonAclImpl "0x866Ad4D7283C4dcF00A01c1884DCDa98c2F1aE0A"
+    - &aragonAclImplAddress "0x866Ad4D7283C4dcF00A01c1884DCDa98c2F1aE0A"
     - &aragonApmRegistry "0x85C4e347Cba194Ce2237fD19865cf9EE89A6Bb43"
-    - &aragonApmRegistryImpl "0x13f43DCe264695D4118Cbc8Adb8691ABaEa0562d"
+    - &aragonApmRegistryImplAddress "0x13f43DCe264695D4118Cbc8Adb8691ABaEa0562d"
     - &aragonEvmScriptRegistry "0x49335f718631a7aA201B459B499AFfdc1d8Ca774"
-    - &aragonEvmScriptRegistryImpl "0xA75A76Ca92068c8fe1fA2665795805aA4610999E"
+    - &aragonEvmScriptRegistryImplAddress "0xA75A76Ca92068c8fe1fA2665795805aA4610999E"
     - &aragonRepoBase "0xD03e828844AA4eF31566F984Fe2A1693e7d5aF38"
     - &aragonID "0xAa3dFDDA2670A3d2A5B9cd6669ce1E4cF99258D9"
 
     # --- Staking modules ---
     - &nodeOperatorsRegistry "0x94bd69Be2711205F4eBAA084c34cEf29E24A8E59"
-    - &nodeOperatorsRegistryImpl "0x6A3b5315C13A07270E80Cee23df99adeb7469194"
+    - &nodeOperatorsRegistryImplAddress "0x6A3b5315C13A07270E80Cee23df99adeb7469194"
     - &simpleDvt "0x90106946d5525003385310D8e3e123cA6CFCf5Cd"
 
     # --- stVaults factory stack ---
     - &stakingVaultFactory "0xBf18618d1Ba07cCcA63d3D74f6a9056762Eac3cA"
     - &stakingVaultBeacon "0xAF5bf52E784361f4eBBA86f2e918fFDd6A31453A"
-    - &stakingVaultImpl "0x7ade83C09A0Aa0FEA45695840067438a9dC96361"
-    - &dashboardImpl "0x5667f7477325F85C1b5E324387545C5045A57E2b"
+    - &stakingVaultImplAddress "0x7ade83C09A0Aa0FEA45695840067438a9dC96361"
+    - &dashboardImplAddress "0x5667f7477325F85C1b5E324387545C5045A57E2b"
 
     # --- Easy Track ---
     - &EasyTrack "0x9A2029735Bd14C8b17fd03FE05D5F04F7AF797c2"
@@ -98,7 +98,7 @@ misc:
   - &DEPOSIT_CONTRACT "0x00000000219ab540356cBB839Cbe05303d7705Fa"
   - &MAX_UINT256 "115792089237316195423570985008687907853269984665640564039457584007913129639935"
   - &MAX_UINT64 "18446744073709551615"
-  - &ensSubdomainRegistrarImpl "0x5ED5661F744E11A2076865810B0d7553b74468D2"
+  - &ensSubdomainRegistrarImplAddress "0x5ED5661F744E11A2076865810B0d7553b74468D2"
   - &aragonIdResolver "0x3eBCA460bA62724CaE0F801210e76dBB4f3C2A1f"
 
 eoa:
@@ -114,10 +114,10 @@ l1:
       name: LidoLocator
       address: *lidoLocator
       proxyName: OssifiableProxy
-      implementation: *lidoLocatorImpl
+      implementation: *lidoLocatorImplAddress
       proxyChecks:
         proxy__getAdmin: *aragonAgent
-        proxy__getImplementation: *lidoLocatorImpl
+        proxy__getImplementation: *lidoLocatorImplAddress
         proxy__getIsOssified: false
       checks:
         accounting: *accounting
@@ -191,11 +191,11 @@ l1:
       name: Lido
       address: *lido
       proxyName: AppProxyUpgradeable
-      implementation: *lidoImpl
+      implementation: *lidoImplAddress
       proxyChecks:
         proxyType: 2
         isDepositable: false
-        implementation: *lidoImpl
+        implementation: *lidoImplAddress
         appId: "0x3ca7c3e38968823ccb4c78ea688df41356f182ae1d159e4ee608d30d68cef320"
         kernel: *aragonKernel
       checks:
@@ -341,10 +341,10 @@ l1:
       name: StakingRouter
       address: *stakingRouter
       proxyName: OssifiableProxy
-      implementation: *stakingRouterImpl
+      implementation: *stakingRouterImplAddress
       proxyChecks:
         proxy__getAdmin: *aragonAgent
-        proxy__getImplementation: *stakingRouterImpl
+        proxy__getImplementation: *stakingRouterImplAddress
         proxy__getIsOssified: false
       checks:
         DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
@@ -467,10 +467,10 @@ l1:
       name: WithdrawalQueueERC721
       address: *withdrawalQueueERC721
       proxyName: OssifiableProxy
-      implementation: *withdrawalQueueERC721Impl
+      implementation: *withdrawalQueueERC721ImplAddress
       proxyChecks:
         proxy__getAdmin: *aragonAgent
-        proxy__getImplementation: *withdrawalQueueERC721Impl
+        proxy__getImplementation: *withdrawalQueueERC721ImplAddress
         proxy__getIsOssified: false
       checks:
         BUNKER_MODE_DISABLED_TIMESTAMP: *MAX_UINT256
@@ -566,9 +566,9 @@ l1:
       name: WithdrawalVault
       address: *withdrawalVault
       proxyName: WithdrawalsManagerProxy
-      implementation: *withdrawalVaultImpl
+      implementation: *withdrawalVaultImplAddress
       proxyChecks:
-        implementation: *withdrawalVaultImpl
+        implementation: *withdrawalVaultImplAddress
         proxy_getAdmin: "0xd401Bf29751aE77cF5A479b22fbAaB30cD027dD6"
         proxy_getIsOssified: false
       checks:
@@ -611,7 +611,7 @@ l1:
       implementation: "0xe633f4758b17c004656bf33aac5ed9f14e713246"
       proxyChecks:
         proxy__getAdmin: *aragonAgent
-        proxy__getImplementation: *accountingImpl
+        proxy__getImplementation: *accountingImplAddress
         proxy__getIsOssified: false
       checks:
         LIDO: *lido
@@ -625,10 +625,10 @@ l1:
       name: VaultHub
       address: *vaultHub
       proxyName: OssifiableProxy
-      implementation: *vaultHubImpl
+      implementation: *vaultHubImplAddress
       proxyChecks:
         proxy__getAdmin: *aragonAgent
-        proxy__getImplementation: *vaultHubImpl
+        proxy__getImplementation: *vaultHubImplAddress
         proxy__getIsOssified: false
       checks:
         CONNECT_DEPOSIT: 1000000000000000000
@@ -761,10 +761,10 @@ l1:
       name: AccountingOracle
       address: *accountingOracle
       proxyName: OssifiableProxy
-      implementation: *accountingOracleImpl
+      implementation: *accountingOracleImplAddress
       proxyChecks:
         proxy__getAdmin: *aragonAgent
-        proxy__getImplementation: *accountingOracleImpl
+        proxy__getImplementation: *accountingOracleImplAddress
         proxy__getIsOssified: false
       checks:
         DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
@@ -850,10 +850,10 @@ l1:
       name: ValidatorsExitBusOracle
       address: *validatorsExitBusOracle
       proxyName: OssifiableProxy
-      implementation: *validatorsExitBusOracleImpl
+      implementation: *validatorsExitBusOracleImplAddress
       proxyChecks:
         proxy__getAdmin: *aragonAgent
-        proxy__getImplementation: *validatorsExitBusOracleImpl
+        proxy__getImplementation: *validatorsExitBusOracleImplAddress
         proxy__getIsOssified: false
       checks:
         DATA_FORMAT_LIST: 1
@@ -1003,12 +1003,12 @@ l1:
       name: Kernel
       address: *aragonKernel
       proxyName: KernelProxy
-      implementation: *aragonKernelImpl
+      implementation: *aragonKernelImplAddress
       proxyChecks:
         proxyType: 2
         apps: null
         isDepositable: false
-        implementation: *aragonKernelImpl
+        implementation: *aragonKernelImplAddress
         recoveryVaultAppId: "0x701a4fd1f5174d12a0f1d9ad2c88d0ad11ab6aad0ac72b7d9ce621815f8016a9"
       checks:
         hasInitialized: true
@@ -1067,11 +1067,11 @@ l1:
       name: Voting
       address: *aragonVoting
       proxyName: AppProxyUpgradeable
-      implementation: *aragonVotingImpl
+      implementation: *aragonVotingImplAddress
       proxyChecks:
         proxyType: 2
         isDepositable: false
-        implementation: *aragonVotingImpl
+        implementation: *aragonVotingImplAddress
         appId: "0x0abcd104777321a82b010357f20887d61247493d89d2e987ff57bcecbde00e1e"
         kernel: *aragonKernel
       checks:
@@ -1136,11 +1136,11 @@ l1:
       name: TokenManager
       address: *aragonTokenManager
       proxyName: AppProxyUpgradeable
-      implementation: *aragonTokenManagerImpl
+      implementation: *aragonTokenManagerImplAddress
       proxyChecks:
         proxyType: 2
         isDepositable: false
-        implementation: *aragonTokenManagerImpl
+        implementation: *aragonTokenManagerImplAddress
         appId: "0xcd567bdf93dd0f6acc3bc7f2155f83244d56a65abbfbefb763e015420102c67b"
         kernel: *aragonKernel
       checks:
@@ -1345,11 +1345,11 @@ l1:
       name: ACL
       address: *aragonAcl
       proxyName: AppProxyUpgradeable
-      implementation: *aragonAclImpl
+      implementation: *aragonAclImplAddress
       proxyChecks:
         proxyType: 2
         isDepositable: false
-        implementation: *aragonAclImpl
+        implementation: *aragonAclImplAddress
         appId: "0xe3262375f45a6e2026b7e7b18c2b807434f2508fe1a2a3dfb493c7df8f4aad6a"
         kernel: *aragonKernel
       checks:
@@ -1398,11 +1398,11 @@ l1:
       name: NodeOperatorsRegistry
       address: *nodeOperatorsRegistry
       proxyName: AppProxyUpgradeable
-      implementation: *nodeOperatorsRegistryImpl
+      implementation: *nodeOperatorsRegistryImplAddress
       proxyChecks:
         proxyType: 2
         isDepositable: false
-        implementation: *nodeOperatorsRegistryImpl
+        implementation: *nodeOperatorsRegistryImplAddress
         appId: "0x7071f283424072341f856ac9e947e7ec0eb68719f757a7e785979b6b8717579d"
         kernel: *aragonKernel
       checks:
@@ -1487,11 +1487,11 @@ l1:
       name: NodeOperatorsRegistry
       address: *simpleDvt
       proxyName: AppProxyUpgradeable
-      implementation: *nodeOperatorsRegistryImpl
+      implementation: *nodeOperatorsRegistryImplAddress
       proxyChecks:
         proxyType: 2
         isDepositable: false
-        implementation: *nodeOperatorsRegistryImpl
+        implementation: *nodeOperatorsRegistryImplAddress
         appId: "0xe1635b63b5f7b5e545f2a637558a4029dea7905361a2f0fc28c66e9136cf86a4"
         kernel: *aragonKernel
       checks:
@@ -1577,17 +1577,17 @@ l1:
       address: *stakingVaultFactory
       checks:
         BEACON: *stakingVaultBeacon
-        DASHBOARD_IMPL: *dashboardImpl
+        DASHBOARD_IMPL: *dashboardImplAddress
         LIDO_LOCATOR: *lidoLocator
     stakingVaultBeacon:
       name: UpgradeableBeacon
       address: *stakingVaultBeacon
       checks:
-        implementation: *stakingVaultImpl
+        implementation: *stakingVaultImplAddress
         owner: *aragonAgent
-    stakingVaultImpl:
+    stakingVaultImplAddress:
       name: StakingVault
-      address: *stakingVaultImpl
+      address: *stakingVaultImplAddress
       checks:
         DEPOSIT_CONTRACT: *DEPOSIT_CONTRACT
         PUBLIC_KEY_LENGTH: 48
@@ -1608,9 +1608,9 @@ l1:
         vaultHubAuthorized: false
         version: 1
         withdrawalCredentials: "0x0200000000000000000000007ade83c09a0aa0fea45695840067438a9dc96361"
-    dashboardImpl:
+    dashboardImplAddress:
       name: Dashboard
-      address: *dashboardImpl
+      address: *dashboardImplAddress
       checks:
         BURN_ROLE: "0x689f0a569be0c9b6cd2c11c81cb0add722272abdae6b649fdb1e05f1d9bb8a2f"
         DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
@@ -1683,7 +1683,7 @@ l1:
       name: APMRegistry
       address: *aragonApmRegistry
       proxyName: AppProxyUpgradeable
-      implementation: *aragonApmRegistryImpl
+      implementation: *aragonApmRegistryImplAddress
       proxyChecks:
         proxyType: 2
         isDepositable: false
@@ -1722,11 +1722,11 @@ l1:
       name: EVMScriptRegistry
       address: *aragonEvmScriptRegistry
       proxyName: AppProxyPinned
-      implementation: *aragonEvmScriptRegistryImpl
+      implementation: *aragonEvmScriptRegistryImplAddress
       proxyChecks:
         proxyType: 1
         isDepositable: false
-        implementation: *aragonEvmScriptRegistryImpl
+        implementation: *aragonEvmScriptRegistryImplAddress
         appId: "0xddbcfd564f642ab5627cf68b9b7d374fb4f8a36e941a75d89c87998cef03bd61"
         kernel: *aragonKernel
       checks:
@@ -1797,9 +1797,9 @@ l1:
       name: DAOFactory
       address: *daoFactory
       checks:
-        baseACL: *aragonAclImpl
+        baseACL: *aragonAclImplAddress
         regFactory: *evmScriptRegistryFactory
-        baseKernel: *aragonKernelImpl
+        baseKernel: *aragonKernelImplAddress
     dummyEmptyContract:
       name: DummyEmptyContract
       address: *dummyEmptyContract
@@ -1819,13 +1819,13 @@ l1:
       name: EVMScriptRegistryFactory
       address: *evmScriptRegistryFactory
       checks:
-        baseReg: *aragonEvmScriptRegistryImpl
+        baseReg: *aragonEvmScriptRegistryImplAddress
         baseCallScript: *callsScript
     lidoApm:
       name: APMRegistry
       address: *lidoApm
       proxyName: AppProxyUpgradeable
-      implementation: *aragonApmRegistryImpl
+      implementation: *aragonApmRegistryImplAddress
       proxyChecks:
         proxyType: 2
         isDepositable: false
@@ -1875,7 +1875,7 @@ l1:
       proxyName: PinnedBeaconProxy
       implementation: "0x7ade83c09a0aa0fea45695840067438a9dc96361"
       proxyChecks:
-        implementation: *stakingVaultImpl
+        implementation: *stakingVaultImplAddress
       checks:
         DEPOSIT_CONTRACT: *DEPOSIT_CONTRACT
         PUBLIC_KEY_LENGTH: 48
