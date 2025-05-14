@@ -123,6 +123,19 @@ const Sr2ProxyChecksTB = Type.Readonly(
   ),
 );
 
+const AragonProxyChecksTB = Type.Readonly(
+  Type.Object(
+    {
+      proxyType: PlainValueTB,
+      apps: PlainValueTB,
+      isDepositable: PlainValueTB,
+      implementation: EthereumStringTB,
+      recoveryVaultAppId: EthereumStringTB,
+    },
+    { additionalProperties: false },
+  ),
+);
+
 const RegularChecksTB = Type.Readonly(Type.Record(Type.String(), ChecksEntryValueTB));
 
 const ImplementationChecksTB = Type.Optional(RegularChecksTB);
@@ -145,7 +158,7 @@ export const ProxyContractEntryTB = Type.Readonly(
       ...RegularContractEntryTB.properties,
       proxyName: Type.String(),
       implementation: Type.Optional(EthereumStringTB),
-      proxyChecks: Type.Optional(Type.Union([ProxyChecksTB, Sr2ProxyChecksTB])),
+      proxyChecks: Type.Optional(Type.Union([ProxyChecksTB, Sr2ProxyChecksTB, AragonProxyChecksTB])),
       implementationChecks: ImplementationChecksTB,
       ozAcl: Type.Optional(OzAclChecksTB),
     },
