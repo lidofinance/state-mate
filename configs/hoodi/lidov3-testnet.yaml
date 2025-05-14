@@ -562,24 +562,23 @@ l1:
         tokenURI: null
         unfinalizedRequestNumber: 0
         unfinalizedStETH: 0
-        # TODO json-schema
-    # withdrawalVault:
-    #   name: WithdrawalVault
-    #   address: *withdrawalVault
-    #   proxyName: WithdrawalsManagerProxy
-    #   implementation: *withdrawalVaultImpl
-    #   proxyChecks:
-    #     implementation: *withdrawalVaultImpl
-    #     proxy_getAdmin: "0xd401Bf29751aE77cF5A479b22fbAaB30cD027dD6"
-    #     proxy_getIsOssified: false
-    #   checks:
-    #     LIDO: *lido
-    #     TREASURY: *aragonAgent
-    #     getContractVersion: 0
-    #   implementationChecks:
-    #     LIDO: *lido
-    #     TREASURY: *aragonAgent
-    #     getContractVersion: *MAX_UINT256
+    withdrawalVault:
+      name: WithdrawalVault
+      address: *withdrawalVault
+      proxyName: WithdrawalsManagerProxy
+      implementation: *withdrawalVaultImpl
+      proxyChecks:
+        implementation: *withdrawalVaultImpl
+        proxy_getAdmin: "0xd401Bf29751aE77cF5A479b22fbAaB30cD027dD6"
+        proxy_getIsOssified: false
+      checks:
+        LIDO: *lido
+        TREASURY: *aragonAgent
+        getContractVersion: 0
+      implementationChecks:
+        LIDO: *lido
+        TREASURY: *aragonAgent
+        getContractVersion: *MAX_UINT256
     burner:
       name: Burner
       address: *burner
@@ -1871,54 +1870,53 @@ l1:
       name: MiniMeTokenFactory
       address: *miniMeTokenFactory
       checks: {}
-      # TODO json-schema
-    # pinnedBeaconProxy:
-    #   name: StakingVault
-    #   address: *pinnedBeaconProxy
-    #   proxyName: PinnedBeaconProxy
-    #   implementation: "0x7ade83c09a0aa0fea45695840067438a9dc96361"
-    #   proxyChecks:
-    #     implementation: *stakingVaultImpl
-    #   checks:
-    #     DEPOSIT_CONTRACT: *DEPOSIT_CONTRACT
-    #     PUBLIC_KEY_LENGTH: 48
-    #     beaconChainDepositsPaused: false
-    #     calculateValidatorWithdrawalFee: null
-    #     depositor: *ZERO_ADDRESS
-    #     getInitializedVersion: 0
-    #     inOutDelta: 0
-    #     isReportFresh: true
-    #     latestReport: [0, 0, 0]
-    #     locked: 0
-    #     nodeOperator: *ZERO_ADDRESS
-    #     ossified: true
-    #     owner: *ZERO_ADDRESS
-    #     totalValue: 0
-    #     unlocked: 0
-    #     vaultHub: *vaultHub
-    #     vaultHubAuthorized: false
-    #     version: 1
-    #     withdrawalCredentials: "0x020000000000000000000000f19e48c5ad2f8abb452f5a6ab9cb104e70495e08"
-    #   implementationChecks:
-    #     DEPOSIT_CONTRACT: *DEPOSIT_CONTRACT
-    #     PUBLIC_KEY_LENGTH: 48
-    #     beaconChainDepositsPaused: false
-    #     calculateValidatorWithdrawalFee: null
-    #     depositor: *ZERO_ADDRESS
-    #     getInitializedVersion: *MAX_UINT64
-    #     inOutDelta: 0
-    #     isReportFresh: true
-    #     latestReport: [0, 0, 0]
-    #     locked: 0
-    #     nodeOperator: *ZERO_ADDRESS
-    #     ossified: true
-    #     owner: *ZERO_ADDRESS
-    #     totalValue: 0
-    #     unlocked: 0
-    #     vaultHub: *vaultHub
-    #     vaultHubAuthorized: false
-    #     version: 1
-    #     withdrawalCredentials: "0x0200000000000000000000007ade83c09a0aa0fea45695840067438a9dc96361"
+    pinnedBeaconProxy:
+      name: StakingVault
+      address: *pinnedBeaconProxy
+      proxyName: PinnedBeaconProxy
+      implementation: "0x7ade83c09a0aa0fea45695840067438a9dc96361"
+      proxyChecks:
+        implementation: *stakingVaultImpl
+      checks:
+        DEPOSIT_CONTRACT: *DEPOSIT_CONTRACT
+        PUBLIC_KEY_LENGTH: 48
+        beaconChainDepositsPaused: false
+        calculateValidatorWithdrawalFee: null
+        depositor: *ZERO_ADDRESS
+        getInitializedVersion: 0
+        inOutDelta: 0
+        isReportFresh: true
+        latestReport: [0, 0, 0]
+        locked: 0
+        nodeOperator: *ZERO_ADDRESS
+        ossified: true
+        owner: *ZERO_ADDRESS
+        totalValue: 0
+        unlocked: 0
+        vaultHub: *vaultHub
+        vaultHubAuthorized: false
+        version: 1
+        withdrawalCredentials: "0x020000000000000000000000f19e48c5ad2f8abb452f5a6ab9cb104e70495e08"
+      implementationChecks:
+        DEPOSIT_CONTRACT: *DEPOSIT_CONTRACT
+        PUBLIC_KEY_LENGTH: 48
+        beaconChainDepositsPaused: false
+        calculateValidatorWithdrawalFee: null
+        depositor: *ZERO_ADDRESS
+        getInitializedVersion: *MAX_UINT64
+        inOutDelta: 0
+        isReportFresh: true
+        latestReport: [0, 0, 0]
+        locked: 0
+        nodeOperator: *ZERO_ADDRESS
+        ossified: true
+        owner: *ZERO_ADDRESS
+        totalValue: 0
+        unlocked: 0
+        vaultHub: *vaultHub
+        vaultHubAuthorized: false
+        version: 1
+        withdrawalCredentials: "0x0200000000000000000000007ade83c09a0aa0fea45695840067438a9dc96361"
     EasyTrack:
       name: EasyTrack
       address: *EasyTrack
