@@ -45,7 +45,9 @@ deployed:
     - &aragonTokenManager "0x32Ea1c8Df51BCAd93309DB159E54415951782992"
     - &aragonTokenManagerImplAddress "0x3cBDFd1C852Ea9B31226d3108d5948E2a21103A8"
     - &aragonFinance "0x973bD4e3F387F1BBF1576c5B12101450328F067f"
+    - &aragonFinanceImplAddress "0x9C7d4c81BfdDc76F916bf724829029bFCCd1Aefb"
     - &aragonAgent "0x2cE254Fd852d6B5023b1B2355ae96A8d752a47cf"
+    - &aragonAgentImplAddress "0x3e4a509BBE76EC3F553D1f73131cF7E1896814A1"
     - &aragonAcl "0x428d6E1C384B743b1D6bed40b3a01F5357Ec24A9"
     - &aragonAclImplAddress "0x866Ad4D7283C4dcF00A01c1884DCDa98c2F1aE0A"
     - &aragonApmRegistry "0x85C4e347Cba194Ce2237fD19865cf9EE89A6Bb43"
@@ -136,9 +138,18 @@ roles:
   - &OZ_PAUSE_ROLE "0x8d0e4ae4847b49935b55c99f9c3ce025c87e7c4604c35b7ae56929bd32fa5a78"
   - &OZ_RESUME_ROLE "0xa79a6aede309e0d48bf2ef0f71355c06ad317956d4c0da2deb0dc47cc34f826c"
 
+  # Aragon
+  - &KERNEL_APP_ID "0x3b4bf6bf3ad5000ecf0f989d5befde585c6860fea3e574a4fab4c49d1c177d9c"
+  - &DEFAULT_ACL_APP_ID "0xe3262375f45a6e2026b7e7b18c2b807434f2508fe1a2a3dfb493c7df8f4aad6a"
+  - &VOTING_APP_ID "0x0abcd104777321a82b010357f20887d61247493d89d2e987ff57bcecbde00e1e"
+  - &TOKEN_MANAGER_APP_ID "0xcd567bdf93dd0f6acc3bc7f2155f83244d56a65abbfbefb763e015420102c67b"
+  - &FINANCE_APP_ID "0x5c9918c99c4081ca9459c178381be71d9da40e49e151687da55099c49a4237f1"
+  - &AGENT_APP_ID "0x701a4fd1f5174d12a0f1d9ad2c88d0ad11ab6aad0ac72b7d9ce621815f8016a9"
+
 misc:
   - &CHAIN_ID "560048"
   - &GENESIS_TIME "1742213400"
+  - &DEPOSIT_DOMAIN "0x03000000719103511efa4f1362ff2a50996cccf329cc84cb410c5e5c7d351d03"
   - &LIDO_VERSION "3"
   - &AO_CONSENSUS_VERSION "3"
   - &AO_CONTRACT_VERSION "3"
@@ -766,7 +777,7 @@ l1:
       checks:
         BEACON_ROOTS: *BEACON_ROOTS
         DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
-        DEPOSIT_DOMAIN: "0x03000000719103511efa4f1362ff2a50996cccf329cc84cb410c5e5c7d351d03"
+        DEPOSIT_DOMAIN: *DEPOSIT_DOMAIN
         GI_FIRST_VALIDATOR: *GI_FIRST_VALIDATOR
         GI_FIRST_VALIDATOR_AFTER_CHANGE: *GI_FIRST_VALIDATOR_AFTER_CHANGE
         GI_PUBKEY_WC_PARENT: *GI_PUBKEY_WC_PARENT
@@ -798,7 +809,7 @@ l1:
       implementationChecks:
         BEACON_ROOTS: *BEACON_ROOTS
         DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
-        DEPOSIT_DOMAIN: "0x03000000719103511efa4f1362ff2a50996cccf329cc84cb410c5e5c7d351d03"
+        DEPOSIT_DOMAIN: *DEPOSIT_DOMAIN
         GI_FIRST_VALIDATOR: *GI_FIRST_VALIDATOR
         GI_FIRST_VALIDATOR_AFTER_CHANGE: *GI_FIRST_VALIDATOR_AFTER_CHANGE
         GI_PUBKEY_WC_PARENT: *GI_PUBKEY_WC_PARENT
@@ -1016,459 +1027,457 @@ l1:
         hasRole: null
         supportsInterface: null
 
-    # oracleReportSanityChecker:
-    #   name: OracleReportSanityChecker
-    #   address: *oracleReportSanityChecker
-    #   checks:
-    #     ALL_LIMITS_MANAGER_ROLE: "0x5bf88568a012dfc9fe67407ad6775052bddc4ac89902dea1f4373ef5d9f1e35b"
-    #     ANNUAL_BALANCE_INCREASE_LIMIT_MANAGER_ROLE: "0x12c02753cd3d584dc4bb965eb0c88392c4c4d7c00433fdb7490d33c61ea57622"
-    #     APPEARED_VALIDATORS_PER_DAY_LIMIT_MANAGER_ROLE: "0x14ca7b84baa11a976283347b0159b8ddf2dcf5fd5cf613cc567a3423cf510119"
-    #     DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
-    #     EXITED_VALIDATORS_PER_DAY_LIMIT_MANAGER_ROLE: "0x60b9982471bc0620c7b74959f48a86c55c92c11876fddc5b0b54d1ec47153e5d"
-    #     INITIAL_SLASHING_AND_PENALTIES_MANAGER_ROLE: "0xebfa317a5d279811b024586b17a50f48924bce86f6293b233927322d7209b507"
-    #     MAX_ITEMS_PER_EXTRA_DATA_TRANSACTION_ROLE: "0x13445b811594f3a8800b82296d63f371c695d2f86c1069c899ded3d73f523d2e"
-    #     MAX_NODE_OPERATORS_PER_EXTRA_DATA_ITEM_ROLE: "0xb3f2d16385bde8a7121e101a021aff43bbe4d4137a587832caf1f583b9d34395"
-    #     MAX_POSITIVE_TOKEN_REBASE_MANAGER_ROLE: "0x78de2bab4a3a0c88f50b6bb7c2290e0eb46bc61d575eae694d8bffbc2ca98c92"
-    #     MAX_VALIDATOR_EXIT_REQUESTS_PER_REPORT_ROLE: "0x9925400e72399e0a89e9b346878fc47ac0031526d0e060e33ff372d7a5d11ba8"
-    #     REQUEST_TIMESTAMP_MARGIN_MANAGER_ROLE: "0x2f8719116fbba3aba2a39759e34dcd29ea3516f7568c8321695aaea208280cd3"
-    #     SECOND_OPINION_MANAGER_ROLE: "0xaa0e0f619f5a9368ee035bae759cfe7da8958f44bd71456a05198effc68ea647"
-    #     SHARE_RATE_DEVIATION_LIMIT_MANAGER_ROLE: "0x7b21c0949109e9e143f66d6aa1f8a065b3f4ab47ee9f84f6837fd0490eace4d5"
-    #     checkExitBusOracleReport: null
-    #     checkExitedValidatorsRatePerDay: null
-    #     checkExtraDataItemsCountPerTransaction: null
-    #     checkNodeOperatorsPerExtraDataItemCount: null
-    #     checkWithdrawalQueueOracleReport: null
-    #     getLidoLocator: *lidoLocator
-    #     getMaxPositiveTokenRebase: "750000"
-    #     getOracleReportLimits:
-    #       - 9000
-    #       - 43200
-    #       - 1000
-    #       - 600
-    #       - 8
-    #       - 24
-    #       - 128
-    #       - 750000
-    #       - 1000
-    #       - 101
-    #       - 50
-    #     getReportDataCount: null
-    #     getRoleAdmin: null
-    #     getRoleMember: null
-    #     getRoleMemberCount: null
-    #     hasRole: null
-    #     reportData: null
-    #     secondOpinionOracle: *ZERO_ADDRESS
-    #     smoothenTokenRebase: null
-    #     supportsInterface: null
-    # oracleDaemonConfig:
-    #   name: OracleDaemonConfig
-    #   address: *oracleDaemonConfig
-    #   checks:
-    #     CONFIG_MANAGER_ROLE: "0xbbfb55d933c2bfa638763473275b1d84c4418e58d26cf9d2cd5758237756d9f0"
-    #     DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
-    #     get: null
-    #     getList: null
-    #     getRoleAdmin: null
-    #     getRoleMember: null
-    #     getRoleMemberCount: null
-    #     hasRole: null
-    #     supportsInterface: null
-    # aragon-kernel:
-    #   name: Kernel
-    #   address: *aragonKernel
-    #   proxyName: KernelProxy
-    #   implementation: *aragonKernelImplAddress
-    #   proxyChecks:
-    #     proxyType: 2
-    #     apps: null
-    #     isDepositable: false
-    #     implementation: *aragonKernelImplAddress
-    #     recoveryVaultAppId: "0x701a4fd1f5174d12a0f1d9ad2c88d0ad11ab6aad0ac72b7d9ce621815f8016a9"
-    #   checks:
-    #     hasInitialized: true
-    #     KERNEL_APP_ID: "0x3b4bf6bf3ad5000ecf0f989d5befde585c6860fea3e574a4fab4c49d1c177d9c"
-    #     APP_ADDR_NAMESPACE: "0xd6f028ca0e8edb4a8c9757ca4fdccab25fa1e0317da1188108f7d2dee14902fb"
-    #     getRecoveryVault: *aragonAgent
-    #     apps: null
-    #     CORE_NAMESPACE: "0xc681a85306374a5ab27f0bbc385296a54bcd314a1948b6cf61c4ea1bc44bb9f8"
-    #     allowRecoverability: null
-    #     recoveryVaultAppId: "0x701a4fd1f5174d12a0f1d9ad2c88d0ad11ab6aad0ac72b7d9ce621815f8016a9"
-    #     getInitializationBlock: 213093
-    #     APP_MANAGER_ROLE: "0xb6d92708f3d4817afc106147d969e229ced5c46e65e0a5002a0d391287762bd0"
-    #     getApp: null
-    #     APP_BASES_NAMESPACE: "0xf1f3eb40f5bc1ad1344716ced8b8a0431d840b5783aea1fd01786bc26f35ac0f"
-    #     acl: "0x428d6E1C384B743b1D6bed40b3a01F5357Ec24A9"
-    #     isPetrified: false
-    #     DEFAULT_ACL_APP_ID: "0xe3262375f45a6e2026b7e7b18c2b807434f2508fe1a2a3dfb493c7df8f4aad6a"
-    #     hasPermission: null
-    #   implementationChecks:
-    #     hasInitialized: false
-    #     KERNEL_APP_ID: "0x3b4bf6bf3ad5000ecf0f989d5befde585c6860fea3e574a4fab4c49d1c177d9c"
-    #     APP_ADDR_NAMESPACE: "0xd6f028ca0e8edb4a8c9757ca4fdccab25fa1e0317da1188108f7d2dee14902fb"
-    #     getRecoveryVault: *ZERO_ADDRESS
-    #     apps: null
-    #     CORE_NAMESPACE: "0xc681a85306374a5ab27f0bbc385296a54bcd314a1948b6cf61c4ea1bc44bb9f8"
-    #     allowRecoverability: null
-    #     recoveryVaultAppId: *ZERO_BYTES32
-    #     getInitializationBlock: *MAX_UINT256
-    #     APP_MANAGER_ROLE: "0xb6d92708f3d4817afc106147d969e229ced5c46e65e0a5002a0d391287762bd0"
-    #     getApp: null
-    #     APP_BASES_NAMESPACE: "0xf1f3eb40f5bc1ad1344716ced8b8a0431d840b5783aea1fd01786bc26f35ac0f"
-    #     acl: *ZERO_ADDRESS
-    #     isPetrified: true
-    #     DEFAULT_ACL_APP_ID: "0xe3262375f45a6e2026b7e7b18c2b807434f2508fe1a2a3dfb493c7df8f4aad6a"
-    #     hasPermission: null
-    # ldo:
-    #   name: MiniMeToken
-    #   address: *ldo
-    #   checks:
-    #     name: "TEST Lido DAO Token"
-    #     creationBlock: 213093
-    #     totalSupply: 1000000000000000000000000
-    #     decimals: 18
-    #     balanceOfAt: null
-    #     version: "MMT_0.1"
-    #     balanceOf: null
-    #     parentToken: *ZERO_ADDRESS
-    #     symbol: "TLDO"
-    #     totalSupplyAt: null
-    #     transfersEnabled: true
-    #     parentSnapShotBlock: 0
-    #     allowance: null
-    #     tokenFactory: *miniMeTokenFactory
-    #     controller: "0x32Ea1c8Df51BCAd93309DB159E54415951782992"
-    # aragon-voting:
-    #   name: Voting
-    #   address: *aragonVoting
-    #   proxyName: AppProxyUpgradeable
-    #   implementation: *aragonVotingImplAddress
-    #   proxyChecks:
-    #     proxyType: 2
-    #     isDepositable: false
-    #     implementation: *aragonVotingImplAddress
-    #     appId: "0x0abcd104777321a82b010357f20887d61247493d89d2e987ff57bcecbde00e1e"
-    #     kernel: *aragonKernel
-    #   checks:
-    #     hasInitialized: true
-    #     UNSAFELY_MODIFY_VOTE_TIME_ROLE: "0x068ca51c9d69625c7add396c98ca4f3b27d894c3b973051ad3ee53017d7094ea"
-    #     getEVMScriptExecutor: null
-    #     getRecoveryVault: *aragonAgent
-    #     MODIFY_QUORUM_ROLE: "0xad15e7261800b4bb73f1b69d3864565ffb1fd00cb93cf14fe48da8f1f2149f39"
-    #     objectionPhaseTime: 60
-    #     getVoterState: null
-    #     getVote: null
-    #     MODIFY_SUPPORT_ROLE: "0xda3972983e62bdf826c4b807c4c9c2b8a941e1f83dfa76d53d6aeac11e1be650"
-    #     allowRecoverability: null
-    #     appId: "0x0abcd104777321a82b010357f20887d61247493d89d2e987ff57bcecbde00e1e"
-    #     getInitializationBlock: 213093
-    #     canPerform: null
-    #     getEVMScriptRegistry: *aragonEvmScriptRegistry
-    #     voteTime: 300
-    #     CREATE_VOTES_ROLE: "0xe7dcd7275292e064d090fbc5f3bd7995be23b502c1fed5cd94cfddbbdcd32bbc"
-    #     canForward: null
-    #     canExecute: null
-    #     canVote: null
-    #     kernel: *aragonKernel
-    #     minAcceptQuorumPct: 50000000000000000
-    #     isPetrified: false
-    #     votesLength: 8
-    #     getVotePhase: null
-    #     supportRequiredPct: 500000000000000000
-    #     token: *ldo
-    #     PCT_BASE: 1000000000000000000
-    #     isForwarder: true
-    #   implementationChecks:
-    #     hasInitialized: false
-    #     UNSAFELY_MODIFY_VOTE_TIME_ROLE: "0x068ca51c9d69625c7add396c98ca4f3b27d894c3b973051ad3ee53017d7094ea"
-    #     getEVMScriptExecutor: null
-    #     getRecoveryVault: null
-    #     MODIFY_QUORUM_ROLE: "0xad15e7261800b4bb73f1b69d3864565ffb1fd00cb93cf14fe48da8f1f2149f39"
-    #     objectionPhaseTime: 0
-    #     getVoterState: null
-    #     getVote: null
-    #     MODIFY_SUPPORT_ROLE: "0xda3972983e62bdf826c4b807c4c9c2b8a941e1f83dfa76d53d6aeac11e1be650"
-    #     allowRecoverability: null
-    #     appId: *ZERO_BYTES32
-    #     getInitializationBlock: *MAX_UINT256
-    #     canPerform: null
-    #     getEVMScriptRegistry: null
-    #     voteTime: 0
-    #     CREATE_VOTES_ROLE: "0xe7dcd7275292e064d090fbc5f3bd7995be23b502c1fed5cd94cfddbbdcd32bbc"
-    #     canForward: null
-    #     canExecute: null
-    #     canVote: null
-    #     kernel: *ZERO_ADDRESS
-    #     minAcceptQuorumPct: 0
-    #     isPetrified: true
-    #     votesLength: 0
-    #     getVotePhase: null
-    #     supportRequiredPct: 0
-    #     token: *ZERO_ADDRESS
-    #     PCT_BASE: 1000000000000000000
-    #     isForwarder: true
-    # aragon-token-manager:
-    #   name: TokenManager
-    #   address: *aragonTokenManager
-    #   proxyName: AppProxyUpgradeable
-    #   implementation: *aragonTokenManagerImplAddress
-    #   proxyChecks:
-    #     proxyType: 2
-    #     isDepositable: false
-    #     implementation: *aragonTokenManagerImplAddress
-    #     appId: "0xcd567bdf93dd0f6acc3bc7f2155f83244d56a65abbfbefb763e015420102c67b"
-    #     kernel: *aragonKernel
-    #   checks:
-    #     hasInitialized: true
-    #     MAX_VESTINGS_PER_ADDRESS: 50
-    #     spendableBalanceOf: null
-    #     getEVMScriptExecutor: null
-    #     getRecoveryVault: *aragonAgent
-    #     getVesting: null
-    #     transferableBalance: null
-    #     allowRecoverability: null
-    #     appId: "0xcd567bdf93dd0f6acc3bc7f2155f83244d56a65abbfbefb763e015420102c67b"
-    #     ISSUE_ROLE: "0x2406f1e99f79cea012fb88c5c36566feaeefee0f4b98d3a376b49310222b53c4"
-    #     getInitializationBlock: 213093
-    #     vestingsLengths: null
-    #     canPerform: null
-    #     getEVMScriptRegistry: *aragonEvmScriptRegistry
-    #     ASSIGN_ROLE: "0xf5a08927c847d7a29dc35e105208dbde5ce951392105d712761cc5d17440e2ff"
-    #     BURN_ROLE: "0xe97b137254058bd94f28d2f3eb79e2d34074ffb488d042e3bc958e0a57d2fa22"
-    #     canForward: null
-    #     kernel: *aragonKernel
-    #     isPetrified: false
-    #     MINT_ROLE: "0x154c00819833dac601ee5ddded6fda79d9d8b506b911b3dbd54cdb95fe6c3686"
-    #     maxAccountTokens: *MAX_UINT256
-    #     REVOKE_VESTINGS_ROLE: "0x95ffc68daedf1eb334cfcd22ee24a5eeb5a8e58aa40679f2ad247a84140f8d6e"
-    #     token: *ldo
-    #     isForwarder: true
-    #   implementationChecks:
-    #     hasInitialized: false
-    #     MAX_VESTINGS_PER_ADDRESS: 50
-    #     spendableBalanceOf: null
-    #     getEVMScriptExecutor: null
-    #     getRecoveryVault: null
-    #     getVesting: null
-    #     transferableBalance: null
-    #     allowRecoverability: null
-    #     appId: *ZERO_BYTES32
-    #     ISSUE_ROLE: "0x2406f1e99f79cea012fb88c5c36566feaeefee0f4b98d3a376b49310222b53c4"
-    #     getInitializationBlock: *MAX_UINT256
-    #     vestingsLengths: null
-    #     canPerform: null
-    #     getEVMScriptRegistry: null
-    #     ASSIGN_ROLE: "0xf5a08927c847d7a29dc35e105208dbde5ce951392105d712761cc5d17440e2ff"
-    #     BURN_ROLE: "0xe97b137254058bd94f28d2f3eb79e2d34074ffb488d042e3bc958e0a57d2fa22"
-    #     canForward: null
-    #     kernel: *ZERO_ADDRESS
-    #     isPetrified: true
-    #     MINT_ROLE: "0x154c00819833dac601ee5ddded6fda79d9d8b506b911b3dbd54cdb95fe6c3686"
-    #     maxAccountTokens: 0
-    #     REVOKE_VESTINGS_ROLE: "0x95ffc68daedf1eb334cfcd22ee24a5eeb5a8e58aa40679f2ad247a84140f8d6e"
-    #     token: *ZERO_ADDRESS
-    #     isForwarder: true
-    # aragon-finance:
-    #   name: Finance
-    #   address: *aragonFinance
-    #   proxyName: AppProxyUpgradeable
-    #   implementation: "0x9c7d4c81bfddc76f916bf724829029bfccd1aefb"
-    #   proxyChecks:
-    #     proxyType: 2
-    #     isDepositable: false
-    #     implementation: "0x9C7d4c81BfdDc76F916bf724829029bFCCd1Aefb"
-    #     appId: "0x5c9918c99c4081ca9459c178381be71d9da40e49e151687da55099c49a4237f1"
-    #     kernel: *aragonKernel
-    #   checks:
-    #     hasInitialized: true
-    #     CREATE_PAYMENTS_ROLE: "0x5de467a460382d13defdc02aacddc9c7d6605d6d4e0b8bd2f70732cae8ea17bc"
-    #     getBudget: null
-    #     getEVMScriptExecutor: null
-    #     getPayment: null
-    #     getRecoveryVault: *aragonAgent
-    #     getTransaction: null
-    #     CHANGE_PERIOD_ROLE: "0xd35e458bacdd5343c2f050f574554b2f417a8ea38d6a9a65ce2225dbe8bb9a9d"
-    #     CHANGE_BUDGETS_ROLE: "0xd79730e82bfef7d2f9639b9d10bf37ebb662b22ae2211502a00bdf7b2cc3a23a"
-    #     getPeriod: null
-    #     periodsLength: 1
-    #     allowRecoverability: null
-    #     appId: "0x5c9918c99c4081ca9459c178381be71d9da40e49e151687da55099c49a4237f1"
-    #     getInitializationBlock: 213093
-    #     EXECUTE_PAYMENTS_ROLE: "0x563165d3eae48bcb0a092543ca070d989169c98357e9a1b324ec5da44bab75fd"
-    #     currentPeriodId: 0
-    #     canPerform: null
-    #     getEVMScriptRegistry: *aragonEvmScriptRegistry
-    #     getPeriodDuration: 2592000
-    #     nextPaymentTime: null
-    #     getPeriodTokenStatement: null
-    #     kernel: *aragonKernel
-    #     paymentsNextIndex: 1
-    #     isPetrified: false
-    #     canMakePayment: null
-    #     MANAGE_PAYMENTS_ROLE: "0x30597dd103acfaef0649675953d9cb22faadab7e9d9ed57acc1c429d04b80777"
-    #     transactionsNextIndex: 1
-    #     getRemainingBudget: null
-    #     vault: *aragonAgent
-    #   implementationChecks:
-    #     hasInitialized: false
-    #     CREATE_PAYMENTS_ROLE: "0x5de467a460382d13defdc02aacddc9c7d6605d6d4e0b8bd2f70732cae8ea17bc"
-    #     getBudget: null
-    #     getEVMScriptExecutor: null
-    #     getPayment: null
-    #     getRecoveryVault: null
-    #     getTransaction: null
-    #     CHANGE_PERIOD_ROLE: "0xd35e458bacdd5343c2f050f574554b2f417a8ea38d6a9a65ce2225dbe8bb9a9d"
-    #     CHANGE_BUDGETS_ROLE: "0xd79730e82bfef7d2f9639b9d10bf37ebb662b22ae2211502a00bdf7b2cc3a23a"
-    #     getPeriod: null
-    #     periodsLength: 0
-    #     allowRecoverability: null
-    #     appId: *ZERO_BYTES32
-    #     getInitializationBlock: *MAX_UINT256
-    #     EXECUTE_PAYMENTS_ROLE: "0x563165d3eae48bcb0a092543ca070d989169c98357e9a1b324ec5da44bab75fd"
-    #     currentPeriodId: null
-    #     canPerform: null
-    #     getEVMScriptRegistry: null
-    #     getPeriodDuration: null
-    #     nextPaymentTime: null
-    #     getPeriodTokenStatement: null
-    #     kernel: *ZERO_ADDRESS
-    #     paymentsNextIndex: 0
-    #     isPetrified: true
-    #     canMakePayment: null
-    #     MANAGE_PAYMENTS_ROLE: "0x30597dd103acfaef0649675953d9cb22faadab7e9d9ed57acc1c429d04b80777"
-    #     transactionsNextIndex: 0
-    #     getRemainingBudget: null
-    #     vault: *ZERO_ADDRESS
-    # aragon-agent:
-    #   name: Agent
-    #   address: *aragonAgent
-    #   proxyName: AppProxyUpgradeable
-    #   implementation: "0x3e4a509bbe76ec3f553d1f73131cf7e1896814a1"
-    #   proxyChecks:
-    #     proxyType: 2
-    #     isDepositable: true
-    #     implementation: "0x3e4a509BBE76EC3F553D1f73131cF7E1896814A1"
-    #     appId: "0x701a4fd1f5174d12a0f1d9ad2c88d0ad11ab6aad0ac72b7d9ce621815f8016a9"
-    #     kernel: *aragonKernel
-    #   checks:
-    #     ADD_PROTECTED_TOKEN_ROLE: "0x6eb2a499556bfa2872f5aa15812b956cc4a71b4d64eb3553f7073c7e41415aaa"
-    #     supportsInterface: null
-    #     hasInitialized: true
-    #     ERC1271_INTERFACE_ID: "0xfb855dc9"
-    #     isValidSignature: null
-    #     ERC1271_RETURN_INVALID_SIGNATURE: "0x00000000"
-    #     TRANSFER_ROLE: "0x8502233096d909befbda0999bb8ea2f3a6be3c138b9fbf003752a4c8bce86f6c"
-    #     getProtectedTokensLength: 0
-    #     getEVMScriptExecutor: null
-    #     getRecoveryVault: *aragonAgent
-    #     RUN_SCRIPT_ROLE: "0xb421f7ad7646747f3051c50c0b8e2377839296cd4973e27f63821d73e390338f"
-    #     SAFE_EXECUTE_ROLE: "0x0a1ad7b87f5846153c6d5a1f761d71c7d0cfd122384f56066cd33239b7933694"
-    #     REMOVE_PROTECTED_TOKEN_ROLE: "0x71eee93d500f6f065e38b27d242a756466a00a52a1dbcd6b4260f01a8640402a"
-    #     isDepositable: true
-    #     DESIGNATE_SIGNER_ROLE: "0x23ce341656c3f14df6692eebd4757791e33662b7dcf9970c8308303da5472b7c"
-    #     EXECUTE_ROLE: "0xcebf517aa4440d1d125e0355aae64401211d0848a23c02cc5d29a14822580ba4"
-    #     allowRecoverability: null
-    #     appId: "0x701a4fd1f5174d12a0f1d9ad2c88d0ad11ab6aad0ac72b7d9ce621815f8016a9"
-    #     protectedTokens: null
-    #     getInitializationBlock: 213093
-    #     ERC1271_RETURN_VALID_SIGNATURE: "0x20c13b0b"
-    #     canPerform: null
-    #     getEVMScriptRegistry: "0x49335f718631a7aA201B459B499AFfdc1d8Ca774"
-    #     designatedSigner: *ZERO_ADDRESS
-    #     PROTECTED_TOKENS_CAP: 10
-    #     ADD_PRESIGNED_HASH_ROLE: "0x0b29780bb523a130b3b01f231ef49ed2fa2781645591a0b0a44ca98f15a5994c"
-    #     isPresigned: null
-    #     canForward: null
-    #     kernel: *aragonKernel
-    #     isPetrified: false
-    #     balance: null
-    #     isForwarder: true
-    #   implementationChecks:
-    #     ADD_PROTECTED_TOKEN_ROLE: "0x6eb2a499556bfa2872f5aa15812b956cc4a71b4d64eb3553f7073c7e41415aaa"
-    #     supportsInterface: null
-    #     hasInitialized: false
-    #     ERC1271_INTERFACE_ID: "0xfb855dc9"
-    #     isValidSignature: null
-    #     ERC1271_RETURN_INVALID_SIGNATURE: "0x00000000"
-    #     TRANSFER_ROLE: "0x8502233096d909befbda0999bb8ea2f3a6be3c138b9fbf003752a4c8bce86f6c"
-    #     getProtectedTokensLength: null
-    #     getEVMScriptExecutor: null
-    #     getRecoveryVault: null
-    #     RUN_SCRIPT_ROLE: "0xb421f7ad7646747f3051c50c0b8e2377839296cd4973e27f63821d73e390338f"
-    #     SAFE_EXECUTE_ROLE: "0x0a1ad7b87f5846153c6d5a1f761d71c7d0cfd122384f56066cd33239b7933694"
-    #     REMOVE_PROTECTED_TOKEN_ROLE: "0x71eee93d500f6f065e38b27d242a756466a00a52a1dbcd6b4260f01a8640402a"
-    #     isDepositable: false
-    #     DESIGNATE_SIGNER_ROLE: "0x23ce341656c3f14df6692eebd4757791e33662b7dcf9970c8308303da5472b7c"
-    #     EXECUTE_ROLE: "0xcebf517aa4440d1d125e0355aae64401211d0848a23c02cc5d29a14822580ba4"
-    #     allowRecoverability: null
-    #     appId: *ZERO_BYTES32
-    #     protectedTokens: null
-    #     getInitializationBlock: *MAX_UINT256
-    #     ERC1271_RETURN_VALID_SIGNATURE: "0x20c13b0b"
-    #     canPerform: null
-    #     getEVMScriptRegistry: null
-    #     designatedSigner: *ZERO_ADDRESS
-    #     PROTECTED_TOKENS_CAP: 10
-    #     ADD_PRESIGNED_HASH_ROLE: "0x0b29780bb523a130b3b01f231ef49ed2fa2781645591a0b0a44ca98f15a5994c"
-    #     isPresigned: null
-    #     canForward: null
-    #     kernel: *ZERO_ADDRESS
-    #     isPetrified: true
-    #     balance: null
-    #     isForwarder: true
-    # aragon-acl:
-    #   name: ACL
-    #   address: *aragonAcl
-    #   proxyName: AppProxyUpgradeable
-    #   implementation: *aragonAclImplAddress
-    #   proxyChecks:
-    #     proxyType: 2
-    #     isDepositable: false
-    #     implementation: *aragonAclImplAddress
-    #     appId: "0xe3262375f45a6e2026b7e7b18c2b807434f2508fe1a2a3dfb493c7df8f4aad6a"
-    #     kernel: *aragonKernel
-    #   checks:
-    #     hasInitialized: true
-    #     getPermissionParamsLength: null
-    #     evalParams: null
-    #     NO_PERMISSION: *ZERO_BYTES32
-    #     getEVMScriptExecutor: null
-    #     getRecoveryVault: *aragonAgent
-    #     CREATE_PERMISSIONS_ROLE: "0x0b719b33c83b8e5d300c521cb8b54ae9bd933996a14bef8c2f4e0285d2d2400a"
-    #     hasPermission: null
-    #     allowRecoverability: null
-    #     appId: "0xe3262375f45a6e2026b7e7b18c2b807434f2508fe1a2a3dfb493c7df8f4aad6a"
-    #     getInitializationBlock: 213093
-    #     getPermissionParam: null
-    #     canPerform: null
-    #     getEVMScriptRegistry: *aragonEvmScriptRegistry
-    #     ANY_ENTITY: "0xFFfFfFffFFfffFFfFFfFFFFFffFFFffffFfFFFfF"
-    #     getPermissionManager: null
-    #     EMPTY_PARAM_HASH: "0x290decd9548b62a8d60345a988386fc84ba6bc95484008f6362f93160ef3e563"
-    #     kernel: *aragonKernel
-    #     isPetrified: false
-    #     BURN_ENTITY: "0x0000000000000000000000000000000000000001"
-    #   implementationChecks:
-    #     hasInitialized: false
-    #     getPermissionParamsLength: null
-    #     evalParams: null
-    #     NO_PERMISSION: *ZERO_BYTES32
-    #     getEVMScriptExecutor: null
-    #     getRecoveryVault: null
-    #     CREATE_PERMISSIONS_ROLE: "0x0b719b33c83b8e5d300c521cb8b54ae9bd933996a14bef8c2f4e0285d2d2400a"
-    #     hasPermission: null
-    #     allowRecoverability: null
-    #     appId: *ZERO_BYTES32
-    #     getInitializationBlock: *MAX_UINT256
-    #     getPermissionParam: null
-    #     canPerform: null
-    #     getEVMScriptRegistry: null
-    #     ANY_ENTITY: "0xFFfFfFffFFfffFFfFFfFFFFFffFFFffffFfFFFfF"
-    #     getPermissionManager: null
-    #     EMPTY_PARAM_HASH: "0x290decd9548b62a8d60345a988386fc84ba6bc95484008f6362f93160ef3e563"
-    #     kernel: *ZERO_ADDRESS
-    #     isPetrified: true
-    #     BURN_ENTITY: "0x0000000000000000000000000000000000000001"
+    oracleReportSanityChecker:
+      name: OracleReportSanityChecker
+      address: *oracleReportSanityChecker
+      checks:
+        ALL_LIMITS_MANAGER_ROLE: "0x5bf88568a012dfc9fe67407ad6775052bddc4ac89902dea1f4373ef5d9f1e35b"
+        ANNUAL_BALANCE_INCREASE_LIMIT_MANAGER_ROLE: "0x12c02753cd3d584dc4bb965eb0c88392c4c4d7c00433fdb7490d33c61ea57622"
+        APPEARED_VALIDATORS_PER_DAY_LIMIT_MANAGER_ROLE: "0x14ca7b84baa11a976283347b0159b8ddf2dcf5fd5cf613cc567a3423cf510119"
+        DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
+        EXITED_VALIDATORS_PER_DAY_LIMIT_MANAGER_ROLE: "0x60b9982471bc0620c7b74959f48a86c55c92c11876fddc5b0b54d1ec47153e5d"
+        INITIAL_SLASHING_AND_PENALTIES_MANAGER_ROLE: "0xebfa317a5d279811b024586b17a50f48924bce86f6293b233927322d7209b507"
+        MAX_ITEMS_PER_EXTRA_DATA_TRANSACTION_ROLE: "0x13445b811594f3a8800b82296d63f371c695d2f86c1069c899ded3d73f523d2e"
+        MAX_NODE_OPERATORS_PER_EXTRA_DATA_ITEM_ROLE: "0xb3f2d16385bde8a7121e101a021aff43bbe4d4137a587832caf1f583b9d34395"
+        MAX_POSITIVE_TOKEN_REBASE_MANAGER_ROLE: "0x78de2bab4a3a0c88f50b6bb7c2290e0eb46bc61d575eae694d8bffbc2ca98c92"
+        MAX_VALIDATOR_EXIT_REQUESTS_PER_REPORT_ROLE: "0x9925400e72399e0a89e9b346878fc47ac0031526d0e060e33ff372d7a5d11ba8"
+        REQUEST_TIMESTAMP_MARGIN_MANAGER_ROLE: "0x2f8719116fbba3aba2a39759e34dcd29ea3516f7568c8321695aaea208280cd3"
+        SECOND_OPINION_MANAGER_ROLE: "0xaa0e0f619f5a9368ee035bae759cfe7da8958f44bd71456a05198effc68ea647"
+        SHARE_RATE_DEVIATION_LIMIT_MANAGER_ROLE: "0x7b21c0949109e9e143f66d6aa1f8a065b3f4ab47ee9f84f6837fd0490eace4d5"
+        checkExitBusOracleReport: null
+        checkExitedValidatorsRatePerDay: null
+        checkExtraDataItemsCountPerTransaction: null
+        checkNodeOperatorsPerExtraDataItemCount: null
+        checkWithdrawalQueueOracleReport: null
+        getLidoLocator: *lidoLocator
+        getMaxPositiveTokenRebase: 750000
+        getOracleReportLimits: [9000, 43200, 1000, 600, 8, 24, 128, 750000, 1000, 101, 50]
+        getReportDataCount: null
+        getRoleAdmin: null
+        getRoleMember: null
+        getRoleMemberCount: null
+        hasRole: null
+        reportData: null
+        secondOpinionOracle: *ZERO_ADDRESS
+        smoothenTokenRebase: null
+        supportsInterface: null
+
+    oracleDaemonConfig:
+      name: OracleDaemonConfig
+      address: *oracleDaemonConfig
+      checks:
+        CONFIG_MANAGER_ROLE: "0xbbfb55d933c2bfa638763473275b1d84c4418e58d26cf9d2cd5758237756d9f0"
+        DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
+        get: null
+        getList: null
+        getRoleAdmin: null
+        getRoleMember: null
+        getRoleMemberCount: null
+        hasRole: null
+        supportsInterface: null
+
+    aragon-kernel:
+      name: Kernel
+      address: *aragonKernel
+      proxyName: KernelProxy
+      implementation: *aragonKernelImplAddress
+      proxyChecks:
+        proxyType: 2
+        apps: null
+        isDepositable: false
+        implementation: *aragonKernelImplAddress
+        recoveryVaultAppId: "0x701a4fd1f5174d12a0f1d9ad2c88d0ad11ab6aad0ac72b7d9ce621815f8016a9"
+      checks:
+        hasInitialized: true
+        KERNEL_APP_ID: *KERNEL_APP_ID
+        APP_ADDR_NAMESPACE: "0xd6f028ca0e8edb4a8c9757ca4fdccab25fa1e0317da1188108f7d2dee14902fb"
+        getRecoveryVault: *aragonAgent
+        apps: null
+        CORE_NAMESPACE: "0xc681a85306374a5ab27f0bbc385296a54bcd314a1948b6cf61c4ea1bc44bb9f8"
+        allowRecoverability: null
+        recoveryVaultAppId: "0x701a4fd1f5174d12a0f1d9ad2c88d0ad11ab6aad0ac72b7d9ce621815f8016a9"
+        getInitializationBlock: 213093
+        APP_MANAGER_ROLE: "0xb6d92708f3d4817afc106147d969e229ced5c46e65e0a5002a0d391287762bd0"
+        getApp: null
+        APP_BASES_NAMESPACE: "0xf1f3eb40f5bc1ad1344716ced8b8a0431d840b5783aea1fd01786bc26f35ac0f"
+        acl: "0x428d6E1C384B743b1D6bed40b3a01F5357Ec24A9"
+        isPetrified: false
+        DEFAULT_ACL_APP_ID: *DEFAULT_ACL_APP_ID
+        hasPermission: null
+      implementationChecks:
+        hasInitialized: false
+        KERNEL_APP_ID: *KERNEL_APP_ID
+        APP_ADDR_NAMESPACE: "0xd6f028ca0e8edb4a8c9757ca4fdccab25fa1e0317da1188108f7d2dee14902fb"
+        getRecoveryVault: *ZERO_ADDRESS
+        apps: null
+        CORE_NAMESPACE: "0xc681a85306374a5ab27f0bbc385296a54bcd314a1948b6cf61c4ea1bc44bb9f8"
+        allowRecoverability: null
+        recoveryVaultAppId: *ZERO_BYTES32
+        getInitializationBlock: *MAX_UINT256
+        APP_MANAGER_ROLE: "0xb6d92708f3d4817afc106147d969e229ced5c46e65e0a5002a0d391287762bd0"
+        getApp: null
+        APP_BASES_NAMESPACE: "0xf1f3eb40f5bc1ad1344716ced8b8a0431d840b5783aea1fd01786bc26f35ac0f"
+        acl: *ZERO_ADDRESS
+        isPetrified: true
+        DEFAULT_ACL_APP_ID: *DEFAULT_ACL_APP_ID
+        hasPermission: null
+
+    ldo:
+      name: MiniMeToken
+      address: *ldo
+      checks:
+        name: "TEST Lido DAO Token"
+        creationBlock: null
+        totalSupply: 1000000000000000000000000
+        decimals: 18
+        balanceOfAt: null
+        version: "MMT_0.1"
+        balanceOf: null
+        parentToken: *ZERO_ADDRESS
+        symbol: "TLDO"
+        totalSupplyAt: null
+        transfersEnabled: true
+        parentSnapShotBlock: 0
+        allowance: null
+        tokenFactory: *miniMeTokenFactory
+        controller: *aragonTokenManager
+
+    aragon-voting:
+      name: Voting
+      address: *aragonVoting
+      proxyName: AppProxyUpgradeable
+      implementation: *aragonVotingImplAddress
+      proxyChecks:
+        proxyType: 2
+        isDepositable: false
+        implementation: *aragonVotingImplAddress
+        appId: *VOTING_APP_ID
+        kernel: *aragonKernel
+      checks:
+        hasInitialized: true
+        UNSAFELY_MODIFY_VOTE_TIME_ROLE: "0x068ca51c9d69625c7add396c98ca4f3b27d894c3b973051ad3ee53017d7094ea"
+        getEVMScriptExecutor: null
+        getRecoveryVault: *aragonAgent
+        MODIFY_QUORUM_ROLE: "0xad15e7261800b4bb73f1b69d3864565ffb1fd00cb93cf14fe48da8f1f2149f39"
+        objectionPhaseTime: 60
+        getVoterState: null
+        getVote: null
+        MODIFY_SUPPORT_ROLE: "0xda3972983e62bdf826c4b807c4c9c2b8a941e1f83dfa76d53d6aeac11e1be650"
+        allowRecoverability: null
+        appId: *VOTING_APP_ID
+        getInitializationBlock: null
+        canPerform: null
+        getEVMScriptRegistry: *aragonEvmScriptRegistry
+        voteTime: 300
+        CREATE_VOTES_ROLE: "0xe7dcd7275292e064d090fbc5f3bd7995be23b502c1fed5cd94cfddbbdcd32bbc"
+        canForward: null
+        canExecute: null
+        canVote: null
+        kernel: *aragonKernel
+        minAcceptQuorumPct: 50000000000000000
+        isPetrified: false
+        votesLength: null
+        getVotePhase: null
+        supportRequiredPct: 500000000000000000
+        token: *ldo
+        PCT_BASE: 1000000000000000000
+        isForwarder: true
+      implementationChecks:
+        hasInitialized: false
+        UNSAFELY_MODIFY_VOTE_TIME_ROLE: "0x068ca51c9d69625c7add396c98ca4f3b27d894c3b973051ad3ee53017d7094ea"
+        getEVMScriptExecutor: null
+        getRecoveryVault: null
+        MODIFY_QUORUM_ROLE: "0xad15e7261800b4bb73f1b69d3864565ffb1fd00cb93cf14fe48da8f1f2149f39"
+        objectionPhaseTime: 0
+        getVoterState: null
+        getVote: null
+        MODIFY_SUPPORT_ROLE: "0xda3972983e62bdf826c4b807c4c9c2b8a941e1f83dfa76d53d6aeac11e1be650"
+        allowRecoverability: null
+        appId: *ZERO_BYTES32
+        getInitializationBlock: *MAX_UINT256
+        canPerform: null
+        getEVMScriptRegistry: null
+        voteTime: 0
+        CREATE_VOTES_ROLE: "0xe7dcd7275292e064d090fbc5f3bd7995be23b502c1fed5cd94cfddbbdcd32bbc"
+        canForward: null
+        canExecute: null
+        canVote: null
+        kernel: *ZERO_ADDRESS
+        minAcceptQuorumPct: 0
+        isPetrified: true
+        votesLength: 0
+        getVotePhase: null
+        supportRequiredPct: 0
+        token: *ZERO_ADDRESS
+        PCT_BASE: 1000000000000000000
+        isForwarder: true
+
+    aragon-token-manager:
+      name: TokenManager
+      address: *aragonTokenManager
+      proxyName: AppProxyUpgradeable
+      implementation: *aragonTokenManagerImplAddress
+      proxyChecks:
+        proxyType: 2
+        isDepositable: false
+        implementation: *aragonTokenManagerImplAddress
+        appId: *TOKEN_MANAGER_APP_ID
+        kernel: *aragonKernel
+      checks:
+        hasInitialized: true
+        MAX_VESTINGS_PER_ADDRESS: 50
+        spendableBalanceOf: null
+        getEVMScriptExecutor: null
+        getRecoveryVault: *aragonAgent
+        getVesting: null
+        transferableBalance: null
+        allowRecoverability: null
+        appId: *TOKEN_MANAGER_APP_ID
+        ISSUE_ROLE: "0x2406f1e99f79cea012fb88c5c36566feaeefee0f4b98d3a376b49310222b53c4"
+        getInitializationBlock: null
+        vestingsLengths: null
+        canPerform: null
+        getEVMScriptRegistry: *aragonEvmScriptRegistry
+        ASSIGN_ROLE: "0xf5a08927c847d7a29dc35e105208dbde5ce951392105d712761cc5d17440e2ff"
+        BURN_ROLE: "0xe97b137254058bd94f28d2f3eb79e2d34074ffb488d042e3bc958e0a57d2fa22"
+        canForward: null
+        kernel: *aragonKernel
+        isPetrified: false
+        MINT_ROLE: "0x154c00819833dac601ee5ddded6fda79d9d8b506b911b3dbd54cdb95fe6c3686"
+        maxAccountTokens: *MAX_UINT256
+        REVOKE_VESTINGS_ROLE: "0x95ffc68daedf1eb334cfcd22ee24a5eeb5a8e58aa40679f2ad247a84140f8d6e"
+        token: *ldo
+        isForwarder: true
+      implementationChecks:
+        hasInitialized: false
+        MAX_VESTINGS_PER_ADDRESS: 50
+        spendableBalanceOf: null
+        getEVMScriptExecutor: null
+        getRecoveryVault: null
+        getVesting: null
+        transferableBalance: null
+        allowRecoverability: null
+        appId: *ZERO_BYTES32
+        ISSUE_ROLE: "0x2406f1e99f79cea012fb88c5c36566feaeefee0f4b98d3a376b49310222b53c4"
+        getInitializationBlock: *MAX_UINT256
+        vestingsLengths: null
+        canPerform: null
+        getEVMScriptRegistry: null
+        ASSIGN_ROLE: "0xf5a08927c847d7a29dc35e105208dbde5ce951392105d712761cc5d17440e2ff"
+        BURN_ROLE: "0xe97b137254058bd94f28d2f3eb79e2d34074ffb488d042e3bc958e0a57d2fa22"
+        canForward: null
+        kernel: *ZERO_ADDRESS
+        isPetrified: true
+        MINT_ROLE: "0x154c00819833dac601ee5ddded6fda79d9d8b506b911b3dbd54cdb95fe6c3686"
+        maxAccountTokens: 0
+        REVOKE_VESTINGS_ROLE: "0x95ffc68daedf1eb334cfcd22ee24a5eeb5a8e58aa40679f2ad247a84140f8d6e"
+        token: *ZERO_ADDRESS
+        isForwarder: true
+
+    aragon-finance:
+      name: Finance
+      address: *aragonFinance
+      proxyName: AppProxyUpgradeable
+      implementation: *aragonFinanceImplAddress
+      proxyChecks:
+        proxyType: 2
+        isDepositable: false
+        implementation: *aragonFinanceImplAddress
+        appId: *FINANCE_APP_ID
+        kernel: *aragonKernel
+      checks:
+        hasInitialized: true
+        CREATE_PAYMENTS_ROLE: "0x5de467a460382d13defdc02aacddc9c7d6605d6d4e0b8bd2f70732cae8ea17bc"
+        getBudget: null
+        getEVMScriptExecutor: null
+        getPayment: null
+        getRecoveryVault: *aragonAgent
+        getTransaction: null
+        CHANGE_PERIOD_ROLE: "0xd35e458bacdd5343c2f050f574554b2f417a8ea38d6a9a65ce2225dbe8bb9a9d"
+        CHANGE_BUDGETS_ROLE: "0xd79730e82bfef7d2f9639b9d10bf37ebb662b22ae2211502a00bdf7b2cc3a23a"
+        getPeriod: null
+        periodsLength: 1
+        allowRecoverability: null
+        appId: *FINANCE_APP_ID
+        getInitializationBlock: null
+        EXECUTE_PAYMENTS_ROLE: "0x563165d3eae48bcb0a092543ca070d989169c98357e9a1b324ec5da44bab75fd"
+        currentPeriodId: 0
+        canPerform: null
+        getEVMScriptRegistry: *aragonEvmScriptRegistry
+        getPeriodDuration: 2592000
+        nextPaymentTime: null
+        getPeriodTokenStatement: null
+        kernel: *aragonKernel
+        paymentsNextIndex: 1
+        isPetrified: false
+        canMakePayment: null
+        MANAGE_PAYMENTS_ROLE: "0x30597dd103acfaef0649675953d9cb22faadab7e9d9ed57acc1c429d04b80777"
+        transactionsNextIndex: 1
+        getRemainingBudget: null
+        vault: *aragonAgent
+      implementationChecks:
+        hasInitialized: false
+        CREATE_PAYMENTS_ROLE: "0x5de467a460382d13defdc02aacddc9c7d6605d6d4e0b8bd2f70732cae8ea17bc"
+        getBudget: null
+        getEVMScriptExecutor: null
+        getPayment: null
+        getRecoveryVault: null
+        getTransaction: null
+        CHANGE_PERIOD_ROLE: "0xd35e458bacdd5343c2f050f574554b2f417a8ea38d6a9a65ce2225dbe8bb9a9d"
+        CHANGE_BUDGETS_ROLE: "0xd79730e82bfef7d2f9639b9d10bf37ebb662b22ae2211502a00bdf7b2cc3a23a"
+        getPeriod: null
+        periodsLength: 0
+        allowRecoverability: null
+        appId: *ZERO_BYTES32
+        getInitializationBlock: *MAX_UINT256
+        EXECUTE_PAYMENTS_ROLE: "0x563165d3eae48bcb0a092543ca070d989169c98357e9a1b324ec5da44bab75fd"
+        currentPeriodId: null
+        canPerform: null
+        getEVMScriptRegistry: null
+        getPeriodDuration: null
+        nextPaymentTime: null
+        getPeriodTokenStatement: null
+        kernel: *ZERO_ADDRESS
+        paymentsNextIndex: 0
+        isPetrified: true
+        canMakePayment: null
+        MANAGE_PAYMENTS_ROLE: "0x30597dd103acfaef0649675953d9cb22faadab7e9d9ed57acc1c429d04b80777"
+        transactionsNextIndex: 0
+        getRemainingBudget: null
+        vault: *ZERO_ADDRESS
+
+    aragon-agent:
+      name: Agent
+      address: *aragonAgent
+      proxyName: AppProxyUpgradeable
+      implementation: *aragonAgentImplAddress
+      proxyChecks:
+        proxyType: 2
+        isDepositable: true
+        implementation: *aragonAgentImplAddress
+        appId: *AGENT_APP_ID
+        kernel: *aragonKernel
+      checks:
+        ADD_PROTECTED_TOKEN_ROLE: "0x6eb2a499556bfa2872f5aa15812b956cc4a71b4d64eb3553f7073c7e41415aaa"
+        supportsInterface: null
+        hasInitialized: true
+        ERC1271_INTERFACE_ID: "0xfb855dc9"
+        isValidSignature: null
+        ERC1271_RETURN_INVALID_SIGNATURE: "0x00000000"
+        TRANSFER_ROLE: "0x8502233096d909befbda0999bb8ea2f3a6be3c138b9fbf003752a4c8bce86f6c"
+        getProtectedTokensLength: 0
+        getEVMScriptExecutor: null
+        getRecoveryVault: *aragonAgent
+        RUN_SCRIPT_ROLE: "0xb421f7ad7646747f3051c50c0b8e2377839296cd4973e27f63821d73e390338f"
+        SAFE_EXECUTE_ROLE: "0x0a1ad7b87f5846153c6d5a1f761d71c7d0cfd122384f56066cd33239b7933694"
+        REMOVE_PROTECTED_TOKEN_ROLE: "0x71eee93d500f6f065e38b27d242a756466a00a52a1dbcd6b4260f01a8640402a"
+        isDepositable: true
+        DESIGNATE_SIGNER_ROLE: "0x23ce341656c3f14df6692eebd4757791e33662b7dcf9970c8308303da5472b7c"
+        EXECUTE_ROLE: "0xcebf517aa4440d1d125e0355aae64401211d0848a23c02cc5d29a14822580ba4"
+        allowRecoverability: null
+        appId: *AGENT_APP_ID
+        protectedTokens: null
+        getInitializationBlock: 213093
+        ERC1271_RETURN_VALID_SIGNATURE: "0x20c13b0b"
+        canPerform: null
+        getEVMScriptRegistry: "0x49335f718631a7aA201B459B499AFfdc1d8Ca774"
+        designatedSigner: *ZERO_ADDRESS
+        PROTECTED_TOKENS_CAP: 10
+        ADD_PRESIGNED_HASH_ROLE: "0x0b29780bb523a130b3b01f231ef49ed2fa2781645591a0b0a44ca98f15a5994c"
+        isPresigned: null
+        canForward: null
+        kernel: *aragonKernel
+        isPetrified: false
+        balance: null
+        isForwarder: true
+      implementationChecks:
+        ADD_PROTECTED_TOKEN_ROLE: "0x6eb2a499556bfa2872f5aa15812b956cc4a71b4d64eb3553f7073c7e41415aaa"
+        supportsInterface: null
+        hasInitialized: false
+        ERC1271_INTERFACE_ID: "0xfb855dc9"
+        isValidSignature: null
+        ERC1271_RETURN_INVALID_SIGNATURE: "0x00000000"
+        TRANSFER_ROLE: "0x8502233096d909befbda0999bb8ea2f3a6be3c138b9fbf003752a4c8bce86f6c"
+        getProtectedTokensLength: null
+        getEVMScriptExecutor: null
+        getRecoveryVault: null
+        RUN_SCRIPT_ROLE: "0xb421f7ad7646747f3051c50c0b8e2377839296cd4973e27f63821d73e390338f"
+        SAFE_EXECUTE_ROLE: "0x0a1ad7b87f5846153c6d5a1f761d71c7d0cfd122384f56066cd33239b7933694"
+        REMOVE_PROTECTED_TOKEN_ROLE: "0x71eee93d500f6f065e38b27d242a756466a00a52a1dbcd6b4260f01a8640402a"
+        isDepositable: false
+        DESIGNATE_SIGNER_ROLE: "0x23ce341656c3f14df6692eebd4757791e33662b7dcf9970c8308303da5472b7c"
+        EXECUTE_ROLE: "0xcebf517aa4440d1d125e0355aae64401211d0848a23c02cc5d29a14822580ba4"
+        allowRecoverability: null
+        appId: *ZERO_BYTES32
+        protectedTokens: null
+        getInitializationBlock: *MAX_UINT256
+        ERC1271_RETURN_VALID_SIGNATURE: "0x20c13b0b"
+        canPerform: null
+        getEVMScriptRegistry: null
+        designatedSigner: *ZERO_ADDRESS
+        PROTECTED_TOKENS_CAP: 10
+        ADD_PRESIGNED_HASH_ROLE: "0x0b29780bb523a130b3b01f231ef49ed2fa2781645591a0b0a44ca98f15a5994c"
+        isPresigned: null
+        canForward: null
+        kernel: *ZERO_ADDRESS
+        isPetrified: true
+        balance: null
+        isForwarder: true
+
+    aragon-acl:
+      name: ACL
+      address: *aragonAcl
+      proxyName: AppProxyUpgradeable
+      implementation: *aragonAclImplAddress
+      proxyChecks:
+        proxyType: 2
+        isDepositable: false
+        implementation: *aragonAclImplAddress
+        appId: *DEFAULT_ACL_APP_ID
+        kernel: *aragonKernel
+      checks:
+        hasInitialized: true
+        getPermissionParamsLength: null
+        evalParams: null
+        NO_PERMISSION: *ZERO_BYTES32
+        getEVMScriptExecutor: null
+        getRecoveryVault: *aragonAgent
+        CREATE_PERMISSIONS_ROLE: "0x0b719b33c83b8e5d300c521cb8b54ae9bd933996a14bef8c2f4e0285d2d2400a"
+        hasPermission: null
+        allowRecoverability: null
+        appId: *DEFAULT_ACL_APP_ID
+        getInitializationBlock: null
+        getPermissionParam: null
+        canPerform: null
+        getEVMScriptRegistry: *aragonEvmScriptRegistry
+        ANY_ENTITY: "0xFFfFfFffFFfffFFfFFfFFFFFffFFFffffFfFFFfF"
+        getPermissionManager: null
+        EMPTY_PARAM_HASH: "0x290decd9548b62a8d60345a988386fc84ba6bc95484008f6362f93160ef3e563"
+        kernel: *aragonKernel
+        isPetrified: false
+        BURN_ENTITY: "0x0000000000000000000000000000000000000001"
+      implementationChecks:
+        hasInitialized: false
+        getPermissionParamsLength: null
+        evalParams: null
+        NO_PERMISSION: *ZERO_BYTES32
+        getEVMScriptExecutor: null
+        getRecoveryVault: null
+        CREATE_PERMISSIONS_ROLE: "0x0b719b33c83b8e5d300c521cb8b54ae9bd933996a14bef8c2f4e0285d2d2400a"
+        hasPermission: null
+        allowRecoverability: null
+        appId: *ZERO_BYTES32
+        getInitializationBlock: *MAX_UINT256
+        getPermissionParam: null
+        canPerform: null
+        getEVMScriptRegistry: null
+        ANY_ENTITY: "0xFFfFfFffFFfffFFfFFfFFFFFffFFFffffFfFFFfF"
+        getPermissionManager: null
+        EMPTY_PARAM_HASH: "0x290decd9548b62a8d60345a988386fc84ba6bc95484008f6362f93160ef3e563"
+        kernel: *ZERO_ADDRESS
+        isPetrified: true
+        BURN_ENTITY: "0x0000000000000000000000000000000000000001"
+
     # node-operators-registry:
     #   name: NodeOperatorsRegistry
     #   address: *nodeOperatorsRegistry
