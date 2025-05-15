@@ -24,6 +24,7 @@ deployed:
     - &operatorGrid "0xccb86588b776743CCCB6572D2a6eAFd466012191"
     - &operatorGridImplAddress "0x7FC784952EE7e96e9A8C3f271712805fc439dfD7"
     - &predepositGuarantee "0x4C003D5586B32359Df5f37B42A2E717E24817Ec2"
+    - &predepositGuaranteeImplAddress "0x306F410c6b238348fa098761a860CAf571d84F41"
 
     # --- Oracle contracts ---
     - &accountingOracle "0xaBDf9686e4fbC7eEFff91621df82457dAb300168"
@@ -86,8 +87,8 @@ roles:
   # Lido
   - &STAKING_CONTROL_ROLE "0xa42eee1333c0758ba72be38e728b6dadb32ea767de5b4ddbaea1dae85b1b051f"
   - &STAKING_PAUSE_ROLE "0x84ea57490227bc2be925c684e2a367071d69890b629590198f4125a018eb1de8"
-  - &RESUME_ROLE "0x2fc10cc8ae19568712f7a176fb4978616a610650813c9d05326c34abb62749c7"
-  - &PAUSE_ROLE "0x139c2898040ef16910dc9f44dc697df79363da767d8bc92f2e310312b816e46d"
+  - &LIDO_RESUME_ROLE "0x2fc10cc8ae19568712f7a176fb4978616a610650813c9d05326c34abb62749c7"
+  - &LIDO_PAUSE_ROLE "0x139c2898040ef16910dc9f44dc697df79363da767d8bc92f2e310312b816e46d"
   - &UNSAFE_CHANGE_DEPOSITED_VALIDATORS_ROLE "0xe6dc5d79630c61871e99d341ad72c5a052bed2fc8c79e5a4480a7cd31117576c"
 
   # StakingRouter
@@ -102,27 +103,54 @@ roles:
   - &FINALIZE_ROLE "0x485191a2ef18512555bd4426d18a716ce8e98c80ec2de16394dcf86d7d91bc80"
   - &MANAGE_TOKEN_URI_ROLE "0xbe882725f03f148e7c5a5e63ec45f182f7dcdb6bb8b92311ade5a6d138e0ee0f"
   - &ORACLE_ROLE "0x68e79a7bf1e0bc45d0a330c573bc367f9cf464fd326078812f301165fbda4ef1"
+  - &WQ_RESUME_ROLE "0x2fc10cc8ae19568712f7a176fb4978616a610650813c9d05326c34abb62749c7"
+  - &WQ_PAUSE_ROLE "0x139c2898040ef16910dc9f44dc697df79363da767d8bc92f2e310312b816e46d"
 
   # Burner
   - &REQUEST_BURN_MY_STETH_ROLE "0x28186f938b759084eea36948ef1cd8b40ec8790a98d5f1a09b70879fe054e5cc"
   - &REQUEST_BURN_SHARES_ROLE "0x4be29e0e4eb91f98f709d98803cba271592782e293b84a625e025cbb40197ba8"
 
+  # VaultHub
+  - &VAULT_MASTER_ROLE "0x30093811282617f5aa2eaee280bf1446734ff9c1973edb3f45b455fe8d71dab5"
+  - &VAULT_REGISTRY_ROLE "0xeb0a9f61937ee79c98f577dbb4d3832abbad74e3f10502b060c64762d2b075f8"
+
+  # Oracle
+  - &ORACLE_PAUSE_ROLE "0x139c2898040ef16910dc9f44dc697df79363da767d8bc92f2e310312b816e46d"
+  - &ORACLE_RESUME_ROLE "0x2fc10cc8ae19568712f7a176fb4978616a610650813c9d05326c34abb62749c7"
+  - &ORACLE_MANAGE_CONSENSUS_CONTRACT_ROLE "0x04a0afbbd09d5ad397fc858789da4f8edd59f5ca5098d70faa490babee945c3b"
+  - &ORACLE_MANAGE_CONSENSUS_VERSION_ROLE "0xc31b1e4b732c5173dc51d519dfa432bad95550ecc4b0f9a61c2a558a2a8e4341"
+  - &ORACLE_SUBMIT_DATA_ROLE "0x65fa0c17458517c727737e4153dd477fa3e328cf706640b0f68b1a285c5990da"
+
+  # HashConsensus
+  - &DISABLE_CONSENSUS_ROLE "0x10b016346186602d93fc7a27ace09ba944baf9453611b186d36acd3d3d667dc0"
+  - &MANAGE_FAST_LANE_CONFIG_ROLE "0x4af6faa30fabb2c4d8d567d06168f9be8adb583156c1ecb424b4832a7e4d6717"
+  - &MANAGE_FRAME_CONFIG_ROLE "0x921f40f434e049d23969cbe68d9cf3ac1013fbe8945da07963af6f3142de6afe"
+  - &MANAGE_MEMBERS_AND_QUORUM_ROLE "0x66a484cf1a3c6ef8dfd59d24824943d2853a29d96f34a01271efc55774452a51"
+  - &MANAGE_REPORT_PROCESSOR_ROLE "0xc5219a8d2d0107a57aad00b22081326d173df87bad251126f070df2659770c3e"
+
   # EasyTrack
   - &CANCEL_ROLE "0x9f959e00d95122f5cbd677010436cf273ef535b86b056afc172852144b9491d7"
   - &UNPAUSE_ROLE "0x265b220c5a8891efdd9e1b1b7fa72f257bd5169f8d87e319cf3dad6ff52b94ae"
 
-  # AccountingOracle
-  - &MANAGE_CONSENSUS_CONTRACT_ROLE "0x04a0afbbd09d5ad397fc858789da4f8edd59f5ca5098d70faa490babee945c3b"
-  - &MANAGE_CONSENSUS_VERSION_ROLE "0xc31b1e4b732c5173dc51d519dfa432bad95550ecc4b0f9a61c2a558a2a8e4341"
-  - &SUBMIT_DATA_ROLE "0x65fa0c17458517c727737e4153dd477fa3e328cf706640b0f68b1a285c5990da"
+  # OZ
+  - &OZ_PAUSE_ROLE "0x8d0e4ae4847b49935b55c99f9c3ce025c87e7c4604c35b7ae56929bd32fa5a78"
+  - &OZ_RESUME_ROLE "0xa79a6aede309e0d48bf2ef0f71355c06ad317956d4c0da2deb0dc47cc34f826c"
 
 misc:
   - &CHAIN_ID "560048"
+  - &GENESIS_TIME "1742213400"
   - &LIDO_VERSION "3"
+  - &AO_CONSENSUS_VERSION "3"
+  - &AO_CONTRACT_VERSION "3"
+  - &BEACON_ROOTS "0x000F3df6D732807Ef1319fB7B8bB8522d0Beac02"
+  - &DEPOSIT_CONTRACT "0x00000000219ab540356cBB839Cbe05303d7705Fa"
+  - &GI_FIRST_VALIDATOR "0x0000000000000000000000000000000000000000000000000096000000000028"
+  - &GI_FIRST_VALIDATOR_AFTER_CHANGE "0x0000000000000000000000000000000000000000000000000096000000000028"
+  - &GI_PUBKEY_WC_PARENT "0x0000000000000000000000000000000000000000000000000000000000000402"
+  - &GI_STATE_ROOT "0x0000000000000000000000000000000000000000000000000000000000000b03"
   - &ZERO_ADDRESS "0x0000000000000000000000000000000000000000"
   - &ZERO_BYTES32 "0x0000000000000000000000000000000000000000000000000000000000000000"
   - &REGISTRY_BASE "0x13f43DCe264695D4118Cbc8Adb8691ABaEa0562d"
-  - &DEPOSIT_CONTRACT "0x00000000219ab540356cBB839Cbe05303d7705Fa"
   - &MAX_UINT256 "115792089237316195423570985008687907853269984665640564039457584007913129639935"
   - &MAX_UINT64 "18446744073709551615"
   - &ensSubdomainRegistrarImplAddress "0x5ED5661F744E11A2076865810B0d7553b74468D2"
@@ -236,12 +264,12 @@ l1:
         getSharesByPooledEth: null
         isStakingPaused: false
         getEVMScriptExecutor: null
-        RESUME_ROLE: *RESUME_ROLE
+        RESUME_ROLE: *LIDO_RESUME_ROLE
         decimals: 18
         getRecoveryVault: *aragonAgent
         DOMAIN_SEPARATOR: "0x1d71fb0eab9b3ce61d0c245669877c7caeb4af9175f17892ec695f05f4f1ce96"
         getTotalPooledEther: null
-        PAUSE_ROLE: *PAUSE_ROLE
+        PAUSE_ROLE: *LIDO_PAUSE_ROLE
         getTreasury: *aragonAgent
         isStopped: false
         getBufferedEther: null
@@ -294,12 +322,12 @@ l1:
         getSharesByPooledEth: null
         isStakingPaused: true
         getEVMScriptExecutor: null
-        RESUME_ROLE: *RESUME_ROLE
+        RESUME_ROLE: *LIDO_RESUME_ROLE
         decimals: 18
         getRecoveryVault: null
         DOMAIN_SEPARATOR: null
         getTotalPooledEther: null
-        PAUSE_ROLE: *PAUSE_ROLE
+        PAUSE_ROLE: *LIDO_PAUSE_ROLE
         getTreasury: null
         isStopped: true
         getBufferedEther: 0
@@ -518,8 +546,8 @@ l1:
         MIN_STETH_WITHDRAWAL_AMOUNT: 100
         ORACLE_ROLE: *ORACLE_ROLE
         PAUSE_INFINITELY: *MAX_UINT256
-        PAUSE_ROLE: *PAUSE_ROLE
-        RESUME_ROLE: *RESUME_ROLE
+        PAUSE_ROLE: *WQ_PAUSE_ROLE
+        RESUME_ROLE: *WQ_RESUME_ROLE
         STETH: *lido
         WSTETH: *wstETH
         balanceOf: null
@@ -563,8 +591,8 @@ l1:
         MIN_STETH_WITHDRAWAL_AMOUNT: 100
         ORACLE_ROLE: *ORACLE_ROLE
         PAUSE_INFINITELY: *MAX_UINT256
-        PAUSE_ROLE: *PAUSE_ROLE
-        RESUME_ROLE: *RESUME_ROLE
+        PAUSE_ROLE: *WQ_PAUSE_ROLE
+        RESUME_ROLE: *WQ_RESUME_ROLE
         STETH: *lido
         WSTETH: *wstETH
         balanceOf: null
@@ -662,326 +690,332 @@ l1:
         simulateOracleReport: null
         handleOracleReport: null
 
-    # vaultHub:
-    #   name: VaultHub
-    #   address: *vaultHub
-    #   proxyName: OssifiableProxy
-    #   implementation: *vaultHubImplAddress
-    #   proxyChecks:
-    #     proxy__getAdmin: *aragonAgent
-    #     proxy__getImplementation: *vaultHubImplAddress
-    #     proxy__getIsOssified: false
-    #   checks:
-    #     CONNECT_DEPOSIT: 1000000000000000000
-    #     DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
-    #     LIDO: *lido
-    #     LIDO_LOCATOR: *lidoLocator
-    #     PAUSE_INFINITELY: *MAX_UINT256
-    #     PAUSE_ROLE: "0x8d0e4ae4847b49935b55c99f9c3ce025c87e7c4604c35b7ae56929bd32fa5a78"
-    #     REPORT_FRESHNESS_DELTA: 86400
-    #     RESUME_ROLE: "0xa79a6aede309e0d48bf2ef0f71355c06ad317956d4c0da2deb0dc47cc34f826c"
-    #     VAULT_MASTER_ROLE: "0x30093811282617f5aa2eaee280bf1446734ff9c1973edb3f45b455fe8d71dab5"
-    #     VAULT_REGISTRY_ROLE: "0xeb0a9f61937ee79c98f577dbb4d3832abbad74e3f10502b060c64762d2b075f8"
-    #     batchVaultsInfo: null
-    #     getResumeSinceTimestamp: 0
-    #     getRoleAdmin: null
-    #     getRoleMember: null
-    #     getRoleMemberCount: null
-    #     getRoleMembers: null
-    #     hasRole: null
-    #     isPaused: false
-    #     isVaultHealthyAsOfLatestReport: null
-    #     latestReportData: null
-    #     operatorGrid: *operatorGrid
-    #     rebalanceShortfall: null
-    #     supportsInterface: null
-    #     vault: null
-    #     vaultSocket: null
-    #     vaultsCount: 33
-    #   implementationChecks:
-    #     CONNECT_DEPOSIT: 1000000000000000000
-    #     DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
-    #     LIDO: *lido
-    #     LIDO_LOCATOR: *lidoLocator
-    #     PAUSE_INFINITELY: *MAX_UINT256
-    #     PAUSE_ROLE: "0x8d0e4ae4847b49935b55c99f9c3ce025c87e7c4604c35b7ae56929bd32fa5a78"
-    #     REPORT_FRESHNESS_DELTA: 86400
-    #     RESUME_ROLE: "0xa79a6aede309e0d48bf2ef0f71355c06ad317956d4c0da2deb0dc47cc34f826c"
-    #     VAULT_MASTER_ROLE: "0x30093811282617f5aa2eaee280bf1446734ff9c1973edb3f45b455fe8d71dab5"
-    #     VAULT_REGISTRY_ROLE: "0xeb0a9f61937ee79c98f577dbb4d3832abbad74e3f10502b060c64762d2b075f8"
-    #     batchVaultsInfo: null
-    #     getResumeSinceTimestamp: 0
-    #     getRoleAdmin: null
-    #     getRoleMember: null
-    #     getRoleMemberCount: null
-    #     getRoleMembers: null
-    #     hasRole: null
-    #     isPaused: false
-    #     isVaultHealthyAsOfLatestReport: null
-    #     latestReportData: null
-    #     operatorGrid: *operatorGrid
-    #     rebalanceShortfall: null
-    #     supportsInterface: null
-    #     vault: null
-    #     vaultSocket: null
-    #     vaultsCount: null
-    # predepositGuarantee:
-    #   name: PredepositGuarantee
-    #   address: *predepositGuarantee
-    #   proxyName: OssifiableProxy
-    #   implementation: "0x306f410c6b238348fa098761a860caf571d84f41"
-    #   proxyChecks:
-    #     proxy__getAdmin: *aragonAgent
-    #     proxy__getImplementation: "0x306F410c6b238348fa098761a860CAf571d84F41"
-    #     proxy__getIsOssified: false
-    #   checks:
-    #     BEACON_ROOTS: "0x000F3df6D732807Ef1319fB7B8bB8522d0Beac02"
-    #     DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
-    #     DEPOSIT_DOMAIN: "0x03000000719103511efa4f1362ff2a50996cccf329cc84cb410c5e5c7d351d03"
-    #     GI_FIRST_VALIDATOR: "0x0000000000000000000000000000000000000000000000000096000000000028"
-    #     GI_FIRST_VALIDATOR_AFTER_CHANGE: "0x0000000000000000000000000000000000000000000000000096000000000028"
-    #     GI_PUBKEY_WC_PARENT: "0x0000000000000000000000000000000000000000000000000000000000000402"
-    #     GI_STATE_ROOT: "0x0000000000000000000000000000000000000000000000000000000000000b03"
-    #     MAX_SUPPORTED_WC_VERSION: 2
-    #     MIN_SUPPORTED_WC_VERSION: 1
-    #     PAUSE_INFINITELY: *MAX_UINT256
-    #     PAUSE_ROLE: "0x8d0e4ae4847b49935b55c99f9c3ce025c87e7c4604c35b7ae56929bd32fa5a78"
-    #     PREDEPOSIT_AMOUNT: 1000000000000000000
-    #     RESUME_ROLE: "0xa79a6aede309e0d48bf2ef0f71355c06ad317956d4c0da2deb0dc47cc34f826c"
-    #     SLOT_CHANGE_GI_FIRST_VALIDATOR: 0
-    #     STATE_ROOT_DEPTH: 3
-    #     STATE_ROOT_POSITION: 3
-    #     WC_PUBKEY_PARENT_DEPTH: 2
-    #     WC_PUBKEY_PARENT_POSITION: 0
-    #     claimableRefund: null
-    #     getResumeSinceTimestamp: 0
-    #     getRoleAdmin: null
-    #     getRoleMember: null
-    #     getRoleMemberCount: null
-    #     getRoleMembers: null
-    #     hasRole: null
-    #     isPaused: false
-    #     nodeOperatorBalance: null
-    #     nodeOperatorGuarantor: null
-    #     supportsInterface: null
-    #     unlockedBalance: null
-    #     validatorStatus: null
-    #   implementationChecks:
-    #     BEACON_ROOTS: "0x000F3df6D732807Ef1319fB7B8bB8522d0Beac02"
-    #     DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
-    #     DEPOSIT_DOMAIN: "0x03000000719103511efa4f1362ff2a50996cccf329cc84cb410c5e5c7d351d03"
-    #     GI_FIRST_VALIDATOR: "0x0000000000000000000000000000000000000000000000000096000000000028"
-    #     GI_FIRST_VALIDATOR_AFTER_CHANGE: "0x0000000000000000000000000000000000000000000000000096000000000028"
-    #     GI_PUBKEY_WC_PARENT: "0x0000000000000000000000000000000000000000000000000000000000000402"
-    #     GI_STATE_ROOT: "0x0000000000000000000000000000000000000000000000000000000000000b03"
-    #     MAX_SUPPORTED_WC_VERSION: 2
-    #     MIN_SUPPORTED_WC_VERSION: 1
-    #     PAUSE_INFINITELY: *MAX_UINT256
-    #     PAUSE_ROLE: "0x8d0e4ae4847b49935b55c99f9c3ce025c87e7c4604c35b7ae56929bd32fa5a78"
-    #     PREDEPOSIT_AMOUNT: 1000000000000000000
-    #     RESUME_ROLE: "0xa79a6aede309e0d48bf2ef0f71355c06ad317956d4c0da2deb0dc47cc34f826c"
-    #     SLOT_CHANGE_GI_FIRST_VALIDATOR: 0
-    #     STATE_ROOT_DEPTH: 3
-    #     STATE_ROOT_POSITION: 3
-    #     WC_PUBKEY_PARENT_DEPTH: 2
-    #     WC_PUBKEY_PARENT_POSITION: 0
-    #     claimableRefund: null
-    #     getResumeSinceTimestamp: *MAX_UINT256
-    #     getRoleAdmin: null
-    #     getRoleMember: null
-    #     getRoleMemberCount: null
-    #     getRoleMembers: null
-    #     hasRole: null
-    #     isPaused: true
-    #     nodeOperatorBalance: null
-    #     nodeOperatorGuarantor: null
-    #     supportsInterface: null
-    #     unlockedBalance: null
-    #     validatorStatus: null
-    # accountingOracle:
-    #   name: AccountingOracle
-    #   address: *accountingOracle
-    #   proxyName: OssifiableProxy
-    #   implementation: *accountingOracleImplAddress
-    #   proxyChecks:
-    #     proxy__getAdmin: *aragonAgent
-    #     proxy__getImplementation: *accountingOracleImplAddress
-    #     proxy__getIsOssified: false
-    #   checks:
-    #     DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
-    #     EXTRA_DATA_FORMAT_EMPTY: 0
-    #     EXTRA_DATA_FORMAT_LIST: 1
-    #     EXTRA_DATA_TYPE_EXITED_VALIDATORS: 2
-    #     EXTRA_DATA_TYPE_STUCK_VALIDATORS: 1
-    #     GENESIS_TIME: 1742213400
-    #     LOCATOR: *lidoLocator
-    #     MANAGE_CONSENSUS_CONTRACT_ROLE: *MANAGE_CONSENSUS_CONTRACT_ROLE
-    #     MANAGE_CONSENSUS_VERSION_ROLE: *MANAGE_CONSENSUS_VERSION_ROLE
-    #     SECONDS_PER_SLOT: 12
-    #     SUBMIT_DATA_ROLE: *SUBMIT_DATA_ROLE
-    #     getConsensusContract: *hashConsensusForAccountingOracle
-    #     getConsensusReport: null
-    #     getConsensusVersion: 3
-    #     getContractVersion: 3
-    #     getLastProcessingRefSlot: null
-    #     getProcessingState: null
-    #     getRoleAdmin: null
-    #     getRoleMember: null
-    #     getRoleMemberCount: null
-    #     hasRole: null
-    #     supportsInterface: null
-    #   implementationChecks:
-    #     DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
-    #     EXTRA_DATA_FORMAT_EMPTY: 0
-    #     EXTRA_DATA_FORMAT_LIST: 1
-    #     EXTRA_DATA_TYPE_EXITED_VALIDATORS: 2
-    #     EXTRA_DATA_TYPE_STUCK_VALIDATORS: 1
-    #     GENESIS_TIME: 1742213400
-    #     LOCATOR: *lidoLocator
-    #     MANAGE_CONSENSUS_CONTRACT_ROLE: *MANAGE_CONSENSUS_CONTRACT_ROLE
-    #     MANAGE_CONSENSUS_VERSION_ROLE: *MANAGE_CONSENSUS_VERSION_ROLE
-    #     SECONDS_PER_SLOT: 12
-    #     SUBMIT_DATA_ROLE: *SUBMIT_DATA_ROLE
-    #     getConsensusContract: *ZERO_ADDRESS
-    #     getConsensusReport: null
-    #     getConsensusVersion: 0
-    #     getContractVersion: *MAX_UINT256
-    #     getLastProcessingRefSlot: null
-    #     getRoleMember: null
-    #     getProcessingState: null
-    #     getRoleAdmin: null
-    #     getRoleMemberCount: null
-    #     hasRole: null
-    #     supportsInterface: null
-    # hashConsensusForAccountingOracle:
-    #   name: HashConsensus
-    #   address: *hashConsensusForAccountingOracle
-    #   checks:
-    #     DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
-    #     DISABLE_CONSENSUS_ROLE: "0x10b016346186602d93fc7a27ace09ba944baf9453611b186d36acd3d3d667dc0"
-    #     MANAGE_FAST_LANE_CONFIG_ROLE: "0x4af6faa30fabb2c4d8d567d06168f9be8adb583156c1ecb424b4832a7e4d6717"
-    #     MANAGE_FRAME_CONFIG_ROLE: "0x921f40f434e049d23969cbe68d9cf3ac1013fbe8945da07963af6f3142de6afe"
-    #     MANAGE_MEMBERS_AND_QUORUM_ROLE: "0x66a484cf1a3c6ef8dfd59d24824943d2853a29d96f34a01271efc55774452a51"
-    #     MANAGE_REPORT_PROCESSOR_ROLE: "0xc5219a8d2d0107a57aad00b22081326d173df87bad251126f070df2659770c3e"
-    #     getChainConfig:
-    #       - 32
-    #       - 12
-    #       - 1742213400
-    #     getConsensusState: null
-    #     getConsensusStateForMember: null
-    #     getCurrentFrame: null
-    #     getFastLaneMembers: null
-    #     getFrameConfig:
-    #       - 7275
-    #       - 12
-    #       - 10
-    #     getInitialRefSlot: 232799
-    #     getIsFastLaneMember: null
-    #     getIsMember: null
-    #     getMembers: null
-    #     getQuorum: 2
-    #     getReportProcessor: *accountingOracle
-    #     getReportVariants:
-    #     getRoleAdmin: null
-    #     getRoleMember: null
-    #     getRoleMemberCount: null
-    #     hasRole: null
-    #     supportsInterface: null
-    # validatorsExitBusOracle:
-    #   name: ValidatorsExitBusOracle
-    #   address: *validatorsExitBusOracle
-    #   proxyName: OssifiableProxy
-    #   implementation: *validatorsExitBusOracleImplAddress
-    #   proxyChecks:
-    #     proxy__getAdmin: *aragonAgent
-    #     proxy__getImplementation: *validatorsExitBusOracleImplAddress
-    #     proxy__getIsOssified: false
-    #   checks:
-    #     DATA_FORMAT_LIST: 1
-    #     DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
-    #     GENESIS_TIME: 1742213400
-    #     MANAGE_CONSENSUS_CONTRACT_ROLE: *MANAGE_CONSENSUS_CONTRACT_ROLE
-    #     MANAGE_CONSENSUS_VERSION_ROLE: *MANAGE_CONSENSUS_VERSION_ROLE
-    #     PAUSE_INFINITELY: *MAX_UINT256
-    #     PAUSE_ROLE: *PAUSE_ROLE
-    #     RESUME_ROLE: *RESUME_ROLE
-    #     SECONDS_PER_SLOT: 12
-    #     SUBMIT_DATA_ROLE: *SUBMIT_DATA_ROLE
-    #     getConsensusContract: *hashConsensusForValidatorsExitBusOracle
-    #     getConsensusReport: null
-    #     getConsensusVersion: 2
-    #     getContractVersion: 1
-    #     getLastProcessingRefSlot: null
-    #     getLastRequestedValidatorIndices: null
-    #     getProcessingState: null
-    #     getResumeSinceTimestamp: 1745005488
-    #     getRoleAdmin: null
-    #     getRoleMember: null
-    #     getRoleMemberCount: null
-    #     getTotalRequestsProcessed: 0
-    #     hasRole: null
-    #     isPaused: false
-    #     supportsInterface: null
-    #   implementationChecks:
-    #     DATA_FORMAT_LIST: 1
-    #     DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
-    #     GENESIS_TIME: 1742213400
-    #     MANAGE_CONSENSUS_CONTRACT_ROLE: *MANAGE_CONSENSUS_CONTRACT_ROLE
-    #     MANAGE_CONSENSUS_VERSION_ROLE: *MANAGE_CONSENSUS_VERSION_ROLE
-    #     PAUSE_INFINITELY: *MAX_UINT256
-    #     PAUSE_ROLE: *PAUSE_ROLE
-    #     RESUME_ROLE: *RESUME_ROLE
-    #     SECONDS_PER_SLOT: 12
-    #     SUBMIT_DATA_ROLE: *SUBMIT_DATA_ROLE
-    #     getConsensusContract: *ZERO_ADDRESS
-    #     getConsensusReport: null
-    #     getConsensusVersion: 0
-    #     getContractVersion: *MAX_UINT256
-    #     getLastProcessingRefSlot: null
-    #     getLastRequestedValidatorIndices: null
-    #     getProcessingState: null
-    #     getResumeSinceTimestamp: 0
-    #     getRoleAdmin: null
-    #     getRoleMember: null
-    #     getRoleMemberCount: null
-    #     getTotalRequestsProcessed: 0
-    #     hasRole: null
-    #     isPaused: false
-    #     supportsInterface: null
-    # hashConsensusForValidatorsExitBusOracle:
-    #   name: HashConsensus
-    #   address: *hashConsensusForValidatorsExitBusOracle
-    #   checks:
-    #     DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
-    #     DISABLE_CONSENSUS_ROLE: "0x10b016346186602d93fc7a27ace09ba944baf9453611b186d36acd3d3d667dc0"
-    #     MANAGE_FAST_LANE_CONFIG_ROLE: "0x4af6faa30fabb2c4d8d567d06168f9be8adb583156c1ecb424b4832a7e4d6717"
-    #     MANAGE_FRAME_CONFIG_ROLE: "0x921f40f434e049d23969cbe68d9cf3ac1013fbe8945da07963af6f3142de6afe"
-    #     MANAGE_MEMBERS_AND_QUORUM_ROLE: "0x66a484cf1a3c6ef8dfd59d24824943d2853a29d96f34a01271efc55774452a51"
-    #     MANAGE_REPORT_PROCESSOR_ROLE: "0xc5219a8d2d0107a57aad00b22081326d173df87bad251126f070df2659770c3e"
-    #     getChainConfig:
-    #       - 32
-    #       - 12
-    #       - 1742213400
-    #     getConsensusState: null
-    #     getConsensusStateForMember: null
-    #     getCurrentFrame: null
-    #     getFastLaneMembers: null
-    #     getFrameConfig:
-    #       - 7275
-    #       - 4
-    #       - 10
-    #     getInitialRefSlot: 232799
-    #     getIsFastLaneMember: null
-    #     getIsMember: null
-    #     getMembers: null
-    #     getQuorum: 2
-    #     getReportProcessor: *validatorsExitBusOracle
-    #     getReportVariants:
-    #     getRoleAdmin: null
-    #     getRoleMember: null
-    #     getRoleMemberCount: null
-    #     hasRole: null
-    #     supportsInterface: null
+    vaultHub:
+      name: VaultHub
+      address: *vaultHub
+      proxyName: OssifiableProxy
+      implementation: *vaultHubImplAddress
+      proxyChecks:
+        proxy__getAdmin: *aragonAgent
+        proxy__getImplementation: *vaultHubImplAddress
+        proxy__getIsOssified: false
+      checks:
+        CONNECT_DEPOSIT: 1000000000000000000
+        DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
+        LIDO: *lido
+        LIDO_LOCATOR: *lidoLocator
+        PAUSE_INFINITELY: *MAX_UINT256
+        PAUSE_ROLE: *OZ_PAUSE_ROLE
+        REPORT_FRESHNESS_DELTA: 86400
+        RESUME_ROLE: *OZ_RESUME_ROLE
+        VAULT_MASTER_ROLE: *VAULT_MASTER_ROLE
+        VAULT_REGISTRY_ROLE: *VAULT_REGISTRY_ROLE
+        batchVaultsInfo: null
+        getResumeSinceTimestamp: 0
+        getRoleAdmin: null
+        getRoleMember: null
+        getRoleMemberCount: null
+        getRoleMembers: null
+        hasRole: null
+        isPaused: false
+        isVaultHealthyAsOfLatestReport: null
+        latestReportData: null
+        operatorGrid: *operatorGrid
+        rebalanceShortfall: null
+        supportsInterface: null
+        vault: null
+        vaultSocket: null
+        vaultsCount: null
+      implementationChecks:
+        CONNECT_DEPOSIT: 1000000000000000000
+        DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
+        LIDO: *lido
+        LIDO_LOCATOR: *lidoLocator
+        PAUSE_INFINITELY: *MAX_UINT256
+        PAUSE_ROLE: *OZ_PAUSE_ROLE
+        REPORT_FRESHNESS_DELTA: 86400
+        RESUME_ROLE: *OZ_RESUME_ROLE
+        VAULT_MASTER_ROLE: *VAULT_MASTER_ROLE
+        VAULT_REGISTRY_ROLE: *VAULT_REGISTRY_ROLE
+        batchVaultsInfo: null
+        getResumeSinceTimestamp: 0
+        getRoleAdmin: null
+        getRoleMember: null
+        getRoleMemberCount: null
+        getRoleMembers: null
+        hasRole: null
+        isPaused: false
+        isVaultHealthyAsOfLatestReport: null
+        latestReportData: null
+        operatorGrid: *operatorGrid
+        rebalanceShortfall: null
+        supportsInterface: null
+        vault: null
+        vaultSocket: null
+        vaultsCount: null
+
+    predepositGuarantee:
+      name: PredepositGuarantee
+      address: *predepositGuarantee
+      proxyName: OssifiableProxy
+      implementation: *predepositGuaranteeImplAddress
+      proxyChecks:
+        proxy__getAdmin: *aragonAgent
+        proxy__getImplementation: *predepositGuaranteeImplAddress
+        proxy__getIsOssified: false
+      checks:
+        BEACON_ROOTS: *BEACON_ROOTS
+        DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
+        DEPOSIT_DOMAIN: "0x03000000719103511efa4f1362ff2a50996cccf329cc84cb410c5e5c7d351d03"
+        GI_FIRST_VALIDATOR: *GI_FIRST_VALIDATOR
+        GI_FIRST_VALIDATOR_AFTER_CHANGE: *GI_FIRST_VALIDATOR_AFTER_CHANGE
+        GI_PUBKEY_WC_PARENT: *GI_PUBKEY_WC_PARENT
+        GI_STATE_ROOT: *GI_STATE_ROOT
+        MAX_SUPPORTED_WC_VERSION: 2
+        MIN_SUPPORTED_WC_VERSION: 1
+        PAUSE_INFINITELY: *MAX_UINT256
+        PAUSE_ROLE: *OZ_PAUSE_ROLE
+        PREDEPOSIT_AMOUNT: 1000000000000000000
+        RESUME_ROLE: *OZ_RESUME_ROLE
+        SLOT_CHANGE_GI_FIRST_VALIDATOR: 0
+        STATE_ROOT_DEPTH: 3
+        STATE_ROOT_POSITION: 3
+        WC_PUBKEY_PARENT_DEPTH: 2
+        WC_PUBKEY_PARENT_POSITION: 0
+        claimableRefund: null
+        getResumeSinceTimestamp: 0
+        getRoleAdmin: null
+        getRoleMember: null
+        getRoleMemberCount: null
+        getRoleMembers: null
+        hasRole: null
+        isPaused: false
+        nodeOperatorBalance: null
+        nodeOperatorGuarantor: null
+        supportsInterface: null
+        unlockedBalance: null
+        validatorStatus: null
+      implementationChecks:
+        BEACON_ROOTS: *BEACON_ROOTS
+        DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
+        DEPOSIT_DOMAIN: "0x03000000719103511efa4f1362ff2a50996cccf329cc84cb410c5e5c7d351d03"
+        GI_FIRST_VALIDATOR: *GI_FIRST_VALIDATOR
+        GI_FIRST_VALIDATOR_AFTER_CHANGE: *GI_FIRST_VALIDATOR_AFTER_CHANGE
+        GI_PUBKEY_WC_PARENT: *GI_PUBKEY_WC_PARENT
+        GI_STATE_ROOT: *GI_STATE_ROOT
+        MAX_SUPPORTED_WC_VERSION: 2
+        MIN_SUPPORTED_WC_VERSION: 1
+        PAUSE_INFINITELY: *MAX_UINT256
+        PAUSE_ROLE: *OZ_PAUSE_ROLE
+        PREDEPOSIT_AMOUNT: 1000000000000000000
+        RESUME_ROLE: *OZ_RESUME_ROLE
+        SLOT_CHANGE_GI_FIRST_VALIDATOR: 0
+        STATE_ROOT_DEPTH: 3
+        STATE_ROOT_POSITION: 3
+        WC_PUBKEY_PARENT_DEPTH: 2
+        WC_PUBKEY_PARENT_POSITION: 0
+        claimableRefund: null
+        getResumeSinceTimestamp: *MAX_UINT256
+        getRoleAdmin: null
+        getRoleMember: null
+        getRoleMemberCount: null
+        getRoleMembers: null
+        hasRole: null
+        isPaused: true
+        nodeOperatorBalance: null
+        nodeOperatorGuarantor: null
+        supportsInterface: null
+        unlockedBalance: null
+        validatorStatus: null
+
+    accountingOracle:
+      name: AccountingOracle
+      address: *accountingOracle
+      proxyName: OssifiableProxy
+      implementation: *accountingOracleImplAddress
+      proxyChecks:
+        proxy__getAdmin: *aragonAgent
+        proxy__getImplementation: *accountingOracleImplAddress
+        proxy__getIsOssified: false
+      checks:
+        DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
+        EXTRA_DATA_FORMAT_EMPTY: 0
+        EXTRA_DATA_FORMAT_LIST: 1
+        EXTRA_DATA_TYPE_EXITED_VALIDATORS: 2
+        EXTRA_DATA_TYPE_STUCK_VALIDATORS: 1
+        GENESIS_TIME: *GENESIS_TIME
+        LOCATOR: *lidoLocator
+        MANAGE_CONSENSUS_CONTRACT_ROLE: *ORACLE_MANAGE_CONSENSUS_CONTRACT_ROLE
+        MANAGE_CONSENSUS_VERSION_ROLE: *ORACLE_MANAGE_CONSENSUS_VERSION_ROLE
+        SECONDS_PER_SLOT: 12
+        SUBMIT_DATA_ROLE: *ORACLE_SUBMIT_DATA_ROLE
+        getConsensusContract: *hashConsensusForAccountingOracle
+        getConsensusReport: null
+        getConsensusVersion: *AO_CONSENSUS_VERSION
+        getContractVersion: *AO_CONTRACT_VERSION
+        getLastProcessingRefSlot: null
+        getProcessingState: null
+        getRoleAdmin: null
+        getRoleMember: null
+        getRoleMemberCount: null
+        hasRole: null
+        supportsInterface: null
+      implementationChecks:
+        DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
+        EXTRA_DATA_FORMAT_EMPTY: 0
+        EXTRA_DATA_FORMAT_LIST: 1
+        EXTRA_DATA_TYPE_EXITED_VALIDATORS: 2
+        EXTRA_DATA_TYPE_STUCK_VALIDATORS: 1
+        GENESIS_TIME: *GENESIS_TIME
+        LOCATOR: *lidoLocator
+        MANAGE_CONSENSUS_CONTRACT_ROLE: *ORACLE_MANAGE_CONSENSUS_CONTRACT_ROLE
+        MANAGE_CONSENSUS_VERSION_ROLE: *ORACLE_MANAGE_CONSENSUS_VERSION_ROLE
+        SECONDS_PER_SLOT: 12
+        SUBMIT_DATA_ROLE: *ORACLE_SUBMIT_DATA_ROLE
+        getConsensusContract: *ZERO_ADDRESS
+        getConsensusReport: null
+        getConsensusVersion: 0
+        getContractVersion: *MAX_UINT256
+        getLastProcessingRefSlot: null
+        getRoleMember: null
+        getProcessingState: null
+        getRoleAdmin: null
+        getRoleMemberCount: null
+        hasRole: null
+        supportsInterface: null
+
+    hashConsensusForAccountingOracle:
+      name: HashConsensus
+      address: *hashConsensusForAccountingOracle
+      checks:
+        DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
+        DISABLE_CONSENSUS_ROLE: *DISABLE_CONSENSUS_ROLE
+        MANAGE_FAST_LANE_CONFIG_ROLE: *MANAGE_FAST_LANE_CONFIG_ROLE
+        MANAGE_FRAME_CONFIG_ROLE: *MANAGE_FRAME_CONFIG_ROLE
+        MANAGE_MEMBERS_AND_QUORUM_ROLE: *MANAGE_MEMBERS_AND_QUORUM_ROLE
+        MANAGE_REPORT_PROCESSOR_ROLE: *MANAGE_REPORT_PROCESSOR_ROLE
+        getChainConfig:
+          - 32
+          - 12
+          - *GENESIS_TIME
+        getConsensusState: null
+        getConsensusStateForMember: null
+        getCurrentFrame: null
+        getFastLaneMembers: null
+        getFrameConfig:
+          - 7275
+          - 12
+          - 10
+        getInitialRefSlot: null
+        getIsFastLaneMember: null
+        getIsMember: null
+        getMembers: null
+        getQuorum: 2
+        getReportProcessor: *accountingOracle
+        getReportVariants:
+        getRoleAdmin: null
+        getRoleMember: null
+        getRoleMemberCount: null
+        hasRole: null
+        supportsInterface: null
+
+    validatorsExitBusOracle:
+      name: ValidatorsExitBusOracle
+      address: *validatorsExitBusOracle
+      proxyName: OssifiableProxy
+      implementation: *validatorsExitBusOracleImplAddress
+      proxyChecks:
+        proxy__getAdmin: *aragonAgent
+        proxy__getImplementation: *validatorsExitBusOracleImplAddress
+        proxy__getIsOssified: false
+      checks:
+        DATA_FORMAT_LIST: 1
+        DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
+        GENESIS_TIME: *GENESIS_TIME
+        MANAGE_CONSENSUS_CONTRACT_ROLE: *ORACLE_MANAGE_CONSENSUS_CONTRACT_ROLE
+        MANAGE_CONSENSUS_VERSION_ROLE: *ORACLE_MANAGE_CONSENSUS_VERSION_ROLE
+        PAUSE_INFINITELY: *MAX_UINT256
+        PAUSE_ROLE: *ORACLE_PAUSE_ROLE
+        RESUME_ROLE: *ORACLE_RESUME_ROLE
+        SECONDS_PER_SLOT: 12
+        SUBMIT_DATA_ROLE: *ORACLE_SUBMIT_DATA_ROLE
+        getConsensusContract: *hashConsensusForValidatorsExitBusOracle
+        getConsensusReport: null
+        getConsensusVersion: 2
+        getContractVersion: 1
+        getLastProcessingRefSlot: null
+        getLastRequestedValidatorIndices: null
+        getProcessingState: null
+        getResumeSinceTimestamp: null
+        getRoleAdmin: null
+        getRoleMember: null
+        getRoleMemberCount: null
+        getTotalRequestsProcessed: 0
+        hasRole: null
+        isPaused: false
+        supportsInterface: null
+      implementationChecks:
+        DATA_FORMAT_LIST: 1
+        DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
+        GENESIS_TIME: *GENESIS_TIME
+        MANAGE_CONSENSUS_CONTRACT_ROLE: *ORACLE_MANAGE_CONSENSUS_CONTRACT_ROLE
+        MANAGE_CONSENSUS_VERSION_ROLE: *ORACLE_MANAGE_CONSENSUS_VERSION_ROLE
+        PAUSE_INFINITELY: *MAX_UINT256
+        PAUSE_ROLE: *ORACLE_PAUSE_ROLE
+        RESUME_ROLE: *ORACLE_RESUME_ROLE
+        SECONDS_PER_SLOT: 12
+        SUBMIT_DATA_ROLE: *ORACLE_SUBMIT_DATA_ROLE
+        getConsensusContract: *ZERO_ADDRESS
+        getConsensusReport: null
+        getConsensusVersion: 0
+        getContractVersion: *MAX_UINT256
+        getLastProcessingRefSlot: null
+        getLastRequestedValidatorIndices: null
+        getProcessingState: null
+        getResumeSinceTimestamp: 0
+        getRoleAdmin: null
+        getRoleMember: null
+        getRoleMemberCount: null
+        getTotalRequestsProcessed: 0
+        hasRole: null
+        isPaused: false
+        supportsInterface: null
+
+    hashConsensusForValidatorsExitBusOracle:
+      name: HashConsensus
+      address: *hashConsensusForValidatorsExitBusOracle
+      checks:
+        DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
+        DISABLE_CONSENSUS_ROLE: *DISABLE_CONSENSUS_ROLE
+        MANAGE_FAST_LANE_CONFIG_ROLE: *MANAGE_FAST_LANE_CONFIG_ROLE
+        MANAGE_FRAME_CONFIG_ROLE: *MANAGE_FRAME_CONFIG_ROLE
+        MANAGE_MEMBERS_AND_QUORUM_ROLE: *MANAGE_MEMBERS_AND_QUORUM_ROLE
+        MANAGE_REPORT_PROCESSOR_ROLE: *MANAGE_REPORT_PROCESSOR_ROLE
+        getChainConfig:
+          - 32
+          - 12
+          - *GENESIS_TIME
+        getConsensusState: null
+        getConsensusStateForMember: null
+        getCurrentFrame: null
+        getFastLaneMembers: null
+        getFrameConfig:
+          - 7275
+          - 4
+          - 10
+        getInitialRefSlot: null
+        getIsFastLaneMember: null
+        getIsMember: null
+        getMembers: null
+        getQuorum: 2
+        getReportProcessor: *validatorsExitBusOracle
+        getReportVariants:
+        getRoleAdmin: null
+        getRoleMember: null
+        getRoleMemberCount: null
+        hasRole: null
+        supportsInterface: null
+
     # oracleReportSanityChecker:
     #   name: OracleReportSanityChecker
     #   address: *oracleReportSanityChecker
