@@ -117,7 +117,8 @@ roles:
   - &SUBMIT_DATA_ROLE "0x65fa0c17458517c727737e4153dd477fa3e328cf706640b0f68b1a285c5990da"
 
 misc:
-  - &HOODI_CHAIN_ID "560048"
+  - &CHAIN_ID "560048"
+  - &LIDO_VERSION "3"
   - &ZERO_ADDRESS "0x0000000000000000000000000000000000000000"
   - &ZERO_BYTES32 "0x0000000000000000000000000000000000000000000000000000000000000000"
   - &REGISTRY_BASE "0x13f43DCe264695D4118Cbc8Adb8691ABaEa0562d"
@@ -260,10 +261,10 @@ l1:
         eip712Domain:
           - "Liquid staked Ether 2.0"
           - 2
-          - 560048
+          - *CHAIN_ID
           - *lido
         getMaxMintableExternalShares: null
-        getContractVersion: 3
+        getContractVersion: *LIDO_VERSION
         getInitializationBlock: 213132
         symbol: "stETH"
         getEIP712StETH: *eip712StETH
@@ -283,7 +284,7 @@ l1:
         STAKING_PAUSE_ROLE: *STAKING_PAUSE_ROLE
         getDepositableEther: null
         sharesOf: null
-        getTotalELRewardsCollected: 10000000000000000000
+        getTotalELRewardsCollected: null
       implementationChecks:
         getPooledEthBySharesRoundUp: null
         name: "Liquid staked Ether 2.0"
@@ -371,7 +372,7 @@ l1:
             result:
               - "Liquid staked Ether 2.0"
               - 2
-              - 560048
+              - *CHAIN_ID
               - *lido
         hashTypedDataV4: null
 
@@ -529,10 +530,10 @@ l1:
         getBaseURI: ""
         getClaimableEther: null
         getContractVersion: 1
-        getLastCheckpointIndex: 2
-        getLastFinalizedRequestId: 2
-        getLastRequestId: 2
-        getLockedEtherAmount: 110000000000000000
+        getLastCheckpointIndex: null
+        getLastFinalizedRequestId: null
+        getLastRequestId: null
+        getLockedEtherAmount: null
         getNFTDescriptorAddress: *ZERO_ADDRESS
         getResumeSinceTimestamp: 1745005488
         getRoleAdmin: null
