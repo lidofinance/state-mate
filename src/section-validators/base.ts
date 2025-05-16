@@ -1,4 +1,4 @@
-import { assert, AssertionError } from "chai";
+import { AssertionError } from "chai";
 import chalk from "chalk";
 import { Contract, JsonRpcProvider, Result } from "ethers";
 
@@ -132,10 +132,7 @@ function _stringify(value: unknown) {
 }
 
 function _assertEqual(actual: unknown, expected: ViewResult, errorMessage?: string) {
-  if (typeof actual === "bigint") {
-    assert(typeof expected === "string" || typeof expected === "bigint");
-    _equalOrThrow(actual, BigInt(expected), errorMessage);
-  } else if (Array.isArray(expected)) {
+  if (Array.isArray(expected)) {
     _equalOrThrow(
       (actual as unknown[]).length,
       expected.length,
@@ -177,8 +174,19 @@ function _assertEqualStruct(expected: null | ArbitraryObject, actual: Result) {
   }
 }
 
+function toBigIntIfPossible(value: unknown): bigint | unknown {
+  if (typeof value === "string" || typeof value === "number") {
+    try {
+      return BigInt(value);
+    } catch {
+      return value;
+    }
+  }
+  return value;
+}
+
 function _equalOrThrow(actual: unknown, expected: unknown, errorMessage?: string) {
-  if (actual !== expected) {
+  if (toBigIntIfPossible(actual) !== toBigIntIfPossible(expected)) {
     if (!errorMessage) {
       errorMessage = `Expected "${_stringify(expected)}" to equal actual "${_stringify(actual)}"`;
     }
