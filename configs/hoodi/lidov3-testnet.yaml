@@ -37,6 +37,7 @@ deployed:
     - &oracleDaemonConfig "0x2c2e8fE09a2449aB93D9eAD68f987D33189E6168"
 
     # --- DAO & Aragon apps ---
+    - &lidoAPMKernelProxy "0xe4fAd5232489Fe4E403918cbF45aA71EEB7e93D4"
     - &aragonKernel "0xf5591B4CA4De7f3e339248bbA35b0A02Ef9939c2"
     - &aragonKernelImplAddress "0x14dDb33F1D85997Bc35546e7E8CC306F5A7B9DD1"
     - &ldo "0x0E9Fa6947804c5573796aE211898f7a652e58d1f"
@@ -150,6 +151,8 @@ roles:
   - &NODE_OPERATORS_REGISTRY_APP_ID "0x7071f283424072341f856ac9e947e7ec0eb68719f757a7e785979b6b8717579d"
   - &SIMPLE_DVT_APP_ID "0xe1635b63b5f7b5e545f2a637558a4029dea7905361a2f0fc28c66e9136cf86a4"
   - &APM_REGISTRY_APP_ID "0x9089af016eb74d66811e1c39c1eef86fdcdb84b5665a4884ebf62339c2613991"
+  - &LIDO_APP_ID "0x3ca7c3e38968823ccb4c78ea688df41356f182ae1d159e4ee608d30d68cef320"
+  - &LIDO_APM_APP_ID "0xc95d34302dc847b668b330533aa705a57718eab1060b8549df38040633554bcd"
 
   # NodeOperatorsRegistry
   - &STAKING_ROUTER_ROLE "0xbb75b874360e0bfd87f964eadd8276d8efb7c942134fc329b513032d0803e0c6"
@@ -159,6 +162,16 @@ roles:
 
   # Dashboard
   - &NODE_OPERATOR_MANAGER_ROLE "0x59783a4ae82167eefad593739a5430c1d9e896a16c35f1e5285ddd0c0980885c"
+  - &BURN_ROLE "0x689f0a569be0c9b6cd2c11c81cb0add722272abdae6b649fdb1e05f1d9bb8a2f"
+  - &ETH_ADDR "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"
+  - &FUND_ROLE "0x933b7d5c112a4d05b489cea0b2ced98acb27d3d0fc9827c92cdacb2d6c5559c2"
+  - &MINT_ROLE "0xe996ac9b332538bb1fa3cd6743aa47011623cdb94bd964a494ee9d371e4a27d3"
+  - &LOCK_ROLE "0xaf5678186f680e15e8b3e8a8679bdd61c0eb1aaded90254c3e1b5b6b3fed62af"
+  - &REBALANCE_ROLE "0x3f82ecf462ddac43fc17ba11472c35f18b7760b4f5a5fc50b9625f9b5a22cf62"
+  - &WITHDRAW_ROLE "0x355caf1c2580ed8185acb5ea3573b71f85186b41bdf69e3eb8f1fcd122a562df"
+
+  # OperatorGrid
+  - &REGISTRY_ROLE "0xa495a3428837724c7f7648cda02eb83c9c4c778c8688d6f254c7f3f80c154d55"
 
 misc:
   - &CHAIN_ID "560048"
@@ -280,7 +293,7 @@ l1:
         proxyType: 2
         isDepositable: false
         implementation: *lidoImplAddress
-        appId: "0x3ca7c3e38968823ccb4c78ea688df41356f182ae1d159e4ee608d30d68cef320"
+        appId: *LIDO_APP_ID
         kernel: *aragonKernel
       checks:
         getPooledEthBySharesRoundUp: null
@@ -301,7 +314,7 @@ l1:
         isStopped: false
         getBufferedEther: null
         getWithdrawalCredentials: *LIDO_WITHDRAWAL_CREDENTIALS
-        getCurrentStakeLimit: 150000000000000000000000
+        getCurrentStakeLimit: null
         getExternalShares: null
         getStakeLimitFullInfo: null
         balanceOf: null
@@ -312,7 +325,7 @@ l1:
         getPooledEthByShares: null
         allowRecoverability: null
         nonces: null
-        appId: "0x3ca7c3e38968823ccb4c78ea688df41356f182ae1d159e4ee608d30d68cef320"
+        appId: *LIDO_APP_ID
         eip712Domain:
           - "Liquid staked Ether 2.0"
           - 2
@@ -320,7 +333,7 @@ l1:
           - *lido
         getMaxMintableExternalShares: null
         getContractVersion: *LIDO_VERSION
-        getInitializationBlock: 213132
+        getInitializationBlock: null
         symbol: "stETH"
         getEIP712StETH: *eip712StETH
         getMaxExternalRatioBP: 5000
@@ -590,7 +603,7 @@ l1:
         getLastRequestId: null
         getLockedEtherAmount: null
         getNFTDescriptorAddress: *ZERO_ADDRESS
-        getResumeSinceTimestamp: 1745005488
+        getResumeSinceTimestamp: null
         getRoleAdmin: null
         getRoleMember: null
         getRoleMemberCount: null
@@ -661,7 +674,7 @@ l1:
       implementation: *withdrawalVaultImplAddress
       proxyChecks:
         implementation: *withdrawalVaultImplAddress
-        proxy_getAdmin: "0xd401Bf29751aE77cF5A479b22fbAaB30cD027dD6"
+        proxy_getAdmin: *aragonVoting
         proxy_getIsOssified: false
       checks:
         LIDO: *lido
@@ -780,7 +793,55 @@ l1:
         vault: null
         vaultSocket: null
         vaultsCount: null
-
+    operatorGrid:
+      name: OperatorGrid
+      address: *operatorGrid
+      proxyName: OssifiableProxy
+      implementation: *operatorGridImplAddress
+      proxyChecks:
+        proxy__getAdmin: *aragonAgent
+        proxy__getImplementation: *operatorGridImplAddress
+        proxy__getIsOssified: false
+      checks:
+        DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
+        DEFAULT_TIER_ID: 0
+        DEFAULT_TIER_OPERATOR: "0xFFfFfFffFFfffFFfFFfFFFFFffFFFffffFfFFFfF"
+        LIDO_LOCATOR: *lidoLocator
+        REGISTRY_ROLE: *REGISTRY_ROLE
+        getRoleAdmin: null
+        getRoleMember: null
+        getRoleMemberCount: null
+        getRoleMembers: null
+        group: null
+        hasRole: null
+        nodeOperatorAddress: null
+        nodeOperatorCount: 0
+        pendingRequest: null
+        pendingRequests: null
+        pendingRequestsCount: null
+        supportsInterface: null
+        tier: null
+        vaultInfo: null
+      implementationChecks:
+        DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
+        DEFAULT_TIER_ID: 0
+        DEFAULT_TIER_OPERATOR: "0xFFfFfFffFFfffFFfFFfFFFFFffFFFffffFfFFFfF"
+        LIDO_LOCATOR: *lidoLocator
+        REGISTRY_ROLE: *REGISTRY_ROLE
+        getRoleAdmin: null
+        getRoleMember: null
+        getRoleMemberCount: null
+        getRoleMembers: null
+        group: null
+        hasRole: null
+        nodeOperatorAddress: null
+        nodeOperatorCount: 0
+        pendingRequest: null
+        pendingRequests: null
+        pendingRequestsCount: null
+        supportsInterface: null
+        tier: null
+        vaultInfo: null
     predepositGuarantee:
       name: PredepositGuarantee
       address: *predepositGuarantee
@@ -898,16 +959,16 @@ l1:
       name: Dashboard
       address: *dashboardImplAddress
       checks:
-        BURN_ROLE: "0x689f0a569be0c9b6cd2c11c81cb0add722272abdae6b649fdb1e05f1d9bb8a2f"
+        BURN_ROLE: *BURN_ROLE
         DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
-        ETH: "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"
-        FUND_ROLE: "0x933b7d5c112a4d05b489cea0b2ced98acb27d3d0fc9827c92cdacb2d6c5559c2"
+        ETH: *ETH_ADDR
+        FUND_ROLE: *FUND_ROLE
         LIDO_VAULTHUB_AUTHORIZATION_ROLE: "0x12721d7ec843176aec149b06f8f88034866537c4b8a2fc38014f2daaba6f1563"
         LIDO_VAULTHUB_DEAUTHORIZATION_ROLE: "0x956303b84cebe7f6d4c573121d1d147af67b9f1048630d8dba50a3e6f41a738c"
-        LOCK_ROLE: "0xaf5678186f680e15e8b3e8a8679bdd61c0eb1aaded90254c3e1b5b6b3fed62af"
+        LOCK_ROLE: *LOCK_ROLE
         MANUAL_ACCRUED_REWARDS_ADJUSTMENT_LIMIT: 10000000000000000000000000
         MAX_CONFIRM_EXPIRY: 2592000
-        MINT_ROLE: "0xe996ac9b332538bb1fa3cd6743aa47011623cdb94bd964a494ee9d371e4a27d3"
+        MINT_ROLE: *MINT_ROLE
         MIN_CONFIRM_EXPIRY: 86400
         NODE_OPERATOR_FEE_CLAIM_ROLE: "0x24633f096579ea9942f9f4de94a59d0fd90e22436d62e831fc27ea6f0cbba5a0"
         NODE_OPERATOR_MANAGER_ROLE: *NODE_OPERATOR_MANAGER_ROLE
@@ -916,7 +977,7 @@ l1:
         PAUSE_BEACON_CHAIN_DEPOSITS_ROLE: "0xa90c7030a27f389f9fc8ed21a0556f40c88130cc14a80db936bed68261819b2c"
         PDG_COMPENSATE_PREDEPOSIT_ROLE: "0x17960a6b137243c888669d93712b617414dd6d1ab55d5eca488ccb1d0894cd5c"
         PDG_PROVE_VALIDATOR_ROLE: "0xb850402129bccae797798069a8cf3147a0cb7c3193f70558a75f7df0b8651c30"
-        REBALANCE_ROLE: "0x3f82ecf462ddac43fc17ba11472c35f18b7760b4f5a5fc50b9625f9b5a22cf62"
+        REBALANCE_ROLE: *REBALANCE_ROLE
         RECOVER_ASSETS_ROLE: "0xa38b301640bddfd3e6a9d2a11d13551d53ef81526347ff09d798738fcc5a49d4"
         REQUEST_TIER_CHANGE_ROLE: "0xd0d885b3f66154d15e918afc9fcd5eb37aea7fbf993c32b18a84a0be97d13276"
         REQUEST_VALIDATOR_EXIT_ROLE: "0x32d0d6546e21c13ff633616141dc9daad87d248d1d37c56bf493d06d627ecb7b"
@@ -928,7 +989,7 @@ l1:
         UNGUARANTEED_BEACON_CHAIN_DEPOSIT_ROLE: "0xea6487df651bb740150364c496e1c7403dd62063c96e44906cc98c6a919a9d88"
         VAULT_HUB: *vaultHub
         VOLUNTARY_DISCONNECT_ROLE: "0x9586321ac05f110e4b4a0a42aba899709345af0ca78910e8832ddfd71fed2bf4"
-        WITHDRAW_ROLE: "0x355caf1c2580ed8185acb5ea3573b71f85186b41bdf69e3eb8f1fcd122a562df"
+        WITHDRAW_ROLE: *WITHDRAW_ROLE
         WSTETH: *wstETH
         accruedRewardsAdjustment: 0
         confirmations: null
@@ -1947,21 +2008,21 @@ l1:
         proxyType: 2
         isDepositable: false
         implementation: *REGISTRY_BASE
-        appId: "0xc95d34302dc847b668b330533aa705a57718eab1060b8549df38040633554bcd"
-        kernel: "0xe4fAd5232489Fe4E403918cbF45aA71EEB7e93D4" # QUESTIONS!
+        appId: *LIDO_APM_APP_ID
+        kernel: *lidoAPMKernelProxy
       checks:
         hasInitialized: true
-        getEVMScriptExecutor: *EVMScriptExecutor
+        getEVMScriptExecutor: null
         registrar: "0x8Bc73f8c706AF2C595a58b183736b4d576DC8873"
         getRecoveryVault: *ZERO_ADDRESS
         ens: *ens
         CREATE_REPO_ROLE: "0x2a9494d64846c9fdbf0158785aa330d8bc9caf45af27fa0e8898eb4d55adcea6"
         allowRecoverability: null
-        appId: "0xc95d34302dc847b668b330533aa705a57718eab1060b8549df38040633554bcd"
+        appId: *LIDO_APM_APP_ID
         getInitializationBlock: 213090
         canPerform: null
         getEVMScriptRegistry: "0xDfe6B83Da5eFf7D8AB6f22903CB8722d9089F87b"
-        kernel: "0xe4fAd5232489Fe4E403918cbF45aA71EEB7e93D4" # QUESTIONS!
+        kernel: *lidoAPMKernelProxy
         isPetrified: false
       implementationChecks:
         hasInitialized: false
