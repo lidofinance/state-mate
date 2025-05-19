@@ -73,7 +73,7 @@ deployed:
     - &EVMScriptExecutor "0x0b6de69562CADa4dBFdCA7e448fdc71D3542A590"
 
     # ------
-    - &apmRegistryFactory "0xcA98541C98bCd77123eE74C4A37b8BDfd792C4b6"
+    - &apmRegistryFactory "0xcA98541C98bCd77123eE74C4a37b8BDfd792C4b6"
     - &callsScript "0x207474d0f0Ba51A28ce911C2e77d6c93e231E8FD"
     - &daoFactory "0xb1833a044f74d4b37d8230941eBA11368999e057"
     - &dummyEmptyContract "0x7c625913A9c1dcCeB0799c62C0D3dfd2C21dBbE9"
