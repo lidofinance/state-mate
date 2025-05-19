@@ -1,0 +1,71 @@
+# yaml-language-server: $schema=../../schemas/seed-schema.json
+deployed:
+  l1:
+    # --- Core protocol ---
+    - &lidoLocator "0xbE861866E2Ca8f401e2b51b2cFb36A61B0Bf6840"
+    - &lido "0x04d160820C0f2E2C693D9Eb26078189D10A1a3e1"
+    - &wstETH "0xDFD55388020a8CEDADCe0B177DF5EF1E11553b43"
+    - &eip712StETH "0x53520A0F043Bf005009588fcbb8Ef19bd0B98BC1"
+    - &stakingRouter "0xf320D34b55E89826631C2bb1b3c5b50932cCaB3C"
+    - &executionLayerRewardsVault "0xA60b3AF9244D7AF1e844d714fDc0E3796CC4390d"
+    - &withdrawalQueueERC721 "0xe41d78740A1009029c44E43618Fe09C8f368851F"
+    - &withdrawalVault "0x79e52DbA27718B1b618FC519A8F05a1386F4A8d2"
+    - &burner "0x87d699cBC410511216BC88E8c8523A8EFf41102b"
+    - &minFirstAllocationStrategy "0x9b322efdB04840052f97649fD0C27B678De88DA2"
+    - &accounting "0x7d7EcCE45cAc6eF043f34e8049399b4b03044F97"
+    - &vaultHub "0xDfA0B34F28b1b6735d2df150a99048139302a80E"
+    - &operatorGrid "0xccb86588b776743CCCB6572D2a6eAFd466012191"
+    - &predepositGuarantee "0x4C003D5586B32359Df5f37B42A2E717E24817Ec2"
+
+    # --- Oracle contracts ---
+    - &accountingOracle "0xaBDf9686e4fbC7eEFff91621df82457dAb300168"
+    - &hashConsensusForAccountingOracle "0x9F1c37DBCb2e01537786aEB2e6b4d6106dd81234"
+    - &validatorsExitBusOracle "0xaf41922d0b9677e8CF21D72a318C72a5188dd9f1"
+    - &hashConsensusForValidatorsExitBusOracle "0xF1BbbB0749736cC0c39eA1a1EDAA7fD36E2924d1"
+    - &oracleReportSanityChecker "0x4077619FBAdB002fDC125171c8daf6a149C71166"
+    - &oracleDaemonConfig "0x2c2e8fE09a2449aB93D9eAD68f987D33189E6168"
+
+    # --- DAO & Aragon apps ---
+    - &aragonKernel "0xf5591B4CA4De7f3e339248bbA35b0A02Ef9939c2"
+    - &ldo "0x0E9Fa6947804c5573796aE211898f7a652e58d1f"
+    - &aragonVoting "0xd401Bf29751aE77cF5A479b22fbAaB30cD027dD6"
+    - &aragonTokenManager "0x32Ea1c8Df51BCAd93309DB159E54415951782992"
+    - &aragonFinance "0x973bD4e3F387F1BBF1576c5B12101450328F067f"
+    - &aragonAgent "0x2cE254Fd852d6B5023b1B2355ae96A8d752a47cf"
+    - &aragonAcl "0x428d6E1C384B743b1D6bed40b3a01F5357Ec24A9"
+    - &aragonApmRegistry "0x85C4e347Cba194Ce2237fD19865cf9EE89A6Bb43"
+    - &aragonEvmScriptRegistry "0x49335f718631a7aA201B459B499AFfdc1d8Ca774"
+    - &aragonRepoBase "0xD03e828844AA4eF31566F984Fe2A1693e7d5aF38"
+    - &aragonID "0xAa3dFDDA2670A3d2A5B9cd6669ce1E4cF99258D9"
+
+    # --- Staking modules ---
+    - &nodeOperatorsRegistry "0x94bd69Be2711205F4eBAA084c34cEf29E24A8E59"
+    - &simpleDvt "0x90106946d5525003385310D8e3e123cA6CFCf5Cd"
+
+    # --- stVaults factory stack ---
+    - &stakingVaultFactory "0xBf18618d1Ba07cCcA63d3D74f6a9056762Eac3cA"
+    - &stakingVaultBeacon "0xAF5bf52E784361f4eBBA86f2e918fFDd6A31453A"
+    - &stakingVaultImpl "0x7ade83C09A0Aa0FEA45695840067438a9dC96361"
+    - &dashboardImpl "0x5667f7477325F85C1b5E324387545C5045A57E2b"
+
+    # --- Easy Track ---
+    - &EasyTrack "0x9A2029735Bd14C8b17fd03FE05D5F04F7AF797c2"
+    - &EVMScriptExecutor "0x0b6de69562CADa4dBFdCA7e448fdc71D3542A590"
+
+    # ------
+    - &apmRegistryFactory "0xcA98541C98bCd77123eE74C4A37b8BDfd792C4b6"
+    - &callsScript "0x207474d0f0Ba51A28ce911C2e77d6c93e231E8FD"
+    - &daoFactory "0xb1833a044f74d4b37d8230941eBA11368999e057"
+    - &dummyEmptyContract "0x7c625913A9c1dcCeB0799c62C0D3dfd2C21dBbE9"
+    - &ens "0x5A8bF7fe99a69c2b34B540eA09d4a48c6ae78C21"
+    - &ensFactory "0xf04b96fcE598C75EEAF8D517D569DE812B78683E"
+    - &evmScriptRegistryFactory "0x8F002279D8A3147230dc948fB892F5BC2FfEf5d5"
+    - &lidoApm "0x2F78689e4534b1461F4c35C2fC65b53205f6e50f"
+    - &lidoTemplate "0xEC39F7ea18BC1c1bf3C0617fb6110dfC62d1e888"
+    - &miniMeTokenFactory "0x4d0E05677c1005C4C808cb5e824abE99b2b39497"
+    - &pinnedBeaconProxy "0xF19E48C5Ad2F8aBB452F5A6AB9cb104E70495e08"
+
+l1:
+  rpcUrl: HOODI_REMOTE_RPC_URL # https://ethereum-hoodi-rpc.publicnode.com
+  explorerHostname: api-hoodi.etherscan.io
+  explorerTokenEnv: ETHERSCAN_TOKEN
