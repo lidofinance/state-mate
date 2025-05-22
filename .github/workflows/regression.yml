@@ -1,0 +1,40 @@
+name: Regression Tests
+
+on:
+  workflow_dispatch:
+    inputs:
+      folders:
+        description: 'Space separated list of config folders to test. Leave blank to test all.'
+        required: false
+        default: ''
+  pull_request:
+    paths:
+      - 'configs/**'
+      - '.github/workflows/regression.yml'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'yarn'
+
+      - name: Enable corepack and install dependencies
+        run: |
+          corepack enable
+          yarn install --immutable
+
+      - name: Run regression tests
+        run: |
+          folders="${{ github.event.inputs.folders }}"
+          if [ -z "$folders" ]; then
+            yarn test .
+          else
+            yarn test . $folders
+          fi
