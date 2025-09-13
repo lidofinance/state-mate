@@ -311,7 +311,7 @@ l1:
         get_sealing_committee: *gateSealCommittee
         get_seal_duration_seconds: 1209600  # 2 weeks
         get_sealables: [*withdrawalQueue]
-        get_expiry_timestamp: 1788908579  # Should be in one year. It is ok it fails.
+        get_expiry_timestamp: 1789207187  # Should be in one year. It is ok it fails.
         is_expired: false
     twGateSeal:
       name: TwGateSeal
@@ -320,5 +320,5 @@ l1:
         get_sealing_committee: *gateSealCommittee
         get_seal_duration_seconds: 1209600  # 2 weeks
         get_sealables: [*triggerableWithdrawalsGateway, *validatorsExitBusOracle]
-        get_expiry_timestamp: 1788908579  # Should be in one year. It is ok it fails.
+        get_expiry_timestamp: 1789207187  # Should be in one year. It is ok it fails.
         is_expired: false
