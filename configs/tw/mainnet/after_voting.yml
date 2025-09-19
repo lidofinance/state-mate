@@ -124,7 +124,7 @@ parameters:
   # TW voting specific contracts
   - &triggerableWithdrawalsGateway "0xDC00116a0D3E064427dA2600449cfD2566B3037B"
   - &validatorExitDelayVerifier "0xbDb567672c867DB533119C2dcD4FB9d8b44EC82f"
-  - &csEjector "0x21e271cBa32672B106737AbeB3a45E53Fe9a0df4"
+  - &csEjector "0xc72b58aa02E0e98cF8A4a0E9Dce75e763800802C"
 
   # Gate seals
   - &oldGateSeal "0xf9C9fDB4A5D2AA1D836D5370AB9b28BC1847e178"
@@ -133,7 +133,7 @@ parameters:
   - &resealManager "0x7914b5a1539b97Bd0bbd155757F25FD79A522d24"
 
   # EasyTrack
-  - &easyTrackEvmScriptExecutor "0x79a20FD0FA36453B2F45eAbab19bfef43575Ba9E"
+  - &easyTrackEvmScriptExecutor "0xFE5986E06210aC1eCC1aDCafc0cc7f8D63B3F977"
 
 misc:
   - &stakingModuleCuratedType "0x637572617465642d6f6e636861696e2d76310000000000000000000000000000"
@@ -168,7 +168,7 @@ roles:
   - &SUBMIT_REPORT_HASH_ROLE "0x22ebb4dbafb72948800c1e1afa1688772a1a4cfc54d5ebfcec8163b1139c082e"
   - &ADD_FULL_WITHDRAWAL_REQUEST_ROLE "0x15fac8ba7fe8dd5344b88c1915452ce66976f270d1cd793c3b0ab579cecd33c0"
   - &TW_EXIT_LIMIT_MANAGER_ROLE "0x03c30da9b9e4d4789ac88a294d39a63058ca4a498804c2aa823e381df59d0cf4"
-  - &CONFIG_MANAGER_ROLE "PLACEHOLDER_CONFIG_MANAGER_ROLE"
+  - &CONFIG_MANAGER_ROLE "0xbbfb55d933c2bfa638763473275b1d84c4418e58d26cf9d2cd5758237756d9f0"
 
 l1:
   rpcUrl: L1_MAINNET_RPC_URL
@@ -235,16 +235,16 @@ l1:
         # Item 19: Call finalizeUpgrade_v3() on SR
         getContractVersion: 3
         getDepositsAllocation: null
-        getLido: "0x0000000000000000000000000000000000000000"
+        getLido: *lido
         getNodeOperatorDigests: null
         getNodeOperatorSummary: null
         getRoleAdmin: null
         getRoleMember: null
         getRoleMemberCount:
           - args: [ *STAKING_MODULE_UNVETTING_ROLE ]
-            result: 0
+            result: 1
           - args: [ *DEFAULT_ADMIN_ROLE ]
-            result: 0
+            result: 1
           # Item 20: Check role granted
           - args: [ *REPORT_VALIDATOR_EXITING_STATUS_ROLE ]
             result: 1
@@ -271,7 +271,7 @@ l1:
         getStakingModulesCount: null
         getStakingRewardsDistribution: null
         getTotalFeeE4Precision: null
-        getWithdrawalCredentials: "0x0000000000000000000000000000000000000000000000000000000000000000"
+        getWithdrawalCredentials: "0x010000000000000000000000b9d7934878b5fb9610b3fe8a5e441e8fad7e293f"
         hasRole:
           # Item 20: Verify role granted to ValidatorExitDelayVerifier
           - args: [ *REPORT_VALIDATOR_EXITING_STATUS_ROLE, *validatorExitDelayVerifier ]
@@ -295,6 +295,9 @@ l1:
         appId: null
         kernel: null
       checks:
+        proxyType: null
+        isDepositable: null
+        implementation: null
         MANAGE_NODE_OPERATOR_ROLE: "0x78523850fdd761612f46e844cf5a16bda6b3151d6ae961fd7e8e7b92bfbca7f8"
         MANAGE_SIGNING_KEYS: "0x75abc64490e17b40ea1e66691c3eb493647b24430b358bd87ec3e5127f1621ee"
         MAX_NODE_OPERATORS_COUNT: 200
@@ -327,7 +330,7 @@ l1:
         getStakingModuleSummary: null
         getStuckPenaltyDelay: 0
         getTotalSigningKeyCount: null
-        getType: "0x0000000000000000000000000000000000000000000000000000000000000000"
+        getType: "0x637572617465642d6f6e636861696e2d76310000000000000000000000000000"
         getUnusedSigningKeyCount: null
         hasInitialized: null
         isOperatorPenalized:
@@ -345,7 +348,7 @@ l1:
         isPetrified: null
         kernel: null
         isValidatorExitDelayPenaltyApplicable: null
-        exitPenaltyCutoffTimestamp: 0
+        exitPenaltyCutoffTimestamp: 1758896059  # Warning! Vote enactment minus 4 days on mainnet
 
     # Item 25: Update SimpleDVT implementation
     simpleDVT:
@@ -360,6 +363,9 @@ l1:
         appId: null
         kernel: null
       checks:
+        proxyType: null
+        isDepositable: null
+        implementation: null
         MANAGE_NODE_OPERATOR_ROLE: null
         MANAGE_SIGNING_KEYS: null
         MAX_NODE_OPERATORS_COUNT: null
@@ -404,7 +410,7 @@ l1:
         isPetrified: null
         kernel: null
         isValidatorExitDelayPenaltyApplicable: null
-        exitPenaltyCutoffTimestamp: 0
+        exitPenaltyCutoffTimestamp: 1758896059  # Warning! Vote enactment minus 4 days on mainnet
 
     # Item 13: Update Accounting Oracle implementation
     accountingOracle:
@@ -430,7 +436,7 @@ l1:
         MANAGE_CONSENSUS_VERSION_ROLE: "0xc31b1e4b732c5173dc51d519dfa432bad95550ecc4b0f9a61c2a558a2a8e4341"
         SECONDS_PER_SLOT: 12
         SUBMIT_DATA_ROLE: *SUBMIT_DATA_ROLE
-        getConsensusContract: "0x0000000000000000000000000000000000000000"
+        getConsensusContract: "0xD624B08C83bAECF0807Dd2c6880C3154a5F0B288"
         getConsensusReport: null
         # Item 15: Bump AO consensus version to 4
         getConsensusVersion: 4
@@ -496,9 +502,9 @@ l1:
           # Item 7: Verify SUBMIT_REPORT_HASH_ROLE granted to EasyTrack EVM Script Executor
           - args: [ *SUBMIT_REPORT_HASH_ROLE ]
             result: 1
-          # Item 61, 63: Verify PAUSE_ROLE changes
+          # Item 61, 63: Verify PAUSE_ROLE changes (new TW GateSeal + ResealManager)
           - args: [ *PAUSE_ROLE ]
-            result: 1
+            result: 2
         getTotalRequestsProcessed: null
         hasRole:
           # Item 4 & 6: Verify MANAGE_CONSENSUS_VERSION_ROLE revoked from AGENT
@@ -525,7 +531,8 @@ l1:
       implementation: *withdrawalVaultImpl
       proxyChecks:
         proxy_getAdmin: *agent
-        proxy_getImplementation: *withdrawalVaultImpl
+        implementation: *withdrawalVaultImpl
+        proxy_getIsOssified: null
       checks:
         LIDO: *lido
         TREASURY: *treasury
@@ -633,10 +640,52 @@ l1:
       name: WithdrawalQueue
       address: *withdrawalQueue
       checks:
+        BUNKER_MODE_DISABLED_TIMESTAMP: null
+        DEFAULT_ADMIN_ROLE: null
+        FINALIZE_ROLE: null
+        MANAGE_TOKEN_URI_ROLE: null
+        MAX_BATCHES_LENGTH: null
+        MAX_STETH_WITHDRAWAL_AMOUNT: null
+        MIN_STETH_WITHDRAWAL_AMOUNT: null
+        ORACLE_ROLE: null
+        PAUSE_INFINITELY: null
+        PAUSE_ROLE: null
+        RESUME_ROLE: null
+        STETH: null
+        WSTETH: null
+        balanceOf: null
+        bunkerModeSinceTimestamp: null
+        calculateFinalizationBatches: null
+        findCheckpointHints: null
+        getApproved: null
+        getBaseURI: null
+        getClaimableEther: null
+        getContractVersion: null
+        getLastCheckpointIndex: null
+        getLastFinalizedRequestId: null
+        getLastRequestId: null
+        getLockedEtherAmount: null
+        getNFTDescriptorAddress: null
+        getResumeSinceTimestamp: null
+        getRoleAdmin: null
+        getRoleMember: null
+        getWithdrawalRequests: null
+        getWithdrawalStatus: null
+        isApprovedForAll: null
+        isBunkerModeActive: null
+        isPaused: null
+        name: null
+        ownerOf: null
+        prefinalize: null
+        supportsInterface: null
+        symbol: null
+        tokenURI: null
+        unfinalizedRequestNumber: null
+        unfinalizedStETH: null
         getRoleMemberCount:
-          # Item 60, 62: Verify PAUSE_ROLE changes
+          # Item 60, 62: Verify PAUSE_ROLE changes (expecting 2 due to both old and new GateSeals)
           - args: [ *PAUSE_ROLE ]
-            result: 1
+            result: 2
         hasRole:
           # Item 60: Verify PAUSE_ROLE revoked from old GateSeal
           - args: [ *PAUSE_ROLE, *oldGateSeal ]
@@ -650,6 +699,13 @@ l1:
       name: OracleDaemonConfig
       address: *oracleDaemonConfig
       checks:
+        CONFIG_MANAGER_ROLE: null
+        DEFAULT_ADMIN_ROLE: null
+        get: null
+        getList: null
+        getRoleAdmin: null
+        getRoleMember: null
+        supportsInterface: null
         getRoleMemberCount:
           # Item 28 & 33: Verify CONFIG_MANAGER_ROLE revoked from AGENT
           - args: [ *CONFIG_MANAGER_ROLE ]
