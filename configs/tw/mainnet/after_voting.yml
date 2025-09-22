@@ -348,7 +348,7 @@ l1:
         isPetrified: null
         kernel: null
         isValidatorExitDelayPenaltyApplicable: null
-        exitPenaltyCutoffTimestamp: 1758896059  # Warning! Vote enactment minus 4 days on mainnet
+        exitPenaltyCutoffTimestamp: 1759150801  # Warning! Vote enactment minus 4 days on mainnet
 
     # Item 25: Update SimpleDVT implementation
     simpleDVT:
@@ -410,7 +410,7 @@ l1:
         isPetrified: null
         kernel: null
         isValidatorExitDelayPenaltyApplicable: null
-        exitPenaltyCutoffTimestamp: 1758896059  # Warning! Vote enactment minus 4 days on mainnet
+        exitPenaltyCutoffTimestamp: 1759150801  # Warning! Vote enactment minus 4 days on mainnet
 
     # Item 13: Update Accounting Oracle implementation
     accountingOracle:
@@ -701,7 +701,10 @@ l1:
       checks:
         CONFIG_MANAGER_ROLE: null
         DEFAULT_ADMIN_ROLE: null
-        get: null
+        get:
+          # Item 32: Verify EXIT_EVENTS_LOOKBACK_WINDOW_IN_SLOTS variable added
+          - args: [ "EXIT_EVENTS_LOOKBACK_WINDOW_IN_SLOTS" ]
+            result: "0x0189c0"  # 100800 = 14 * 7200 (14 days in slots)
         getList: null
         getRoleAdmin: null
         getRoleMember: null
