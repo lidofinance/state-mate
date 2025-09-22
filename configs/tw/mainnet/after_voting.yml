@@ -16,7 +16,7 @@
 # --- Triggerable Withdrawals Gateway (TWG) ---
 # 8. Grant TWG role ADD_FULL_WITHDRAWAL_REQUEST_ROLE to the CS Ejector ⚠️ PARTIALLY COVERED (role check)
 # 9. Grant TWG role ADD_FULL_WITHDRAWAL_REQUEST_ROLE to the VEB ⚠️ PARTIALLY COVERED (role check)
-# 10. Connect TRIGGERABLE_WITHDRAWALS_GATEWAY to Dual Governance tiebreaker ❌ NOT COVERED
+# 10. Connect TRIGGERABLE_WITHDRAWALS_GATEWAY to Dual Governance tiebreaker ✅ COVERED
 
 # --- WV ---
 # 11. Update WithdrawalVault implementation ✅ COVERED
@@ -50,7 +50,7 @@
 # 29. Remove NODE_OPERATOR_NETWORK_PENETRATION_THRESHOLD_BP variable from OracleDaemonConfig ❌ NOT COVERED
 # 30. Remove VALIDATOR_DELAYED_TIMEOUT_IN_SLOTS variable from OracleDaemonConfig ❌ NOT COVERED
 # 31. Remove VALIDATOR_DELINQUENT_TIMEOUT_IN_SLOTS variable from OracleDaemonConfig ❌ NOT COVERED
-# 32. Add EXIT_EVENTS_LOOKBACK_WINDOW_IN_SLOTS variable to OracleDaemonConfig ❌ NOT COVERED
+# 32. Add EXIT_EVENTS_LOOKBACK_WINDOW_IN_SLOTS variable to OracleDaemonConfig ✅ COVERED
 # 33. Revoke CONFIG_MANAGER_ROLE role from the AGENT ⚠️ PARTIALLY COVERED (role check)
 
 # --- CSM ---
@@ -125,6 +125,8 @@ parameters:
   - &triggerableWithdrawalsGateway "0xDC00116a0D3E064427dA2600449cfD2566B3037B"
   - &validatorExitDelayVerifier "0xbDb567672c867DB533119C2dcD4FB9d8b44EC82f"
   - &csEjector "0xc72b58aa02E0e98cF8A4a0E9Dce75e763800802C"
+  - &dualGovernance "0xC1db28B3301331277e307FDCfF8DE28242A4486E"
+  - &tiebreakerCommittee "0xf65614d73952Be91ce0aE7Dd9cFf25Ba15bEE2f5"
 
   # Gate seals
   - &oldGateSeal "0xf9C9fDB4A5D2AA1D836D5370AB9b28BC1847e178"
@@ -717,3 +719,34 @@ l1:
           # Item 28 & 33: Verify CONFIG_MANAGER_ROLE revoked from AGENT
           - args: [ *CONFIG_MANAGER_ROLE, *agent ]
             result: false
+
+    # Item 10: Connect TRIGGERABLE_WITHDRAWALS_GATEWAY to Dual Governance tiebreaker
+    dualGovernance:
+      name: DualGovernance
+      address: *dualGovernance
+      checks:
+        MAX_SEALABLE_WITHDRAWAL_BLOCKERS_COUNT: null
+        MAX_TIEBREAKER_ACTIVATION_TIMEOUT: null
+        MIN_TIEBREAKER_ACTIVATION_TIMEOUT: null
+        TIMELOCK: null
+        canCancelAllPendingProposals: null
+        canScheduleProposal: null
+        canSubmitProposal: null
+        getConfigProvider: null
+        getEffectiveState: null
+        getPersistedState: null
+        getProposalsCanceller: null
+        getProposer: null
+        getProposers: null
+        getRageQuitEscrow: null
+        getResealCommittee: null
+        getResealManager: null
+        getStateDetails: null
+        getVetoSignallingEscrow: null
+        isExecutor: null
+        isProposer: null
+        getTiebreakerDetails:
+          # Item 10: Verify TriggerableWithdrawalsGateway connected to Dual Governance tiebreaker
+          # Current blockers: WithdrawalQueue, ValidatorsExitBusOracle, TriggerableWithdrawalsGateway
+          - args: []
+            result: [false,*tiebreakerCommittee,31536000,[*withdrawalQueue,*validatorsExitBusOracle,*triggerableWithdrawalsGateway]]
