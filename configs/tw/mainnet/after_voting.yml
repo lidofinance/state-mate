@@ -343,7 +343,7 @@ l1:
             result: true
         exitDeadlineThreshold:
           - args: [ 1 ]
-            result: 172800  # NOR_EXIT_DEADLINE_IN_SEC from voting script
+            result: 345600  # NOR_EXIT_DEADLINE_IN_SEC from voting script
         isValidatorExitingKeyReported:
           - args: [ "0x95F00b016bB31b7182D96D25074684518246E42a" ]
             result: false
@@ -407,7 +407,7 @@ l1:
         isOperatorPenaltyCleared: null
         exitDeadlineThreshold:
           - args: [ 1 ]
-            result: 172800  # NOR_EXIT_DEADLINE_IN_SEC from voting script
+            result: 345600  # NOR_EXIT_DEADLINE_IN_SEC from voting script
         isValidatorExitingKeyReported: null
         isPetrified: null
         kernel: null
