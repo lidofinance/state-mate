@@ -1,0 +1,1467 @@
+# yaml-language-server: $schema=../../schemas/main-schema.json
+deployed:
+  l1:
+    # --- Base deployment (VERIFIED)---
+    - &factoryImplementation "0x0000000397b71C8f3182Fd40D247330D218fdC72"
+    - &factoryFactory "0x0000000f9686896836C39cf721141922Ce42639f"
+    - &consensusFactory "0xaEEB06CBd91A18b51a2D30b61477eAeE3a9633C3"
+    - &consensusImplementation "0x0000000167598d2C78E2313fD5328E16bD9A0b13"
+    - &depositQueueFactory "0xBB92A7B9695750e1234BaB18F83b73686dd09854"
+    - &depositQueueImplementation "0x00000006dA9f179BFE250Dd1c51cD2d3581930c8"
+    - &signatureDepositQueueImplementation "0x00000003887dfBCEbD1e4097Ad89B690de7eFbf9"
+    - &feeManagerFactory "0xF7223356819Ea48f25880b6c2ab3e907CC336D45"
+    - &feeManagerImplementation "0x0000000dE74e5D51651326E0A3e1ACA94bEAF6E1"
+    - &oracleFactory "0x0CdFf250C7a071fdc72340D820C5C8e29507Aaad"
+    - &oracleImplementation "0x0000000F0d3D1c31b72368366A4049C05E291D58"
+    - &redeemQueueFactory "0xfe76b5fd238553D65Ce6dd0A572C0fda629F8421"
+    - &redeemQueueImplementation "0x0000000285805eac535DADdb9648F1E10DfdC411"
+    - &signatureRedeemQueueImplementation "0x0000000b2082667589A16c4cF18e9f923781c471"
+    - &riskManagerFactory "0xa51E4FA916b939Fa451520D2B7600c740d86E5A0"
+    - &riskManagerImplementation "0x0000000714cf2851baC1AE2f41871862e9D216fD"
+    - &shareManagerFactory "0x952f39AA62E94db3Ad0d1C7D1E43C1a8519E45D8"
+    - &tokenizedShareManagerImplementation "0x0000000E8eb7173fA1a3ba60eCA325bcB6aaf378"
+    - &basicShareManagerImplementation "0x00000005564AAE40D88e2F08dA71CBe156767977"
+    - &subvaultFactory "0x75FE0d73d3C64cdC1C6449D9F977Be6857c4d011"
+    - &subvaultImplementation "0x0000000E535B4E063f8372933A55470e67910a66"
+    - &verifierFactory "0x04B30b1e98950e6A13550d84e991bE0d734C2c61"
+    - &verifierImplementation "0x000000047Fc878662006E78D5174FB4285637966"
+    - &vaultFactory "0x4E38F679e46B3216f0bd4B314E9C429AFfB1dEE3"
+    - &vaultImplementation "0x0000000615B2771511dAa693aC07BE5622869E01"
+    - &bitmaskVerifier "0x0000000263Fb29C3D6B0C5837883519eF05ea20A"
+    - &eigenLayerVerifierFactory "0x77A83AcBf7A6df20f1D681b4810437d74AE790F8"
+    - &eigenLayerVerifier "0x00000003F82051A8B2F020B79e94C3DC94E89B81"
+    - &ERC20VerifierFactory "0x2e234F4E1b7934d5F4bEAE3fF2FDC109f5C42F1d"
+    - &ERC20Verifier "0x00000009207D366cBB8549837F8Ae4bf800Af2D6"
+    - &symbioticVerifierFactory "0x41C443F10a92D597e6c9E271140BC94c10f5159F"
+    - &symbioticVerifier "0x00000000cBC6f5d4348496FfA22Cf014b9DA394B"
+    - &vaultConfigurator "0x000000028be48f9E62E13403480B60C4822C5aa5"
+    - &basicRedeemHook "0x0000000637f1b1ccDA4Af2dB6CDDf5e5Ec45fd93"
+    - &redirectingDepositHook "0x00000004d3B17e5391eb571dDb8fDF95646ca827"
+    - &lidoDepositHook "0x000000065d1A7bD71f52886910aaBE6555b7317c"
+    - &oracleHelper "0x000000005F543c38d5ea6D0bF10A50974Eb55E35"
+
+    # --- strETH deployment ---
+    - &vault "0x277C6A642564A91ff78b008022D65683cEE5CCC5"
+    - &depositQueueETH "0xE707321B887b9da133AC5fCc5eDB78Ab177a152D"
+    - &depositQueueWETH "0x2eA268f1018a4767bF5da42D531Ea9e943942A36"
+    - &depositQueueWSTETH "0x614cb9E9D13712781DfD15aDC9F3DAde60E4eFAb"
+    - &redeemQueueWSTETH "0x1ae8C006b5C97707aa074AaeD42BecAD2CF80Da2"
+    - &oracle "0x8a78e6b7E15C4Ae3aeAeE3bf0DE4F2de4078c1cD"
+    - &shareManager "0xcd3c0F51798D1daA92Fb192E57844Ae6cEE8a6c7"
+    - &feeManager "0x24FD64EB4766d91FD79a4D5e8086b2460dEBcaE7"
+    - &riskManager "0x4f6bc03537C6F74E250f57a9a7238087caBF1c6D"
+    - &subvault0 "0x90c983DC732e65DB6177638f0125914787b8Cb78"
+    - &verifier0 "0xF4eA276361348b301Ba2296dB909a7c973A15451"
+    - &subvault1 "0x893aa69FBAA1ee81B536f0FbE3A3453e86290080"
+    - &verifier1 "0x02e1C91C4D82af454D892FBE2c5De2c4504b2675"
+    - &subvault2 "0x181cB55f872450D16aE858D532B4e35e50eaA76D"
+    - &verifier2 "0x1616d39a201D246cbD1B3B145234638f7719b53A"
+    - &subvault3 "0x9938A09FeA37bA681A1Bd53D33ddDE2dEBEc1dA0"
+    - &verifier3 "0xd662dF7C0FAF0Fe6446638651b05C287806AD1AE"
+    - &timelockController "0x8D8b65727729Fb484CB6dc1452D61608a5758596"
+
+    # --- Actors ---
+    - &PROXY_ADMIN "0x81698f87C6482bF1ce9bFcfC0F103C4A0Adf0Af0"
+    - &LAZY_VAULT_ADMIN "0xAbE20D266Ae54b9Ae30492dEa6B6407bF18fEeb5"
+    - &ACTIVE_VAULT_ADMIN "0xeb1CaFBcC8923eCbc243ff251C385C201A6c734a"
+    - &ORACLE_UPDATER "0xd27fFB15Dd00D5E52aC2BFE6d5AFD36caE850081"
+    - &CURATOR "0x5Dbf9287787A5825beCb0321A276C9c92d570a75"
+    - &TREASURY "0xb1E5a8F26C43d019f2883378548a350ecdD1423B"
+    - &LIDO_PAUSER "0xA916fD5252160A7E56A6405741De76dc0Da5A0Cd"
+    - &MELLOW_PAUSER "0xa6278B726d4AA09D14f9E820D7785FAd82E7196F"
+
+    # --- Special addresses ---
+    - &ZERO_ADDRESS "0x0000000000000000000000000000000000000000"
+
+l1:
+  rpcUrl: ETH_RPC_URL # Mainnet RPC URL
+  explorerHostname: api.etherscan.io
+  explorerTokenEnv: ETHERSCAN_TOKEN
+  contracts:
+    factoryFactory:
+      name: Factory
+      address: *factoryFactory
+      proxyName: TransparentUpgradeableProxy
+      implementation: *factoryImplementation
+      proxyChecks: {}
+      checks:
+        entities: REPLACEME # 13
+        entityAt: REPLACEME # need to specify args
+        implementationAt: REPLACEME # need to specify args
+        implementations: 1
+        isBlacklisted: REPLACEME # need to specify args
+        isEntity: REPLACEME # need to specify args
+        owner: *PROXY_ADMIN
+        proposalAt: REPLACEME # need to specify args
+        proposals: 0
+      implementationChecks:
+        entities: 0
+        entityAt: REPLACEME # need to specify args
+        implementationAt: REPLACEME # need to specify args
+        implementations: 0
+        isBlacklisted: REPLACEME # need to specify args
+        isEntity: REPLACEME # need to specify args
+        owner: *ZERO_ADDRESS
+        proposalAt: REPLACEME # need to specify args
+        proposals: 0
+    consensusFactory:
+      name: Factory
+      address: *consensusFactory
+      proxyName: TransparentUpgradeableProxy
+      implementation: *consensusImplementation
+      proxyChecks: {}
+      checks:
+        entities: 0
+        entityAt: REPLACEME # need to specify args
+        implementationAt: REPLACEME # need to specify args
+        implementations: 1
+        isBlacklisted: REPLACEME # need to specify args
+        isEntity: REPLACEME # need to specify args
+        owner: *PROXY_ADMIN
+        proposalAt: REPLACEME # need to specify args
+        proposals: 0
+      implementationChecks:
+        entities: 0
+        entityAt: REPLACEME # need to specify args
+        implementationAt: REPLACEME # need to specify args
+        implementations: 0
+        isBlacklisted: REPLACEME # need to specify args
+        isEntity: REPLACEME # need to specify args
+        owner: *ZERO_ADDRESS
+        proposalAt: REPLACEME # need to specify args
+        proposals: 0
+    depositQueueFactory:
+      name: Factory
+      address: *depositQueueFactory
+      proxyName: TransparentUpgradeableProxy
+      implementation: *depositQueueImplementation
+      proxyChecks: {}
+      checks:
+        entities: REPLACEME # 10
+        entityAt: REPLACEME # need to specify args
+        implementationAt: REPLACEME # need to specify args
+        implementations: REPLACEME # 2
+        isBlacklisted: REPLACEME # need to specify args
+        isEntity: REPLACEME # need to specify args
+        owner: *PROXY_ADMIN
+        proposalAt: REPLACEME # need to specify args
+        proposals: 0
+      implementationChecks:
+        entities: 0
+        entityAt: REPLACEME # need to specify args
+        implementationAt: REPLACEME # need to specify args
+        implementations: 0
+        isBlacklisted: REPLACEME # need to specify args
+        isEntity: REPLACEME # need to specify args
+        owner: *ZERO_ADDRESS
+        proposalAt: REPLACEME # need to specify args
+        proposals: 0
+    signatureDepositQueueImplementation:
+      name: SignatureDepositQueue
+      address: *signatureDepositQueueImplementation
+      checks:
+        ORDER_TYPEHASH: REPLACEME # 0xb367c53189b3057a91923801116b5f9c4e7211a314d1961f94770747512a1b68
+        asset: *ZERO_ADDRESS
+        canBeRemoved: REPLACEME # true
+        claimableOf: REPLACEME # need to specify args
+        consensus: *ZERO_ADDRESS
+        consensusFactory: REPLACEME # 0xaEEB06CBd91A18b51a2D30b61477eAeE3a9633C3
+        eip712Domain: REPLACEME # 0x0f,,,1,0x00000003887dfBCEbD1e4097Ad89B690de7eFbf9,0x0000000000000000000000000000000000000000000000000000000000000000,
+        handleReport: REPLACEME # need to specify args
+        hashOrder: REPLACEME # need to specify args
+        nonces: REPLACEME # need to specify args
+        validateOrder: REPLACEME # need to specify args
+        vault: *ZERO_ADDRESS
+    feeManagerFactory:
+      name: Factory
+      address: *feeManagerFactory
+      proxyName: TransparentUpgradeableProxy
+      implementation: *feeManagerImplementation
+      proxyChecks: {}
+      checks:
+        entities: REPLACEME # 4
+        entityAt: REPLACEME # need to specify args
+        implementationAt: REPLACEME # need to specify args
+        implementations: 1
+        isBlacklisted: REPLACEME # need to specify args
+        isEntity: REPLACEME # need to specify args
+        owner: *PROXY_ADMIN
+        proposalAt: REPLACEME # need to specify args
+        proposals: REPLACEME # 0
+      implementationChecks:
+        entities: REPLACEME # 0
+        entityAt: REPLACEME # need to specify args
+        implementationAt: REPLACEME # need to specify args
+        implementations: REPLACEME # 0
+        isBlacklisted: REPLACEME # need to specify args
+        isEntity: REPLACEME # need to specify args
+        owner: REPLACEME # 0x0000000000000000000000000000000000000000
+        proposalAt: REPLACEME # need to specify args
+        proposals: REPLACEME # 0
+    oracleFactory:
+      name: Factory
+      address: *oracleFactory
+      proxyName: TransparentUpgradeableProxy
+      implementation: *oracleImplementation
+      proxyChecks: {}
+      checks:
+        entities: REPLACEME # 4
+        entityAt: REPLACEME # need to specify args
+        implementationAt: REPLACEME # need to specify args
+        implementations: REPLACEME # 1
+        isBlacklisted: REPLACEME # need to specify args
+        isEntity: REPLACEME # need to specify args
+        owner: *PROXY_ADMIN
+        proposalAt: REPLACEME # need to specify args
+        proposals: REPLACEME # 0
+      implementationChecks:
+        entities: REPLACEME # 0
+        entityAt: REPLACEME # need to specify args
+        implementationAt: REPLACEME # need to specify args
+        implementations: REPLACEME # 0
+        isBlacklisted: REPLACEME # need to specify args
+        isEntity: REPLACEME # need to specify args
+        owner: *ZERO_ADDRESS
+        proposalAt: REPLACEME # need to specify args
+        proposals: REPLACEME # 0
+    redeemQueueFactory:
+      name: Factory
+      address: *redeemQueueFactory
+      proxyName: TransparentUpgradeableProxy
+      implementation: *redeemQueueImplementation
+      proxyChecks: {}
+      checks:
+        entities: REPLACEME # 8
+        entityAt: REPLACEME # need to specify args
+        implementationAt: REPLACEME # need to specify args
+        implementations: REPLACEME # 2
+        isBlacklisted: REPLACEME # need to specify args
+        isEntity: REPLACEME # need to specify args
+        owner: *PROXY_ADMIN
+        proposalAt: REPLACEME # need to specify args
+        proposals: REPLACEME # 0
+      implementationChecks:
+        entities: REPLACEME # 0
+        entityAt: REPLACEME # need to specify args
+        implementationAt: REPLACEME # need to specify args
+        implementations: REPLACEME # 0
+        isBlacklisted: REPLACEME # need to specify args
+        isEntity: REPLACEME # need to specify args
+        owner: REPLACEME # 0x0000000000000000000000000000000000000000
+        proposalAt: REPLACEME # need to specify args
+        proposals: REPLACEME # 0
+    signatureRedeemQueueImplementation:
+      name: SignatureRedeemQueue
+      address: *signatureRedeemQueueImplementation
+      checks:
+        ORDER_TYPEHASH: REPLACEME # 0xb367c53189b3057a91923801116b5f9c4e7211a314d1961f94770747512a1b68
+        asset: REPLACEME # 0x0000000000000000000000000000000000000000
+        canBeRemoved: REPLACEME # true
+        claimableOf: REPLACEME # need to specify args
+        consensus: REPLACEME # 0x0000000000000000000000000000000000000000
+        consensusFactory: REPLACEME # 0xaEEB06CBd91A18b51a2D30b61477eAeE3a9633C3
+        eip712Domain: REPLACEME # 0x0f,,,1,0x0000000b2082667589A16c4cF18e9f923781c471,0x0000000000000000000000000000000000000000000000000000000000000000,
+        handleReport: REPLACEME # need to specify args
+        hashOrder: REPLACEME # need to specify args
+        nonces: REPLACEME # need to specify args
+        validateOrder: REPLACEME # need to specify args
+        vault: REPLACEME # 0x0000000000000000000000000000000000000000
+    riskManagerFactory:
+      name: Factory
+      address: *riskManagerFactory
+      proxyName: TransparentUpgradeableProxy
+      implementation: "0x0000000397b71c8f3182fd40d247330d218fdc72"
+      proxyChecks: {}
+      checks:
+        entities: REPLACEME # 4
+        entityAt: REPLACEME # need to specify args
+        implementationAt: REPLACEME # need to specify args
+        implementations: REPLACEME # 1
+        isBlacklisted: REPLACEME # need to specify args
+        isEntity: REPLACEME # need to specify args
+        owner: REPLACEME # 0x81698f87C6482bF1ce9bFcfC0F103C4A0Adf0Af0
+        proposalAt: REPLACEME # need to specify args
+        proposals: REPLACEME # 0
+      implementationChecks:
+        entities: REPLACEME # 0
+        entityAt: REPLACEME # need to specify args
+        implementationAt: REPLACEME # need to specify args
+        implementations: REPLACEME # 0
+        isBlacklisted: REPLACEME # need to specify args
+        isEntity: REPLACEME # need to specify args
+        owner: REPLACEME # 0x0000000000000000000000000000000000000000
+        proposalAt: REPLACEME # need to specify args
+        proposals: REPLACEME # 0
+    shareManagerFactory:
+      name: Factory
+      address: *shareManagerFactory
+      proxyName: TransparentUpgradeableProxy
+      implementation: "0x0000000397b71c8f3182fd40d247330d218fdc72"
+      proxyChecks: {}
+      checks:
+        entities: REPLACEME # 4
+        entityAt: REPLACEME # need to specify args
+        implementationAt: REPLACEME # need to specify args
+        implementations: REPLACEME # 2
+        isBlacklisted: REPLACEME # need to specify args
+        isEntity: REPLACEME # need to specify args
+        owner: REPLACEME # 0x81698f87C6482bF1ce9bFcfC0F103C4A0Adf0Af0
+        proposalAt: REPLACEME # need to specify args
+        proposals: REPLACEME # 0
+      implementationChecks:
+        entities: REPLACEME # 0
+        entityAt: REPLACEME # need to specify args
+        implementationAt: REPLACEME # need to specify args
+        implementations: REPLACEME # 0
+        isBlacklisted: REPLACEME # need to specify args
+        isEntity: REPLACEME # need to specify args
+        owner: REPLACEME # 0x0000000000000000000000000000000000000000
+        proposalAt: REPLACEME # need to specify args
+        proposals: REPLACEME # 0
+    tokenizedShareManagerImplementation:
+      name: TokenizedShareManager
+      address: *tokenizedShareManagerImplementation
+      checks:
+        SET_ACCOUNT_INFO_ROLE: REPLACEME # 0x58258f737b9cea9d7da81a3a12943f800a9668a2494235fec0d84cc60ad04cff
+        SET_FLAGS_ROLE: REPLACEME # 0x78b235a1fa2fd5e00dba7867d599bed6f088684010a7fee7b9fe05fa1082d01e
+        SET_WHITELIST_MERKLE_ROOT_ROLE: REPLACEME # 0xca196afb47c2d16c8388ba0ef201b98a808acb83a856576ffc57360840a5fd99
+        accounts: REPLACEME # need to specify args
+        activeShares: REPLACEME # 0
+        activeSharesOf: REPLACEME # need to specify args
+        allocatedShares: REPLACEME # 0
+        allowance: REPLACEME # need to specify args
+        balanceOf: REPLACEME # need to specify args
+        claimableSharesOf: REPLACEME # need to specify args
+        decimals: REPLACEME # 18
+        flags: REPLACEME # false,false,false,false,false,0
+        isDepositorWhitelisted: REPLACEME # need to specify args
+        name: REPLACEME #
+        sharesOf: REPLACEME # need to specify args
+        symbol: REPLACEME #
+        totalShares: REPLACEME # 0
+        totalSupply: REPLACEME # 0
+        updateChecks: REPLACEME # need to specify args
+        vault: REPLACEME # 0x0000000000000000000000000000000000000000
+        whitelistMerkleRoot: REPLACEME # 0x0000000000000000000000000000000000000000000000000000000000000000
+    basicShareManagerImplementation:
+      name: BasicShareManager
+      address: *basicShareManagerImplementation
+      checks:
+        SET_ACCOUNT_INFO_ROLE: REPLACEME # 0x58258f737b9cea9d7da81a3a12943f800a9668a2494235fec0d84cc60ad04cff
+        SET_FLAGS_ROLE: REPLACEME # 0x78b235a1fa2fd5e00dba7867d599bed6f088684010a7fee7b9fe05fa1082d01e
+        SET_WHITELIST_MERKLE_ROOT_ROLE: REPLACEME # 0xca196afb47c2d16c8388ba0ef201b98a808acb83a856576ffc57360840a5fd99
+        accounts: REPLACEME # need to specify args
+        activeShares: REPLACEME # 0
+        activeSharesOf: REPLACEME # need to specify args
+        allocatedShares: REPLACEME # 0
+        claimableSharesOf: REPLACEME # need to specify args
+        flags: REPLACEME # false,false,false,false,false,0
+        isDepositorWhitelisted: REPLACEME # need to specify args
+        sharesOf: REPLACEME # need to specify args
+        totalShares: REPLACEME # 0
+        updateChecks: REPLACEME # need to specify args
+        vault: REPLACEME # 0x0000000000000000000000000000000000000000
+        whitelistMerkleRoot: REPLACEME # 0x0000000000000000000000000000000000000000000000000000000000000000
+    subvaultFactory:
+      name: Factory
+      address: *subvaultFactory
+      proxyName: TransparentUpgradeableProxy
+      implementation: "0x0000000397b71c8f3182fd40d247330d218fdc72"
+      proxyChecks: {}
+      checks:
+        entities: REPLACEME # 6
+        entityAt: REPLACEME # need to specify args
+        implementationAt: REPLACEME # need to specify args
+        implementations: REPLACEME # 1
+        isBlacklisted: REPLACEME # need to specify args
+        isEntity: REPLACEME # need to specify args
+        owner: REPLACEME # 0x81698f87C6482bF1ce9bFcfC0F103C4A0Adf0Af0
+        proposalAt: REPLACEME # need to specify args
+        proposals: REPLACEME # 0
+      implementationChecks:
+        entities: REPLACEME # 0
+        entityAt: REPLACEME # need to specify args
+        implementationAt: REPLACEME # need to specify args
+        implementations: REPLACEME # 0
+        isBlacklisted: REPLACEME # need to specify args
+        isEntity: REPLACEME # need to specify args
+        owner: REPLACEME # 0x0000000000000000000000000000000000000000
+        proposalAt: REPLACEME # need to specify args
+        proposals: REPLACEME # 0
+    verifierFactory:
+      name: Factory
+      address: *verifierFactory
+      proxyName: TransparentUpgradeableProxy
+      implementation: "0x0000000397b71c8f3182fd40d247330d218fdc72"
+      proxyChecks: {}
+      checks:
+        entities: REPLACEME # 6
+        entityAt: REPLACEME # need to specify args
+        implementationAt: REPLACEME # need to specify args
+        implementations: REPLACEME # 1
+        isBlacklisted: REPLACEME # need to specify args
+        isEntity: REPLACEME # need to specify args
+        owner: REPLACEME # 0x81698f87C6482bF1ce9bFcfC0F103C4A0Adf0Af0
+        proposalAt: REPLACEME # need to specify args
+        proposals: REPLACEME # 0
+      implementationChecks:
+        entities: REPLACEME # 0
+        entityAt: REPLACEME # need to specify args
+        implementationAt: REPLACEME # need to specify args
+        implementations: REPLACEME # 0
+        isBlacklisted: REPLACEME # need to specify args
+        isEntity: REPLACEME # need to specify args
+        owner: REPLACEME # 0x0000000000000000000000000000000000000000
+        proposalAt: REPLACEME # need to specify args
+        proposals: REPLACEME # 0
+    vaultFactory:
+      name: Factory
+      address: *vaultFactory
+      proxyName: TransparentUpgradeableProxy
+      implementation: "0x0000000397b71c8f3182fd40d247330d218fdc72"
+      proxyChecks: {}
+      checks:
+        entities: REPLACEME # 4
+        entityAt: REPLACEME # need to specify args
+        implementationAt: REPLACEME # need to specify args
+        implementations: REPLACEME # 1
+        isBlacklisted: REPLACEME # need to specify args
+        isEntity: REPLACEME # need to specify args
+        owner: REPLACEME # 0x81698f87C6482bF1ce9bFcfC0F103C4A0Adf0Af0
+        proposalAt: REPLACEME # need to specify args
+        proposals: REPLACEME # 0
+      implementationChecks:
+        entities: REPLACEME # 0
+        entityAt: REPLACEME # need to specify args
+        implementationAt: REPLACEME # need to specify args
+        implementations: REPLACEME # 0
+        isBlacklisted: REPLACEME # need to specify args
+        isEntity: REPLACEME # need to specify args
+        owner: REPLACEME # 0x0000000000000000000000000000000000000000
+        proposalAt: REPLACEME # need to specify args
+        proposals: REPLACEME # 0
+    vaultImplementation:
+      name: Vault
+      address: *vaultImplementation
+      checks:
+        CREATE_QUEUE_ROLE: REPLACEME # 0x6788636e7899d6d227901dc9f8c4c785401c0991724cf908dc65388af686da6f
+        CREATE_SUBVAULT_ROLE: REPLACEME # 0x85c2023fdfb1e93dedf5d18f9bc0e79347e071d12740ba71aeb84a4fcbdc4b79
+        DEFAULT_ADMIN_ROLE: REPLACEME # 0x0000000000000000000000000000000000000000000000000000000000000000
+        DISCONNECT_SUBVAULT_ROLE: REPLACEME # 0xf610639f4b9b8986f875fcb4e49486da5c7aa449a6942b5013fabd061e9b9fff
+        PULL_LIQUIDITY_ROLE: REPLACEME # 0x68895691ff006f290ca74825ce06ed17fffab55af49f0274f49b7424f752583a
+        PUSH_LIQUIDITY_ROLE: REPLACEME # 0x32a781031f04cc60b32394e40124d1e87f54273bf26d0532a115a424f6a93298
+        RECONNECT_SUBVAULT_ROLE: REPLACEME # 0xb557d53a2e72d8333ffa3bf2f556678becb5e995b0e25b7dca354627e550c08f
+        REMOVE_QUEUE_ROLE: REPLACEME # 0x9a4c49d6fb9452bbfe187968075d0fac7d7202d2b7f731d8cffbce9cf66756b2
+        SET_HOOK_ROLE: REPLACEME # 0x627f9e4ac2dadb64d045e7e6333c09f39ed34e0e066957955d0052b46d2e83e8
+        SET_QUEUE_LIMIT_ROLE: REPLACEME # 0x407fc42eadf1aba68b1d4a8c3c4aa2e8b6beac7957623f3694d0ad77bfb70e06
+        SET_QUEUE_STATUS_ROLE: REPLACEME # 0x6618a6d92147bbcacfb2ef2375976fc4c529eeeaeb72a66048296571370c6946
+        assetAt: REPLACEME # need to specify args
+        claimableSharesOf: REPLACEME # need to specify args
+        defaultDepositHook: REPLACEME # 0x0000000000000000000000000000000000000000
+        defaultRedeemHook: REPLACEME # 0x0000000000000000000000000000000000000000
+        depositQueueFactory: REPLACEME # 0xBB92A7B9695750e1234BaB18F83b73686dd09854
+        feeManager: REPLACEME # 0x0000000000000000000000000000000000000000
+        getAssetCount: REPLACEME # 0
+        getHook: REPLACEME # need to specify args
+        getLiquidAssets: REPLACEME # view call reverted
+        getQueueCount: REPLACEME # need to specify args
+        getRoleAdmin: REPLACEME # need to specify args
+        getRoleMember: REPLACEME # need to specify args
+        getRoleMemberCount: REPLACEME # need to specify args
+        getRoleMembers: REPLACEME # need to specify args
+        getStorageAt: REPLACEME # need to specify args
+        hasAsset: REPLACEME # need to specify args
+        hasQueue: REPLACEME # need to specify args
+        hasRole: REPLACEME # need to specify args
+        hasSubvault: REPLACEME # need to specify args
+        hasSupportedRole: REPLACEME # need to specify args
+        isDepositQueue: REPLACEME # need to specify args
+        isPausedQueue: REPLACEME # need to specify args
+        onERC721Received: REPLACEME # need to specify args
+        oracle: REPLACEME # 0x0000000000000000000000000000000000000000
+        queueAt: REPLACEME # need to specify args
+        queueLimit: REPLACEME # 0
+        redeemQueueFactory: REPLACEME # 0xfe76b5fd238553D65Ce6dd0A572C0fda629F8421
+        riskManager: REPLACEME # 0x0000000000000000000000000000000000000000
+        shareManager: REPLACEME # 0x0000000000000000000000000000000000000000
+        subvaultAt: REPLACEME # need to specify args
+        subvaultFactory: REPLACEME # 0x75FE0d73d3C64cdC1C6449D9F977Be6857c4d011
+        subvaults: REPLACEME # 0
+        supportedRoleAt: REPLACEME # need to specify args
+        supportedRoles: REPLACEME # 0
+        supportsInterface: REPLACEME # need to specify args
+        verifierFactory: REPLACEME # 0x04B30b1e98950e6A13550d84e991bE0d734C2c61
+    bitmaskVerifier:
+      name: BitmaskVerifier
+      address: *bitmaskVerifier
+      checks:
+        calculateHash: REPLACEME # need to specify args
+        verifyCall: REPLACEME # need to specify args
+    eigenLayerVerifierFactory:
+      name: TransparentUpgradeableProxy
+      address: *eigenLayerVerifierFactory
+      checks: {}
+    eigenLayerVerifier:
+      name: EigenLayerVerifier
+      address: *eigenLayerVerifier
+      checks:
+        ASSET_ROLE: REPLACEME # 0x7a2ed8c36fc77fb21dfb67d40423dad2ecf5e9539694580ecb4f6aaec99d266e
+        CALLER_ROLE: REPLACEME # 0x429987c65ae1b21d36923ef95ce6fcd59f7bf9663738a09ee8eefcf6f777562b
+        DEFAULT_ADMIN_ROLE: REPLACEME # 0x0000000000000000000000000000000000000000000000000000000000000000
+        MELLOW_VAULT_ROLE: REPLACEME # 0x935fd7b940d597b587bde3e2081c175c3c2ef95cd30a83492573ee0907ad6aaa
+        OPERATOR_ROLE: REPLACEME # 0xcf0cbc050f25c592622c05ff9a7f25030deea63c230fa4d7b8d226d8c0837201
+        RECEIVER_ROLE: REPLACEME # 0x59b484ad6f5409567fc5a4860c4c34866eec78f8cc4024ed3e17efb0f215d8db
+        STRATEGY_ROLE: REPLACEME # 0x2eab4b6bd944eae98f56071c3f2866a8355e10331fc8a04157ddf9ee0feff1e0
+        delegationManager: REPLACEME # 0x39053D51B77DC0d36036Fc1fCc8Cb819df8Ef37A
+        getRoleAdmin: REPLACEME # need to specify args
+        getRoleMember: REPLACEME # need to specify args
+        getRoleMemberCount: REPLACEME # need to specify args
+        getRoleMembers: REPLACEME # need to specify args
+        hasRole: REPLACEME # need to specify args
+        hasSupportedRole: REPLACEME # need to specify args
+        rewardsCoordinator: REPLACEME # 0x7750d328b314EfFa365A0402CcfD489B80B0adda
+        strategyManager: REPLACEME # 0x858646372CC42E1A627fcE94aa7A7033e7CF075A
+        supportedRoleAt: REPLACEME # need to specify args
+        supportedRoles: REPLACEME # 0
+        supportsInterface: REPLACEME # need to specify args
+        verifyCall: REPLACEME # need to specify args
+    ERC20VerifierFactory:
+      name: Factory
+      address: *ERC20VerifierFactory
+      proxyName: TransparentUpgradeableProxy
+      implementation: "0x0000000397b71c8f3182fd40d247330d218fdc72"
+      proxyChecks: {}
+      checks:
+        entities: REPLACEME # 0
+        entityAt: REPLACEME # need to specify args
+        implementationAt: REPLACEME # need to specify args
+        implementations: REPLACEME # 1
+        isBlacklisted: REPLACEME # need to specify args
+        isEntity: REPLACEME # need to specify args
+        owner: REPLACEME # 0x81698f87C6482bF1ce9bFcfC0F103C4A0Adf0Af0
+        proposalAt: REPLACEME # need to specify args
+        proposals: REPLACEME # 0
+      implementationChecks:
+        entities: REPLACEME # 0
+        entityAt: REPLACEME # need to specify args
+        implementationAt: REPLACEME # need to specify args
+        implementations: REPLACEME # 0
+        isBlacklisted: REPLACEME # need to specify args
+        isEntity: REPLACEME # need to specify args
+        owner: REPLACEME # 0x0000000000000000000000000000000000000000
+        proposalAt: REPLACEME # need to specify args
+        proposals: REPLACEME # 0
+    ERC20Verifier:
+      name: ERC20Verifier
+      address: *ERC20Verifier
+      checks:
+        ASSET_ROLE: REPLACEME # 0x8b4b1250247f1cbb35f7f69415df3cf642553a6953f81fae69e135c5feefc94b
+        CALLER_ROLE: REPLACEME # 0xc896aac795f7376adc96049886670c0e28cf66652e338a4139e37d2503456058
+        DEFAULT_ADMIN_ROLE: REPLACEME # 0x0000000000000000000000000000000000000000000000000000000000000000
+        RECIPIENT_ROLE: REPLACEME # 0x7c6c5b36d31deb1f0c3cbcc15c12c0be85fe383faacee29701116ad6cfb3a29a
+        getRoleAdmin: REPLACEME # need to specify args
+        getRoleMember: REPLACEME # need to specify args
+        getRoleMemberCount: REPLACEME # need to specify args
+        getRoleMembers: REPLACEME # need to specify args
+        hasRole: REPLACEME # need to specify args
+        hasSupportedRole: REPLACEME # need to specify args
+        supportedRoleAt: REPLACEME # need to specify args
+        supportedRoles: REPLACEME # 0
+        supportsInterface: REPLACEME # need to specify args
+        verifyCall: REPLACEME # need to specify args
+    symbioticVerifierFactory:
+      name: Factory
+      address: *symbioticVerifierFactory
+      proxyName: TransparentUpgradeableProxy
+      implementation: "0x0000000397b71c8f3182fd40d247330d218fdc72"
+      proxyChecks: {}
+      checks:
+        entities: REPLACEME # 0
+        entityAt: REPLACEME # need to specify args
+        implementationAt: REPLACEME # need to specify args
+        implementations: REPLACEME # 1
+        isBlacklisted: REPLACEME # need to specify args
+        isEntity: REPLACEME # need to specify args
+        owner: REPLACEME # 0x81698f87C6482bF1ce9bFcfC0F103C4A0Adf0Af0
+        proposalAt: REPLACEME # need to specify args
+        proposals: REPLACEME # 0
+      implementationChecks:
+        entities: REPLACEME # 0
+        entityAt: REPLACEME # need to specify args
+        implementationAt: REPLACEME # need to specify args
+        implementations: REPLACEME # 0
+        isBlacklisted: REPLACEME # need to specify args
+        isEntity: REPLACEME # need to specify args
+        owner: REPLACEME # 0x0000000000000000000000000000000000000000
+        proposalAt: REPLACEME # need to specify args
+        proposals: REPLACEME # 0
+    symbioticVerifier:
+      name: SymbioticVerifier
+      address: *symbioticVerifier
+      checks:
+        CALLER_ROLE: REPLACEME # 0x3b48a429628aa7e067d22e77e8f4703a9d84dc4efdabe07716c4d0322e7f2714
+        DEFAULT_ADMIN_ROLE: REPLACEME # 0x0000000000000000000000000000000000000000000000000000000000000000
+        MELLOW_VAULT_ROLE: REPLACEME # 0xabf80feb2ee273d208fadd5ac778f2fc719588bcc130607c0fcddd743ce6f6c1
+        SYMBIOTIC_FARM_ROLE: REPLACEME # 0xefe4de88b49c8b8f17f4c2ff9d6f775c4747e6bf57255a802349a8ebf4842239
+        SYMBIOTIC_VAULT_ROLE: REPLACEME # 0x909c8b12bf402721ba65c08a75ac086b15941cd32bcb6ecba9dc69a7757d1ca9
+        farmFactory: REPLACEME # 0xFEB871581C2ab2e1EEe6f7dDC7e6246cFa087A23
+        getRoleAdmin: REPLACEME # need to specify args
+        getRoleMember: REPLACEME # need to specify args
+        getRoleMemberCount: REPLACEME # need to specify args
+        getRoleMembers: REPLACEME # need to specify args
+        hasRole: REPLACEME # need to specify args
+        hasSupportedRole: REPLACEME # need to specify args
+        supportedRoleAt: REPLACEME # need to specify args
+        supportedRoles: REPLACEME # 0
+        supportsInterface: REPLACEME # need to specify args
+        vaultFactory: REPLACEME # 0xAEb6bdd95c502390db8f52c8909F703E9Af6a346
+        verifyCall: REPLACEME # need to specify args
+    vaultConfigurator:
+      name: VaultConfigurator
+      address: *vaultConfigurator
+      checks:
+        feeManagerFactory: REPLACEME # 0xF7223356819Ea48f25880b6c2ab3e907CC336D45
+        oracleFactory: REPLACEME # 0x0CdFf250C7a071fdc72340D820C5C8e29507Aaad
+        riskManagerFactory: REPLACEME # 0xa51E4FA916b939Fa451520D2B7600c740d86E5A0
+        shareManagerFactory: REPLACEME # 0x952f39AA62E94db3Ad0d1C7D1E43C1a8519E45D8
+        vaultFactory: REPLACEME # 0x4E38F679e46B3216f0bd4B314E9C429AFfB1dEE3
+    basicRedeemHook:
+      name: BasicRedeemHook
+      address: *basicRedeemHook
+      checks:
+        getLiquidAssets: REPLACEME # need to specify args
+    redirectingDepositHook:
+      name: RedirectingDepositHook
+      address: *redirectingDepositHook
+      checks: {}
+    lidoDepositHook:
+      name: LidoDepositHook
+      address: *lidoDepositHook
+      checks:
+        nextHook: REPLACEME # 0x00000004d3B17e5391eb571dDb8fDF95646ca827
+        steth: REPLACEME # 0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84
+        weth: REPLACEME # 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2
+        wsteth: REPLACEME # 0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0
+    oracleHelper:
+      name: OracleHelper
+      address: *oracleHelper
+      checks:
+        getPricesD18: REPLACEME # need to specify args
+    vault:
+      name: Vault
+      address: *vault
+      proxyName: TransparentUpgradeableProxy
+      implementation: "0x0000000615b2771511daa693ac07be5622869e01"
+      proxyChecks: {}
+      checks:
+        CREATE_QUEUE_ROLE: REPLACEME # 0x6788636e7899d6d227901dc9f8c4c785401c0991724cf908dc65388af686da6f
+        CREATE_SUBVAULT_ROLE: REPLACEME # 0x85c2023fdfb1e93dedf5d18f9bc0e79347e071d12740ba71aeb84a4fcbdc4b79
+        DEFAULT_ADMIN_ROLE: REPLACEME # 0x0000000000000000000000000000000000000000000000000000000000000000
+        DISCONNECT_SUBVAULT_ROLE: REPLACEME # 0xf610639f4b9b8986f875fcb4e49486da5c7aa449a6942b5013fabd061e9b9fff
+        PULL_LIQUIDITY_ROLE: REPLACEME # 0x68895691ff006f290ca74825ce06ed17fffab55af49f0274f49b7424f752583a
+        PUSH_LIQUIDITY_ROLE: REPLACEME # 0x32a781031f04cc60b32394e40124d1e87f54273bf26d0532a115a424f6a93298
+        RECONNECT_SUBVAULT_ROLE: REPLACEME # 0xb557d53a2e72d8333ffa3bf2f556678becb5e995b0e25b7dca354627e550c08f
+        REMOVE_QUEUE_ROLE: REPLACEME # 0x9a4c49d6fb9452bbfe187968075d0fac7d7202d2b7f731d8cffbce9cf66756b2
+        SET_HOOK_ROLE: REPLACEME # 0x627f9e4ac2dadb64d045e7e6333c09f39ed34e0e066957955d0052b46d2e83e8
+        SET_QUEUE_LIMIT_ROLE: REPLACEME # 0x407fc42eadf1aba68b1d4a8c3c4aa2e8b6beac7957623f3694d0ad77bfb70e06
+        SET_QUEUE_STATUS_ROLE: REPLACEME # 0x6618a6d92147bbcacfb2ef2375976fc4c529eeeaeb72a66048296571370c6946
+        assetAt: REPLACEME # need to specify args
+        claimableSharesOf: REPLACEME # need to specify args
+        defaultDepositHook: REPLACEME # 0x00000004d3B17e5391eb571dDb8fDF95646ca827
+        defaultRedeemHook: REPLACEME # 0x0000000637f1b1ccDA4Af2dB6CDDf5e5Ec45fd93
+        depositQueueFactory: REPLACEME # 0xBB92A7B9695750e1234BaB18F83b73686dd09854
+        feeManager: REPLACEME # 0x24FD64EB4766d91FD79a4D5e8086b2460dEBcaE7
+        getAssetCount: REPLACEME # 3
+        getHook: REPLACEME # need to specify args
+        getLiquidAssets: REPLACEME # view call reverted
+        getQueueCount: REPLACEME # need to specify args
+        getRoleAdmin: REPLACEME # need to specify args
+        getRoleMember: REPLACEME # need to specify args
+        getRoleMemberCount: REPLACEME # need to specify args
+        getRoleMembers: REPLACEME # need to specify args
+        getStorageAt: REPLACEME # need to specify args
+        hasAsset: REPLACEME # need to specify args
+        hasQueue: REPLACEME # need to specify args
+        hasRole: REPLACEME # need to specify args
+        hasSubvault: REPLACEME # need to specify args
+        hasSupportedRole: REPLACEME # need to specify args
+        isDepositQueue: REPLACEME # need to specify args
+        isPausedQueue: REPLACEME # need to specify args
+        onERC721Received: REPLACEME # need to specify args
+        oracle: REPLACEME # 0x8a78e6b7E15C4Ae3aeAeE3bf0DE4F2de4078c1cD
+        queueAt: REPLACEME # need to specify args
+        queueLimit: REPLACEME # 4
+        redeemQueueFactory: REPLACEME # 0xfe76b5fd238553D65Ce6dd0A572C0fda629F8421
+        riskManager: REPLACEME # 0x4f6bc03537C6F74E250f57a9a7238087caBF1c6D
+        shareManager: REPLACEME # 0xcd3c0F51798D1daA92Fb192E57844Ae6cEE8a6c7
+        subvaultAt: REPLACEME # need to specify args
+        subvaultFactory: REPLACEME # 0x75FE0d73d3C64cdC1C6449D9F977Be6857c4d011
+        subvaults: REPLACEME # 4
+        supportedRoleAt: REPLACEME # need to specify args
+        supportedRoles: REPLACEME # 16
+        supportsInterface: REPLACEME # need to specify args
+        verifierFactory: REPLACEME # 0x04B30b1e98950e6A13550d84e991bE0d734C2c61
+      implementationChecks:
+        CREATE_QUEUE_ROLE: REPLACEME # 0x6788636e7899d6d227901dc9f8c4c785401c0991724cf908dc65388af686da6f
+        CREATE_SUBVAULT_ROLE: REPLACEME # 0x85c2023fdfb1e93dedf5d18f9bc0e79347e071d12740ba71aeb84a4fcbdc4b79
+        DEFAULT_ADMIN_ROLE: REPLACEME # 0x0000000000000000000000000000000000000000000000000000000000000000
+        DISCONNECT_SUBVAULT_ROLE: REPLACEME # 0xf610639f4b9b8986f875fcb4e49486da5c7aa449a6942b5013fabd061e9b9fff
+        PULL_LIQUIDITY_ROLE: REPLACEME # 0x68895691ff006f290ca74825ce06ed17fffab55af49f0274f49b7424f752583a
+        PUSH_LIQUIDITY_ROLE: REPLACEME # 0x32a781031f04cc60b32394e40124d1e87f54273bf26d0532a115a424f6a93298
+        RECONNECT_SUBVAULT_ROLE: REPLACEME # 0xb557d53a2e72d8333ffa3bf2f556678becb5e995b0e25b7dca354627e550c08f
+        REMOVE_QUEUE_ROLE: REPLACEME # 0x9a4c49d6fb9452bbfe187968075d0fac7d7202d2b7f731d8cffbce9cf66756b2
+        SET_HOOK_ROLE: REPLACEME # 0x627f9e4ac2dadb64d045e7e6333c09f39ed34e0e066957955d0052b46d2e83e8
+        SET_QUEUE_LIMIT_ROLE: REPLACEME # 0x407fc42eadf1aba68b1d4a8c3c4aa2e8b6beac7957623f3694d0ad77bfb70e06
+        SET_QUEUE_STATUS_ROLE: REPLACEME # 0x6618a6d92147bbcacfb2ef2375976fc4c529eeeaeb72a66048296571370c6946
+        assetAt: REPLACEME # need to specify args
+        claimableSharesOf: REPLACEME # need to specify args
+        defaultDepositHook: REPLACEME # 0x0000000000000000000000000000000000000000
+        defaultRedeemHook: REPLACEME # 0x0000000000000000000000000000000000000000
+        depositQueueFactory: REPLACEME # 0xBB92A7B9695750e1234BaB18F83b73686dd09854
+        feeManager: REPLACEME # 0x0000000000000000000000000000000000000000
+        getAssetCount: REPLACEME # 0
+        getHook: REPLACEME # need to specify args
+        getLiquidAssets: REPLACEME # view call reverted
+        getQueueCount: REPLACEME # need to specify args
+        getRoleAdmin: REPLACEME # need to specify args
+        getRoleMember: REPLACEME # need to specify args
+        getRoleMemberCount: REPLACEME # need to specify args
+        getRoleMembers: REPLACEME # need to specify args
+        getStorageAt: REPLACEME # need to specify args
+        hasAsset: REPLACEME # need to specify args
+        hasQueue: REPLACEME # need to specify args
+        hasRole: REPLACEME # need to specify args
+        hasSubvault: REPLACEME # need to specify args
+        hasSupportedRole: REPLACEME # need to specify args
+        isDepositQueue: REPLACEME # need to specify args
+        isPausedQueue: REPLACEME # need to specify args
+        onERC721Received: REPLACEME # need to specify args
+        oracle: REPLACEME # 0x0000000000000000000000000000000000000000
+        queueAt: REPLACEME # need to specify args
+        queueLimit: REPLACEME # 0
+        redeemQueueFactory: REPLACEME # 0xfe76b5fd238553D65Ce6dd0A572C0fda629F8421
+        riskManager: REPLACEME # 0x0000000000000000000000000000000000000000
+        shareManager: REPLACEME # 0x0000000000000000000000000000000000000000
+        subvaultAt: REPLACEME # need to specify args
+        subvaultFactory: REPLACEME # 0x75FE0d73d3C64cdC1C6449D9F977Be6857c4d011
+        subvaults: REPLACEME # 0
+        supportedRoleAt: REPLACEME # need to specify args
+        supportedRoles: REPLACEME # 0
+        supportsInterface: REPLACEME # need to specify args
+        verifierFactory: REPLACEME # 0x04B30b1e98950e6A13550d84e991bE0d734C2c61
+    depositQueueETH:
+      name: DepositQueue
+      address: *depositQueueETH
+      proxyName: TransparentUpgradeableProxy
+      implementation: "0x00000006da9f179bfe250dd1c51cd2d3581930c8"
+      proxyChecks: {}
+      checks:
+        asset: REPLACEME # 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE
+        canBeRemoved: REPLACEME # false
+        claimableOf: REPLACEME # need to specify args
+        requestOf: REPLACEME # need to specify args
+        unclaimedRequests: REPLACEME # 3
+        vault: REPLACEME # 0x277C6A642564A91ff78b008022D65683cEE5CCC5
+      implementationChecks:
+        asset: REPLACEME # 0x0000000000000000000000000000000000000000
+        canBeRemoved: REPLACEME # true
+        claimableOf: REPLACEME # need to specify args
+        requestOf: REPLACEME # need to specify args
+        unclaimedRequests: REPLACEME # 0
+        vault: REPLACEME # 0x0000000000000000000000000000000000000000
+    depositQueueWETH:
+      name: TransparentUpgradeableProxy
+      address: *depositQueueWETH
+      checks: {}
+    depositQueueWSTETH:
+      name: DepositQueue
+      address: *depositQueueWSTETH
+      proxyName: TransparentUpgradeableProxy
+      implementation: "0x00000006da9f179bfe250dd1c51cd2d3581930c8"
+      proxyChecks: {}
+      checks:
+        asset: REPLACEME # 0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0
+        canBeRemoved: REPLACEME # false
+        claimableOf: REPLACEME # need to specify args
+        requestOf: REPLACEME # need to specify args
+        unclaimedRequests: REPLACEME # 2
+        vault: REPLACEME # 0x277C6A642564A91ff78b008022D65683cEE5CCC5
+      implementationChecks:
+        asset: REPLACEME # 0x0000000000000000000000000000000000000000
+        canBeRemoved: REPLACEME # true
+        claimableOf: REPLACEME # need to specify args
+        requestOf: REPLACEME # need to specify args
+        unclaimedRequests: REPLACEME # 0
+        vault: REPLACEME # 0x0000000000000000000000000000000000000000
+    redeemQueueWSTETH:
+      name: RedeemQueue
+      address: *redeemQueueWSTETH
+      proxyName: TransparentUpgradeableProxy
+      implementation: "0x0000000285805eac535daddb9648f1e10dfdc411"
+      proxyChecks: {}
+      checks:
+        asset: REPLACEME # 0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0
+        batchAt: REPLACEME # need to specify args
+        canBeRemoved: REPLACEME # false
+        getState: REPLACEME # 3,4,82409923405945,0
+        requestsOf: REPLACEME # need to specify args
+        vault: REPLACEME # 0x277C6A642564A91ff78b008022D65683cEE5CCC5
+      implementationChecks:
+        asset: REPLACEME # 0x0000000000000000000000000000000000000000
+        batchAt: REPLACEME # need to specify args
+        canBeRemoved: REPLACEME # true
+        getState: REPLACEME # 0,0,0,0
+        requestsOf: REPLACEME # need to specify args
+        vault: REPLACEME # 0x0000000000000000000000000000000000000000
+    oracle:
+      name: Oracle
+      address: *oracle
+      proxyName: TransparentUpgradeableProxy
+      implementation: "0x0000000f0d3d1c31b72368366a4049c05e291d58"
+      proxyChecks: {}
+      checks:
+        ACCEPT_REPORT_ROLE: REPLACEME # 0x341f4b58682c3a888bdb3eb9a8a4452a6e847be8a380eb3d742794b4f9ac0ab3
+        ADD_SUPPORTED_ASSETS_ROLE: REPLACEME # 0x73c07eddbe5b5274995c8e6cbe94d644cedc04911df3baf934188d230ca7a2cd
+        REMOVE_SUPPORTED_ASSETS_ROLE: REPLACEME # 0x748ab7827e75e9f34387e3ded8598f06eb04cc7bb90fff07bc6dc2a748377021
+        SET_SECURITY_PARAMS_ROLE: REPLACEME # 0x79abe62d91dbd05fcda41b212f4c8c1f1d8be54ccddf859de3ccd1361b71fcb6
+        SUBMIT_REPORTS_ROLE: REPLACEME # 0xb54eea9408efadf36da92cc5ecd8af0f45d6dd90de54634bbc5a2113ddcb505d
+        getReport: REPLACEME # need to specify args
+        isSupportedAsset: REPLACEME # need to specify args
+        securityParams: REPLACEME # 5000000000000000,1000000000000000,5000000000000000,1000000000000000,72000,3600,172800
+        supportedAssetAt: REPLACEME # need to specify args
+        supportedAssets: REPLACEME # 6
+        validatePrice: REPLACEME # need to specify args
+        vault: REPLACEME # 0x277C6A642564A91ff78b008022D65683cEE5CCC5
+      implementationChecks:
+        ACCEPT_REPORT_ROLE: REPLACEME # 0x341f4b58682c3a888bdb3eb9a8a4452a6e847be8a380eb3d742794b4f9ac0ab3
+        ADD_SUPPORTED_ASSETS_ROLE: REPLACEME # 0x73c07eddbe5b5274995c8e6cbe94d644cedc04911df3baf934188d230ca7a2cd
+        REMOVE_SUPPORTED_ASSETS_ROLE: REPLACEME # 0x748ab7827e75e9f34387e3ded8598f06eb04cc7bb90fff07bc6dc2a748377021
+        SET_SECURITY_PARAMS_ROLE: REPLACEME # 0x79abe62d91dbd05fcda41b212f4c8c1f1d8be54ccddf859de3ccd1361b71fcb6
+        SUBMIT_REPORTS_ROLE: REPLACEME # 0xb54eea9408efadf36da92cc5ecd8af0f45d6dd90de54634bbc5a2113ddcb505d
+        getReport: REPLACEME # need to specify args
+        isSupportedAsset: REPLACEME # need to specify args
+        securityParams: REPLACEME # 0,0,0,0,0,0,0
+        supportedAssetAt: REPLACEME # need to specify args
+        supportedAssets: REPLACEME # 0
+        validatePrice: REPLACEME # need to specify args
+        vault: REPLACEME # 0x0000000000000000000000000000000000000000
+    shareManager:
+      name: TokenizedShareManager
+      address: *shareManager
+      proxyName: TransparentUpgradeableProxy
+      implementation: "0x0000000e8eb7173fa1a3ba60eca325bcb6aaf378"
+      proxyChecks: {}
+      checks:
+        SET_ACCOUNT_INFO_ROLE: REPLACEME # 0x58258f737b9cea9d7da81a3a12943f800a9668a2494235fec0d84cc60ad04cff
+        SET_FLAGS_ROLE: REPLACEME # 0x78b235a1fa2fd5e00dba7867d599bed6f088684010a7fee7b9fe05fa1082d01e
+        SET_WHITELIST_MERKLE_ROOT_ROLE: REPLACEME # 0xca196afb47c2d16c8388ba0ef201b98a808acb83a856576ffc57360840a5fd99
+        accounts: REPLACEME # need to specify args
+        activeShares: REPLACEME # 1013648601579655124
+        activeSharesOf: REPLACEME # need to specify args
+        allocatedShares: REPLACEME # 2043865286274162
+        allowance: REPLACEME # need to specify args
+        balanceOf: REPLACEME # need to specify args
+        claimableSharesOf: REPLACEME # need to specify args
+        decimals: REPLACEME # 18
+        flags: REPLACEME # false,false,false,false,false,0
+        isDepositorWhitelisted: REPLACEME # need to specify args
+        name: REPLACEME # Mellow stRATEGY
+        sharesOf: REPLACEME # need to specify args
+        symbol: REPLACEME # strETH
+        totalShares: REPLACEME # 1015692466865929286
+        totalSupply: REPLACEME # 1013648601579655124
+        updateChecks: REPLACEME # need to specify args
+        vault: REPLACEME # 0x277C6A642564A91ff78b008022D65683cEE5CCC5
+        whitelistMerkleRoot: REPLACEME # 0x0000000000000000000000000000000000000000000000000000000000000000
+      implementationChecks:
+        SET_ACCOUNT_INFO_ROLE: REPLACEME # 0x58258f737b9cea9d7da81a3a12943f800a9668a2494235fec0d84cc60ad04cff
+        SET_FLAGS_ROLE: REPLACEME # 0x78b235a1fa2fd5e00dba7867d599bed6f088684010a7fee7b9fe05fa1082d01e
+        SET_WHITELIST_MERKLE_ROOT_ROLE: REPLACEME # 0xca196afb47c2d16c8388ba0ef201b98a808acb83a856576ffc57360840a5fd99
+        accounts: REPLACEME # need to specify args
+        activeShares: REPLACEME # 0
+        activeSharesOf: REPLACEME # need to specify args
+        allocatedShares: REPLACEME # 0
+        allowance: REPLACEME # need to specify args
+        balanceOf: REPLACEME # need to specify args
+        claimableSharesOf: REPLACEME # need to specify args
+        decimals: REPLACEME # 18
+        flags: REPLACEME # false,false,false,false,false,0
+        isDepositorWhitelisted: REPLACEME # need to specify args
+        name: REPLACEME #
+        sharesOf: REPLACEME # need to specify args
+        symbol: REPLACEME #
+        totalShares: REPLACEME # 0
+        totalSupply: REPLACEME # 0
+        updateChecks: REPLACEME # need to specify args
+        vault: REPLACEME # 0x0000000000000000000000000000000000000000
+        whitelistMerkleRoot: REPLACEME # 0x0000000000000000000000000000000000000000000000000000000000000000
+    feeManager:
+      name: FeeManager
+      address: *feeManager
+      proxyName: TransparentUpgradeableProxy
+      implementation: "0x0000000de74e5d51651326e0a3e1aca94beaf6e1"
+      proxyChecks: {}
+      checks:
+        baseAsset: REPLACEME # need to specify args
+        calculateDepositFee: REPLACEME # need to specify args
+        calculateFee: REPLACEME # need to specify args
+        calculateRedeemFee: REPLACEME # need to specify args
+        depositFeeD6: REPLACEME # 0
+        feeRecipient: REPLACEME # 0xb1E5a8F26C43d019f2883378548a350ecdD1423B
+        minPriceD18: REPLACEME # need to specify args
+        owner: REPLACEME # 0xAbE20D266Ae54b9Ae30492dEa6B6407bF18fEeb5
+        performanceFeeD6: REPLACEME # 100000
+        protocolFeeD6: REPLACEME # 10000
+        redeemFeeD6: REPLACEME # 0
+        timestamps: REPLACEME # need to specify args
+      implementationChecks:
+        baseAsset: REPLACEME # need to specify args
+        calculateDepositFee: REPLACEME # need to specify args
+        calculateFee: REPLACEME # need to specify args
+        calculateRedeemFee: REPLACEME # need to specify args
+        depositFeeD6: REPLACEME # 0
+        feeRecipient: REPLACEME # 0x0000000000000000000000000000000000000000
+        minPriceD18: REPLACEME # need to specify args
+        owner: REPLACEME # 0x0000000000000000000000000000000000000000
+        performanceFeeD6: REPLACEME # 0
+        protocolFeeD6: REPLACEME # 0
+        redeemFeeD6: REPLACEME # 0
+        timestamps: REPLACEME # need to specify args
+    riskManager:
+      name: RiskManager
+      address: *riskManager
+      proxyName: TransparentUpgradeableProxy
+      implementation: "0x0000000714cf2851bac1ae2f41871862e9d216fd"
+      proxyChecks: {}
+      checks:
+        ALLOW_SUBVAULT_ASSETS_ROLE: REPLACEME # 0x4a899e3e648ea55418d9c99177e5c522df621b1953c0ad7e99da3711043ba1c1
+        DISALLOW_SUBVAULT_ASSETS_ROLE: REPLACEME # 0x35c8c55cb15b3aef15751488f551edf793583e377f8951cf9738f035a1649ec5
+        MODIFY_PENDING_ASSETS_ROLE: REPLACEME # 0xcaa6b67a612f0bc4bdf15a48dde19f543e93099681b3ceaee93d630e38bcff38
+        MODIFY_SUBVAULT_BALANCE_ROLE: REPLACEME # 0xa7ecfd54b0ab6ce6ecc88746fe62beba4e9a103dbb00d88cfedffbc0c6069ce8
+        MODIFY_VAULT_BALANCE_ROLE: REPLACEME # 0x94b8a54d503c6b752e707c591f9345ae8ccc138255588e460ee15622d499fdba
+        SET_SUBVAULT_LIMIT_ROLE: REPLACEME # 0x253eb39d0edc77da10bbc4bcaa23c44e40e3c67ed649fbecb18a3f7c51bfbb10
+        SET_VAULT_LIMIT_ROLE: REPLACEME # 0x2b2a32ecca586a148d15aea321ddbb421a2a3ac6b4d56c0a9ad9de32e84cf5c4
+        allowedAssetAt: REPLACEME # need to specify args
+        allowedAssets: REPLACEME # need to specify args
+        convertToShares: REPLACEME # need to specify args
+        isAllowedAsset: REPLACEME # need to specify args
+        maxDeposit: REPLACEME # need to specify args
+        pendingAssets: REPLACEME # need to specify args
+        pendingBalance: REPLACEME # 0
+        pendingShares: REPLACEME # need to specify args
+        requireValidSubvault: REPLACEME # need to specify args
+        subvaultState: REPLACEME # need to specify args
+        vault: REPLACEME # 0x277C6A642564A91ff78b008022D65683cEE5CCC5
+        vaultState: REPLACEME # 1015441010233563903,28948022309329048855892746252171976963317496166410141009864396001978282409983
+      implementationChecks:
+        ALLOW_SUBVAULT_ASSETS_ROLE: REPLACEME # 0x4a899e3e648ea55418d9c99177e5c522df621b1953c0ad7e99da3711043ba1c1
+        DISALLOW_SUBVAULT_ASSETS_ROLE: REPLACEME # 0x35c8c55cb15b3aef15751488f551edf793583e377f8951cf9738f035a1649ec5
+        MODIFY_PENDING_ASSETS_ROLE: REPLACEME # 0xcaa6b67a612f0bc4bdf15a48dde19f543e93099681b3ceaee93d630e38bcff38
+        MODIFY_SUBVAULT_BALANCE_ROLE: REPLACEME # 0xa7ecfd54b0ab6ce6ecc88746fe62beba4e9a103dbb00d88cfedffbc0c6069ce8
+        MODIFY_VAULT_BALANCE_ROLE: REPLACEME # 0x94b8a54d503c6b752e707c591f9345ae8ccc138255588e460ee15622d499fdba
+        SET_SUBVAULT_LIMIT_ROLE: REPLACEME # 0x253eb39d0edc77da10bbc4bcaa23c44e40e3c67ed649fbecb18a3f7c51bfbb10
+        SET_VAULT_LIMIT_ROLE: REPLACEME # 0x2b2a32ecca586a148d15aea321ddbb421a2a3ac6b4d56c0a9ad9de32e84cf5c4
+        allowedAssetAt: REPLACEME # need to specify args
+        allowedAssets: REPLACEME # need to specify args
+        convertToShares: REPLACEME # need to specify args
+        isAllowedAsset: REPLACEME # need to specify args
+        maxDeposit: REPLACEME # need to specify args
+        pendingAssets: REPLACEME # need to specify args
+        pendingBalance: REPLACEME # 0
+        pendingShares: REPLACEME # need to specify args
+        requireValidSubvault: REPLACEME # need to specify args
+        subvaultState: REPLACEME # need to specify args
+        vault: REPLACEME # 0x0000000000000000000000000000000000000000
+        vaultState: REPLACEME # 0,0
+    subvault0:
+      name: Subvault
+      address: *subvault0
+      proxyName: TransparentUpgradeableProxy
+      implementation: "0x0000000e535b4e063f8372933a55470e67910a66"
+      proxyChecks: {}
+      checks:
+        getStorageAt: REPLACEME # need to specify args
+        onERC721Received: REPLACEME # need to specify args
+        vault: REPLACEME # 0x277C6A642564A91ff78b008022D65683cEE5CCC5
+        verifier: REPLACEME # 0xF4eA276361348b301Ba2296dB909a7c973A15451
+      implementationChecks:
+        getStorageAt: REPLACEME # need to specify args
+        onERC721Received: REPLACEME # need to specify args
+        vault: REPLACEME # 0x0000000000000000000000000000000000000000
+        verifier: REPLACEME # 0x0000000000000000000000000000000000000000
+    verifier0:
+      name: TransparentUpgradeableProxy
+      address: *verifier0
+      checks: {}
+    subvault1:
+      name: TransparentUpgradeableProxy
+      address: *subvault1
+      checks: {}
+    verifier1:
+      name: Verifier
+      address: *verifier1
+      proxyName: TransparentUpgradeableProxy
+      implementation: "0x000000047fc878662006e78d5174fb4285637966"
+      proxyChecks: {}
+      checks:
+        ALLOW_CALL_ROLE: REPLACEME # 0x7e8318b807524ed75f0b7cc82d3cd61e590497e7502a54c698a969fa62dc0a2e
+        CALLER_ROLE: REPLACEME # 0x877766a829235d063c3ba37802a4874fcf1b575d310fbe898df17d8ebabee463
+        DISALLOW_CALL_ROLE: REPLACEME # 0xf3354d076b52bf34f14c15ff5c85faef55353add7b5bb69cd8ac10c4b85748cf
+        SET_MERKLE_ROOT_ROLE: REPLACEME # 0xfc199f685d023b44b528c5fcb9cebfe292e64340dd5729b20761da4ad1e93024
+        allowedCallAt: REPLACEME # need to specify args
+        allowedCalls: REPLACEME # 0
+        getVerificationResult: REPLACEME # need to specify args
+        hashCall: REPLACEME # need to specify args
+        isAllowedCall: REPLACEME # need to specify args
+        merkleRoot: REPLACEME # 0x48037d48ff66b5b18badbb5f19bec5ec7b3cb0693c26b632fd718f2971099bc4
+        vault: REPLACEME # 0x277C6A642564A91ff78b008022D65683cEE5CCC5
+        verifyCall: REPLACEME # need to specify args
+      implementationChecks:
+        ALLOW_CALL_ROLE: REPLACEME # 0x7e8318b807524ed75f0b7cc82d3cd61e590497e7502a54c698a969fa62dc0a2e
+        CALLER_ROLE: REPLACEME # 0x877766a829235d063c3ba37802a4874fcf1b575d310fbe898df17d8ebabee463
+        DISALLOW_CALL_ROLE: REPLACEME # 0xf3354d076b52bf34f14c15ff5c85faef55353add7b5bb69cd8ac10c4b85748cf
+        SET_MERKLE_ROOT_ROLE: REPLACEME # 0xfc199f685d023b44b528c5fcb9cebfe292e64340dd5729b20761da4ad1e93024
+        allowedCallAt: REPLACEME # need to specify args
+        allowedCalls: REPLACEME # 0
+        getVerificationResult: REPLACEME # need to specify args
+        hashCall: REPLACEME # need to specify args
+        isAllowedCall: REPLACEME # need to specify args
+        merkleRoot: REPLACEME # 0x0000000000000000000000000000000000000000000000000000000000000000
+        vault: REPLACEME # 0x0000000000000000000000000000000000000000
+        verifyCall: REPLACEME # need to specify args
+    subvault2:
+      name: Subvault
+      address: *subvault2
+      proxyName: TransparentUpgradeableProxy
+      implementation: "0x0000000e535b4e063f8372933a55470e67910a66"
+      proxyChecks: {}
+      checks:
+        getStorageAt: REPLACEME # need to specify args
+        onERC721Received: REPLACEME # need to specify args
+        vault: REPLACEME # 0x277C6A642564A91ff78b008022D65683cEE5CCC5
+        verifier: REPLACEME # 0x1616d39a201D246cbD1B3B145234638f7719b53A
+      implementationChecks:
+        getStorageAt: REPLACEME # need to specify args
+        onERC721Received: REPLACEME # need to specify args
+        vault: REPLACEME # 0x0000000000000000000000000000000000000000
+        verifier: REPLACEME # 0x0000000000000000000000000000000000000000
+    verifier2:
+      name: Verifier
+      address: *verifier2
+      proxyName: TransparentUpgradeableProxy
+      implementation: "0x000000047fc878662006e78d5174fb4285637966"
+      proxyChecks: {}
+      checks:
+        ALLOW_CALL_ROLE: REPLACEME # 0x7e8318b807524ed75f0b7cc82d3cd61e590497e7502a54c698a969fa62dc0a2e
+        CALLER_ROLE: REPLACEME # 0x877766a829235d063c3ba37802a4874fcf1b575d310fbe898df17d8ebabee463
+        DISALLOW_CALL_ROLE: REPLACEME # 0xf3354d076b52bf34f14c15ff5c85faef55353add7b5bb69cd8ac10c4b85748cf
+        SET_MERKLE_ROOT_ROLE: REPLACEME # 0xfc199f685d023b44b528c5fcb9cebfe292e64340dd5729b20761da4ad1e93024
+        allowedCallAt: REPLACEME # need to specify args
+        allowedCalls: REPLACEME # 0
+        getVerificationResult: REPLACEME # need to specify args
+        hashCall: REPLACEME # need to specify args
+        isAllowedCall: REPLACEME # need to specify args
+        merkleRoot: REPLACEME # 0x080cb97443b335e08fc7bf37173844afad84b85e576a6494b827809dab86dc1d
+        vault: REPLACEME # 0x277C6A642564A91ff78b008022D65683cEE5CCC5
+        verifyCall: REPLACEME # need to specify args
+      implementationChecks:
+        ALLOW_CALL_ROLE: REPLACEME # 0x7e8318b807524ed75f0b7cc82d3cd61e590497e7502a54c698a969fa62dc0a2e
+        CALLER_ROLE: REPLACEME # 0x877766a829235d063c3ba37802a4874fcf1b575d310fbe898df17d8ebabee463
+        DISALLOW_CALL_ROLE: REPLACEME # 0xf3354d076b52bf34f14c15ff5c85faef55353add7b5bb69cd8ac10c4b85748cf
+        SET_MERKLE_ROOT_ROLE: REPLACEME # 0xfc199f685d023b44b528c5fcb9cebfe292e64340dd5729b20761da4ad1e93024
+        allowedCallAt: REPLACEME # need to specify args
+        allowedCalls: REPLACEME # 0
+        getVerificationResult: REPLACEME # need to specify args
+        hashCall: REPLACEME # need to specify args
+        isAllowedCall: REPLACEME # need to specify args
+        merkleRoot: REPLACEME # 0x0000000000000000000000000000000000000000000000000000000000000000
+        vault: REPLACEME # 0x0000000000000000000000000000000000000000
+        verifyCall: REPLACEME # need to specify args
+    subvault3:
+      name: Subvault
+      address: *subvault3
+      proxyName: TransparentUpgradeableProxy
+      implementation: "0x0000000e535b4e063f8372933a55470e67910a66"
+      proxyChecks: {}
+      checks:
+        getStorageAt: REPLACEME # need to specify args
+        onERC721Received: REPLACEME # need to specify args
+        vault: REPLACEME # 0x277C6A642564A91ff78b008022D65683cEE5CCC5
+        verifier: REPLACEME # 0xd662dF7C0FAF0Fe6446638651b05C287806AD1AE
+      implementationChecks:
+        getStorageAt: REPLACEME # need to specify args
+        onERC721Received: REPLACEME # need to specify args
+        vault: REPLACEME # 0x0000000000000000000000000000000000000000
+        verifier: REPLACEME # 0x0000000000000000000000000000000000000000
+    verifier3:
+      name: Verifier
+      address: *verifier3
+      proxyName: TransparentUpgradeableProxy
+      implementation: "0x000000047fc878662006e78d5174fb4285637966"
+      proxyChecks: {}
+      checks:
+        ALLOW_CALL_ROLE: REPLACEME # 0x7e8318b807524ed75f0b7cc82d3cd61e590497e7502a54c698a969fa62dc0a2e
+        CALLER_ROLE: REPLACEME # 0x877766a829235d063c3ba37802a4874fcf1b575d310fbe898df17d8ebabee463
+        DISALLOW_CALL_ROLE: REPLACEME # 0xf3354d076b52bf34f14c15ff5c85faef55353add7b5bb69cd8ac10c4b85748cf
+        SET_MERKLE_ROOT_ROLE: REPLACEME # 0xfc199f685d023b44b528c5fcb9cebfe292e64340dd5729b20761da4ad1e93024
+        allowedCallAt: REPLACEME # need to specify args
+        allowedCalls: REPLACEME # 0
+        getVerificationResult: REPLACEME # need to specify args
+        hashCall: REPLACEME # need to specify args
+        isAllowedCall: REPLACEME # need to specify args
+        merkleRoot: REPLACEME # 0xaf587542b69f03e03996b4fea8d8551076b6b9e44b745187b3eecd6a7f5b263e
+        vault: REPLACEME # 0x277C6A642564A91ff78b008022D65683cEE5CCC5
+        verifyCall: REPLACEME # need to specify args
+      implementationChecks:
+        ALLOW_CALL_ROLE: REPLACEME # 0x7e8318b807524ed75f0b7cc82d3cd61e590497e7502a54c698a969fa62dc0a2e
+        CALLER_ROLE: REPLACEME # 0x877766a829235d063c3ba37802a4874fcf1b575d310fbe898df17d8ebabee463
+        DISALLOW_CALL_ROLE: REPLACEME # 0xf3354d076b52bf34f14c15ff5c85faef55353add7b5bb69cd8ac10c4b85748cf
+        SET_MERKLE_ROOT_ROLE: REPLACEME # 0xfc199f685d023b44b528c5fcb9cebfe292e64340dd5729b20761da4ad1e93024
+        allowedCallAt: REPLACEME # need to specify args
+        allowedCalls: REPLACEME # 0
+        getVerificationResult: REPLACEME # need to specify args
+        hashCall: REPLACEME # need to specify args
+        isAllowedCall: REPLACEME # need to specify args
+        merkleRoot: REPLACEME # 0x0000000000000000000000000000000000000000000000000000000000000000
+        vault: REPLACEME # 0x0000000000000000000000000000000000000000
+        verifyCall: REPLACEME # need to specify args
+    timelockController:
+      name: TimelockController
+      address: *timelockController
+      checks:
+        CANCELLER_ROLE: REPLACEME # 0xfd643c72710c63c0180259aba6b2d05451e3591a24e58b62239378085726f783
+        DEFAULT_ADMIN_ROLE: REPLACEME # 0x0000000000000000000000000000000000000000000000000000000000000000
+        EXECUTOR_ROLE: REPLACEME # 0xd8aa0f3194971a2a116679f7c2090f6939c8d4e01a2a8d7e41d55e5351469e63
+        PROPOSER_ROLE: REPLACEME # 0xb09aa5aeb3702cfd50b6b62bc4532604938f21248a27a1d5ca736082b6819cc1
+        getMinDelay: REPLACEME # 0
+        getOperationState: REPLACEME # need to specify args
+        getRoleAdmin: REPLACEME # need to specify args
+        getTimestamp: REPLACEME # need to specify args
+        hasRole: REPLACEME # need to specify args
+        hashOperation: REPLACEME # need to specify args
+        hashOperationBatch: REPLACEME # need to specify args
+        isOperation: REPLACEME # need to specify args
+        isOperationDone: REPLACEME # need to specify args
+        isOperationPending: REPLACEME # need to specify args
+        isOperationReady: REPLACEME # need to specify args
+        supportsInterface: REPLACEME # need to specify args
+    PROXY_ADMIN:
+      name: GnosisSafe
+      address: *PROXY_ADMIN
+      proxyName: GnosisSafeProxy
+      implementation: "0xd9db270c1b5e3bd161e8c8503c55ceabee709552"
+      proxyChecks: {}
+      checks:
+        VERSION: 1.3.0
+        approvedHashes: REPLACEME # need to specify args
+        checkNSignatures: REPLACEME # need to specify args
+        checkSignatures: REPLACEME # need to specify args
+        domainSeparator: REPLACEME # 0x90468bd6f3155511c3cb7b455a07664de4779c3a328ac577fdd4cc584ee815d0
+        encodeTransactionData: REPLACEME # need to specify args
+        getChainId: 1
+        getModulesPaginated: REPLACEME # need to specify args
+        getOwners: REPLACEME # 0xEA685f0AF4A0BF5E7D6729b2C63eDF574D3EE27f,0xa94e4ADceC38074967b17F6e8856AB12368686B5,0xFB864C1127ff77215d0A8e652bB632F526A4A89f,0x59F8D74Fe49d5ebEAc069E3baf07eB4b614BD5A7,0x185111c113d9B19Ea4C424D3cD8628A1ee09Be6A,0x06C3992a6067bEA8FB3Af7F004EdEbC13656761F,0x44A388BBD782AE1D7f4542aEb6C3569E2CfdF5a1,0x8888843c607F4Bbd6aD72128F478085256Bdd15D
+        getStorageAt: REPLACEME # need to specify args
+        getThreshold: 5
+        getTransactionHash: REPLACEME # need to specify args
+        isModuleEnabled: REPLACEME # need to specify args
+        isOwner: REPLACEME # need to specify args
+        nonce: 16
+        signedMessages: REPLACEME # need to specify args
+      implementationChecks:
+        VERSION: 1.3.0
+        approvedHashes: REPLACEME # need to specify args
+        checkNSignatures: REPLACEME # need to specify args
+        checkSignatures: REPLACEME # need to specify args
+        domainSeparator: REPLACEME # 0xb0d1bc5d61a96b7e642e23eb0d9f7d3d53a1e9b75f5b28b8e68b1bdb8e9faecb
+        encodeTransactionData: REPLACEME # need to specify args
+        getChainId: REPLACEME # 1
+        getModulesPaginated: REPLACEME # need to specify args
+        getOwners: REPLACEME # view call reverted
+        getStorageAt: REPLACEME # need to specify args
+        getThreshold: REPLACEME # 1
+        getTransactionHash: REPLACEME # need to specify args
+        isModuleEnabled: REPLACEME # need to specify args
+        isOwner: REPLACEME # need to specify args
+        nonce: REPLACEME # 0
+        signedMessages: REPLACEME # need to specify args
+    LAZY_VAULT_ADMIN:
+      name: Safe
+      address: *ACTIVE_VAULT_ADMIN
+      proxyName: SafeProxy
+      implementation: "0x41675c099f32341bf84bfc5382af534df5c7461a"
+      proxyChecks: {}
+      checks:
+        VERSION: 1.4.1
+        approvedHashes: REPLACEME # need to specify args
+        checkNSignatures: REPLACEME # need to specify args
+        checkSignatures: REPLACEME # need to specify args
+        domainSeparator: REPLACEME # 0x2e6e927ecb0c9bf266fba6c2876a7917327dd50f5bd72fa31c1af94e264ce432
+        encodeTransactionData: REPLACEME # need to specify args
+        getChainId: 1
+        getModulesPaginated: REPLACEME # need to specify args
+        getOwners: REPLACEME # 0xe49384e6Aca6A26c82Eaa161A9211fA60fEee3Ef,0x185111c113d9B19Ea4C424D3cD8628A1ee09Be6A,0x06C3992a6067bEA8FB3Af7F004EdEbC13656761F,0x44A388BBD782AE1D7f4542aEb6C3569E2CfdF5a1,0x8888843c607F4Bbd6aD72128F478085256Bdd15D,0x1f3E4c3dBF27056CD7881D8eb376B1D7815757a6
+        getStorageAt: REPLACEME # need to specify args
+        getThreshold: REPLACEME # 3
+        getTransactionHash: REPLACEME # need to specify args
+        isModuleEnabled: REPLACEME # need to specify args
+        isOwner: REPLACEME # need to specify args
+        nonce: REPLACEME # 3
+        signedMessages: REPLACEME # need to specify args
+      implementationChecks:
+        VERSION: REPLACEME # 1.4.1
+        approvedHashes: REPLACEME # need to specify args
+        checkNSignatures: REPLACEME # need to specify args
+        checkSignatures: REPLACEME # need to specify args
+        domainSeparator: REPLACEME # 0xc4864056e21022913a49884ba9fb4035364d5c2ab8b40f0305583ae419c72f86
+        encodeTransactionData: REPLACEME # need to specify args
+        getChainId: REPLACEME # 1
+        getModulesPaginated: REPLACEME # need to specify args
+        getOwners: REPLACEME # view call reverted
+        getStorageAt: REPLACEME # need to specify args
+        getThreshold: REPLACEME # 1
+        getTransactionHash: REPLACEME # need to specify args
+        isModuleEnabled: REPLACEME # need to specify args
+        isOwner: REPLACEME # need to specify args
+        nonce: REPLACEME # 0
+        signedMessages: REPLACEME # need to specify args
+    ACTIVE_VAULT_ADMIN:
+      name: Safe
+      address: *ACTIVE_VAULT_ADMIN
+      proxyName: SafeProxy
+      implementation: "0x41675c099f32341bf84bfc5382af534df5c7461a"
+      proxyChecks: {}
+      checks:
+        VERSION: 1.4.1
+        approvedHashes: REPLACEME # need to specify args
+        checkNSignatures: REPLACEME # need to specify args
+        checkSignatures: REPLACEME # need to specify args
+        domainSeparator: REPLACEME # 0x2e6e927ecb0c9bf266fba6c2876a7917327dd50f5bd72fa31c1af94e264ce432
+        encodeTransactionData: REPLACEME # need to specify args
+        getChainId: 1
+        getModulesPaginated: REPLACEME # need to specify args
+        getOwners: REPLACEME # 0xe49384e6Aca6A26c82Eaa161A9211fA60fEee3Ef,0x185111c113d9B19Ea4C424D3cD8628A1ee09Be6A,0x06C3992a6067bEA8FB3Af7F004EdEbC13656761F,0x44A388BBD782AE1D7f4542aEb6C3569E2CfdF5a1,0x8888843c607F4Bbd6aD72128F478085256Bdd15D,0x1f3E4c3dBF27056CD7881D8eb376B1D7815757a6
+        getStorageAt: REPLACEME # need to specify args
+        getThreshold: REPLACEME # 3
+        getTransactionHash: REPLACEME # need to specify args
+        isModuleEnabled: REPLACEME # need to specify args
+        isOwner: REPLACEME # need to specify args
+        nonce: REPLACEME # 3
+        signedMessages: REPLACEME # need to specify args
+      implementationChecks:
+        VERSION: REPLACEME # 1.4.1
+        approvedHashes: REPLACEME # need to specify args
+        checkNSignatures: REPLACEME # need to specify args
+        checkSignatures: REPLACEME # need to specify args
+        domainSeparator: REPLACEME # 0xc4864056e21022913a49884ba9fb4035364d5c2ab8b40f0305583ae419c72f86
+        encodeTransactionData: REPLACEME # need to specify args
+        getChainId: REPLACEME # 1
+        getModulesPaginated: REPLACEME # need to specify args
+        getOwners: REPLACEME # view call reverted
+        getStorageAt: REPLACEME # need to specify args
+        getThreshold: REPLACEME # 1
+        getTransactionHash: REPLACEME # need to specify args
+        isModuleEnabled: REPLACEME # need to specify args
+        isOwner: REPLACEME # need to specify args
+        nonce: REPLACEME # 0
+        signedMessages: REPLACEME # need to specify args
+    ORACLE_UPDATER:
+      name: Safe
+      address: *ACTIVE_VAULT_ADMIN
+      proxyName: SafeProxy
+      implementation: "0x41675c099f32341bf84bfc5382af534df5c7461a"
+      proxyChecks: {}
+      checks:
+        VERSION: 1.4.1
+        approvedHashes: REPLACEME # need to specify args
+        checkNSignatures: REPLACEME # need to specify args
+        checkSignatures: REPLACEME # need to specify args
+        domainSeparator: REPLACEME # 0x2e6e927ecb0c9bf266fba6c2876a7917327dd50f5bd72fa31c1af94e264ce432
+        encodeTransactionData: REPLACEME # need to specify args
+        getChainId: 1
+        getModulesPaginated: REPLACEME # need to specify args
+        getOwners: REPLACEME # 0xe49384e6Aca6A26c82Eaa161A9211fA60fEee3Ef,0x185111c113d9B19Ea4C424D3cD8628A1ee09Be6A,0x06C3992a6067bEA8FB3Af7F004EdEbC13656761F,0x44A388BBD782AE1D7f4542aEb6C3569E2CfdF5a1,0x8888843c607F4Bbd6aD72128F478085256Bdd15D,0x1f3E4c3dBF27056CD7881D8eb376B1D7815757a6
+        getStorageAt: REPLACEME # need to specify args
+        getThreshold: REPLACEME # 3
+        getTransactionHash: REPLACEME # need to specify args
+        isModuleEnabled: REPLACEME # need to specify args
+        isOwner: REPLACEME # need to specify args
+        nonce: REPLACEME # 3
+        signedMessages: REPLACEME # need to specify args
+      implementationChecks:
+        VERSION: REPLACEME # 1.4.1
+        approvedHashes: REPLACEME # need to specify args
+        checkNSignatures: REPLACEME # need to specify args
+        checkSignatures: REPLACEME # need to specify args
+        domainSeparator: REPLACEME # 0xc4864056e21022913a49884ba9fb4035364d5c2ab8b40f0305583ae419c72f86
+        encodeTransactionData: REPLACEME # need to specify args
+        getChainId: REPLACEME # 1
+        getModulesPaginated: REPLACEME # need to specify args
+        getOwners: REPLACEME # view call reverted
+        getStorageAt: REPLACEME # need to specify args
+        getThreshold: REPLACEME # 1
+        getTransactionHash: REPLACEME # need to specify args
+        isModuleEnabled: REPLACEME # need to specify args
+        isOwner: REPLACEME # need to specify args
+        nonce: REPLACEME # 0
+        signedMessages: REPLACEME # need to specify args
+    CURATOR:
+      name: Safe
+      address: *ACTIVE_VAULT_ADMIN
+      proxyName: SafeProxy
+      implementation: "0x41675c099f32341bf84bfc5382af534df5c7461a"
+      proxyChecks: {}
+      checks:
+        VERSION: 1.4.1
+        approvedHashes: REPLACEME # need to specify args
+        checkNSignatures: REPLACEME # need to specify args
+        checkSignatures: REPLACEME # need to specify args
+        domainSeparator: REPLACEME # 0x2e6e927ecb0c9bf266fba6c2876a7917327dd50f5bd72fa31c1af94e264ce432
+        encodeTransactionData: REPLACEME # need to specify args
+        getChainId: 1
+        getModulesPaginated: REPLACEME # need to specify args
+        getOwners: REPLACEME # 0xe49384e6Aca6A26c82Eaa161A9211fA60fEee3Ef,0x185111c113d9B19Ea4C424D3cD8628A1ee09Be6A,0x06C3992a6067bEA8FB3Af7F004EdEbC13656761F,0x44A388BBD782AE1D7f4542aEb6C3569E2CfdF5a1,0x8888843c607F4Bbd6aD72128F478085256Bdd15D,0x1f3E4c3dBF27056CD7881D8eb376B1D7815757a6
+        getStorageAt: REPLACEME # need to specify args
+        getThreshold: REPLACEME # 3
+        getTransactionHash: REPLACEME # need to specify args
+        isModuleEnabled: REPLACEME # need to specify args
+        isOwner: REPLACEME # need to specify args
+        nonce: REPLACEME # 3
+        signedMessages: REPLACEME # need to specify args
+      implementationChecks:
+        VERSION: REPLACEME # 1.4.1
+        approvedHashes: REPLACEME # need to specify args
+        checkNSignatures: REPLACEME # need to specify args
+        checkSignatures: REPLACEME # need to specify args
+        domainSeparator: REPLACEME # 0xc4864056e21022913a49884ba9fb4035364d5c2ab8b40f0305583ae419c72f86
+        encodeTransactionData: REPLACEME # need to specify args
+        getChainId: REPLACEME # 1
+        getModulesPaginated: REPLACEME # need to specify args
+        getOwners: REPLACEME # view call reverted
+        getStorageAt: REPLACEME # need to specify args
+        getThreshold: REPLACEME # 1
+        getTransactionHash: REPLACEME # need to specify args
+        isModuleEnabled: REPLACEME # need to specify args
+        isOwner: REPLACEME # need to specify args
+        nonce: REPLACEME # 0
+        signedMessages: REPLACEME # need to specify args
+    TREASURY:
+      name: Safe
+      address: *ACTIVE_VAULT_ADMIN
+      proxyName: SafeProxy
+      implementation: "0x41675c099f32341bf84bfc5382af534df5c7461a"
+      proxyChecks: {}
+      checks:
+        VERSION: 1.4.1
+        approvedHashes: REPLACEME # need to specify args
+        checkNSignatures: REPLACEME # need to specify args
+        checkSignatures: REPLACEME # need to specify args
+        domainSeparator: REPLACEME # 0x2e6e927ecb0c9bf266fba6c2876a7917327dd50f5bd72fa31c1af94e264ce432
+        encodeTransactionData: REPLACEME # need to specify args
+        getChainId: 1
+        getModulesPaginated: REPLACEME # need to specify args
+        getOwners: REPLACEME # 0xe49384e6Aca6A26c82Eaa161A9211fA60fEee3Ef,0x185111c113d9B19Ea4C424D3cD8628A1ee09Be6A,0x06C3992a6067bEA8FB3Af7F004EdEbC13656761F,0x44A388BBD782AE1D7f4542aEb6C3569E2CfdF5a1,0x8888843c607F4Bbd6aD72128F478085256Bdd15D,0x1f3E4c3dBF27056CD7881D8eb376B1D7815757a6
+        getStorageAt: REPLACEME # need to specify args
+        getThreshold: REPLACEME # 3
+        getTransactionHash: REPLACEME # need to specify args
+        isModuleEnabled: REPLACEME # need to specify args
+        isOwner: REPLACEME # need to specify args
+        nonce: REPLACEME # 3
+        signedMessages: REPLACEME # need to specify args
+      implementationChecks:
+        VERSION: REPLACEME # 1.4.1
+        approvedHashes: REPLACEME # need to specify args
+        checkNSignatures: REPLACEME # need to specify args
+        checkSignatures: REPLACEME # need to specify args
+        domainSeparator: REPLACEME # 0xc4864056e21022913a49884ba9fb4035364d5c2ab8b40f0305583ae419c72f86
+        encodeTransactionData: REPLACEME # need to specify args
+        getChainId: REPLACEME # 1
+        getModulesPaginated: REPLACEME # need to specify args
+        getOwners: REPLACEME # view call reverted
+        getStorageAt: REPLACEME # need to specify args
+        getThreshold: REPLACEME # 1
+        getTransactionHash: REPLACEME # need to specify args
+        isModuleEnabled: REPLACEME # need to specify args
+        isOwner: REPLACEME # need to specify args
+        nonce: REPLACEME # 0
+        signedMessages: REPLACEME # need to specify args
+    LIDO_PAUSER:
+      name: Safe
+      address: *LIDO_PAUSER
+      proxyName: SafeProxy
+      implementation: "0x41675c099f32341bf84bfc5382af534df5c7461a"
+      proxyChecks: {}
+      checks:
+        VERSION: REPLACEME # 1.4.1
+        approvedHashes: REPLACEME # need to specify args
+        checkNSignatures: REPLACEME # need to specify args
+        checkSignatures: REPLACEME # need to specify args
+        domainSeparator: REPLACEME # 0x8bfd883cdb30b46e66a8824a700fa258b5484e6ff68f07a5a0b952405291d9a0
+        encodeTransactionData: REPLACEME # need to specify args
+        getChainId: REPLACEME # 1
+        getModulesPaginated: REPLACEME # need to specify args
+        getOwners: REPLACEME # 0x59d07dc34B135B17b87840a86BFF7302039E7EDf,0x04e7C0350241b818eE5c92cc260008C9898F41cf,0x8ecd93982FfbB2f937ADa6c6e50d1950974081C0,0x59F8D74Fe49d5ebEAc069E3baf07eB4b614BD5A7,0x75D95fF8D48E2Ca5c4235322A8AC8e52A76124cD
+        getStorageAt: REPLACEME # need to specify args
+        getThreshold: REPLACEME # 3
+        getTransactionHash: REPLACEME # need to specify args
+        isModuleEnabled: REPLACEME # need to specify args
+        isOwner: REPLACEME # need to specify args
+        nonce: REPLACEME # 1
+        signedMessages: REPLACEME # need to specify args
+      implementationChecks:
+        VERSION: REPLACEME # 1.4.1
+        approvedHashes: REPLACEME # need to specify args
+        checkNSignatures: REPLACEME # need to specify args
+        checkSignatures: REPLACEME # need to specify args
+        domainSeparator: REPLACEME # 0xc4864056e21022913a49884ba9fb4035364d5c2ab8b40f0305583ae419c72f86
+        encodeTransactionData: REPLACEME # need to specify args
+        getChainId: REPLACEME # 1
+        getModulesPaginated: REPLACEME # need to specify args
+        getOwners: REPLACEME # view call reverted
+        getStorageAt: REPLACEME # need to specify args
+        getThreshold: REPLACEME # 1
+        getTransactionHash: REPLACEME # need to specify args
+        isModuleEnabled: REPLACEME # need to specify args
+        isOwner: REPLACEME # need to specify args
+        nonce: REPLACEME # 0
+        signedMessages: REPLACEME # need to specify args
+    MELLOW_PAUSER:
+      name: Safe
+      address: *ACTIVE_VAULT_ADMIN
+      proxyName: SafeProxy
+      implementation: "0x41675c099f32341bf84bfc5382af534df5c7461a"
+      proxyChecks: {}
+      checks:
+        VERSION: 1.4.1
+        approvedHashes: REPLACEME # need to specify args
+        checkNSignatures: REPLACEME # need to specify args
+        checkSignatures: REPLACEME # need to specify args
+        domainSeparator: REPLACEME # 0x2e6e927ecb0c9bf266fba6c2876a7917327dd50f5bd72fa31c1af94e264ce432
+        encodeTransactionData: REPLACEME # need to specify args
+        getChainId: 1
+        getModulesPaginated: REPLACEME # need to specify args
+        getOwners: REPLACEME # 0xe49384e6Aca6A26c82Eaa161A9211fA60fEee3Ef,0x185111c113d9B19Ea4C424D3cD8628A1ee09Be6A,0x06C3992a6067bEA8FB3Af7F004EdEbC13656761F,0x44A388BBD782AE1D7f4542aEb6C3569E2CfdF5a1,0x8888843c607F4Bbd6aD72128F478085256Bdd15D,0x1f3E4c3dBF27056CD7881D8eb376B1D7815757a6
+        getStorageAt: REPLACEME # need to specify args
+        getThreshold: REPLACEME # 3
+        getTransactionHash: REPLACEME # need to specify args
+        isModuleEnabled: REPLACEME # need to specify args
+        isOwner: REPLACEME # need to specify args
+        nonce: REPLACEME # 3
+        signedMessages: REPLACEME # need to specify args
+      implementationChecks:
+        VERSION: REPLACEME # 1.4.1
+        approvedHashes: REPLACEME # need to specify args
+        checkNSignatures: REPLACEME # need to specify args
+        checkSignatures: REPLACEME # need to specify args
+        domainSeparator: REPLACEME # 0xc4864056e21022913a49884ba9fb4035364d5c2ab8b40f0305583ae419c72f86
+        encodeTransactionData: REPLACEME # need to specify args
+        getChainId: REPLACEME # 1
+        getModulesPaginated: REPLACEME # need to specify args
+        getOwners: REPLACEME # view call reverted
+        getStorageAt: REPLACEME # need to specify args
+        getThreshold: REPLACEME # 1
+        getTransactionHash: REPLACEME # need to specify args
+        isModuleEnabled: REPLACEME # need to specify args
+        isOwner: REPLACEME # need to specify args
+        nonce: REPLACEME # 0
+        signedMessages: REPLACEME # need to specify args

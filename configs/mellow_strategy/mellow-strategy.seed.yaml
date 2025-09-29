@@ -35,8 +35,7 @@ deployed:
     - &symbioticVerifierFactory "0x41C443F10a92D597e6c9E271140BC94c10f5159F"
     - &symbioticVerifier "0x00000000cBC6f5d4348496FfA22Cf014b9DA394B"
     - &vaultConfigurator "0x000000028be48f9E62E13403480B60C4822C5aa5"
-    - &basicRedeeHook "0x0000000637f1b1ccDA4Af2dB6CDDf5e5Ec45fd93" 
-    # redeem???
+    - &basicRedeemHook "0x0000000637f1b1ccDA4Af2dB6CDDf5e5Ec45fd93"
     - &redirectingDepositHook "0x00000004d3B17e5391eb571dDb8fDF95646ca827"
     - &lidoDepositHook "0x000000065d1A7bD71f52886910aaBE6555b7317c"
     - &oracleHelper "0x000000005F543c38d5ea6D0bF10A50974Eb55E35"
@@ -72,6 +71,6 @@ deployed:
     - &MELLOW_PAUSER "0xa6278B726d4AA09D14f9E820D7785FAd82E7196F"
 
 l1:
-  rpcUrl: REMOTE_RPC_URL # Mainnet RPC URL
+  rpcUrl: ETH_RPC_URL # Mainnet RPC URL
   explorerHostname: api.etherscan.io
   explorerTokenEnv: ETHERSCAN_TOKEN
