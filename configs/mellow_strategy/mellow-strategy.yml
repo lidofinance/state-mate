@@ -70,8 +70,9 @@ deployed:
     - &LIDO_PAUSER "0xA916fD5252160A7E56A6405741De76dc0Da5A0Cd"
     - &MELLOW_PAUSER "0xa6278B726d4AA09D14f9E820D7785FAd82E7196F"
 
-    # --- Special addresses ---
+    # --- Special addresses and values ---
     - &ZERO_ADDRESS "0x0000000000000000000000000000000000000000"
+    - &ZERO_BYTES32 "0x0000000000000000000000000000000000000000000000000000000000000000"
 
 l1:
   rpcUrl: ETH_RPC_URL # Mainnet RPC URL
@@ -275,24 +276,26 @@ l1:
         implementations:
         isBlacklisted:
         isEntity:
-        owner: *ZERO_ADDRESS
+        owner:
         proposalAt:
-        proposals: 0
+        proposals:
     signatureDepositQueueImplementation:
       name: SignatureDepositQueue
       address: *signatureDepositQueueImplementation
       checks:
-        ORDER_TYPEHASH: REPLACEME # 0xb367c53189b3057a91923801116b5f9c4e7211a314d1961f94770747512a1b68
+        ORDER_TYPEHASH: "0xb367c53189b3057a91923801116b5f9c4e7211a314d1961f94770747512a1b68"
         asset: *ZERO_ADDRESS
-        canBeRemoved: REPLACEME # true
-        claimableOf: REPLACEME # need to specify args
+        canBeRemoved: true
+        claimableOf: # this queue doesn't have claimableOf shares
         consensus: *ZERO_ADDRESS
-        consensusFactory: REPLACEME # 0xaEEB06CBd91A18b51a2D30b61477eAeE3a9633C3
-        eip712Domain: REPLACEME # 0x0f,,,1,0x00000003887dfBCEbD1e4097Ad89B690de7eFbf9,0x0000000000000000000000000000000000000000000000000000000000000000,
-        handleReport: REPLACEME # need to specify args
-        hashOrder: REPLACEME # need to specify args
-        nonces: REPLACEME # need to specify args
-        validateOrder: REPLACEME # need to specify args
+        consensusFactory: *consensusFactory
+        eip712Domain: ["0x0f", "", "", 1, *signatureDepositQueueImplementation, *ZERO_BYTES32, []]
+        handleReport: # this queue doesn't have handleReport (no-op)
+        hashOrder:
+        nonces:
+          - args: [*ZERO_ADDRESS]
+            result: 0
+        validateOrder:
         vault: *ZERO_ADDRESS
     feeManagerFactory:
       name: Factory
@@ -301,25 +304,51 @@ l1:
       implementation: *feeManagerImplementation
       proxyChecks: {}
       checks:
-        entities: REPLACEME # 4
-        entityAt: REPLACEME # need to specify args
-        implementationAt: REPLACEME # need to specify args
+        entities: 4
+        entityAt:
+          - args: [4]
+            mustRevert: true
+          - args: [3]
+            result: "0x3fEA00B3f535fCd2A77840563b48EDFee71B0E85" #???
+          - args: [2]
+            result: *feeManager
+          - args: [1]
+            result: "0x06b2424D39CdB0C4EBb2ad0F886e903afA0aDa06" #???
+          - args: [0]
+            result: "0x3A7F35760298017daD55c870dB515E12c4262ecB" #???
+        implementationAt:
+          - args: [0]
+            result: *feeManagerImplementation
+          - args: [1]
+            mustRevert: true
         implementations: 1
-        isBlacklisted: REPLACEME # need to specify args
-        isEntity: REPLACEME # need to specify args
+        isBlacklisted:
+          - args: [*feeManagerImplementation]
+            result: false
+        isEntity:
+          - args: ["0x3fEA00B3f535fCd2A77840563b48EDFee71B0E85"]
+            result: true
+          - args: [*feeManager]
+            result: true
+          - args: ["0x06b2424D39CdB0C4EBb2ad0F886e903afA0aDa06"]
+            result: true
+          - args: ["0x3A7F35760298017daD55c870dB515E12c4262ecB"]
+            result: true
         owner: *PROXY_ADMIN
-        proposalAt: REPLACEME # need to specify args
-        proposals: REPLACEME # 0
+        proposalAt:
+          - args: [0]
+            mustRevert: true
+        proposals: 0
       implementationChecks:
-        entities: REPLACEME # 0
-        entityAt: REPLACEME # need to specify args
-        implementationAt: REPLACEME # need to specify args
-        implementations: REPLACEME # 0
-        isBlacklisted: REPLACEME # need to specify args
-        isEntity: REPLACEME # need to specify args
-        owner: REPLACEME # 0x0000000000000000000000000000000000000000
-        proposalAt: REPLACEME # need to specify args
-        proposals: REPLACEME # 0
+        entities:
+        entityAt:
+        implementationAt:
+        implementations:
+        isBlacklisted:
+        isEntity:
+        owner:
+        proposalAt:
+        proposals:
     oracleFactory:
       name: Factory
       address: *oracleFactory
@@ -327,25 +356,51 @@ l1:
       implementation: *oracleImplementation
       proxyChecks: {}
       checks:
-        entities: REPLACEME # 4
-        entityAt: REPLACEME # need to specify args
-        implementationAt: REPLACEME # need to specify args
-        implementations: REPLACEME # 1
-        isBlacklisted: REPLACEME # need to specify args
-        isEntity: REPLACEME # need to specify args
+        entities: 4
+        entityAt:
+          - args: [4]
+            mustRevert: true
+          - args: [3]
+            result: "0x7AD1D268Ab39612345CDACbC53bD7FFe806a3919" # ???Ы
+          - args: [2]
+            result: *oracle
+          - args: [1]
+            result: "0x9c369d0Ed346bB4DB3938E70304E5c18059af5e5" # ???
+          - args: [0]
+            result: "0xD800E8925471bBe846DeFcD805D4d56C658894Ac" # ???
+        implementationAt:
+          - args: [0]
+            result: *oracleImplementation
+          - args: [1]
+            mustRevert: true
+        implementations: 1
+        isBlacklisted:
+          - args: [*oracleImplementation]
+            result: false
+        isEntity:
+          - args: ["0x7AD1D268Ab39612345CDACbC53bD7FFe806a3919"]
+            result: true
+          - args: [*oracle]
+            result: true
+          - args: ["0x9c369d0Ed346bB4DB3938E70304E5c18059af5e5"]
+            result: true
+          - args: ["0xD800E8925471bBe846DeFcD805D4d56C658894Ac"]
+            result: true
         owner: *PROXY_ADMIN
-        proposalAt: REPLACEME # need to specify args
-        proposals: REPLACEME # 0
+        proposalAt:
+          - args: [0]
+            mustRevert: true
+        proposals: 0
       implementationChecks:
-        entities: REPLACEME # 0
-        entityAt: REPLACEME # need to specify args
-        implementationAt: REPLACEME # need to specify args
-        implementations: REPLACEME # 0
-        isBlacklisted: REPLACEME # need to specify args
-        isEntity: REPLACEME # need to specify args
-        owner: *ZERO_ADDRESS
-        proposalAt: REPLACEME # need to specify args
-        proposals: REPLACEME # 0
+        entities:
+        entityAt:
+        implementationAt:
+        implementations:
+        isBlacklisted:
+        isEntity:
+        owner:
+        proposalAt:
+        proposals:
     redeemQueueFactory:
       name: Factory
       address: *redeemQueueFactory
@@ -353,25 +408,71 @@ l1:
       implementation: *redeemQueueImplementation
       proxyChecks: {}
       checks:
-        entities: REPLACEME # 8
-        entityAt: REPLACEME # need to specify args
-        implementationAt: REPLACEME # need to specify args
-        implementations: REPLACEME # 2
-        isBlacklisted: REPLACEME # need to specify args
-        isEntity: REPLACEME # need to specify args
+        entities: 8
+        entityAt:
+          - args: [8]
+            mustRevert: true
+          - args: [7]
+            result: "0x52135C49e6d734866AB37e127de03B479559A018" # ???
+          - args: [6]
+            result: "0x5490729bBB5821C56F8598b856ae353435b9E993" # ???
+          - args: [5]
+            result: "0xa1CE84069E5AC305075B0d54EBc12389BF674d18" # ???
+          - args: [4]
+            result: *redeemQueueWSTETH
+          - args: [3]
+            result: "0x89961b1a5906Dd5651EA0d17f67961Ce24702853" # ???
+          - args: [2]
+            result: "0x9cf0d1dc2812a54F8b4613148196Ca18706E3370" # ???
+          - args: [1]
+            result: "0x873422Aab77aA6A3FD9194F76d5b3ceB03fd466f" # ???
+          - args: [0]
+            result: "0x1956669435cFEE8d1E7703D6BaB4379476F0d0f4" # ???
+        implementationAt:
+          - args: [0]
+            result: *redeemQueueImplementation
+          - args: [1]
+            result: *signatureRedeemQueueImplementation
+          - args: [2]
+            mustRevert: true
+        implementations: 2
+        isBlacklisted:
+          - args: [*redeemQueueImplementation]
+            result: false
+          - args: [*signatureRedeemQueueImplementation]
+            result: false
+        isEntity:
+          - args: ["0x52135C49e6d734866AB37e127de03B479559A018"]
+            result: true
+          - args: ["0x5490729bBB5821C56F8598b856ae353435b9E993"]
+            result: true
+          - args: ["0xa1CE84069E5AC305075B0d54EBc12389BF674d18"]
+            result: true
+          - args: [*redeemQueueWSTETH]
+            result: true
+          - args: ["0x89961b1a5906Dd5651EA0d17f67961Ce24702853"]
+            result: true
+          - args: ["0x9cf0d1dc2812a54F8b4613148196Ca18706E3370"]
+            result: true
+          - args: ["0x873422Aab77aA6A3FD9194F76d5b3ceB03fd466f"]
+            result: true
+          - args: ["0x1956669435cFEE8d1E7703D6BaB4379476F0d0f4"]
+            result: true
         owner: *PROXY_ADMIN
-        proposalAt: REPLACEME # need to specify args
-        proposals: REPLACEME # 0
+        proposalAt:
+          - args: [0]
+            mustRevert: true
+        proposals: 0
       implementationChecks:
-        entities: REPLACEME # 0
-        entityAt: REPLACEME # need to specify args
-        implementationAt: REPLACEME # need to specify args
-        implementations: REPLACEME # 0
-        isBlacklisted: REPLACEME # need to specify args
-        isEntity: REPLACEME # need to specify args
-        owner: REPLACEME # 0x0000000000000000000000000000000000000000
-        proposalAt: REPLACEME # need to specify args
-        proposals: REPLACEME # 0
+        entities:
+        entityAt:
+        implementationAt:
+        implementations:
+        isBlacklisted:
+        isEntity:
+        owner:
+        proposalAt:
+        proposals:
     signatureRedeemQueueImplementation:
       name: SignatureRedeemQueue
       address: *signatureRedeemQueueImplementation
