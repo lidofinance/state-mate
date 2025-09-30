@@ -85,24 +85,84 @@ l1:
       implementation: *factoryImplementation
       proxyChecks: {}
       checks:
-        entities: REPLACEME # 13
-        entityAt: REPLACEME # need to specify args
-        implementationAt: REPLACEME # need to specify args
+        entities: 13
+        entityAt:
+          - args: [13]
+            mustRevert: true
+          - args: [12]
+            result: *symbioticVerifierFactory
+          - args: [11]
+            result: *ERC20VerifierFactory
+          - args: [10]
+            result: *eigenLayerVerifierFactory
+          - args: [9]
+            result: *vaultFactory
+          - args: [8]
+            result: *verifierFactory
+          - args: [7]
+            result: *subvaultFactory
+          - args: [6]
+            result: *shareManagerFactory
+          - args: [5]
+            result: *riskManagerFactory
+          - args: [4]
+            result: *redeemQueueFactory
+          - args: [3]
+            result: *oracleFactory
+          - args: [2]
+            result: *feeManagerFactory
+          - args: [1]
+            result: *depositQueueFactory
+          - args: [0]
+            result: *consensusFactory
+        implementationAt:
+          - args: [0]
+            result: *factoryImplementation
         implementations: 1
-        isBlacklisted: REPLACEME # need to specify args
-        isEntity: REPLACEME # need to specify args
+        isBlacklisted:
+          - args: [*factoryImplementation]
+            result: false
+        isEntity:
+          - args: [*symbioticVerifierFactory]
+            result: true
+          - args: [*ERC20VerifierFactory]
+            result: true
+          - args: [*eigenLayerVerifierFactory]
+            result: true
+          - args: [*vaultFactory]
+            result: true
+          - args: [*verifierFactory]
+            result: true
+          - args: [*subvaultFactory]
+            result: true
+          - args: [*shareManagerFactory]
+            result: true
+          - args: [*riskManagerFactory]
+            result: true
+          - args: [*redeemQueueFactory]
+            result: true
+          - args: [*oracleFactory]
+            result: true
+          - args: [*feeManagerFactory]
+            result: true
+          - args: [*depositQueueFactory]
+            result: true
+          - args: [*consensusFactory]
+            result: true
         owner: *PROXY_ADMIN
-        proposalAt: REPLACEME # need to specify args
+        proposalAt:
+          - args: [0]
+            mustRevert: true
         proposals: 0
       implementationChecks:
         entities: 0
-        entityAt: REPLACEME # need to specify args
-        implementationAt: REPLACEME # need to specify args
+        entityAt:
+        implementationAt:
         implementations: 0
-        isBlacklisted: REPLACEME # need to specify args
-        isEntity: REPLACEME # need to specify args
+        isBlacklisted:
+        isEntity:
         owner: *ZERO_ADDRESS
-        proposalAt: REPLACEME # need to specify args
+        proposalAt:
         proposals: 0
     consensusFactory:
       name: Factory
@@ -112,24 +172,32 @@ l1:
       proxyChecks: {}
       checks:
         entities: 0
-        entityAt: REPLACEME # need to specify args
-        implementationAt: REPLACEME # need to specify args
+        entityAt:
+          - args: [0]
+            mustRevert: true
+        implementationAt:
+          - args: [0]
+            result: *consensusImplementation
         implementations: 1
-        isBlacklisted: REPLACEME # need to specify args
-        isEntity: REPLACEME # need to specify args
+        isBlacklisted:
+          - args: [*consensusImplementation]
+            result: false
+        isEntity:
         owner: *PROXY_ADMIN
-        proposalAt: REPLACEME # need to specify args
+        proposalAt:
+          - args: [0]
+            mustRevert: true
         proposals: 0
       implementationChecks:
-        entities: 0
-        entityAt: REPLACEME # need to specify args
-        implementationAt: REPLACEME # need to specify args
-        implementations: 0
-        isBlacklisted: REPLACEME # need to specify args
-        isEntity: REPLACEME # need to specify args
+        entities:
+        entityAt:
+        implementationAt:
+        implementations:
+        isBlacklisted:
+        isEntity:
         owner: *ZERO_ADDRESS
-        proposalAt: REPLACEME # need to specify args
-        proposals: 0
+        proposalAt:
+        proposals:
     depositQueueFactory:
       name: Factory
       address: *depositQueueFactory
@@ -137,24 +205,78 @@ l1:
       implementation: *depositQueueImplementation
       proxyChecks: {}
       checks:
-        entities: REPLACEME # 10
-        entityAt: REPLACEME # need to specify args
-        implementationAt: REPLACEME # need to specify args
-        implementations: REPLACEME # 2
-        isBlacklisted: REPLACEME # need to specify args
-        isEntity: REPLACEME # need to specify args
+        entities: 10
+        entityAt:
+          - args: [10]
+            mustRevert: true
+          - args: [9]
+            result: "0x34b46C8e622730C7115bB71c720F939274F73bEc" # ???
+          - args: [8]
+            result: "0x729f0fE9c1BE8e4a814695277d7B56AD2427487e" # ???
+          - args: [7]
+            result: "0xfA428FDBC73AD52C12724096e73e213FCd307141" # ???
+          - args: [6]
+            result: *depositQueueWSTETH
+          - args: [5]
+            result: *depositQueueWETH
+          - args: [4]
+            result: *depositQueueETH
+          - args: [3]
+            result: "0x37631803CDC5aD9729dd213EB84F09467f57239c" # ???
+          - args: [2]
+            result: "0x2aB3e457EA24CfA1fCD8b88502f825F2dBCc6D2c" # ???
+          - args: [1]
+            result: "0x94EE1F30a8191201c0BBc9E0C96c36c8561d885D" # ???
+          - args: [0]
+            result: "0x2915c6aF8Ab39A8E7d300Db078488212cd75cA22" # ???
+        implementationAt:
+          - args: [0]
+            result: *depositQueueImplementation
+          - args: [1]
+            result: *signatureDepositQueueImplementation
+          - args: [2]
+            mustRevert: true
+        implementations: 2
+        isBlacklisted:
+          - args: [*depositQueueImplementation]
+            result: false
+          - args: [*signatureDepositQueueImplementation]
+            result: false
+        isEntity:
+          - args: ["0x34b46C8e622730C7115bB71c720F939274F73bEc"]
+            result: true
+          - args: ["0x729f0fE9c1BE8e4a814695277d7B56AD2427487e"]
+            result: true
+          - args: ["0xfA428FDBC73AD52C12724096e73e213FCd307141"]
+            result: true
+          - args: [*depositQueueWSTETH]
+            result: true
+          - args: [*depositQueueWETH]
+            result: true
+          - args: [*depositQueueETH]
+            result: true
+          - args: ["0x37631803CDC5aD9729dd213EB84F09467f57239c"]
+            result: true
+          - args: ["0x2aB3e457EA24CfA1fCD8b88502f825F2dBCc6D2c"]
+            result: true
+          - args: ["0x94EE1F30a8191201c0BBc9E0C96c36c8561d885D"]
+            result: true
+          - args: ["0x2915c6aF8Ab39A8E7d300Db078488212cd75cA22"]
+            result: true
         owner: *PROXY_ADMIN
-        proposalAt: REPLACEME # need to specify args
+        proposalAt:
+          - args: [0]
+            mustRevert: true
         proposals: 0
       implementationChecks:
-        entities: 0
-        entityAt: REPLACEME # need to specify args
-        implementationAt: REPLACEME # need to specify args
-        implementations: 0
-        isBlacklisted: REPLACEME # need to specify args
-        isEntity: REPLACEME # need to specify args
+        entities:
+        entityAt:
+        implementationAt:
+        implementations:
+        isBlacklisted:
+        isEntity:
         owner: *ZERO_ADDRESS
-        proposalAt: REPLACEME # need to specify args
+        proposalAt:
         proposals: 0
     signatureDepositQueueImplementation:
       name: SignatureDepositQueue
