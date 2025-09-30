@@ -73,14 +73,16 @@ deployed:
     # --- Special addresses and values ---
     - &ZERO_ADDRESS "0x0000000000000000000000000000000000000000"
     - &ZERO_BYTES32 "0x0000000000000000000000000000000000000000000000000000000000000000"
+    - &DEFAULT_ADMIN_ROLE "0x0000000000000000000000000000000000000000000000000000000000000000"
 
-    # --- Roles
+    # --- Roles 1 ---
     - &SET_ACCOUNT_INFO_ROLE "0x58258f737b9cea9d7da81a3a12943f800a9668a2494235fec0d84cc60ad04cff"
     - &SET_FLAGS_ROLE "0x78b235a1fa2fd5e00dba7867d599bed6f088684010a7fee7b9fe05fa1082d01e"
     - &SET_WHITELIST_MERKLE_ROOT_ROLE "0xca196afb47c2d16c8388ba0ef201b98a808acb83a856576ffc57360840a5fd99"
-    - &CREATE_QUEUE_ROLE "0x66b0512136985574365426028914091459034491778548125527411171234923"
+
+    # --- Roles 2 ---
+    - &CREATE_QUEUE_ROLE "0x6788636e7899d6d227901dc9f8c4c785401c0991724cf908dc65388af686da6f"
     - &CREATE_SUBVAULT_ROLE "0x85c2023fdfb1e93dedf5d18f9bc0e79347e071d12740ba71aeb84a4fcbdc4b79"
-    - &DEFAULT_ADMIN_ROLE "0x0000000000000000000000000000000000000000000000000000000000000000"
     - &DISCONNECT_SUBVAULT_ROLE "0xf610639f4b9b8986f875fcb4e49486da5c7aa449a6942b5013fabd061e9b9fff"
     - &PULL_LIQUIDITY_ROLE "0x68895691ff006f290ca74825ce06ed17fffab55af49f0274f49b7424f752583a"
     - &PUSH_LIQUIDITY_ROLE "0x32a781031f04cc60b32394e40124d1e87f54273bf26d0532a115a424f6a93298"
@@ -89,6 +91,25 @@ deployed:
     - &SET_HOOK_ROLE "0x627f9e4ac2dadb64d045e7e6333c09f39ed34e0e066957955d0052b46d2e83e8"
     - &SET_QUEUE_LIMIT_ROLE "0x407fc42eadf1aba68b1d4a8c3c4aa2e8b6beac7957623f3694d0ad77bfb70e06"
     - &SET_QUEUE_STATUS_ROLE "0x6618a6d92147bbcacfb2ef2375976fc4c529eeeaeb72a66048296571370c6946"
+
+    # --- Roles 3 ---
+    - &ASSET_ROLE "0x7a2ed8c36fc77fb21dfb67d40423dad2ecf5e9539694580ecb4f6aaec99d266e"
+    - &CALLER_ROLE "0x429987c65ae1b21d36923ef95ce6fcd59f7bf9663738a09ee8eefcf6f777562b"
+    - &MELLOW_VAULT_ROLE "0x935fd7b940d597b587bde3e2081c175c3c2ef95cd30a83492573ee0907ad6aaa"
+    - &OPERATOR_ROLE "0xcf0cbc050f25c592622c05ff9a7f25030deea63c230fa4d7b8d226d8c0837201"
+    - &RECEIVER_ROLE "0x59b484ad6f5409567fc5a4860c4c34866eec78f8cc4024ed3e17efb0f215d8db"
+    - &STRATEGY_ROLE "0x2eab4b6bd944eae98f56071c3f2866a8355e10331fc8a04157ddf9ee0feff1e0"
+
+    # --- Roles 4 ---
+    - &ERC20_ASSET_ROLE "0x8b4b1250247f1cbb35f7f69415df3cf642553a6953f81fae69e135c5feefc94b"
+    - &ERC20_CALLER_ROLE "0xc896aac795f7376adc96049886670c0e28cf66652e338a4139e37d2503456058"
+    - &ERC20_RECIPIENT_ROLE "0x7c6c5b36d31deb1f0c3cbcc15c12c0be85fe383faacee29701116ad6cfb3a29a"
+
+    # --- Roles 5 ---
+    - &SYMBIOTIC_CALLER_ROLE "0x3b48a429628aa7e067d22e77e8f4703a9d84dc4efdabe07716c4d0322e7f2714"
+    - &SYMBIOTIC_MELLOW_VAULT_ROLE "0xabf80feb2ee273d208fadd5ac778f2fc719588bcc130607c0fcddd743ce6f6c1"
+    - &SYMBIOTIC_FARM_ROLE "0xefe4de88b49c8b8f17f4c2ff9d6f775c4747e6bf57255a802349a8ebf4842239"
+    - &SYMBIOTIC_VAULT_ROLE "0x909c8b12bf402721ba65c08a75ac086b15941cd32bcb6ecba9dc69a7757d1ca9"
 
 l1:
   rpcUrl: ETH_RPC_URL # Mainnet RPC URL
@@ -849,6 +870,8 @@ l1:
         SET_QUEUE_LIMIT_ROLE: *SET_QUEUE_LIMIT_ROLE
         SET_QUEUE_STATUS_ROLE: *SET_QUEUE_STATUS_ROLE
         assetAt:
+          - args: [0]
+            mustRevert: true
         claimableSharesOf:
         defaultDepositHook: *ZERO_ADDRESS
         defaultRedeemHook: *ZERO_ADDRESS
@@ -857,167 +880,245 @@ l1:
         getAssetCount: 0
         getHook:
         getLiquidAssets:
-        getQueueCount: REPLACEME # need to specify args
+        getQueueCount:
         getRoleAdmin:
         getRoleMember:
         getRoleMemberCount:
-        getRoleMembers: REPLACEME # need to specify args
-        getStorageAt: REPLACEME # need to specify args
-        hasAsset: REPLACEME # need to specify args
-        hasQueue: REPLACEME # need to specify args
-        hasRole: REPLACEME # need to specify args
-        hasSubvault: REPLACEME # need to specify args
-        hasSupportedRole: REPLACEME # need to specify args
-        isDepositQueue: REPLACEME # need to specify args
-        isPausedQueue: REPLACEME # need to specify args
-        onERC721Received: REPLACEME # need to specify args
+          - args: [*DEFAULT_ADMIN_ROLE]
+            result: 0
+          - args: [*CREATE_QUEUE_ROLE]
+            result: 0
+          - args: [*CREATE_SUBVAULT_ROLE]
+            result: 0
+          - args: [*DISCONNECT_SUBVAULT_ROLE]
+            result: 0
+          - args: [*PULL_LIQUIDITY_ROLE]
+            result: 0
+          - args: [*PUSH_LIQUIDITY_ROLE]
+            result: 0
+          - args: [*RECONNECT_SUBVAULT_ROLE]
+            result: 0
+          - args: [*REMOVE_QUEUE_ROLE]
+            result: 0
+          - args: [*SET_HOOK_ROLE]
+            result: 0
+          - args: [*SET_QUEUE_LIMIT_ROLE]
+            result: 0
+          - args: [*SET_QUEUE_STATUS_ROLE]
+            result: 0
+        getRoleMembers:
+        getStorageAt:
+        hasAsset:
+        hasQueue:
+        hasRole:
+        hasSubvault:
+        hasSupportedRole:
+        isDepositQueue:
+        isPausedQueue:
+        onERC721Received:
         oracle: *ZERO_ADDRESS
-        queueAt: REPLACEME # need to specify args
+        queueAt:
         queueLimit: 0
         redeemQueueFactory: *redeemQueueFactory
         riskManager: *ZERO_ADDRESS
         shareManager: *ZERO_ADDRESS
         subvaultAt:
         subvaultFactory: *subvaultFactory
-        subvaults: REPLACEME # 0
-        supportedRoleAt: REPLACEME # need to specify args
-        supportedRoles: REPLACEME # 0
-        supportsInterface: REPLACEME # need to specify args
-        verifierFactory: REPLACEME # 0x04B30b1e98950e6A13550d84e991bE0d734C2c61
+        subvaults: 0
+        supportedRoleAt:
+        supportedRoles:
+        supportsInterface:
+        verifierFactory: *verifierFactory
     bitmaskVerifier:
       name: BitmaskVerifier
       address: *bitmaskVerifier
       checks:
-        calculateHash: REPLACEME # need to specify args
-        verifyCall: REPLACEME # need to specify args
+        calculateHash:
+        verifyCall:
     eigenLayerVerifierFactory:
-      name: TransparentUpgradeableProxy
+      name: EigenLayerVerifierFactory
       address: *eigenLayerVerifierFactory
-      checks: {}
+      proxyName: TransparentUpgradeableProxy
+      implementation: *eigenLayerVerifier
+      proxyChecks: {}
+      checks:
+        entities: 0
+        entityAt:
+          - args: [0]
+            mustRevert: true
+        implementationAt:
+          - args: [0]
+            result: *eigenLayerVerifier
+          - args: [1]
+            mustRevert: true
+        implementations: 1
+        isBlacklisted:
+          - args: [*eigenLayerVerifier]
+            result: false
+        isEntity:
+        owner: *PROXY_ADMIN
+        proposalAt:
+          - args: [0]
+            mustRevert: true
+        proposals: 0
+      implementationChecks:
+        entities:
+        entityAt:
+        implementationAt:
+        implementations:
+        isBlacklisted:
+        isEntity:
+        owner: *ZERO_ADDRESS
+        proposalAt:
+        proposals:
     eigenLayerVerifier:
       name: EigenLayerVerifier
       address: *eigenLayerVerifier
       checks:
-        ASSET_ROLE: REPLACEME # 0x7a2ed8c36fc77fb21dfb67d40423dad2ecf5e9539694580ecb4f6aaec99d266e
-        CALLER_ROLE: REPLACEME # 0x429987c65ae1b21d36923ef95ce6fcd59f7bf9663738a09ee8eefcf6f777562b
-        DEFAULT_ADMIN_ROLE: REPLACEME # 0x0000000000000000000000000000000000000000000000000000000000000000
-        MELLOW_VAULT_ROLE: REPLACEME # 0x935fd7b940d597b587bde3e2081c175c3c2ef95cd30a83492573ee0907ad6aaa
-        OPERATOR_ROLE: REPLACEME # 0xcf0cbc050f25c592622c05ff9a7f25030deea63c230fa4d7b8d226d8c0837201
-        RECEIVER_ROLE: REPLACEME # 0x59b484ad6f5409567fc5a4860c4c34866eec78f8cc4024ed3e17efb0f215d8db
-        STRATEGY_ROLE: REPLACEME # 0x2eab4b6bd944eae98f56071c3f2866a8355e10331fc8a04157ddf9ee0feff1e0
-        delegationManager: REPLACEME # 0x39053D51B77DC0d36036Fc1fCc8Cb819df8Ef37A
-        getRoleAdmin: REPLACEME # need to specify args
-        getRoleMember: REPLACEME # need to specify args
-        getRoleMemberCount: REPLACEME # need to specify args
-        getRoleMembers: REPLACEME # need to specify args
-        hasRole: REPLACEME # need to specify args
-        hasSupportedRole: REPLACEME # need to specify args
-        rewardsCoordinator: REPLACEME # 0x7750d328b314EfFa365A0402CcfD489B80B0adda
-        strategyManager: REPLACEME # 0x858646372CC42E1A627fcE94aa7A7033e7CF075A
-        supportedRoleAt: REPLACEME # need to specify args
-        supportedRoles: REPLACEME # 0
-        supportsInterface: REPLACEME # need to specify args
-        verifyCall: REPLACEME # need to specify args
+        ASSET_ROLE: *ASSET_ROLE
+        CALLER_ROLE: *CALLER_ROLE
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        MELLOW_VAULT_ROLE: *MELLOW_VAULT_ROLE
+        OPERATOR_ROLE: *OPERATOR_ROLE
+        RECEIVER_ROLE: *RECEIVER_ROLE
+        STRATEGY_ROLE: *STRATEGY_ROLE
+        delegationManager: "0x39053D51B77DC0d36036Fc1fCc8Cb819df8Ef37A" # ???
+        getRoleAdmin:
+        getRoleMember:
+        getRoleMemberCount:
+        getRoleMembers:
+        hasRole:
+        hasSupportedRole:
+        rewardsCoordinator: "0x7750d328b314EfFa365A0402CcfD489B80B0adda" # ???
+        strategyManager: "0x858646372CC42E1A627fcE94aa7A7033e7CF075A" # ???
+        supportedRoleAt:
+        supportedRoles:
+        supportsInterface:
+        verifyCall:
     ERC20VerifierFactory:
       name: Factory
       address: *ERC20VerifierFactory
       proxyName: TransparentUpgradeableProxy
-      implementation: "0x0000000397b71c8f3182fd40d247330d218fdc72"
+      implementation: *ERC20Verifier
       proxyChecks: {}
       checks:
-        entities: REPLACEME # 0
-        entityAt: REPLACEME # need to specify args
-        implementationAt: REPLACEME # need to specify args
-        implementations: REPLACEME # 1
-        isBlacklisted: REPLACEME # need to specify args
-        isEntity: REPLACEME # need to specify args
-        owner: REPLACEME # 0x81698f87C6482bF1ce9bFcfC0F103C4A0Adf0Af0
-        proposalAt: REPLACEME # need to specify args
-        proposals: REPLACEME # 0
+        entities: 0
+        entityAt:
+          - args: [0]
+            mustRevert: true
+        implementationAt:
+          - args: [0]
+            result: *ERC20Verifier
+          - args: [1]
+            mustRevert: true
+        implementations: 1
+        isBlacklisted:
+          - args: [*ERC20Verifier]
+            result: false
+        isEntity:
+          - args: [*ERC20Verifier]
+            result: true
+        owner: *PROXY_ADMIN
+        proposalAt:
+          - args: [0]
+            mustRevert: true
+        proposals: 0
       implementationChecks:
-        entities: REPLACEME # 0
-        entityAt: REPLACEME # need to specify args
-        implementationAt: REPLACEME # need to specify args
-        implementations: REPLACEME # 0
-        isBlacklisted: REPLACEME # need to specify args
-        isEntity: REPLACEME # need to specify args
-        owner: REPLACEME # 0x0000000000000000000000000000000000000000
-        proposalAt: REPLACEME # need to specify args
-        proposals: REPLACEME # 0
+        entities: 0
+        entityAt:
+        implementationAt:
+        implementations:
+        isBlacklisted:
+        isEntity:
+        owner: *ZERO_ADDRESS
+        proposalAt:
+        proposals:
     ERC20Verifier:
       name: ERC20Verifier
       address: *ERC20Verifier
       checks:
-        ASSET_ROLE: REPLACEME # 0x8b4b1250247f1cbb35f7f69415df3cf642553a6953f81fae69e135c5feefc94b
-        CALLER_ROLE: REPLACEME # 0xc896aac795f7376adc96049886670c0e28cf66652e338a4139e37d2503456058
-        DEFAULT_ADMIN_ROLE: REPLACEME # 0x0000000000000000000000000000000000000000000000000000000000000000
-        RECIPIENT_ROLE: REPLACEME # 0x7c6c5b36d31deb1f0c3cbcc15c12c0be85fe383faacee29701116ad6cfb3a29a
-        getRoleAdmin: REPLACEME # need to specify args
-        getRoleMember: REPLACEME # need to specify args
-        getRoleMemberCount: REPLACEME # need to specify args
-        getRoleMembers: REPLACEME # need to specify args
-        hasRole: REPLACEME # need to specify args
-        hasSupportedRole: REPLACEME # need to specify args
-        supportedRoleAt: REPLACEME # need to specify args
-        supportedRoles: REPLACEME # 0
-        supportsInterface: REPLACEME # need to specify args
-        verifyCall: REPLACEME # need to specify args
+        ASSET_ROLE: *ERC20_ASSET_ROLE
+        CALLER_ROLE: *ERC20_CALLER_ROLE
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        RECIPIENT_ROLE: *ERC20_RECIPIENT_ROLE
+        getRoleAdmin:
+        getRoleMember:
+        getRoleMemberCount:
+        getRoleMembers:
+        hasRole:
+        hasSupportedRole:
+        supportedRoleAt:
+        supportedRoles:
+        supportsInterface:
+        verifyCall:
     symbioticVerifierFactory:
       name: Factory
       address: *symbioticVerifierFactory
       proxyName: TransparentUpgradeableProxy
-      implementation: "0x0000000397b71c8f3182fd40d247330d218fdc72"
+      implementation: *symbioticVerifier
       proxyChecks: {}
       checks:
-        entities: REPLACEME # 0
-        entityAt: REPLACEME # need to specify args
-        implementationAt: REPLACEME # need to specify args
-        implementations: REPLACEME # 1
-        isBlacklisted: REPLACEME # need to specify args
-        isEntity: REPLACEME # need to specify args
-        owner: REPLACEME # 0x81698f87C6482bF1ce9bFcfC0F103C4A0Adf0Af0
-        proposalAt: REPLACEME # need to specify args
-        proposals: REPLACEME # 0
+        entities: 0
+        entityAt:
+          - args: [0]
+            mustRevert: true
+        implementationAt:
+          - args: [0]
+            result: *symbioticVerifier
+          - args: [1]
+            mustRevert: true
+        implementations: 1
+        isBlacklisted:
+          - args: [*symbioticVerifier]
+            result: false
+        isEntity:
+          - args: [*symbioticVerifier]
+            result: true
+        owner: *PROXY_ADMIN
+        proposalAt:
+          - args: [0]
+            mustRevert: true
+        proposals: 0
       implementationChecks:
-        entities: REPLACEME # 0
-        entityAt: REPLACEME # need to specify args
-        implementationAt: REPLACEME # need to specify args
-        implementations: REPLACEME # 0
-        isBlacklisted: REPLACEME # need to specify args
-        isEntity: REPLACEME # need to specify args
-        owner: REPLACEME # 0x0000000000000000000000000000000000000000
-        proposalAt: REPLACEME # need to specify args
-        proposals: REPLACEME # 0
+        entities:
+        entityAt:
+        implementationAt:
+        implementations:
+        isBlacklisted:
+        isEntity:
+        owner:
+        proposalAt:
+        proposals:
     symbioticVerifier:
       name: SymbioticVerifier
       address: *symbioticVerifier
       checks:
-        CALLER_ROLE: REPLACEME # 0x3b48a429628aa7e067d22e77e8f4703a9d84dc4efdabe07716c4d0322e7f2714
-        DEFAULT_ADMIN_ROLE: REPLACEME # 0x0000000000000000000000000000000000000000000000000000000000000000
-        MELLOW_VAULT_ROLE: REPLACEME # 0xabf80feb2ee273d208fadd5ac778f2fc719588bcc130607c0fcddd743ce6f6c1
-        SYMBIOTIC_FARM_ROLE: REPLACEME # 0xefe4de88b49c8b8f17f4c2ff9d6f775c4747e6bf57255a802349a8ebf4842239
-        SYMBIOTIC_VAULT_ROLE: REPLACEME # 0x909c8b12bf402721ba65c08a75ac086b15941cd32bcb6ecba9dc69a7757d1ca9
-        farmFactory: REPLACEME # 0xFEB871581C2ab2e1EEe6f7dDC7e6246cFa087A23
-        getRoleAdmin: REPLACEME # need to specify args
-        getRoleMember: REPLACEME # need to specify args
-        getRoleMemberCount: REPLACEME # need to specify args
-        getRoleMembers: REPLACEME # need to specify args
-        hasRole: REPLACEME # need to specify args
-        hasSupportedRole: REPLACEME # need to specify args
-        supportedRoleAt: REPLACEME # need to specify args
-        supportedRoles: REPLACEME # 0
-        supportsInterface: REPLACEME # need to specify args
-        vaultFactory: REPLACEME # 0xAEb6bdd95c502390db8f52c8909F703E9Af6a346
-        verifyCall: REPLACEME # need to specify args
+        CALLER_ROLE: *SYMBIOTIC_CALLER_ROLE
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        MELLOW_VAULT_ROLE: *SYMBIOTIC_MELLOW_VAULT_ROLE
+        SYMBIOTIC_FARM_ROLE: *SYMBIOTIC_FARM_ROLE
+        SYMBIOTIC_VAULT_ROLE: *SYMBIOTIC_VAULT_ROLE
+        farmFactory: *farmFactory
+        getRoleAdmin:
+        getRoleMember:
+        getRoleMemberCount:
+        getRoleMembers:
+        hasRole:
+        hasSupportedRole:
+        supportedRoleAt:
+        supportedRoles:
+        supportsInterface:
+        vaultFactory: *vaultFactory
+        verifyCall:
     vaultConfigurator:
       name: VaultConfigurator
       address: *vaultConfigurator
       checks:
-        feeManagerFactory: REPLACEME # 0xF7223356819Ea48f25880b6c2ab3e907CC336D45
-        oracleFactory: REPLACEME # 0x0CdFf250C7a071fdc72340D820C5C8e29507Aaad
-        riskManagerFactory: REPLACEME # 0xa51E4FA916b939Fa451520D2B7600c740d86E5A0
-        shareManagerFactory: REPLACEME # 0x952f39AA62E94db3Ad0d1C7D1E43C1a8519E45D8
-        vaultFactory: REPLACEME # 0x4E38F679e46B3216f0bd4B314E9C429AFfB1dEE3
+        feeManagerFactory: *feeManagerFactory
+        oracleFactory: *oracleFactory
+        riskManagerFactory: *riskManagerFactory
+        shareManagerFactory: *shareManagerFactory
+        vaultFactory: *vaultFactory
     basicRedeemHook:
       name: BasicRedeemHook
       address: *basicRedeemHook
@@ -1031,7 +1132,7 @@ l1:
       name: LidoDepositHook
       address: *lidoDepositHook
       checks:
-        nextHook: REPLACEME # 0x00000004d3B17e5391eb571dDb8fDF95646ca827
+        nextHook: *redirectingDepositHook
         steth: REPLACEME # 0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84
         weth: REPLACEME # 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2
         wsteth: REPLACEME # 0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0
