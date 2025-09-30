@@ -74,6 +74,9 @@ deployed:
     - &ZERO_ADDRESS "0x0000000000000000000000000000000000000000"
     - &ZERO_BYTES32 "0x0000000000000000000000000000000000000000000000000000000000000000"
     - &DEFAULT_ADMIN_ROLE "0x0000000000000000000000000000000000000000000000000000000000000000"
+    - &LIDO_STETH "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84"
+    - &WETH "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
+    - &LIDO_WSTETH "0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0"
 
     # --- Roles 1 ---
     - &SET_ACCOUNT_INFO_ROLE "0x58258f737b9cea9d7da81a3a12943f800a9668a2494235fec0d84cc60ad04cff"
@@ -1098,7 +1101,7 @@ l1:
         MELLOW_VAULT_ROLE: *SYMBIOTIC_MELLOW_VAULT_ROLE
         SYMBIOTIC_FARM_ROLE: *SYMBIOTIC_FARM_ROLE
         SYMBIOTIC_VAULT_ROLE: *SYMBIOTIC_VAULT_ROLE
-        farmFactory: *farmFactory
+        farmFactory: *ZERO_ADDRESS
         getRoleAdmin:
         getRoleMember:
         getRoleMemberCount:
@@ -1133,14 +1136,14 @@ l1:
       address: *lidoDepositHook
       checks:
         nextHook: *redirectingDepositHook
-        steth: REPLACEME # 0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84
-        weth: REPLACEME # 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2
-        wsteth: REPLACEME # 0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0
+        steth: *LIDO_STETH
+        weth: *WETH
+        wsteth: *LIDO_WSTETH
     oracleHelper:
       name: OracleHelper
       address: *oracleHelper
       checks:
-        getPricesD18: REPLACEME # need to specify args
+        getPricesD18:
     vault:
       name: Vault
       address: *vault
@@ -1148,72 +1151,74 @@ l1:
       implementation: "0x0000000615b2771511daa693ac07be5622869e01"
       proxyChecks: {}
       checks:
-        CREATE_QUEUE_ROLE: REPLACEME # 0x6788636e7899d6d227901dc9f8c4c785401c0991724cf908dc65388af686da6f
-        CREATE_SUBVAULT_ROLE: REPLACEME # 0x85c2023fdfb1e93dedf5d18f9bc0e79347e071d12740ba71aeb84a4fcbdc4b79
-        DEFAULT_ADMIN_ROLE: REPLACEME # 0x0000000000000000000000000000000000000000000000000000000000000000
-        DISCONNECT_SUBVAULT_ROLE: REPLACEME # 0xf610639f4b9b8986f875fcb4e49486da5c7aa449a6942b5013fabd061e9b9fff
-        PULL_LIQUIDITY_ROLE: REPLACEME # 0x68895691ff006f290ca74825ce06ed17fffab55af49f0274f49b7424f752583a
-        PUSH_LIQUIDITY_ROLE: REPLACEME # 0x32a781031f04cc60b32394e40124d1e87f54273bf26d0532a115a424f6a93298
-        RECONNECT_SUBVAULT_ROLE: REPLACEME # 0xb557d53a2e72d8333ffa3bf2f556678becb5e995b0e25b7dca354627e550c08f
-        REMOVE_QUEUE_ROLE: REPLACEME # 0x9a4c49d6fb9452bbfe187968075d0fac7d7202d2b7f731d8cffbce9cf66756b2
-        SET_HOOK_ROLE: REPLACEME # 0x627f9e4ac2dadb64d045e7e6333c09f39ed34e0e066957955d0052b46d2e83e8
-        SET_QUEUE_LIMIT_ROLE: REPLACEME # 0x407fc42eadf1aba68b1d4a8c3c4aa2e8b6beac7957623f3694d0ad77bfb70e06
-        SET_QUEUE_STATUS_ROLE: REPLACEME # 0x6618a6d92147bbcacfb2ef2375976fc4c529eeeaeb72a66048296571370c6946
-        assetAt: REPLACEME # need to specify args
-        claimableSharesOf: REPLACEME # need to specify args
-        defaultDepositHook: REPLACEME # 0x00000004d3B17e5391eb571dDb8fDF95646ca827
-        defaultRedeemHook: REPLACEME # 0x0000000637f1b1ccDA4Af2dB6CDDf5e5Ec45fd93
-        depositQueueFactory: REPLACEME # 0xBB92A7B9695750e1234BaB18F83b73686dd09854
-        feeManager: REPLACEME # 0x24FD64EB4766d91FD79a4D5e8086b2460dEBcaE7
-        getAssetCount: REPLACEME # 3
-        getHook: REPLACEME # need to specify args
-        getLiquidAssets: REPLACEME # view call reverted
-        getQueueCount: REPLACEME # need to specify args
-        getRoleAdmin: REPLACEME # need to specify args
-        getRoleMember: REPLACEME # need to specify args
-        getRoleMemberCount: REPLACEME # need to specify args
-        getRoleMembers: REPLACEME # need to specify args
-        getStorageAt: REPLACEME # need to specify args
-        hasAsset: REPLACEME # need to specify args
-        hasQueue: REPLACEME # need to specify args
-        hasRole: REPLACEME # need to specify args
-        hasSubvault: REPLACEME # need to specify args
-        hasSupportedRole: REPLACEME # need to specify args
-        isDepositQueue: REPLACEME # need to specify args
-        isPausedQueue: REPLACEME # need to specify args
-        onERC721Received: REPLACEME # need to specify args
-        oracle: REPLACEME # 0x8a78e6b7E15C4Ae3aeAeE3bf0DE4F2de4078c1cD
-        queueAt: REPLACEME # need to specify args
-        queueLimit: REPLACEME # 4
-        redeemQueueFactory: REPLACEME # 0xfe76b5fd238553D65Ce6dd0A572C0fda629F8421
-        riskManager: REPLACEME # 0x4f6bc03537C6F74E250f57a9a7238087caBF1c6D
-        shareManager: REPLACEME # 0xcd3c0F51798D1daA92Fb192E57844Ae6cEE8a6c7
-        subvaultAt: REPLACEME # need to specify args
+        CREATE_QUEUE_ROLE: *CREATE_QUEUE_ROLE
+        CREATE_SUBVAULT_ROLE: *CREATE_SUBVAULT_ROLE
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        DISCONNECT_SUBVAULT_ROLE: *DISCONNECT_SUBVAULT_ROLE
+        PULL_LIQUIDITY_ROLE: *PULL_LIQUIDITY_ROLE
+        PUSH_LIQUIDITY_ROLE: *PUSH_LIQUIDITY_ROLE
+        RECONNECT_SUBVAULT_ROLE: *RECONNECT_SUBVAULT_ROLE
+        REMOVE_QUEUE_ROLE: *REMOVE_QUEUE_ROLE
+        SET_HOOK_ROLE: *SET_HOOK_ROLE
+        SET_QUEUE_LIMIT_ROLE: *SET_QUEUE_LIMIT_ROLE
+        SET_QUEUE_STATUS_ROLE: *SET_QUEUE_STATUS_ROLE
+        assetAt:
+          - args: [0]
+            mustRevert: true
+        claimableSharesOf:
+        defaultDepositHook: *redirectingDepositHook
+        defaultRedeemHook: *basicRedeemHook
+        depositQueueFactory: *depositQueueFactory
+        feeManager: *feeManager
+        getAssetCount: 3
+        getHook:
+        getLiquidAssets:
+        getQueueCount:
+        getRoleAdmin:
+        getRoleMember:
+        getRoleMemberCount:
+        getRoleMembers:
+        getStorageAt:
+        hasAsset:
+        hasQueue:
+        hasRole:
+        hasSubvault:
+        hasSupportedRole:
+        isDepositQueue:
+        isPausedQueue:
+        onERC721Received:
+        oracle: *oracle
+        queueAt:
+        queueLimit: 4
+        redeemQueueFactory: *redeemQueueFactory
+        riskManager: *riskManager
+        shareManager: *shareManager
+        subvaultAt:
         subvaultFactory: REPLACEME # 0x75FE0d73d3C64cdC1C6449D9F977Be6857c4d011
-        subvaults: REPLACEME # 4
-        supportedRoleAt: REPLACEME # need to specify args
-        supportedRoles: REPLACEME # 16
-        supportsInterface: REPLACEME # need to specify args
-        verifierFactory: REPLACEME # 0x04B30b1e98950e6A13550d84e991bE0d734C2c61
+        subvaults: 4
+        supportedRoleAt:
+        supportedRoles: 16
+        supportsInterface:
+        verifierFactory: *verifierFactory
       implementationChecks:
-        CREATE_QUEUE_ROLE: REPLACEME # 0x6788636e7899d6d227901dc9f8c4c785401c0991724cf908dc65388af686da6f
-        CREATE_SUBVAULT_ROLE: REPLACEME # 0x85c2023fdfb1e93dedf5d18f9bc0e79347e071d12740ba71aeb84a4fcbdc4b79
-        DEFAULT_ADMIN_ROLE: REPLACEME # 0x0000000000000000000000000000000000000000000000000000000000000000
-        DISCONNECT_SUBVAULT_ROLE: REPLACEME # 0xf610639f4b9b8986f875fcb4e49486da5c7aa449a6942b5013fabd061e9b9fff
-        PULL_LIQUIDITY_ROLE: REPLACEME # 0x68895691ff006f290ca74825ce06ed17fffab55af49f0274f49b7424f752583a
-        PUSH_LIQUIDITY_ROLE: REPLACEME # 0x32a781031f04cc60b32394e40124d1e87f54273bf26d0532a115a424f6a93298
-        RECONNECT_SUBVAULT_ROLE: REPLACEME # 0xb557d53a2e72d8333ffa3bf2f556678becb5e995b0e25b7dca354627e550c08f
-        REMOVE_QUEUE_ROLE: REPLACEME # 0x9a4c49d6fb9452bbfe187968075d0fac7d7202d2b7f731d8cffbce9cf66756b2
-        SET_HOOK_ROLE: REPLACEME # 0x627f9e4ac2dadb64d045e7e6333c09f39ed34e0e066957955d0052b46d2e83e8
-        SET_QUEUE_LIMIT_ROLE: REPLACEME # 0x407fc42eadf1aba68b1d4a8c3c4aa2e8b6beac7957623f3694d0ad77bfb70e06
-        SET_QUEUE_STATUS_ROLE: REPLACEME # 0x6618a6d92147bbcacfb2ef2375976fc4c529eeeaeb72a66048296571370c6946
-        assetAt: REPLACEME # need to specify args
-        claimableSharesOf: REPLACEME # need to specify args
-        defaultDepositHook: REPLACEME # 0x0000000000000000000000000000000000000000
-        defaultRedeemHook: REPLACEME # 0x0000000000000000000000000000000000000000
-        depositQueueFactory: REPLACEME # 0xBB92A7B9695750e1234BaB18F83b73686dd09854
-        feeManager: REPLACEME # 0x0000000000000000000000000000000000000000
-        getAssetCount: REPLACEME # 0
+        CREATE_QUEUE_ROLE:
+        CREATE_SUBVAULT_ROLE:
+        DEFAULT_ADMIN_ROLE:
+        DISCONNECT_SUBVAULT_ROLE:
+        PULL_LIQUIDITY_ROLE:
+        PUSH_LIQUIDITY_ROLE:
+        RECONNECT_SUBVAULT_ROLE:
+        REMOVE_QUEUE_ROLE:
+        SET_HOOK_ROLE:
+        SET_QUEUE_LIMIT_ROLE:
+        SET_QUEUE_STATUS_ROLE:
+        assetAt:
+        claimableSharesOf:
+        defaultDepositHook:
+        defaultRedeemHook:
+        depositQueueFactory:
+        feeManager:
+        getAssetCount:
         getHook: REPLACEME # need to specify args
         getLiquidAssets: REPLACEME # view call reverted
         getQueueCount: REPLACEME # need to specify args
