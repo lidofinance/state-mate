@@ -79,6 +79,7 @@ deployed:
     - &LIDO_WSTETH "0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0"
     - &SAFE_IMPL_1_3_0 "0xd9db270c1b5e3bd161e8c8503c55ceabee709552"
     - &SAFE_IMPL_1_4_1 "0x41675c099f32341bf84bfc5382af534df5c7461a"
+    - &DEPLOYER "0xE98Be1E5538FCbD716C506052eB1Fd5d6fC495A3"
 
     # --- Roles 1 ---
     - &SET_ACCOUNT_INFO_ROLE "0x58258f737b9cea9d7da81a3a12943f800a9668a2494235fec0d84cc60ad04cff"
@@ -115,6 +116,11 @@ deployed:
     - &SYMBIOTIC_MELLOW_VAULT_ROLE "0xabf80feb2ee273d208fadd5ac778f2fc719588bcc130607c0fcddd743ce6f6c1"
     - &SYMBIOTIC_FARM_ROLE "0xefe4de88b49c8b8f17f4c2ff9d6f775c4747e6bf57255a802349a8ebf4842239"
     - &SYMBIOTIC_VAULT_ROLE "0x909c8b12bf402721ba65c08a75ac086b15941cd32bcb6ecba9dc69a7757d1ca9"
+
+    # --- Roles 6 ---
+    - &CANCELLER_ROLE "0xfd643c72710c63c0180259aba6b2d05451e3591a24e58b62239378085726f783"
+    - &EXECUTOR_ROLE "0xd8aa0f3194971a2a116679f7c2090f6939c8d4e01a2a8d7e41d55e5351469e63"
+    - &PROPOSER_ROLE "0xb09aa5aeb3702cfd50b6b62bc4532604938f21248a27a1d5ca736082b6819cc1"
 
     # --- Mellow signers ---
     - &MELLOW_SIGNER_1 "0x44A388BBD782AE1D7f4542aEb6C3569E2CfdF5a1"
@@ -1670,22 +1676,94 @@ l1:
       name: TimelockController
       address: *timelockController
       checks:
-        CANCELLER_ROLE: REPLACEME # 0xfd643c72710c63c0180259aba6b2d05451e3591a24e58b62239378085726f783
-        DEFAULT_ADMIN_ROLE: REPLACEME # 0x0000000000000000000000000000000000000000000000000000000000000000
-        EXECUTOR_ROLE: REPLACEME # 0xd8aa0f3194971a2a116679f7c2090f6939c8d4e01a2a8d7e41d55e5351469e63
-        PROPOSER_ROLE: REPLACEME # 0xb09aa5aeb3702cfd50b6b62bc4532604938f21248a27a1d5ca736082b6819cc1
-        getMinDelay: REPLACEME # 0
-        getOperationState: REPLACEME # need to specify args
-        getRoleAdmin: REPLACEME # need to specify args
-        getTimestamp: REPLACEME # need to specify args
-        hasRole: REPLACEME # need to specify args
-        hashOperation: REPLACEME # need to specify args
-        hashOperationBatch: REPLACEME # need to specify args
-        isOperation: REPLACEME # need to specify args
-        isOperationDone: REPLACEME # need to specify args
-        isOperationPending: REPLACEME # need to specify args
-        isOperationReady: REPLACEME # need to specify args
-        supportsInterface: REPLACEME # need to specify args
+        CANCELLER_ROLE: *CANCELLER_ROLE
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        EXECUTOR_ROLE: *EXECUTOR_ROLE
+        PROPOSER_ROLE: *PROPOSER_ROLE
+        getMinDelay: 0 # ???
+        getOperationState:
+        getRoleAdmin:
+        getTimestamp:
+        hasRole:
+          - args: [*DEFAULT_ADMIN_ROLE, *PROXY_ADMIN]
+            result: false
+          - args: [*DEFAULT_ADMIN_ROLE, *LAZY_VAULT_ADMIN]
+            result: true # ???
+          - args: [*DEFAULT_ADMIN_ROLE, *ACTIVE_VAULT_ADMIN]
+            result: false
+          - args: [*DEFAULT_ADMIN_ROLE, *ORACLE_UPDATER]
+            result: false
+          - args: [*DEFAULT_ADMIN_ROLE, *CURATOR]
+            result: false
+          - args: [*DEFAULT_ADMIN_ROLE, *TREASURY]
+            result: false
+          - args: [*DEFAULT_ADMIN_ROLE, *LIDO_PAUSER]
+            result: false
+          - args: [*DEFAULT_ADMIN_ROLE, *MELLOW_PAUSER]
+            result: false
+          - args: [*DEFAULT_ADMIN_ROLE, *DEPLOYER]
+            result: false
+          - args: [*CANCELLER_ROLE, *PROXY_ADMIN]
+            result: false
+          - args: [*CANCELLER_ROLE, *LAZY_VAULT_ADMIN]
+            result: true # ???
+          - args: [*CANCELLER_ROLE, *ACTIVE_VAULT_ADMIN]
+            result: false
+          - args: [*CANCELLER_ROLE, *ORACLE_UPDATER]
+            result: false
+          - args: [*CANCELLER_ROLE, *CURATOR]
+            result: false
+          - args: [*CANCELLER_ROLE, *TREASURY]
+            result: false
+          - args: [*CANCELLER_ROLE, *LIDO_PAUSER]
+            result: false
+          - args: [*CANCELLER_ROLE, *MELLOW_PAUSER]
+            result: false
+          - args: [*CANCELLER_ROLE, *DEPLOYER]
+            result: false
+          - args: [*EXECUTOR_ROLE, *PROXY_ADMIN]
+            result: false
+          - args: [*EXECUTOR_ROLE, *LAZY_VAULT_ADMIN]
+            result: false
+          - args: [*EXECUTOR_ROLE, *ACTIVE_VAULT_ADMIN]
+            result: false
+          - args: [*EXECUTOR_ROLE, *ORACLE_UPDATER]
+            result: false
+          - args: [*EXECUTOR_ROLE, *CURATOR]
+            result: false
+          - args: [*EXECUTOR_ROLE, *TREASURY]
+            result: false
+          - args: [*EXECUTOR_ROLE, *LIDO_PAUSER]
+            result: true # ???
+          - args: [*EXECUTOR_ROLE, *MELLOW_PAUSER]
+            result: true # ???
+          - args: [*EXECUTOR_ROLE, *DEPLOYER]
+            result: false
+          - args: [*PROPOSER_ROLE, *PROXY_ADMIN]
+            result: false
+          - args: [*PROPOSER_ROLE, *LAZY_VAULT_ADMIN]
+            result: true # ???
+          - args: [*PROPOSER_ROLE, *ACTIVE_VAULT_ADMIN]
+            result: false
+          - args: [*PROPOSER_ROLE, *ORACLE_UPDATER]
+            result: false
+          - args: [*PROPOSER_ROLE, *CURATOR]
+            result: false
+          - args: [*PROPOSER_ROLE, *TREASURY]
+            result: false
+          - args: [*PROPOSER_ROLE, *LIDO_PAUSER]
+            result: false
+          - args: [*PROPOSER_ROLE, *MELLOW_PAUSER]
+            result: false
+          - args: [*PROPOSER_ROLE, *DEPLOYER]
+            result: false
+        hashOperation:
+        hashOperationBatch:
+        isOperation:
+        isOperationDone:
+        isOperationPending:
+        isOperationReady:
+        supportsInterface:
     #
     # --- Multisigs ---
     #
