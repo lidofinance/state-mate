@@ -74,6 +74,22 @@ deployed:
     - &ZERO_ADDRESS "0x0000000000000000000000000000000000000000"
     - &ZERO_BYTES32 "0x0000000000000000000000000000000000000000000000000000000000000000"
 
+    # --- Roles
+    - &SET_ACCOUNT_INFO_ROLE "0x58258f737b9cea9d7da81a3a12943f800a9668a2494235fec0d84cc60ad04cff"
+    - &SET_FLAGS_ROLE "0x78b235a1fa2fd5e00dba7867d599bed6f088684010a7fee7b9fe05fa1082d01e"
+    - &SET_WHITELIST_MERKLE_ROOT_ROLE "0xca196afb47c2d16c8388ba0ef201b98a808acb83a856576ffc57360840a5fd99"
+    - &CREATE_QUEUE_ROLE "0x66b0512136985574365426028914091459034491778548125527411171234923"
+    - &CREATE_SUBVAULT_ROLE "0x85c2023fdfb1e93dedf5d18f9bc0e79347e071d12740ba71aeb84a4fcbdc4b79"
+    - &DEFAULT_ADMIN_ROLE "0x0000000000000000000000000000000000000000000000000000000000000000"
+    - &DISCONNECT_SUBVAULT_ROLE "0xf610639f4b9b8986f875fcb4e49486da5c7aa449a6942b5013fabd061e9b9fff"
+    - &PULL_LIQUIDITY_ROLE "0x68895691ff006f290ca74825ce06ed17fffab55af49f0274f49b7424f752583a"
+    - &PUSH_LIQUIDITY_ROLE "0x32a781031f04cc60b32394e40124d1e87f54273bf26d0532a115a424f6a93298"
+    - &RECONNECT_SUBVAULT_ROLE "0xb557d53a2e72d8333ffa3bf2f556678becb5e995b0e25b7dca354627e550c08f"
+    - &REMOVE_QUEUE_ROLE "0x9a4c49d6fb9452bbfe187968075d0fac7d7202d2b7f731d8cffbce9cf66756b2"
+    - &SET_HOOK_ROLE "0x627f9e4ac2dadb64d045e7e6333c09f39ed34e0e066957955d0052b46d2e83e8"
+    - &SET_QUEUE_LIMIT_ROLE "0x407fc42eadf1aba68b1d4a8c3c4aa2e8b6beac7957623f3694d0ad77bfb70e06"
+    - &SET_QUEUE_STATUS_ROLE "0x6618a6d92147bbcacfb2ef2375976fc4c529eeeaeb72a66048296571370c6946"
+
 l1:
   rpcUrl: ETH_RPC_URL # Mainnet RPC URL
   explorerHostname: api.etherscan.io
@@ -477,220 +493,374 @@ l1:
       name: SignatureRedeemQueue
       address: *signatureRedeemQueueImplementation
       checks:
-        ORDER_TYPEHASH: REPLACEME # 0xb367c53189b3057a91923801116b5f9c4e7211a314d1961f94770747512a1b68
-        asset: REPLACEME # 0x0000000000000000000000000000000000000000
-        canBeRemoved: REPLACEME # true
-        claimableOf: REPLACEME # need to specify args
-        consensus: REPLACEME # 0x0000000000000000000000000000000000000000
-        consensusFactory: REPLACEME # 0xaEEB06CBd91A18b51a2D30b61477eAeE3a9633C3
-        eip712Domain: REPLACEME # 0x0f,,,1,0x0000000b2082667589A16c4cF18e9f923781c471,0x0000000000000000000000000000000000000000000000000000000000000000,
-        handleReport: REPLACEME # need to specify args
-        hashOrder: REPLACEME # need to specify args
-        nonces: REPLACEME # need to specify args
-        validateOrder: REPLACEME # need to specify args
-        vault: REPLACEME # 0x0000000000000000000000000000000000000000
+        ORDER_TYPEHASH: "0xb367c53189b3057a91923801116b5f9c4e7211a314d1961f94770747512a1b68"
+        asset: *ZERO_ADDRESS
+        canBeRemoved: true
+        claimableOf:
+          - args: [*ZERO_ADDRESS]
+            result: 0
+        consensus: *ZERO_ADDRESS
+        consensusFactory: *consensusFactory
+        eip712Domain: ["0x0f", "", "", 1, *signatureRedeemQueueImplementation, *ZERO_BYTES32, []]
+        handleReport: # this queue doesn't have handleReport (no-op)
+        hashOrder:
+        nonces:
+          - args: [*ZERO_ADDRESS]
+            result: 0
+        validateOrder:
+        vault: *ZERO_ADDRESS
     riskManagerFactory:
       name: Factory
       address: *riskManagerFactory
       proxyName: TransparentUpgradeableProxy
-      implementation: "0x0000000397b71c8f3182fd40d247330d218fdc72"
+      implementation: *factoryImplementation
       proxyChecks: {}
       checks:
-        entities: REPLACEME # 4
-        entityAt: REPLACEME # need to specify args
-        implementationAt: REPLACEME # need to specify args
-        implementations: REPLACEME # 1
-        isBlacklisted: REPLACEME # need to specify args
-        isEntity: REPLACEME # need to specify args
-        owner: REPLACEME # 0x81698f87C6482bF1ce9bFcfC0F103C4A0Adf0Af0
-        proposalAt: REPLACEME # need to specify args
-        proposals: REPLACEME # 0
+        entities: 4
+        entityAt:
+          - args: [4]
+            mustRevert: true
+          - args: [3]
+            result: "0x22D047637D6aCD0B5525b5bD1449AE9f9575FEc5" # ???
+          - args: [2]
+            result: *riskManager
+          - args: [1]
+            result: "0x86909e76a0Faac4A3bf1134204125592CC40EBa2" # ???
+          - args: [0]
+            result: "0x6C85dC0E59BB81B5840411cf952eC8FaA7E39b91" # ???
+        implementationAt:
+          - args: [0]
+            result: *riskManagerImplementation
+          - args: [1]
+            mustRevert: true
+        implementations: 1
+        isBlacklisted:
+          - args: [*riskManagerImplementation]
+            result: false
+        isEntity:
+          - args: ["0x22D047637D6aCD0B5525b5bD1449AE9f9575FEc5"]
+            result: true
+          - args: [*riskManager]
+            result: true
+          - args: ["0x86909e76a0Faac4A3bf1134204125592CC40EBa2"]
+            result: true
+          - args: ["0x6C85dC0E59BB81B5840411cf952eC8FaA7E39b91"]
+            result: true
+        owner: *PROXY_ADMIN
+        proposalAt:
+          - args: [0]
+            mustRevert: true
+        proposals: 0
       implementationChecks:
-        entities: REPLACEME # 0
-        entityAt: REPLACEME # need to specify args
-        implementationAt: REPLACEME # need to specify args
-        implementations: REPLACEME # 0
-        isBlacklisted: REPLACEME # need to specify args
-        isEntity: REPLACEME # need to specify args
-        owner: REPLACEME # 0x0000000000000000000000000000000000000000
-        proposalAt: REPLACEME # need to specify args
-        proposals: REPLACEME # 0
+        entities:
+        entityAt:
+        implementationAt:
+        implementations:
+        isBlacklisted:
+        isEntity:
+        owner:
+        proposalAt:
+        proposals:
     shareManagerFactory:
       name: Factory
       address: *shareManagerFactory
       proxyName: TransparentUpgradeableProxy
-      implementation: "0x0000000397b71c8f3182fd40d247330d218fdc72"
+      implementation: *tokenizedShareManagerImplementation
       proxyChecks: {}
       checks:
-        entities: REPLACEME # 4
-        entityAt: REPLACEME # need to specify args
-        implementationAt: REPLACEME # need to specify args
-        implementations: REPLACEME # 2
-        isBlacklisted: REPLACEME # need to specify args
-        isEntity: REPLACEME # need to specify args
-        owner: REPLACEME # 0x81698f87C6482bF1ce9bFcfC0F103C4A0Adf0Af0
-        proposalAt: REPLACEME # need to specify args
-        proposals: REPLACEME # 0
+        entities: 4
+        entityAt:
+          - args: [4]
+            mustRevert: true
+          - args: [3]
+            result: "0x4076D217fAA2813165235b4f0D9C03B67bfF9355" # ???
+          - args: [2]
+            result: *shareManager
+          - args: [1]
+            result: "0x84C6321ea04b4D69425C1045dCd86Ee38033C012" # ???
+          - args: [0]
+            result: "0x5d1Bb09E87F3f52a252893522182a00Bd8649ac7" # ???
+        implementations: 2
+        implementationAt:
+          - args: [0]
+            result: *tokenizedShareManagerImplementation
+          - args: [1]
+            result: *basicShareManagerImplementation
+          - args: [2]
+            mustRevert: true
+        isBlacklisted:
+          - args: [*tokenizedShareManagerImplementation]
+            result: false
+          - args: [*basicShareManagerImplementation]
+            result: false
+        isEntity:
+          - args: ["0x4076D217fAA2813165235b4f0D9C03B67bfF9355"]
+            result: true
+          - args: [*shareManager]
+            result: true
+          - args: ["0x84C6321ea04b4D69425C1045dCd86Ee38033C012"]
+            result: true
+          - args: ["0x5d1Bb09E87F3f52a252893522182a00Bd8649ac7"]
+            result: true
+        owner: *PROXY_ADMIN
+        proposalAt:
+          - args: [0]
+            mustRevert: true
+        proposals: 0
       implementationChecks:
-        entities: REPLACEME # 0
-        entityAt: REPLACEME # need to specify args
-        implementationAt: REPLACEME # need to specify args
-        implementations: REPLACEME # 0
-        isBlacklisted: REPLACEME # need to specify args
-        isEntity: REPLACEME # need to specify args
-        owner: REPLACEME # 0x0000000000000000000000000000000000000000
-        proposalAt: REPLACEME # need to specify args
-        proposals: REPLACEME # 0
+        entities:
+        entityAt:
+        implementationAt:
+        implementations:
+        isBlacklisted:
+        isEntity:
+        owner:
+        proposalAt:
+        proposals:
     tokenizedShareManagerImplementation:
       name: TokenizedShareManager
       address: *tokenizedShareManagerImplementation
       checks:
-        SET_ACCOUNT_INFO_ROLE: REPLACEME # 0x58258f737b9cea9d7da81a3a12943f800a9668a2494235fec0d84cc60ad04cff
-        SET_FLAGS_ROLE: REPLACEME # 0x78b235a1fa2fd5e00dba7867d599bed6f088684010a7fee7b9fe05fa1082d01e
-        SET_WHITELIST_MERKLE_ROOT_ROLE: REPLACEME # 0xca196afb47c2d16c8388ba0ef201b98a808acb83a856576ffc57360840a5fd99
-        accounts: REPLACEME # need to specify args
-        activeShares: REPLACEME # 0
-        activeSharesOf: REPLACEME # need to specify args
-        allocatedShares: REPLACEME # 0
-        allowance: REPLACEME # need to specify args
-        balanceOf: REPLACEME # need to specify args
-        claimableSharesOf: REPLACEME # need to specify args
-        decimals: REPLACEME # 18
-        flags: REPLACEME # false,false,false,false,false,0
-        isDepositorWhitelisted: REPLACEME # need to specify args
-        name: REPLACEME #
-        sharesOf: REPLACEME # need to specify args
-        symbol: REPLACEME #
-        totalShares: REPLACEME # 0
-        totalSupply: REPLACEME # 0
-        updateChecks: REPLACEME # need to specify args
-        vault: REPLACEME # 0x0000000000000000000000000000000000000000
-        whitelistMerkleRoot: REPLACEME # 0x0000000000000000000000000000000000000000000000000000000000000000
+        SET_ACCOUNT_INFO_ROLE: *SET_ACCOUNT_INFO_ROLE
+        SET_FLAGS_ROLE: *SET_FLAGS_ROLE
+        SET_WHITELIST_MERKLE_ROOT_ROLE: *SET_WHITELIST_MERKLE_ROOT_ROLE
+        accounts:
+        activeShares: 0
+        activeSharesOf:
+        allocatedShares: 0
+        allowance:
+        balanceOf:
+        claimableSharesOf:
+        decimals: 18
+        flags: [false, false, false, false, false, 0]
+        isDepositorWhitelisted:
+        name: ""
+        sharesOf:
+        symbol: ""
+        totalShares: 0
+        totalSupply: 0
+        updateChecks:
+        vault: *ZERO_ADDRESS
+        whitelistMerkleRoot: *ZERO_ADDRESS
     basicShareManagerImplementation:
       name: BasicShareManager
       address: *basicShareManagerImplementation
       checks:
-        SET_ACCOUNT_INFO_ROLE: REPLACEME # 0x58258f737b9cea9d7da81a3a12943f800a9668a2494235fec0d84cc60ad04cff
-        SET_FLAGS_ROLE: REPLACEME # 0x78b235a1fa2fd5e00dba7867d599bed6f088684010a7fee7b9fe05fa1082d01e
-        SET_WHITELIST_MERKLE_ROOT_ROLE: REPLACEME # 0xca196afb47c2d16c8388ba0ef201b98a808acb83a856576ffc57360840a5fd99
-        accounts: REPLACEME # need to specify args
-        activeShares: REPLACEME # 0
-        activeSharesOf: REPLACEME # need to specify args
-        allocatedShares: REPLACEME # 0
-        claimableSharesOf: REPLACEME # need to specify args
-        flags: REPLACEME # false,false,false,false,false,0
-        isDepositorWhitelisted: REPLACEME # need to specify args
-        sharesOf: REPLACEME # need to specify args
-        totalShares: REPLACEME # 0
-        updateChecks: REPLACEME # need to specify args
-        vault: REPLACEME # 0x0000000000000000000000000000000000000000
-        whitelistMerkleRoot: REPLACEME # 0x0000000000000000000000000000000000000000000000000000000000000000
+        SET_ACCOUNT_INFO_ROLE: *SET_ACCOUNT_INFO_ROLE
+        SET_FLAGS_ROLE: *SET_FLAGS_ROLE
+        SET_WHITELIST_MERKLE_ROOT_ROLE: *SET_WHITELIST_MERKLE_ROOT_ROLE
+        accounts:
+        activeShares: 0
+        activeSharesOf:
+        allocatedShares: 0
+        claimableSharesOf:
+        flags: [false, false, false, false, false, 0]
+        isDepositorWhitelisted:
+        sharesOf:
+        totalShares: 0
+        updateChecks:
+        vault: *ZERO_ADDRESS
+        whitelistMerkleRoot: *ZERO_ADDRESS
     subvaultFactory:
       name: Factory
       address: *subvaultFactory
       proxyName: TransparentUpgradeableProxy
-      implementation: "0x0000000397b71c8f3182fd40d247330d218fdc72"
+      implementation: *subvaultImplementation
       proxyChecks: {}
       checks:
-        entities: REPLACEME # 6
-        entityAt: REPLACEME # need to specify args
-        implementationAt: REPLACEME # need to specify args
-        implementations: REPLACEME # 1
-        isBlacklisted: REPLACEME # need to specify args
-        isEntity: REPLACEME # need to specify args
-        owner: REPLACEME # 0x81698f87C6482bF1ce9bFcfC0F103C4A0Adf0Af0
-        proposalAt: REPLACEME # need to specify args
-        proposals: REPLACEME # 0
+        entities: 6
+        entityAt:
+          - args: [6]
+            mustRevert: true
+          - args: [5]
+            result: "0x2e2b73616e67c1C3660111baE981483a126e8F7a" # ???
+          - args: [4]
+            result: *subvault3
+          - args: [3]
+            result: *subvault2
+          - args: [2]
+            result: *subvault1
+          - args: [1]
+            result: *subvault0
+          - args: [0]
+            result: "0xDF53d349a00Cb25C33cf2A5925EF21d8c2cFD3b1" # ???
+        implementationAt:
+          - args: [0]
+            result: *subvaultImplementation
+          - args: [1]
+            mustRevert: true
+        implementations: 1
+        isBlacklisted:
+          - args: [*subvaultImplementation]
+            result: false
+        isEntity:
+          - args: ["0x2e2b73616e67c1C3660111baE981483a126e8F7a"]
+            result: true
+          - args: [*subvault3]
+            result: true
+          - args: [*subvault2]
+            result: true
+          - args: [*subvault1]
+            result: true
+          - args: [*subvault0]
+            result: true
+          - args: ["0xDF53d349a00Cb25C33cf2A5925EF21d8c2cFD3b1"]
+            result: true
+        owner: *PROXY_ADMIN
+        proposalAt:
+          - args: [0]
+            mustRevert: true
+        proposals: 0
       implementationChecks:
-        entities: REPLACEME # 0
-        entityAt: REPLACEME # need to specify args
-        implementationAt: REPLACEME # need to specify args
-        implementations: REPLACEME # 0
-        isBlacklisted: REPLACEME # need to specify args
-        isEntity: REPLACEME # need to specify args
-        owner: REPLACEME # 0x0000000000000000000000000000000000000000
-        proposalAt: REPLACEME # need to specify args
-        proposals: REPLACEME # 0
+        entities:
+        entityAt:
+        implementationAt:
+        implementations:
+        isBlacklisted:
+        isEntity:
+        owner:
+        proposalAt:
+        proposals:
     verifierFactory:
       name: Factory
       address: *verifierFactory
       proxyName: TransparentUpgradeableProxy
-      implementation: "0x0000000397b71c8f3182fd40d247330d218fdc72"
+      implementation: *verifierImplementation
       proxyChecks: {}
       checks:
-        entities: REPLACEME # 6
-        entityAt: REPLACEME # need to specify args
-        implementationAt: REPLACEME # need to specify args
-        implementations: REPLACEME # 1
-        isBlacklisted: REPLACEME # need to specify args
-        isEntity: REPLACEME # need to specify args
-        owner: REPLACEME # 0x81698f87C6482bF1ce9bFcfC0F103C4A0Adf0Af0
-        proposalAt: REPLACEME # need to specify args
-        proposals: REPLACEME # 0
+        entities: 6
+        entityAt:
+          - args: [6]
+            mustRevert: true
+          - args: [5]
+            result: "0x6AF924f6450b2B5FdE62160bdD3eD076Ad92BCa1" # ???
+          - args: [4]
+            result: *verifier3
+          - args: [3]
+            result: *verifier2
+          - args: [2]
+            result: *verifier1
+          - args: [1]
+            result: *verifier0
+          - args: [0]
+            result: "0x972C2c6b0f11dC748635b00dAD36Bf0BdE08Aa82" # ???
+        implementationAt:
+          - args: [0]
+            result: *verifierImplementation
+          - args: [1]
+            mustRevert: true
+        implementations: 1
+        isBlacklisted:
+          - args: [*verifierImplementation]
+            result: false
+        isEntity:
+          - args: ["0x6AF924f6450b2B5FdE62160bdD3eD076Ad92BCa1"]
+            result: true
+          - args: [*verifier3]
+            result: true
+          - args: [*verifier2]
+            result: true
+          - args: [*verifier1]
+            result: true
+          - args: [*verifier0]
+            result: true
+          - args: ["0x972C2c6b0f11dC748635b00dAD36Bf0BdE08Aa82"]
+            result: true
+        owner: *PROXY_ADMIN
+        proposalAt:
+          - args: [0]
+            mustRevert: true
+        proposals: 0
       implementationChecks:
-        entities: REPLACEME # 0
-        entityAt: REPLACEME # need to specify args
-        implementationAt: REPLACEME # need to specify args
-        implementations: REPLACEME # 0
-        isBlacklisted: REPLACEME # need to specify args
-        isEntity: REPLACEME # need to specify args
-        owner: REPLACEME # 0x0000000000000000000000000000000000000000
-        proposalAt: REPLACEME # need to specify args
-        proposals: REPLACEME # 0
+        entities:
+        entityAt:
+        implementationAt:
+        implementations:
+        isBlacklisted:
+        isEntity:
+        owner:
+        proposalAt:
+        proposals:
     vaultFactory:
       name: Factory
       address: *vaultFactory
       proxyName: TransparentUpgradeableProxy
-      implementation: "0x0000000397b71c8f3182fd40d247330d218fdc72"
+      implementation: *vaultImplementation
       proxyChecks: {}
       checks:
-        entities: REPLACEME # 4
-        entityAt: REPLACEME # need to specify args
-        implementationAt: REPLACEME # need to specify args
-        implementations: REPLACEME # 1
-        isBlacklisted: REPLACEME # need to specify args
-        isEntity: REPLACEME # need to specify args
-        owner: REPLACEME # 0x81698f87C6482bF1ce9bFcfC0F103C4A0Adf0Af0
-        proposalAt: REPLACEME # need to specify args
-        proposals: REPLACEME # 0
+        entities: 4
+        entityAt:
+          - args: [4]
+            mustRevert: true
+          - args: [3]
+            result: "0xDbC81B33A23375A90c8Ba4039d5738CB6f56fE8d" # ???
+          - args: [2]
+            result: *vault
+          - args: [1]
+            result: "0xf328463fb20d9265C612155F4d023f8cD79916C7" # ???
+          - args: [0]
+            result: "0x54b94cFD52f4eEd446bfbB2FeD1a6CD51ce995f6" # ???
+        implementationAt:
+          - args: [0]
+            result: *vaultImplementation
+          - args: [1]
+            mustRevert: true
+        implementations: 1
+        isBlacklisted:
+          - args: [*vaultImplementation]
+            result: false
+        isEntity:
+          - args: [*vault]
+            result: true
+          - args: ["0xf328463fb20d9265C612155F4d023f8cD79916C7"]
+            result: true
+          - args: ["0x54b94cFD52f4eEd446bfbB2FeD1a6CD51ce995f6"]
+            result: true
+          - args: ["0xDbC81B33A23375A90c8Ba4039d5738CB6f56fE8d"]
+            result: true
+        owner: *PROXY_ADMIN
+        proposalAt:
+          - args: [0]
+            mustRevert: true
+        proposals: 0
       implementationChecks:
-        entities: REPLACEME # 0
-        entityAt: REPLACEME # need to specify args
-        implementationAt: REPLACEME # need to specify args
-        implementations: REPLACEME # 0
-        isBlacklisted: REPLACEME # need to specify args
-        isEntity: REPLACEME # need to specify args
-        owner: REPLACEME # 0x0000000000000000000000000000000000000000
-        proposalAt: REPLACEME # need to specify args
-        proposals: REPLACEME # 0
+        entities:
+        entityAt:
+        implementationAt:
+        implementations:
+        isBlacklisted:
+        isEntity:
+        owner:
+        proposalAt:
+        proposals:
     vaultImplementation:
       name: Vault
       address: *vaultImplementation
       checks:
-        CREATE_QUEUE_ROLE: REPLACEME # 0x6788636e7899d6d227901dc9f8c4c785401c0991724cf908dc65388af686da6f
-        CREATE_SUBVAULT_ROLE: REPLACEME # 0x85c2023fdfb1e93dedf5d18f9bc0e79347e071d12740ba71aeb84a4fcbdc4b79
-        DEFAULT_ADMIN_ROLE: REPLACEME # 0x0000000000000000000000000000000000000000000000000000000000000000
-        DISCONNECT_SUBVAULT_ROLE: REPLACEME # 0xf610639f4b9b8986f875fcb4e49486da5c7aa449a6942b5013fabd061e9b9fff
-        PULL_LIQUIDITY_ROLE: REPLACEME # 0x68895691ff006f290ca74825ce06ed17fffab55af49f0274f49b7424f752583a
-        PUSH_LIQUIDITY_ROLE: REPLACEME # 0x32a781031f04cc60b32394e40124d1e87f54273bf26d0532a115a424f6a93298
-        RECONNECT_SUBVAULT_ROLE: REPLACEME # 0xb557d53a2e72d8333ffa3bf2f556678becb5e995b0e25b7dca354627e550c08f
-        REMOVE_QUEUE_ROLE: REPLACEME # 0x9a4c49d6fb9452bbfe187968075d0fac7d7202d2b7f731d8cffbce9cf66756b2
-        SET_HOOK_ROLE: REPLACEME # 0x627f9e4ac2dadb64d045e7e6333c09f39ed34e0e066957955d0052b46d2e83e8
-        SET_QUEUE_LIMIT_ROLE: REPLACEME # 0x407fc42eadf1aba68b1d4a8c3c4aa2e8b6beac7957623f3694d0ad77bfb70e06
-        SET_QUEUE_STATUS_ROLE: REPLACEME # 0x6618a6d92147bbcacfb2ef2375976fc4c529eeeaeb72a66048296571370c6946
-        assetAt: REPLACEME # need to specify args
-        claimableSharesOf: REPLACEME # need to specify args
-        defaultDepositHook: REPLACEME # 0x0000000000000000000000000000000000000000
-        defaultRedeemHook: REPLACEME # 0x0000000000000000000000000000000000000000
-        depositQueueFactory: REPLACEME # 0xBB92A7B9695750e1234BaB18F83b73686dd09854
-        feeManager: REPLACEME # 0x0000000000000000000000000000000000000000
-        getAssetCount: REPLACEME # 0
-        getHook: REPLACEME # need to specify args
-        getLiquidAssets: REPLACEME # view call reverted
+        CREATE_QUEUE_ROLE: *CREATE_QUEUE_ROLE
+        CREATE_SUBVAULT_ROLE: *CREATE_SUBVAULT_ROLE
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        DISCONNECT_SUBVAULT_ROLE: *DISCONNECT_SUBVAULT_ROLE
+        PULL_LIQUIDITY_ROLE: *PULL_LIQUIDITY_ROLE
+        PUSH_LIQUIDITY_ROLE: *PUSH_LIQUIDITY_ROLE
+        RECONNECT_SUBVAULT_ROLE: *RECONNECT_SUBVAULT_ROLE
+        REMOVE_QUEUE_ROLE: *REMOVE_QUEUE_ROLE
+        SET_HOOK_ROLE: *SET_HOOK_ROLE
+        SET_QUEUE_LIMIT_ROLE: *SET_QUEUE_LIMIT_ROLE
+        SET_QUEUE_STATUS_ROLE: *SET_QUEUE_STATUS_ROLE
+        assetAt:
+        claimableSharesOf:
+        defaultDepositHook: *ZERO_ADDRESS
+        defaultRedeemHook: *ZERO_ADDRESS
+        depositQueueFactory: *depositQueueFactory
+        feeManager: *ZERO_ADDRESS
+        getAssetCount: 0
+        getHook:
+        getLiquidAssets:
         getQueueCount: REPLACEME # need to specify args
-        getRoleAdmin: REPLACEME # need to specify args
-        getRoleMember: REPLACEME # need to specify args
-        getRoleMemberCount: REPLACEME # need to specify args
+        getRoleAdmin:
+        getRoleMember:
+        getRoleMemberCount:
         getRoleMembers: REPLACEME # need to specify args
         getStorageAt: REPLACEME # need to specify args
         hasAsset: REPLACEME # need to specify args
@@ -701,14 +871,14 @@ l1:
         isDepositQueue: REPLACEME # need to specify args
         isPausedQueue: REPLACEME # need to specify args
         onERC721Received: REPLACEME # need to specify args
-        oracle: REPLACEME # 0x0000000000000000000000000000000000000000
+        oracle: *ZERO_ADDRESS
         queueAt: REPLACEME # need to specify args
-        queueLimit: REPLACEME # 0
-        redeemQueueFactory: REPLACEME # 0xfe76b5fd238553D65Ce6dd0A572C0fda629F8421
-        riskManager: REPLACEME # 0x0000000000000000000000000000000000000000
-        shareManager: REPLACEME # 0x0000000000000000000000000000000000000000
-        subvaultAt: REPLACEME # need to specify args
-        subvaultFactory: REPLACEME # 0x75FE0d73d3C64cdC1C6449D9F977Be6857c4d011
+        queueLimit: 0
+        redeemQueueFactory: *redeemQueueFactory
+        riskManager: *ZERO_ADDRESS
+        shareManager: *ZERO_ADDRESS
+        subvaultAt:
+        subvaultFactory: *subvaultFactory
         subvaults: REPLACEME # 0
         supportedRoleAt: REPLACEME # need to specify args
         supportedRoles: REPLACEME # 0
