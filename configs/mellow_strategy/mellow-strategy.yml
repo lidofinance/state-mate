@@ -1007,10 +1007,10 @@ l1:
         calculateHash:
         verifyCall:
     eigenLayerVerifierFactory:
-      name: EigenLayerVerifierFactory
+      name: Factory
       address: *eigenLayerVerifierFactory
       proxyName: TransparentUpgradeableProxy
-      implementation: *eigenLayerVerifier
+      implementation: *factoryImplementation
       proxyChecks: {}
       checks:
         entities: 0
@@ -1019,12 +1019,12 @@ l1:
             mustRevert: true
         implementationAt:
           - args: [0]
-            result: *eigenLayerVerifier
+            result: *factoryImplementation
           - args: [1]
             mustRevert: true
         implementations: 1
         isBlacklisted:
-          - args: [*eigenLayerVerifier]
+          - args: [*factoryImplementation]
             result: false
         isEntity:
         owner: *PROXY_ADMIN
@@ -1039,7 +1039,7 @@ l1:
         implementations:
         isBlacklisted:
         isEntity:
-        owner: *ZERO_ADDRESS
+        owner:
         proposalAt:
         proposals:
     eigenLayerVerifier:
@@ -1087,21 +1087,19 @@ l1:
           - args: [*ERC20Verifier]
             result: false
         isEntity:
-          - args: [*ERC20Verifier]
-            result: true
         owner: *PROXY_ADMIN
         proposalAt:
           - args: [0]
             mustRevert: true
         proposals: 0
       implementationChecks:
-        entities: 0
+        entities:
         entityAt:
         implementationAt:
         implementations:
         isBlacklisted:
         isEntity:
-        owner: *ZERO_ADDRESS
+        owner:
         proposalAt:
         proposals:
     ERC20Verifier:
@@ -1143,8 +1141,6 @@ l1:
           - args: [*symbioticVerifier]
             result: false
         isEntity:
-          - args: [*symbioticVerifier]
-            result: true
         owner: *PROXY_ADMIN
         proposalAt:
           - args: [0]
