@@ -1,7 +1,7 @@
 # yaml-language-server: $schema=../../schemas/main-schema.json
 deployed:
   l1:
-    # --- Base deployment (VERIFIED)---
+    # --- Base contracts deployment (VERIFIED by Nethermind)---
     - &factoryImplementation "0x0000000397b71C8f3182Fd40D247330D218fdC72"
     - &factoryFactory "0x0000000f9686896836C39cf721141922Ce42639f"
     - &consensusFactory "0xaEEB06CBd91A18b51a2D30b61477eAeE3a9633C3"
@@ -60,7 +60,7 @@ deployed:
     - &verifier3 "0xd662dF7C0FAF0Fe6446638651b05C287806AD1AE"
     - &timelockController "0x8D8b65727729Fb484CB6dc1452D61608a5758596"
 
-    # --- Actors ---
+    # --- Actors (multisigs) ---
     - &PROXY_ADMIN "0x81698f87C6482bF1ce9bFcfC0F103C4A0Adf0Af0"
     - &LAZY_VAULT_ADMIN "0xAbE20D266Ae54b9Ae30492dEa6B6407bF18fEeb5"
     - &ACTIVE_VAULT_ADMIN "0xeb1CaFBcC8923eCbc243ff251C385C201A6c734a"
@@ -82,12 +82,16 @@ deployed:
     - &SAFE_IMPL_1_4_1 "0x41675c099f32341bf84bfc5382af534df5c7461a"
     - &DEPLOYER "0xE98Be1E5538FCbD716C506052eB1Fd5d6fC495A3"
 
-    # --- Roles 1 ---
+    #
+    # --- ROLES --- #
+    #
+
+    # --- Roles: share manager ---
     - &SET_ACCOUNT_INFO_ROLE "0x58258f737b9cea9d7da81a3a12943f800a9668a2494235fec0d84cc60ad04cff"
     - &SET_FLAGS_ROLE "0x78b235a1fa2fd5e00dba7867d599bed6f088684010a7fee7b9fe05fa1082d01e"
     - &SET_WHITELIST_MERKLE_ROOT_ROLE "0xca196afb47c2d16c8388ba0ef201b98a808acb83a856576ffc57360840a5fd99"
 
-    # --- Roles 2 ---
+    # --- Roles: vault ---
     - &CREATE_QUEUE_ROLE "0x6788636e7899d6d227901dc9f8c4c785401c0991724cf908dc65388af686da6f"
     - &CREATE_SUBVAULT_ROLE "0x85c2023fdfb1e93dedf5d18f9bc0e79347e071d12740ba71aeb84a4fcbdc4b79"
     - &DISCONNECT_SUBVAULT_ROLE "0xf610639f4b9b8986f875fcb4e49486da5c7aa449a6942b5013fabd061e9b9fff"
@@ -99,37 +103,37 @@ deployed:
     - &SET_QUEUE_LIMIT_ROLE "0x407fc42eadf1aba68b1d4a8c3c4aa2e8b6beac7957623f3694d0ad77bfb70e06"
     - &SET_QUEUE_STATUS_ROLE "0x6618a6d92147bbcacfb2ef2375976fc4c529eeeaeb72a66048296571370c6946"
 
-    # --- Roles 3 ---
+    # --- Roles: EigenLayer verifier ---
     - &ASSET_ROLE "0x7a2ed8c36fc77fb21dfb67d40423dad2ecf5e9539694580ecb4f6aaec99d266e"
-    - &CALLER_ROLE "0x429987c65ae1b21d36923ef95ce6fcd59f7bf9663738a09ee8eefcf6f777562b"
+    - &EL_CALLER_ROLE "0x429987c65ae1b21d36923ef95ce6fcd59f7bf9663738a09ee8eefcf6f777562b"
     - &MELLOW_VAULT_ROLE "0x935fd7b940d597b587bde3e2081c175c3c2ef95cd30a83492573ee0907ad6aaa"
     - &OPERATOR_ROLE "0xcf0cbc050f25c592622c05ff9a7f25030deea63c230fa4d7b8d226d8c0837201"
     - &RECEIVER_ROLE "0x59b484ad6f5409567fc5a4860c4c34866eec78f8cc4024ed3e17efb0f215d8db"
     - &STRATEGY_ROLE "0x2eab4b6bd944eae98f56071c3f2866a8355e10331fc8a04157ddf9ee0feff1e0"
 
-    # --- Roles 4 ---
+    # --- Roles: ERC20 verifier ---
     - &ERC20_ASSET_ROLE "0x8b4b1250247f1cbb35f7f69415df3cf642553a6953f81fae69e135c5feefc94b"
     - &ERC20_CALLER_ROLE "0xc896aac795f7376adc96049886670c0e28cf66652e338a4139e37d2503456058"
     - &ERC20_RECIPIENT_ROLE "0x7c6c5b36d31deb1f0c3cbcc15c12c0be85fe383faacee29701116ad6cfb3a29a"
 
-    # --- Roles 5 ---
+    # --- Roles: Symbiotic verifier ---
     - &SYMBIOTIC_CALLER_ROLE "0x3b48a429628aa7e067d22e77e8f4703a9d84dc4efdabe07716c4d0322e7f2714"
     - &SYMBIOTIC_MELLOW_VAULT_ROLE "0xabf80feb2ee273d208fadd5ac778f2fc719588bcc130607c0fcddd743ce6f6c1"
     - &SYMBIOTIC_FARM_ROLE "0xefe4de88b49c8b8f17f4c2ff9d6f775c4747e6bf57255a802349a8ebf4842239"
     - &SYMBIOTIC_VAULT_ROLE "0x909c8b12bf402721ba65c08a75ac086b15941cd32bcb6ecba9dc69a7757d1ca9"
 
-    # --- Roles 6 ---
+    # --- Roles: timelock controller ---
     - &CANCELLER_ROLE "0xfd643c72710c63c0180259aba6b2d05451e3591a24e58b62239378085726f783"
     - &EXECUTOR_ROLE "0xd8aa0f3194971a2a116679f7c2090f6939c8d4e01a2a8d7e41d55e5351469e63"
     - &PROPOSER_ROLE "0xb09aa5aeb3702cfd50b6b62bc4532604938f21248a27a1d5ca736082b6819cc1"
 
-    # --- Roles 7 ---
+    # --- Roles: verifier ---
     - &ALLOW_CALL_ROLE "0x7e8318b807524ed75f0b7cc82d3cd61e590497e7502a54c698a969fa62dc0a2e"
     - &CALLER_ROLE "0x877766a829235d063c3ba37802a4874fcf1b575d310fbe898df17d8ebabee463"
     - &DISALLOW_CALL_ROLE "0xf3354d076b52bf34f14c15ff5c85faef55353add7b5bb69cd8ac10c4b85748cf"
     - &SET_MERKLE_ROOT_ROLE "0xfc199f685d023b44b528c5fcb9cebfe292e64340dd5729b20761da4ad1e93024"
 
-    # --- Roles 8 ---
+    # --- Roles: risk manager ---
     - &ALLOW_SUBVAULT_ASSETS_ROLE "0x4a899e3e648ea55418d9c99177e5c522df621b1953c0ad7e99da3711043ba1c1"
     - &DISALLOW_SUBVAULT_ASSETS_ROLE "0x35c8c55cb15b3aef15751488f551edf793583e377f8951cf9738f035a1649ec5"
     - &MODIFY_PENDING_ASSETS_ROLE "0xcaa6b67a612f0bc4bdf15a48dde19f543e93099681b3ceaee93d630e38bcff38"
@@ -138,12 +142,16 @@ deployed:
     - &SET_SUBVAULT_LIMIT_ROLE "0x253eb39d0edc77da10bbc4bcaa23c44e40e3c67ed649fbecb18a3f7c51bfbb10"
     - &SET_VAULT_LIMIT_ROLE "0x2b2a32ecca586a148d15aea321ddbb421a2a3ac6b4d56c0a9ad9de32e84cf5c4"
 
-    # --- Roles 9 ---
+    # --- Roles: oracle ---
     - &ACCEPT_REPORT_ROLE "0x341f4b58682c3a888bdb3eb9a8a4452a6e847be8a380eb3d742794b4f9ac0ab3"
     - &ADD_SUPPORTED_ASSETS_ROLE "0x73c07eddbe5b5274995c8e6cbe94d644cedc04911df3baf934188d230ca7a2cd"
     - &REMOVE_SUPPORTED_ASSETS_ROLE "0x748ab7827e75e9f34387e3ded8598f06eb04cc7bb90fff07bc6dc2a748377021"
     - &SET_SECURITY_PARAMS_ROLE "0x79abe62d91dbd05fcda41b212f4c8c1f1d8be54ccddf859de3ccd1361b71fcb6"
     - &SUBMIT_REPORTS_ROLE "0xb54eea9408efadf36da92cc5ecd8af0f45d6dd90de54634bbc5a2113ddcb505d"
+
+    #
+    # --- MULTISIGS -- #
+    #
 
     # --- Mellow signers ---
     - &MELLOW_SIGNER_1 "0x44A388BBD782AE1D7f4542aEb6C3569E2CfdF5a1"
@@ -1019,12 +1027,12 @@ l1:
             mustRevert: true
         implementationAt:
           - args: [0]
-            result: *factoryImplementation
+            result: *eigenLayerVerifier
           - args: [1]
             mustRevert: true
         implementations: 1
         isBlacklisted:
-          - args: [*factoryImplementation]
+          - args: [*eigenLayerVerifier]
             result: false
         isEntity:
         owner: *PROXY_ADMIN
@@ -1047,7 +1055,7 @@ l1:
       address: *eigenLayerVerifier
       checks:
         ASSET_ROLE: *ASSET_ROLE
-        CALLER_ROLE: *CALLER_ROLE
+        CALLER_ROLE: *EL_CALLER_ROLE
         DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
         MELLOW_VAULT_ROLE: *MELLOW_VAULT_ROLE
         OPERATOR_ROLE: *OPERATOR_ROLE
@@ -1165,7 +1173,7 @@ l1:
         MELLOW_VAULT_ROLE: *SYMBIOTIC_MELLOW_VAULT_ROLE
         SYMBIOTIC_FARM_ROLE: *SYMBIOTIC_FARM_ROLE
         SYMBIOTIC_VAULT_ROLE: *SYMBIOTIC_VAULT_ROLE
-        farmFactory: *ZERO_ADDRESS
+        farmFactory: "0xFEB871581C2ab2e1EEe6f7dDC7e6246cFa087A23" # ???
         getRoleAdmin:
         getRoleMember:
         getRoleMemberCount:
@@ -1175,7 +1183,7 @@ l1:
         supportedRoleAt:
         supportedRoles:
         supportsInterface:
-        vaultFactory: *vaultFactory
+        vaultFactory: "0xAEb6bdd95c502390db8f52c8909F703E9Af6a346" # ???
         verifyCall:
     vaultConfigurator:
       name: VaultConfigurator
@@ -1190,7 +1198,7 @@ l1:
       name: BasicRedeemHook
       address: *basicRedeemHook
       checks:
-        getLiquidAssets: REPLACEME # need to specify args
+        getLiquidAssets:
     redirectingDepositHook:
       name: RedirectingDepositHook
       address: *redirectingDepositHook
@@ -1231,7 +1239,11 @@ l1:
         SET_QUEUE_STATUS_ROLE: *SET_QUEUE_STATUS_ROLE
         assetAt:
           - args: [0]
-            mustRevert: true
+            result: *ETH
+          - args: [1]
+            result: *WETH
+          - args: [2]
+            result: *LIDO_WSTETH
         claimableSharesOf:
         defaultDepositHook: *redirectingDepositHook
         defaultRedeemHook: *basicRedeemHook
@@ -1346,7 +1358,7 @@ l1:
         canBeRemoved: false
         claimableOf:
         requestOf:
-        unclaimedRequests: 0
+        unclaimedRequests:
         vault: *vault
       implementationChecks:
         asset:
@@ -1366,7 +1378,7 @@ l1:
         canBeRemoved: false
         claimableOf:
         requestOf:
-        unclaimedRequests: 2
+        unclaimedRequests:
         vault: *vault
       implementationChecks:
         asset:
@@ -1385,7 +1397,7 @@ l1:
         asset: *LIDO_WSTETH
         batchAt:
         canBeRemoved: false
-        getState: 3,4,82409923405945,0
+        getState:
         requestsOf:
         vault: *vault
       implementationChecks:
@@ -1409,10 +1421,7 @@ l1:
         SUBMIT_REPORTS_ROLE: *SUBMIT_REPORTS_ROLE
         getReport:
         isSupportedAsset:
-        securityParams:
-          - 5000000000000000
-          - 1000000000000000
-          - 5000000000000000
+        securityParams: [5000000000000000, 1000000000000000, 5000000000000000, 1000000000000000, 72000, 3600, 172800]
         supportedAssetAt:
         supportedAssets: 6
         validatePrice:
@@ -1532,12 +1541,12 @@ l1:
         isAllowedAsset:
         maxDeposit:
         pendingAssets:
-        pendingBalance: 0
+        pendingBalance:
         pendingShares:
         requireValidSubvault:
         subvaultState:
         vault: *vault
-        vaultState: "1015341004040570466,28948022309329048855892746252171976963317496166410141009864396001978282409983"
+        vaultState:
       implementationChecks:
         ALLOW_SUBVAULT_ASSETS_ROLE:
         DISALLOW_SUBVAULT_ASSETS_ROLE:
