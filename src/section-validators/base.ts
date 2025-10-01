@@ -18,11 +18,41 @@ import {
 } from "src/typebox";
 import { Abi, AbiArgumentsLength } from "src/types";
 
+export interface ErrorDetail {
+  section: string;
+  contract: string;
+  contractAddress: string;
+  checksType: string;
+  method: string;
+  message: string;
+}
+
 export let g_errors: number = 0;
 export let g_total_checks: number = 0;
+export const g_error_details: ErrorDetail[] = [];
 
-export function incErrors(): void {
+let g_current_context: Partial<ErrorDetail> = {};
+
+export function setErrorContext(context: Partial<ErrorDetail>): void {
+  g_current_context = { ...g_current_context, ...context };
+}
+
+export function clearErrorContext(): void {
+  g_current_context = {};
+}
+
+export function incErrors(errorMessage?: string): void {
   g_errors += 1;
+  if (errorMessage && g_current_context) {
+    g_error_details.push({
+      section: g_current_context.section || "unknown",
+      contract: g_current_context.contract || "unknown",
+      contractAddress: g_current_context.contractAddress || "unknown",
+      checksType: g_current_context.checksType || "unknown",
+      method: g_current_context.method || "unknown",
+      message: errorMessage,
+    });
+  }
 }
 
 export function incChecks(): void {
@@ -73,12 +103,15 @@ export abstract class SectionValidatorBase {
 
     const argumentsString = args ? `(${args.toString()})` : "";
     const logHandle = new LogCommand(`.${signature}${argumentsString}`);
+    setErrorContext({ method: `${signature}${argumentsString}` });
+
     let contractFunction: ReturnType<typeof contract.getFunction>;
     try {
       contractFunction = contract.getFunction(signature);
     } catch (error) {
-      logHandle.failure(printError(error));
-      g_errors++;
+      const errorMessage = printError(error);
+      logHandle.failure(errorMessage);
+      incErrors(errorMessage);
       return;
     }
     try {
@@ -86,8 +119,9 @@ export abstract class SectionValidatorBase {
       _assertEqual(actual, expected);
       logHandle.success(_stringify(actual));
     } catch (error) {
-      logHandle.failure(`REVERTED with: ${printError(error)}`);
-      g_errors++;
+      const errorMessage = `REVERTED with: ${printError(error)}`;
+      logHandle.failure(errorMessage);
+      incErrors(errorMessage);
     }
   }
 
@@ -96,18 +130,22 @@ export abstract class SectionValidatorBase {
 
     const argumentsString = args ? `(${args.toString()})` : "";
     const logHandle = new LogCommand(`.${signature}${argumentsString}`);
+    setErrorContext({ method: `${signature}${argumentsString}` });
+
     let contractFunction: ReturnType<typeof contract.getFunction>;
     try {
       contractFunction = contract.getFunction(signature);
     } catch (error) {
-      logHandle.failure(printError(error));
-      g_errors++;
+      const errorMessage = printError(error);
+      logHandle.failure(errorMessage);
+      incErrors(errorMessage);
       return;
     }
     try {
       const actual: unknown = await contractFunction.staticCall(...(args || ""));
-      logHandle.failure(_stringify(actual));
-      g_errors++;
+      const errorMessage = `Expected revert but got: ${_stringify(actual)}`;
+      logHandle.failure(errorMessage);
+      incErrors(errorMessage);
     } catch (error) {
       logHandle.success(`REVERTED with: ${printError(error)}`);
     }
@@ -119,10 +157,9 @@ export abstract class SectionValidatorBase {
       .filter((x) => !checks.includes(x.name))
       .map((x) => x.name || x) as AbiArgumentsLength;
     if (nonCovered.length > 0) {
-      logError(
-        `Section ${contractAlias} ${this.sectionName} does not cover these non-mutable function from ABI: ${chalk.red(nonCovered.join(", "))}`,
-      );
-      incErrors();
+      const errorMessage = `Section ${contractAlias} ${this.sectionName} does not cover these non-mutable function from ABI: ${chalk.red(nonCovered.join(", "))}`;
+      logError(errorMessage);
+      incErrors(`Non-covered functions: ${nonCovered.join(", ")}`);
     }
   }
 }
