@@ -1071,7 +1071,7 @@ l1:
         rewardsCoordinator: "0x7750d328b314EfFa365A0402CcfD489B80B0adda" # ???
         strategyManager: "0x858646372CC42E1A627fcE94aa7A7033e7CF075A" # ???
         supportedRoleAt:
-        supportedRoles:
+        supportedRoles: 0
         supportsInterface:
         verifyCall:
     ERC20VerifierFactory:
@@ -1125,7 +1125,7 @@ l1:
         hasRole:
         hasSupportedRole:
         supportedRoleAt:
-        supportedRoles:
+        supportedRoles: 0
         supportsInterface:
         verifyCall:
     symbioticVerifierFactory:
@@ -1181,7 +1181,7 @@ l1:
         hasRole:
         hasSupportedRole:
         supportedRoleAt:
-        supportedRoles:
+        supportedRoles: 0
         supportsInterface:
         vaultFactory: "0xAEb6bdd95c502390db8f52c8909F703E9Af6a346" # ???
         verifyCall:
@@ -1251,31 +1251,205 @@ l1:
         feeManager: *feeManager
         getAssetCount: 3
         getHook:
+          - args: [*depositQueueETH]
+            result: *redirectingDepositHook
+          - args: [*depositQueueWETH]
+            result: *redirectingDepositHook
+          - args: [*depositQueueWSTETH]
+            result: *redirectingDepositHook
+          - args: [*redeemQueueWSTETH]
+            result: *basicRedeemHook
         getLiquidAssets:
-        getQueueCount:
+        getQueueCount: 4
         getRoleAdmin:
         getRoleMember:
         getRoleMemberCount:
+          - args: [*DEFAULT_ADMIN_ROLE]
+            result: 1
+          - args: [*ACCEPT_REPORT_ROLE]
+            result: 1
+          - args: [*SET_MERKLE_ROOT_ROLE]
+            result: 2
+          - args: [*ALLOW_CALL_ROLE]
+            result: 1
+          - args: [*DISALLOW_CALL_ROLE]
+            result: 1
+          - args: [*SET_VAULT_LIMIT_ROLE]
+            result: 1
+          - args: [*SET_SUBVAULT_LIMIT_ROLE]
+            result: 1
+          - args: [*ALLOW_SUBVAULT_ASSETS_ROLE]
+            result: 1
+          - args: [*MODIFY_VAULT_BALANCE_ROLE]
+            result: 1
+          - args: [*MODIFY_SUBVAULT_BALANCE_ROLE]
+            result: 1
+          - args: [*SET_FLAGS_ROLE]
+            result: 1
+          - args: [*SET_QUEUE_STATUS_ROLE]
+            result: 1
+          - args: [*SUBMIT_REPORTS_ROLE]
+            result: 1
+          - args: [*CALLER_ROLE]
+            result: 1
+          - args: [*PULL_LIQUIDITY_ROLE]
+            result: 1
+          - args: [*PUSH_LIQUIDITY_ROLE]
+            result: 1
         getRoleMembers:
+          - args: [*DEFAULT_ADMIN_ROLE]
+            result: [*LAZY_VAULT_ADMIN]
+          - args: [*ACCEPT_REPORT_ROLE]
+            result: [*ACTIVE_VAULT_ADMIN]
+          - args: [*SET_MERKLE_ROOT_ROLE]
+            result: [*ACTIVE_VAULT_ADMIN, *timelockController]
+          - args: [*ALLOW_CALL_ROLE]
+            result: [*ACTIVE_VAULT_ADMIN]
+          - args: [*DISALLOW_CALL_ROLE]
+            result: [*ACTIVE_VAULT_ADMIN]
+          - args: [*SET_VAULT_LIMIT_ROLE]
+            result: [*ACTIVE_VAULT_ADMIN]
+          - args: [*SET_SUBVAULT_LIMIT_ROLE]
+            result: [*ACTIVE_VAULT_ADMIN]
+          - args: [*ALLOW_SUBVAULT_ASSETS_ROLE]
+            result: [*ACTIVE_VAULT_ADMIN]
+          - args: [*MODIFY_VAULT_BALANCE_ROLE]
+            result: [*ACTIVE_VAULT_ADMIN]
+          - args: [*MODIFY_SUBVAULT_BALANCE_ROLE]
+            result: [*ACTIVE_VAULT_ADMIN]
+          - args: [*SET_FLAGS_ROLE]
+            result: [*timelockController]
+          - args: [*SET_QUEUE_STATUS_ROLE]
+            result: [*timelockController]
+          - args: [*SUBMIT_REPORTS_ROLE]
+            result: [*ORACLE_UPDATER]
+          - args: [*CALLER_ROLE]
+            result: [*CURATOR]
+          - args: [*PULL_LIQUIDITY_ROLE]
+            result: [*CURATOR]
+          - args: [*PUSH_LIQUIDITY_ROLE]
+            result: [*CURATOR]
         getStorageAt:
         hasAsset:
+          - args: [*ETH]
+            result: true
+          - args: [*WETH]
+            result: true
+          - args: [*LIDO_WSTETH]
+            result: true
         hasQueue:
+          - args: [*depositQueueETH]
+            result: true
+          - args: [*depositQueueWETH]
+            result: true
+          - args: [*depositQueueWSTETH]
+            result: true
+          - args: [*redeemQueueWSTETH]
+            result: true
         hasRole:
         hasSubvault:
+          - args: [*subvault0]
+            result: true
+          - args: [*subvault1]
+            result: true
+          - args: [*subvault2]
+            result: true
+          - args: [*subvault3]
+            result: true
         hasSupportedRole:
+          - args: [*DEFAULT_ADMIN_ROLE]
+            result: true
+          - args: [*ACCEPT_REPORT_ROLE]
+            result: true
+          - args: [*SET_MERKLE_ROOT_ROLE]
+            result: true
+          - args: [*ALLOW_CALL_ROLE]
+            result: true
+          - args: [*DISALLOW_CALL_ROLE]
+            result: true
+          - args: [*SET_VAULT_LIMIT_ROLE]
+            result: true
+          - args: [*SET_SUBVAULT_LIMIT_ROLE]
+            result: true
+          - args: [*ALLOW_SUBVAULT_ASSETS_ROLE]
+            result: true
+          - args: [*MODIFY_VAULT_BALANCE_ROLE]
+            result: true
+          - args: [*MODIFY_SUBVAULT_BALANCE_ROLE]
+            result: true
+          - args: [*SET_FLAGS_ROLE]
+            result: true
+          - args: [*SET_QUEUE_STATUS_ROLE]
+            result: true
+          - args: [*SUBMIT_REPORTS_ROLE]
+            result: true
+          - args: [*CALLER_ROLE]
+            result: true
+          - args: [*PULL_LIQUIDITY_ROLE]
+            result: true
+          - args: [*PUSH_LIQUIDITY_ROLE]
+            result: true
         isDepositQueue:
         isPausedQueue:
         onERC721Received:
         oracle: *oracle
         queueAt:
+          - args: [*ETH, 0]
+            result: *depositQueueETH
+          - args: [*WETH, 0]
+            result: *depositQueueWETH
+          - args: [*LIDO_WSTETH, 0]
+            result: *depositQueueWSTETH
+          - args: [*LIDO_WSTETH, 1]
+            result: *redeemQueueWSTETH
         queueLimit: 4
         redeemQueueFactory: *redeemQueueFactory
         riskManager: *riskManager
         shareManager: *shareManager
         subvaultAt:
+          - args: [0]
+            result: *subvault0
+          - args: [1]
+            result: *subvault1
+          - args: [2]
+            result: *subvault2
+          - args: [3]
+            result: *subvault3
         subvaultFactory: *subvaultFactory
         subvaults: 4
         supportedRoleAt:
+          - args: [0]
+            result: *DEFAULT_ADMIN_ROLE
+          - args: [1]
+            result: *ACCEPT_REPORT_ROLE
+          - args: [2]
+            result: *SET_MERKLE_ROOT_ROLE
+          - args: [3]
+            result: *ALLOW_CALL_ROLE
+          - args: [4]
+            result: *DISALLOW_CALL_ROLE
+          - args: [5]
+            result: *SET_VAULT_LIMIT_ROLE
+          - args: [6]
+            result: *SET_SUBVAULT_LIMIT_ROLE
+          - args: [7]
+            result: *ALLOW_SUBVAULT_ASSETS_ROLE
+          - args: [8]
+            result: *MODIFY_VAULT_BALANCE_ROLE
+          - args: [9]
+            result: *MODIFY_SUBVAULT_BALANCE_ROLE
+          - args: [10]
+            result: *SET_FLAGS_ROLE
+          - args: [11]
+            result: *SET_QUEUE_STATUS_ROLE
+          - args: [12]
+            result: *SUBMIT_REPORTS_ROLE
+          - args: [13]
+            result: *CALLER_ROLE
+          - args: [14]
+            result: *PULL_LIQUIDITY_ROLE
+          - args: [15]
+            result: *PUSH_LIQUIDITY_ROLE
         supportedRoles: 16
         supportsInterface:
         verifierFactory: *verifierFactory
@@ -1338,7 +1512,7 @@ l1:
         canBeRemoved: false
         claimableOf:
         requestOf:
-        unclaimedRequests: 3
+        unclaimedRequests:
         vault: *vault
       implementationChecks:
         asset:
@@ -2023,7 +2197,7 @@ l1:
         getTransactionHash:
         isModuleEnabled:
         isOwner:
-        nonce: 13
+        nonce:
         signedMessages:
       implementationChecks:
         VERSION:
