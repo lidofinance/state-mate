@@ -153,7 +153,7 @@ export async function httpGetAsync<T>(url: string): Promise<T> | never {
 }
 
 function _getExplorerApiUrl(explorerHostname: string, address: string, explorerKey?: string) {
-  let url = `https://${explorerHostname}/api?module=contract&action=getsourcecode&address=${address}`;
+  let url = `https://${explorerHostname}/v2/api?chainid=1&module=contract&action=getsourcecode&address=${address}`;
   if (explorerKey) {
     url = `${url}&apikey=${explorerKey}`;
   }
