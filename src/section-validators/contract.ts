@@ -4,7 +4,7 @@ import { EntryField } from "src/common";
 import { logHeader1, logHeader2 } from "src/logger";
 import { ContractEntry } from "src/typebox";
 
-import { CheckLevel, needCheck, SectionValidatorBase } from "./base";
+import { CheckLevel, clearErrorContext, needCheck, SectionValidatorBase, setErrorContext } from "./base";
 import { ChecksSectionValidator } from "./checks";
 import { ImplementationChecksSectionValidator } from "./implementation-checks";
 import { OzAclSectionValidator } from "./oz-acl";
@@ -58,25 +58,40 @@ export class ContractSectionValidator {
 
     logHeader1(`Contract (${sectionTitle}): ${contractAlias} (${contractEntry.name}, ${contractEntry.address})`);
 
+    // Set base error context for this contract
+    setErrorContext({
+      section: sectionTitle,
+      contract: contractAlias,
+      contractAddress: contractEntry.address,
+    });
+
     if (needCheck(CheckLevel.checksType, EntryField.checks)) {
       logHeader2(EntryField.checks);
+      setErrorContext({ checksType: EntryField.checks });
       await this.map.get(EntryField.checks)!.validateSection(contractEntry, contractAlias);
     }
 
     if (needCheck(CheckLevel.checksType, EntryField.proxyChecks)) {
+      setErrorContext({ checksType: EntryField.proxyChecks });
       await this.map.get(EntryField.proxyChecks)!.validateSection(contractEntry, contractAlias);
     }
 
     if (needCheck(CheckLevel.checksType, EntryField.ozNonEnumerableAcl)) {
+      setErrorContext({ checksType: EntryField.ozNonEnumerableAcl });
       await this.map.get(EntryField.ozNonEnumerableAcl)!.validateSection(contractEntry, contractAlias);
     }
 
     if (needCheck(CheckLevel.checksType, EntryField.implementationChecks)) {
+      setErrorContext({ checksType: EntryField.implementationChecks });
       await this.map.get(EntryField.implementationChecks)!.validateSection(contractEntry, contractAlias);
     }
 
     if (needCheck(CheckLevel.checksType, EntryField.ozAcl)) {
+      setErrorContext({ checksType: EntryField.ozAcl });
       await this.map.get(EntryField.ozAcl)!.validateSection(contractEntry, contractAlias);
     }
+
+    // Clear error context after contract validation
+    clearErrorContext();
   }
 }

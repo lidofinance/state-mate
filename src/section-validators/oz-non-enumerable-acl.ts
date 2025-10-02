@@ -7,7 +7,7 @@ import { loadContract } from "src/explorer-provider";
 import { log, LogCommand, logHeader2, WARNING_MARK } from "src/logger";
 import { ContractEntry } from "src/typebox";
 
-import { incChecks, incErrors, SectionValidatorBase } from "./base";
+import { incChecks, incErrors, SectionValidatorBase, setErrorContext } from "./base";
 
 export class OzNonEnumerableAclSectionValidator extends SectionValidatorBase {
   constructor(provider: JsonRpcProvider) {
@@ -38,14 +38,17 @@ export class OzNonEnumerableAclSectionValidator extends SectionValidatorBase {
           rolesByHolders.set(holder, new Set<string>());
         }
         rolesByHolders.get(holder)?.add(role);
-        const logHandle = new LogCommand(`.hasRole(${role}, ${holder})`);
+        const methodName = `.hasRole(${role}, ${holder})`;
+        const logHandle = new LogCommand(methodName);
+        setErrorContext({ method: methodName });
         try {
           const isRoleOnHolder: unknown = await contract.getFunction("hasRole").staticCall(role, holder);
           assert.isTrue(isRoleOnHolder);
           logHandle.success(`${isRoleOnHolder}`);
         } catch (error) {
-          logHandle.failure(`REVERTED with: ${(error as Error).message}`);
-          incErrors();
+          const errorMessage = `REVERTED with: ${(error as Error).message}`;
+          logHandle.failure(errorMessage);
+          incErrors(errorMessage);
         }
       }
     }
@@ -54,14 +57,17 @@ export class OzNonEnumerableAclSectionValidator extends SectionValidatorBase {
       for (const role in contractEntry.ozNonEnumerableAcl) {
         if (!rolesExpectedOnTheHolder.has(role)) {
           incChecks();
-          const logHandle = new LogCommand(`.hasRole(${role}, ${holder})`);
+          const methodName = `.hasRole(${role}, ${holder})`;
+          const logHandle = new LogCommand(methodName);
+          setErrorContext({ method: methodName });
           try {
             const isRoleOnHolder: unknown = await contract.getFunction("hasRole").staticCall(role, holder);
             assert.isFalse(isRoleOnHolder);
             logHandle.success(`${isRoleOnHolder}`);
           } catch (error) {
-            logHandle.failure(`REVERTED with: ${(error as Error).message}`);
-            incErrors();
+            const errorMessage = `REVERTED with: ${(error as Error).message}`;
+            logHandle.failure(errorMessage);
+            incErrors(errorMessage);
           }
         }
       }

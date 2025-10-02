@@ -16,7 +16,7 @@ import { parseCmdLineArguments } from "./cli-parser";
 import { printError, readUrlOrFromEnvironment } from "./common";
 import { loadContractInfoFromExplorer } from "./explorer-provider";
 import { FAILURE_MARK, log, logError, logErrorAndExit, logHeader1, WARNING_MARK } from "./logger";
-import { g_errors, g_total_checks } from "./section-validators/base";
+import { g_error_details, g_errors, g_total_checks } from "./section-validators/base";
 import { ContractSectionValidator } from "./section-validators/contract";
 import {
   EntireDocument,
@@ -121,6 +121,25 @@ async function doChecks(jsonDocument: EntireDocument) {
   log(chalk.bold(`\n${g_total_checks} checks performed.`));
   if (g_errors) {
     log(`\n${FAILURE_MARK} ${chalk.bold(`${g_errors} errors found!`)} `);
+
+    // Display detailed error summary
+    if (g_error_details.length > 0) {
+      logHeader1("Error Summary");
+      for (let index = 0; index < g_error_details.length; index++) {
+        const error = g_error_details[index];
+        log(
+          `\n${chalk.red(`[${index + 1}/${g_error_details.length}]`)} ` +
+            `${chalk.cyan("Section:")} ${chalk.yellow(error.section)} | ` +
+            `${chalk.cyan("Contract:")} ${chalk.yellow(error.contract)} ` +
+            `${chalk.gray(`(${error.contractAddress})`)}` +
+            `\n    ${chalk.cyan("Check Type:")} ${chalk.yellow(error.checksType)} | ` +
+            `${chalk.cyan("Method:")} ${chalk.yellow(error.method)}` +
+            `\n    ${chalk.cyan("Error:")} ${chalk.red(error.message)}`,
+        );
+      }
+      log(""); // Empty line at the end
+    }
+
     process.exit(g_errors);
   }
 }
