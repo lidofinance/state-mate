@@ -1,0 +1,18 @@
+---
+deployed:
+  l1:
+    - &RegisterGroupsInOperatorGrid "0xa4A0FbE57E2D274B90BbDEaC9E6492eBE9E5acBE"
+    - &UpdateGroupsShareLimitInOperatorGrid "0x7fC0E3084124090fd3401154584727a7a16Af834"
+    - &RegisterTiersInOperatorGrid "0xf8F8902c333666c175ccAcC738c3c3D80a78ACfb"
+    - &AlterTiersInOperatorGrid "0xB17f6E44ed6bf55b8139573119c02526631e24d3"
+    - &VaultsAdapter "0xBC2bb8310730F3D2b514Cb26f7e0A8776De879Ac"
+    - &SetJailStatusInOperatorGrid "0xc3FA83D65a900303e1d99cDBBF762c6630562c04"
+    - &UpdateVaultsFeesInOperatorGrid "0x351426775c75aB5127de860Cdcaf1953F1D622a2"
+    - &ForceValidatorExitsInVaultHub "0x83DfE5Fe8ac8b7DB38c020F4F54BF09b65D92c63"
+    - &SocializeBadDebtInVaultHub "0xa11906bBBBaC5207b8FDA4F7F294d7EcB8dcc758"
+    - &SetLiabilitySharesTargetInVaultHub "0xc5dCd2A9642ceA9B71A632BF5b8ff52424Ea1B40"
+
+l1:
+  rpcUrl: L1_TESTNET_RPC_URL
+  explorerHostname: api-hoodi.etherscan.io
+  explorerTokenEnv: ETHERSCAN_TOKEN
