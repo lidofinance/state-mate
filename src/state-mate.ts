@@ -178,7 +178,13 @@ async function iterateLoadedContracts<T extends EntireDocument | SeedDocument>(
         log(`\n${WARNING_MARK} ${chalk.yellow(`The env var ${explorerTokenEnv} is not set`)}\n`);
       }
       for (const address of addresses) {
-        const contractInfo = await loadContractInfoFromExplorer(address, explorerHostname, explorerKey);
+        const contractInfo = await loadContractInfoFromExplorer(
+          address,
+          explorerHostname,
+          explorerKey,
+          // chainId is optional in schema; only relevant for etherscan v2
+          (explorerSection as { chainId?: number | string }).chainId,
+        );
         if (!contractInfo) {
           continue;
         }

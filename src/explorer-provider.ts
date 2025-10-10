@@ -31,6 +31,7 @@ export type GetContractInfoCallback = (
   address: string,
   explorerHostname: string,
   explorerKey?: string,
+  chainId?: number | string,
 ) => Promise<ContractInfo>;
 
 export interface IExplorerHandler {
@@ -77,12 +78,14 @@ export async function loadContractInfoFromExplorer(
   address: string,
   explorerHostname: string,
   explorerKey?: string,
+  chainId?: number | string,
 ): Promise<ContractInfo | undefined> {
   return loadContractInfo(
     explorerHostname.includes("mode.network") ? new ModeHandler() : new EtherscanHandler(),
     address,
     explorerHostname,
     explorerKey,
+    chainId,
   );
 }
 
@@ -91,8 +94,9 @@ export async function loadContractInfo(
   address: string,
   explorerHostname: string,
   explorerKey?: string,
+  chainId?: number | string,
 ) {
-  const sourcesUrl = _getExplorerApiUrl(explorerHostname, address, explorerKey);
+  const sourcesUrl = _getExplorerApiUrl(explorerHostname, address, explorerKey, chainId);
 
   let sourcesResponse = await httpGetAsync(sourcesUrl);
   if (isResponseBad(sourcesResponse) && explorer.requestWithRateLimit) {
@@ -128,6 +132,7 @@ export async function loadContractInfo(
       address,
       explorerHostname,
       explorerKey,
+      chainId,
     );
 
     return contractInfo;
@@ -152,8 +157,28 @@ export async function httpGetAsync<T>(url: string): Promise<T> | never {
   }
 }
 
-function _getExplorerApiUrl(explorerHostname: string, address: string, explorerKey?: string) {
-  let url = `https://${explorerHostname}/v2/api?chainid=1&module=contract&action=getsourcecode&address=${address}`;
+function _getExplorerApiUrl(
+  explorerHostname: string,
+  address: string,
+  explorerKey?: string,
+  chainId?: number | string,
+) {
+  const isEtherscan = explorerHostname.includes("etherscan.io");
+  let url: string;
+
+  if (isEtherscan) {
+    const chainIdNumber = typeof chainId === "string" ? Number(chainId) : chainId;
+    if (typeof chainIdNumber !== "number" || Number.isNaN(chainIdNumber)) {
+      logErrorAndExit(
+        `The field ${chalk.magenta("chainId")} is required in the YAML for explorer ${chalk.yellow(explorerHostname)}`,
+      );
+    }
+    // Use Etherscan v2 aggregator regardless of subdomain
+    url = `https://api.etherscan.io/v2/api?chainId=${chainIdNumber}&module=contract&action=getsourcecode&address=${address}`;
+  } else {
+    url = `https://${explorerHostname}/api?module=contract&action=getsourcecode&address=${address}`;
+  }
+
   if (explorerKey) {
     url = `${url}&apikey=${explorerKey}`;
   }

@@ -31,13 +31,13 @@ export async function doGenerateBoilerplate(seedConfigPath: string, jsonDocument
   const document = new YAML.Document(seedYaml);
 
   await _iterateDeployedAddresses(document, jsonDocument, async (context: DeployedAddressInfo) => {
-    const { address, deployedNode, explorerHostname, rpcUrl, sectionName, explorerKey } = context;
+    const { address, deployedNode, explorerHostname, rpcUrl, sectionName, explorerKey, chainId } = context;
     if (!explorerHostname) {
       logErrorAndExit(
         `The field ${chalk.magenta(`explorerHostname`)} is required in the ${chalk.magenta(g_Arguments.configPath)}`,
       );
     }
-    const contractInfo = await loadContractInfoFromExplorer(address, explorerHostname, explorerKey);
+    const contractInfo = await loadContractInfoFromExplorer(address, explorerHostname, explorerKey, chainId);
     if (!contractInfo) {
       return;
     }
@@ -126,7 +126,7 @@ function addSchemaIntoYaml(filePath: string, fileContent: string): string {
   return fileContent;
 }
 
-type DeployedAddressInfo = Pick<NetworkSection, "explorerHostname" | "rpcUrl"> &
+type DeployedAddressInfo = Pick<NetworkSection, "explorerHostname" | "rpcUrl" | "chainId"> &
   Pick<ContractEntry, "address"> & {
     [Key in keyof Pick<NetworkSection, "explorerTokenEnv"> as `explorerKey`]: string;
   } & { deployedNode: YAML.Scalar } & { sectionName: string };
@@ -157,6 +157,7 @@ async function _iterateDeployedAddresses<T extends EntireDocument | SeedDocument
             explorerHostname,
             explorerKey,
             rpcUrl,
+            chainId: explorerSection.chainId,
             deployedNode,
             sectionName: explorerSectionKey,
           });

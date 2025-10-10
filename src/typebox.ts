@@ -174,6 +174,7 @@ export const ExplorerSectionTB = Type.Readonly(
       rpcUrl: Type.String(),
       explorerHostname: Type.Optional(Type.String()),
       explorerTokenEnv: Type.Optional(Type.String()),
+      chainId: Type.Optional(Type.Union([Type.Number(), Type.String()])),
     },
     { additionalProperties: false },
   ),

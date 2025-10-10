@@ -26,6 +26,7 @@ async function modeGetContractInfoCallback(
   address: string,
   explorerHostname: string,
   explorerKey?: string,
+  _chainId?: number | string,
 ): Promise<ContractInfo> {
   if (!isModeResponseOkResult(response.result[0])) {
     logErrorAndExit(`It seems, explorer response has changed`);
@@ -35,7 +36,7 @@ async function modeGetContractInfoCallback(
 
   let implementation;
   if (ImplementationAddress) {
-    implementation = await loadContractInfo(explorer, ImplementationAddress, explorerHostname, explorerKey);
+    implementation = await loadContractInfo(explorer, ImplementationAddress, explorerHostname, explorerKey, _chainId);
   }
 
   const contractInfo: ContractInfo = {

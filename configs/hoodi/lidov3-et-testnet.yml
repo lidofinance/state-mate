@@ -26,8 +26,9 @@ deployed:
 
 l1:
   rpcUrl: L1_TESTNET_RPC_URL
-  explorerHostname: api-hoodi.etherscan.io
+  explorerHostname: api.etherscan.io/v2/api
   explorerTokenEnv: ETHERSCAN_TOKEN
+  chainId: 560048
   contracts:
     RegisterGroupsInOperatorGrid:
       name: RegisterGroupsInOperatorGrid
