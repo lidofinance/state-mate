@@ -1,0 +1,15 @@
+# yaml-language-server: $schema=../../schemas/seed-schema.json
+deployed:
+  l1:
+    # --- Base deployment (VERIFIED)---
+    - &vault "0x40330720039352B309c70A5028322D1481F496d1"
+    - &subvault "0x222fa99C485a088564eb43fAA50Bc10b2497CDB2"
+    - &verifier "0x022a33293aeD00E59E93D354D3810249Fa33d7D4"
+    - &timelockController "0xda1674c1135eA98A311a3b4aa11865266ab52A7C"
+    - &PROXY_ADMIN "0x81698f87C6482bF1ce9bFcfC0F103C4A0Adf0Af0"
+
+l1:
+  rpcUrl: ARB_RPC_URL # Arbitrum RPC URL
+  explorerHostname: api.etherscan.io
+  explorerTokenEnv: ETHERSCAN_TOKEN
+  chainId: 42161
