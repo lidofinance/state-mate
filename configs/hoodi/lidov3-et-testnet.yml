@@ -2,8 +2,8 @@
 parameters:
   - &trustedCaller "0xeBe5948787Bb3a565F67ccD93cb85A91960c472a"
   - &initialValidatorExitFeeLimit "100000000000000000"
-  - &maxGroupShareLimit "50000000000000000000000"
-  - &maxDefaultTierShareLimit "0"
+  - &maxGroupShareLimit "500000000000000000000000"
+  - &maxDefaultTierShareLimit "500000000000000000000000"
 
 misc:
   - &DEFAULT_TIER_OPERATOR "0xFFfFfFffFFfffFFfFFfFFFFFffFFFffffFfFFFfF"
@@ -13,10 +13,10 @@ misc:
 
 deployed:
   l1:
-    - &RegisterGroupsInOperatorGrid "0xa4A0FbE57E2D274B90BbDEaC9E6492eBE9E5acBE"
-    - &UpdateGroupsShareLimitInOperatorGrid "0x7fC0E3084124090fd3401154584727a7a16Af834"
+    - &RegisterGroupsInOperatorGrid "0x4D80CBe1a4AcAA53870074Ea3e25BFE7B04e1282"
+    - &UpdateGroupsShareLimitInOperatorGrid "0x56Ff87F41a8CF795764E15E496124240Ac17695b"
     - &RegisterTiersInOperatorGrid "0xf8F8902c333666c175ccAcC738c3c3D80a78ACfb"
-    - &AlterTiersInOperatorGrid "0xB17f6E44ed6bf55b8139573119c02526631e24d3"
+    - &AlterTiersInOperatorGrid "0xE0b822c1126E22D5E248c52F0DF3362DF4D85eAc"
     - &VaultsAdapter "0xBC2bb8310730F3D2b514Cb26f7e0A8776De879Ac"
     - &SetJailStatusInOperatorGrid "0xc3FA83D65a900303e1d99cDBBF762c6630562c04"
     - &UpdateVaultsFeesInOperatorGrid "0x351426775c75aB5127de860Cdcaf1953F1D622a2"
