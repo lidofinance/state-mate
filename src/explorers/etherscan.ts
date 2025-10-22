@@ -57,6 +57,7 @@ async function etherGetContractInfoCallback(
   address: string,
   explorerHostname: string,
   explorerKey?: string,
+  chainId?: number | string,
 ): Promise<ContractInfo> {
   if (!isEtherResponseOkResult(response.result[0])) {
     logErrorAndExit(`It seems, explorer response has changed`);
@@ -66,7 +67,7 @@ async function etherGetContractInfoCallback(
 
   let implementation;
   if (implementationAddress) {
-    implementation = await loadContractInfo(explorer, implementationAddress, explorerHostname, explorerKey);
+    implementation = await loadContractInfo(explorer, implementationAddress, explorerHostname, explorerKey, chainId);
   }
 
   const contractInfo: ContractInfo = {
