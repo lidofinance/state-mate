@@ -15,7 +15,7 @@ deployed:
     - &oracleImplementation "0x0000000F0d3D1c31b72368366A4049C05E291D58"
     - &redeemQueueFactory "0xfe76b5fd238553D65Ce6dd0A572C0fda629F8421"
     - &redeemQueueImplementation "0x0000000285805eac535DADdb9648F1E10DfdC411"
-    - &signatureRedeemQueueImplementation "0x0000000b2082667589A16c4cF18e9f923781c471"
+    - &signatureRedeemQueueImplementation "0xbed82704E110A094a2eae2685a98609789e758b6"
     - &riskManagerFactory "0xa51E4FA916b939Fa451520D2B7600c740d86E5A0"
     - &riskManagerImplementation "0x0000000714cf2851baC1AE2f41871862e9D216fD"
     - &shareManagerFactory "0x952f39AA62E94db3Ad0d1C7D1E43C1a8519E45D8"
@@ -36,14 +36,14 @@ deployed:
     - &oracleHelper "0x000000005F543c38d5ea6D0bF10A50974Eb55E35"
 
     # --- strETH deployment ---
-    - &vault "0x40330720039352B309c70A5028322D1481F496d1"
+    - &vault "0x841e213864046111E43d237703d71FaBe91Ef9e0"
     - &oracle "0x4F00f500b3BB85Eb9186E6aB34d07406ED467Dc2"
     - &shareManager "0xA3F87638aE301F0928f298c70fCa9B503a84d8Da"
     - &feeManager "0xbF444201c521C42Fd7A43A5fD7ffCbBf869E0885"
     - &riskManager "0xB865714580818423Faee47d023aA122585c5DaC4"
-    - &subvault0 "0x222fa99C485a088564eb43fAA50Bc10b2497CDB2"
-    - &verifier0 "0x022a33293aeD00E59E93D354D3810249Fa33d7D4"
-    - &timelockController "0xda1674c1135eA98A311a3b4aa11865266ab52A7C"
+    - &subvault0 "0xbbF9400C09B0F649F3156989F1CCb9c016f943bb"
+    - &verifier0 "0xC724D3bA28e24e243f653c626F8BEA44113b3a0b"
+    - &timelockController "0x3169036c3F79c03C14a7496DD2016f5B059e17D8"
 
     # --- Actors (multisigs) ---
     - &PROXY_ADMIN "0x81698f87C6482bF1ce9bFcfC0F103C4A0Adf0Af0"
@@ -141,10 +141,10 @@ deployed:
     - &CURATOR_THRESHOLD 3
 
 l1:
-  rpcUrl: ARB_RPC_URL # Mainnet RPC URL
+  rpcUrl: PLASMA_RPC_URL # Mainnet RPC URL
   explorerHostname: api.etherscan.io
   explorerTokenEnv: ETHERSCAN_TOKEN
-  chainId: 42161
+  chainId: 9745
   contracts:
     #
     # --- Base deployment (VERIFIED)---
@@ -311,7 +311,7 @@ l1:
         claimableOf: # this queue doesn't have claimableOf shares
         consensus: *ZERO_ADDRESS
         consensusFactory: *consensusFactory
-        eip712Domain: ["0x0f", "", "", 42161, *signatureDepositQueueImplementation, *ZERO_BYTES32, []]
+        eip712Domain: ["0x0f", "", "", 9745, *signatureDepositQueueImplementation, *ZERO_BYTES32, []]
         handleReport: # this queue doesn't have handleReport (no-op)
         hashOrder:
         nonces:
@@ -450,8 +450,8 @@ l1:
           - args: [*ZERO_ADDRESS]
             result: 0
         consensus: *ZERO_ADDRESS
-        consensusFactory: *consensusFactory
-        eip712Domain: ["0x0f", "", "", 42161, *signatureRedeemQueueImplementation, *ZERO_BYTES32, []]
+        consensusFactory: *ZERO_ADDRESS
+        eip712Domain: ["0x0f", "", "", 9745, *signatureRedeemQueueImplementation, *ZERO_BYTES32, []]
         handleReport: # this queue doesn't have handleReport (no-op)
         hashOrder:
         nonces:
@@ -599,7 +599,7 @@ l1:
           - args: [1]
             mustRevert: true
           - args: [0]
-            result: "0x222fa99C485a088564eb43fAA50Bc10b2497CDB2" # ???
+            result: *subvault0
         implementations: 1
         implementationAt:
           - args: [0]
@@ -608,7 +608,7 @@ l1:
           - args: [*subvaultImplementation]
             result: false
         isEntity:
-          - args: ["0x222fa99C485a088564eb43fAA50Bc10b2497CDB2"]
+          - args: [*subvault0]
             result: true
         owner: *PROXY_ADMIN
         proposalAt:
@@ -634,10 +634,10 @@ l1:
       checks:
         entities: 1
         entityAt:
-          - args: [6]
+          - args: [1]
             mustRevert: true
           - args: [0]
-            result: "0x022a33293aeD00E59E93D354D3810249Fa33d7D4" # ???
+            result: *verifier0
         implementationAt:
           - args: [0]
             result: *verifierImplementation
@@ -648,7 +648,7 @@ l1:
           - args: [*verifierImplementation]
             result: false
         isEntity:
-          - args: ["0x022a33293aeD00E59E93D354D3810249Fa33d7D4"]
+          - args: [*verifier0]
             result: true
         owner: *PROXY_ADMIN
         proposalAt:
@@ -677,7 +677,7 @@ l1:
           - args: [1]
             mustRevert: true
           - args: [0]
-            result: "0x40330720039352B309c70A5028322D1481F496d1" # ???
+            result: *vault
         implementationAt:
           - args: [0]
             result: *vaultImplementation
@@ -688,7 +688,7 @@ l1:
           - args: [*vaultImplementation]
             result: false
         isEntity:
-          - args: ["0x40330720039352B309c70A5028322D1481F496d1"]
+          - args: [*vault]
             result: true
         owner: *PROXY_ADMIN
         proposalAt:
@@ -1268,7 +1268,7 @@ l1:
         getVerificationResult:
         hashCall:
         isAllowedCall:
-        merkleRoot: "0x0c2fffab0e8e6e75e6bb8eed57fe7afe310c7b1a2ec9712f58bcbd47cf5c4bbf"
+        merkleRoot: "0x35999536cdd0d8e2e1caf419aee4ef7a32add6278a626915fa0024047fd7f883"
         vault: *vault
         verifyCall:
       implementationChecks:
@@ -1360,7 +1360,7 @@ l1:
         checkSignatures:
         domainSeparator:
         encodeTransactionData:
-        getChainId: 42161
+        getChainId: 9745
         getModulesPaginated:
         getOwners:
           - *LIDO_SIGNER_3
@@ -1408,12 +1408,12 @@ l1:
         checkSignatures:
         domainSeparator:
         encodeTransactionData:
-        getChainId: 42161
+        getChainId: 9745
         getModulesPaginated:
         getOwners:
-          - *EXT_MELLOW_SIGNER_1
-          - *EXT_MELLOW_SIGNER_2
           - *EXT_MELLOW_SIGNER_3
+          - *EXT_MELLOW_SIGNER_2
+          - *EXT_MELLOW_SIGNER_1
           - *MELLOW_SIGNER_2
           - *MELLOW_SIGNER_3
           - *MELLOW_SIGNER_1
@@ -1456,7 +1456,7 @@ l1:
         checkSignatures:
         domainSeparator:
         encodeTransactionData:
-        getChainId: 42161
+        getChainId: 9745
         getModulesPaginated:
         getOwners:
           - *EXT_MELLOW_SIGNER_2
@@ -1502,7 +1502,7 @@ l1:
         checkSignatures:
         domainSeparator:
         encodeTransactionData:
-        getChainId: 42161
+        getChainId: 9745
         getModulesPaginated:
         getOwners:
           - *EXT_MELLOW_SIGNER_2
