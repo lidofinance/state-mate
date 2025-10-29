@@ -3,9 +3,9 @@ import { JsonRpcProvider, Interface, Contract } from "ethers";
 
 import { EntryField } from "src/common";
 import { logHeader2 } from "src/logger";
-import { ContractEntry, isTypeOfTB, ProxyContractEntryTB, StaticCallResult } from "src/typebox";
+import { ContractEntry, StaticCallResult } from "src/typebox";
 
-import { SectionValidatorBase, CheckLevel, needCheck } from "./base";
+import { SectionValidatorBase } from "./base";
 
 const ACCESS_CONTROL_ABI = [
   "function hasRole(bytes32 role, address account) view returns (bool)",
@@ -18,11 +18,7 @@ export class OzAclSectionValidator extends SectionValidatorBase {
   }
 
   override async validateSection(contractEntry: ContractEntry, contractAlias: string) {
-    if (!needCheck(CheckLevel.checksType, this.sectionName)) {
-      return;
-    }
-
-    if (isTypeOfTB(contractEntry, ProxyContractEntryTB) && contractEntry.ozAcl) {
+    if (contractEntry.ozAcl) {
       logHeader2(this.sectionName);
 
       const address = contractEntry.address;

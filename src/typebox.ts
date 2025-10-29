@@ -140,6 +140,8 @@ const RegularChecksTB = Type.Readonly(Type.Record(Type.String(), ChecksEntryValu
 
 const ImplementationChecksTB = Type.Optional(RegularChecksTB);
 
+const OzAclChecksTB = Type.Readonly(Type.Record(Type.String(), EthereumStringArrayTB, { additionalProperties: false }));
+
 const RegularContractEntryTB = Type.Readonly(
   Type.Object(
     {
@@ -147,11 +149,12 @@ const RegularContractEntryTB = Type.Readonly(
       name: Type.String(),
       checks: RegularChecksTB,
       ozNonEnumerableAcl: Type.Optional(OzNonEnumerableAclTB),
+      ozAcl: Type.Optional(OzAclChecksTB),
     },
     { additionalProperties: false },
   ),
 );
-const OzAclChecksTB = Type.Readonly(Type.Record(Type.String(), EthereumStringArrayTB, { additionalProperties: false }));
+
 export const ProxyContractEntryTB = Type.Readonly(
   Type.Object(
     {
@@ -160,7 +163,6 @@ export const ProxyContractEntryTB = Type.Readonly(
       implementation: Type.Optional(EthereumStringTB),
       proxyChecks: Type.Optional(Type.Union([ProxyChecksTB, Sr2ProxyChecksTB, AragonProxyChecksTB])),
       implementationChecks: ImplementationChecksTB,
-      ozAcl: Type.Optional(OzAclChecksTB),
     },
     { additionalProperties: false },
   ),
