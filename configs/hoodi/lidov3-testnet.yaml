@@ -39,7 +39,7 @@ deployed:
     - &stakingVaultImplAddress "0xE96BE4FB723e68e7b96244b7399C64a58bcD0062"
     - &dashboardImplAddress "0x7CA203e3b7341341A4a83086780137eb283A9338"
     - &consolidationRequestsValidator "0xbf95Cd394cC03cD03fEA62A435ac347314877f1d"
-    - &pinnedBeaconProxy "0xF19E48C5Ad2F8aBB452F5A6AB9cb104E70495e08"
+    - &pinnedBeaconProxy "0x3e144aEd003b5AE6953A99B78dD34154CF3F8c76"
 
     # --- Oracle contracts ---
     - &accountingOracle "0xcb883B1bD0a41512b42D2dB267F2A2cd919FB216"
@@ -148,6 +148,7 @@ eoa:
   - &superManager "0xE28f573b732632fdE03BD5507A7d475383e8512E"
   - &oracleManager "0x4022E0754d0cB6905B54306105D3346d1547988b"
   - &nomManager "0xF865A1d43D36c713B4DA085f32b7d1e9739B9275"
+  - &resealCommittee "0x83BCE68B4e8b7071b2a664a26e6D3Bc17eEe3102" # WARNING: same as deployer!
 
 roles:
   # Lido
@@ -197,6 +198,7 @@ roles:
   - &ORACLE_MANAGE_CONSENSUS_CONTRACT_ROLE "0x04a0afbbd09d5ad397fc858789da4f8edd59f5ca5098d70faa490babee945c3b"
   - &ORACLE_MANAGE_CONSENSUS_VERSION_ROLE "0xc31b1e4b732c5173dc51d519dfa432bad95550ecc4b0f9a61c2a558a2a8e4341"
   - &ORACLE_SUBMIT_DATA_ROLE "0x65fa0c17458517c727737e4153dd477fa3e328cf706640b0f68b1a285c5990da"
+  - &ORACLE_DAEMON_CONFIG_MANAGER_ROLE "0xbbfb55d933c2bfa638763473275b1d84c4418e58d26cf9d2cd5758237756d9f0"
 
   # OracleReportSanityChecker
   - &SANITY_CHECKER_ALL_LIMITS_MANAGER_ROLE "0x5bf88568a012dfc9fe67407ad6775052bddc4ac89902dea1f4373ef5d9f1e35b"
@@ -1287,6 +1289,54 @@ l1:
         *NODE_OPERATOR_UNGUARANTEED_DEPOSIT_ROLE : []
         *VAULT_CONFIGURATION_ROLE : []
 
+    consolidationRequestsValidator:
+      name: ValidatorConsolidationRequests
+      address: *consolidationRequestsValidator
+      checks:
+        CONSOLIDATION_REQUEST_PREDEPLOY_ADDRESS: "0x0000BBdDc7CE488642fb579F8B00f3a590007251"
+        LIDO_LOCATOR: *lidoLocator
+        getConsolidationRequestFee: null
+        getConsolidationRequestsAndFeeExemptionEncodedCalls: null
+
+    # TODO: need to update state-mate code to make it work as
+    # pinnedBeaconProxy:
+    #   name: PinnedBeaconProxy
+    #   address: *pinnedBeaconProxy
+    #   proxyName: PinnedBeaconProxy
+    #   implementation: *stakingVaultImplAddress
+    #   proxyChecks:
+    #     implementation: *stakingVaultImplAddress
+    #     isOssified: false
+    #   checks:
+    #     DEPOSIT_CONTRACT: *DEPOSIT_CONTRACT
+    #     PUBLIC_KEY_LENGTH: 48
+    #     beaconChainDepositsPaused: false
+    #     depositor: *ZERO_ADDRESS
+    #     getInitializedVersion: 0
+    #     inOutDelta: 0
+    #     isReportFresh: true
+    #     latestReport: [0, 0, 0]
+    #     locked: 0
+    #     nodeOperator: *ZERO_ADDRESS
+    #     ossified: false
+    #     owner: *ZERO_ADDRESS
+    #     totalValue: 0
+    #     unlocked: 0
+    #     vaultHub: *vaultHub
+    #     version: 1
+    #     withdrawalCredentials: "0x020000000000000000000000f19e48c5ad2f8abb452f5a6ab9cb104e70495e08"
+    #     availableBalance: null
+    #     calculateValidatorWithdrawalFee: null
+    #     vaultHubAuthorized: null
+    #     stagedBalance: null
+    #   implementationChecks:
+    #     DEPOSIT_CONTRACT: *DEPOSIT_CONTRACT
+    #     beaconChainDepositsPaused: false
+    #     getInitializedVersion: *MAX_UINT64
+    #     owner: *ZERO_ADDRESS
+    #     version: 1
+    #     withdrawalCredentials: "0x020000000000000000000000e96be4fb723e68e7b96244b7399c64a58bcd0062"
+
     accountingOracle:
       name: AccountingOracle
       address: *accountingOracle
@@ -1558,910 +1608,922 @@ l1:
         *SANITY_CHECKER_SECOND_OPINION_MANAGER_ROLE : []
         *SANITY_CHECKER_SHARE_RATE_DEVIATION_LIMIT_MANAGER_ROLE : []
 
-    # oracleDaemonConfig:
-    #   name: OracleDaemonConfig
-    #   address: *oracleDaemonConfig
+    oracleDaemonConfig:
+      name: OracleDaemonConfig
+      address: *oracleDaemonConfig
+      checks:
+        CONFIG_MANAGER_ROLE: *ORACLE_DAEMON_CONFIG_MANAGER_ROLE
+        DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
+        get:
+          - args: ["NORMALIZED_CL_REWARD_PER_EPOCH"]
+            result: 0x40
+          - args: ["NORMALIZED_CL_REWARD_MISTAKE_RATE_BP"]
+            result: 0x03E8
+          - args: ["REBASE_CHECK_NEAREST_EPOCH_DISTANCE"]
+            result: 0x01
+          - args: ["REBASE_CHECK_DISTANT_EPOCH_DISTANCE"]
+            result: 0x02
+          - args: ["PREDICTION_DURATION_IN_SLOTS"]
+            result: 0xc4e0
+          - args: ["FINALIZATION_MAX_NEGATIVE_REBASE_EPOCH_SHIFT"]
+            result: 0x0546
+          - args: ["EXIT_EVENTS_LOOKBACK_WINDOW_IN_SLOTS"]
+            result: 0x0189c0
+          - args: ["SLASHING_RESERVE_WE_RIGHT_SHIFT"]
+            result: 0x2000
+          - args: ["SLASHING_RESERVE_WE_LEFT_SHIFT"]
+            result: 0x2000
+        getList: null
+        getRoleAdmin: null
+        getRoleMember: null
+        getRoleMemberCount: null
+        hasRole: null
+        supportsInterface: null
+      ozAcl:
+        *DEFAULT_ADMIN_ROLE : [*aragonAgent]
+        *ORACLE_DAEMON_CONFIG_MANAGER_ROLE : [*superManager]
+
+    aragon-kernel:
+      name: Kernel
+      address: *aragonKernel
+      proxyName: KernelProxy
+      implementation: *aragonKernelImplAddress
+      proxyChecks:
+        proxyType: 2
+        apps: null
+        isDepositable: false
+        implementation: *aragonKernelImplAddress
+        recoveryVaultAppId: "0x701a4fd1f5174d12a0f1d9ad2c88d0ad11ab6aad0ac72b7d9ce621815f8016a9"
+      checks:
+        hasInitialized: true
+        KERNEL_APP_ID: *KERNEL_APP_ID
+        APP_ADDR_NAMESPACE: "0xd6f028ca0e8edb4a8c9757ca4fdccab25fa1e0317da1188108f7d2dee14902fb"
+        getRecoveryVault: *aragonAgent
+        CORE_NAMESPACE: "0xc681a85306374a5ab27f0bbc385296a54bcd314a1948b6cf61c4ea1bc44bb9f8"
+        recoveryVaultAppId: "0x701a4fd1f5174d12a0f1d9ad2c88d0ad11ab6aad0ac72b7d9ce621815f8016a9"
+        getInitializationBlock: 727
+        APP_MANAGER_ROLE: "0xb6d92708f3d4817afc106147d969e229ced5c46e65e0a5002a0d391287762bd0"
+        APP_BASES_NAMESPACE: "0xf1f3eb40f5bc1ad1344716ced8b8a0431d840b5783aea1fd01786bc26f35ac0f"
+        acl: *aragonAcl
+        isPetrified: false
+        DEFAULT_ACL_APP_ID: *DEFAULT_ACL_APP_ID
+        allowRecoverability: null
+        apps: null
+        getApp: null
+        hasPermission: null
+      implementationChecks:
+        hasInitialized: false
+        KERNEL_APP_ID: *KERNEL_APP_ID
+        APP_ADDR_NAMESPACE: "0xd6f028ca0e8edb4a8c9757ca4fdccab25fa1e0317da1188108f7d2dee14902fb"
+        getRecoveryVault: *ZERO_ADDRESS
+        CORE_NAMESPACE: "0xc681a85306374a5ab27f0bbc385296a54bcd314a1948b6cf61c4ea1bc44bb9f8"
+        recoveryVaultAppId: *ZERO_BYTES32
+        getInitializationBlock: *MAX_UINT256
+        APP_MANAGER_ROLE: "0xb6d92708f3d4817afc106147d969e229ced5c46e65e0a5002a0d391287762bd0"
+        APP_BASES_NAMESPACE: "0xf1f3eb40f5bc1ad1344716ced8b8a0431d840b5783aea1fd01786bc26f35ac0f"
+        acl: *ZERO_ADDRESS
+        isPetrified: true
+        DEFAULT_ACL_APP_ID: *DEFAULT_ACL_APP_ID
+        apps: null
+        allowRecoverability: null
+        getApp: null
+        hasPermission: null
+
+    ldo:
+      name: MiniMeToken
+      address: *ldo
+      checks:
+        name: "TEST Lido DAO Token"
+        totalSupply: "1000000000000000000000000"
+        decimals: *DECIMALS_18
+        version: "MMT_0.1"
+        parentToken: *ZERO_ADDRESS
+        symbol: "TLDO"
+        transfersEnabled: true
+        parentSnapShotBlock: 0
+        tokenFactory: "0x8B608E59aC132075248Ee090A6713D0074CF5f95"
+        controller: *aragonTokenManager
+        creationBlock: null
+        balanceOfAt: null
+        balanceOf: null
+        totalSupplyAt: null
+        allowance: null
+
+    aragon-voting:
+      name: Voting
+      address: *aragonVoting
+      proxyName: AppProxyUpgradeable
+      implementation: *aragonVotingImplAddress
+      proxyChecks:
+        proxyType: 2
+        isDepositable: false
+        implementation: *aragonVotingImplAddress
+        appId: *VOTING_APP_ID
+        kernel: *aragonKernel
+      checks:
+        hasInitialized: true
+        UNSAFELY_MODIFY_VOTE_TIME_ROLE: "0x068ca51c9d69625c7add396c98ca4f3b27d894c3b973051ad3ee53017d7094ea"
+        getRecoveryVault: *aragonAgent
+        MODIFY_QUORUM_ROLE: "0xad15e7261800b4bb73f1b69d3864565ffb1fd00cb93cf14fe48da8f1f2149f39"
+        objectionPhaseTime: 300
+        MODIFY_SUPPORT_ROLE: "0xda3972983e62bdf826c4b807c4c9c2b8a941e1f83dfa76d53d6aeac11e1be650"
+        appId: *VOTING_APP_ID
+        getEVMScriptRegistry: *aragonEvmScriptRegistry
+        voteTime: 900
+        CREATE_VOTES_ROLE: "0xe7dcd7275292e064d090fbc5f3bd7995be23b502c1fed5cd94cfddbbdcd32bbc"
+        kernel: *aragonKernel
+        minAcceptQuorumPct: 50000000000000000
+        isPetrified: false
+        supportRequiredPct: 500000000000000000
+        token: *ldo
+        PCT_BASE: 1000000000000000000
+        isForwarder: true
+        getEVMScriptExecutor: null
+        getVoterState: null
+        getVote: null
+        allowRecoverability: null
+        getInitializationBlock: null
+        canPerform: null
+        canForward: null
+        canExecute: null
+        canVote: null
+        votesLength: null
+        getVotePhase: null
+        getDelegate: null
+        getDelegatedVoters: null
+        getVotingPowerMultipleAtVote: null
+        getDelegatedVotersCount: null
+        getVoterStateMultipleAtVote: null
+        getVotingPowerMultiple: null
+      implementationChecks:
+        hasInitialized: false
+        UNSAFELY_MODIFY_VOTE_TIME_ROLE: "0x068ca51c9d69625c7add396c98ca4f3b27d894c3b973051ad3ee53017d7094ea"
+        MODIFY_QUORUM_ROLE: "0xad15e7261800b4bb73f1b69d3864565ffb1fd00cb93cf14fe48da8f1f2149f39"
+        objectionPhaseTime: 0
+        MODIFY_SUPPORT_ROLE: "0xda3972983e62bdf826c4b807c4c9c2b8a941e1f83dfa76d53d6aeac11e1be650"
+        appId: *ZERO_BYTES32
+        getInitializationBlock: *MAX_UINT256
+        voteTime: 0
+        CREATE_VOTES_ROLE: "0xe7dcd7275292e064d090fbc5f3bd7995be23b502c1fed5cd94cfddbbdcd32bbc"
+        kernel: *ZERO_ADDRESS
+        minAcceptQuorumPct: 0
+        isPetrified: true
+        votesLength: 0
+        supportRequiredPct: 0
+        token: *ZERO_ADDRESS
+        PCT_BASE: 1000000000000000000
+        isForwarder: true
+        getEVMScriptExecutor: null
+        getRecoveryVault: null
+        getVoterState: null
+        getVote: null
+        allowRecoverability: null
+        canPerform: null
+        getEVMScriptRegistry: null
+        canForward: null
+        canExecute: null
+        canVote: null
+        getVotePhase: null
+
+    aragon-token-manager:
+      name: TokenManager
+      address: *aragonTokenManager
+      proxyName: AppProxyUpgradeable
+      implementation: *aragonTokenManagerImplAddress
+      proxyChecks:
+        proxyType: 2
+        isDepositable: false
+        implementation: *aragonTokenManagerImplAddress
+        appId: *TOKEN_MANAGER_APP_ID
+        kernel: *aragonKernel
+      checks:
+        hasInitialized: true
+        MAX_VESTINGS_PER_ADDRESS: 50
+        getRecoveryVault: *aragonAgent
+        appId: *TOKEN_MANAGER_APP_ID
+        ISSUE_ROLE: "0x2406f1e99f79cea012fb88c5c36566feaeefee0f4b98d3a376b49310222b53c4"
+        getEVMScriptRegistry: *aragonEvmScriptRegistry
+        ASSIGN_ROLE: "0xf5a08927c847d7a29dc35e105208dbde5ce951392105d712761cc5d17440e2ff"
+        BURN_ROLE: "0xe97b137254058bd94f28d2f3eb79e2d34074ffb488d042e3bc958e0a57d2fa22"
+        kernel: *aragonKernel
+        isPetrified: false
+        MINT_ROLE: "0x154c00819833dac601ee5ddded6fda79d9d8b506b911b3dbd54cdb95fe6c3686"
+        maxAccountTokens: *MAX_UINT256
+        REVOKE_VESTINGS_ROLE: "0x95ffc68daedf1eb334cfcd22ee24a5eeb5a8e58aa40679f2ad247a84140f8d6e"
+        token: *ldo
+        isForwarder: true
+        spendableBalanceOf: null
+        getEVMScriptExecutor: null
+        getVesting: null
+        transferableBalance: null
+        allowRecoverability: null
+        getInitializationBlock: null
+        vestingsLengths: null
+        canPerform: null
+        canForward: null
+      implementationChecks:
+        hasInitialized: false
+        MAX_VESTINGS_PER_ADDRESS: 50
+        appId: *ZERO_BYTES32
+        ISSUE_ROLE: "0x2406f1e99f79cea012fb88c5c36566feaeefee0f4b98d3a376b49310222b53c4"
+        getInitializationBlock: *MAX_UINT256
+        ASSIGN_ROLE: "0xf5a08927c847d7a29dc35e105208dbde5ce951392105d712761cc5d17440e2ff"
+        BURN_ROLE: "0xe97b137254058bd94f28d2f3eb79e2d34074ffb488d042e3bc958e0a57d2fa22"
+        kernel: *ZERO_ADDRESS
+        isPetrified: true
+        MINT_ROLE: "0x154c00819833dac601ee5ddded6fda79d9d8b506b911b3dbd54cdb95fe6c3686"
+        maxAccountTokens: 0
+        REVOKE_VESTINGS_ROLE: "0x95ffc68daedf1eb334cfcd22ee24a5eeb5a8e58aa40679f2ad247a84140f8d6e"
+        token: *ZERO_ADDRESS
+        isForwarder: true
+        spendableBalanceOf: null
+        getEVMScriptExecutor: null
+        getRecoveryVault: null
+        getVesting: null
+        transferableBalance: null
+        allowRecoverability: null
+        vestingsLengths: null
+        canPerform: null
+        getEVMScriptRegistry: null
+        canForward: null
+
+    aragon-finance:
+      name: Finance
+      address: *aragonFinance
+      proxyName: AppProxyUpgradeable
+      implementation: *aragonFinanceImplAddress
+      proxyChecks:
+        proxyType: 2
+        isDepositable: false
+        implementation: *aragonFinanceImplAddress
+        appId: *FINANCE_APP_ID
+        kernel: *aragonKernel
+      checks:
+        hasInitialized: true
+        CREATE_PAYMENTS_ROLE: "0x5de467a460382d13defdc02aacddc9c7d6605d6d4e0b8bd2f70732cae8ea17bc"
+        getRecoveryVault: *aragonAgent
+        CHANGE_PERIOD_ROLE: "0xd35e458bacdd5343c2f050f574554b2f417a8ea38d6a9a65ce2225dbe8bb9a9d"
+        CHANGE_BUDGETS_ROLE: "0xd79730e82bfef7d2f9639b9d10bf37ebb662b22ae2211502a00bdf7b2cc3a23a"
+        periodsLength: 1
+        appId: *FINANCE_APP_ID
+        EXECUTE_PAYMENTS_ROLE: "0x563165d3eae48bcb0a092543ca070d989169c98357e9a1b324ec5da44bab75fd"
+        currentPeriodId: 0
+        getEVMScriptRegistry: *aragonEvmScriptRegistry
+        getPeriodDuration: 2592000
+        kernel: *aragonKernel
+        paymentsNextIndex: 1
+        isPetrified: false
+        MANAGE_PAYMENTS_ROLE: "0x30597dd103acfaef0649675953d9cb22faadab7e9d9ed57acc1c429d04b80777"
+        transactionsNextIndex: 1
+        vault: *aragonAgent
+        getBudget: null
+        getEVMScriptExecutor: null
+        getPayment: null
+        getTransaction: null
+        getPeriod: null
+        allowRecoverability: null
+        getInitializationBlock: null
+        canPerform: null
+        nextPaymentTime: null
+        getPeriodTokenStatement: null
+        canMakePayment: null
+        getRemainingBudget: null
+      implementationChecks:
+        hasInitialized: false
+        CREATE_PAYMENTS_ROLE: "0x5de467a460382d13defdc02aacddc9c7d6605d6d4e0b8bd2f70732cae8ea17bc"
+        CHANGE_PERIOD_ROLE: "0xd35e458bacdd5343c2f050f574554b2f417a8ea38d6a9a65ce2225dbe8bb9a9d"
+        CHANGE_BUDGETS_ROLE: "0xd79730e82bfef7d2f9639b9d10bf37ebb662b22ae2211502a00bdf7b2cc3a23a"
+        periodsLength: 0
+        appId: *ZERO_BYTES32
+        getInitializationBlock: *MAX_UINT256
+        EXECUTE_PAYMENTS_ROLE: "0x563165d3eae48bcb0a092543ca070d989169c98357e9a1b324ec5da44bab75fd"
+        kernel: *ZERO_ADDRESS
+        paymentsNextIndex: 0
+        isPetrified: true
+        MANAGE_PAYMENTS_ROLE: "0x30597dd103acfaef0649675953d9cb22faadab7e9d9ed57acc1c429d04b80777"
+        transactionsNextIndex: 0
+        vault: *ZERO_ADDRESS
+        getBudget: null
+        getEVMScriptExecutor: null
+        getPayment: null
+        getRecoveryVault: null
+        getTransaction: null
+        getPeriod: null
+        allowRecoverability: null
+        currentPeriodId: null
+        canPerform: null
+        getEVMScriptRegistry: null
+        getPeriodDuration: null
+        nextPaymentTime: null
+        getPeriodTokenStatement: null
+        canMakePayment: null
+        getRemainingBudget: null
+
+    aragon-agent:
+      name: Agent
+      address: *aragonAgent
+      proxyName: AppProxyUpgradeable
+      implementation: *aragonAgentImplAddress
+      proxyChecks:
+        proxyType: 2
+        isDepositable: true
+        implementation: *aragonAgentImplAddress
+        appId: *AGENT_APP_ID
+        kernel: *aragonKernel
+      checks:
+        ADD_PROTECTED_TOKEN_ROLE: "0x6eb2a499556bfa2872f5aa15812b956cc4a71b4d64eb3553f7073c7e41415aaa"
+        hasInitialized: true
+        ERC1271_INTERFACE_ID: "0xfb855dc9"
+        ERC1271_RETURN_INVALID_SIGNATURE: "0x00000000"
+        TRANSFER_ROLE: "0x8502233096d909befbda0999bb8ea2f3a6be3c138b9fbf003752a4c8bce86f6c"
+        getProtectedTokensLength: 0
+        getRecoveryVault: *aragonAgent
+        RUN_SCRIPT_ROLE: "0xb421f7ad7646747f3051c50c0b8e2377839296cd4973e27f63821d73e390338f"
+        SAFE_EXECUTE_ROLE: "0x0a1ad7b87f5846153c6d5a1f761d71c7d0cfd122384f56066cd33239b7933694"
+        REMOVE_PROTECTED_TOKEN_ROLE: "0x71eee93d500f6f065e38b27d242a756466a00a52a1dbcd6b4260f01a8640402a"
+        isDepositable: true
+        DESIGNATE_SIGNER_ROLE: "0x23ce341656c3f14df6692eebd4757791e33662b7dcf9970c8308303da5472b7c"
+        EXECUTE_ROLE: "0xcebf517aa4440d1d125e0355aae64401211d0848a23c02cc5d29a14822580ba4"
+        appId: *AGENT_APP_ID
+        getInitializationBlock: 727
+        ERC1271_RETURN_VALID_SIGNATURE: "0x20c13b0b"
+        getEVMScriptRegistry: *aragonEvmScriptRegistry
+        designatedSigner: *ZERO_ADDRESS
+        PROTECTED_TOKENS_CAP: 10
+        ADD_PRESIGNED_HASH_ROLE: "0x0b29780bb523a130b3b01f231ef49ed2fa2781645591a0b0a44ca98f15a5994c"
+        kernel: *aragonKernel
+        isPetrified: false
+        isForwarder: true
+        supportsInterface: null
+        isValidSignature: null
+        getEVMScriptExecutor: null
+        allowRecoverability: null
+        protectedTokens: null
+        canPerform: null
+        isPresigned: null
+        canForward: null
+        balance: null
+      implementationChecks:
+        ADD_PROTECTED_TOKEN_ROLE: "0x6eb2a499556bfa2872f5aa15812b956cc4a71b4d64eb3553f7073c7e41415aaa"
+        hasInitialized: false
+        ERC1271_INTERFACE_ID: "0xfb855dc9"
+        ERC1271_RETURN_INVALID_SIGNATURE: "0x00000000"
+        TRANSFER_ROLE: "0x8502233096d909befbda0999bb8ea2f3a6be3c138b9fbf003752a4c8bce86f6c"
+        RUN_SCRIPT_ROLE: "0xb421f7ad7646747f3051c50c0b8e2377839296cd4973e27f63821d73e390338f"
+        SAFE_EXECUTE_ROLE: "0x0a1ad7b87f5846153c6d5a1f761d71c7d0cfd122384f56066cd33239b7933694"
+        REMOVE_PROTECTED_TOKEN_ROLE: "0x71eee93d500f6f065e38b27d242a756466a00a52a1dbcd6b4260f01a8640402a"
+        isDepositable: false
+        DESIGNATE_SIGNER_ROLE: "0x23ce341656c3f14df6692eebd4757791e33662b7dcf9970c8308303da5472b7c"
+        EXECUTE_ROLE: "0xcebf517aa4440d1d125e0355aae64401211d0848a23c02cc5d29a14822580ba4"
+        appId: *ZERO_BYTES32
+        getInitializationBlock: *MAX_UINT256
+        ERC1271_RETURN_VALID_SIGNATURE: "0x20c13b0b"
+        getEVMScriptRegistry:
+          mustRevert: true # due to zero kernel
+        designatedSigner: *ZERO_ADDRESS
+        PROTECTED_TOKENS_CAP: 10
+        ADD_PRESIGNED_HASH_ROLE: "0x0b29780bb523a130b3b01f231ef49ed2fa2781645591a0b0a44ca98f15a5994c"
+        kernel: *ZERO_ADDRESS
+        isPetrified: true
+        isForwarder: true
+        supportsInterface: null
+        isValidSignature: null
+        getProtectedTokensLength: null
+        getEVMScriptExecutor: null
+        getRecoveryVault: null
+        allowRecoverability: null
+        protectedTokens: null
+        canPerform: null
+        isPresigned: null
+        canForward: null
+        balance: null
+
+    aragon-acl:
+      name: ACL
+      address: *aragonAcl
+      proxyName: AppProxyUpgradeable
+      implementation: *aragonAclImplAddress
+      proxyChecks:
+        proxyType: 2
+        isDepositable: false
+        implementation: *aragonAclImplAddress
+        appId: *DEFAULT_ACL_APP_ID
+        kernel: *aragonKernel
+      checks:
+        hasInitialized: true
+        NO_PERMISSION: *ZERO_BYTES32
+        getRecoveryVault: *aragonAgent
+        CREATE_PERMISSIONS_ROLE: "0x0b719b33c83b8e5d300c521cb8b54ae9bd933996a14bef8c2f4e0285d2d2400a"
+        appId: *DEFAULT_ACL_APP_ID
+        getEVMScriptRegistry: *aragonEvmScriptRegistry
+        ANY_ENTITY: "0xFFfFfFffFFfffFFfFFfFFFFFffFFFffffFfFFFfF"
+        EMPTY_PARAM_HASH: "0x290decd9548b62a8d60345a988386fc84ba6bc95484008f6362f93160ef3e563"
+        kernel: *aragonKernel
+        isPetrified: false
+        BURN_ENTITY: "0x0000000000000000000000000000000000000001"
+        getPermissionParamsLength: null
+        evalParams: null
+        getEVMScriptExecutor: null
+        hasPermission: null
+        allowRecoverability: null
+        getInitializationBlock: null
+        getPermissionParam: null
+        canPerform: null
+        getPermissionManager: null
+      implementationChecks:
+        hasInitialized: false
+        NO_PERMISSION: *ZERO_BYTES32
+        CREATE_PERMISSIONS_ROLE: "0x0b719b33c83b8e5d300c521cb8b54ae9bd933996a14bef8c2f4e0285d2d2400a"
+        appId: *ZERO_BYTES32
+        getInitializationBlock: *MAX_UINT256
+        ANY_ENTITY: "0xFFfFfFffFFfffFFfFFfFFFFFffFFFffffFfFFFfF"
+        EMPTY_PARAM_HASH: "0x290decd9548b62a8d60345a988386fc84ba6bc95484008f6362f93160ef3e563"
+        kernel: *ZERO_ADDRESS
+        isPetrified: true
+        BURN_ENTITY: "0x0000000000000000000000000000000000000001"
+        getPermissionParamsLength: null
+        evalParams: null
+        getEVMScriptExecutor: null
+        getRecoveryVault: null
+        hasPermission: null
+        allowRecoverability: null
+        getPermissionParam: null
+        canPerform: null
+        getEVMScriptRegistry: null
+        getPermissionManager: null
+
+    apm-registry-factory:
+      name: APMRegistryFactory
+      address: *apmRegistryFactory
+      checks:
+        registryBase: *aragonApmRegistryImplAddress
+        ensSubdomainRegistrarBase: *ensSubdomainRegistrarImplAddress
+        ens: *ens
+        daoFactory: *daoFactory
+        repoBase: *aragonRepoBase
+
+    aragon-evm-script-registry:
+      name: EVMScriptRegistry
+      address: *aragonEvmScriptRegistry
+      proxyName: AppProxyPinned
+      implementation: *aragonEvmScriptRegistryImplAddress
+      proxyChecks:
+        proxyType: 1
+        isDepositable: false
+        implementation: *aragonEvmScriptRegistryImplAddress
+        appId: "0xddbcfd564f642ab5627cf68b9b7d374fb4f8a36e941a75d89c87998cef03bd61"
+        kernel: *aragonKernel
+      checks:
+        hasInitialized: true
+        REGISTRY_ADD_EXECUTOR_ROLE: "0xc4e90f38eea8c4212a009ca7b8947943ba4d4a58d19b683417f65291d1cd9ed2"
+        getRecoveryVault: *aragonAgent
+        appId: "0xddbcfd564f642ab5627cf68b9b7d374fb4f8a36e941a75d89c87998cef03bd61"
+        getInitializationBlock: 727
+        getEVMScriptRegistry: *aragonEvmScriptRegistry
+        REGISTRY_MANAGER_ROLE: "0xf7a450ef335e1892cb42c8ca72e7242359d7711924b75db5717410da3f614aa3"
+        kernel: *aragonKernel
+        isPetrified: false
+        getScriptExecutor: null
+        getEVMScriptExecutor: null
+        allowRecoverability: null
+        canPerform: null
+        executors: null
+      implementationChecks:
+        hasInitialized: false
+        REGISTRY_ADD_EXECUTOR_ROLE: "0xc4e90f38eea8c4212a009ca7b8947943ba4d4a58d19b683417f65291d1cd9ed2"
+        appId: *ZERO_BYTES32
+        getInitializationBlock: *MAX_UINT256
+        REGISTRY_MANAGER_ROLE: "0xf7a450ef335e1892cb42c8ca72e7242359d7711924b75db5717410da3f614aa3"
+        kernel: *ZERO_ADDRESS
+        isPetrified: true
+        getScriptExecutor: null
+        getEVMScriptExecutor: null
+        getRecoveryVault: null
+        allowRecoverability: null
+        canPerform: null
+        getEVMScriptRegistry: null
+        executors: null
+
+    callsScript:
+      name: CallsScript
+      address: *callsScript
+      checks:
+        hasInitialized: false
+        executorType: "0x2dc858a00f3e417be1394b87c07158e989ec681ce8cc68a9093680ac1a870302"
+        getInitializationBlock: *MAX_UINT256
+        isPetrified: true
+
+    aragon-lido-apm:
+      name: APMRegistry
+      address: *lidoApm
+      proxyName: AppProxyUpgradeable
+      implementation: *aragonApmRegistryImplAddress
+      proxyChecks:
+        proxyType: 2
+        isDepositable: false
+        implementation: "0x2D7EF7C6BEDA2a18E4c32151A758B8b081f5C2d7"
+        appId: *LIDO_APM_APP_ID
+        kernel: "0xfce76fdBF71D2A30Cd1a5a00C1fcb3A46044af78"
+      checks:
+        hasInitialized: true
+        registrar: "0xf0E2d6f345Ab54630F2867BBcC64879Ad6a30C68"
+        getRecoveryVault: *ZERO_ADDRESS
+        ens: "0x6d4995cA535179d4126cC153C386bc9C13B92ba3"
+        CREATE_REPO_ROLE: "0x2a9494d64846c9fdbf0158785aa330d8bc9caf45af27fa0e8898eb4d55adcea6"
+        appId: *LIDO_APM_APP_ID
+        getInitializationBlock: 721
+        getEVMScriptRegistry: "0x15464fF12B3a857ee43ba08185D53648d9c2F8d7"
+        kernel: "0xfce76fdBF71D2A30Cd1a5a00C1fcb3A46044af78"
+        isPetrified: false
+        getEVMScriptExecutor: null
+        allowRecoverability: null
+        canPerform: null
+      implementationChecks:
+        hasInitialized: false
+        registrar: *ZERO_ADDRESS
+        ens: *ZERO_ADDRESS
+        CREATE_REPO_ROLE: "0x2a9494d64846c9fdbf0158785aa330d8bc9caf45af27fa0e8898eb4d55adcea6"
+        appId: *ZERO_BYTES32
+        getInitializationBlock: *MAX_UINT256
+        kernel: *ZERO_ADDRESS
+        isPetrified: true
+        getEVMScriptExecutor: null
+        getRecoveryVault: null
+        allowRecoverability: null
+        canPerform: null
+        getEVMScriptRegistry: null
+
+    aragon-apm-registry:
+      name: APMRegistry
+      address: *aragonApmRegistry
+      proxyName: AppProxyUpgradeable
+      implementation: *aragonApmRegistryImplAddress
+      proxyChecks:
+        proxyType: 2
+        isDepositable: false
+        implementation: "0x2D7EF7C6BEDA2a18E4c32151A758B8b081f5C2d7"
+        appId: *APM_REGISTRY_APP_ID
+        kernel: "0xa8331ECa4817b33eFe8e70dC6c667eE9B530AC5b"
+      checks:
+        hasInitialized: true
+        getRecoveryVault: *ZERO_ADDRESS
+        ens: "0x6d4995cA535179d4126cC153C386bc9C13B92ba3"
+        CREATE_REPO_ROLE: "0x2a9494d64846c9fdbf0158785aa330d8bc9caf45af27fa0e8898eb4d55adcea6"
+        appId: *APM_REGISTRY_APP_ID
+        getEVMScriptRegistry: "0xa5BDA9a9f08c44bC7f579A89e1aa9cfB324c2991"
+        kernel: "0xa8331ECa4817b33eFe8e70dC6c667eE9B530AC5b"
+        isPetrified: false
+        getEVMScriptExecutor: null
+        registrar: null
+        allowRecoverability: null
+        getInitializationBlock: null
+        canPerform: null
+      implementationChecks:
+        hasInitialized: false
+        registrar: *ZERO_ADDRESS
+        ens: *ZERO_ADDRESS
+        CREATE_REPO_ROLE: "0x2a9494d64846c9fdbf0158785aa330d8bc9caf45af27fa0e8898eb4d55adcea6"
+        appId: *ZERO_BYTES32
+        getInitializationBlock: *MAX_UINT256
+        kernel: *ZERO_ADDRESS
+        isPetrified: true
+        getEVMScriptExecutor: null
+        getRecoveryVault: null
+        allowRecoverability: null
+        canPerform: null
+        getEVMScriptRegistry: null
+
+    aragon-repo-base:
+      name: Repo
+      address: *aragonRepoBase
+      checks:
+        hasInitialized: false
+        appId: *ZERO_BYTES32
+        getInitializationBlock: *MAX_UINT256
+        CREATE_VERSION_ROLE: "0x1f56cfecd3595a2e6cc1a7e6cb0b20df84cdbd92eff2fee554e70e4e45a9a7d8"
+        getVersionsCount: *MAX_UINT256
+        kernel: *ZERO_ADDRESS
+        isPetrified: true
+        getEVMScriptExecutor: null
+        getRecoveryVault: null
+        getBySemanticVersion: null
+        getByVersionId: null
+        allowRecoverability: null
+        getLatestForContractAddress: null
+        canPerform: null
+        getEVMScriptRegistry: null
+        isValidBump: null
+        getLatest: null
+
+    aragonID:
+      name: FIFSResolvingRegistrar
+      address: *aragonID
+      checks:
+        rootNode: "0x7e74a86b6e146964fb965db04dc2590516da77f720bb6759337bf5632415fd86"
+
+    daoFactory:
+      name: DAOFactory
+      address: *daoFactory
+      checks:
+        baseACL: "0x866Ad4D7283C4dcF00A01c1884DCDa98c2F1aE0A"
+        regFactory: *evmScriptRegistryFactory
+        baseKernel: "0x14dDb33F1D85997Bc35546e7E8CC306F5A7B9DD1"
+
+    gateSealBlueprint:
+      name: GateSeal
+      address: *gateSealBlueprint
+      checks:
+        get_sealing_committee:
+          - mustRevert: true
+        get_seal_duration_seconds:
+          - mustRevert: true
+        get_sealables:
+          - mustRevert: true
+        get_expiry_timestamp:
+          - mustRevert: true
+        is_expired:
+          - mustRevert: true
+
+    gateSealFactory:
+      name: GateSealFactory
+      address: *gateSealFactory
+      checks:
+        get_blueprint: *gateSealBlueprint
+
+    gateSealWithdrawalQueue:
+      name: GateSeal
+      address: *gateSealWithdrawalQueue
+      checks:
+        get_sealing_committee: *resealCommittee
+        get_seal_duration_seconds: 1209600
+        get_sealables: [*withdrawalQueueERC721]
+        get_expiry_timestamp: 1784217696
+        is_expired: false
+
+    gateSealVaulthubAndPredepositGuarantee:
+      name: GateSeal
+      address: *gateSealVaulthubAndPredepositGuarantee
+      checks:
+        get_sealing_committee: *resealCommittee
+        get_seal_duration_seconds: 1209600
+        get_sealables: [*vaultHub, *predepositGuarantee]
+        get_expiry_timestamp: 1791454296
+        is_expired: false
+
+    gateSealVEBAndTWG:
+      name: GateSeal
+      address: *gateSealVEBAndTWG
+      checks:
+        get_sealing_committee: *resealCommittee
+        get_seal_duration_seconds: 1209600
+        get_sealables: [*triggerableWithdrawalsGateway, *validatorsExitBusOracle]
+        get_expiry_timestamp: 1784217696
+        is_expired: false
+
+    node-operators-registry:
+      name: NodeOperatorsRegistry
+      address: *nodeOperatorsRegistry
+      proxyName: AppProxyUpgradeable
+      implementation: *nodeOperatorsRegistryImplAddress
+      proxyChecks:
+        proxyType: 2
+        isDepositable: false
+        implementation: *nodeOperatorsRegistryImplAddress
+        appId: *NODE_OPERATORS_REGISTRY_APP_ID
+        kernel: *aragonKernel
+      checks:
+        hasInitialized: true
+        getType: "0x637572617465642d6f6e636861696e2d76310000000000000000000000000000"
+        getRecoveryVault: *aragonAgent
+        STAKING_ROUTER_ROLE: *STAKING_ROUTER_ROLE
+        appId: *NODE_OPERATORS_REGISTRY_APP_ID
+        MANAGE_NODE_OPERATOR_ROLE: *MANAGE_NODE_OPERATOR_ROLE
+        getEVMScriptRegistry: *aragonEvmScriptRegistry
+        MAX_NODE_OPERATOR_NAME_LENGTH: 255
+        kernel: *aragonKernel
+        getLocator: *lidoLocator
+        SET_NODE_OPERATOR_LIMIT_ROLE: *SET_NODE_OPERATOR_LIMIT_ROLE
+        isPetrified: false
+        MAX_STUCK_PENALTY_DELAY: 31536000
+        MAX_NODE_OPERATORS_COUNT: 200
+        MANAGE_SIGNING_KEYS: *MANAGE_SIGNING_KEYS_ROLE
+        getEVMScriptExecutor: null
+        getNodeOperatorIds: null
+        getSigningKeys: null
+        getNodeOperatorIsActive: null
+        getRewardsDistribution: null
+        getStuckPenaltyDelay: null
+        getRewardDistributionState: null
+        isOperatorPenalized: null
+        allowRecoverability: null
+        getActiveNodeOperatorsCount: null
+        getContractVersion: null
+        getInitializationBlock: null
+        getUnusedSigningKeyCount: null
+        getNodeOperator: null
+        getStakingModuleSummary: null
+        canPerform: null
+        getNodeOperatorsCount: null
+        getNodeOperatorSummary: null
+        getSigningKey: null
+        getKeysOpIndex: null
+        getNonce: null
+        getTotalSigningKeyCount: null
+        isOperatorPenaltyCleared: null
+        exitDeadlineThreshold: null
+        isValidatorExitDelayPenaltyApplicable: null
+        isValidatorExitingKeyReported: null
+        exitPenaltyCutoffTimestamp: null
+      implementationChecks:
+        hasInitialized: false
+        getType: *ZERO_BYTES32
+        getStuckPenaltyDelay: 0
+        getRewardDistributionState: 0
+        STAKING_ROUTER_ROLE: *STAKING_ROUTER_ROLE
+        appId: *ZERO_BYTES32
+        getActiveNodeOperatorsCount: 0
+        getContractVersion: *MAX_UINT256
+        getInitializationBlock: *MAX_UINT256
+        MANAGE_NODE_OPERATOR_ROLE: *MANAGE_NODE_OPERATOR_ROLE
+        getStakingModuleSummary: [0, 0, 0]
+        getNodeOperatorsCount: 0
+        MAX_NODE_OPERATOR_NAME_LENGTH: 255
+        getKeysOpIndex: 0
+        getNonce: 0
+        kernel: *ZERO_ADDRESS
+        getLocator: *ZERO_ADDRESS
+        SET_NODE_OPERATOR_LIMIT_ROLE: *SET_NODE_OPERATOR_LIMIT_ROLE
+        isPetrified: true
+        MAX_STUCK_PENALTY_DELAY: 31536000
+        MAX_NODE_OPERATORS_COUNT: 200
+        MANAGE_SIGNING_KEYS: *MANAGE_SIGNING_KEYS_ROLE
+        getEVMScriptExecutor: null
+        getRecoveryVault: null
+        getNodeOperatorIds: null
+        getSigningKeys: null
+        getNodeOperatorIsActive: null
+        getRewardsDistribution: null
+        isOperatorPenalized: null
+        allowRecoverability: null
+        getUnusedSigningKeyCount: null
+        getNodeOperator: null
+        canPerform: null
+        getEVMScriptRegistry: null
+        getNodeOperatorSummary: null
+        getSigningKey: null
+        getTotalSigningKeyCount: null
+        isOperatorPenaltyCleared: null
+
+    simple-dvt:
+      name: NodeOperatorsRegistry
+      address: *simpleDvt
+      proxyName: AppProxyUpgradeable
+      implementation: *nodeOperatorsRegistryImplAddress
+      proxyChecks:
+        proxyType: 2
+        isDepositable: false
+        implementation: *nodeOperatorsRegistryImplAddress
+        appId: *SIMPLE_DVT_APP_ID
+        kernel: *aragonKernel
+      checks:
+        hasInitialized: true
+        getType: "0x637572617465642d6f6e636861696e2d76310000000000000000000000000000"
+        getRecoveryVault: *aragonAgent
+        STAKING_ROUTER_ROLE: *STAKING_ROUTER_ROLE
+        appId: *SIMPLE_DVT_APP_ID
+        MANAGE_NODE_OPERATOR_ROLE: *MANAGE_NODE_OPERATOR_ROLE
+        getEVMScriptRegistry: *aragonEvmScriptRegistry
+        MAX_NODE_OPERATOR_NAME_LENGTH: 255
+        kernel: *aragonKernel
+        getLocator: *lidoLocator
+        SET_NODE_OPERATOR_LIMIT_ROLE: *SET_NODE_OPERATOR_LIMIT_ROLE
+        isPetrified: false
+        MAX_STUCK_PENALTY_DELAY: 31536000
+        MAX_NODE_OPERATORS_COUNT: 200
+        MANAGE_SIGNING_KEYS: *MANAGE_SIGNING_KEYS_ROLE
+        getEVMScriptExecutor: null
+        getNodeOperatorIds: null
+        getSigningKeys: null
+        getNodeOperatorIsActive: null
+        getRewardsDistribution: null
+        getStuckPenaltyDelay: null
+        getRewardDistributionState: null
+        isOperatorPenalized: null
+        allowRecoverability: null
+        getActiveNodeOperatorsCount: null
+        getContractVersion: null
+        getInitializationBlock: null
+        getUnusedSigningKeyCount: null
+        getNodeOperator: null
+        getStakingModuleSummary: null
+        canPerform: null
+        getNodeOperatorsCount: null
+        getNodeOperatorSummary: null
+        getSigningKey: null
+        getKeysOpIndex: null
+        getNonce: null
+        getTotalSigningKeyCount: null
+        isOperatorPenaltyCleared: null
+        exitDeadlineThreshold: null
+        isValidatorExitDelayPenaltyApplicable: null
+        isValidatorExitingKeyReported: null
+        exitPenaltyCutoffTimestamp: null
+      implementationChecks:
+        hasInitialized: false
+        getType: *ZERO_BYTES32
+        getStuckPenaltyDelay: 0
+        getRewardDistributionState: 0
+        STAKING_ROUTER_ROLE: *STAKING_ROUTER_ROLE
+        appId: *ZERO_BYTES32
+        getActiveNodeOperatorsCount: 0
+        getContractVersion: *MAX_UINT256
+        getInitializationBlock: *MAX_UINT256
+        MANAGE_NODE_OPERATOR_ROLE: *MANAGE_NODE_OPERATOR_ROLE
+        getStakingModuleSummary: [0, 0, 0]
+        getNodeOperatorsCount: 0
+        MAX_NODE_OPERATOR_NAME_LENGTH: 255
+        getKeysOpIndex: 0
+        getNonce: 0
+        kernel: *ZERO_ADDRESS
+        getLocator: *ZERO_ADDRESS
+        SET_NODE_OPERATOR_LIMIT_ROLE: *SET_NODE_OPERATOR_LIMIT_ROLE
+        isPetrified: true
+        MAX_STUCK_PENALTY_DELAY: 31536000
+        MAX_NODE_OPERATORS_COUNT: 200
+        MANAGE_SIGNING_KEYS: *MANAGE_SIGNING_KEYS_ROLE
+        getEVMScriptExecutor: null
+        getRecoveryVault: null
+        getNodeOperatorIds: null
+        getSigningKeys: null
+        getNodeOperatorIsActive: null
+        getRewardsDistribution: null
+        isOperatorPenalized: null
+        allowRecoverability: null
+        getUnusedSigningKeyCount: null
+        getNodeOperator: null
+        canPerform: null
+        getEVMScriptRegistry: null
+        getNodeOperatorSummary: null
+        getSigningKey: null
+        getTotalSigningKeyCount: null
+        isOperatorPenaltyCleared: null
+
+    # TODO
+    # evmScriptRegistryFactory:
+    #   name: EVMScriptRegistryFactory
+    #   address: *evmScriptRegistryFactory
     #   checks:
-    #     CONFIG_MANAGER_ROLE: "0xbbfb55d933c2bfa638763473275b1d84c4418e58d26cf9d2cd5758237756d9f0"
-    #     DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
-    #     get: null
-    #     getList: null
-    #     getRoleAdmin: null
-    #     getRoleMember: null
-    #     getRoleMemberCount: null
-    #     hasRole: null
-    #     supportsInterface: null
+    #     baseReg: "0xA75A76Ca92068c8fe1fA2665795805aA4610999E"
+    #     baseCallScript: *callsScript
 
-    # aragon-kernel:
-    #   name: Kernel
-    #   address: *aragonKernel
-    #   proxyName: KernelProxy
-    #   implementation: *aragonKernelImplAddress
-    #   proxyChecks:
-    #     proxyType: 2
-    #     apps: null
-    #     isDepositable: false
-    #     implementation: *aragonKernelImplAddress
-    #     recoveryVaultAppId: "0x701a4fd1f5174d12a0f1d9ad2c88d0ad11ab6aad0ac72b7d9ce621815f8016a9"
-    #   checks:
-    #     hasInitialized: true
-    #     KERNEL_APP_ID: *KERNEL_APP_ID
-    #     APP_ADDR_NAMESPACE: "0xd6f028ca0e8edb4a8c9757ca4fdccab25fa1e0317da1188108f7d2dee14902fb"
-    #     getRecoveryVault: *aragonAgent
-    #     CORE_NAMESPACE: "0xc681a85306374a5ab27f0bbc385296a54bcd314a1948b6cf61c4ea1bc44bb9f8"
-    #     recoveryVaultAppId: "0x701a4fd1f5174d12a0f1d9ad2c88d0ad11ab6aad0ac72b7d9ce621815f8016a9"
-    #     getInitializationBlock: 727
-    #     APP_MANAGER_ROLE: "0xb6d92708f3d4817afc106147d969e229ced5c46e65e0a5002a0d391287762bd0"
-    #     APP_BASES_NAMESPACE: "0xf1f3eb40f5bc1ad1344716ced8b8a0431d840b5783aea1fd01786bc26f35ac0f"
-    #     acl: *aragonAcl
-    #     isPetrified: false
-    #     DEFAULT_ACL_APP_ID: *DEFAULT_ACL_APP_ID
-    #     allowRecoverability: null
-    #     apps: null
-    #     getApp: null
-    #     hasPermission: null
-    #   implementationChecks:
-    #     hasInitialized: false
-    #     KERNEL_APP_ID: *KERNEL_APP_ID
-    #     APP_ADDR_NAMESPACE: "0xd6f028ca0e8edb4a8c9757ca4fdccab25fa1e0317da1188108f7d2dee14902fb"
-    #     getRecoveryVault: *ZERO_ADDRESS
-    #     CORE_NAMESPACE: "0xc681a85306374a5ab27f0bbc385296a54bcd314a1948b6cf61c4ea1bc44bb9f8"
-    #     recoveryVaultAppId: *ZERO_BYTES32
-    #     getInitializationBlock: *MAX_UINT256
-    #     APP_MANAGER_ROLE: "0xb6d92708f3d4817afc106147d969e229ced5c46e65e0a5002a0d391287762bd0"
-    #     APP_BASES_NAMESPACE: "0xf1f3eb40f5bc1ad1344716ced8b8a0431d840b5783aea1fd01786bc26f35ac0f"
-    #     acl: *ZERO_ADDRESS
-    #     isPetrified: true
-    #     DEFAULT_ACL_APP_ID: *DEFAULT_ACL_APP_ID
-    #     apps: null
-    #     allowRecoverability: null
-    #     getApp: null
-    #     hasPermission: null
+    lidoTemplate:
+      name: LidoTemplate
+      address: *lidoTemplate
+      checks:
+        getConfig:
+          [
+            "0x2cE254Fd852d6B5023b1B2355ae96A8d752a47cf",
+            *daoFactory,
+            *ens,
+            *miniMeTokenFactory,
+            *aragonID,
+            *apmRegistryFactory,
+          ]
 
-    # ldo:
-    #   name: MiniMeToken
-    #   address: *ldo
-    #   checks:
-    #     name: "TEST Lido DAO Token"
-    #     totalSupply: "1000000000000000000000000"
-    #     decimals: *DECIMALS_18
-    #     version: "MMT_0.1"
-    #     parentToken: *ZERO_ADDRESS
-    #     symbol: "TLDO"
-    #     transfersEnabled: true
-    #     parentSnapShotBlock: 0
-    #     tokenFactory: "0x8B608E59aC132075248Ee090A6713D0074CF5f95"
-    #     controller: *aragonTokenManager
-    #     creationBlock: null
-    #     balanceOfAt: null
-    #     balanceOf: null
-    #     totalSupplyAt: null
-    #     allowance: null
+    easyTrack:
+      name: EasyTrack
+      address: *easyTrack
+      checks:
+        CANCEL_ROLE: *ET_CANCEL_ROLE
+        DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
+        MAX_MOTIONS_LIMIT: 255
+        MAX_OBJECTIONS_THRESHOLD: 1000
+        MIN_MOTION_DURATION: 60
+        PAUSE_ROLE: *ET_PAUSE_ROLE
+        UNPAUSE_ROLE: *ET_UNPAUSE_ROLE
+        evmScriptExecutor: *evmScriptExecutor
+        governanceToken: *ldo
+        motionDuration: 600
+        motionsCountLimit: 24
+        objectionsThreshold: 50
+        paused: false
+        canObjectToMotion: null
+        evmScriptFactories: null
+        evmScriptFactoryPermissions: null
+        getEVMScriptFactories: null
+        getMotion: null
+        getMotions: null
+        getRoleAdmin: null
+        hasRole: null
+        isEVMScriptFactory: null
+        motions: null
+        objections: null
+        supportsInterface: null
 
-    # aragon-voting:
-    #   name: Voting
-    #   address: *aragonVoting
-    #   proxyName: AppProxyUpgradeable
-    #   implementation: *aragonVotingImplAddress
-    #   proxyChecks:
-    #     proxyType: 2
-    #     isDepositable: false
-    #     implementation: *aragonVotingImplAddress
-    #     appId: *VOTING_APP_ID
-    #     kernel: *aragonKernel
-    #   checks:
-    #     hasInitialized: true
-    #     UNSAFELY_MODIFY_VOTE_TIME_ROLE: "0x068ca51c9d69625c7add396c98ca4f3b27d894c3b973051ad3ee53017d7094ea"
-    #     getRecoveryVault: *aragonAgent
-    #     MODIFY_QUORUM_ROLE: "0xad15e7261800b4bb73f1b69d3864565ffb1fd00cb93cf14fe48da8f1f2149f39"
-    #     objectionPhaseTime: 300
-    #     MODIFY_SUPPORT_ROLE: "0xda3972983e62bdf826c4b807c4c9c2b8a941e1f83dfa76d53d6aeac11e1be650"
-    #     appId: *VOTING_APP_ID
-    #     getEVMScriptRegistry: *aragonEvmScriptRegistry
-    #     voteTime: 900
-    #     CREATE_VOTES_ROLE: "0xe7dcd7275292e064d090fbc5f3bd7995be23b502c1fed5cd94cfddbbdcd32bbc"
-    #     kernel: *aragonKernel
-    #     minAcceptQuorumPct: 50000000000000000
-    #     isPetrified: false
-    #     supportRequiredPct: 500000000000000000
-    #     token: *ldo
-    #     PCT_BASE: 1000000000000000000
-    #     isForwarder: true
-    #     getEVMScriptExecutor: null
-    #     getVoterState: null
-    #     getVote: null
-    #     allowRecoverability: null
-    #     getInitializationBlock: null
-    #     canPerform: null
-    #     canForward: null
-    #     canExecute: null
-    #     canVote: null
-    #     votesLength: null
-    #     getVotePhase: null
-    #     getDelegate: null
-    #     getDelegatedVoters: null
-    #     getVotingPowerMultipleAtVote: null
-    #     getDelegatedVotersCount: null
-    #     getVoterStateMultipleAtVote: null
-    #     getVotingPowerMultiple: null
-    #   implementationChecks:
-    #     hasInitialized: false
-    #     UNSAFELY_MODIFY_VOTE_TIME_ROLE: "0x068ca51c9d69625c7add396c98ca4f3b27d894c3b973051ad3ee53017d7094ea"
-    #     MODIFY_QUORUM_ROLE: "0xad15e7261800b4bb73f1b69d3864565ffb1fd00cb93cf14fe48da8f1f2149f39"
-    #     objectionPhaseTime: 0
-    #     MODIFY_SUPPORT_ROLE: "0xda3972983e62bdf826c4b807c4c9c2b8a941e1f83dfa76d53d6aeac11e1be650"
-    #     appId: *ZERO_BYTES32
-    #     getInitializationBlock: *MAX_UINT256
-    #     voteTime: 0
-    #     CREATE_VOTES_ROLE: "0xe7dcd7275292e064d090fbc5f3bd7995be23b502c1fed5cd94cfddbbdcd32bbc"
-    #     kernel: *ZERO_ADDRESS
-    #     minAcceptQuorumPct: 0
-    #     isPetrified: true
-    #     votesLength: 0
-    #     supportRequiredPct: 0
-    #     token: *ZERO_ADDRESS
-    #     PCT_BASE: 1000000000000000000
-    #     isForwarder: true
-    #     getEVMScriptExecutor: null
-    #     getRecoveryVault: null
-    #     getVoterState: null
-    #     getVote: null
-    #     allowRecoverability: null
-    #     canPerform: null
-    #     getEVMScriptRegistry: null
-    #     canForward: null
-    #     canExecute: null
-    #     canVote: null
-    #     getVotePhase: null
-
-    # aragon-token-manager:
-    #   name: TokenManager
-    #   address: *aragonTokenManager
-    #   proxyName: AppProxyUpgradeable
-    #   implementation: *aragonTokenManagerImplAddress
-    #   proxyChecks:
-    #     proxyType: 2
-    #     isDepositable: false
-    #     implementation: *aragonTokenManagerImplAddress
-    #     appId: *TOKEN_MANAGER_APP_ID
-    #     kernel: *aragonKernel
-    #   checks:
-    #     hasInitialized: true
-    #     MAX_VESTINGS_PER_ADDRESS: 50
-    #     getRecoveryVault: *aragonAgent
-    #     appId: *TOKEN_MANAGER_APP_ID
-    #     ISSUE_ROLE: "0x2406f1e99f79cea012fb88c5c36566feaeefee0f4b98d3a376b49310222b53c4"
-    #     getEVMScriptRegistry: *aragonEvmScriptRegistry
-    #     ASSIGN_ROLE: "0xf5a08927c847d7a29dc35e105208dbde5ce951392105d712761cc5d17440e2ff"
-    #     BURN_ROLE: "0xe97b137254058bd94f28d2f3eb79e2d34074ffb488d042e3bc958e0a57d2fa22"
-    #     kernel: *aragonKernel
-    #     isPetrified: false
-    #     MINT_ROLE: "0x154c00819833dac601ee5ddded6fda79d9d8b506b911b3dbd54cdb95fe6c3686"
-    #     maxAccountTokens: *MAX_UINT256
-    #     REVOKE_VESTINGS_ROLE: "0x95ffc68daedf1eb334cfcd22ee24a5eeb5a8e58aa40679f2ad247a84140f8d6e"
-    #     token: *ldo
-    #     isForwarder: true
-    #     spendableBalanceOf: null
-    #     getEVMScriptExecutor: null
-    #     getVesting: null
-    #     transferableBalance: null
-    #     allowRecoverability: null
-    #     getInitializationBlock: null
-    #     vestingsLengths: null
-    #     canPerform: null
-    #     canForward: null
-    #   implementationChecks:
-    #     hasInitialized: false
-    #     MAX_VESTINGS_PER_ADDRESS: 50
-    #     appId: *ZERO_BYTES32
-    #     ISSUE_ROLE: "0x2406f1e99f79cea012fb88c5c36566feaeefee0f4b98d3a376b49310222b53c4"
-    #     getInitializationBlock: *MAX_UINT256
-    #     ASSIGN_ROLE: "0xf5a08927c847d7a29dc35e105208dbde5ce951392105d712761cc5d17440e2ff"
-    #     BURN_ROLE: "0xe97b137254058bd94f28d2f3eb79e2d34074ffb488d042e3bc958e0a57d2fa22"
-    #     kernel: *ZERO_ADDRESS
-    #     isPetrified: true
-    #     MINT_ROLE: "0x154c00819833dac601ee5ddded6fda79d9d8b506b911b3dbd54cdb95fe6c3686"
-    #     maxAccountTokens: 0
-    #     REVOKE_VESTINGS_ROLE: "0x95ffc68daedf1eb334cfcd22ee24a5eeb5a8e58aa40679f2ad247a84140f8d6e"
-    #     token: *ZERO_ADDRESS
-    #     isForwarder: true
-    #     spendableBalanceOf: null
-    #     getEVMScriptExecutor: null
-    #     getRecoveryVault: null
-    #     getVesting: null
-    #     transferableBalance: null
-    #     allowRecoverability: null
-    #     vestingsLengths: null
-    #     canPerform: null
-    #     getEVMScriptRegistry: null
-    #     canForward: null
-
-    # aragon-finance:
-    #   name: Finance
-    #   address: *aragonFinance
-    #   proxyName: AppProxyUpgradeable
-    #   implementation: *aragonFinanceImplAddress
-    #   proxyChecks:
-    #     proxyType: 2
-    #     isDepositable: false
-    #     implementation: *aragonFinanceImplAddress
-    #     appId: *FINANCE_APP_ID
-    #     kernel: *aragonKernel
-    #   checks:
-    #     hasInitialized: true
-    #     CREATE_PAYMENTS_ROLE: "0x5de467a460382d13defdc02aacddc9c7d6605d6d4e0b8bd2f70732cae8ea17bc"
-    #     getRecoveryVault: *aragonAgent
-    #     CHANGE_PERIOD_ROLE: "0xd35e458bacdd5343c2f050f574554b2f417a8ea38d6a9a65ce2225dbe8bb9a9d"
-    #     CHANGE_BUDGETS_ROLE: "0xd79730e82bfef7d2f9639b9d10bf37ebb662b22ae2211502a00bdf7b2cc3a23a"
-    #     periodsLength: 1
-    #     appId: *FINANCE_APP_ID
-    #     EXECUTE_PAYMENTS_ROLE: "0x563165d3eae48bcb0a092543ca070d989169c98357e9a1b324ec5da44bab75fd"
-    #     currentPeriodId: 0
-    #     getEVMScriptRegistry: *aragonEvmScriptRegistry
-    #     getPeriodDuration: 2592000
-    #     kernel: *aragonKernel
-    #     paymentsNextIndex: 1
-    #     isPetrified: false
-    #     MANAGE_PAYMENTS_ROLE: "0x30597dd103acfaef0649675953d9cb22faadab7e9d9ed57acc1c429d04b80777"
-    #     transactionsNextIndex: 1
-    #     vault: *aragonAgent
-    #     getBudget: null
-    #     getEVMScriptExecutor: null
-    #     getPayment: null
-    #     getTransaction: null
-    #     getPeriod: null
-    #     allowRecoverability: null
-    #     getInitializationBlock: null
-    #     canPerform: null
-    #     nextPaymentTime: null
-    #     getPeriodTokenStatement: null
-    #     canMakePayment: null
-    #     getRemainingBudget: null
-    #   implementationChecks:
-    #     hasInitialized: false
-    #     CREATE_PAYMENTS_ROLE: "0x5de467a460382d13defdc02aacddc9c7d6605d6d4e0b8bd2f70732cae8ea17bc"
-    #     CHANGE_PERIOD_ROLE: "0xd35e458bacdd5343c2f050f574554b2f417a8ea38d6a9a65ce2225dbe8bb9a9d"
-    #     CHANGE_BUDGETS_ROLE: "0xd79730e82bfef7d2f9639b9d10bf37ebb662b22ae2211502a00bdf7b2cc3a23a"
-    #     periodsLength: 0
-    #     appId: *ZERO_BYTES32
-    #     getInitializationBlock: *MAX_UINT256
-    #     EXECUTE_PAYMENTS_ROLE: "0x563165d3eae48bcb0a092543ca070d989169c98357e9a1b324ec5da44bab75fd"
-    #     kernel: *ZERO_ADDRESS
-    #     paymentsNextIndex: 0
-    #     isPetrified: true
-    #     MANAGE_PAYMENTS_ROLE: "0x30597dd103acfaef0649675953d9cb22faadab7e9d9ed57acc1c429d04b80777"
-    #     transactionsNextIndex: 0
-    #     vault: *ZERO_ADDRESS
-    #     getBudget: null
-    #     getEVMScriptExecutor: null
-    #     getPayment: null
-    #     getRecoveryVault: null
-    #     getTransaction: null
-    #     getPeriod: null
-    #     allowRecoverability: null
-    #     currentPeriodId: null
-    #     canPerform: null
-    #     getEVMScriptRegistry: null
-    #     getPeriodDuration: null
-    #     nextPaymentTime: null
-    #     getPeriodTokenStatement: null
-    #     canMakePayment: null
-    #     getRemainingBudget: null
-
-    # aragon-agent:
-    #   name: Agent
-    #   address: *aragonAgent
-    #   proxyName: AppProxyUpgradeable
-    #   implementation: *aragonAgentImplAddress
-    #   proxyChecks:
-    #     proxyType: 2
-    #     isDepositable: true
-    #     implementation: *aragonAgentImplAddress
-    #     appId: *AGENT_APP_ID
-    #     kernel: *aragonKernel
-    #   checks:
-    #     ADD_PROTECTED_TOKEN_ROLE: "0x6eb2a499556bfa2872f5aa15812b956cc4a71b4d64eb3553f7073c7e41415aaa"
-    #     hasInitialized: true
-    #     ERC1271_INTERFACE_ID: "0xfb855dc9"
-    #     ERC1271_RETURN_INVALID_SIGNATURE: "0x00000000"
-    #     TRANSFER_ROLE: "0x8502233096d909befbda0999bb8ea2f3a6be3c138b9fbf003752a4c8bce86f6c"
-    #     getProtectedTokensLength: 0
-    #     getRecoveryVault: *aragonAgent
-    #     RUN_SCRIPT_ROLE: "0xb421f7ad7646747f3051c50c0b8e2377839296cd4973e27f63821d73e390338f"
-    #     SAFE_EXECUTE_ROLE: "0x0a1ad7b87f5846153c6d5a1f761d71c7d0cfd122384f56066cd33239b7933694"
-    #     REMOVE_PROTECTED_TOKEN_ROLE: "0x71eee93d500f6f065e38b27d242a756466a00a52a1dbcd6b4260f01a8640402a"
-    #     isDepositable: true
-    #     DESIGNATE_SIGNER_ROLE: "0x23ce341656c3f14df6692eebd4757791e33662b7dcf9970c8308303da5472b7c"
-    #     EXECUTE_ROLE: "0xcebf517aa4440d1d125e0355aae64401211d0848a23c02cc5d29a14822580ba4"
-    #     appId: *AGENT_APP_ID
-    #     getInitializationBlock: 727
-    #     ERC1271_RETURN_VALID_SIGNATURE: "0x20c13b0b"
-    #     getEVMScriptRegistry: *aragonEvmScriptRegistry
-    #     designatedSigner: *ZERO_ADDRESS
-    #     PROTECTED_TOKENS_CAP: 10
-    #     ADD_PRESIGNED_HASH_ROLE: "0x0b29780bb523a130b3b01f231ef49ed2fa2781645591a0b0a44ca98f15a5994c"
-    #     kernel: *aragonKernel
-    #     isPetrified: false
-    #     isForwarder: true
-    #     supportsInterface: null
-    #     isValidSignature: null
-    #     getEVMScriptExecutor: null
-    #     allowRecoverability: null
-    #     protectedTokens: null
-    #     canPerform: null
-    #     isPresigned: null
-    #     canForward: null
-    #     balance: null
-    #   implementationChecks:
-    #     ADD_PROTECTED_TOKEN_ROLE: "0x6eb2a499556bfa2872f5aa15812b956cc4a71b4d64eb3553f7073c7e41415aaa"
-    #     hasInitialized: false
-    #     ERC1271_INTERFACE_ID: "0xfb855dc9"
-    #     ERC1271_RETURN_INVALID_SIGNATURE: "0x00000000"
-    #     TRANSFER_ROLE: "0x8502233096d909befbda0999bb8ea2f3a6be3c138b9fbf003752a4c8bce86f6c"
-    #     RUN_SCRIPT_ROLE: "0xb421f7ad7646747f3051c50c0b8e2377839296cd4973e27f63821d73e390338f"
-    #     SAFE_EXECUTE_ROLE: "0x0a1ad7b87f5846153c6d5a1f761d71c7d0cfd122384f56066cd33239b7933694"
-    #     REMOVE_PROTECTED_TOKEN_ROLE: "0x71eee93d500f6f065e38b27d242a756466a00a52a1dbcd6b4260f01a8640402a"
-    #     isDepositable: false
-    #     DESIGNATE_SIGNER_ROLE: "0x23ce341656c3f14df6692eebd4757791e33662b7dcf9970c8308303da5472b7c"
-    #     EXECUTE_ROLE: "0xcebf517aa4440d1d125e0355aae64401211d0848a23c02cc5d29a14822580ba4"
-    #     appId: *ZERO_BYTES32
-    #     getInitializationBlock: *MAX_UINT256
-    #     ERC1271_RETURN_VALID_SIGNATURE: "0x20c13b0b"
-    #     getEVMScriptRegistry:
-    #       mustRevert: true # due to zero kernel
-    #     designatedSigner: *ZERO_ADDRESS
-    #     PROTECTED_TOKENS_CAP: 10
-    #     ADD_PRESIGNED_HASH_ROLE: "0x0b29780bb523a130b3b01f231ef49ed2fa2781645591a0b0a44ca98f15a5994c"
-    #     kernel: *ZERO_ADDRESS
-    #     isPetrified: true
-    #     isForwarder: true
-    #     supportsInterface: null
-    #     isValidSignature: null
-    #     getProtectedTokensLength: null
-    #     getEVMScriptExecutor: null
-    #     getRecoveryVault: null
-    #     allowRecoverability: null
-    #     protectedTokens: null
-    #     canPerform: null
-    #     isPresigned: null
-    #     canForward: null
-    #     balance: null
-
-    # aragon-acl:
-    #   name: ACL
-    #   address: *aragonAcl
-    #   proxyName: AppProxyUpgradeable
-    #   implementation: *aragonAclImplAddress
-    #   proxyChecks:
-    #     proxyType: 2
-    #     isDepositable: false
-    #     implementation: *aragonAclImplAddress
-    #     appId: *DEFAULT_ACL_APP_ID
-    #     kernel: *aragonKernel
-    #   checks:
-    #     hasInitialized: true
-    #     NO_PERMISSION: *ZERO_BYTES32
-    #     getRecoveryVault: *aragonAgent
-    #     CREATE_PERMISSIONS_ROLE: "0x0b719b33c83b8e5d300c521cb8b54ae9bd933996a14bef8c2f4e0285d2d2400a"
-    #     appId: *DEFAULT_ACL_APP_ID
-    #     getEVMScriptRegistry: *aragonEvmScriptRegistry
-    #     ANY_ENTITY: "0xFFfFfFffFFfffFFfFFfFFFFFffFFFffffFfFFFfF"
-    #     EMPTY_PARAM_HASH: "0x290decd9548b62a8d60345a988386fc84ba6bc95484008f6362f93160ef3e563"
-    #     kernel: *aragonKernel
-    #     isPetrified: false
-    #     BURN_ENTITY: "0x0000000000000000000000000000000000000001"
-    #     getPermissionParamsLength: null
-    #     evalParams: null
-    #     getEVMScriptExecutor: null
-    #     hasPermission: null
-    #     allowRecoverability: null
-    #     getInitializationBlock: null
-    #     getPermissionParam: null
-    #     canPerform: null
-    #     getPermissionManager: null
-    #   implementationChecks:
-    #     hasInitialized: false
-    #     NO_PERMISSION: *ZERO_BYTES32
-    #     CREATE_PERMISSIONS_ROLE: "0x0b719b33c83b8e5d300c521cb8b54ae9bd933996a14bef8c2f4e0285d2d2400a"
-    #     appId: *ZERO_BYTES32
-    #     getInitializationBlock: *MAX_UINT256
-    #     ANY_ENTITY: "0xFFfFfFffFFfffFFfFFfFFFFFffFFFffffFfFFFfF"
-    #     EMPTY_PARAM_HASH: "0x290decd9548b62a8d60345a988386fc84ba6bc95484008f6362f93160ef3e563"
-    #     kernel: *ZERO_ADDRESS
-    #     isPetrified: true
-    #     BURN_ENTITY: "0x0000000000000000000000000000000000000001"
-    #     getPermissionParamsLength: null
-    #     evalParams: null
-    #     getEVMScriptExecutor: null
-    #     getRecoveryVault: null
-    #     hasPermission: null
-    #     allowRecoverability: null
-    #     getPermissionParam: null
-    #     canPerform: null
-    #     getEVMScriptRegistry: null
-    #     getPermissionManager: null
-
-    # node-operators-registry:
-    #   name: NodeOperatorsRegistry
-    #   address: *nodeOperatorsRegistry
-    #   proxyName: AppProxyUpgradeable
-    #   implementation: *nodeOperatorsRegistryImplAddress
-    #   proxyChecks:
-    #     proxyType: 2
-    #     isDepositable: false
-    #     implementation: *nodeOperatorsRegistryImplAddress
-    #     appId: *NODE_OPERATORS_REGISTRY_APP_ID
-    #     kernel: *aragonKernel
-    #   checks:
-    #     hasInitialized: true
-    #     getType: "0x637572617465642d6f6e636861696e2d76310000000000000000000000000000"
-    #     getRecoveryVault: *aragonAgent
-    #     STAKING_ROUTER_ROLE: *STAKING_ROUTER_ROLE
-    #     appId: *NODE_OPERATORS_REGISTRY_APP_ID
-    #     MANAGE_NODE_OPERATOR_ROLE: *MANAGE_NODE_OPERATOR_ROLE
-    #     getEVMScriptRegistry: *aragonEvmScriptRegistry
-    #     MAX_NODE_OPERATOR_NAME_LENGTH: 255
-    #     kernel: *aragonKernel
-    #     getLocator: *lidoLocator
-    #     SET_NODE_OPERATOR_LIMIT_ROLE: *SET_NODE_OPERATOR_LIMIT_ROLE
-    #     isPetrified: false
-    #     MAX_STUCK_PENALTY_DELAY: 31536000
-    #     MAX_NODE_OPERATORS_COUNT: 200
-    #     MANAGE_SIGNING_KEYS: *MANAGE_SIGNING_KEYS_ROLE
-    #     getEVMScriptExecutor: null
-    #     getNodeOperatorIds: null
-    #     getSigningKeys: null
-    #     getNodeOperatorIsActive: null
-    #     getRewardsDistribution: null
-    #     getStuckPenaltyDelay: null
-    #     getRewardDistributionState: null
-    #     isOperatorPenalized: null
-    #     allowRecoverability: null
-    #     getActiveNodeOperatorsCount: null
-    #     getContractVersion: null
-    #     getInitializationBlock: null
-    #     getUnusedSigningKeyCount: null
-    #     getNodeOperator: null
-    #     getStakingModuleSummary: null
-    #     canPerform: null
-    #     getNodeOperatorsCount: null
-    #     getNodeOperatorSummary: null
-    #     getSigningKey: null
-    #     getKeysOpIndex: null
-    #     getNonce: null
-    #     getTotalSigningKeyCount: null
-    #     isOperatorPenaltyCleared: null
-    #     exitDeadlineThreshold: null
-    #     isValidatorExitDelayPenaltyApplicable: null
-    #     isValidatorExitingKeyReported: null
-    #     exitPenaltyCutoffTimestamp: null
-    #   implementationChecks:
-    #     hasInitialized: false
-    #     getType: *ZERO_BYTES32
-    #     getStuckPenaltyDelay: 0
-    #     getRewardDistributionState: 0
-    #     STAKING_ROUTER_ROLE: *STAKING_ROUTER_ROLE
-    #     appId: *ZERO_BYTES32
-    #     getActiveNodeOperatorsCount: 0
-    #     getContractVersion: *MAX_UINT256
-    #     getInitializationBlock: *MAX_UINT256
-    #     MANAGE_NODE_OPERATOR_ROLE: *MANAGE_NODE_OPERATOR_ROLE
-    #     getStakingModuleSummary: [ 0, 0, 0 ]
-    #     getNodeOperatorsCount: 0
-    #     MAX_NODE_OPERATOR_NAME_LENGTH: 255
-    #     getKeysOpIndex: 0
-    #     getNonce: 0
-    #     kernel: *ZERO_ADDRESS
-    #     getLocator: *ZERO_ADDRESS
-    #     SET_NODE_OPERATOR_LIMIT_ROLE: *SET_NODE_OPERATOR_LIMIT_ROLE
-    #     isPetrified: true
-    #     MAX_STUCK_PENALTY_DELAY: 31536000
-    #     MAX_NODE_OPERATORS_COUNT: 200
-    #     MANAGE_SIGNING_KEYS: *MANAGE_SIGNING_KEYS_ROLE
-    #     getEVMScriptExecutor: null
-    #     getRecoveryVault: null
-    #     getNodeOperatorIds: null
-    #     getSigningKeys: null
-    #     getNodeOperatorIsActive: null
-    #     getRewardsDistribution: null
-    #     isOperatorPenalized: null
-    #     allowRecoverability: null
-    #     getUnusedSigningKeyCount: null
-    #     getNodeOperator: null
-    #     canPerform: null
-    #     getEVMScriptRegistry: null
-    #     getNodeOperatorSummary: null
-    #     getSigningKey: null
-    #     getTotalSigningKeyCount: null
-    #     isOperatorPenaltyCleared: null
-
-    # simple-dvt:
-    #   name: NodeOperatorsRegistry
-    #   address: *simpleDvt
-    #   proxyName: AppProxyUpgradeable
-    #   implementation: *nodeOperatorsRegistryImplAddress
-    #   proxyChecks:
-    #     proxyType: 2
-    #     isDepositable: false
-    #     implementation: *nodeOperatorsRegistryImplAddress
-    #     appId: *SIMPLE_DVT_APP_ID
-    #     kernel: *aragonKernel
-    #   checks:
-    #     hasInitialized: true
-    #     getType: "0x637572617465642d6f6e636861696e2d76310000000000000000000000000000"
-    #     getRecoveryVault: *aragonAgent
-    #     STAKING_ROUTER_ROLE: *STAKING_ROUTER_ROLE
-    #     appId: *SIMPLE_DVT_APP_ID
-    #     MANAGE_NODE_OPERATOR_ROLE: *MANAGE_NODE_OPERATOR_ROLE
-    #     getEVMScriptRegistry: *aragonEvmScriptRegistry
-    #     MAX_NODE_OPERATOR_NAME_LENGTH: 255
-    #     kernel: *aragonKernel
-    #     getLocator: *lidoLocator
-    #     SET_NODE_OPERATOR_LIMIT_ROLE: *SET_NODE_OPERATOR_LIMIT_ROLE
-    #     isPetrified: false
-    #     MAX_STUCK_PENALTY_DELAY: 31536000
-    #     MAX_NODE_OPERATORS_COUNT: 200
-    #     MANAGE_SIGNING_KEYS: *MANAGE_SIGNING_KEYS_ROLE
-    #     getEVMScriptExecutor: null
-    #     getNodeOperatorIds: null
-    #     getSigningKeys: null
-    #     getNodeOperatorIsActive: null
-    #     getRewardsDistribution: null
-    #     getStuckPenaltyDelay: null
-    #     getRewardDistributionState: null
-    #     isOperatorPenalized: null
-    #     allowRecoverability: null
-    #     getActiveNodeOperatorsCount: null
-    #     getContractVersion: null
-    #     getInitializationBlock: null
-    #     getUnusedSigningKeyCount: null
-    #     getNodeOperator: null
-    #     getStakingModuleSummary: null
-    #     canPerform: null
-    #     getNodeOperatorsCount: null
-    #     getNodeOperatorSummary: null
-    #     getSigningKey: null
-    #     getKeysOpIndex: null
-    #     getNonce: null
-    #     getTotalSigningKeyCount: null
-    #     isOperatorPenaltyCleared: null
-    #     exitDeadlineThreshold: null
-    #     isValidatorExitDelayPenaltyApplicable: null
-    #     isValidatorExitingKeyReported: null
-    #     exitPenaltyCutoffTimestamp: null
-    #   implementationChecks:
-    #     hasInitialized: false
-    #     getType: *ZERO_BYTES32
-    #     getStuckPenaltyDelay: 0
-    #     getRewardDistributionState: 0
-    #     STAKING_ROUTER_ROLE: *STAKING_ROUTER_ROLE
-    #     appId: *ZERO_BYTES32
-    #     getActiveNodeOperatorsCount: 0
-    #     getContractVersion: *MAX_UINT256
-    #     getInitializationBlock: *MAX_UINT256
-    #     MANAGE_NODE_OPERATOR_ROLE: *MANAGE_NODE_OPERATOR_ROLE
-    #     getStakingModuleSummary: [ 0, 0, 0 ]
-    #     getNodeOperatorsCount: 0
-    #     MAX_NODE_OPERATOR_NAME_LENGTH: 255
-    #     getKeysOpIndex: 0
-    #     getNonce: 0
-    #     kernel: *ZERO_ADDRESS
-    #     getLocator: *ZERO_ADDRESS
-    #     SET_NODE_OPERATOR_LIMIT_ROLE: *SET_NODE_OPERATOR_LIMIT_ROLE
-    #     isPetrified: true
-    #     MAX_STUCK_PENALTY_DELAY: 31536000
-    #     MAX_NODE_OPERATORS_COUNT: 200
-    #     MANAGE_SIGNING_KEYS: *MANAGE_SIGNING_KEYS_ROLE
-    #     getEVMScriptExecutor: null
-    #     getRecoveryVault: null
-    #     getNodeOperatorIds: null
-    #     getSigningKeys: null
-    #     getNodeOperatorIsActive: null
-    #     getRewardsDistribution: null
-    #     isOperatorPenalized: null
-    #     allowRecoverability: null
-    #     getUnusedSigningKeyCount: null
-    #     getNodeOperator: null
-    #     canPerform: null
-    #     getEVMScriptRegistry: null
-    #     getNodeOperatorSummary: null
-    #     getSigningKey: null
-    #     getTotalSigningKeyCount: null
-    #     isOperatorPenaltyCleared: null
-
-    # apmRegistryFactory:
-    #   name: APMRegistryFactory
-    #   address: *apmRegistryFactory
-    #   checks:
-    #     registryBase: *aragonApmRegistryImplAddress
-    #     ensSubdomainRegistrarBase: *ensSubdomainRegistrarImplAddress
-    #     ens: *ens
-    #     daoFactory: *daoFactory
-    #     repoBase: *aragonRepoBase
-
-    # aragon-apm-registry:
-    #   name: APMRegistry
-    #   address: *aragonApmRegistry
-    #   proxyName: AppProxyUpgradeable
-    #   implementation: *aragonApmRegistryImplAddress
-    #   proxyChecks:
-    #     proxyType: 2
-    #     isDepositable: false
-    #     implementation: "0x2D7EF7C6BEDA2a18E4c32151A758B8b081f5C2d7"
-    #     appId: *APM_REGISTRY_APP_ID
-    #     kernel: "0xa8331ECa4817b33eFe8e70dC6c667eE9B530AC5b"
-    #   checks:
-    #     hasInitialized: true
-    #     getRecoveryVault: *ZERO_ADDRESS
-    #     ens: "0x6d4995cA535179d4126cC153C386bc9C13B92ba3"
-    #     CREATE_REPO_ROLE: "0x2a9494d64846c9fdbf0158785aa330d8bc9caf45af27fa0e8898eb4d55adcea6"
-    #     appId: *APM_REGISTRY_APP_ID
-    #     getEVMScriptRegistry: "0xa5BDA9a9f08c44bC7f579A89e1aa9cfB324c2991"
-    #     kernel: "0xa8331ECa4817b33eFe8e70dC6c667eE9B530AC5b"
-    #     isPetrified: false
-    #     getEVMScriptExecutor: null
-    #     registrar: null
-    #     allowRecoverability: null
-    #     getInitializationBlock: null
-    #     canPerform: null
-    #   implementationChecks:
-    #     hasInitialized: false
-    #     registrar: *ZERO_ADDRESS
-    #     ens: *ZERO_ADDRESS
-    #     CREATE_REPO_ROLE: "0x2a9494d64846c9fdbf0158785aa330d8bc9caf45af27fa0e8898eb4d55adcea6"
-    #     appId: *ZERO_BYTES32
-    #     getInitializationBlock: *MAX_UINT256
-    #     kernel: *ZERO_ADDRESS
-    #     isPetrified: true
-    #     getEVMScriptExecutor: null
-    #     getRecoveryVault: null
-    #     allowRecoverability: null
-    #     canPerform: null
-    #     getEVMScriptRegistry: null
-
-    # aragon-evm-script-registry:
-    #   name: EVMScriptRegistry
-    #   address: *aragonEvmScriptRegistry
-    #   proxyName: AppProxyPinned
-    #   implementation: *aragonEvmScriptRegistryImplAddress
-    #   proxyChecks:
-    #     proxyType: 1
-    #     isDepositable: false
-    #     implementation: *aragonEvmScriptRegistryImplAddress
-    #     appId: "0xddbcfd564f642ab5627cf68b9b7d374fb4f8a36e941a75d89c87998cef03bd61"
-    #     kernel: *aragonKernel
-    #   checks:
-    #     hasInitialized: true
-    #     REGISTRY_ADD_EXECUTOR_ROLE: "0xc4e90f38eea8c4212a009ca7b8947943ba4d4a58d19b683417f65291d1cd9ed2"
-    #     getRecoveryVault: *aragonAgent
-    #     appId: "0xddbcfd564f642ab5627cf68b9b7d374fb4f8a36e941a75d89c87998cef03bd61"
-    #     getInitializationBlock: 727
-    #     getEVMScriptRegistry: *aragonEvmScriptRegistry
-    #     REGISTRY_MANAGER_ROLE: "0xf7a450ef335e1892cb42c8ca72e7242359d7711924b75db5717410da3f614aa3"
-    #     kernel: *aragonKernel
-    #     isPetrified: false
-    #     getScriptExecutor: null
-    #     getEVMScriptExecutor: null
-    #     allowRecoverability: null
-    #     canPerform: null
-    #     executors: null
-    #   implementationChecks:
-    #     hasInitialized: false
-    #     REGISTRY_ADD_EXECUTOR_ROLE: "0xc4e90f38eea8c4212a009ca7b8947943ba4d4a58d19b683417f65291d1cd9ed2"
-    #     appId: *ZERO_BYTES32
-    #     getInitializationBlock: *MAX_UINT256
-    #     REGISTRY_MANAGER_ROLE: "0xf7a450ef335e1892cb42c8ca72e7242359d7711924b75db5717410da3f614aa3"
-    #     kernel: *ZERO_ADDRESS
-    #     isPetrified: true
-    #     getScriptExecutor: null
-    #     getEVMScriptExecutor: null
-    #     getRecoveryVault: null
-    #     allowRecoverability: null
-    #     canPerform: null
-    #     getEVMScriptRegistry: null
-    #     executors: null
-
-    # aragon-repo-base:
-    #   name: Repo
-    #   address: *aragonRepoBase
-    #   checks:
-    #     hasInitialized: false
-    #     appId: *ZERO_BYTES32
-    #     getInitializationBlock: *MAX_UINT256
-    #     CREATE_VERSION_ROLE: "0x1f56cfecd3595a2e6cc1a7e6cb0b20df84cdbd92eff2fee554e70e4e45a9a7d8"
-    #     getVersionsCount: *MAX_UINT256
-    #     kernel: *ZERO_ADDRESS
-    #     isPetrified: true
-    #     getEVMScriptExecutor: null
-    #     getRecoveryVault: null
-    #     getBySemanticVersion: null
-    #     getByVersionId: null
-    #     allowRecoverability: null
-    #     getLatestForContractAddress: null
-    #     canPerform: null
-    #     getEVMScriptRegistry: null
-    #     isValidBump: null
-    #     getLatest: null
-
-    # aragonID:
-    #   name: FIFSResolvingRegistrar
-    #   address: *aragonID
-    #   checks:
-    #     rootNode: "0x7e74a86b6e146964fb965db04dc2590516da77f720bb6759337bf5632415fd86"
-
-    # callsScript:
-    #   name: CallsScript
-    #   address: *callsScript
-    #   checks:
-    #     hasInitialized: false
-    #     executorType: "0x2dc858a00f3e417be1394b87c07158e989ec681ce8cc68a9093680ac1a870302"
-    #     getInitializationBlock: *MAX_UINT256
-    #     isPetrified: true
-
-    # daoFactory:
-    #   name: DAOFactory
-    #   address: *daoFactory
-    #   checks:
-    #     baseACL: "0x866Ad4D7283C4dcF00A01c1884DCDa98c2F1aE0A"
-    #     regFactory: *evmScriptRegistryFactory
-    #     baseKernel: "0x14dDb33F1D85997Bc35546e7E8CC306F5A7B9DD1"
-
-    # dummyEmptyContract:
-    #   name: DummyEmptyContract
-    #   address: *dummyEmptyContract
-    #   checks: {}
-
-    # ens:
-    #   name: ENS
-    #   address: *ens
-    #   checks:
-    #     resolver: null
-    #     owner: null
-    #     ttl: null
-
-    # ensFactory:
-    #   name: ENSFactory
-    #   address: *ensFactory
-    #   checks: {}
-
-    # # TODO
-    # # evmScriptRegistryFactory:
-    # #   name: EVMScriptRegistryFactory
-    # #   address: *evmScriptRegistryFactory
-    # #   checks:
-    # #     baseReg: "0xA75A76Ca92068c8fe1fA2665795805aA4610999E"
-    # #     baseCallScript: *callsScript
-
-    # lidoApm:
-    #   name: APMRegistry
-    #   address: *lidoApm
-    #   proxyName: AppProxyUpgradeable
-    #   implementation: *aragonApmRegistryImplAddress
-    #   proxyChecks:
-    #     proxyType: 2
-    #     isDepositable: false
-    #     implementation: "0x2D7EF7C6BEDA2a18E4c32151A758B8b081f5C2d7"
-    #     appId: *LIDO_APM_APP_ID
-    #     kernel: "0xfce76fdBF71D2A30Cd1a5a00C1fcb3A46044af78"
-    #   checks:
-    #     hasInitialized: true
-    #     registrar: "0xf0E2d6f345Ab54630F2867BBcC64879Ad6a30C68"
-    #     getRecoveryVault: *ZERO_ADDRESS
-    #     ens: "0x6d4995cA535179d4126cC153C386bc9C13B92ba3"
-    #     CREATE_REPO_ROLE: "0x2a9494d64846c9fdbf0158785aa330d8bc9caf45af27fa0e8898eb4d55adcea6"
-    #     appId: *LIDO_APM_APP_ID
-    #     getInitializationBlock: 721
-    #     getEVMScriptRegistry: "0x15464fF12B3a857ee43ba08185D53648d9c2F8d7"
-    #     kernel: "0xfce76fdBF71D2A30Cd1a5a00C1fcb3A46044af78"
-    #     isPetrified: false
-    #     getEVMScriptExecutor: null
-    #     allowRecoverability: null
-    #     canPerform: null
-    #   implementationChecks:
-    #     hasInitialized: false
-    #     registrar: *ZERO_ADDRESS
-    #     ens: *ZERO_ADDRESS
-    #     CREATE_REPO_ROLE: "0x2a9494d64846c9fdbf0158785aa330d8bc9caf45af27fa0e8898eb4d55adcea6"
-    #     appId: *ZERO_BYTES32
-    #     getInitializationBlock: *MAX_UINT256
-    #     kernel: *ZERO_ADDRESS
-    #     isPetrified: true
-    #     getEVMScriptExecutor: null
-    #     getRecoveryVault: null
-    #     allowRecoverability: null
-    #     canPerform: null
-    #     getEVMScriptRegistry: null
-
-    # lidoTemplate:
-    #   name: LidoTemplate
-    #   address: *lidoTemplate
-    #   checks:
-    #     getConfig:
-    #       [
-    #         "0x2cE254Fd852d6B5023b1B2355ae96A8d752a47cf",
-    #         *daoFactory,
-    #         *ens,
-    #         *miniMeTokenFactory,
-    #         *aragonID,
-    #         *apmRegistryFactory
-    #       ]
-
-    # miniMeTokenFactory:
-    #   name: MiniMeTokenFactory
-    #   address: *miniMeTokenFactory
-    #   checks: {}
-
-    # pinnedBeaconProxy:
-    #   name: StakingVault
-    #   address: *pinnedBeaconProxy
-    #   proxyName: PinnedBeaconProxy
-    #   implementation: *stakingVaultImplAddress
-    #   proxyChecks:
-    #     implementation: "0x7ade83C09A0Aa0FEA45695840067438a9dC96361"
-    #   checks:
-    #     DEPOSIT_CONTRACT: *DEPOSIT_CONTRACT
-    #     PUBLIC_KEY_LENGTH: 48
-    #     beaconChainDepositsPaused: false
-    #     depositor: *ZERO_ADDRESS
-    #     getInitializedVersion: 0
-    #     inOutDelta: 0
-    #     isReportFresh: true
-    #     latestReport: [ 0, 0, 0 ]
-    #     locked: 0
-    #     nodeOperator: *ZERO_ADDRESS
-    #     ossified: false
-    #     owner: *ZERO_ADDRESS
-    #     totalValue: 0
-    #     unlocked: 0
-    #     vaultHub: "0xDfA0B34F28b1b6735d2df150a99048139302a80E"
-    #     version: 1
-    #     withdrawalCredentials: "0x020000000000000000000000f19e48c5ad2f8abb452f5a6ab9cb104e70495e08"
-    #     availableBalance: null
-    #     calculateValidatorWithdrawalFee: null
-    #     vaultHubAuthorized: null
-    #     stagedBalance: null
-    #   implementationChecks:
-    #     DEPOSIT_CONTRACT: *DEPOSIT_CONTRACT
-    #     beaconChainDepositsPaused: false
-    #     getInitializedVersion: *MAX_UINT64
-    #     owner: *ZERO_ADDRESS
-    #     version: 1
-    #     withdrawalCredentials: "0x020000000000000000000000e96be4fb723e68e7b96244b7399c64a58bcd0062"
-
-    # EasyTrack:
-    #   name: EasyTrack
-    #   address: *easyTrack
-    #   checks:
-    #     CANCEL_ROLE: *ET_CANCEL_ROLE
-    #     DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
-    #     MAX_MOTIONS_LIMIT: 255
-    #     MAX_OBJECTIONS_THRESHOLD: 1000
-    #     MIN_MOTION_DURATION: 60
-    #     PAUSE_ROLE: *ET_PAUSE_ROLE
-    #     UNPAUSE_ROLE: *ET_UNPAUSE_ROLE
-    #     evmScriptExecutor: *EVMScriptExecutor
-    #     governanceToken: *ldo
-    #     motionDuration: 600
-    #     motionsCountLimit: 24
-    #     objectionsThreshold: 50
-    #     paused: false
-    #     canObjectToMotion: null
-    #     evmScriptFactories: null
-    #     evmScriptFactoryPermissions: null
-    #     getEVMScriptFactories: null
-    #     getMotion: null
-    #     getMotions: null
-    #     getRoleAdmin: null
-    #     hasRole: null
-    #     isEVMScriptFactory: null
-    #     motions: null
-    #     objections: null
-    #     supportsInterface: null
-
-    # EVMScriptExecutor:
-    #   name: EVMScriptExecutor
-    #   address: *EVMScriptExecutor
-    #   checks:
-    #     callsScript: *callsScript
-    #     easyTrack: *easyTrack
-    #     owner: *aragonVoting
+    evmScriptExecutor:
+      name: EVMScriptExecutor
+      address: *evmScriptExecutor
+      checks:
+        callsScript: *callsScript
+        easyTrack: *easyTrack
+        owner: *aragonVoting
