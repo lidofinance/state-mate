@@ -10,7 +10,7 @@ import chalk from "chalk";
 import { JsonRpcProvider } from "ethers";
 import * as YAML from "yaml";
 
-import { checkAllAbi, renameAllAbiToLowerCase } from "./abi-provider";
+import { checkAllAbi, flushAbiUpdates, renameAllAbiToLowerCase } from "./abi-provider";
 import { doGenerateBoilerplate } from "./boilerplate-generator";
 import { parseCmdLineArguments } from "./cli-parser";
 import { printError, readUrlOrFromEnvironment } from "./common";
@@ -149,6 +149,8 @@ async function downloadAndCheckAllAbi<T extends EntireDocument | SeedDocument>(j
   fs.mkdirSync(abiDirectoryPath, { recursive: true });
   logHeader1("ABI checking");
   await iterateLoadedContracts(jsonDocument, checkAllAbi);
+  // Flush any pending ABI updates in consolidated mode
+  flushAbiUpdates();
 }
 
 async function iterateLoadedContracts<T extends EntireDocument | SeedDocument>(

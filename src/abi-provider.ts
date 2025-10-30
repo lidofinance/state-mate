@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import zlib from "node:zlib";
 
 import chalk from "chalk";
 import jsonDiff from "json-diff";
@@ -9,20 +10,159 @@ import { log, LogCommand, logError, logErrorAndExit } from "./logger";
 import { g_Arguments } from "./state-mate";
 import { Abi, ContractInfo, isValidAbi } from "./types";
 
-export function loadAbiFromFile(contractName: string, address: string): Abi | never {
-  address = address.toLowerCase();
-  let abiPath;
+type AbiMode = "consolidated" | "individual" | "none";
 
-  try {
-    abiPath = _findAbiPath(contractName, address, { shouldThrow: true });
-  } catch (error) {
+let g_abiMode: AbiMode | null = null;
+let g_consolidatedAbis: Record<string, Abi> | null = null;
+let g_pendingAbiUpdates: Record<string, Abi> | null = null;
+const CONSOLIDATED_ABI_FILENAME = "abis.json";
+const CONSOLIDATED_ABI_FILENAME_GZ = "abis.json.gz";
+
+function getConsolidatedAbiPath(): string {
+  // Place abis.json alongside the config file, not in the abi subdirectory
+  return path.join(path.dirname(g_Arguments.configPath), CONSOLIDATED_ABI_FILENAME);
+}
+
+function getConsolidatedAbiPathGz(): string {
+  // Place abis.json.gz alongside the config file
+  return path.join(path.dirname(g_Arguments.configPath), CONSOLIDATED_ABI_FILENAME_GZ);
+}
+
+function getConsolidatedAbiPathToUse(): { path: string; isCompressed: boolean } | null {
+  const gzPath = getConsolidatedAbiPathGz();
+  const jsonPath = getConsolidatedAbiPath();
+
+  // Prefer compressed version if it exists
+  if (fs.existsSync(gzPath)) {
+    return { path: gzPath, isCompressed: true };
+  }
+  if (fs.existsSync(jsonPath)) {
+    return { path: jsonPath, isCompressed: false };
+  }
+  return null;
+}
+
+function determineAbiMode(): AbiMode {
+  if (g_abiMode !== null) {
+    return g_abiMode;
+  }
+
+  const consolidatedFile = getConsolidatedAbiPathToUse();
+  const consolidatedExists = consolidatedFile !== null;
+
+  let individualFilesExist = false;
+  if (fs.existsSync(g_Arguments.abiDirPath)) {
+    const files = fs.readdirSync(g_Arguments.abiDirPath);
+    individualFilesExist = files.some((file) => file.endsWith(".json") && file !== CONSOLIDATED_ABI_FILENAME);
+  }
+
+  if (consolidatedExists && individualFilesExist) {
     logErrorAndExit(
-      `Error finding ABI file for contract
-        ${contractName} in ${g_Arguments.abiDirPath}: ${printError(error)}\n\n` +
-        chalk.yellow.bold(`Try running with the '--update-abi' option to download the unnecessary ABI`),
+      `Cannot use both consolidated ${chalk.yellow(CONSOLIDATED_ABI_FILENAME)} and individual ABI files.\n` +
+        `Please remove one format from ${chalk.magenta(g_Arguments.abiDirPath)}`,
     );
   }
-  return loadAbiFromAbiPath(abiPath);
+
+  if (consolidatedExists) {
+    g_abiMode = "consolidated";
+  } else if (individualFilesExist) {
+    g_abiMode = "individual";
+  } else {
+    g_abiMode = "none";
+  }
+
+  return g_abiMode;
+}
+
+function loadConsolidatedAbis(): Record<string, Abi> {
+  if (g_consolidatedAbis !== null) {
+    return g_consolidatedAbis;
+  }
+
+  const consolidatedFile = getConsolidatedAbiPathToUse();
+  if (!consolidatedFile) {
+    logErrorAndExit(
+      `No consolidated ABI file found (neither ${CONSOLIDATED_ABI_FILENAME_GZ} nor ${CONSOLIDATED_ABI_FILENAME})`,
+    );
+  }
+
+  try {
+    let content: string;
+    if (consolidatedFile.isCompressed) {
+      // Read and decompress gzipped file
+      const compressedData = fs.readFileSync(consolidatedFile.path);
+      const decompressed = zlib.gunzipSync(compressedData);
+      content = decompressed.toString("utf8");
+    } else {
+      // Read plain JSON file
+      content = fs.readFileSync(consolidatedFile.path, "utf8");
+    }
+
+    const parsed: unknown = JSON.parse(content);
+
+    if (typeof parsed !== "object" || parsed === null) {
+      logErrorAndExit(`Consolidated ABI file ${chalk.magenta(consolidatedFile.path)} is not a valid JSON object`);
+    }
+
+    g_consolidatedAbis = parsed as Record<string, Abi>;
+
+    // Validate all ABIs
+    for (const [key, abi] of Object.entries(g_consolidatedAbis)) {
+      if (!isValidAbi(abi)) {
+        logErrorAndExit(
+          `Consolidated ABI file ${chalk.magenta(consolidatedFile.path)} contains invalid ABI for key ${chalk.yellow(key)}`,
+        );
+      }
+    }
+
+    return g_consolidatedAbis;
+  } catch (error) {
+    logErrorAndExit(`Failed to read consolidated ABI file at ${consolidatedFile.path}: ${printError(error)}`);
+  }
+}
+
+function getAbiKey(contractName: string, address?: string): string {
+  return address ? `${contractName}-${address}` : contractName;
+}
+
+export function loadAbiFromFile(contractName: string, address: string): Abi | never {
+  address = address.toLowerCase();
+  const mode = determineAbiMode();
+
+  if (mode === "consolidated") {
+    const abis = loadConsolidatedAbis();
+    const key = getAbiKey(contractName, address);
+
+    // Try with address first, then without
+    let abi = abis[key];
+    if (!abi && address) {
+      abi = abis[contractName];
+    }
+
+    if (!abi) {
+      logErrorAndExit(
+        `ABI not found in consolidated file for ${chalk.yellow(key)}\n` +
+          `Available keys: ${Object.keys(abis).join(", ")}\n\n` +
+          chalk.yellow.bold(`Try running with the '--update-abi' option to download the ABI`),
+      );
+    }
+
+    return abi;
+  } else if (mode === "individual") {
+    let abiPath;
+    try {
+      abiPath = _findAbiPath(contractName, address, { shouldThrow: true });
+    } catch (error) {
+      logErrorAndExit(
+        `Error finding ABI file for contract
+        ${contractName} in ${g_Arguments.abiDirPath}: ${printError(error)}\n\n` +
+          chalk.yellow.bold(`Try running with the '--update-abi' option to download the unnecessary ABI`),
+      );
+    }
+    return loadAbiFromAbiPath(abiPath);
+  } else {
+    logErrorAndExit(`No ABI files found in ${chalk.magenta(g_Arguments.abiDirPath)}`);
+  }
 }
 
 export async function checkAllAbi(contractInfo: ContractInfo) {
@@ -36,14 +176,53 @@ export async function checkAllAbi(contractInfo: ContractInfo) {
 
 export function renameAllAbiToLowerCase() {
   if (!fs.existsSync(g_Arguments.abiDirPath)) return;
-  try {
-    const abiDirectoryContent = fs.readdirSync(g_Arguments.abiDirPath);
 
-    for (const fileName of abiDirectoryContent) {
-      _renameAbiIfNeed(fileName);
+  const mode = determineAbiMode();
+
+  if (mode === "consolidated") {
+    // For consolidated mode, ensure all keys have lowercase addresses
+    const abis = loadConsolidatedAbis();
+    let changed = false;
+    const newAbis: Record<string, Abi> = {};
+
+    for (const [key, abi] of Object.entries(abis)) {
+      const newKey = toLowerCaseAddress(key);
+      newAbis[newKey] = abi;
+      if (key !== newKey) {
+        log(`The ABI key renamed from ${chalk.yellow(key)} to ${chalk.yellow(newKey)}`);
+        changed = true;
+      }
     }
-  } catch (error) {
-    logErrorAndExit(`Failed to read ${chalk.yellow(g_Arguments.abiDirPath)}:\n ${printError(error)}`);
+
+    if (changed) {
+      const consolidatedFile = getConsolidatedAbiPathToUse();
+      const outputPath = consolidatedFile ? consolidatedFile.path : getConsolidatedAbiPathGz();
+      const shouldCompress = !consolidatedFile || consolidatedFile.isCompressed;
+
+      try {
+        const jsonContent = JSON.stringify(newAbis, null, 2);
+
+        if (shouldCompress) {
+          const compressed = zlib.gzipSync(jsonContent);
+          fs.writeFileSync(outputPath, compressed);
+        } else {
+          fs.writeFileSync(outputPath, jsonContent);
+        }
+        g_consolidatedAbis = newAbis; // Update cache
+      } catch (error) {
+        logErrorAndExit(`Failed to update consolidated ABI file: ${printError(error)}`);
+      }
+    }
+  } else if (mode === "individual") {
+    // For individual mode, use existing file-based renaming
+    try {
+      const abiDirectoryContent = fs.readdirSync(g_Arguments.abiDirPath);
+      for (const fileName of abiDirectoryContent) {
+        _renameAbiIfNeed(fileName);
+      }
+    } catch (error) {
+      logErrorAndExit(`Failed to read ${chalk.yellow(g_Arguments.abiDirPath)}:\n ${printError(error)}`);
+    }
   }
 }
 
@@ -65,26 +244,94 @@ function loadAbiFromAbiPath(abiPath: string): Abi | never {
 async function _checkAbi(contractName: string, address: string, abiFromExplorer: Abi): Promise<void> {
   address = address.toLowerCase();
   const logHandler = new LogCommand(`ABI ${chalk.magenta(`${contractName}-${address}.json`)}`);
-  const abiExistedPath = _findAbiPath(contractName, address, { shouldThrow: false });
+  const mode = determineAbiMode();
 
-  if (abiExistedPath) {
-    const savedAbi = loadAbiFromAbiPath(abiExistedPath);
-    if (!jsonDiff.diffString(savedAbi, abiFromExplorer)) {
-      logHandler.success("Matched");
-      return;
+  let savedAbi: Abi | null = null;
+  let abiExists = false;
+
+  if (mode === "consolidated") {
+    const abis = loadConsolidatedAbis();
+    const key = getAbiKey(contractName, address);
+    savedAbi = abis[key] || abis[contractName] || null;
+    abiExists = savedAbi !== null;
+  } else if (mode === "individual") {
+    const abiExistedPath = _findAbiPath(contractName, address, { shouldThrow: false });
+    if (abiExistedPath) {
+      savedAbi = loadAbiFromAbiPath(abiExistedPath);
+      abiExists = true;
     }
   }
 
-  const abiFileNameToSave = abiExistedPath || _defaultAbiFilePath(contractName, address);
+  if (abiExists && savedAbi && !jsonDiff.diffString(savedAbi, abiFromExplorer)) {
+    logHandler.success("Matched");
+    return;
+  }
+
+  const abiFileNameToSave =
+    mode === "consolidated"
+      ? getAbiKey(contractName, address)
+      : _findAbiPath(contractName, address, { shouldThrow: false }) || _defaultAbiFilePath(contractName, address);
+
   _saveAbi(abiFileNameToSave, abiFromExplorer);
-  logHandler.success(abiExistedPath ? "Overwritten" : "Saved");
+  logHandler.success(abiExists ? "Overwritten" : "Saved");
 }
 
 function _saveAbi(abiFileName: string, abiFromExplorer: Abi) {
-  try {
-    fs.writeFileSync(abiFileName, JSON.stringify(abiFromExplorer, null, 2));
-  } catch (error) {
-    logErrorAndExit(`Error writing file at ${chalk.magenta(abiFileName)}:" ${printError(error)}`);
+  const mode = determineAbiMode();
+
+  if (mode === "consolidated") {
+    // Extract key from filename
+    const basename = path.basename(abiFileName, ".json");
+
+    // Initialize pending updates on first call
+    if (!g_pendingAbiUpdates) {
+      g_pendingAbiUpdates = { ...loadConsolidatedAbis() };
+    }
+
+    // Stage the update instead of writing immediately
+    g_pendingAbiUpdates[basename] = abiFromExplorer;
+  } else {
+    // Individual file mode
+    try {
+      fs.writeFileSync(abiFileName, JSON.stringify(abiFromExplorer, null, 2));
+    } catch (error) {
+      logErrorAndExit(`Error writing file at ${chalk.magenta(abiFileName)}: ${printError(error)}`);
+    }
+  }
+}
+
+/**
+ * Flushes all pending ABI updates to disk in consolidated mode.
+ * This should be called after all ABI updates are complete to write once.
+ */
+export function flushAbiUpdates(): void {
+  const mode = determineAbiMode();
+
+  if (mode === "consolidated" && g_pendingAbiUpdates) {
+    const consolidatedFile = getConsolidatedAbiPathToUse();
+    const outputPath = consolidatedFile ? consolidatedFile.path : getConsolidatedAbiPathGz();
+    const shouldCompress = !consolidatedFile || consolidatedFile.isCompressed;
+
+    try {
+      const jsonContent = JSON.stringify(g_pendingAbiUpdates, null, 2);
+
+      if (shouldCompress) {
+        // Write compressed file
+        const compressed = zlib.gzipSync(jsonContent);
+        fs.writeFileSync(outputPath, compressed);
+      } else {
+        // Write plain JSON file
+        fs.writeFileSync(outputPath, jsonContent);
+      }
+
+      // Update cache only after successful write
+      g_consolidatedAbis = g_pendingAbiUpdates;
+      g_pendingAbiUpdates = null;
+    } catch (error) {
+      // Reset pending updates on error
+      g_pendingAbiUpdates = null;
+      logErrorAndExit(`Error writing consolidated ABI file at ${chalk.magenta(outputPath)}: ${printError(error)}`);
+    }
   }
 }
 
