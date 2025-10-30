@@ -130,7 +130,36 @@ l1:
 
 All required ABIs are located in the same directory as the config and placed under `abi` folder being downloaded upon the first launch. See [configs](/configs/).
 
-Use the --update-abi option to download all ABIs overwriting existing files
+state-mate supports two ABI storage formats:
+
+1. **Individual files** (default): Each contract ABI is stored as a separate JSON file in the `abi/` directory
+2. **Consolidated file**: All ABIs are stored in a single `abis.json` or `abis.json.gz` file alongside the config
+
+#### Consolidating ABIs
+
+For large projects with many contracts, you can consolidate all individual ABI files into a single compressed file to reduce repository size and improve performance:
+
+```sh
+yarn consolidate-abi path/to/config/abi --compress
+```
+
+This command:
+
+- Reads all `.json` files from the specified ABI directory
+- Validates each ABI format
+- Consolidates them into a single `abis.json.gz` file (or `abis.json` without `--compress`)
+- Places the output file alongside your config file
+- Provides compression statistics
+
+**Note**: You cannot use both consolidated and individual ABI files simultaneously. state-mate will automatically detect which format you're using.
+
+#### Updating ABIs
+
+Use the `--update-abi` option to download all ABIs, overwriting existing files:
+
+```sh
+yarn start path/to/config.yaml --update-abi
+```
 
 ## 🔧 Contributing
 

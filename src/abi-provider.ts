@@ -14,6 +14,7 @@ type AbiMode = "consolidated" | "individual" | "none";
 
 let g_abiMode: AbiMode | null = null;
 let g_consolidatedAbis: Record<string, Abi> | null = null;
+let g_pendingAbiUpdates: Record<string, Abi> | null = null;
 const CONSOLIDATED_ABI_FILENAME = "abis.json";
 const CONSOLIDATED_ABI_FILENAME_GZ = "abis.json.gz";
 
@@ -281,16 +282,38 @@ function _saveAbi(abiFileName: string, abiFromExplorer: Abi) {
   if (mode === "consolidated") {
     // Extract key from filename
     const basename = path.basename(abiFileName, ".json");
-    const abis = loadConsolidatedAbis();
-    abis[basename] = abiFromExplorer;
 
-    // Write back the entire consolidated file (compressed)
+    // Initialize pending updates on first call
+    if (!g_pendingAbiUpdates) {
+      g_pendingAbiUpdates = { ...loadConsolidatedAbis() };
+    }
+
+    // Stage the update instead of writing immediately
+    g_pendingAbiUpdates[basename] = abiFromExplorer;
+  } else {
+    // Individual file mode
+    try {
+      fs.writeFileSync(abiFileName, JSON.stringify(abiFromExplorer, null, 2));
+    } catch (error) {
+      logErrorAndExit(`Error writing file at ${chalk.magenta(abiFileName)}: ${printError(error)}`);
+    }
+  }
+}
+
+/**
+ * Flushes all pending ABI updates to disk in consolidated mode.
+ * This should be called after all ABI updates are complete to write once.
+ */
+export function flushAbiUpdates(): void {
+  const mode = determineAbiMode();
+
+  if (mode === "consolidated" && g_pendingAbiUpdates) {
     const consolidatedFile = getConsolidatedAbiPathToUse();
     const outputPath = consolidatedFile ? consolidatedFile.path : getConsolidatedAbiPathGz();
     const shouldCompress = !consolidatedFile || consolidatedFile.isCompressed;
 
     try {
-      const jsonContent = JSON.stringify(abis, null, 2);
+      const jsonContent = JSON.stringify(g_pendingAbiUpdates, null, 2);
 
       if (shouldCompress) {
         // Write compressed file
@@ -300,15 +323,14 @@ function _saveAbi(abiFileName: string, abiFromExplorer: Abi) {
         // Write plain JSON file
         fs.writeFileSync(outputPath, jsonContent);
       }
+
+      // Update cache only after successful write
+      g_consolidatedAbis = g_pendingAbiUpdates;
+      g_pendingAbiUpdates = null;
     } catch (error) {
+      // Reset pending updates on error
+      g_pendingAbiUpdates = null;
       logErrorAndExit(`Error writing consolidated ABI file at ${chalk.magenta(outputPath)}: ${printError(error)}`);
-    }
-  } else {
-    // Individual file mode
-    try {
-      fs.writeFileSync(abiFileName, JSON.stringify(abiFromExplorer, null, 2));
-    } catch (error) {
-      logErrorAndExit(`Error writing file at ${chalk.magenta(abiFileName)}: ${printError(error)}`);
     }
   }
 }

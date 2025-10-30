@@ -13,7 +13,7 @@ deployed:
     - &SetLiabilitySharesTargetInVaultHub "0xc5dCd2A9642ceA9B71A632BF5b8ff52424Ea1B40"
 
 l1:
-  rpcUrl: L1_TESTNET_RPC_URL
+  rpcUrl: HOODI_REMOTE_RPC_URL
   explorerHostname: api.etherscan.io/v2/api
   explorerTokenEnv: ETHERSCAN_TOKEN
   chainId: 560048

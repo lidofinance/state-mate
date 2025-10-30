@@ -56,6 +56,11 @@ function readAbiFiles(abiDirectoryPath: string): ConsolidatedAbis {
         continue;
       }
 
+      // Warn about duplicate keys
+      if (consolidatedAbis[key]) {
+        console.warn(`⚠ Duplicate key detected: ${key} (overwriting previous entry)`);
+      }
+
       consolidatedAbis[key] = abi;
       console.log(`✓ ${key}`);
     } catch (error) {
@@ -73,6 +78,8 @@ function writeConsolidatedAbis(
   shouldCompress: boolean,
 ): void {
   const outputFilename = shouldCompress ? "abis.json.gz" : "abis.json";
+  // Output file is placed in the parent directory of the ABI folder
+  // e.g., configs/myproject/abi/ -> configs/myproject/abis.json.gz
   const outputPath = path.join(path.dirname(abiDirectoryPath), outputFilename);
   const jsonContent = JSON.stringify(consolidatedAbis, null, 2);
 
