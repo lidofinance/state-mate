@@ -132,14 +132,64 @@ misc:
   - &ZERO_ADDRESS "0x0000000000000000000000000000000000000000"
   - &ZERO_BYTES32 "0x0000000000000000000000000000000000000000000000000000000000000000"
   - &DEFAULT_ADMIN_ROLE "0x0000000000000000000000000000000000000000000000000000000000000000"
-  - &REGISTRY_BASE "0x13f43DCe264695D4118Cbc8Adb8691ABaEa0562d"
   - &MAX_UINT256 "115792089237316195423570985008687907853269984665640564039457584007913129639935"
   - &MAX_UINT64 "18446744073709551615"
   - &DECIMALS_18 18
 
-  - &evmScriptRegistry "0xe4D32427b1F9b12ab89B142eD3714dCAABB3f38c"
   - &LIDO_DOMAIN_SEPARATOR "0x184cb04a1e003ce18451fff652ee914c2df2dafa833a0786d1b38edcecf6f30d"
   - &WSTETH_DOMAIN_SEPARATOR "0x3c9e03f12de3da07e25447fc3360a27c7953822d198c14bd480bba6f03d99a22"
+
+  # --- Derived and frequently reused constants (avoid hard-coded values below) ---
+  - &SLOTS_PER_EPOCH 32
+  - &SECONDS_PER_SLOT 12
+  - &SLOTS_PER_HISTORICAL_ROOT 8192
+  - &SHARD_COMMITTEE_PERIOD_IN_SECONDS 98304
+  - &EIP712_VERSION 2
+  - &LIDO_NAME "Liquid staked Ether 2.0"
+  - &LIDO_SYMBOL "stETH"
+  - &WSTETH_NAME "Wrapped liquid staked Ether 2.0"
+  - &WSTETH_SYMBOL "wstETH"
+  - &LIDO_MAX_EXTERNAL_RATIO_BP 3000
+  - &TOTAL_BASIS_POINTS 10000
+  - &FEE_PRECISION_POINTS 100000000000000000000
+  - &MAX_BATCHES_LENGTH 36
+  - &MAX_STETH_WITHDRAWAL_AMOUNT 1e+21
+  - &MIN_STETH_WITHDRAWAL_AMOUNT 100
+  - &VERSION_1 1
+  - &VERSION_2 2
+  - &ONE_ETH_WEI 1000000000000000000
+  - &PREDEPOSIT_AMOUNT 1000000000000000000
+  - &ACTIVATION_DEPOSIT_AMOUNT 31000000000000000000
+  - &MAX_TOPUP_AMOUNT 2016000000000000000000
+  - &DEFAULT_TIER_ID 0
+  - &DEFAULT_TIER_OPERATOR "0xFFfFfFffFFfffFFfFFfFFFFFffFFFffffFfFFFfF"
+  - &MAX_RELATIVE_SHARE_LIMIT_BP 1000
+  - &REPORT_FRESHNESS_DELTA 172800
+  - &MIN_CONFIRM_EXPIRY 3600
+  - &MAX_CONFIRM_EXPIRY 2592000
+  - &DEFAULT_CONFIRM_EXPIRY 86400
+  - &PCT_BASE 1000000000000000000
+  - &VEB_CONSENSUS_VERSION 4
+  - &HASH_CONSENSUS_FAST_LANE 75
+  - &HC_AO_START 39833
+  - &HC_VEB_START 39843
+  - &HASH_CONSENSUS_QUORUM 6
+  - &MAX_NODE_OPERATORS_COUNT 200
+  - &MAX_NODE_OPERATOR_NAME_LENGTH 255
+  - &MAX_STUCK_PENALTY_DELAY 31536000
+  - &VOTING_SUPPORT_REQUIRED_PCT 500000000000000000
+  - &VOTING_MIN_ACCEPT_QUORUM_PCT 50000000000000000
+  - &VOTING_VOTE_TIME 900
+  - &VOTING_OBJECTION_PHASE_TIME 300
+  - &EASYTRACK_MIN_MOTION_DURATION 60
+  - &EASYTRACK_MOTION_DURATION 600
+  - &EASYTRACK_MAX_MOTIONS_LIMIT 255
+  - &EASYTRACK_MAX_OBJECTIONS_THRESHOLD 1000
+  - &EASYTRACK_MOTIONS_COUNT_LIMIT 24
+  - &EASYTRACK_OBJECTIONS_THRESHOLD 50
+  - &DURATION_TWO_WEEKS 1209600
+  - &MAX_POSITIVE_TOKEN_REBASE 750000
+  - &ORACLE_REPORT_LIMITS [9000, 43200, 1000, 50, 600, 8, 24, 128, 750000, 1000, 101, 50]
 
 eoa:
   - &depositSecurityModule "0x2F0303F20E0795E6CCd17BD5efE791A586f28E03"
@@ -376,7 +426,7 @@ l1:
         appId: *LIDO_APP_ID
         kernel: *aragonKernel
       checks:
-        name: "Liquid staked Ether 2.0"
+        name: *LIDO_NAME
         hasInitialized: true
         STAKING_CONTROL_ROLE: *STAKING_CONTROL_ROLE
         isStakingPaused: false
@@ -388,12 +438,12 @@ l1:
         getWithdrawalCredentials: *LIDO_WITHDRAWAL_CREDENTIALS
         appId: *LIDO_APP_ID
         eip712Domain:
-          - "Liquid staked Ether 2.0"
-          - 2
+          - *LIDO_NAME
+          - *EIP712_VERSION
           - *CHAIN_ID
           - *lido
         getContractVersion: *LIDO_VERSION
-        symbol: "stETH"
+        symbol: *LIDO_SYMBOL
         getEIP712StETH: *eip712StETH
         getEVMScriptRegistry: *aragonEvmScriptRegistry
         UNSAFE_CHANGE_DEPOSITED_VALIDATORS_ROLE: *UNSAFE_CHANGE_DEPOSITED_VALIDATORS_ROLE
@@ -409,7 +459,7 @@ l1:
           - result: true
             args: [*ldo]
         getInitializationBlock: 764
-        getMaxExternalRatioBP: 3000 # <-- V3 critical parameter
+        getMaxExternalRatioBP: *LIDO_MAX_EXTERNAL_RATIO_BP # <-- V3 critical parameter
         getFee: 999
         getMaxMintableExternalShares: null
         getExternalEther: null
@@ -435,7 +485,7 @@ l1:
         sharesOf: null
         getTotalELRewardsCollected: null
       implementationChecks:
-        name: "Liquid staked Ether 2.0"
+        name: *LIDO_NAME
         hasInitialized: false
         STAKING_CONTROL_ROLE: *STAKING_CONTROL_ROLE
         isStakingPaused: true
@@ -449,7 +499,7 @@ l1:
         getMaxMintableExternalShares: 0
         getContractVersion: *MAX_UINT256
         getInitializationBlock: *MAX_UINT256
-        symbol: "stETH"
+        symbol: *LIDO_SYMBOL
         getEIP712StETH: *ZERO_ADDRESS
         getMaxExternalRatioBP: 0
         UNSAFE_CHANGE_DEPOSITED_VALIDATORS_ROLE: *UNSAFE_CHANGE_DEPOSITED_VALIDATORS_ROLE
@@ -502,9 +552,9 @@ l1:
       address: *wstETH
       checks:
         decimals: *DECIMALS_18
-        name: "Wrapped liquid staked Ether 2.0"
+        name: *WSTETH_NAME
         stETH: *lido
-        symbol: "wstETH"
+        symbol: *WSTETH_SYMBOL
         DOMAIN_SEPARATOR: *WSTETH_DOMAIN_SEPARATOR
         allowance: null
         balanceOf: null
@@ -535,8 +585,8 @@ l1:
           - args: [*lido]
             signature: "eip712Domain(address)"
             result:
-              - "Liquid staked Ether 2.0"
-              - 2
+              - *LIDO_NAME
+              - *EIP712_VERSION
               - *CHAIN_ID
               - *lido
         hashTypedDataV4: null
@@ -564,8 +614,8 @@ l1:
         REPORT_VALIDATOR_EXIT_TRIGGERED_ROLE: *REPORT_VALIDATOR_EXIT_TRIGGERED_ROLE
         MANAGE_WITHDRAWAL_CREDENTIALS_ROLE: *MANAGE_WITHDRAWAL_CREDENTIALS_ROLE
         DEPOSIT_CONTRACT: *DEPOSIT_CONTRACT
-        FEE_PRECISION_POINTS: 100000000000000000000
-        TOTAL_BASIS_POINTS: 10000
+        FEE_PRECISION_POINTS: *FEE_PRECISION_POINTS
+        TOTAL_BASIS_POINTS: *TOTAL_BASIS_POINTS
         MAX_STAKING_MODULES_COUNT: 32
         MAX_STAKING_MODULE_NAME_LENGTH: 31
         getLido: *lido
@@ -683,9 +733,9 @@ l1:
         DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
         FINALIZE_ROLE: *FINALIZE_ROLE
         MANAGE_TOKEN_URI_ROLE: *MANAGE_TOKEN_URI_ROLE
-        MAX_BATCHES_LENGTH: 36
-        MAX_STETH_WITHDRAWAL_AMOUNT: 1e+21
-        MIN_STETH_WITHDRAWAL_AMOUNT: 100
+        MAX_BATCHES_LENGTH: *MAX_BATCHES_LENGTH
+        MAX_STETH_WITHDRAWAL_AMOUNT: *MAX_STETH_WITHDRAWAL_AMOUNT
+        MIN_STETH_WITHDRAWAL_AMOUNT: *MIN_STETH_WITHDRAWAL_AMOUNT
         ORACLE_ROLE: *ORACLE_ROLE
         PAUSE_INFINITELY: *MAX_UINT256
         PAUSE_ROLE: *WQ_PAUSE_ROLE
@@ -694,7 +744,7 @@ l1:
         WSTETH: *wstETH
         bunkerModeSinceTimestamp: *MAX_UINT256
         getBaseURI: "https://wq-api-hoodi.testnet.fi/v1/nft"
-        getContractVersion: 1
+        getContractVersion: *VERSION_1
         getNFTDescriptorAddress: *ZERO_ADDRESS
         isBunkerModeActive: false
         isPaused: false
@@ -735,9 +785,9 @@ l1:
         DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
         FINALIZE_ROLE: *FINALIZE_ROLE
         MANAGE_TOKEN_URI_ROLE: *MANAGE_TOKEN_URI_ROLE
-        MAX_BATCHES_LENGTH: 36
-        MAX_STETH_WITHDRAWAL_AMOUNT: 1e+21
-        MIN_STETH_WITHDRAWAL_AMOUNT: 100
+        MAX_BATCHES_LENGTH: *MAX_BATCHES_LENGTH
+        MAX_STETH_WITHDRAWAL_AMOUNT: *MAX_STETH_WITHDRAWAL_AMOUNT
+        MIN_STETH_WITHDRAWAL_AMOUNT: *MIN_STETH_WITHDRAWAL_AMOUNT
         ORACLE_ROLE: *ORACLE_ROLE
         PAUSE_INFINITELY: *MAX_UINT256
         PAUSE_ROLE: *WQ_PAUSE_ROLE
@@ -788,7 +838,7 @@ l1:
       checks:
         LIDO: *lido
         TREASURY: *aragonAgent
-        getContractVersion: 2
+        getContractVersion: *VERSION_2
         TRIGGERABLE_WITHDRAWALS_GATEWAY: *triggerableWithdrawalsGateway
         WITHDRAWAL_REQUEST: null
         getWithdrawalRequestFee: null
@@ -885,7 +935,7 @@ l1:
         RESUME_ROLE: *TWG_RESUME_ROLE
         TWR_LIMIT_POSITION: null
         TW_EXIT_LIMIT_MANAGER_ROLE: *TW_EXIT_LIMIT_MANAGER_ROLE
-        VERSION: 1
+        VERSION: *VERSION_1
         getExitRequestLimitFullInfo: null
         getResumeSinceTimestamp: 0
         getRoleAdmin: null
@@ -911,10 +961,10 @@ l1:
         GI_FIRST_VALIDATOR_PREV: *GI_FIRST_VALIDATOR_PREV
         LOCATOR: *lidoLocator
         PIVOT_SLOT: 1
-        SECONDS_PER_SLOT: 12
-        SHARD_COMMITTEE_PERIOD_IN_SECONDS: 98304
-        SLOTS_PER_EPOCH: 32
-        SLOTS_PER_HISTORICAL_ROOT: 8192
+        SECONDS_PER_SLOT: *SECONDS_PER_SLOT
+        SHARD_COMMITTEE_PERIOD_IN_SECONDS: *SHARD_COMMITTEE_PERIOD_IN_SECONDS
+        SLOTS_PER_EPOCH: *SLOTS_PER_EPOCH
+        SLOTS_PER_HISTORICAL_ROOT: *SLOTS_PER_HISTORICAL_ROOT
 
     vaultHub:
       name: VaultHub
@@ -926,10 +976,10 @@ l1:
         proxy__getImplementation: *vaultHubImplAddress
         proxy__getIsOssified: false
       checks:
-        CONNECT_DEPOSIT: 1000000000000000000
+        CONNECT_DEPOSIT: *ONE_ETH_WEI
         CONSENSUS_CONTRACT: *hashConsensusForAccountingOracle
-        MAX_RELATIVE_SHARE_LIMIT_BP: 1000
-        REPORT_FRESHNESS_DELTA: 172800
+        MAX_RELATIVE_SHARE_LIMIT_BP: *MAX_RELATIVE_SHARE_LIMIT_BP
+        REPORT_FRESHNESS_DELTA: *REPORT_FRESHNESS_DELTA
         LIDO: *lido
         LIDO_LOCATOR: *lidoLocator
         PAUSE_INFINITELY: *MAX_UINT256
@@ -1040,9 +1090,9 @@ l1:
         proxy__getImplementation: *predepositGuaranteeImplAddress
         proxy__getIsOssified: false
       checks:
-        PREDEPOSIT_AMOUNT: 1000000000000000000
-        ACTIVATION_DEPOSIT_AMOUNT: 31000000000000000000
-        MAX_TOPUP_AMOUNT: 2016000000000000000000
+        PREDEPOSIT_AMOUNT: *PREDEPOSIT_AMOUNT
+        ACTIVATION_DEPOSIT_AMOUNT: *ACTIVATION_DEPOSIT_AMOUNT
+        MAX_TOPUP_AMOUNT: *MAX_TOPUP_AMOUNT
         BEACON_ROOTS: *BEACON_ROOTS
         DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
         DEPOSIT_DOMAIN: *DEPOSIT_DOMAIN
@@ -1078,9 +1128,9 @@ l1:
         *OZ_PAUSE_ROLE : [*gateSealVaulthubAndPredepositGuarantee]
         *OZ_RESUME_ROLE : []
       implementationChecks:
-        PREDEPOSIT_AMOUNT: 1000000000000000000
-        ACTIVATION_DEPOSIT_AMOUNT: 31000000000000000000
-        MAX_TOPUP_AMOUNT: 2016000000000000000000
+        PREDEPOSIT_AMOUNT: *PREDEPOSIT_AMOUNT
+        ACTIVATION_DEPOSIT_AMOUNT: *ACTIVATION_DEPOSIT_AMOUNT
+        MAX_TOPUP_AMOUNT: *MAX_TOPUP_AMOUNT
         BEACON_ROOTS: *BEACON_ROOTS
         DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
         DEPOSIT_DOMAIN: *DEPOSIT_DOMAIN
@@ -1123,12 +1173,12 @@ l1:
         proxy__getIsOssified: false
       checks:
         DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
-        DEFAULT_TIER_ID: 0
-        DEFAULT_TIER_OPERATOR: "0xFFfFfFffFFfffFFfFFfFFFFFffFFFffffFfFFFfF"
+        DEFAULT_TIER_ID: *DEFAULT_TIER_ID
+        DEFAULT_TIER_OPERATOR: *DEFAULT_TIER_OPERATOR
         LIDO_LOCATOR: *lidoLocator
         REGISTRY_ROLE: *REGISTRY_ROLE
-        MAX_CONFIRM_EXPIRY: 2592000 # 30 days
-        MIN_CONFIRM_EXPIRY: 3600 # 1 hour
+        MAX_CONFIRM_EXPIRY: *MAX_CONFIRM_EXPIRY # 30 days
+        MIN_CONFIRM_EXPIRY: *MIN_CONFIRM_EXPIRY # 1 hour
         confirmation: null
         effectiveShareLimit: null
         getConfirmExpiry: null
@@ -1202,7 +1252,7 @@ l1:
         getInitializedVersion: *MAX_UINT64
         nodeOperator: *ZERO_ADDRESS
         owner: *ZERO_ADDRESS
-        version: 1
+        version: *VERSION_1
         withdrawalCredentials: "0x020000000000000000000000e96be4fb723e68e7b96244b7399c64a58bcd0062"
         availableBalance: null
         calculateValidatorWithdrawalFee: null
@@ -1215,8 +1265,8 @@ l1:
       address: *dashboardImplAddress
       checks:
         DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
-        MIN_CONFIRM_EXPIRY: 3600
-        MAX_CONFIRM_EXPIRY: 2592000
+        MIN_CONFIRM_EXPIRY: *MIN_CONFIRM_EXPIRY
+        MAX_CONFIRM_EXPIRY: *MAX_CONFIRM_EXPIRY
         STETH: *lido
         WSTETH: *wstETH
         VAULT_HUB: *vaultHub
@@ -1239,7 +1289,7 @@ l1:
         NODE_OPERATOR_UNGUARANTEED_DEPOSIT_ROLE: *NODE_OPERATOR_UNGUARANTEED_DEPOSIT_ROLE
         VAULT_CONFIGURATION_ROLE: *VAULT_CONFIGURATION_ROLE
         confirmingRoles: [*ZERO_BYTES32, *NODE_OPERATOR_MANAGER_ROLE]
-        getConfirmExpiry: 86400
+        getConfirmExpiry: *DEFAULT_CONFIRM_EXPIRY
         initialized: true
         liabilityShares: 0
         confirmations: null
@@ -1352,7 +1402,7 @@ l1:
         EXTRA_DATA_TYPE_EXITED_VALIDATORS: 2
         EXTRA_DATA_TYPE_STUCK_VALIDATORS: 1
         GENESIS_TIME: *GENESIS_TIME
-        SECONDS_PER_SLOT: 12
+        SECONDS_PER_SLOT: *SECONDS_PER_SLOT
         LOCATOR: *lidoLocator
         MANAGE_CONSENSUS_CONTRACT_ROLE: *ORACLE_MANAGE_CONSENSUS_CONTRACT_ROLE
         MANAGE_CONSENSUS_VERSION_ROLE: *ORACLE_MANAGE_CONSENSUS_VERSION_ROLE
@@ -1380,7 +1430,7 @@ l1:
         EXTRA_DATA_TYPE_EXITED_VALIDATORS: 2
         EXTRA_DATA_TYPE_STUCK_VALIDATORS: 1
         GENESIS_TIME: *GENESIS_TIME
-        SECONDS_PER_SLOT: 12
+        SECONDS_PER_SLOT: *SECONDS_PER_SLOT
         LOCATOR: *lidoLocator
         MANAGE_CONSENSUS_CONTRACT_ROLE: *ORACLE_MANAGE_CONSENSUS_CONTRACT_ROLE
         MANAGE_CONSENSUS_VERSION_ROLE: *ORACLE_MANAGE_CONSENSUS_VERSION_ROLE
@@ -1408,14 +1458,14 @@ l1:
         MANAGE_MEMBERS_AND_QUORUM_ROLE: *MANAGE_MEMBERS_AND_QUORUM_ROLE
         MANAGE_REPORT_PROCESSOR_ROLE: *MANAGE_REPORT_PROCESSOR_ROLE
         getChainConfig:
-          - 32
-          - 12
+          - *SLOTS_PER_EPOCH
+          - *SECONDS_PER_SLOT
           - *GENESIS_TIME
         getFrameConfig:
-          - 39833
-          - 75
-          - 32
-        getQuorum: 6
+          - *HC_AO_START
+          - *HASH_CONSENSUS_FAST_LANE
+          - *SLOTS_PER_EPOCH
+        getQuorum: *HASH_CONSENSUS_QUORUM
         getReportProcessor: *accountingOracle
         getConsensusState: null
         getConsensusStateForMember: null
@@ -1457,12 +1507,12 @@ l1:
         PAUSE_INFINITELY: *MAX_UINT256
         PAUSE_ROLE: *ORACLE_PAUSE_ROLE
         RESUME_ROLE: *ORACLE_RESUME_ROLE
-        SECONDS_PER_SLOT: 12
+        SECONDS_PER_SLOT: *SECONDS_PER_SLOT
         SUBMIT_DATA_ROLE: *ORACLE_SUBMIT_DATA_ROLE
         getConsensusContract: *hashConsensusForValidatorsExitBusOracle
-        getConsensusVersion: 4
-        getContractVersion: 2
-        getTotalRequestsProcessed: 1653
+        getConsensusVersion: *VEB_CONSENSUS_VERSION
+        getContractVersion: *VERSION_2
+        getTotalRequestsProcessed: 1653 # NOTE: brittle on live chains; consider relaxing when schema supports ranges
         isPaused: false
         getConsensusReport: null
         getLastProcessingRefSlot: null
@@ -1526,14 +1576,14 @@ l1:
         MANAGE_MEMBERS_AND_QUORUM_ROLE: *MANAGE_MEMBERS_AND_QUORUM_ROLE
         MANAGE_REPORT_PROCESSOR_ROLE: *MANAGE_REPORT_PROCESSOR_ROLE
         getChainConfig:
-          - 32
-          - 12
+          - *SLOTS_PER_EPOCH
+          - *SECONDS_PER_SLOT
           - *GENESIS_TIME
         getFrameConfig:
-          - 39843
-          - 75
-          - 32
-        getQuorum: 6
+          - *HC_VEB_START
+          - *HASH_CONSENSUS_FAST_LANE
+          - *SLOTS_PER_EPOCH
+        getQuorum: *HASH_CONSENSUS_QUORUM
         getReportProcessor: *validatorsExitBusOracle
         getConsensusState: null
         getConsensusStateForMember: null
@@ -1575,8 +1625,8 @@ l1:
         SECOND_OPINION_MANAGER_ROLE: *SANITY_CHECKER_SECOND_OPINION_MANAGER_ROLE
         SHARE_RATE_DEVIATION_LIMIT_MANAGER_ROLE: *SANITY_CHECKER_SHARE_RATE_DEVIATION_LIMIT_MANAGER_ROLE
         getLidoLocator: *lidoLocator
-        getMaxPositiveTokenRebase: 750000
-        getOracleReportLimits: [9000, 43200, 1000, 50, 600, 8, 24, 128, 750000, 1000, 101, 50]
+        getMaxPositiveTokenRebase: *MAX_POSITIVE_TOKEN_REBASE
+        getOracleReportLimits: *ORACLE_REPORT_LIMITS
         secondOpinionOracle: *ZERO_ADDRESS
         checkExitBusOracleReport: null
         checkExitedValidatorsRatePerDay: null
@@ -1724,18 +1774,18 @@ l1:
         UNSAFELY_MODIFY_VOTE_TIME_ROLE: "0x068ca51c9d69625c7add396c98ca4f3b27d894c3b973051ad3ee53017d7094ea"
         getRecoveryVault: *aragonAgent
         MODIFY_QUORUM_ROLE: "0xad15e7261800b4bb73f1b69d3864565ffb1fd00cb93cf14fe48da8f1f2149f39"
-        objectionPhaseTime: 300
+        objectionPhaseTime: *VOTING_OBJECTION_PHASE_TIME
         MODIFY_SUPPORT_ROLE: "0xda3972983e62bdf826c4b807c4c9c2b8a941e1f83dfa76d53d6aeac11e1be650"
         appId: *VOTING_APP_ID
         getEVMScriptRegistry: *aragonEvmScriptRegistry
-        voteTime: 900
+        voteTime: *VOTING_VOTE_TIME
         CREATE_VOTES_ROLE: "0xe7dcd7275292e064d090fbc5f3bd7995be23b502c1fed5cd94cfddbbdcd32bbc"
         kernel: *aragonKernel
-        minAcceptQuorumPct: 50000000000000000
+        minAcceptQuorumPct: *VOTING_MIN_ACCEPT_QUORUM_PCT
         isPetrified: false
-        supportRequiredPct: 500000000000000000
+        supportRequiredPct: *VOTING_SUPPORT_REQUIRED_PCT
         token: *ldo
-        PCT_BASE: 1000000000000000000
+        PCT_BASE: *PCT_BASE
         isForwarder: true
         getEVMScriptExecutor: null
         getVoterState: null
@@ -2254,7 +2304,7 @@ l1:
       address: *gateSealWithdrawalQueue
       checks:
         get_sealing_committee: *resealCommittee
-        get_seal_duration_seconds: 1209600
+        get_seal_duration_seconds: *DURATION_TWO_WEEKS
         get_sealables: [*withdrawalQueueERC721]
         get_expiry_timestamp: 1784217696
         is_expired: false
@@ -2264,7 +2314,7 @@ l1:
       address: *gateSealVaulthubAndPredepositGuarantee
       checks:
         get_sealing_committee: *resealCommittee
-        get_seal_duration_seconds: 1209600
+        get_seal_duration_seconds: *DURATION_TWO_WEEKS
         get_sealables: [*vaultHub, *predepositGuarantee]
         get_expiry_timestamp: 1791454296
         is_expired: false
@@ -2274,7 +2324,7 @@ l1:
       address: *gateSealVEBAndTWG
       checks:
         get_sealing_committee: *resealCommittee
-        get_seal_duration_seconds: 1209600
+        get_seal_duration_seconds: *DURATION_TWO_WEEKS
         get_sealables: [*triggerableWithdrawalsGateway, *validatorsExitBusOracle]
         get_expiry_timestamp: 1784217696
         is_expired: false
@@ -2298,13 +2348,13 @@ l1:
         appId: *NODE_OPERATORS_REGISTRY_APP_ID
         MANAGE_NODE_OPERATOR_ROLE: *MANAGE_NODE_OPERATOR_ROLE
         getEVMScriptRegistry: *aragonEvmScriptRegistry
-        MAX_NODE_OPERATOR_NAME_LENGTH: 255
+        MAX_NODE_OPERATOR_NAME_LENGTH: *MAX_NODE_OPERATOR_NAME_LENGTH
         kernel: *aragonKernel
         getLocator: *lidoLocator
         SET_NODE_OPERATOR_LIMIT_ROLE: *SET_NODE_OPERATOR_LIMIT_ROLE
         isPetrified: false
-        MAX_STUCK_PENALTY_DELAY: 31536000
-        MAX_NODE_OPERATORS_COUNT: 200
+        MAX_STUCK_PENALTY_DELAY: *MAX_STUCK_PENALTY_DELAY
+        MAX_NODE_OPERATORS_COUNT: *MAX_NODE_OPERATORS_COUNT
         MANAGE_SIGNING_KEYS: *MANAGE_SIGNING_KEYS_ROLE
         getEVMScriptExecutor: null
         getNodeOperatorIds: null
@@ -2346,15 +2396,15 @@ l1:
         MANAGE_NODE_OPERATOR_ROLE: *MANAGE_NODE_OPERATOR_ROLE
         getStakingModuleSummary: [0, 0, 0]
         getNodeOperatorsCount: 0
-        MAX_NODE_OPERATOR_NAME_LENGTH: 255
+        MAX_NODE_OPERATOR_NAME_LENGTH: *MAX_NODE_OPERATOR_NAME_LENGTH
         getKeysOpIndex: 0
         getNonce: 0
         kernel: *ZERO_ADDRESS
         getLocator: *ZERO_ADDRESS
         SET_NODE_OPERATOR_LIMIT_ROLE: *SET_NODE_OPERATOR_LIMIT_ROLE
         isPetrified: true
-        MAX_STUCK_PENALTY_DELAY: 31536000
-        MAX_NODE_OPERATORS_COUNT: 200
+        MAX_STUCK_PENALTY_DELAY: *MAX_STUCK_PENALTY_DELAY
+        MAX_NODE_OPERATORS_COUNT: *MAX_NODE_OPERATORS_COUNT
         MANAGE_SIGNING_KEYS: *MANAGE_SIGNING_KEYS_ROLE
         getEVMScriptExecutor: null
         getRecoveryVault: null
@@ -2495,16 +2545,16 @@ l1:
       checks:
         CANCEL_ROLE: *ET_CANCEL_ROLE
         DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
-        MAX_MOTIONS_LIMIT: 255
-        MAX_OBJECTIONS_THRESHOLD: 1000
-        MIN_MOTION_DURATION: 60
+        MAX_MOTIONS_LIMIT: *EASYTRACK_MAX_MOTIONS_LIMIT
+        MAX_OBJECTIONS_THRESHOLD: *EASYTRACK_MAX_OBJECTIONS_THRESHOLD
+        MIN_MOTION_DURATION: *EASYTRACK_MIN_MOTION_DURATION
         PAUSE_ROLE: *ET_PAUSE_ROLE
         UNPAUSE_ROLE: *ET_UNPAUSE_ROLE
         evmScriptExecutor: *evmScriptExecutor
         governanceToken: *ldo
-        motionDuration: 600
-        motionsCountLimit: 24
-        objectionsThreshold: 50
+        motionDuration: *EASYTRACK_MOTION_DURATION
+        motionsCountLimit: *EASYTRACK_MOTIONS_COUNT_LIMIT
+        objectionsThreshold: *EASYTRACK_OBJECTIONS_THRESHOLD
         paused: false
         canObjectToMotion: null
         evmScriptFactories: null
