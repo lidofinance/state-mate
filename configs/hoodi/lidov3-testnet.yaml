@@ -5,9 +5,9 @@ deployed:
   l1:
     # --- Core protocol ---
     - &lidoLocator "0xe2EF9536DAAAEBFf5b1c130957AB3E80056b06D8"
-    - &lidoLocatorImplAddress "0x8717971067D6FeeB631d750B09Ba66a6B4E01BA3"
+    - &lidoLocatorImplAddress "0x778Dc3a94B24D0Cd66E36d3ED8d47cAa622688F6"
     - &lido "0x3508A952176b3c15387C97BE809eaffB1982176a"
-    - &lidoImplAddress "0x35A4f9c9c2B1f81bDe7Eaa1f23b6465D3d741EEF"
+    - &lidoImplAddress "0x892D3fF28Dc9360cAA47576070B1892244e68a1f"
     - &wstETH "0x7E99eE3C66636DE415D2d7C880938F2f40f94De4"
     - &wstETHReferralStaker "0xf886BcC68b240316103fE8A12453Ce7831c2e835"
     - &eip712StETH "0x2A1d51BF3aAA7A7D027C8f561e5f579876a17B0a"
@@ -27,17 +27,17 @@ deployed:
     - &triggerableWithdrawalsGateway "0x6679090D92b08a2a686eF8614feECD8cDFE209db"
     - &validatorExitDelayVerifier "0xa5F5A9360275390fF9728262a29384399f38d2f0"
     - &vaultHub "0x4C9fFC325392090F789255b9948Ab1659b797964"
-    - &vaultHubImplAddress "0x36CdDa6Ff2cb8a83a0F328aA2Bf1B5200377FAf9"
+    - &vaultHubImplAddress "0x25414E6CEB90F5ffa42cb11CeE95Adb4EC9a1dB8"
     - &predepositGuarantee "0xa5F55f3402beA2B14AE15Dae1b6811457D43581d"
     - &predepositGuaranteeImplAddress "0x6D2c164Be7cc36b03aBd0e2e133bE03A30ad3358"
     - &operatorGrid "0x501e678182bB5dF3f733281521D3f3D1aDe69917"
-    - &operatorGridImplAddress "0xab35DA5722B188E3b67896873F88e2dFA905c944"
+    - &operatorGridImplAddress "0x81a8e96bf75eb02CE082FaFF5701B181E491dc1c"
 
     # --- stVaults factory stack ---
-    - &stakingVaultFactory "0xf0Cf0c852Bb2b41eF8171399a71be79aa67e6295"
+    - &stakingVaultFactory "0x1d10DB6a66EF8D2A6f6D36Ad4dc7092Ef7C12569"
     - &stakingVaultBeacon "0xb3e6a8B6A752d3bb905A1B3Ef12bbdeE77E8160e"
     - &stakingVaultImplAddress "0xE96BE4FB723e68e7b96244b7399C64a58bcD0062"
-    - &dashboardImplAddress "0x7CA203e3b7341341A4a83086780137eb283A9338"
+    - &dashboardImplAddress "0x7D25D43D5a69ae0521440211C655C11840aF0FD6"
     - &consolidationRequestsValidator "0xbf95Cd394cC03cD03fEA62A435ac347314877f1d"
     - &pinnedBeaconProxy "0x3e144aEd003b5AE6953A99B78dD34154CF3F8c76"
 
@@ -51,6 +51,7 @@ deployed:
     - &oracleReportSanityChecker "0x53417BA942bC86492bAF46FAbA8769f246422388"
     - &oracleDaemonConfig "0x2a833402e3F46fFC1ecAb3598c599147a78731a9"
     - &lazyOracle "0xf41491C79C30e8f4862d3F4A5b790171adB8e04A"
+    - &lazyOracleImplAddress "0x60beda728821B47446fDBcD14111b447BF8663e0"
 
     # --- DAO & Aragon apps ---
     - &aragonRepoBase "0xD03e828844AA4eF31566F984Fe2A1693e7d5aF38"
@@ -87,6 +88,7 @@ deployed:
     - &gateSealVEBAndTWG "0x368f2fcb593170823cc844F1B29e75E3d26879A1"
     - &gateSealWithdrawalQueue "0x73d76Bd3D589B2b2185c402da82cdAfbc18b958D"
     - &gateSealVaulthubAndPredepositGuarantee "0x2291496c76CC2e9368DbE9d4977ED2623cbDfb32"
+    - &gateSealCSAccounting "0x725166f143DdcD9EC1b96dfb70f16E3f44968A65"
 
     # --- Staking modules ---
     - &nodeOperatorsRegistry "0x5cDbE1590c083b5A2A64427fAA63A7cfDB91FbB5"
@@ -94,7 +96,11 @@ deployed:
     - &simpleDvt "0x0B5236BECA68004DB89434462DfC3BB074d2c830"
 
     # --- CSM ---
+    - &CSModule "0x79CEf36D84743222f37765204Bec41E92a93E59d"
     - &CSAccounting "0xA54b90BA34C5f326BC1485054080994e38FB4C60"
+    - &CSAccountingImplAddress "0xD32b59d6054b94516f8EEE2A84C3c33DaF1d06B8"
+    - &CSFeeDistributor "0xaCd9820b0A2229a82dc1A0770307ce5522FF3582"
+    - &CSVettedGate "0x10a254E724fe2b7f305F76f3F116a3969c53845f"
 
     # --- Easy Track ---
     - &easyTrack "0x284D91a7D47850d21A6DEaaC6E538AC7E5E6fc2a"
@@ -249,6 +255,9 @@ roles:
   - &ORACLE_SUBMIT_DATA_ROLE "0x65fa0c17458517c727737e4153dd477fa3e328cf706640b0f68b1a285c5990da"
   - &ORACLE_DAEMON_CONFIG_MANAGER_ROLE "0xbbfb55d933c2bfa638763473275b1d84c4418e58d26cf9d2cd5758237756d9f0"
 
+  # LazyOracle
+  - &UPDATE_SANITY_PARAMS_ROLE "0x7baf7f4a9784fa74c97162de631a3eb567edeb85878cb6965945310f2c512c63"
+
   # OracleReportSanityChecker
   - &SANITY_CHECKER_ALL_LIMITS_MANAGER_ROLE "0x5bf88568a012dfc9fe67407ad6775052bddc4ac89902dea1f4373ef5d9f1e35b"
   - &SANITY_CHECKER_ANNUAL_BALANCE_INCREASE_LIMIT_MANAGER_ROLE "0x12c02753cd3d584dc4bb965eb0c88392c4c4d7c00433fdb7490d33c61ea57622"
@@ -321,6 +330,13 @@ roles:
 
   # OperatorGrid
   - &REGISTRY_ROLE "0xa495a3428837724c7f7648cda02eb83c9c4c778c8688d6f254c7f3f80c154d55"
+
+  # CSAccounting
+  - &CS_MANAGE_BOND_CURVES_ROLE "0xd35e4a788498271198ec69c34f1dc762a1eee8200c111f598da1b3dde946783d"
+  - &CS_SET_BOND_CURVE_ROLE "0x645c9e6d2a86805cb5a28b1e4751c0dab493df7cf935070ce405489ba1a7bf72"
+  - &CS_RECOVERER_ROLE "0xb3e25b5404b87e5a838579cb5d7481d61ad96ee284d38ec1e97c07ba64e7f6fc"
+  - &CS_RESUME_ROLE "0x2fc10cc8ae19568712f7a176fb4978616a610650813c9d05326c34abb62749c7"
+  - &CS_PAUSE_ROLE "0x139c2898040ef16910dc9f44dc697df79363da767d8bc92f2e310312b816e46d"
 
 l1:
   rpcUrl: HOODI_REMOTE_RPC_URL # https://ethereum-hoodi-rpc.publicnode.com
@@ -918,6 +934,125 @@ l1:
         hasRole: null
         supportsInterface: null
 
+    CSAccounting:
+      name: CSAccounting
+      address: *CSAccounting
+      proxyName: OssifiableProxy
+      implementation: *CSAccountingImplAddress
+      proxyChecks:
+        proxy__getAdmin: *aragonAgent
+        proxy__getImplementation: *CSAccountingImplAddress
+        proxy__getIsOssified: false
+      checks:
+        DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
+        DEFAULT_BOND_CURVE_ID: 0
+        FEE_DISTRIBUTOR: *CSFeeDistributor
+        LIDO: *lido
+        LIDO_LOCATOR: *lidoLocator
+        MANAGE_BOND_CURVES_ROLE: *CS_MANAGE_BOND_CURVES_ROLE
+        MAX_BOND_LOCK_PERIOD: 31536000
+        MAX_CURVE_LENGTH: 100
+        MIN_BOND_LOCK_PERIOD: 86400
+        MIN_CURVE_LENGTH: 1
+        MODULE: *CSModule
+        PAUSE_INFINITELY: *MAX_UINT256
+        PAUSE_ROLE: *CS_PAUSE_ROLE
+        RECOVERER_ROLE: *CS_RECOVERER_ROLE
+        RESUME_ROLE: *CS_RESUME_ROLE
+        SET_BOND_CURVE_ROLE: *CS_SET_BOND_CURVE_ROLE
+        WITHDRAWAL_QUEUE: *withdrawalQueueERC721
+        WSTETH: *wstETH
+        chargePenaltyRecipient: null
+        feeDistributor: *CSFeeDistributor
+        getActualLockedBond: null
+        getBond: null
+        getBondAmountByKeysCount: null
+        getBondAmountByKeysCountWstETH: null
+        getBondCurve: null
+        getBondCurveId: null
+        getBondLockPeriod: null
+        getBondShares: null
+        getBondSummary: null
+        getBondSummaryShares: null
+        getClaimableBondShares: null
+        getClaimableRewardsAndBondShares: null
+        getCurveInfo: null
+        getCurvesCount: null
+        getInitializedVersion: null
+        getKeysCountByBondAmount: null
+        getLockedBondInfo: null
+        getRequiredBondForNextKeys: null
+        getRequiredBondForNextKeysWstETH: null
+        getResumeSinceTimestamp: null
+        getUnbondedKeysCount: null
+        getUnbondedKeysCountToEject: null
+        getRoleAdmin: null
+        getRoleMember: null
+        getRoleMembers: null
+        getRoleMemberCount: null
+        hasRole: null
+        isPaused: false
+        supportsInterface: null
+        totalBondShares: null
+      ozAcl:
+        *DEFAULT_ADMIN_ROLE : [*aragonAgent, "0x4AF43Ee34a6fcD1fEcA1e1F832124C763561dA53"]
+        *CS_MANAGE_BOND_CURVES_ROLE : ["0x4AF43Ee34a6fcD1fEcA1e1F832124C763561dA53"]
+        *CS_SET_BOND_CURVE_ROLE : [*CSVettedGate, "0x4AF43Ee34a6fcD1fEcA1e1F832124C763561dA53"]
+        *CS_RECOVERER_ROLE : []
+        *CS_RESUME_ROLE : [*resealManager]
+        *CS_PAUSE_ROLE : [*resealManager, *gateSealCSAccounting]
+      implementationChecks:
+        DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
+        DEFAULT_BOND_CURVE_ID: 0
+        FEE_DISTRIBUTOR: *CSFeeDistributor
+        LIDO: *lido
+        LIDO_LOCATOR: *lidoLocator
+        MANAGE_BOND_CURVES_ROLE: *CS_MANAGE_BOND_CURVES_ROLE
+        MAX_BOND_LOCK_PERIOD: 31536000
+        MAX_CURVE_LENGTH: 100
+        MIN_BOND_LOCK_PERIOD: 86400
+        MIN_CURVE_LENGTH: 1
+        MODULE: *CSModule
+        PAUSE_INFINITELY: *MAX_UINT256
+        PAUSE_ROLE: *CS_PAUSE_ROLE
+        RECOVERER_ROLE: *CS_RECOVERER_ROLE
+        RESUME_ROLE: *CS_RESUME_ROLE
+        SET_BOND_CURVE_ROLE: *CS_SET_BOND_CURVE_ROLE
+        WITHDRAWAL_QUEUE: *withdrawalQueueERC721
+        WSTETH: *wstETH
+        chargePenaltyRecipient: null
+        feeDistributor: *CSFeeDistributor
+        getActualLockedBond: null
+        getBond: null
+        getBondAmountByKeysCount: null
+        getBondAmountByKeysCountWstETH: null
+        getBondCurve: null
+        getBondCurveId: null
+        getBondLockPeriod: null
+        getBondShares: null
+        getBondSummary: null
+        getBondSummaryShares: null
+        getClaimableBondShares: null
+        getClaimableRewardsAndBondShares: null
+        getCurveInfo: null
+        getCurvesCount: null
+        getInitializedVersion: null
+        getKeysCountByBondAmount: null
+        getLockedBondInfo: null
+        getRequiredBondForNextKeys: null
+        getRequiredBondForNextKeysWstETH: null
+        getResumeSinceTimestamp: null
+        getUnbondedKeysCount: null
+        getUnbondedKeysCountToEject: null
+        getRoleAdmin: null
+        getRoleMember: null
+        getRoleMembers: null
+        getRoleMemberCount: null
+        hasRole: null
+        isPaused: false # WARNING: must be true for mainnet
+        supportsInterface: null
+        totalBondShares: 0
+
     minFirstAllocationStrategy:
       name: MinFirstAllocationStrategy
       address: *minFirstAllocationStrategy
@@ -1204,12 +1339,12 @@ l1:
         *REGISTRY_ROLE : [*aragonAgent, *evmScriptExecutor, *vaultsAdapter]
       implementationChecks:
         DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
-        DEFAULT_TIER_ID: 0
-        DEFAULT_TIER_OPERATOR: "0xFFfFfFffFFfffFFfFFfFFFFFffFFFffffFfFFFfF"
+        DEFAULT_TIER_ID: *DEFAULT_TIER_ID
+        DEFAULT_TIER_OPERATOR: *DEFAULT_TIER_OPERATOR
         LIDO_LOCATOR: *lidoLocator
         REGISTRY_ROLE: *REGISTRY_ROLE
-        MAX_CONFIRM_EXPIRY: 2592000 # 30 days
-        MIN_CONFIRM_EXPIRY: 3600 # 1 hour
+        MAX_CONFIRM_EXPIRY: *MAX_CONFIRM_EXPIRY # 30 days
+        MIN_CONFIRM_EXPIRY: *MIN_CONFIRM_EXPIRY # 1 hour
         nodeOperatorCount: 0
         getRoleAdmin: null
         getRoleMember: null
@@ -1229,7 +1364,7 @@ l1:
       name: VaultFactory
       address: *stakingVaultFactory
       checks:
-        PREVIOUS_FACTORY: "0x67Fc99587B4Cd6FA16E26FF4782711f79055d7ad"
+        PREVIOUS_FACTORY: "0xf0Cf0c852Bb2b41eF8171399a71be79aa67e6295"
         BEACON: *stakingVaultBeacon
         DASHBOARD_IMPL: *dashboardImplAddress
         LIDO_LOCATOR: *lidoLocator
@@ -1512,7 +1647,7 @@ l1:
         getConsensusContract: *hashConsensusForValidatorsExitBusOracle
         getConsensusVersion: *VEB_CONSENSUS_VERSION
         getContractVersion: *VERSION_2
-        getTotalRequestsProcessed: 1653 # NOTE: brittle on live chains; consider relaxing when schema supports ranges
+        getTotalRequestsProcessed: null
         isPaused: false
         getConsensusReport: null
         getLastProcessingRefSlot: null
@@ -1691,6 +1826,65 @@ l1:
       ozAcl:
         *DEFAULT_ADMIN_ROLE : [*aragonAgent]
         *ORACLE_DAEMON_CONFIG_MANAGER_ROLE : [*superManager]
+
+    lazyOracle:
+      name: LazyOracle
+      address: *lazyOracle
+      proxyName: OssifiableProxy
+      implementation: *lazyOracleImplAddress
+      proxyChecks:
+        proxy__getAdmin: *aragonAgent
+        proxy__getImplementation: *lazyOracleImplAddress
+        proxy__getIsOssified: false
+      checks:
+        DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
+        LIDO_LOCATOR: *lidoLocator
+        MAX_LIDO_FEE_RATE_PER_SECOND: 10000000000000000000
+        MAX_QUARANTINE_PERIOD: 2592000
+        MAX_REWARD_RATIO: 65535
+        UPDATE_SANITY_PARAMS_ROLE: *UPDATE_SANITY_PARAMS_ROLE
+        batchValidatorStages: null
+        batchVaultsInfo: null
+        getRoleAdmin: null
+        getRoleMember: null
+        getRoleMembers: null
+        getRoleMemberCount: null
+        hasRole: null
+        supportsInterface: null
+        latestReportData: null
+        latestReportTimestamp: null
+        maxLidoFeeRatePerSecond: null
+        maxRewardRatioBP: null
+        quarantinePeriod: null
+        vaultInfo: null
+        vaultQuarantine: null
+        vaultsCount: null
+      ozAcl:
+        *DEFAULT_ADMIN_ROLE : [*aragonAgent]
+        *UPDATE_SANITY_PARAMS_ROLE : [*aragonAgent]
+      implementationChecks:
+        DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
+        LIDO_LOCATOR: *lidoLocator
+        MAX_LIDO_FEE_RATE_PER_SECOND: 10000000000000000000
+        MAX_QUARANTINE_PERIOD: 2592000
+        MAX_REWARD_RATIO: 65535
+        UPDATE_SANITY_PARAMS_ROLE: *UPDATE_SANITY_PARAMS_ROLE
+        batchValidatorStages: null
+        batchVaultsInfo: null
+        getRoleAdmin: null
+        getRoleMember: null
+        getRoleMembers: null
+        getRoleMemberCount: null
+        hasRole: null
+        supportsInterface: null
+        latestReportData: null
+        latestReportTimestamp: null
+        maxLidoFeeRatePerSecond: null
+        maxRewardRatioBP: null
+        quarantinePeriod: null
+        vaultInfo: null
+        vaultQuarantine: null
+        vaultsCount: null
 
     aragon-kernel:
       name: Kernel
