@@ -171,9 +171,12 @@ misc:
   - &DEFAULT_TIER_OPERATOR "0xFFfFfFffFFfffFFfFFfFFFFFffFFFffffFfFFFfF"
   - &MAX_RELATIVE_SHARE_LIMIT_BP 1000
   - &REPORT_FRESHNESS_DELTA 172800
-  - &MIN_CONFIRM_EXPIRY 3600
-  - &MAX_CONFIRM_EXPIRY 2592000
-  - &DEFAULT_CONFIRM_EXPIRY 86400
+
+  # --- Time durations (in seconds) ---
+  - &DURATION_1_HOUR 3600
+  - &DURATION_1_DAY 86400
+  - &DURATION_30_DAYS 2592000
+  - &DURATION_1_YEAR 31536000
   - &PCT_BASE 1000000000000000000
   - &VEB_CONSENSUS_VERSION 4
   - &HASH_CONSENSUS_FAST_LANE 75
@@ -182,7 +185,6 @@ misc:
   - &HASH_CONSENSUS_QUORUM 6
   - &MAX_NODE_OPERATORS_COUNT 200
   - &MAX_NODE_OPERATOR_NAME_LENGTH 255
-  - &MAX_STUCK_PENALTY_DELAY 31536000
   - &VOTING_SUPPORT_REQUIRED_PCT 500000000000000000
   - &VOTING_MIN_ACCEPT_QUORUM_PCT 50000000000000000
   - &VOTING_VOTE_TIME 900
@@ -196,6 +198,33 @@ misc:
   - &DURATION_TWO_WEEKS 1209600
   - &MAX_POSITIVE_TOKEN_REBASE 750000
   - &ORACLE_REPORT_LIMITS [9000, 43200, 1000, 50, 600, 8, 24, 128, 750000, 1000, 101, 50]
+
+  # --- Proxy types ---
+  - &PROXY_TYPE_APP_PROXY_UPGRADEABLE 2
+  - &PROXY_TYPE_KERNEL_PROXY 1
+
+  # --- Contract versions and counts ---
+  - &STAKING_ROUTER_VERSION 3
+  - &STAKING_MODULES_COUNT 4
+  - &BURNER_VERSION 1
+
+  # --- Limits ---
+  - &MAX_VESTINGS_PER_ADDRESS 50
+  - &MAX_CURVE_LENGTH 100
+  - &MIN_CURVE_LENGTH 1
+  - &MAX_STAKING_MODULES_COUNT 32
+  - &MAX_STAKING_MODULE_NAME_LENGTH 31
+
+  # --- Extra data format enum values ---
+  - &EXTRA_DATA_FORMAT_EMPTY 0
+  - &EXTRA_DATA_FORMAT_LIST 1
+  - &EXTRA_DATA_TYPE_EXITED_VALIDATORS 2
+  - &EXTRA_DATA_TYPE_STUCK_VALIDATORS 1
+  - &DATA_FORMAT_LIST 1
+
+  # --- LazyOracle constants ---
+  - &MAX_LIDO_FEE_RATE_PER_SECOND 10000000000000000000
+  - &MAX_REWARD_RATIO 65535
 
 eoa:
   - &depositSecurityModule "0x2F0303F20E0795E6CCd17BD5efE791A586f28E03"
@@ -436,7 +465,7 @@ l1:
       proxyName: AppProxyUpgradeable
       implementation: *lidoImplAddress
       proxyChecks:
-        proxyType: 2
+        proxyType: *PROXY_TYPE_APP_PROXY_UPGRADEABLE
         isDepositable: false
         implementation: *lidoImplAddress
         appId: *LIDO_APP_ID
@@ -617,8 +646,8 @@ l1:
         proxy__getImplementation: *stakingRouterImplAddress
         proxy__getIsOssified: false
       checks:
-        getContractVersion: 3
-        getStakingModulesCount: 4
+        getContractVersion: *STAKING_ROUTER_VERSION
+        getStakingModulesCount: *STAKING_MODULES_COUNT
         getWithdrawalCredentials: *LIDO_WITHDRAWAL_CREDENTIALS
         DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
         REPORT_EXITED_VALIDATORS_ROLE: *REPORT_EXITED_VALIDATORS_ROLE
@@ -632,8 +661,8 @@ l1:
         DEPOSIT_CONTRACT: *DEPOSIT_CONTRACT
         FEE_PRECISION_POINTS: *FEE_PRECISION_POINTS
         TOTAL_BASIS_POINTS: *TOTAL_BASIS_POINTS
-        MAX_STAKING_MODULES_COUNT: 32
-        MAX_STAKING_MODULE_NAME_LENGTH: 31
+        MAX_STAKING_MODULES_COUNT: *MAX_STAKING_MODULES_COUNT
+        MAX_STAKING_MODULE_NAME_LENGTH: *MAX_STAKING_MODULE_NAME_LENGTH
         getLido: *lido
         getAllNodeOperatorDigests: null
         getAllStakingModuleDigests: null
@@ -684,10 +713,10 @@ l1:
         REPORT_VALIDATOR_EXITING_STATUS_ROLE: *REPORT_VALIDATOR_EXITING_STATUS_ROLE
         REPORT_VALIDATOR_EXIT_TRIGGERED_ROLE: *REPORT_VALIDATOR_EXIT_TRIGGERED_ROLE
         DEPOSIT_CONTRACT: *DEPOSIT_CONTRACT
-        FEE_PRECISION_POINTS: 100000000000000000000
-        MAX_STAKING_MODULES_COUNT: 32
-        MAX_STAKING_MODULE_NAME_LENGTH: 31
-        TOTAL_BASIS_POINTS: 10000
+        FEE_PRECISION_POINTS: *FEE_PRECISION_POINTS
+        MAX_STAKING_MODULES_COUNT: *MAX_STAKING_MODULES_COUNT
+        MAX_STAKING_MODULE_NAME_LENGTH: *MAX_STAKING_MODULE_NAME_LENGTH
+        TOTAL_BASIS_POINTS: *TOTAL_BASIS_POINTS
         getAllStakingModuleDigests: []
         getContractVersion: *MAX_UINT256
         getLido: *ZERO_ADDRESS
@@ -901,7 +930,7 @@ l1:
         LOCATOR: *lidoLocator
         REQUEST_BURN_MY_STETH_ROLE: *REQUEST_BURN_MY_STETH_ROLE
         REQUEST_BURN_SHARES_ROLE: *REQUEST_BURN_SHARES_ROLE
-        getContractVersion: 1
+        getContractVersion: *BURNER_VERSION
         isMigrationAllowed: false
         getCoverSharesBurnt: null
         getExcessStETH: null
@@ -950,10 +979,10 @@ l1:
         LIDO: *lido
         LIDO_LOCATOR: *lidoLocator
         MANAGE_BOND_CURVES_ROLE: *CS_MANAGE_BOND_CURVES_ROLE
-        MAX_BOND_LOCK_PERIOD: 31536000
-        MAX_CURVE_LENGTH: 100
-        MIN_BOND_LOCK_PERIOD: 86400
-        MIN_CURVE_LENGTH: 1
+        MAX_BOND_LOCK_PERIOD: *DURATION_1_YEAR
+        MAX_CURVE_LENGTH: *MAX_CURVE_LENGTH
+        MIN_BOND_LOCK_PERIOD: *DURATION_1_DAY
+        MIN_CURVE_LENGTH: *MIN_CURVE_LENGTH
         MODULE: *CSModule
         PAUSE_INFINITELY: *MAX_UINT256
         PAUSE_ROLE: *CS_PAUSE_ROLE
@@ -995,9 +1024,9 @@ l1:
         supportsInterface: null
         totalBondShares: null
       ozAcl:
-        *DEFAULT_ADMIN_ROLE : [*aragonAgent, "0x4AF43Ee34a6fcD1fEcA1e1F832124C763561dA53"]
-        *CS_MANAGE_BOND_CURVES_ROLE : ["0x4AF43Ee34a6fcD1fEcA1e1F832124C763561dA53"]
-        *CS_SET_BOND_CURVE_ROLE : [*CSVettedGate, "0x4AF43Ee34a6fcD1fEcA1e1F832124C763561dA53"]
+        *DEFAULT_ADMIN_ROLE : [*aragonAgent, "0x4AF43Ee34a6fcD1fEcA1e1F832124C763561dA53"] # WARNING: who is this?
+        *CS_MANAGE_BOND_CURVES_ROLE : ["0x4AF43Ee34a6fcD1fEcA1e1F832124C763561dA53"] # WARNING: who is this?
+        *CS_SET_BOND_CURVE_ROLE : [*CSVettedGate, "0x4AF43Ee34a6fcD1fEcA1e1F832124C763561dA53"] # WARNING: who is this?
         *CS_RECOVERER_ROLE : []
         *CS_RESUME_ROLE : [*resealManager]
         *CS_PAUSE_ROLE : [*resealManager, *gateSealCSAccounting]
@@ -1008,10 +1037,10 @@ l1:
         LIDO: *lido
         LIDO_LOCATOR: *lidoLocator
         MANAGE_BOND_CURVES_ROLE: *CS_MANAGE_BOND_CURVES_ROLE
-        MAX_BOND_LOCK_PERIOD: 31536000
-        MAX_CURVE_LENGTH: 100
-        MIN_BOND_LOCK_PERIOD: 86400
-        MIN_CURVE_LENGTH: 1
+        MAX_BOND_LOCK_PERIOD: *DURATION_1_YEAR
+        MAX_CURVE_LENGTH: *MAX_CURVE_LENGTH
+        MIN_BOND_LOCK_PERIOD: *DURATION_1_DAY
+        MIN_CURVE_LENGTH: *MIN_CURVE_LENGTH
         MODULE: *CSModule
         PAUSE_INFINITELY: *MAX_UINT256
         PAUSE_ROLE: *CS_PAUSE_ROLE
@@ -1167,10 +1196,10 @@ l1:
         *REDEMPTION_MASTER_ROLE : [*aragonAgent, *vaultsAdapter] # WARNING: must be none for mainnet
         *VALIDATOR_EXIT_ROLE : [*vaultsAdapter]
       implementationChecks:
-        CONNECT_DEPOSIT: 1000000000000000000
+        CONNECT_DEPOSIT: *ONE_ETH_WEI
         CONSENSUS_CONTRACT: *hashConsensusForAccountingOracle
-        MAX_RELATIVE_SHARE_LIMIT_BP: 1000
-        REPORT_FRESHNESS_DELTA: 172800
+        MAX_RELATIVE_SHARE_LIMIT_BP: *MAX_RELATIVE_SHARE_LIMIT_BP
+        REPORT_FRESHNESS_DELTA: *REPORT_FRESHNESS_DELTA
         LIDO: *lido
         LIDO_LOCATOR: *lidoLocator
         PAUSE_INFINITELY: *MAX_UINT256
@@ -1181,8 +1210,8 @@ l1:
         BAD_DEBT_MASTER_ROLE: *BAD_DEBT_MASTER_ROLE
         REDEMPTION_MASTER_ROLE: *REDEMPTION_MASTER_ROLE
         VALIDATOR_EXIT_ROLE: *VALIDATOR_EXIT_ROLE
-        getResumeSinceTimestamp: 0 # WARNING: must be *MAX_UINT256 for mainnet
-        isPaused: false # WARNING: must be true for mainnet
+        getResumeSinceTimestamp: *MAX_UINT256
+        isPaused: true
         batchVaultsInfo: null
         getRoleAdmin: null
         getRoleMember: null
@@ -1312,8 +1341,8 @@ l1:
         DEFAULT_TIER_OPERATOR: *DEFAULT_TIER_OPERATOR
         LIDO_LOCATOR: *lidoLocator
         REGISTRY_ROLE: *REGISTRY_ROLE
-        MAX_CONFIRM_EXPIRY: *MAX_CONFIRM_EXPIRY # 30 days
-        MIN_CONFIRM_EXPIRY: *MIN_CONFIRM_EXPIRY # 1 hour
+        MAX_CONFIRM_EXPIRY: *DURATION_30_DAYS
+        MIN_CONFIRM_EXPIRY: *DURATION_1_HOUR
         confirmation: null
         effectiveShareLimit: null
         getConfirmExpiry: null
@@ -1343,8 +1372,8 @@ l1:
         DEFAULT_TIER_OPERATOR: *DEFAULT_TIER_OPERATOR
         LIDO_LOCATOR: *lidoLocator
         REGISTRY_ROLE: *REGISTRY_ROLE
-        MAX_CONFIRM_EXPIRY: *MAX_CONFIRM_EXPIRY # 30 days
-        MIN_CONFIRM_EXPIRY: *MIN_CONFIRM_EXPIRY # 1 hour
+        MAX_CONFIRM_EXPIRY: *DURATION_30_DAYS
+        MIN_CONFIRM_EXPIRY: *DURATION_1_HOUR
         nodeOperatorCount: 0
         getRoleAdmin: null
         getRoleMember: null
@@ -1400,8 +1429,8 @@ l1:
       address: *dashboardImplAddress
       checks:
         DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
-        MIN_CONFIRM_EXPIRY: *MIN_CONFIRM_EXPIRY
-        MAX_CONFIRM_EXPIRY: *MAX_CONFIRM_EXPIRY
+        MIN_CONFIRM_EXPIRY: *DURATION_1_HOUR
+        MAX_CONFIRM_EXPIRY: *DURATION_30_DAYS
         STETH: *lido
         WSTETH: *wstETH
         VAULT_HUB: *vaultHub
@@ -1424,7 +1453,7 @@ l1:
         NODE_OPERATOR_UNGUARANTEED_DEPOSIT_ROLE: *NODE_OPERATOR_UNGUARANTEED_DEPOSIT_ROLE
         VAULT_CONFIGURATION_ROLE: *VAULT_CONFIGURATION_ROLE
         confirmingRoles: [*ZERO_BYTES32, *NODE_OPERATOR_MANAGER_ROLE]
-        getConfirmExpiry: *DEFAULT_CONFIRM_EXPIRY
+        getConfirmExpiry: *DURATION_1_DAY
         initialized: true
         liabilityShares: 0
         confirmations: null
@@ -1455,6 +1484,7 @@ l1:
         totalValue: null
         vaultConnection: null
         withdrawableValue: null
+        feeLeftover: null
       ozAcl:
         *NODE_OPERATOR_MANAGER_ROLE : []
         *PAUSE_BEACON_CHAIN_DEPOSITS_ROLE : []
@@ -1532,10 +1562,10 @@ l1:
         proxy__getIsOssified: false
       checks:
         DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
-        EXTRA_DATA_FORMAT_EMPTY: 0
-        EXTRA_DATA_FORMAT_LIST: 1
-        EXTRA_DATA_TYPE_EXITED_VALIDATORS: 2
-        EXTRA_DATA_TYPE_STUCK_VALIDATORS: 1
+        EXTRA_DATA_FORMAT_EMPTY: *EXTRA_DATA_FORMAT_EMPTY
+        EXTRA_DATA_FORMAT_LIST: *EXTRA_DATA_FORMAT_LIST
+        EXTRA_DATA_TYPE_EXITED_VALIDATORS: *EXTRA_DATA_TYPE_EXITED_VALIDATORS
+        EXTRA_DATA_TYPE_STUCK_VALIDATORS: *EXTRA_DATA_TYPE_STUCK_VALIDATORS
         GENESIS_TIME: *GENESIS_TIME
         SECONDS_PER_SLOT: *SECONDS_PER_SLOT
         LOCATOR: *lidoLocator
@@ -1560,10 +1590,10 @@ l1:
         *ORACLE_SUBMIT_DATA_ROLE : []
       implementationChecks:
         DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
-        EXTRA_DATA_FORMAT_EMPTY: 0
-        EXTRA_DATA_FORMAT_LIST: 1
-        EXTRA_DATA_TYPE_EXITED_VALIDATORS: 2
-        EXTRA_DATA_TYPE_STUCK_VALIDATORS: 1
+        EXTRA_DATA_FORMAT_EMPTY: *EXTRA_DATA_FORMAT_EMPTY
+        EXTRA_DATA_FORMAT_LIST: *EXTRA_DATA_FORMAT_LIST
+        EXTRA_DATA_TYPE_EXITED_VALIDATORS: *EXTRA_DATA_TYPE_EXITED_VALIDATORS
+        EXTRA_DATA_TYPE_STUCK_VALIDATORS: *EXTRA_DATA_TYPE_STUCK_VALIDATORS
         GENESIS_TIME: *GENESIS_TIME
         SECONDS_PER_SLOT: *SECONDS_PER_SLOT
         LOCATOR: *lidoLocator
@@ -1634,7 +1664,7 @@ l1:
         proxy__getImplementation: *validatorsExitBusOracleImplAddress
         proxy__getIsOssified: false
       checks:
-        DATA_FORMAT_LIST: 1
+        DATA_FORMAT_LIST: *DATA_FORMAT_LIST
         DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
         GENESIS_TIME: *GENESIS_TIME
         MANAGE_CONSENSUS_CONTRACT_ROLE: *ORACLE_MANAGE_CONSENSUS_CONTRACT_ROLE
@@ -1674,7 +1704,7 @@ l1:
         *ORACLE_RESUME_ROLE : [*aragonAgent, *resealManager]
         *ORACLE_SUBMIT_DATA_ROLE : []
       implementationChecks:
-        DATA_FORMAT_LIST: 1
+        DATA_FORMAT_LIST: *DATA_FORMAT_LIST
         DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
         GENESIS_TIME: *GENESIS_TIME
         MANAGE_CONSENSUS_CONTRACT_ROLE: *ORACLE_MANAGE_CONSENSUS_CONTRACT_ROLE
@@ -1839,9 +1869,9 @@ l1:
       checks:
         DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
         LIDO_LOCATOR: *lidoLocator
-        MAX_LIDO_FEE_RATE_PER_SECOND: 10000000000000000000
-        MAX_QUARANTINE_PERIOD: 2592000
-        MAX_REWARD_RATIO: 65535
+        MAX_LIDO_FEE_RATE_PER_SECOND: *MAX_LIDO_FEE_RATE_PER_SECOND
+        MAX_QUARANTINE_PERIOD: *DURATION_30_DAYS
+        MAX_REWARD_RATIO: *MAX_REWARD_RATIO
         UPDATE_SANITY_PARAMS_ROLE: *UPDATE_SANITY_PARAMS_ROLE
         batchValidatorStages: null
         batchVaultsInfo: null
@@ -1861,13 +1891,13 @@ l1:
         vaultsCount: null
       ozAcl:
         *DEFAULT_ADMIN_ROLE : [*aragonAgent]
-        *UPDATE_SANITY_PARAMS_ROLE : [*aragonAgent]
+        *UPDATE_SANITY_PARAMS_ROLE : [*aragonAgent] # WARNING: must be zero
       implementationChecks:
         DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
         LIDO_LOCATOR: *lidoLocator
-        MAX_LIDO_FEE_RATE_PER_SECOND: 10000000000000000000
-        MAX_QUARANTINE_PERIOD: 2592000
-        MAX_REWARD_RATIO: 65535
+        MAX_LIDO_FEE_RATE_PER_SECOND: *MAX_LIDO_FEE_RATE_PER_SECOND
+        MAX_QUARANTINE_PERIOD: *DURATION_30_DAYS
+        MAX_REWARD_RATIO: *MAX_REWARD_RATIO
         UPDATE_SANITY_PARAMS_ROLE: *UPDATE_SANITY_PARAMS_ROLE
         batchValidatorStages: null
         batchVaultsInfo: null
@@ -1892,7 +1922,7 @@ l1:
       proxyName: KernelProxy
       implementation: *aragonKernelImplAddress
       proxyChecks:
-        proxyType: 2
+        proxyType: *PROXY_TYPE_APP_PROXY_UPGRADEABLE
         apps: null
         isDepositable: false
         implementation: *aragonKernelImplAddress
@@ -1958,7 +1988,7 @@ l1:
       proxyName: AppProxyUpgradeable
       implementation: *aragonVotingImplAddress
       proxyChecks:
-        proxyType: 2
+        proxyType: *PROXY_TYPE_APP_PROXY_UPGRADEABLE
         isDepositable: false
         implementation: *aragonVotingImplAddress
         appId: *VOTING_APP_ID
@@ -2034,14 +2064,14 @@ l1:
       proxyName: AppProxyUpgradeable
       implementation: *aragonTokenManagerImplAddress
       proxyChecks:
-        proxyType: 2
+        proxyType: *PROXY_TYPE_APP_PROXY_UPGRADEABLE
         isDepositable: false
         implementation: *aragonTokenManagerImplAddress
         appId: *TOKEN_MANAGER_APP_ID
         kernel: *aragonKernel
       checks:
         hasInitialized: true
-        MAX_VESTINGS_PER_ADDRESS: 50
+        MAX_VESTINGS_PER_ADDRESS: *MAX_VESTINGS_PER_ADDRESS
         getRecoveryVault: *aragonAgent
         appId: *TOKEN_MANAGER_APP_ID
         ISSUE_ROLE: "0x2406f1e99f79cea012fb88c5c36566feaeefee0f4b98d3a376b49310222b53c4"
@@ -2066,7 +2096,7 @@ l1:
         canForward: null
       implementationChecks:
         hasInitialized: false
-        MAX_VESTINGS_PER_ADDRESS: 50
+        MAX_VESTINGS_PER_ADDRESS: *MAX_VESTINGS_PER_ADDRESS
         appId: *ZERO_BYTES32
         ISSUE_ROLE: "0x2406f1e99f79cea012fb88c5c36566feaeefee0f4b98d3a376b49310222b53c4"
         getInitializationBlock: *MAX_UINT256
@@ -2096,7 +2126,7 @@ l1:
       proxyName: AppProxyUpgradeable
       implementation: *aragonFinanceImplAddress
       proxyChecks:
-        proxyType: 2
+        proxyType: *PROXY_TYPE_APP_PROXY_UPGRADEABLE
         isDepositable: false
         implementation: *aragonFinanceImplAddress
         appId: *FINANCE_APP_ID
@@ -2112,7 +2142,7 @@ l1:
         EXECUTE_PAYMENTS_ROLE: "0x563165d3eae48bcb0a092543ca070d989169c98357e9a1b324ec5da44bab75fd"
         currentPeriodId: 0
         getEVMScriptRegistry: *aragonEvmScriptRegistry
-        getPeriodDuration: 2592000
+        getPeriodDuration: *DURATION_30_DAYS
         kernel: *aragonKernel
         paymentsNextIndex: 1
         isPetrified: false
@@ -2168,7 +2198,7 @@ l1:
       proxyName: AppProxyUpgradeable
       implementation: *aragonAgentImplAddress
       proxyChecks:
-        proxyType: 2
+        proxyType: *PROXY_TYPE_APP_PROXY_UPGRADEABLE
         isDepositable: true
         implementation: *aragonAgentImplAddress
         appId: *AGENT_APP_ID
@@ -2247,7 +2277,7 @@ l1:
       proxyName: AppProxyUpgradeable
       implementation: *aragonAclImplAddress
       proxyChecks:
-        proxyType: 2
+        proxyType: *PROXY_TYPE_APP_PROXY_UPGRADEABLE
         isDepositable: false
         implementation: *aragonAclImplAddress
         appId: *DEFAULT_ACL_APP_ID
@@ -2311,7 +2341,7 @@ l1:
       proxyName: AppProxyPinned
       implementation: *aragonEvmScriptRegistryImplAddress
       proxyChecks:
-        proxyType: 1
+        proxyType: *PROXY_TYPE_KERNEL_PROXY
         isDepositable: false
         implementation: *aragonEvmScriptRegistryImplAddress
         appId: "0xddbcfd564f642ab5627cf68b9b7d374fb4f8a36e941a75d89c87998cef03bd61"
@@ -2362,7 +2392,7 @@ l1:
       proxyName: AppProxyUpgradeable
       implementation: *aragonApmRegistryImplAddress
       proxyChecks:
-        proxyType: 2
+        proxyType: *PROXY_TYPE_APP_PROXY_UPGRADEABLE
         isDepositable: false
         implementation: "0x2D7EF7C6BEDA2a18E4c32151A758B8b081f5C2d7"
         appId: *LIDO_APM_APP_ID
@@ -2402,7 +2432,7 @@ l1:
       proxyName: AppProxyUpgradeable
       implementation: *aragonApmRegistryImplAddress
       proxyChecks:
-        proxyType: 2
+        proxyType: *PROXY_TYPE_APP_PROXY_UPGRADEABLE
         isDepositable: false
         implementation: "0x2D7EF7C6BEDA2a18E4c32151A758B8b081f5C2d7"
         appId: *APM_REGISTRY_APP_ID
@@ -2529,7 +2559,7 @@ l1:
       proxyName: AppProxyUpgradeable
       implementation: *nodeOperatorsRegistryImplAddress
       proxyChecks:
-        proxyType: 2
+        proxyType: *PROXY_TYPE_APP_PROXY_UPGRADEABLE
         isDepositable: false
         implementation: *nodeOperatorsRegistryImplAddress
         appId: *NODE_OPERATORS_REGISTRY_APP_ID
@@ -2547,7 +2577,7 @@ l1:
         getLocator: *lidoLocator
         SET_NODE_OPERATOR_LIMIT_ROLE: *SET_NODE_OPERATOR_LIMIT_ROLE
         isPetrified: false
-        MAX_STUCK_PENALTY_DELAY: *MAX_STUCK_PENALTY_DELAY
+        MAX_STUCK_PENALTY_DELAY: *DURATION_1_YEAR
         MAX_NODE_OPERATORS_COUNT: *MAX_NODE_OPERATORS_COUNT
         MANAGE_SIGNING_KEYS: *MANAGE_SIGNING_KEYS_ROLE
         getEVMScriptExecutor: null
@@ -2597,7 +2627,7 @@ l1:
         getLocator: *ZERO_ADDRESS
         SET_NODE_OPERATOR_LIMIT_ROLE: *SET_NODE_OPERATOR_LIMIT_ROLE
         isPetrified: true
-        MAX_STUCK_PENALTY_DELAY: *MAX_STUCK_PENALTY_DELAY
+        MAX_STUCK_PENALTY_DELAY: *DURATION_1_YEAR
         MAX_NODE_OPERATORS_COUNT: *MAX_NODE_OPERATORS_COUNT
         MANAGE_SIGNING_KEYS: *MANAGE_SIGNING_KEYS_ROLE
         getEVMScriptExecutor: null
@@ -2623,7 +2653,7 @@ l1:
       proxyName: AppProxyUpgradeable
       implementation: *nodeOperatorsRegistryImplAddress
       proxyChecks:
-        proxyType: 2
+        proxyType: *PROXY_TYPE_APP_PROXY_UPGRADEABLE
         isDepositable: false
         implementation: *nodeOperatorsRegistryImplAddress
         appId: *SIMPLE_DVT_APP_ID
@@ -2636,13 +2666,13 @@ l1:
         appId: *SIMPLE_DVT_APP_ID
         MANAGE_NODE_OPERATOR_ROLE: *MANAGE_NODE_OPERATOR_ROLE
         getEVMScriptRegistry: *aragonEvmScriptRegistry
-        MAX_NODE_OPERATOR_NAME_LENGTH: 255
+        MAX_NODE_OPERATOR_NAME_LENGTH: *MAX_NODE_OPERATOR_NAME_LENGTH
         kernel: *aragonKernel
         getLocator: *lidoLocator
         SET_NODE_OPERATOR_LIMIT_ROLE: *SET_NODE_OPERATOR_LIMIT_ROLE
         isPetrified: false
-        MAX_STUCK_PENALTY_DELAY: 31536000
-        MAX_NODE_OPERATORS_COUNT: 200
+        MAX_STUCK_PENALTY_DELAY: *DURATION_1_YEAR
+        MAX_NODE_OPERATORS_COUNT: *MAX_NODE_OPERATORS_COUNT
         MANAGE_SIGNING_KEYS: *MANAGE_SIGNING_KEYS_ROLE
         getEVMScriptExecutor: null
         getNodeOperatorIds: null
@@ -2684,15 +2714,15 @@ l1:
         MANAGE_NODE_OPERATOR_ROLE: *MANAGE_NODE_OPERATOR_ROLE
         getStakingModuleSummary: [0, 0, 0]
         getNodeOperatorsCount: 0
-        MAX_NODE_OPERATOR_NAME_LENGTH: 255
+        MAX_NODE_OPERATOR_NAME_LENGTH: *MAX_NODE_OPERATOR_NAME_LENGTH
         getKeysOpIndex: 0
         getNonce: 0
         kernel: *ZERO_ADDRESS
         getLocator: *ZERO_ADDRESS
         SET_NODE_OPERATOR_LIMIT_ROLE: *SET_NODE_OPERATOR_LIMIT_ROLE
         isPetrified: true
-        MAX_STUCK_PENALTY_DELAY: 31536000
-        MAX_NODE_OPERATORS_COUNT: 200
+        MAX_STUCK_PENALTY_DELAY: *DURATION_1_YEAR
+        MAX_NODE_OPERATORS_COUNT: *MAX_NODE_OPERATORS_COUNT
         MANAGE_SIGNING_KEYS: *MANAGE_SIGNING_KEYS_ROLE
         getEVMScriptExecutor: null
         getRecoveryVault: null
