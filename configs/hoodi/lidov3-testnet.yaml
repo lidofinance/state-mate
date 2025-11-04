@@ -122,35 +122,42 @@ deployed:
     - &resealManager "0x05172CbCDb7307228F781436b327679e4DAE166B"
 
 misc:
+  # --- Chain and deployment constants ---
   - &CHAIN_ID "560048"
   - &GENESIS_TIME "1742213400"
-  - &DEPOSIT_DOMAIN "0x03000000719103511efa4f1362ff2a50996cccf329cc84cb410c5e5c7d351d03"
-  - &LIDO_VERSION "3"
-  - &LIDO_WITHDRAWAL_CREDENTIALS "0x0100000000000000000000004473dcddbf77679a643bdb654dbd86d67f8d32f2"
-  - &AO_CONSENSUS_VERSION "5"
-  - &AO_CONTRACT_VERSION "4"
-  - &BEACON_ROOTS "0x000F3df6D732807Ef1319fB7B8bB8522d0Beac02"
   - &DEPOSIT_CONTRACT "0x00000000219ab540356cBB839Cbe05303d7705Fa"
+  - &DEPOSIT_DOMAIN "0x03000000719103511efa4f1362ff2a50996cccf329cc84cb410c5e5c7d351d03"
+
+  # --- Lido versioning and credentials ---
+  - &LIDO_VERSION 3
+  - &LIDO_WITHDRAWAL_CREDENTIALS "0x0100000000000000000000004473dcddbf77679a643bdb654dbd86d67f8d32f2"
+
+  # --- AO (Attestation Oracle) Versions ---
+  - &AO_CONSENSUS_VERSION 5
+  - &AO_CONTRACT_VERSION 4
+
+  # --- Beacon/Genesis roots and validator info ---
+  - &BEACON_ROOTS "0x000F3df6D732807Ef1319fB7B8bB8522d0Beac02"
   - &GI_FIRST_VALIDATOR_PREV "0x0000000000000000000000000000000000000000000000000096000000000028"
   - &GI_FIRST_VALIDATOR_CURR "0x0000000000000000000000000000000000000000000000000096000000000028"
   - &GI_PUBKEY_WC_PARENT "0x0000000000000000000000000000000000000000000000000000000000000402"
   - &GI_STATE_ROOT "0x0000000000000000000000000000000000000000000000000000000000000b03"
+
+  # --- Addresses / Zero values ---
   - &ZERO_ADDRESS "0x0000000000000000000000000000000000000000"
   - &ZERO_BYTES32 "0x0000000000000000000000000000000000000000000000000000000000000000"
   - &DEFAULT_ADMIN_ROLE "0x0000000000000000000000000000000000000000000000000000000000000000"
+
+  # --- General numeric constants ---
   - &MAX_UINT256 "115792089237316195423570985008687907853269984665640564039457584007913129639935"
   - &MAX_UINT64 "18446744073709551615"
   - &DECIMALS_18 18
 
+  # --- EIP-712 domain separators ---
   - &LIDO_DOMAIN_SEPARATOR "0x184cb04a1e003ce18451fff652ee914c2df2dafa833a0786d1b38edcecf6f30d"
   - &WSTETH_DOMAIN_SEPARATOR "0x3c9e03f12de3da07e25447fc3360a27c7953822d198c14bd480bba6f03d99a22"
 
-  # --- Derived and frequently reused constants (avoid hard-coded values below) ---
-  - &SLOTS_PER_EPOCH 32
-  - &SECONDS_PER_SLOT 12
-  - &SLOTS_PER_HISTORICAL_ROOT 8192
-  - &SHARD_COMMITTEE_PERIOD_IN_SECONDS 98304
-  - &EIP712_VERSION 2
+  # --- Protocol and token configuration ---
   - &LIDO_NAME "Liquid staked Ether 2.0"
   - &LIDO_SYMBOL "stETH"
   - &WSTETH_NAME "Wrapped liquid staked Ether 2.0"
@@ -164,7 +171,6 @@ misc:
   - &VERSION_1 1
   - &VERSION_2 2
   - &ONE_ETH_WEI 1000000000000000000
-  - &PREDEPOSIT_AMOUNT 1000000000000000000
   - &ACTIVATION_DEPOSIT_AMOUNT 31000000000000000000
   - &MAX_TOPUP_AMOUNT 2016000000000000000000
   - &DEFAULT_TIER_ID 0
@@ -172,57 +178,73 @@ misc:
   - &MAX_RELATIVE_SHARE_LIMIT_BP 1000
   - &REPORT_FRESHNESS_DELTA 172800
 
+  # --- Derived and frequently reused spec constants ---
+  - &SLOTS_PER_EPOCH 32
+  - &SECONDS_PER_SLOT 12
+  - &SLOTS_PER_HISTORICAL_ROOT 8192
+  - &SHARD_COMMITTEE_PERIOD_IN_SECONDS 98304
+  - &EIP712_VERSION 2
+
   # --- Time durations (in seconds) ---
   - &DURATION_1_HOUR 3600
   - &DURATION_1_DAY 86400
+  - &DURATION_2_WEEKS 1209600
   - &DURATION_30_DAYS 2592000
   - &DURATION_1_YEAR 31536000
-  - &PCT_BASE 1000000000000000000
-  - &VEB_CONSENSUS_VERSION 4
-  - &HASH_CONSENSUS_FAST_LANE 75
-  - &HC_AO_START 39833
-  - &HC_VEB_START 39843
-  - &HASH_CONSENSUS_QUORUM 6
-  - &MAX_NODE_OPERATORS_COUNT 200
-  - &MAX_NODE_OPERATOR_NAME_LENGTH 255
+
+  # --- Percentage bases & voting parameters ---
   - &VOTING_SUPPORT_REQUIRED_PCT 500000000000000000
   - &VOTING_MIN_ACCEPT_QUORUM_PCT 50000000000000000
   - &VOTING_VOTE_TIME 900
   - &VOTING_OBJECTION_PHASE_TIME 300
+
+  # --- Consensus and hash constants ---
+  - &VEB_CONSENSUS_VERSION 4
+  - &VEB_DATA_FORMAT_LIST 1
+  - &HASH_CONSENSUS_FAST_LANE 75
+  - &HC_AO_START 39833
+  - &HC_VEB_START 39843
+  - &HASH_CONSENSUS_QUORUM 6
+
+  # --- Node/operator limits ---
+  - &MAX_NODE_OPERATORS_COUNT 200
+  - &MAX_NODE_OPERATOR_NAME_LENGTH 255
+
+  # --- EasyTrack motion limits ---
   - &EASYTRACK_MIN_MOTION_DURATION 60
   - &EASYTRACK_MOTION_DURATION 600
   - &EASYTRACK_MAX_MOTIONS_LIMIT 255
   - &EASYTRACK_MAX_OBJECTIONS_THRESHOLD 1000
   - &EASYTRACK_MOTIONS_COUNT_LIMIT 24
   - &EASYTRACK_OBJECTIONS_THRESHOLD 50
-  - &DURATION_TWO_WEEKS 1209600
-  - &MAX_POSITIVE_TOKEN_REBASE 750000
-  - &ORACLE_REPORT_LIMITS [9000, 43200, 1000, 50, 600, 8, 24, 128, 750000, 1000, 101, 50]
+
+  # --- Oracle/reporting ---
+  - &MAX_POSITIVE_TOKEN_REBASE 750000 # Oracle limit
+  - &ORACLE_REPORT_LIMITS [9000, 43200, 1000, 50, 600, 8, 24, 128, 750000, 1000, 101, 50] # Configurable oracle report limits
 
   # --- Proxy types ---
   - &PROXY_TYPE_APP_PROXY_UPGRADEABLE 2
   - &PROXY_TYPE_KERNEL_PROXY 1
 
-  # --- Contract versions and counts ---
+  # --- Contract versions/counts ---
   - &STAKING_ROUTER_VERSION 3
   - &STAKING_MODULES_COUNT 4
   - &BURNER_VERSION 1
 
-  # --- Limits ---
+  # --- Misc Limits ---
   - &MAX_VESTINGS_PER_ADDRESS 50
   - &MAX_CURVE_LENGTH 100
   - &MIN_CURVE_LENGTH 1
   - &MAX_STAKING_MODULES_COUNT 32
   - &MAX_STAKING_MODULE_NAME_LENGTH 31
 
-  # --- Extra data format enum values ---
+  # --- Extra data format/type enums ---
   - &EXTRA_DATA_FORMAT_EMPTY 0
   - &EXTRA_DATA_FORMAT_LIST 1
   - &EXTRA_DATA_TYPE_EXITED_VALIDATORS 2
   - &EXTRA_DATA_TYPE_STUCK_VALIDATORS 1
-  - &DATA_FORMAT_LIST 1
 
-  # --- LazyOracle constants ---
+  # --- LazyOracle, reward, and fee constants ---
   - &MAX_LIDO_FEE_RATE_PER_SECOND 10000000000000000000
   - &MAX_REWARD_RATIO 65535
 
@@ -1254,7 +1276,7 @@ l1:
         proxy__getImplementation: *predepositGuaranteeImplAddress
         proxy__getIsOssified: false
       checks:
-        PREDEPOSIT_AMOUNT: *PREDEPOSIT_AMOUNT
+        PREDEPOSIT_AMOUNT: *ONE_ETH_WEI
         ACTIVATION_DEPOSIT_AMOUNT: *ACTIVATION_DEPOSIT_AMOUNT
         MAX_TOPUP_AMOUNT: *MAX_TOPUP_AMOUNT
         BEACON_ROOTS: *BEACON_ROOTS
@@ -1292,7 +1314,7 @@ l1:
         *OZ_PAUSE_ROLE : [*gateSealVaulthubAndPredepositGuarantee]
         *OZ_RESUME_ROLE : []
       implementationChecks:
-        PREDEPOSIT_AMOUNT: *PREDEPOSIT_AMOUNT
+        PREDEPOSIT_AMOUNT: *ONE_ETH_WEI
         ACTIVATION_DEPOSIT_AMOUNT: *ACTIVATION_DEPOSIT_AMOUNT
         MAX_TOPUP_AMOUNT: *MAX_TOPUP_AMOUNT
         BEACON_ROOTS: *BEACON_ROOTS
@@ -1664,7 +1686,7 @@ l1:
         proxy__getImplementation: *validatorsExitBusOracleImplAddress
         proxy__getIsOssified: false
       checks:
-        DATA_FORMAT_LIST: *DATA_FORMAT_LIST
+        DATA_FORMAT_LIST: *VEB_DATA_FORMAT_LIST
         DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
         GENESIS_TIME: *GENESIS_TIME
         MANAGE_CONSENSUS_CONTRACT_ROLE: *ORACLE_MANAGE_CONSENSUS_CONTRACT_ROLE
@@ -1704,7 +1726,7 @@ l1:
         *ORACLE_RESUME_ROLE : [*aragonAgent, *resealManager]
         *ORACLE_SUBMIT_DATA_ROLE : []
       implementationChecks:
-        DATA_FORMAT_LIST: *DATA_FORMAT_LIST
+        DATA_FORMAT_LIST: *VEB_DATA_FORMAT_LIST
         DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
         GENESIS_TIME: *GENESIS_TIME
         MANAGE_CONSENSUS_CONTRACT_ROLE: *ORACLE_MANAGE_CONSENSUS_CONTRACT_ROLE
@@ -2009,7 +2031,7 @@ l1:
         isPetrified: false
         supportRequiredPct: *VOTING_SUPPORT_REQUIRED_PCT
         token: *ldo
-        PCT_BASE: *PCT_BASE
+        PCT_BASE: *ONE_ETH_WEI
         isForwarder: true
         getEVMScriptExecutor: null
         getVoterState: null
@@ -2044,7 +2066,7 @@ l1:
         votesLength: 0
         supportRequiredPct: 0
         token: *ZERO_ADDRESS
-        PCT_BASE: 1000000000000000000
+        PCT_BASE: *ONE_ETH_WEI
         isForwarder: true
         getEVMScriptExecutor: null
         getRecoveryVault: null
@@ -2528,7 +2550,7 @@ l1:
       address: *gateSealWithdrawalQueue
       checks:
         get_sealing_committee: *resealCommittee
-        get_seal_duration_seconds: *DURATION_TWO_WEEKS
+        get_seal_duration_seconds: *DURATION_2_WEEKS
         get_sealables: [*withdrawalQueueERC721]
         get_expiry_timestamp: 1784217696
         is_expired: false
@@ -2538,7 +2560,7 @@ l1:
       address: *gateSealVaulthubAndPredepositGuarantee
       checks:
         get_sealing_committee: *resealCommittee
-        get_seal_duration_seconds: *DURATION_TWO_WEEKS
+        get_seal_duration_seconds: *DURATION_2_WEEKS
         get_sealables: [*vaultHub, *predepositGuarantee]
         get_expiry_timestamp: 1791454296
         is_expired: false
@@ -2548,7 +2570,7 @@ l1:
       address: *gateSealVEBAndTWG
       checks:
         get_sealing_committee: *resealCommittee
-        get_seal_duration_seconds: *DURATION_TWO_WEEKS
+        get_seal_duration_seconds: *DURATION_2_WEEKS
         get_sealables: [*triggerableWithdrawalsGateway, *validatorsExitBusOracle]
         get_expiry_timestamp: 1784217696
         is_expired: false
