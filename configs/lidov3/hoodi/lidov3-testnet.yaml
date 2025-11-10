@@ -1187,7 +1187,8 @@ l1:
         isVaultHealthyAsOfLatestReport: null
         latestReportData: null
         rebalanceShortfall: null
-        badDebtToInternalize: null
+        badDebtToInternalize: 0
+        badDebtToInternalizeForLastRefSlot: 0
         healthShortfallShares: null
         isPendingDisconnect: null
         isReportFresh: null
@@ -1244,6 +1245,7 @@ l1:
         latestReportData: null
         rebalanceShortfall: null
         badDebtToInternalize: null
+        badDebtToInternalizeForLastRefSlot: null
         healthShortfallShares: null
         isPendingDisconnect: null
         isReportFresh: null
@@ -1895,7 +1897,7 @@ l1:
         MAX_QUARANTINE_PERIOD: *DURATION_30_DAYS
         MAX_REWARD_RATIO: *MAX_REWARD_RATIO
         UPDATE_SANITY_PARAMS_ROLE: *UPDATE_SANITY_PARAMS_ROLE
-        batchValidatorStages: null
+        batchValidatorStatuses: null
         batchVaultsInfo: null
         getRoleAdmin: null
         getRoleMember: null
@@ -1911,6 +1913,7 @@ l1:
         vaultInfo: null
         vaultQuarantine: null
         vaultsCount: null
+        quarantineValue: null
       ozAcl:
         *DEFAULT_ADMIN_ROLE : [*aragonAgent]
         *UPDATE_SANITY_PARAMS_ROLE : [*aragonAgent] # WARNING: must be zero
@@ -1921,7 +1924,7 @@ l1:
         MAX_QUARANTINE_PERIOD: *DURATION_30_DAYS
         MAX_REWARD_RATIO: *MAX_REWARD_RATIO
         UPDATE_SANITY_PARAMS_ROLE: *UPDATE_SANITY_PARAMS_ROLE
-        batchValidatorStages: null
+        batchValidatorStatuses: null
         batchVaultsInfo: null
         getRoleAdmin: null
         getRoleMember: null
@@ -1937,7 +1940,7 @@ l1:
         vaultInfo: null
         vaultQuarantine: null
         vaultsCount: null
-
+        quarantineValue: null
     aragon-kernel:
       name: Kernel
       address: *aragonKernel
