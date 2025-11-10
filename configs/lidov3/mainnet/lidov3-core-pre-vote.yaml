@@ -1,11 +1,9 @@
 # yaml-language-server: $schema=../../schemas/main-schema.json
 
-# Source of truth: https://docs.lido.fi/deployed-contracts/hoodi/
+# Source of truth: https://docs.lido.fi/deployed-contracts/
 
 ---
 parameters:
-  - &contract7002 "0x00000961Ef480Eb55e80D19ad83579A64c007002"
-  - &contract7251 "0x0000BBdDc7CE488642fb579F8B00f3a590007251"
   - &contract4788 "0x000F3df6D732807Ef1319fB7B8bB8522d0Beac02"
   - &contractDeposit "0x00000000219ab540356cBB839Cbe05303d7705Fa"
 
@@ -118,10 +116,10 @@ deployed:
     - &callsScript "0x5cEb19e1890f677c3676d5ecDF7c501eBA01A054"
     - &vaultsAdapter "0x00000000000000000000000000000000544f444f" # TODO
 
-    # --- Dual Governance ---
+    # --- Committees (Safe msigs) ---
     - &resealManager "0x7914b5a1539b97Bd0bbd155757F25FD79A522d24"
-    - &dualGovernance "0xC1db28B3301331277e307FDCfF8DE28242A4486E"
     - &sealCommittee "0x8772E3a2D86B9347A2688f9bc1808A6d8917760C"
+    - &csmCommittee "0xC52fC3081123073078698F1EAc2f1Dc7Bd71880f"
 
 misc:
   # --- Chain and deployment constants ---
@@ -135,8 +133,10 @@ misc:
   - &LIDO_WITHDRAWAL_CREDENTIALS "0x010000000000000000000000b9d7934878b5fb9610b3fe8a5e441e8fad7e293f"
 
   # --- AO (Attestation Oracle) Versions ---
-  - &AO_CONSENSUS_VERSION 5
-  - &AO_CONTRACT_VERSION 4
+  - &AO_CONSENSUS_VERSION_NEW 5
+  - &AO_CONTRACT_VERSION_NEW 4
+  - &AO_CONSENSUS_VERSION_OLD 4
+  - &AO_CONTRACT_VERSION_OLD 3
 
   # --- Beacon/Genesis roots and validator info ---
   - &GI_FIRST_VALIDATOR_PREV "0x0000000000000000000000000000000000000000000000000096000000000028"
@@ -151,7 +151,6 @@ misc:
 
   # --- General numeric constants ---
   - &MAX_UINT256 "115792089237316195423570985008687907853269984665640564039457584007913129639935"
-  - &MAX_UINT64 "18446744073709551615"
   - &DECIMALS_18 18
 
   # --- EIP-712 domain separators ---
@@ -190,38 +189,42 @@ misc:
   - &DURATION_1_HOUR 3600
   - &DURATION_1_DAY 86400
   - &DURATION_2_WEEKS 1209600
+  - &DURATION_28_DAYS 2419200
   - &DURATION_30_DAYS 2592000
   - &DURATION_1_YEAR 31536000
 
   # --- Percentage bases & voting parameters ---
   - &VOTING_SUPPORT_REQUIRED_PCT 500000000000000000
   - &VOTING_MIN_ACCEPT_QUORUM_PCT 50000000000000000
-  - &VOTING_VOTE_TIME 900
-  - &VOTING_OBJECTION_PHASE_TIME 300
+  - &VOTING_VOTE_TIME 432000
+  - &VOTING_OBJECTION_PHASE_TIME 172800
 
   # --- Consensus and hash constants ---
   - &VEB_CONSENSUS_VERSION 4
   - &VEB_DATA_FORMAT_LIST 1
-  - &HASH_CONSENSUS_FAST_LANE 75
-  - &HC_AO_START 39833
-  - &HC_VEB_START 39843
-  - &HASH_CONSENSUS_QUORUM 6
+  - &HC_AO_FAST_LANE 100
+  - &HC_AO_START 201600
+  - &HC_AO_FRAME_EPOCHS 225
+  - &HC_VEB_START 201600
+  - &HC_VEB_FAST_LANE 100
+  - &HC_VEB_FRAME_EPOCHS 75
+  - &HASH_CONSENSUS_QUORUM 5
 
   # --- Node/operator limits ---
   - &MAX_NODE_OPERATORS_COUNT 200
   - &MAX_NODE_OPERATOR_NAME_LENGTH 255
 
   # --- EasyTrack motion limits ---
-  - &EASYTRACK_MIN_MOTION_DURATION 60
-  - &EASYTRACK_MOTION_DURATION 600
-  - &EASYTRACK_MAX_MOTIONS_LIMIT 255
-  - &EASYTRACK_MAX_OBJECTIONS_THRESHOLD 1000
-  - &EASYTRACK_MOTIONS_COUNT_LIMIT 24
+  - &EASYTRACK_MIN_MOTION_DURATION 172800
+  - &EASYTRACK_MOTION_DURATION 259200
+  - &EASYTRACK_MAX_MOTIONS_LIMIT 24
+  - &EASYTRACK_MAX_OBJECTIONS_THRESHOLD 500
+  - &EASYTRACK_MOTIONS_COUNT_LIMIT 20
   - &EASYTRACK_OBJECTIONS_THRESHOLD 50
 
   # --- Oracle/reporting ---
   - &MAX_POSITIVE_TOKEN_REBASE 750000 # Oracle limit
-  - &ORACLE_REPORT_LIMITS [9000, 43200, 1000, 50, 600, 8, 24, 128, 750000, 1000, 101, 50] # Configurable oracle report limits
+  - &ORACLE_REPORT_LIMITS [3600, 1800, 1000, 50, 600, 8, 24, 7680, 750000, 8, 101, 50] # Configurable oracle report limits
 
   # --- Proxy types ---
   - &PROXY_TYPE_APP_PROXY_UPGRADEABLE 2
@@ -978,7 +981,7 @@ l1:
         MANAGE_BOND_CURVES_ROLE: *CS_MANAGE_BOND_CURVES_ROLE
         MAX_BOND_LOCK_PERIOD: *DURATION_1_YEAR
         MAX_CURVE_LENGTH: *MAX_CURVE_LENGTH
-        MIN_BOND_LOCK_PERIOD: *DURATION_1_DAY
+        MIN_BOND_LOCK_PERIOD: *DURATION_28_DAYS
         MIN_CURVE_LENGTH: *MIN_CURVE_LENGTH
         MODULE: *CSModule
         PAUSE_INFINITELY: *MAX_UINT256
@@ -1021,9 +1024,9 @@ l1:
         supportsInterface: null
         totalBondShares: null
       ozAcl:
-        *DEFAULT_ADMIN_ROLE : [*aragonAgent, "0x4AF43Ee34a6fcD1fEcA1e1F832124C763561dA53"] # WARNING: who is this?
-        *CS_MANAGE_BOND_CURVES_ROLE : ["0x4AF43Ee34a6fcD1fEcA1e1F832124C763561dA53"] # WARNING: who is this?
-        *CS_SET_BOND_CURVE_ROLE : [*CSVettedGate, "0x4AF43Ee34a6fcD1fEcA1e1F832124C763561dA53"] # WARNING: who is this?
+        *DEFAULT_ADMIN_ROLE : [*aragonAgent]
+        *CS_MANAGE_BOND_CURVES_ROLE : []
+        *CS_SET_BOND_CURVE_ROLE : [*csmCommittee, *CSVettedGate]
         *CS_RECOVERER_ROLE : []
         *CS_RESUME_ROLE : [*resealManager]
         *CS_PAUSE_ROLE : [*resealManager, *gateSealCSAccounting]
@@ -1036,7 +1039,7 @@ l1:
         MANAGE_BOND_CURVES_ROLE: *CS_MANAGE_BOND_CURVES_ROLE
         MAX_BOND_LOCK_PERIOD: *DURATION_1_YEAR
         MAX_CURVE_LENGTH: *MAX_CURVE_LENGTH
-        MIN_BOND_LOCK_PERIOD: *DURATION_1_DAY
+        MIN_BOND_LOCK_PERIOD: *DURATION_28_DAYS
         MIN_CURVE_LENGTH: *MIN_CURVE_LENGTH
         MODULE: *CSModule
         PAUSE_INFINITELY: *MAX_UINT256
@@ -1111,8 +1114,8 @@ l1:
       address: *validatorExitDelayVerifier
       checks:
         BEACON_ROOTS: *contract4788
-        CAPELLA_SLOT: 0
-        FIRST_SUPPORTED_SLOT: 1
+        CAPELLA_SLOT: 6209536
+        FIRST_SUPPORTED_SLOT: 11649024
         GENESIS_TIME: *GENESIS_TIME
         GI_FIRST_BLOCK_ROOT_IN_SUMMARY_CURR: "0x000000000000000000000000000000000000000000000000000000000040000d"
         GI_FIRST_BLOCK_ROOT_IN_SUMMARY_PREV: "0x000000000000000000000000000000000000000000000000000000000040000d"
@@ -1121,7 +1124,7 @@ l1:
         GI_FIRST_VALIDATOR_CURR: *GI_FIRST_VALIDATOR_CURR
         GI_FIRST_VALIDATOR_PREV: *GI_FIRST_VALIDATOR_PREV
         LOCATOR: *lidoLocator
-        PIVOT_SLOT: 1
+        PIVOT_SLOT: 11649024
         SECONDS_PER_SLOT: *SECONDS_PER_SLOT
         SHARD_COMMITTEE_PERIOD_IN_SECONDS: *SHARD_COMMITTEE_PERIOD_IN_SECONDS
         SLOTS_PER_EPOCH: *SLOTS_PER_EPOCH
@@ -1570,8 +1573,8 @@ l1:
         MANAGE_CONSENSUS_VERSION_ROLE: *ORACLE_MANAGE_CONSENSUS_VERSION_ROLE
         SUBMIT_DATA_ROLE: *ORACLE_SUBMIT_DATA_ROLE
         getConsensusContract: *hashConsensusForAccountingOracle
-        getConsensusVersion: *AO_CONSENSUS_VERSION
-        getContractVersion: *AO_CONTRACT_VERSION
+        getConsensusVersion: *AO_CONSENSUS_VERSION_OLD
+        getContractVersion: *AO_CONTRACT_VERSION_OLD
         getConsensusReport: null
         getLastProcessingRefSlot: null
         getProcessingState: null
@@ -1580,6 +1583,8 @@ l1:
         getRoleMemberCount: null
         hasRole: null
         supportsInterface: null
+        LEGACY_ORACLE: *legacyOracle
+        LIDO: *lido
       ozAcl:
         *DEFAULT_ADMIN_ROLE : [*aragonAgent]
         *ORACLE_MANAGE_CONSENSUS_CONTRACT_ROLE : []
@@ -1625,8 +1630,8 @@ l1:
           - *GENESIS_TIME
         getFrameConfig:
           - *HC_AO_START
-          - *HASH_CONSENSUS_FAST_LANE
-          - *SLOTS_PER_EPOCH
+          - *HC_AO_FRAME_EPOCHS
+          - *HC_AO_FAST_LANE
         getQuorum: *HASH_CONSENSUS_QUORUM
         getReportProcessor: *accountingOracle
         getConsensusState: null
@@ -1698,7 +1703,7 @@ l1:
         *ORACLE_MANAGE_CONSENSUS_CONTRACT_ROLE : []
         *ORACLE_MANAGE_CONSENSUS_VERSION_ROLE : []
         *ORACLE_PAUSE_ROLE : [*resealManager, *gateSealVEBAndTWG]
-        *ORACLE_RESUME_ROLE : [*aragonAgent, *resealManager]
+        *ORACLE_RESUME_ROLE : [*resealManager]
         *ORACLE_SUBMIT_DATA_ROLE : []
       implementationChecks:
         DATA_FORMAT_LIST: *VEB_DATA_FORMAT_LIST
@@ -1743,8 +1748,8 @@ l1:
           - *GENESIS_TIME
         getFrameConfig:
           - *HC_VEB_START
-          - *HASH_CONSENSUS_FAST_LANE
-          - *SLOTS_PER_EPOCH
+          - *HC_VEB_FRAME_EPOCHS
+          - *HC_VEB_FAST_LANE
         getQuorum: *HASH_CONSENSUS_QUORUM
         getReportProcessor: *validatorsExitBusOracle
         getConsensusState: null
@@ -1833,17 +1838,13 @@ l1:
           - args: ["REBASE_CHECK_NEAREST_EPOCH_DISTANCE"]
             result: 0x01
           - args: ["REBASE_CHECK_DISTANT_EPOCH_DISTANCE"]
-            result: 0x02
+            result: 0x17
           - args: ["PREDICTION_DURATION_IN_SLOTS"]
             result: 0xc4e0
           - args: ["FINALIZATION_MAX_NEGATIVE_REBASE_EPOCH_SHIFT"]
-            result: 0x0546
+            result: 0x08ca
           - args: ["EXIT_EVENTS_LOOKBACK_WINDOW_IN_SLOTS"]
             result: 0x0189c0
-          - args: ["SLASHING_RESERVE_WE_RIGHT_SHIFT"]
-            result: 0x2000
-          - args: ["SLASHING_RESERVE_WE_LEFT_SHIFT"]
-            result: 0x2000
         getList: null
         getRoleAdmin: null
         getRoleMember: null
@@ -1923,14 +1924,14 @@ l1:
         apps: null
         isDepositable: false
         implementation: *aragonKernelImplAddress
-        recoveryVaultAppId: "0x701a4fd1f5174d12a0f1d9ad2c88d0ad11ab6aad0ac72b7d9ce621815f8016a9"
+        recoveryVaultAppId: *ZERO_ADDRESS
       checks:
         hasInitialized: true
         KERNEL_APP_ID: *KERNEL_APP_ID
         APP_ADDR_NAMESPACE: "0xd6f028ca0e8edb4a8c9757ca4fdccab25fa1e0317da1188108f7d2dee14902fb"
         getRecoveryVault: *ZERO_ADDRESS
         CORE_NAMESPACE: "0xc681a85306374a5ab27f0bbc385296a54bcd314a1948b6cf61c4ea1bc44bb9f8"
-        recoveryVaultAppId: "0x701a4fd1f5174d12a0f1d9ad2c88d0ad11ab6aad0ac72b7d9ce621815f8016a9"
+        recoveryVaultAppId: *ZERO_ADDRESS
         getInitializationBlock: 11473216
         APP_MANAGER_ROLE: "0xb6d92708f3d4817afc106147d969e229ced5c46e65e0a5002a0d391287762bd0"
         APP_BASES_NAMESPACE: "0xf1f3eb40f5bc1ad1344716ced8b8a0431d840b5783aea1fd01786bc26f35ac0f"
@@ -1963,15 +1964,15 @@ l1:
       name: MiniMeToken
       address: *ldo
       checks:
-        name: "TEST Lido DAO Token"
-        totalSupply: "1000000000000000000000000"
+        name: "Lido DAO Token"
+        totalSupply: "1000000000000000000000000000"
         decimals: *DECIMALS_18
         version: "MMT_0.1"
         parentToken: *ZERO_ADDRESS
-        symbol: "TLDO"
+        symbol: "LDO"
         transfersEnabled: true
         parentSnapShotBlock: 0
-        tokenFactory: "0x8B608E59aC132075248Ee090A6713D0074CF5f95"
+        tokenFactory: "0x909d05F384D0663eD4BE59863815aB43b4f347Ec"
         controller: *aragonTokenManager
         creationBlock: null
         balanceOfAt: null
@@ -2134,17 +2135,17 @@ l1:
         getRecoveryVault: *ZERO_ADDRESS
         CHANGE_PERIOD_ROLE: "0xd35e458bacdd5343c2f050f574554b2f417a8ea38d6a9a65ce2225dbe8bb9a9d"
         CHANGE_BUDGETS_ROLE: "0xd79730e82bfef7d2f9639b9d10bf37ebb662b22ae2211502a00bdf7b2cc3a23a"
-        periodsLength: 1
+        periodsLength: 60
         appId: *FINANCE_APP_ID
         EXECUTE_PAYMENTS_ROLE: "0x563165d3eae48bcb0a092543ca070d989169c98357e9a1b324ec5da44bab75fd"
-        currentPeriodId: 0
+        currentPeriodId: 59
         getEVMScriptRegistry: *aragonEvmScriptRegistry
         getPeriodDuration: *DURATION_30_DAYS
         kernel: *aragonKernel
         paymentsNextIndex: 1
         isPetrified: false
         MANAGE_PAYMENTS_ROLE: "0x30597dd103acfaef0649675953d9cb22faadab7e9d9ed57acc1c429d04b80777"
-        transactionsNextIndex: 1
+        transactionsNextIndex: 649
         vault: *aragonAgent
         getBudget: null
         getEVMScriptExecutor: null
@@ -2215,7 +2216,7 @@ l1:
         DESIGNATE_SIGNER_ROLE: "0x23ce341656c3f14df6692eebd4757791e33662b7dcf9970c8308303da5472b7c"
         EXECUTE_ROLE: "0xcebf517aa4440d1d125e0355aae64401211d0848a23c02cc5d29a14822580ba4"
         appId: *AGENT_APP_ID
-        getInitializationBlock: 727
+        getInitializationBlock: 11473216
         ERC1271_RETURN_VALID_SIGNATURE: "0x20c13b0b"
         getEVMScriptRegistry: *aragonEvmScriptRegistry
         designatedSigner: *ZERO_ADDRESS
@@ -2338,7 +2339,7 @@ l1:
         REGISTRY_ADD_EXECUTOR_ROLE: "0xc4e90f38eea8c4212a009ca7b8947943ba4d4a58d19b683417f65291d1cd9ed2"
         getRecoveryVault: *ZERO_ADDRESS
         appId: "0xddbcfd564f642ab5627cf68b9b7d374fb4f8a36e941a75d89c87998cef03bd61"
-        getInitializationBlock: 727
+        getInitializationBlock: 11473216
         getEVMScriptRegistry: *aragonEvmScriptRegistry
         REGISTRY_MANAGER_ROLE: "0xf7a450ef335e1892cb42c8ca72e7242359d7711924b75db5717410da3f614aa3"
         kernel: *aragonKernel
@@ -2414,7 +2415,7 @@ l1:
         get_sealing_committee: *sealCommittee
         get_seal_duration_seconds: *DURATION_2_WEEKS
         get_sealables: [*withdrawalQueueERC721]
-        get_expiry_timestamp: 1784217696
+        get_expiry_timestamp: 1789207187
         is_expired: false
 
     # gateSealVaulthubAndPredepositGuarantee:
@@ -2434,7 +2435,7 @@ l1:
         get_sealing_committee: *sealCommittee
         get_seal_duration_seconds: *DURATION_2_WEEKS
         get_sealables: [*triggerableWithdrawalsGateway, *validatorsExitBusOracle]
-        get_expiry_timestamp: 1784217696
+        get_expiry_timestamp: 1789207187
         is_expired: false
 
     node-operators-registry:
