@@ -1,6 +1,14 @@
 # yaml-language-server: $schema=../../schemas/main-schema.json
 
 # Source of truth: https://docs.lido.fi/deployed-contracts/hoodi/
+
+---
+parameters:
+  - &contract7002 "0x00000961Ef480Eb55e80D19ad83579A64c007002"
+  - &contract7251 "0x0000BBdDc7CE488642fb579F8B00f3a590007251"
+  - &contract4788 "0x000F3df6D732807Ef1319fB7B8bB8522d0Beac02"
+  - &contractDeposit "0x00000000219ab540356cBB839Cbe05303d7705Fa"
+
 deployed:
   l1:
     # --- Core protocol ---
@@ -22,14 +30,17 @@ deployed:
     - &withdrawalVault "0xb9d7934878b5fb9610b3fe8a5e441e8fad7e293f"
     - &withdrawalVaultImplAddress "0x7D2BAa6094E1C4B60Da4cbAF4A77C3f4694fD53D"
     - &accounting "" # TODO
-    - &accountingImplAddress "" # TODO
-    - &oldBurner "0xb2c99cd38a2636a6281a849C8de938B3eF4A7C3D"
+    - &accountingNewImplAddress "" # TODO
+    - &oldBurner "0xD15a672319Cf0352560eE76d9e89eAB0889046D3"
     - &newBurder "" # TODO
-    - &burnerNewImplAddress "" # TODO
+    - &newBurnderImplAddress "" # TODO
+    - &mevBoostRelayAllowedList "0xF95f069F9AD107938F6ba802a3da87892298610E"
     - &minFirstAllocationStrategy "0x7e70De6D1877B3711b2bEDa7BA00013C7142d993"
-    - &mevBoostRelayAllowedList "0xF95f069F9AD107938F6ba802a3da87892298610E" # TODO: add checks ?
     - &triggerableWithdrawalsGateway "0xDC00116a0D3E064427dA2600449cfD2566B3037B"
     - &validatorExitDelayVerifier "0xbDb567672c867DB533119C2dcD4FB9d8b44EC82f"
+
+    # --- stVaults system contracts ---
+
     - &vaultHub "" # TODO
     - &vaultHubImplAddress "" # TODO
     - &predepositGuarantee "" # TODO
@@ -52,14 +63,14 @@ deployed:
     - &hashConsensusForAccountingOracle "0xD624B08C83bAECF0807Dd2c6880C3154a5F0B288"
 
     - &validatorsExitBusOracle "0x0De4Ea0184c2ad0BacA7183356Aea5B8d5Bf5c6e"
-    - &validatorsExitBusOracleOldImplAddress "0x905A211eD6830Cfc95643f0bE2ff64E7f3bf9b94"
-    - &validatorsExitBusOracleNewImplAddress "" # TODO
+    - &validatorsExitBusOracleImplAddress "0x905A211eD6830Cfc95643f0bE2ff64E7f3bf9b94"
     - &hashConsensusForValidatorsExitBusOracle "0x7FaDB6358950c5fAA66Cb5EB8eE5147De3df355a"
-    - &oracleReportSanityCheckerOld "0x6232397ebac4f5772e53285b26c47914e9461e75"
-    - &oracleReportSanityCheckerNew "" # TODO
+    - &oldOracleReportSanityChecker "0x6232397ebac4f5772e53285b26c47914e9461e75"
+    - &newOracleReportSanityChecker "" # TODO
     - &oracleDaemonConfig "0xbf05A929c3D7885a6aeAd833a992dA6E5ac23b09"
     - &lazyOracle "" # TODO
     - &lazyOracleImplAddress "" # TODO
+    - &tokenRateNotifier "0xe6793B9e4FbA7DE0ee833F9D02bba7DB5EB27823"
 
     # --- DAO & Aragon apps ---
     - &aragonRepoBase "0xa8A358E9bbB9fF60D4B89CBE5b2FE88f98b51B9D"
@@ -76,8 +87,6 @@ deployed:
     - &aragonAgentImplAddress "0x3A93C17FC82CC33420d1809dDA9Fb715cc89dd37"
     - &aragonAcl "0x9895F0F17cc1d1891b6f18ee0b483B6f221b37Bb"
     - &aragonAclImplAddress "0x9f3b9198911054B122fDb865f8A5Ac516201c339"
-    - &aragonVotingRepo "0x4ee3118e3858e8d7164a634825bfe0f73d99c792" # TODO: add checks
-    - &aragonLidoAppRepo "0xF5Dc67E54FC96F993CD06073f71ca732C1E654B1" # TODO: add checks
     - &aragonEvmScriptRegistry "0x853cc0D5917f49B57B8e9F89e491F5E18919093A"
     - &aragonEvmScriptRegistryImplAddress "0xBF1Ce0Bc4EdaAD8e576b3b55e19c4C15Cf6999eb"
 
@@ -109,24 +118,24 @@ deployed:
 
     # --- Dual Governance ---
     - &resealManager "0x7914b5a1539b97Bd0bbd155757F25FD79A522d24"
+    - &dualGovernance "0xC1db28B3301331277e307FDCfF8DE28242A4486E"
 
 misc:
   # --- Chain and deployment constants ---
   - &CHAIN_ID "1"
-  - &GENESIS_TIME "1742213400"
-  - &DEPOSIT_CONTRACT "0x00000000219ab540356cBB839Cbe05303d7705Fa"
-  - &DEPOSIT_DOMAIN "0x03000000719103511efa4f1362ff2a50996cccf329cc84cb410c5e5c7d351d03"
+  - &GENESIS_TIME "1606824023"
+  - &DEPOSIT_DOMAIN "0x0000000000000000000000000000000000000000000000000000000000000000"
 
   # --- Lido versioning and credentials ---
-  - &LIDO_VERSION 3
-  - &LIDO_WITHDRAWAL_CREDENTIALS "0x0100000000000000000000004473dcddbf77679a643bdb654dbd86d67f8d32f2"
+  - &LIDO_VERSION_OLD 2
+  - &LIDO_VERSION_NEW 3
+  - &LIDO_WITHDRAWAL_CREDENTIALS "0x010000000000000000000000b9d7934878b5fb9610b3fe8a5e441e8fad7e293f"
 
   # --- AO (Attestation Oracle) Versions ---
   - &AO_CONSENSUS_VERSION 5
   - &AO_CONTRACT_VERSION 4
 
   # --- Beacon/Genesis roots and validator info ---
-  - &BEACON_ROOTS "0x000F3df6D732807Ef1319fB7B8bB8522d0Beac02"
   - &GI_FIRST_VALIDATOR_PREV "0x0000000000000000000000000000000000000000000000000096000000000028"
   - &GI_FIRST_VALIDATOR_CURR "0x0000000000000000000000000000000000000000000000000096000000000028"
   - &GI_PUBKEY_WC_PARENT "0x0000000000000000000000000000000000000000000000000000000000000402"
@@ -143,15 +152,15 @@ misc:
   - &DECIMALS_18 18
 
   # --- EIP-712 domain separators ---
-  - &LIDO_DOMAIN_SEPARATOR "0x184cb04a1e003ce18451fff652ee914c2df2dafa833a0786d1b38edcecf6f30d"
-  - &WSTETH_DOMAIN_SEPARATOR "0x3c9e03f12de3da07e25447fc3360a27c7953822d198c14bd480bba6f03d99a22"
+  - &LIDO_DOMAIN_SEPARATOR "0x260e7e1a220ea89b9454cbcdc1fcc44087325df199a3986e560d75db18b2e253"
+  - &WSTETH_DOMAIN_SEPARATOR "0xd4a8ff90a402dc7d4fcbf60f5488291263c743ccff180e139f47d139cedfd5fe"
 
   # --- Protocol and token configuration ---
   - &LIDO_NAME "Liquid staked Ether 2.0"
   - &LIDO_SYMBOL "stETH"
   - &WSTETH_NAME "Wrapped liquid staked Ether 2.0"
   - &WSTETH_SYMBOL "wstETH"
-  - &LIDO_MAX_EXTERNAL_RATIO_BP 3000
+  - &LIDO_MAX_EXTERNAL_RATIO_BP 300 # 3% cap as of stage 1
   - &TOTAL_BASIS_POINTS 10000
   - &FEE_PRECISION_POINTS 100000000000000000000
   - &MAX_BATCHES_LENGTH 36
@@ -238,12 +247,7 @@ misc:
   - &MAX_REWARD_RATIO 65535
 
 eoa:
-  - &depositSecurityModule "0x2F0303F20E0795E6CCd17BD5efE791A586f28E03"
-  - &deployer "0x83BCE68B4e8b7071b2a664a26e6D3Bc17eEe3102"
-  - &superManager "0xE28f573b732632fdE03BD5507A7d475383e8512E"
-  - &oracleManager "0x4022E0754d0cB6905B54306105D3346d1547988b"
-  - &nomManager "0xF865A1d43D36c713B4DA085f32b7d1e9739B9275"
-  - &resealCommittee "0x83BCE68B4e8b7071b2a664a26e6D3Bc17eEe3102" # WARNING: same as deployer!
+  - &deployer "0xAD2F7e30AeA89f6D45D942D0f52aFB8B395965f2"
 
 roles:
   # Lido
@@ -379,8 +383,8 @@ roles:
   - &CS_PAUSE_ROLE "0x139c2898040ef16910dc9f44dc697df79363da767d8bc92f2e310312b816e46d"
 
 l1:
-  rpcUrl: HOODI_REMOTE_RPC_URL # https://ethereum-hoodi-rpc.publicnode.com
-  explorerHostname: api-hoodi.etherscan.io
+  rpcUrl: REMOTE_RPC_URL # https://ethereum-rpc.publicnode.com
+  explorerHostname: api.etherscan.io
   explorerTokenEnv: ETHERSCAN_TOKEN
   chainId: *CHAIN_ID
   contracts:
@@ -388,18 +392,18 @@ l1:
       name: LidoLocator
       address: *lidoLocator
       proxyName: OssifiableProxy
-      implementation: *lidoLocatorImplAddress
+      implementation: *lidoLocatorOldImplAddress
       proxyChecks:
         proxy__getAdmin: *aragonAgent
-        proxy__getImplementation: *lidoLocatorImplAddress
+        proxy__getImplementation: *lidoLocatorOldImplAddress
         proxy__getIsOssified: false
       checks:
         accounting: *accounting
         accountingOracle: *accountingOracle
-        burner: *burner
+        burner: *oldBurner
         coreComponents:
           - *executionLayerRewardsVault
-          - *oracleReportSanityChecker
+          - *oldOracleReportSanityChecker
           - *stakingRouter
           - *aragonAgent
           - *withdrawalQueueERC721
@@ -411,33 +415,29 @@ l1:
         oracleDaemonConfig: *oracleDaemonConfig
         oracleReportComponents:
           - *accountingOracle
-          - *oracleReportSanityChecker
-          - *burner
+          - *oldOracleReportSanityChecker
+          - *oldBurner
           - *withdrawalQueueERC721
-          - *ZERO_ADDRESS
+          - *tokenRateNotifier
           - *stakingRouter
           - *vaultHub
-        oracleReportSanityChecker: *oracleReportSanityChecker
-        postTokenRebaseReceiver: *ZERO_ADDRESS
-        predepositGuarantee: *predepositGuarantee
-        lazyOracle: *lazyOracle
+        oracleReportSanityChecker: *oldOracleReportSanityChecker
+        postTokenRebaseReceiver: *tokenRateNotifier
         triggerableWithdrawalsGateway: *triggerableWithdrawalsGateway
         validatorExitDelayVerifier: *validatorExitDelayVerifier
-        vaultFactory: *stakingVaultFactory
         stakingRouter: *stakingRouter
         treasury: *aragonAgent
         validatorsExitBusOracle: *validatorsExitBusOracle
-        vaultHub: *vaultHub
         withdrawalQueue: *withdrawalQueueERC721
         withdrawalVault: *withdrawalVault
         wstETH: *wstETH
       implementationChecks:
         accounting: *accounting
         accountingOracle: *accountingOracle
-        burner: *burner
+        burner: *oldBurner
         coreComponents:
           - *executionLayerRewardsVault
-          - *oracleReportSanityChecker
+          - *oldOracleReportSanityChecker
           - *stakingRouter
           - *aragonAgent
           - *withdrawalQueueERC721
@@ -449,23 +449,19 @@ l1:
         oracleDaemonConfig: *oracleDaemonConfig
         oracleReportComponents:
           - *accountingOracle
-          - *oracleReportSanityChecker
-          - *burner
+          - *oldOracleReportSanityChecker
+          - *oldBurner
           - *withdrawalQueueERC721
-          - *ZERO_ADDRESS
+          - *tokenRateNotifier
           - *stakingRouter
           - *vaultHub
-        oracleReportSanityChecker: *oracleReportSanityChecker
-        postTokenRebaseReceiver: *ZERO_ADDRESS
-        predepositGuarantee: *predepositGuarantee
-        lazyOracle: *lazyOracle
+        oracleReportSanityChecker: *oldOracleReportSanityChecker
+        postTokenRebaseReceiver: *tokenRateNotifier
         triggerableWithdrawalsGateway: *triggerableWithdrawalsGateway
         validatorExitDelayVerifier: *validatorExitDelayVerifier
-        vaultFactory: *stakingVaultFactory
         stakingRouter: *stakingRouter
         treasury: *aragonAgent
         validatorsExitBusOracle: *validatorsExitBusOracle
-        vaultHub: *vaultHub
         withdrawalQueue: *withdrawalQueueERC721
         withdrawalVault: *withdrawalVault
         wstETH: *wstETH
@@ -474,11 +470,11 @@ l1:
       name: Lido
       address: *lido
       proxyName: AppProxyUpgradeable
-      implementation: *lidoImplAddress
+      implementation: *lidoOldImplAddress
       proxyChecks:
         proxyType: *PROXY_TYPE_APP_PROXY_UPGRADEABLE
         isDepositable: false
-        implementation: *lidoImplAddress
+        implementation: *lidoOldImplAddress
         appId: *LIDO_APP_ID
         kernel: *aragonKernel
       checks:
@@ -498,7 +494,7 @@ l1:
           - *EIP712_VERSION
           - *CHAIN_ID
           - *lido
-        getContractVersion: *LIDO_VERSION
+        getContractVersion: *LIDO_VERSION_OLD
         symbol: *LIDO_SYMBOL
         getEIP712StETH: *eip712StETH
         getEVMScriptRegistry: *aragonEvmScriptRegistry
@@ -515,18 +511,13 @@ l1:
           - result: true
             args: [*ldo]
         getInitializationBlock: 764
-        getMaxExternalRatioBP: *LIDO_MAX_EXTERNAL_RATIO_BP # <-- V3 critical parameter
         getFee: 999
-        getMaxMintableExternalShares: null
-        getExternalEther: null
-        getPooledEthBySharesRoundUp: null
         totalSupply: null
         getSharesByPooledEth: null
         getEVMScriptExecutor: null
         getTotalPooledEther: null
         getBufferedEther: null
         getCurrentStakeLimit: null
-        getExternalShares: null
         getStakeLimitFullInfo: null
         balanceOf: null
         getFeeDistribution: null
@@ -581,13 +572,10 @@ l1:
           - mustRevert: true # due to zero kernel
         getFee:
           - mustRevert: true # due to zero staking router due to zero locator
-        getExternalEther:
-          - mustRevert: true # due to division by zero in "(externalShares * _internalEther) / internalShares"
         getDepositableEther:
           - mustRevert: true # due to zero withdrawal queue due to zero locator
         totalSupply:
           - mustRevert: true # due to division by zero in _getTotalPooledEther in getExternalEther
-        getPooledEthBySharesRoundUp: null
         getSharesByPooledEth: null
         getEVMScriptExecutor: null
         getWithdrawalCredentials: null
@@ -710,7 +698,7 @@ l1:
         *MANAGE_WITHDRAWAL_CREDENTIALS_ROLE : []
         *REPORT_EXITED_VALIDATORS_ROLE : [*accountingOracle]
         *REPORT_REWARDS_MINTED_ROLE : [*accounting]
-        *STAKING_MODULE_MANAGE_ROLE : [*aragonAgent, *superManager]
+        *STAKING_MODULE_MANAGE_ROLE : [*aragonAgent]
         *STAKING_MODULE_UNVETTING_ROLE : [*depositSecurityModule]
         *UNSAFE_SET_EXITED_VALIDATORS_ROLE : []
       implementationChecks:
@@ -723,7 +711,7 @@ l1:
         UNSAFE_SET_EXITED_VALIDATORS_ROLE: *UNSAFE_SET_EXITED_VALIDATORS_ROLE
         REPORT_VALIDATOR_EXITING_STATUS_ROLE: *REPORT_VALIDATOR_EXITING_STATUS_ROLE
         REPORT_VALIDATOR_EXIT_TRIGGERED_ROLE: *REPORT_VALIDATOR_EXIT_TRIGGERED_ROLE
-        DEPOSIT_CONTRACT: *DEPOSIT_CONTRACT
+        DEPOSIT_CONTRACT: *contractDeposit
         FEE_PRECISION_POINTS: *FEE_PRECISION_POINTS
         MAX_STAKING_MODULES_COUNT: *MAX_STAKING_MODULES_COUNT
         MAX_STAKING_MODULE_NAME_LENGTH: *MAX_STAKING_MODULE_NAME_LENGTH
