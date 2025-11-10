@@ -24,7 +24,6 @@ deployed:
     - &l1OpStackTokenRatePusher "0x4067B05a6B2f6801Bfb8d4fF417eD32e71c216d9"
     - &lidoLocatorImpl "0x314Ab8D774c0580942E832f971Bbc7A27B1c2552"
 
-
   l2:
     - &l2GovernanceExecutor "0xf695357C66bA514150Da95b189acb37b46DDe602"
     - &l2TokenBridge "0xdBA2760246f315203F8B716b3a7590F0FFdc704a"
@@ -49,7 +48,6 @@ misc:
   - &withdrawalQueue "0x1583C7b3f4C3B008720E6BcE5726336b0aB25fdd"
   - &withdrawalVault "0xDe7318Afa67eaD6d6bbC8224dfCe5ed6e4b86d76"
   - &oracleDaemonConfig "0x7bC76076b0f3879b4A750450C0Ccf02c6Ca11220"
-
 
 roles:
   - &DEFAULT_ADMIN_ROLE "0x0000000000000000000000000000000000000000000000000000000000000000"
@@ -120,8 +118,8 @@ l1:
         REQUIRED_INTERFACE: "0xa16ba44d"
         observersLength: 1
         observers:
-            args: [0]
-            result: *l1OpStackTokenRatePusher
+          args: [0]
+          result: *l1OpStackTokenRatePusher
     opStackTokenRatePusher:
       name: OpStackTokenRatePusher
       address: *l1OpStackTokenRatePusher
@@ -135,7 +133,7 @@ l1:
         SECONDS_PER_SLOT: 12
         TOKEN_RATE_DECIMALS: 27
         supportsInterface:
-          - args: [ "0x01ffc9a7" ] # IERC165
+          - args: ["0x01ffc9a7"] # IERC165
             result: true
     tokenBridge:
       name: L1LidoTokensBridge
@@ -168,7 +166,7 @@ l1:
         TOKEN_RATE_DECIMALS: 27
         getContractVersion: 2
         supportsInterface:
-          - args: [ "0x01ffc9a7" ] # IERC165
+          - args: ["0x01ffc9a7"] # IERC165
             result: true
         hasRole:
           - args: [*DEFAULT_ADMIN_ROLE, "0x0000000000000000000000000000000000000000"]
@@ -241,7 +239,7 @@ l2:
         isLikelyOutdated: null
         isTokenRateUpdatesPaused: false
         supportsInterface:
-          - args: [ "0x01ffc9a7" ] # IERC165
+          - args: ["0x01ffc9a7"] # IERC165
             result: true
         hasRole:
           - args: [*DEFAULT_ADMIN_ROLE, "0x0000000000000000000000000000000000000000"]
@@ -336,7 +334,7 @@ l2:
         WITHDRAWALS_ENABLER_ROLE: *WITHDRAWALS_ENABLER_ROLE
         getContractVersion: 2
         supportsInterface:
-          - args: [ "0x01ffc9a7" ] # IERC165
+          - args: ["0x01ffc9a7"] # IERC165
             result: true
         getRoleAdmin: null
         hasRole:

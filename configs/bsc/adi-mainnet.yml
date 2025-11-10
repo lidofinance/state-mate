@@ -74,17 +74,16 @@ l1:
   explorerHostname: api.etherscan.io
   explorerTokenEnv: ETHERSCAN_TOKEN
   contracts:
-
     proxyAdmin:
       name: "ProxyAdmin"
       address: *ethProxyAdmin
       checks:
         owner: *ETH_DAO_AGENT
         getProxyAdmin:
-          - args: [ *ethCCC ]
+          - args: [*ethCCC]
             result: *ethProxyAdmin
         getProxyImplementation:
-          - args: [ *ethCCC ]
+          - args: [*ethCCC]
             result: *ethCCCImp
 
     crossChainController:
@@ -92,69 +91,70 @@ l1:
       address: *ethCCC
       proxyName: TransparentUpgradeableProxy
       implementation: *ethCCCImp
-      proxyChecks: { }
+      proxyChecks: {}
       checks:
         owner: *ETH_DAO_AGENT
         guardian: *ZERO_ADDRESS
         # CrossChainReceiver
         getReceiverBridgeAdaptersByChain:
-          - args: [ *BNB_CHAIN_ID ]
-            result: [ ]
-        getSupportedChains: [ ]
+          - args: [*BNB_CHAIN_ID]
+            result: []
+        getSupportedChains: []
         getConfigurationByChain:
-          - args: [ *BNB_CHAIN_ID ]
+          - args: [*BNB_CHAIN_ID]
             result: { requiredConfirmation: 0, validityTimestamp: *VALIDITY_TIMESTAMP }
         isReceiverBridgeAdapterAllowed:
-          - args: [ *ethCCIPAdapter, *BNB_CHAIN_ID ]
+          - args: [*ethCCIPAdapter, *BNB_CHAIN_ID]
             result: false
-          - args: [ *ethHLAdapter, *BNB_CHAIN_ID ]
+          - args: [*ethHLAdapter, *BNB_CHAIN_ID]
             result: false
-          - args: [ *ethLZAdapter, *BNB_CHAIN_ID ]
+          - args: [*ethLZAdapter, *BNB_CHAIN_ID]
             result: false
-          - args: [ *ethWormholeAdapter, *BNB_CHAIN_ID ]
+          - args: [*ethWormholeAdapter, *BNB_CHAIN_ID]
             result: false
         getTransactionState: # no real transactions yet
-          - args: [ *ZERO_BYTES32 ]
+          - args: [*ZERO_BYTES32]
             signature: "getTransactionState(bytes32)"
             result: { confirmations: 0, firstBridgedAt: 0 }
         getEnvelopeState:
-          - args: [ *ZERO_BYTES32 ]
+          - args: [*ZERO_BYTES32]
             signature: "getEnvelopeState(bytes32)"
             result: 0
         isTransactionReceivedByAdapter:
-          - args: [ *ZERO_BYTES32, *ethCCIPAdapter ]
+          - args: [*ZERO_BYTES32, *ethCCIPAdapter]
             result: false
-          - args: [ *ZERO_BYTES32, *ethHLAdapter ]
+          - args: [*ZERO_BYTES32, *ethHLAdapter]
             result: false
-          - args: [ *ZERO_BYTES32, *ethLZAdapter ]
+          - args: [*ZERO_BYTES32, *ethLZAdapter]
             result: false
-          - args: [ *ZERO_BYTES32, *ethWormholeAdapter ]
+          - args: [*ZERO_BYTES32, *ethWormholeAdapter]
             result: false
         # CrossChainForwarder
         getCurrentEnvelopeNonce: *ETH_CCC_ENVELOPE_NONCE
         getCurrentTransactionNonce: *ETH_CCC_TRANSACTION_NONCE
         isEnvelopeRegistered:
-          - args: [ *ZERO_BYTES32 ]
+          - args: [*ZERO_BYTES32]
             signature: "isEnvelopeRegistered(bytes32)"
             result: false
         isTransactionForwarded:
-          - args: [ *ZERO_BYTES32 ]
+          - args: [*ZERO_BYTES32]
             signature: "isTransactionForwarded(bytes32)"
             result: false
         getForwarderBridgeAdaptersByChain:
-          - args: [ *BNB_CHAIN_ID ]
-            result: [
-              [ *bnbCCIPAdapter, *ethCCIPAdapter ],
-              [ *bnbLZAdapter, *ethLZAdapter ],
-              [ *bnbHLAdapter, *ethHLAdapter ],
-              [ *bnbWormholeAdapter, *ethWormholeAdapter ],
-            ]
+          - args: [*BNB_CHAIN_ID]
+            result:
+              [
+                [*bnbCCIPAdapter, *ethCCIPAdapter],
+                [*bnbLZAdapter, *ethLZAdapter],
+                [*bnbHLAdapter, *ethHLAdapter],
+                [*bnbWormholeAdapter, *ethWormholeAdapter],
+              ]
         isSenderApproved:
-          - args: [ *ETH_DAO_AGENT_MOCK ]
+          - args: [*ETH_DAO_AGENT_MOCK]
             result: false
-          - args: [ *ETH_DAO_AGENT ]
+          - args: [*ETH_DAO_AGENT]
             result: true
-          - args: [ *ZERO_ADDRESS ]
+          - args: [*ZERO_ADDRESS]
             result: false
         whoCanRescue: *ETH_DAO_AGENT
       implementationChecks:
@@ -174,18 +174,18 @@ l1:
         LINK_TOKEN: "0x514910771AF9Ca656af840dff83E8264EcF986CA"
         adapterName: "CCIP adapter"
         getTrustedRemoteByChainId:
-          - args: [ *BNB_CHAIN_ID ]
+          - args: [*BNB_CHAIN_ID]
             result: *ZERO_ADDRESS
         infraToNativeChainId:
-          - args: [ *BNB_CHAIN_ID ]
+          - args: [*BNB_CHAIN_ID]
             result: *CCIP_BNB_CHAIN_ID
         nativeToInfraChainId:
-          - args: [ *CCIP_BNB_CHAIN_ID ]
+          - args: [*CCIP_BNB_CHAIN_ID]
             result: *BNB_CHAIN_ID
         supportsInterface:
-          - args: [ "0x01ffc9a7" ] # IERC165
+          - args: ["0x01ffc9a7"] # IERC165
             result: true
-          - args: [ "0x85572ffb" ] # IAny2EVMMessageReceiver
+          - args: ["0x85572ffb"] # IAny2EVMMessageReceiver
             result: true
 
     # https://docs.hyperlane.xyz/docs/reference/contract-addresses
@@ -198,13 +198,13 @@ l1:
         CROSS_CHAIN_CONTROLLER: *ethCCC
         adapterName: "Hyperlane adapter"
         getTrustedRemoteByChainId:
-          - args: [ *BNB_CHAIN_ID ]
+          - args: [*BNB_CHAIN_ID]
             result: *ZERO_ADDRESS
         infraToNativeChainId:
-          - args: [ *BNB_CHAIN_ID ]
+          - args: [*BNB_CHAIN_ID]
             result: *BNB_CHAIN_ID
         nativeToInfraChainId:
-          - args: [ *BNB_CHAIN_ID ]
+          - args: [*BNB_CHAIN_ID]
             result: *BNB_CHAIN_ID
 
     # https://docs.layerzero.network/v2/developers/evm/technical-reference/endpoints
@@ -217,19 +217,19 @@ l1:
         CROSS_CHAIN_CONTROLLER: *ethCCC
         adapterName: "LayerZero adapter"
         allowInitializePath:
-          - args: [ [ *LZ_BNB_CHAIN_ID, *bnbCCCBytes32, 0 ] ]
+          - args: [[*LZ_BNB_CHAIN_ID, *bnbCCCBytes32, 0]]
             result: false
         nextNonce:
-          - args: [ *LZ_BNB_CHAIN_ID, *bnbCCCBytes32 ]
+          - args: [*LZ_BNB_CHAIN_ID, *bnbCCCBytes32]
             result: 0
         getTrustedRemoteByChainId:
-          - args: [ *BNB_CHAIN_ID ]
+          - args: [*BNB_CHAIN_ID]
             result: *ZERO_ADDRESS
         infraToNativeChainId:
-          - args: [ *BNB_CHAIN_ID ]
+          - args: [*BNB_CHAIN_ID]
             result: *LZ_BNB_CHAIN_ID
         nativeToInfraChainId:
-          - args: [ *LZ_BNB_CHAIN_ID ]
+          - args: [*LZ_BNB_CHAIN_ID]
             result: *BNB_CHAIN_ID
 
     # https://docs.wormhole.com/wormhole/reference/constants#standard-relayer
@@ -243,13 +243,13 @@ l1:
         CROSS_CHAIN_CONTROLLER: *ethCCC
         adapterName: "Wormhole adapter"
         getTrustedRemoteByChainId:
-          - args: [ *BNB_CHAIN_ID ]
+          - args: [*BNB_CHAIN_ID]
             result: *ZERO_ADDRESS
         infraToNativeChainId:
-          - args: [ *BNB_CHAIN_ID ]
+          - args: [*BNB_CHAIN_ID]
             result: *WH_BNB_CHAIN_ID
         nativeToInfraChainId:
-          - args: [ *WH_BNB_CHAIN_ID ]
+          - args: [*WH_BNB_CHAIN_ID]
             result: *BNB_CHAIN_ID
 
 l2:
@@ -258,17 +258,16 @@ l2:
   explorerTokenEnv: BSCSCAN_TOKEN
 
   contracts:
-
     proxyAdmin:
       name: "ProxyAdmin"
       address: *bnbProxyAdmin
       checks:
         owner: *bnbCCE
         getProxyAdmin:
-          - args: [ *bnbCCC ]
+          - args: [*bnbCCC]
             result: *bnbProxyAdmin
         getProxyImplementation:
-          - args: [ *bnbCCC ]
+          - args: [*bnbCCC]
             result: *bnbCCCImp
 
     crossChainController:
@@ -276,73 +275,68 @@ l2:
       address: *bnbCCC
       proxyName: TransparentUpgradeableProxy
       implementation: *bnbCCCImp
-      proxyChecks: { }
+      proxyChecks: {}
       checks:
         owner: *bnbCCE
         guardian: *ZERO_ADDRESS
         # CrossChainReceiver
         getReceiverBridgeAdaptersByChain:
-          - args: [ *ETH_CHAIN_ID ]
-            result: [
-              *bnbCCIPAdapter,
-              *bnbLZAdapter,
-              *bnbHLAdapter,
-              *bnbWormholeAdapter,
-            ]
-        getSupportedChains: [ 1 ]
+          - args: [*ETH_CHAIN_ID]
+            result: [*bnbCCIPAdapter, *bnbLZAdapter, *bnbHLAdapter, *bnbWormholeAdapter]
+        getSupportedChains: [1]
         getConfigurationByChain:
-          - args: [ *ETH_CHAIN_ID ]
-            result: { requiredConfirmation: *BNB_CONFIRMATIONS , validityTimestamp: *VALIDITY_TIMESTAMP }
+          - args: [*ETH_CHAIN_ID]
+            result: { requiredConfirmation: *BNB_CONFIRMATIONS, validityTimestamp: *VALIDITY_TIMESTAMP }
         isReceiverBridgeAdapterAllowed:
-          - args: [ *bnbCCIPAdapter, *ETH_CHAIN_ID ]
+          - args: [*bnbCCIPAdapter, *ETH_CHAIN_ID]
             result: true
-          - args: [ *bnbHLAdapter, *ETH_CHAIN_ID ]
+          - args: [*bnbHLAdapter, *ETH_CHAIN_ID]
             result: true
-          - args: [ *bnbLZAdapter, *ETH_CHAIN_ID ]
+          - args: [*bnbLZAdapter, *ETH_CHAIN_ID]
             result: true
-          - args: [ *bnbWormholeAdapter, *ETH_CHAIN_ID ]
+          - args: [*bnbWormholeAdapter, *ETH_CHAIN_ID]
             result: true
         getTransactionState: # no real transactions yet
-          - args: [ *ZERO_BYTES32 ]
+          - args: [*ZERO_BYTES32]
             signature: "getTransactionState(bytes32)"
             result: { confirmations: 0, firstBridgedAt: 0 }
-          - args: [ "0x9a3408ef1a0ec12a5081af3a1ea3b669dd0b2caecf617ec81647c71a5ccced13" ]
+          - args: ["0x9a3408ef1a0ec12a5081af3a1ea3b669dd0b2caecf617ec81647c71a5ccced13"]
             signature: "getTransactionState(bytes32)"
             result: { confirmations: 4, firstBridgedAt: 1719319210 }
         getEnvelopeState:
-          - args: [ *ZERO_BYTES32 ]
+          - args: [*ZERO_BYTES32]
             signature: "getEnvelopeState(bytes32)"
             result: 0
-          - args: [ "0x0c39ef7274a750de961d1ee0e2083ecccacef2c4c5bd3499317f3f2177e43470" ]
+          - args: ["0x0c39ef7274a750de961d1ee0e2083ecccacef2c4c5bd3499317f3f2177e43470"]
             signature: "getEnvelopeState(bytes32)"
             result: 2
         isTransactionReceivedByAdapter:
-          - args: [ *ZERO_BYTES32, *ethCCIPAdapter ]
+          - args: [*ZERO_BYTES32, *ethCCIPAdapter]
             result: false
-          - args: [ *ZERO_BYTES32, *ethHLAdapter ]
+          - args: [*ZERO_BYTES32, *ethHLAdapter]
             result: false
-          - args: [ *ZERO_BYTES32, *ethLZAdapter ]
+          - args: [*ZERO_BYTES32, *ethLZAdapter]
             result: false
-          - args: [ *ZERO_BYTES32, *ethWormholeAdapter ]
+          - args: [*ZERO_BYTES32, *ethWormholeAdapter]
             result: false
         # CrossChainForwarder
         getCurrentEnvelopeNonce: 0
         getCurrentTransactionNonce: 0
         isEnvelopeRegistered:
-          - args: [ *ZERO_BYTES32 ]
+          - args: [*ZERO_BYTES32]
             signature: "isEnvelopeRegistered(bytes32)"
             result: false
         isTransactionForwarded:
-          - args: [ *ZERO_BYTES32 ]
+          - args: [*ZERO_BYTES32]
             signature: "isTransactionForwarded(bytes32)"
             result: false
         getForwarderBridgeAdaptersByChain:
-          - args: [ *ETH_CHAIN_ID ]
-            result: [ ]
+          - args: [*ETH_CHAIN_ID]
+            result: []
         isSenderApproved:
-          - args: [ *bnbCCE ]
+          - args: [*bnbCCE]
             result: false # no sender from BNB
-          - args: [ *ZERO_ADDRESS ]
+          - args: [*ZERO_ADDRESS]
             result: false
         whoCanRescue: *bnbCCE
 
@@ -365,22 +359,13 @@ l2:
         getGuardian: *ZERO_ADDRESS
         getActionsSetCount: *BNB_CCE_ACTIONS_SET_COUNT
         getActionsSetById:
-          - args: [ 0 ]
-            result: [
-              [ ],
-              [ ],
-              [ ],
-              [ ],
-              [ ],
-              0,
-              false,
-              false
-            ]
+          - args: [0]
+            result: [[], [], [], [], [], 0, false, false]
         getCurrentState:
-          - args: [ 0 ]
+          - args: [0]
             mustRevert: true
         isActionQueued:
-          - args: [ *ZERO_BYTES32 ] # want to skip this for now as it's too complex to verify and not worth it, tbh
+          - args: [*ZERO_BYTES32] # want to skip this for now as it's too complex to verify and not worth it, tbh
             result: false
 
     # https://docs.chain.link/ccip/supported-networks/v1_2_0/mainnet
@@ -394,18 +379,18 @@ l2:
         LINK_TOKEN: "0x404460C6A5EdE2D891e8297795264fDe62ADBB75"
         adapterName: "CCIP adapter"
         getTrustedRemoteByChainId:
-          - args: [ *ETH_CHAIN_ID ]
+          - args: [*ETH_CHAIN_ID]
             result: *ethCCC
         infraToNativeChainId:
-          - args: [ *ETH_CHAIN_ID ]
+          - args: [*ETH_CHAIN_ID]
             result: *CCIP_ETH_CHAIN_ID
         nativeToInfraChainId:
-          - args: [ *CCIP_ETH_CHAIN_ID ]
+          - args: [*CCIP_ETH_CHAIN_ID]
             result: *ETH_CHAIN_ID
         supportsInterface:
-          - args: [ "0x01ffc9a7" ] # IERC165
+          - args: ["0x01ffc9a7"] # IERC165
             result: true
-          - args: [ "0x85572ffb" ] # IAny2EVMMessageReceiver
+          - args: ["0x85572ffb"] # IAny2EVMMessageReceiver
             result: true
 
     # https://docs.hyperlane.xyz/docs/reference/contract-addresses
@@ -418,13 +403,13 @@ l2:
         CROSS_CHAIN_CONTROLLER: *bnbCCC
         adapterName: "Hyperlane adapter"
         getTrustedRemoteByChainId:
-          - args: [ *ETH_CHAIN_ID ]
+          - args: [*ETH_CHAIN_ID]
             result: *ethCCC
         infraToNativeChainId:
-          - args: [ *ETH_CHAIN_ID ]
+          - args: [*ETH_CHAIN_ID]
             result: *ETH_CHAIN_ID
         nativeToInfraChainId:
-          - args: [ *ETH_CHAIN_ID ]
+          - args: [*ETH_CHAIN_ID]
             result: *ETH_CHAIN_ID
 
     # https://docs.layerzero.network/v2/developers/evm/technical-reference/endpoints
@@ -437,19 +422,19 @@ l2:
         CROSS_CHAIN_CONTROLLER: *bnbCCC
         adapterName: "LayerZero adapter"
         allowInitializePath:
-          - args: [ [ *LZ_ETH_CHAIN_ID, *ethCCCBytes32, 0 ] ]
+          - args: [[*LZ_ETH_CHAIN_ID, *ethCCCBytes32, 0]]
             result: true # allow to initialize messages
         nextNonce:
-          - args: [ *LZ_ETH_CHAIN_ID, *ethCCCBytes32 ]
+          - args: [*LZ_ETH_CHAIN_ID, *ethCCCBytes32]
             result: 0
         getTrustedRemoteByChainId:
-          - args: [ *ETH_CHAIN_ID ]
+          - args: [*ETH_CHAIN_ID]
             result: *ethCCC
         infraToNativeChainId:
-          - args: [ *ETH_CHAIN_ID ]
+          - args: [*ETH_CHAIN_ID]
             result: *LZ_ETH_CHAIN_ID
         nativeToInfraChainId:
-          - args: [ *LZ_ETH_CHAIN_ID ]
+          - args: [*LZ_ETH_CHAIN_ID]
             result: *ETH_CHAIN_ID
 
     # https://docs.wormhole.com/wormhole/reference/constants#standard-relayer
@@ -463,11 +448,11 @@ l2:
         CROSS_CHAIN_CONTROLLER: *bnbCCC
         adapterName: "Wormhole adapter"
         getTrustedRemoteByChainId:
-          - args: [ *ETH_CHAIN_ID ]
+          - args: [*ETH_CHAIN_ID]
             result: *ethCCC
         infraToNativeChainId:
-          - args: [ *ETH_CHAIN_ID ]
+          - args: [*ETH_CHAIN_ID]
             result: *WH_ETH_CHAIN_ID
         nativeToInfraChainId:
-          - args: [ *WH_ETH_CHAIN_ID ]
+          - args: [*WH_ETH_CHAIN_ID]
             result: *ETH_CHAIN_ID

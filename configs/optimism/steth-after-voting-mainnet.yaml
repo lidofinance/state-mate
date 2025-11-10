@@ -48,7 +48,6 @@ misc:
   - &withdrawalVault "0xB9D7934878B5FB9610B3fE8A5e441e8fad7E293f"
   - &oracleDaemonConfig "0xbf05A929c3D7885a6aeAd833a992dA6E5ac23b09"
 
-
 roles:
   - &DEFAULT_ADMIN_ROLE "0x0000000000000000000000000000000000000000000000000000000000000000"
   - &DEPOSITS_DISABLER_ROLE "0x63f736f21cb2943826cd50b191eb054ebbea670e4e962d0527611f830cd399d6"
@@ -98,8 +97,8 @@ l1:
         REQUIRED_INTERFACE: "0xa16ba44d"
         observersLength: 1
         observers:
-            args: [0]
-            result: *l1OpStackTokenRatePusher
+          args: [0]
+          result: *l1OpStackTokenRatePusher
     opStackTokenRatePusher:
       name: OpStackTokenRatePusher
       address: *l1OpStackTokenRatePusher
@@ -113,7 +112,7 @@ l1:
         SECONDS_PER_SLOT: 12
         TOKEN_RATE_DECIMALS: 27
         supportsInterface:
-          - args: [ "0x01ffc9a7" ] # IERC165
+          - args: ["0x01ffc9a7"] # IERC165
             result: true
     tokenBridge:
       name: L1LidoTokensBridge
@@ -146,7 +145,7 @@ l1:
         TOKEN_RATE_DECIMALS: 27
         getContractVersion: 2
         supportsInterface:
-          - args: [ "0x01ffc9a7" ] # IERC165
+          - args: ["0x01ffc9a7"] # IERC165
             result: true
         hasRole: null
         getRoleAdmin: null
@@ -213,7 +212,7 @@ l2:
         isLikelyOutdated: null
         isTokenRateUpdatesPaused: false
         supportsInterface:
-          - args: [ "0x01ffc9a7" ] # IERC165
+          - args: ["0x01ffc9a7"] # IERC165
             result: true
         hasRole:
           - args: [*DEFAULT_ADMIN_ROLE, "0x0000000000000000000000000000000000000000"]
@@ -242,7 +241,16 @@ l2:
         decimals: 18
         TOKEN_RATE_ORACLE_DECIMALS: 27
         DOMAIN_SEPARATOR: "0xfe9c79f7aaae9e9922c525ba7a6897f8032438b998d38cbb0b92b74829dea68d"
-        eip712Domain: ["0x0f","Liquid staked Ether 2.0","1",10,"0x76A50b8c7349cCDDb7578c6627e79b5d99D24138","0x0000000000000000000000000000000000000000000000000000000000000000",[]]
+        eip712Domain:
+          [
+            "0x0f",
+            "Liquid staked Ether 2.0",
+            "1",
+            10,
+            "0x76A50b8c7349cCDDb7578c6627e79b5d99D24138",
+            "0x0000000000000000000000000000000000000000000000000000000000000000",
+            [],
+          ]
         L2_ERC20_TOKEN_BRIDGE: *l2TokenBridge
         TOKEN_RATE_ORACLE: *l2TokenRateOracle
         TOKEN_TO_WRAP_FROM: *l2WstETH
@@ -271,7 +279,16 @@ l2:
         decimals: 18
         bridge: *l2TokenBridge
         DOMAIN_SEPARATOR: "0xc7078fdc1b0a6dc42aa20237f2c2fe4c9d37d2f61a69811997849b9ca57fe3e9"
-        eip712Domain: ["0x0f","Wrapped liquid staked Ether 2.0","2",10,"0x1F32b1c2345538c0c6f582fCB022739c4A194Ebb","0x0000000000000000000000000000000000000000000000000000000000000000",[]]
+        eip712Domain:
+          [
+            "0x0f",
+            "Wrapped liquid staked Ether 2.0",
+            "2",
+            10,
+            "0x1F32b1c2345538c0c6f582fCB022739c4A194Ebb",
+            "0x0000000000000000000000000000000000000000000000000000000000000000",
+            [],
+          ]
         getContractVersion: 2
         totalSupply: null
         PERMIT_TYPEHASH: null
@@ -305,7 +322,7 @@ l2:
         WITHDRAWALS_ENABLER_ROLE: *WITHDRAWALS_ENABLER_ROLE
         getContractVersion: 2
         supportsInterface:
-          - args: [ "0x01ffc9a7" ] # IERC165
+          - args: ["0x01ffc9a7"] # IERC165
             result: true
         hasRole:
           - args: [*DEFAULT_ADMIN_ROLE, "0x0000000000000000000000000000000000000000"]

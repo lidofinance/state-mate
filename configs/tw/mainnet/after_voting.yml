@@ -188,7 +188,8 @@ l1:
       checks:
         accountingOracle: *accountingOracle
         burner: *burner
-        coreComponents: [*elRewardsVault, *oracleReportSanityChecker, *stakingRouter, *treasury, *withdrawalQueue, *withdrawalVault]
+        coreComponents:
+          [*elRewardsVault, *oracleReportSanityChecker, *stakingRouter, *treasury, *withdrawalQueue, *withdrawalVault]
         depositSecurityModule: *depositSecurityModule
         elRewardsVault: *elRewardsVault
         legacyOracle: *legacyOracle
@@ -243,15 +244,15 @@ l1:
         getRoleAdmin: null
         getRoleMember: null
         getRoleMemberCount:
-          - args: [ *STAKING_MODULE_UNVETTING_ROLE ]
+          - args: [*STAKING_MODULE_UNVETTING_ROLE]
             result: 1
-          - args: [ *DEFAULT_ADMIN_ROLE ]
+          - args: [*DEFAULT_ADMIN_ROLE]
             result: 1
           # Item 20: Check role granted
-          - args: [ *REPORT_VALIDATOR_EXITING_STATUS_ROLE ]
+          - args: [*REPORT_VALIDATOR_EXITING_STATUS_ROLE]
             result: 1
           # Item 21: Check role granted
-          - args: [ *REPORT_VALIDATOR_EXIT_TRIGGERED_ROLE ]
+          - args: [*REPORT_VALIDATOR_EXIT_TRIGGERED_ROLE]
             result: 1
         getStakingFeeAggregateDistribution: null
         getStakingFeeAggregateDistributionE4Precision: null
@@ -276,10 +277,10 @@ l1:
         getWithdrawalCredentials: "0x010000000000000000000000b9d7934878b5fb9610b3fe8a5e441e8fad7e293f"
         hasRole:
           # Item 20: Verify role granted to ValidatorExitDelayVerifier
-          - args: [ *REPORT_VALIDATOR_EXITING_STATUS_ROLE, *validatorExitDelayVerifier ]
+          - args: [*REPORT_VALIDATOR_EXITING_STATUS_ROLE, *validatorExitDelayVerifier]
             result: true
           # Item 21: Verify role granted to TWG
-          - args: [ *REPORT_VALIDATOR_EXIT_TRIGGERED_ROLE, *triggerableWithdrawalsGateway ]
+          - args: [*REPORT_VALIDATOR_EXIT_TRIGGERED_ROLE, *triggerableWithdrawalsGateway]
             result: true
         hasStakingModule: null
         supportsInterface: null
@@ -336,21 +337,21 @@ l1:
         getUnusedSigningKeyCount: null
         hasInitialized: null
         isOperatorPenalized:
-          - args: [ 1 ]
+          - args: [1]
             result: false
         isOperatorPenaltyCleared:
-          - args: [ 1 ]
+          - args: [1]
             result: true
         exitDeadlineThreshold:
-          - args: [ 1 ]
-            result: 345600  # NOR_EXIT_DEADLINE_IN_SEC from voting script
+          - args: [1]
+            result: 345600 # NOR_EXIT_DEADLINE_IN_SEC from voting script
         isValidatorExitingKeyReported:
-          - args: [ "0x95F00b016bB31b7182D96D25074684518246E42a" ]
+          - args: ["0x95F00b016bB31b7182D96D25074684518246E42a"]
             result: false
         isPetrified: null
         kernel: null
         isValidatorExitDelayPenaltyApplicable: null
-        exitPenaltyCutoffTimestamp: 1759150801  # Warning! Vote enactment minus 4 days on mainnet
+        exitPenaltyCutoffTimestamp: 1759150801 # Warning! Vote enactment minus 4 days on mainnet
 
     # Item 25: Update SimpleDVT implementation
     simpleDVT:
@@ -406,13 +407,13 @@ l1:
         isOperatorPenalized: null
         isOperatorPenaltyCleared: null
         exitDeadlineThreshold:
-          - args: [ 1 ]
-            result: 345600  # NOR_EXIT_DEADLINE_IN_SEC from voting script
+          - args: [1]
+            result: 345600 # NOR_EXIT_DEADLINE_IN_SEC from voting script
         isValidatorExitingKeyReported: null
         isPetrified: null
         kernel: null
         isValidatorExitDelayPenaltyApplicable: null
-        exitPenaltyCutoffTimestamp: 1759150801  # Warning! Vote enactment minus 4 days on mainnet
+        exitPenaltyCutoffTimestamp: 1759150801 # Warning! Vote enactment minus 4 days on mainnet
 
     # Item 13: Update Accounting Oracle implementation
     accountingOracle:
@@ -450,11 +451,11 @@ l1:
         getRoleMember: null
         getRoleMemberCount:
           # Item 14 & 16: Verify MANAGE_CONSENSUS_VERSION_ROLE revoked from AGENT
-          - args: [ *MANAGE_CONSENSUS_VERSION_ROLE ]
+          - args: [*MANAGE_CONSENSUS_VERSION_ROLE]
             result: 0
         hasRole:
           # Item 14 & 16: Verify MANAGE_CONSENSUS_VERSION_ROLE revoked from AGENT
-          - args: [ *MANAGE_CONSENSUS_VERSION_ROLE, *agent ]
+          - args: [*MANAGE_CONSENSUS_VERSION_ROLE, *agent]
             result: false
         supportsInterface: null
 
@@ -492,34 +493,34 @@ l1:
         getExitRequestLimitFullInfo: null
         getLastProcessingRefSlot: null
         # Item 3: Verify finalizeUpgrade_v2 parameters
-        getMaxValidatorsPerReport: 600  # MAX_VALIDATORS_PER_REPORT
+        getMaxValidatorsPerReport: 600 # MAX_VALIDATORS_PER_REPORT
         getProcessingState: null
         getResumeSinceTimestamp: null
         getRoleAdmin: null
         getRoleMember: null
         getRoleMemberCount:
           # Item 4 & 6: Verify MANAGE_CONSENSUS_VERSION_ROLE revoked from AGENT
-          - args: [ *MANAGE_CONSENSUS_VERSION_ROLE ]
+          - args: [*MANAGE_CONSENSUS_VERSION_ROLE]
             result: 0
           # Item 7: Verify SUBMIT_REPORT_HASH_ROLE granted to EasyTrack EVM Script Executor
-          - args: [ *SUBMIT_REPORT_HASH_ROLE ]
+          - args: [*SUBMIT_REPORT_HASH_ROLE]
             result: 1
           # Item 61, 63: Verify PAUSE_ROLE changes (new TW GateSeal + ResealManager)
-          - args: [ *PAUSE_ROLE ]
+          - args: [*PAUSE_ROLE]
             result: 2
         getTotalRequestsProcessed: null
         hasRole:
           # Item 4 & 6: Verify MANAGE_CONSENSUS_VERSION_ROLE revoked from AGENT
-          - args: [ *MANAGE_CONSENSUS_VERSION_ROLE, *agent ]
+          - args: [*MANAGE_CONSENSUS_VERSION_ROLE, *agent]
             result: false
           # Item 7: Verify SUBMIT_REPORT_HASH_ROLE granted to EasyTrack EVM Script Executor
-          - args: [ *SUBMIT_REPORT_HASH_ROLE, *easyTrackEvmScriptExecutor ]
+          - args: [*SUBMIT_REPORT_HASH_ROLE, *easyTrackEvmScriptExecutor]
             result: true
           # Item 61: Verify PAUSE_ROLE revoked from old GateSeal
-          - args: [ *PAUSE_ROLE, *oldGateSeal ]
+          - args: [*PAUSE_ROLE, *oldGateSeal]
             result: false
           # Item 63: Verify PAUSE_ROLE granted to new Triggerable Withdrawals GateSeal
-          - args: [ *PAUSE_ROLE, *newTwGateSeal ]
+          - args: [*PAUSE_ROLE, *newTwGateSeal]
             result: true
         isPaused: null
         supportsInterface: null
@@ -579,38 +580,38 @@ l1:
         TW_EXIT_LIMIT_MANAGER_ROLE: *TW_EXIT_LIMIT_MANAGER_ROLE
         VERSION: 1
         # Item 3: Verify finalizeUpgrade_v2 parameters on VEBO affect TWG
-        getExitRequestLimitFullInfo: [11200,1,48,11200,11200]
+        getExitRequestLimitFullInfo: [11200, 1, 48, 11200, 11200]
         getResumeSinceTimestamp: 0
         getRoleAdmin: null
         getRoleMember:
-          - args: [ *DEFAULT_ADMIN_ROLE, 0 ]
+          - args: [*DEFAULT_ADMIN_ROLE, 0]
             result: *agent
         getRoleMemberCount:
-          - args: [ *DEFAULT_ADMIN_ROLE ]
+          - args: [*DEFAULT_ADMIN_ROLE]
             result: 1
           # Item 8: Verify ADD_FULL_WITHDRAWAL_REQUEST_ROLE granted to CS Ejector
-          - args: [ *ADD_FULL_WITHDRAWAL_REQUEST_ROLE ]
+          - args: [*ADD_FULL_WITHDRAWAL_REQUEST_ROLE]
             result: 2
           # Item 64-66: Verify PAUSE_ROLE and RESUME_ROLE changes
-          - args: [ *PAUSE_ROLE ]
+          - args: [*PAUSE_ROLE]
             result: 2
-          - args: [ *RESUME_ROLE ]
+          - args: [*RESUME_ROLE]
             result: 1
         hasRole:
           # Item 8: Verify ADD_FULL_WITHDRAWAL_REQUEST_ROLE granted to CS Ejector
-          - args: [ *ADD_FULL_WITHDRAWAL_REQUEST_ROLE, *csEjector ]
+          - args: [*ADD_FULL_WITHDRAWAL_REQUEST_ROLE, *csEjector]
             result: true
           # Item 9: Verify ADD_FULL_WITHDRAWAL_REQUEST_ROLE granted to VEB
-          - args: [ *ADD_FULL_WITHDRAWAL_REQUEST_ROLE, *validatorsExitBusOracle ]
+          - args: [*ADD_FULL_WITHDRAWAL_REQUEST_ROLE, *validatorsExitBusOracle]
             result: true
           # Item 64: Verify PAUSE_ROLE granted to new Triggerable Withdrawals GateSeal
-          - args: [ *PAUSE_ROLE, *newTwGateSeal ]
+          - args: [*PAUSE_ROLE, *newTwGateSeal]
             result: true
           # Item 65: Verify PAUSE_ROLE granted to ResealManager
-          - args: [ *PAUSE_ROLE, *resealManager ]
+          - args: [*PAUSE_ROLE, *resealManager]
             result: true
           # Item 66: Verify RESUME_ROLE granted to ResealManager
-          - args: [ *RESUME_ROLE, *resealManager ]
+          - args: [*RESUME_ROLE, *resealManager]
             result: true
         isPaused: false
         supportsInterface: null
@@ -686,14 +687,14 @@ l1:
         unfinalizedStETH: null
         getRoleMemberCount:
           # Item 60, 62: Verify PAUSE_ROLE changes (expecting 2 due to both old and new GateSeals)
-          - args: [ *PAUSE_ROLE ]
+          - args: [*PAUSE_ROLE]
             result: 2
         hasRole:
           # Item 60: Verify PAUSE_ROLE revoked from old GateSeal
-          - args: [ *PAUSE_ROLE, *oldGateSeal ]
+          - args: [*PAUSE_ROLE, *oldGateSeal]
             result: false
           # Item 62: Verify PAUSE_ROLE granted to new WithdrawalQueue GateSeal
-          - args: [ *PAUSE_ROLE, *newWqGateSeal ]
+          - args: [*PAUSE_ROLE, *newWqGateSeal]
             result: true
 
     # Item 28, 33: Oracle daemon config role management
@@ -705,19 +706,19 @@ l1:
         DEFAULT_ADMIN_ROLE: null
         get:
           # Item 32: Verify EXIT_EVENTS_LOOKBACK_WINDOW_IN_SLOTS variable added
-          - args: [ "EXIT_EVENTS_LOOKBACK_WINDOW_IN_SLOTS" ]
-            result: "0x0189c0"  # 100800 = 14 * 7200 (14 days in slots)
+          - args: ["EXIT_EVENTS_LOOKBACK_WINDOW_IN_SLOTS"]
+            result: "0x0189c0" # 100800 = 14 * 7200 (14 days in slots)
         getList: null
         getRoleAdmin: null
         getRoleMember: null
         supportsInterface: null
         getRoleMemberCount:
           # Item 28 & 33: Verify CONFIG_MANAGER_ROLE revoked from AGENT
-          - args: [ *CONFIG_MANAGER_ROLE ]
+          - args: [*CONFIG_MANAGER_ROLE]
             result: 0
         hasRole:
           # Item 28 & 33: Verify CONFIG_MANAGER_ROLE revoked from AGENT
-          - args: [ *CONFIG_MANAGER_ROLE, *agent ]
+          - args: [*CONFIG_MANAGER_ROLE, *agent]
             result: false
 
     # Item 10: Connect TRIGGERABLE_WITHDRAWALS_GATEWAY to Dual Governance tiebreaker
@@ -749,4 +750,10 @@ l1:
           # Item 10: Verify TriggerableWithdrawalsGateway connected to Dual Governance tiebreaker
           # Current blockers: WithdrawalQueue, ValidatorsExitBusOracle, TriggerableWithdrawalsGateway
           - args: []
-            result: [false,*tiebreakerCommittee,31536000,[*withdrawalQueue,*validatorsExitBusOracle,*triggerableWithdrawalsGateway]]
+            result:
+              [
+                false,
+                *tiebreakerCommittee,
+                31536000,
+                [*withdrawalQueue, *validatorsExitBusOracle, *triggerableWithdrawalsGateway],
+              ]

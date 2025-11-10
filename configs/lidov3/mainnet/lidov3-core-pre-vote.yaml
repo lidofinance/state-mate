@@ -2145,7 +2145,7 @@ l1:
         paymentsNextIndex: 1
         isPetrified: false
         MANAGE_PAYMENTS_ROLE: "0x30597dd103acfaef0649675953d9cb22faadab7e9d9ed57acc1c429d04b80777"
-        transactionsNextIndex: 649
+        transactionsNextIndex: null
         vault: *aragonAgent
         getBudget: null
         getEVMScriptExecutor: null

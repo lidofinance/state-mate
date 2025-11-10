@@ -13,7 +13,6 @@ parameters:
   - &l1CrossDomainMessenger "0x58Cc85b8D04EA49cC6DBd3CbFFd00B4B8D6cb3ef"
   - &l2CrossDomainMessenger "0x4200000000000000000000000000000000000007"
 
-
 deployed:
   l1:
     - &l1TokenBridge "0x4Abf633d9c0F4aEebB4C2E3213c7aa1b8505D332"
@@ -31,7 +30,6 @@ deployed:
     - &l2StETHImpl "0xFd21C82c99ddFa56EB0B9B2D1d0709b7E26D1B2C"
     - &l2TokenRateOracle "0xB34F2747BCd9BCC4107A0ccEb43D5dcdd7Fabf89"
     - &l2TokenRateOracleImpl "0xa989A4B3A26e28DC9d106F163B2B1f35153E0517"
-
 
 roles:
   - &DEFAULT_ADMIN_ROLE "0x0000000000000000000000000000000000000000000000000000000000000000"
@@ -56,8 +54,8 @@ l1:
         REQUIRED_INTERFACE: "0xa16ba44d"
         observersLength: 1
         observers:
-            args: [0]
-            result: *l1OpStackTokenRatePusher
+          args: [0]
+          result: *l1OpStackTokenRatePusher
     opStackTokenRatePusher:
       name: OpStackTokenRatePusher
       address: *l1OpStackTokenRatePusher
@@ -71,7 +69,7 @@ l1:
         SECONDS_PER_SLOT: 12
         TOKEN_RATE_DECIMALS: 27
         supportsInterface:
-          - args: [ "0x01ffc9a7" ] # IERC165
+          - args: ["0x01ffc9a7"] # IERC165
             result: true
     tokenBridge:
       name: L1ERC20TokenBridge
@@ -144,7 +142,7 @@ l2:
         isLikelyOutdated: true
         isTokenRateUpdatesPaused: false
         supportsInterface:
-          - args: [ "0x01ffc9a7" ] # IERC165
+          - args: ["0x01ffc9a7"] # IERC165
             result: true
         hasRole:
           - args: [*RATE_UPDATE_DISABLER_ROLE, *l2GovernanceExecutor]
