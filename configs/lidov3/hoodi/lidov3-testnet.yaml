@@ -7,7 +7,7 @@ deployed:
     - &lidoLocator "0xe2EF9536DAAAEBFf5b1c130957AB3E80056b06D8"
     - &lidoLocatorImplAddress "0x778Dc3a94B24D0Cd66E36d3ED8d47cAa622688F6"
     - &lido "0x3508A952176b3c15387C97BE809eaffB1982176a"
-    - &lidoImplAddress "0x892D3fF28Dc9360cAA47576070B1892244e68a1f"
+    - &lidoImplAddress "0x4f9143Dba1f1BbFa535528254592f3396E229e53"
     - &wstETH "0x7E99eE3C66636DE415D2d7C880938F2f40f94De4"
     - &wstETHReferralStaker "0xf886BcC68b240316103fE8A12453Ce7831c2e835"
     - &eip712StETH "0x2A1d51BF3aAA7A7D027C8f561e5f579876a17B0a"
@@ -19,7 +19,7 @@ deployed:
     - &withdrawalVault "0x4473dCDDbf77679A643BdB654dbd86D67F8d32f2"
     - &withdrawalVaultImplAddress "0xfe7A58960Af333eAdeAeC39149F9d6A71dc3E668"
     - &accounting "0x9b5b78D1C9A3238bF24662067e34c57c83E8c354"
-    - &accountingImplAddress "0x0bF902fb783Fbf8af0bC011C76D2F7d318a50c74"
+    - &accountingImplAddress "0x41f0765b56d4f6b6AF231c217886ea7A8D1e7640"
     - &burner "0xb2c99cd38a2636a6281a849C8de938B3eF4A7C3D"
     - &burnerImplAddress "0xBb77f95A29D1ccE1A54F6ED9144D48be38D43dbC"
     - &minFirstAllocationStrategy "0x6d1a9bBFF97f7565e9532FEB7b499982848E5e07"
@@ -27,11 +27,11 @@ deployed:
     - &triggerableWithdrawalsGateway "0x6679090D92b08a2a686eF8614feECD8cDFE209db"
     - &validatorExitDelayVerifier "0xa5F5A9360275390fF9728262a29384399f38d2f0"
     - &vaultHub "0x4C9fFC325392090F789255b9948Ab1659b797964"
-    - &vaultHubImplAddress "0x25414E6CEB90F5ffa42cb11CeE95Adb4EC9a1dB8"
+    - &vaultHubImplAddress "0x932d97b59B8846796469C129AB1b83c2a855a3F7"
     - &predepositGuarantee "0xa5F55f3402beA2B14AE15Dae1b6811457D43581d"
     - &predepositGuaranteeImplAddress "0x6D2c164Be7cc36b03aBd0e2e133bE03A30ad3358"
     - &operatorGrid "0x501e678182bB5dF3f733281521D3f3D1aDe69917"
-    - &operatorGridImplAddress "0x81a8e96bf75eb02CE082FaFF5701B181E491dc1c"
+    - &operatorGridImplAddress "0x0f7b5BFA0FC13F2b8218a1624a5aF4055500cAe0"
 
     # --- stVaults factory stack ---
     - &stakingVaultFactory "0x1d10DB6a66EF8D2A6f6D36Ad4dc7092Ef7C12569"
@@ -51,7 +51,7 @@ deployed:
     - &oracleReportSanityChecker "0x53417BA942bC86492bAF46FAbA8769f246422388"
     - &oracleDaemonConfig "0x2a833402e3F46fFC1ecAb3598c599147a78731a9"
     - &lazyOracle "0xf41491C79C30e8f4862d3F4A5b790171adB8e04A"
-    - &lazyOracleImplAddress "0x60beda728821B47446fDBcD14111b447BF8663e0"
+    - &lazyOracleImplAddress "0x4e3b9fd9F713e5dbA86255febD4c402794135095"
 
     # --- DAO & Aragon apps ---
     - &aragonRepoBase "0xD03e828844AA4eF31566F984Fe2A1693e7d5aF38"
