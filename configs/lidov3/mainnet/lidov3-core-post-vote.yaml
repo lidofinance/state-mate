@@ -524,7 +524,7 @@ l1:
           - *EIP712_VERSION
           - *CHAIN_ID
           - *lido
-        getContractVersion: *LIDO_VERSION
+        getContractVersion: *LIDO_VERSION_NEW
         symbol: *LIDO_SYMBOL
         getEIP712StETH: *eip712StETH
         getEVMScriptRegistry: *aragonEvmScriptRegistry
@@ -540,7 +540,7 @@ l1:
             args: [*lido]
           - result: true
             args: [*ldo]
-        getInitializationBlock: 764
+        getInitializationBlock: 11473216
         getMaxExternalRatioBP: *LIDO_MAX_EXTERNAL_RATIO_BP # <-- V3 critical parameter
         getFee: 999
         getMaxMintableExternalShares: null
@@ -735,8 +735,8 @@ l1:
         *DEFAULT_ADMIN_ROLE : [*aragonAgent]
         *MANAGE_WITHDRAWAL_CREDENTIALS_ROLE : []
         *REPORT_EXITED_VALIDATORS_ROLE : [*accountingOracle]
-        *REPORT_REWARDS_MINTED_ROLE : [*accounting]
-        *STAKING_MODULE_MANAGE_ROLE : [*aragonAgent, *superManager]
+        *REPORT_REWARDS_MINTED_ROLE : [*lido]
+        *STAKING_MODULE_MANAGE_ROLE : [*aragonAgent]
         *STAKING_MODULE_UNVETTING_ROLE : [*depositSecurityModule]
         *UNSAFE_SET_EXITED_VALIDATORS_ROLE : []
       implementationChecks:
@@ -825,7 +825,7 @@ l1:
         STETH: *lido
         WSTETH: *wstETH
         bunkerModeSinceTimestamp: *MAX_UINT256
-        getBaseURI: "https://wq-api-hoodi.testnet.fi/v1/nft"
+        getBaseURI: "https://wq-api.lido.fi/v1/nft"
         getContractVersion: *VERSION_1
         getNFTDescriptorAddress: *ZERO_ADDRESS
         isBunkerModeActive: false
@@ -860,7 +860,7 @@ l1:
         *FINALIZE_ROLE : [*lido]
         *MANAGE_TOKEN_URI_ROLE : []
         *ORACLE_ROLE : [*accountingOracle]
-        *WQ_RESUME_ROLE : [*aragonAgent, *resealManager]
+        *WQ_RESUME_ROLE : [*resealManager]
         *WQ_PAUSE_ROLE : [*resealManager, *gateSealWithdrawalQueue]
       implementationChecks:
         BUNKER_MODE_DISABLED_TIMESTAMP: *MAX_UINT256
@@ -952,14 +952,14 @@ l1:
         simulateOracleReport: null
         handleOracleReport: null
 
-    burner:
+    newBurner:
       name: Burner
-      address: *burner
+      address: *newBurner
       proxyName: OssifiableProxy
-      implementation: *burnerImplAddress
+      implementation: *newBurnerImplAddress
       proxyChecks:
         proxy__getAdmin: *aragonAgent
-        proxy__getImplementation: *burnerImplAddress
+        proxy__getImplementation: *newBurnerImplAddress
         proxy__getIsOssified: false
       checks:
         DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
@@ -1061,9 +1061,9 @@ l1:
         supportsInterface: null
         totalBondShares: null
       ozAcl:
-        *DEFAULT_ADMIN_ROLE : [*aragonAgent, "0x4AF43Ee34a6fcD1fEcA1e1F832124C763561dA53"] # WARNING: who is this?
-        *CS_MANAGE_BOND_CURVES_ROLE : ["0x4AF43Ee34a6fcD1fEcA1e1F832124C763561dA53"] # WARNING: who is this?
-        *CS_SET_BOND_CURVE_ROLE : [*CSVettedGate, "0x4AF43Ee34a6fcD1fEcA1e1F832124C763561dA53"] # WARNING: who is this?
+        *DEFAULT_ADMIN_ROLE : [*aragonAgent]
+        *CS_MANAGE_BOND_CURVES_ROLE : []
+        *CS_SET_BOND_CURVE_ROLE : [*csmCommittee, *CSVettedGate]
         *CS_RECOVERER_ROLE : []
         *CS_RESUME_ROLE : [*resealManager]
         *CS_PAUSE_ROLE : [*resealManager, *gateSealCSAccounting]
@@ -1150,9 +1150,9 @@ l1:
       name: ValidatorExitDelayVerifier
       address: *validatorExitDelayVerifier
       checks:
-        BEACON_ROOTS: *BEACON_ROOTS
-        CAPELLA_SLOT: 0
-        FIRST_SUPPORTED_SLOT: 1
+        BEACON_ROOTS: *contract4788
+        CAPELLA_SLOT: 6209536
+        FIRST_SUPPORTED_SLOT: 11649024
         GENESIS_TIME: *GENESIS_TIME
         GI_FIRST_BLOCK_ROOT_IN_SUMMARY_CURR: "0x000000000000000000000000000000000000000000000000000000000040000d"
         GI_FIRST_BLOCK_ROOT_IN_SUMMARY_PREV: "0x000000000000000000000000000000000000000000000000000000000040000d"
@@ -1161,7 +1161,7 @@ l1:
         GI_FIRST_VALIDATOR_CURR: *GI_FIRST_VALIDATOR_CURR
         GI_FIRST_VALIDATOR_PREV: *GI_FIRST_VALIDATOR_PREV
         LOCATOR: *lidoLocator
-        PIVOT_SLOT: 1
+        PIVOT_SLOT: 11649024
         SECONDS_PER_SLOT: *SECONDS_PER_SLOT
         SHARD_COMMITTEE_PERIOD_IN_SECONDS: *SHARD_COMMITTEE_PERIOD_IN_SECONDS
         SLOTS_PER_EPOCH: *SLOTS_PER_EPOCH
@@ -1230,7 +1230,7 @@ l1:
         *OZ_RESUME_ROLE : []
         *VAULT_MASTER_ROLE : [*aragonAgent]
         *BAD_DEBT_MASTER_ROLE : [*vaultsAdapter]
-        *REDEMPTION_MASTER_ROLE : [*aragonAgent, *vaultsAdapter] # WARNING: must be none for mainnet
+        *REDEMPTION_MASTER_ROLE : [] # WARNING: must be none for mainnet
         *VALIDATOR_EXIT_ROLE : [*vaultsAdapter]
       implementationChecks:
         CONNECT_DEPOSIT: *ONE_ETH_WEI
@@ -1294,7 +1294,7 @@ l1:
         PREDEPOSIT_AMOUNT: *ONE_ETH_WEI
         ACTIVATION_DEPOSIT_AMOUNT: *ACTIVATION_DEPOSIT_AMOUNT
         MAX_TOPUP_AMOUNT: *MAX_TOPUP_AMOUNT
-        BEACON_ROOTS: *BEACON_ROOTS
+        BEACON_ROOTS: *contract4788
         DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
         DEPOSIT_DOMAIN: *DEPOSIT_DOMAIN
         GI_FIRST_VALIDATOR_CURR: *GI_FIRST_VALIDATOR_CURR
@@ -1303,7 +1303,7 @@ l1:
         GI_STATE_ROOT: *GI_STATE_ROOT
         MIN_SUPPORTED_WC_VERSION: 1
         MAX_SUPPORTED_WC_VERSION: 2
-        PIVOT_SLOT: 0
+        PIVOT_SLOT: 11649024
         PAUSE_INFINITELY: *MAX_UINT256
         PAUSE_ROLE: *OZ_PAUSE_ROLE
         RESUME_ROLE: *OZ_RESUME_ROLE
@@ -1332,7 +1332,7 @@ l1:
         PREDEPOSIT_AMOUNT: *ONE_ETH_WEI
         ACTIVATION_DEPOSIT_AMOUNT: *ACTIVATION_DEPOSIT_AMOUNT
         MAX_TOPUP_AMOUNT: *MAX_TOPUP_AMOUNT
-        BEACON_ROOTS: *BEACON_ROOTS
+        BEACON_ROOTS: *contract4788
         DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
         DEPOSIT_DOMAIN: *DEPOSIT_DOMAIN
         GI_FIRST_VALIDATOR_CURR: *GI_FIRST_VALIDATOR_CURR
@@ -1341,7 +1341,7 @@ l1:
         GI_STATE_ROOT: *GI_STATE_ROOT
         MIN_SUPPORTED_WC_VERSION: 1
         MAX_SUPPORTED_WC_VERSION: 2
-        PIVOT_SLOT: 0
+        PIVOT_SLOT: 11649024
         PAUSE_INFINITELY: *MAX_UINT256
         PAUSE_ROLE: *OZ_PAUSE_ROLE
         RESUME_ROLE: *OZ_RESUME_ROLE
@@ -1384,7 +1384,7 @@ l1:
         effectiveShareLimit: null
         getConfirmExpiry: null
         isVaultInJail: null
-        tiersCount: null
+        tiersCount: 0 # WARN: IMPORTANT
         vaultTierInfo: null
         getRoleAdmin: null
         getRoleMember: null
@@ -1393,7 +1393,7 @@ l1:
         group: null
         hasRole: null
         nodeOperatorAddress: null
-        nodeOperatorCount: null
+        nodeOperatorCount: 0 # WARN: IMPORTANT
         pendingRequest: null
         pendingRequests: null
         pendingRequestsCount: null
@@ -1430,7 +1430,7 @@ l1:
       name: VaultFactory
       address: *stakingVaultFactory
       checks:
-        PREVIOUS_FACTORY: "0xf0Cf0c852Bb2b41eF8171399a71be79aa67e6295"
+        PREVIOUS_FACTORY: *ZERO_ADDRESS # WARN: IMPORTANT
         BEACON: *stakingVaultBeacon
         DASHBOARD_IMPL: *dashboardImplAddress
         LIDO_LOCATOR: *lidoLocator
@@ -1447,14 +1447,14 @@ l1:
       name: StakingVault
       address: *stakingVaultImplAddress
       checks:
-        DEPOSIT_CONTRACT: *DEPOSIT_CONTRACT
+        DEPOSIT_CONTRACT: *contractDeposit
         beaconChainDepositsPaused: false
         depositor: *ZERO_ADDRESS
         getInitializedVersion: *MAX_UINT64
         nodeOperator: *ZERO_ADDRESS
         owner: *ZERO_ADDRESS
         version: *VERSION_1
-        withdrawalCredentials: "0x020000000000000000000000e96be4fb723e68e7b96244b7399c64a58bcd0062"
+        withdrawalCredentials: "0x00000000000000000000000000000000544f444f" # TODO
         availableBalance: null
         calculateValidatorWithdrawalFee: null
         pendingOwner: null
