@@ -132,7 +132,7 @@ misc:
   - &LIDO_VERSION_NEW 3
   - &LIDO_WITHDRAWAL_CREDENTIALS "0x010000000000000000000000b9d7934878b5fb9610b3fe8a5e441e8fad7e293f"
 
-  # --- AO (Attestation Oracle) Versions ---
+  # --- AO (Accounting Oracle) Versions ---
   - &AO_CONSENSUS_VERSION_NEW 5
   - &AO_CONTRACT_VERSION_NEW 4
   - &AO_CONSENSUS_VERSION_OLD 4
@@ -253,7 +253,7 @@ misc:
   - &MAX_REWARD_RATIO 65535
 
 eoa:
-  - &deployer "0xAD2F7e30AeA89f6D45D942D0f52aFB8B395965f2"
+  - &deployer "0xAD2F7e30AeA89f6D45D942D0f52aFB8B395965f2" # TODO: Check
 
 roles:
   # Lido
@@ -467,6 +467,7 @@ l1:
         withdrawalQueue: *withdrawalQueueERC721
         withdrawalVault: *withdrawalVault
         legacyOracle: *legacyOracle
+
     lido:
       name: Lido
       address: *lido
