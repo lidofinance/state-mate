@@ -104,6 +104,8 @@ const ProxyChecksTB = Type.Readonly(
         implementation: Type.Optional(Type.Union([EthereumStringTB, Type.Null()])),
         proxy_getAdmin: Type.Optional(Type.Union([EthereumStringTB, Type.Null()])),
         proxy_getIsOssified: Type.Optional(Type.Union([Type.Boolean(), Type.Null()])),
+        // For proxies exposing plain isOssified() (e.g., PinnedBeaconProxy)
+        isOssified: Type.Optional(Type.Union([Type.Boolean(), Type.Null()])),
       },
       { additionalProperties: false },
     ),

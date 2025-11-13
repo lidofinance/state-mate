@@ -93,8 +93,8 @@ l1:
         REQUIRED_INTERFACE: "0xa16ba44d"
         observersLength: 1
         observers:
-            args: [0]
-            result: *l1OpStackTokenRatePusher
+          args: [0]
+          result: *l1OpStackTokenRatePusher
     opStackTokenRatePusher:
       name: OpStackTokenRatePusher
       address: *l1OpStackTokenRatePusher
@@ -108,7 +108,7 @@ l1:
         SECONDS_PER_SLOT: 12
         TOKEN_RATE_DECIMALS: 27
         supportsInterface:
-          - args: [ "0x01ffc9a7" ] # IERC165
+          - args: ["0x01ffc9a7"] # IERC165
             result: true
     tokenBridge:
       name: L1ERC20TokenBridge
@@ -133,7 +133,7 @@ l1:
         WITHDRAWALS_DISABLER_ROLE: *WITHDRAWALS_DISABLER_ROLE
         WITHDRAWALS_ENABLER_ROLE: *WITHDRAWALS_ENABLER_ROLE
         supportsInterface:
-          - args: [ "0x01ffc9a7" ] # IERC165
+          - args: ["0x01ffc9a7"] # IERC165
             result: true
         getRoleAdmin: null
         hasRole: null
@@ -175,7 +175,7 @@ l1:
         TOKEN_RATE_DECIMALS: 27
         getContractVersion: *maxInt
         supportsInterface:
-          - args: [ "0x01ffc9a7" ] # IERC165
+          - args: ["0x01ffc9a7"] # IERC165
             result: true
         hasRole:
           - args: [*DEFAULT_ADMIN_ROLE, "0x0000000000000000000000000000000000000000"]
@@ -191,11 +191,11 @@ l1:
           - args: [*DEPOSITS_DISABLER_ROLE, *l1EmergencyBreaksMultisig]
             result: false
           - args: [*WITHDRAWALS_ENABLER_ROLE, *agent]
-            result: false  
+            result: false
           - args: [*WITHDRAWALS_ENABLER_ROLE, *l1EmergencyBreaksMultisig]
             result: false
           - args: [*WITHDRAWALS_DISABLER_ROLE, *agent]
-            result: false  
+            result: false
           - args: [*WITHDRAWALS_DISABLER_ROLE, *l1EmergencyBreaksMultisig]
             result: false
         getRoleAdmin: null
@@ -245,7 +245,7 @@ l2:
         getContractVersion: 1
         isTokenRateUpdatesPaused: false
         supportsInterface:
-          - args: [ "0x01ffc9a7" ] # IERC165
+          - args: ["0x01ffc9a7"] # IERC165
             result: true
         getTokenRatesLength: null
         isLikelyOutdated: null
@@ -272,7 +272,16 @@ l2:
         decimals: 18
         TOKEN_RATE_ORACLE_DECIMALS: 27
         DOMAIN_SEPARATOR: "0xfe9c79f7aaae9e9922c525ba7a6897f8032438b998d38cbb0b92b74829dea68d"
-        eip712Domain: ["0x0f","Liquid staked Ether 2.0","1",10,"0x76A50b8c7349cCDDb7578c6627e79b5d99D24138","0x0000000000000000000000000000000000000000000000000000000000000000",[]]
+        eip712Domain:
+          [
+            "0x0f",
+            "Liquid staked Ether 2.0",
+            "1",
+            10,
+            "0x76A50b8c7349cCDDb7578c6627e79b5d99D24138",
+            "0x0000000000000000000000000000000000000000000000000000000000000000",
+            [],
+          ]
         L2_ERC20_TOKEN_BRIDGE: *l2TokenBridge
         TOKEN_RATE_ORACLE: *l2TokenRateOracle
         TOKEN_TO_WRAP_FROM: *l2WstETH
@@ -314,7 +323,16 @@ l2:
         decimals: 18
         bridge: *l2TokenBridge
         DOMAIN_SEPARATOR: "0xde21cfddb7b61ce76bab64e0cf20729dae722f5777fe2494e89e0575ad5ebf56"
-        eip712Domain: ["0x0f","Wrapped liquid staked Ether 2.0","2",10,"0xFe57042De76c8D6B1DF0E9E2047329fd3e2B7334","0x0000000000000000000000000000000000000000000000000000000000000000",[]]
+        eip712Domain:
+          [
+            "0x0f",
+            "Wrapped liquid staked Ether 2.0",
+            "2",
+            10,
+            "0xFe57042De76c8D6B1DF0E9E2047329fd3e2B7334",
+            "0x0000000000000000000000000000000000000000000000000000000000000000",
+            [],
+          ]
         getContractVersion: *maxInt
         totalSupply: 0
         allowance: null
@@ -343,7 +361,7 @@ l2:
         WITHDRAWALS_DISABLER_ROLE: *WITHDRAWALS_DISABLER_ROLE
         WITHDRAWALS_ENABLER_ROLE: *WITHDRAWALS_ENABLER_ROLE
         supportsInterface:
-          - args: [ "0x01ffc9a7" ] # IERC165
+          - args: ["0x01ffc9a7"] # IERC165
             result: true
         getRoleAdmin: null
         hasRole: null
@@ -380,7 +398,7 @@ l2:
         WITHDRAWALS_ENABLER_ROLE: *WITHDRAWALS_ENABLER_ROLE
         getContractVersion: *maxInt
         supportsInterface:
-          - args: [ "0x01ffc9a7" ] # IERC165
+          - args: ["0x01ffc9a7"] # IERC165
             result: true
         getRoleAdmin: null
         hasRole:
@@ -395,10 +413,10 @@ l2:
           - args: [*DEPOSITS_DISABLER_ROLE, *l2EmergencyBreaksMultisig]
             result: false
           - args: [*WITHDRAWALS_ENABLER_ROLE, *l2GovernanceExecutor]
-            result: false  
+            result: false
           - args: [*WITHDRAWALS_ENABLER_ROLE, *l2EmergencyBreaksMultisig]
             result: false
           - args: [*WITHDRAWALS_DISABLER_ROLE, *l2GovernanceExecutor]
-            result: false  
+            result: false
           - args: [*WITHDRAWALS_DISABLER_ROLE, *l2EmergencyBreaksMultisig]
             result: false

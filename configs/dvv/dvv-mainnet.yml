@@ -1,4 +1,3 @@
-
 # yaml-language-server: $schema=./../../schemas/main-schema.json
 
 parameters:
@@ -125,7 +124,7 @@ l1:
       address: *ERC20TvlModule
       checks:
         tvl:
-          - args: [ *TransparentUpgradeableProxy ]
+          - args: [*TransparentUpgradeableProxy]
             result: [[*WSTETH, *WSTETH, *WSTETH_TVL, *WSTETH_TVL, false], [*WETH, *WETH, *WETH_TVL, *WETH_TVL, false]]
     Initializer:
       name: Initializer
@@ -136,78 +135,78 @@ l1:
         DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
         OPERATOR: *OPERATOR
         allowance:
-          - args: [ *ZERO_ADDRESS, *ZERO_ADDRESS ]
+          - args: [*ZERO_ADDRESS, *ZERO_ADDRESS]
             result: 0
-          - args: [ *TransparentUpgradeableProxy, *DEPLOYER ]
+          - args: [*TransparentUpgradeableProxy, *DEPLOYER]
             result: 0
         balanceOf:
-          - args: [ *ZERO_ADDRESS ]
+          - args: [*ZERO_ADDRESS]
             result: 0
-          - args: [ *DEPLOYER ]
+          - args: [*DEPLOYER]
             result: 0
         configurator: *ZERO_ADDRESS
         decimals: *DECIMALS
         getRoleAdmin:
-          - args: [ *DEFAULT_ADMIN_ROLE ]
+          - args: [*DEFAULT_ADMIN_ROLE]
             result: *DEFAULT_ADMIN_ROLE
-          - args: [ *ADMIN_ROLE ]
+          - args: [*ADMIN_ROLE]
             result: *ADMIN_ROLE
-          - args: [ *ADMIN_DELEGATE_ROLE ]
+          - args: [*ADMIN_DELEGATE_ROLE]
             result: *ADMIN_ROLE
-          - args: [ *OPERATOR ]
+          - args: [*OPERATOR]
             result: *ADMIN_DELEGATE_ROLE
         getRoleMember:
-          - args: [ *DEFAULT_ADMIN_ROLE, 0 ]
+          - args: [*DEFAULT_ADMIN_ROLE, 0]
             mustRevert: true
-          - args: [ *ADMIN_ROLE, 0 ]
+          - args: [*ADMIN_ROLE, 0]
             result: *Initializer
-          - args: [ *ADMIN_DELEGATE_ROLE, 0 ]
+          - args: [*ADMIN_DELEGATE_ROLE, 0]
             mustRevert: true
-          - args: [ *OPERATOR, 0 ]
+          - args: [*OPERATOR, 0]
             result: *Initializer
         getRoleMemberCount:
-          - args: [ *DEFAULT_ADMIN_ROLE ]
+          - args: [*DEFAULT_ADMIN_ROLE]
             result: 0
-          - args: [ *ADMIN_ROLE ]
+          - args: [*ADMIN_ROLE]
             result: 1
-          - args: [ *ADMIN_DELEGATE_ROLE ]
+          - args: [*ADMIN_DELEGATE_ROLE]
             result: 0
-          - args: [ *OPERATOR ]
+          - args: [*OPERATOR]
             result: 1
         hasRole:
-          - args: [ *DEFAULT_ADMIN_ROLE, *DEPLOYER ]
+          - args: [*DEFAULT_ADMIN_ROLE, *DEPLOYER]
             result: false
-          - args: [ *ADMIN_ROLE, *DEPLOYER ]
+          - args: [*ADMIN_ROLE, *DEPLOYER]
             result: false
-          - args: [ *ADMIN_DELEGATE_ROLE, *DEPLOYER ]
+          - args: [*ADMIN_DELEGATE_ROLE, *DEPLOYER]
             result: false
-          - args: [ *OPERATOR, *DEPLOYER ]
+          - args: [*OPERATOR, *DEPLOYER]
             result: false
         isAdmin:
-          - args: [ *DEPLOYER ]
+          - args: [*DEPLOYER]
             result: false
-          - args: [ *Initializer ]
+          - args: [*Initializer]
             result: true
         isOperator:
-          - args: [ *DEPLOYER ]
+          - args: [*DEPLOYER]
             result: false
-          - args: [ *Initializer ]
+          - args: [*Initializer]
             result: true
         name: "Initializer"
         requireAdmin:
-          - args: [ *DEPLOYER ]
+          - args: [*DEPLOYER]
             mustRevert: true
-          - args: [ *Initializer ]
+          - args: [*Initializer]
             result: []
         requireAtLeastOperator:
-          - args: [ *DEPLOYER ]
+          - args: [*DEPLOYER]
             mustRevert: true
-          - args: [ *Initializer ]
+          - args: [*Initializer]
             result: []
         supportsInterface:
-          - args: [ *ZERO_BYTES4 ]
+          - args: [*ZERO_BYTES4]
             result: false
-          - args: [ *FULL_BYTES4 ]
+          - args: [*FULL_BYTES4]
             result: false
         symbol: "init"
         totalSupply: 0
@@ -227,10 +226,10 @@ l1:
       checks:
         Q96: *Q96
         getTargetRatiosX96:
-          - args: [ *TransparentUpgradeableProxy, true ] # deposit
-            result: [ 0, *Q96 ]
-          - args: [ *TransparentUpgradeableProxy, false ] # withdrawal
-            result: [ *Q96, 0 ]
+          - args: [*TransparentUpgradeableProxy, true] # deposit
+            result: [0, *Q96]
+          - args: [*TransparentUpgradeableProxy, false] # withdrawal
+            result: [*Q96, 0]
         vaultToData:
     ChainlinkOracle:
       name: ChainlinkOracle
@@ -238,28 +237,28 @@ l1:
       checks:
         Q96: *Q96
         aggregatorsData:
-          - args: [ *TransparentUpgradeableProxy, *WSTETH ]
-            result: [ *WStethRatiosAggregatorV3, 0 ]
-          - args: [ *TransparentUpgradeableProxy, *WETH ]
-            result: [ *ConstantAggregatorV3, 0 ]
-          - args: [ *TransparentUpgradeableProxy, *STETH ]
-            result: [ *ZERO_ADDRESS, 0 ]
+          - args: [*TransparentUpgradeableProxy, *WSTETH]
+            result: [*WStethRatiosAggregatorV3, 0]
+          - args: [*TransparentUpgradeableProxy, *WETH]
+            result: [*ConstantAggregatorV3, 0]
+          - args: [*TransparentUpgradeableProxy, *STETH]
+            result: [*ZERO_ADDRESS, 0]
         baseTokens:
-          - args: [ *TransparentUpgradeableProxy ]
+          - args: [*TransparentUpgradeableProxy]
             result: *WETH
         getPrice:
-          - args: [ *TransparentUpgradeableProxy, *WSTETH ]
-            result: [ *WSTETH_RATIO, *DECIMALS ]
-          - args: [ *TransparentUpgradeableProxy, *WETH ]
-            result: [ *ONE_RATIO, *DECIMALS ]
-          - args: [ *TransparentUpgradeableProxy, *STETH ]
+          - args: [*TransparentUpgradeableProxy, *WSTETH]
+            result: [*WSTETH_RATIO, *DECIMALS]
+          - args: [*TransparentUpgradeableProxy, *WETH]
+            result: [*ONE_RATIO, *DECIMALS]
+          - args: [*TransparentUpgradeableProxy, *STETH]
             mustRevert: true
         priceX96:
-          - args: [ *TransparentUpgradeableProxy, *WSTETH ]
+          - args: [*TransparentUpgradeableProxy, *WSTETH]
             result: *WSTETH_RATIO_X96
-          - args: [ *TransparentUpgradeableProxy, *WETH ]
+          - args: [*TransparentUpgradeableProxy, *WETH]
             result: *Q96
-          - args: [ *TransparentUpgradeableProxy, *STETH ]
+          - args: [*TransparentUpgradeableProxy, *STETH]
             mustRevert: true
     ConstantAggregatorV3:
       name: ConstantAggregatorV3
@@ -281,14 +280,14 @@ l1:
       address: *DefaultProxyImplementation
       checks:
         allowance:
-          - args: [ *ZERO_ADDRESS, *ZERO_ADDRESS ]
+          - args: [*ZERO_ADDRESS, *ZERO_ADDRESS]
             result: 0
-          - args: [ *TransparentUpgradeableProxy, *DEPLOYER ]
+          - args: [*TransparentUpgradeableProxy, *DEPLOYER]
             result: 0
         balanceOf:
-          - args: [ *ZERO_ADDRESS ]
+          - args: [*ZERO_ADDRESS]
             result: 0
-          - args: [ *DEPLOYER ]
+          - args: [*DEPLOYER]
             result: 0
         decimals: *DECIMALS
         name: ""
@@ -308,11 +307,11 @@ l1:
         depositCallbackDelay: *DEPOSIT_CALLBACK_DELAY
         emergencyWithdrawalDelay: *EMERGENCY_WITHDRAWAL_DELAY
         isDelegateModuleApproved:
-          - args: [ *StakingModule ]
+          - args: [*StakingModule]
             result: true
-          - args: [ "0xD8619769fed318714d362BfF01CA98ac938Bdf9b" ] # DefaultBondModule
+          - args: ["0xD8619769fed318714d362BfF01CA98ac938Bdf9b"] # DefaultBondModule
             result: false
-          - args: [ *TransparentUpgradeableProxy ]
+          - args: [*TransparentUpgradeableProxy]
             result: false
         isDepositLocked: false
         isDepositLockedDelay: *DEPOSIT_LOCKED_DELAY
@@ -336,141 +335,141 @@ l1:
         ADMIN_ROLE_MASK: *ADMIN_ROLE_MASK
         STORAGE_POSITION: "0xc5d9a5dc0c3dbbd4debebdb870fda826372ee5f5ea588d9114d28c33a7f08b39" # keccak256("mellow.lrt.permissions.storage")
         allowAllSignaturesRoles: # with grantContractRole
-          - args: [ *StakingModule ]
+          - args: [*StakingModule]
             result: *VAULT_ROLE_MASK
-          - args: [ *TransparentUpgradeableProxy ]
+          - args: [*TransparentUpgradeableProxy]
             result: 0
-          - args: [ *SimpleDVTStakingStrategy ]
+          - args: [*SimpleDVTStakingStrategy]
             result: 0
-          - args: [ *ProxyAdmin ]
+          - args: [*ProxyAdmin]
             result: 0
-          - args: [ *ProxyAdminMsig ]
+          - args: [*ProxyAdminMsig]
             result: 0
-          - args: [ *AdminMsig ]
+          - args: [*AdminMsig]
             result: 0
-          - args: [ *VaultConfigurator ]
+          - args: [*VaultConfigurator]
             result: 0
         allowSignatureRoles: # with grantContractSignatureRole
-          - args: [ *TransparentUpgradeableProxy, *SIG_VAULT_DELEGATE_CALL ] # Vault.delegateCall
+          - args: [*TransparentUpgradeableProxy, *SIG_VAULT_DELEGATE_CALL] # Vault.delegateCall
             result: *DELEGATE_CALL_ROLE_MASK
-          - args: [ *TransparentUpgradeableProxy, *SIG_VAULT_DEPOSIT ] # Vault.deposit
+          - args: [*TransparentUpgradeableProxy, *SIG_VAULT_DEPOSIT] # Vault.deposit
             result: *DEPOSIT_ROLE_MASK
-          - args: [ *TransparentUpgradeableProxy, *SIG_DUMMY ]
+          - args: [*TransparentUpgradeableProxy, *SIG_DUMMY]
             result: 0 # PROHIBITED
         customValidator: # with setCustomValidator
-          - args: [ *TransparentUpgradeableProxy ]
+          - args: [*TransparentUpgradeableProxy]
             result: *ZERO_ADDRESS
-          - args: [ *SimpleDVTStakingStrategy ]
+          - args: [*SimpleDVTStakingStrategy]
             result: *ZERO_ADDRESS
-          - args: [ *ProxyAdmin ]
+          - args: [*ProxyAdmin]
             result: *ZERO_ADDRESS
-          - args: [ *StakingModule ]
+          - args: [*StakingModule]
             result: *ZERO_ADDRESS
-          - args: [ *VaultConfigurator ]
+          - args: [*VaultConfigurator]
             result: *ZERO_ADDRESS
-          - args: [ *ProxyAdminMsig ]
+          - args: [*ProxyAdminMsig]
             result: *ZERO_ADDRESS
-          - args: [ *AdminMsig ]
+          - args: [*AdminMsig]
             result: *ZERO_ADDRESS
         hasPermission:
           # Deployer can only deposit
-          - args: [ *DEPLOYER, *TransparentUpgradeableProxy, *SIG_VAULT_DEPOSIT ]
+          - args: [*DEPLOYER, *TransparentUpgradeableProxy, *SIG_VAULT_DEPOSIT]
             result: true # Deployer can deposit
-          - args: [ *ZERO_ADDRESS, *TransparentUpgradeableProxy, *SIG_VAULT_DEPOSIT ]
+          - args: [*ZERO_ADDRESS, *TransparentUpgradeableProxy, *SIG_VAULT_DEPOSIT]
             result: true # Anyone can deposit
 
           # DELEGATE CALLS TO INITIATE FROM VAULT
-          - args: [ *SimpleDVTStakingStrategy, *TransparentUpgradeableProxy, *SIG_VAULT_DELEGATE_CALL ]
+          - args: [*SimpleDVTStakingStrategy, *TransparentUpgradeableProxy, *SIG_VAULT_DELEGATE_CALL]
             result: true
-          - args: [ *CuratorAdminMsig, *TransparentUpgradeableProxy, *SIG_VAULT_DELEGATE_CALL ]
+          - args: [*CuratorAdminMsig, *TransparentUpgradeableProxy, *SIG_VAULT_DELEGATE_CALL]
             result: true
-          - args: [ *AdminMsig, *TransparentUpgradeableProxy, *SIG_VAULT_DELEGATE_CALL ]
+          - args: [*AdminMsig, *TransparentUpgradeableProxy, *SIG_VAULT_DELEGATE_CALL]
             result: true
-          - args: [ *CURATOR_OPERATOR_EOA, *TransparentUpgradeableProxy, *SIG_VAULT_DELEGATE_CALL ]
+          - args: [*CURATOR_OPERATOR_EOA, *TransparentUpgradeableProxy, *SIG_VAULT_DELEGATE_CALL]
             result: false
-          - args: [ *DEPLOYER, *TransparentUpgradeableProxy, *SIG_VAULT_DELEGATE_CALL ]
+          - args: [*DEPLOYER, *TransparentUpgradeableProxy, *SIG_VAULT_DELEGATE_CALL]
             result: false # Deployer can't do delegate calls
 
           # VAULT can call any method from StakingModule
-          - args: [ *TransparentUpgradeableProxy, *StakingModule, *SIG_DUMMY ]
+          - args: [*TransparentUpgradeableProxy, *StakingModule, *SIG_DUMMY]
             result: true # Vault has all signature roles against StakingModule
-          - args: [ *AdminMsig, *StakingModule, *SIG_DUMMY ]
+          - args: [*AdminMsig, *StakingModule, *SIG_DUMMY]
             result: true
-          - args: [ *DEPLOYER, *StakingModule, *SIG_DUMMY ]
+          - args: [*DEPLOYER, *StakingModule, *SIG_DUMMY]
             result: false
         publicRoles: *DEPOSIT_ROLE_MASK # with grantPublicRole
         requirePermission:
           # Deployer can only deposit
-          - args: [ *DEPLOYER, *TransparentUpgradeableProxy, *SIG_VAULT_DEPOSIT ]
+          - args: [*DEPLOYER, *TransparentUpgradeableProxy, *SIG_VAULT_DEPOSIT]
             result: []
-          - args: [ *ZERO_ADDRESS, *TransparentUpgradeableProxy, *SIG_VAULT_DEPOSIT ]
+          - args: [*ZERO_ADDRESS, *TransparentUpgradeableProxy, *SIG_VAULT_DEPOSIT]
             result: []
 
           # DELEGATE CALLS TO INITIATE FROM VAULT
-          - args: [ *SimpleDVTStakingStrategy, *TransparentUpgradeableProxy, *SIG_VAULT_DELEGATE_CALL ]
+          - args: [*SimpleDVTStakingStrategy, *TransparentUpgradeableProxy, *SIG_VAULT_DELEGATE_CALL]
             result: []
-          - args: [ *CuratorAdminMsig, *TransparentUpgradeableProxy, *SIG_VAULT_DELEGATE_CALL ]
+          - args: [*CuratorAdminMsig, *TransparentUpgradeableProxy, *SIG_VAULT_DELEGATE_CALL]
             result: []
-          - args: [ *AdminMsig, *TransparentUpgradeableProxy, *SIG_VAULT_DELEGATE_CALL ]
+          - args: [*AdminMsig, *TransparentUpgradeableProxy, *SIG_VAULT_DELEGATE_CALL]
             result: []
-          - args: [ *CURATOR_OPERATOR_EOA, *TransparentUpgradeableProxy, *SIG_VAULT_DELEGATE_CALL ]
+          - args: [*CURATOR_OPERATOR_EOA, *TransparentUpgradeableProxy, *SIG_VAULT_DELEGATE_CALL]
             mustRevert: true
-          - args: [ *DEPLOYER, *TransparentUpgradeableProxy, *SIG_VAULT_DELEGATE_CALL ]
+          - args: [*DEPLOYER, *TransparentUpgradeableProxy, *SIG_VAULT_DELEGATE_CALL]
             mustRevert: true
 
           # VAULT can call any method from StakingModule
-          - args: [ *TransparentUpgradeableProxy, *StakingModule, *SIG_DUMMY ]
+          - args: [*TransparentUpgradeableProxy, *StakingModule, *SIG_DUMMY]
             result: []
-          - args: [ *AdminMsig, *StakingModule, *SIG_DUMMY ]
+          - args: [*AdminMsig, *StakingModule, *SIG_DUMMY]
             result: []
-          - args: [ *DEPLOYER, *StakingModule, *SIG_DUMMY ]
+          - args: [*DEPLOYER, *StakingModule, *SIG_DUMMY]
             mustRevert: true
         userRoles: # with grantRole
-          - args: [ *AdminMsig ]
+          - args: [*AdminMsig]
             result: *ADMIN_ROLE_MASK
-          - args: [ *TransparentUpgradeableProxy ]
+          - args: [*TransparentUpgradeableProxy]
             result: *VAULT_ROLE_MASK
-          - args: [ *SimpleDVTStakingStrategy ]
+          - args: [*SimpleDVTStakingStrategy]
             result: *DELEGATE_CALL_ROLE_MASK
-          - args: [ *CuratorAdminMsig ]
+          - args: [*CuratorAdminMsig]
             result: *DELEGATE_CALL_ROLE_MASK
-          - args: [ *ProxyAdmin ]
+          - args: [*ProxyAdmin]
             result: 0
-          - args: [ *ProxyAdminMsig ]
+          - args: [*ProxyAdminMsig]
             result: 0
-          - args: [ *CURATOR_OPERATOR_EOA ]
+          - args: [*CURATOR_OPERATOR_EOA]
             result: 0
-          - args: [ *StakingModule ]
+          - args: [*StakingModule]
             result: 0
-          - args: [ *VaultConfigurator ]
+          - args: [*VaultConfigurator]
             result: 0
-          - args: [ *DEPLOYER ]
+          - args: [*DEPLOYER]
             result: 0
         validate:
           # Deployer can only deposit
-          - args: [ *DEPLOYER, *TransparentUpgradeableProxy, *SIG_VAULT_DEPOSIT ]
+          - args: [*DEPLOYER, *TransparentUpgradeableProxy, *SIG_VAULT_DEPOSIT]
             result: []
-          - args: [ *ZERO_ADDRESS, *TransparentUpgradeableProxy, *SIG_VAULT_DEPOSIT ]
+          - args: [*ZERO_ADDRESS, *TransparentUpgradeableProxy, *SIG_VAULT_DEPOSIT]
             result: []
 
           # DELEGATE CALLS TO INITIATE FROM VAULT
-          - args: [ *SimpleDVTStakingStrategy, *TransparentUpgradeableProxy, *SIG_VAULT_DELEGATE_CALL ]
+          - args: [*SimpleDVTStakingStrategy, *TransparentUpgradeableProxy, *SIG_VAULT_DELEGATE_CALL]
             result: []
-          - args: [ *CuratorAdminMsig, *TransparentUpgradeableProxy, *SIG_VAULT_DELEGATE_CALL ]
+          - args: [*CuratorAdminMsig, *TransparentUpgradeableProxy, *SIG_VAULT_DELEGATE_CALL]
             result: []
-          - args: [ *AdminMsig, *TransparentUpgradeableProxy, *SIG_VAULT_DELEGATE_CALL ]
+          - args: [*AdminMsig, *TransparentUpgradeableProxy, *SIG_VAULT_DELEGATE_CALL]
             result: []
-          - args: [ *CURATOR_OPERATOR_EOA, *TransparentUpgradeableProxy, *SIG_VAULT_DELEGATE_CALL ]
+          - args: [*CURATOR_OPERATOR_EOA, *TransparentUpgradeableProxy, *SIG_VAULT_DELEGATE_CALL]
             mustRevert: true
-          - args: [ *DEPLOYER, *TransparentUpgradeableProxy, *SIG_VAULT_DELEGATE_CALL ]
+          - args: [*DEPLOYER, *TransparentUpgradeableProxy, *SIG_VAULT_DELEGATE_CALL]
             mustRevert: true
 
           # VAULT can call any method from StakingModule
-          - args: [ *TransparentUpgradeableProxy, *StakingModule, *SIG_DUMMY ]
+          - args: [*TransparentUpgradeableProxy, *StakingModule, *SIG_DUMMY]
             result: []
-          - args: [ *AdminMsig, *StakingModule, *SIG_DUMMY ]
+          - args: [*AdminMsig, *StakingModule, *SIG_DUMMY]
             result: []
-          - args: [ *DEPLOYER, *StakingModule, *SIG_DUMMY ]
+          - args: [*DEPLOYER, *StakingModule, *SIG_DUMMY]
             mustRevert: true
     SimpleDVTStakingStrategy:
       name: SimpleDVTStakingStrategy
@@ -481,67 +480,67 @@ l1:
         DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
         OPERATOR: *OPERATOR
         getRoleAdmin:
-          - args: [ *DEFAULT_ADMIN_ROLE ]
+          - args: [*DEFAULT_ADMIN_ROLE]
             result: *DEFAULT_ADMIN_ROLE
-          - args: [ *ADMIN_ROLE ]
+          - args: [*ADMIN_ROLE]
             result: *ADMIN_ROLE
-          - args: [ *ADMIN_DELEGATE_ROLE ]
+          - args: [*ADMIN_DELEGATE_ROLE]
             result: *ADMIN_ROLE
-          - args: [ *OPERATOR ]
+          - args: [*OPERATOR]
             result: *ADMIN_DELEGATE_ROLE
         getRoleMember:
-          - args: [ *DEFAULT_ADMIN_ROLE, 0 ]
+          - args: [*DEFAULT_ADMIN_ROLE, 0]
             mustRevert: true
-          - args: [ *ADMIN_ROLE, 0 ]
+          - args: [*ADMIN_ROLE, 0]
             result: *AdminMsig
-          - args: [ *ADMIN_DELEGATE_ROLE, 0 ]
+          - args: [*ADMIN_DELEGATE_ROLE, 0]
             mustRevert: true
-          - args: [ *OPERATOR, 0 ]
+          - args: [*OPERATOR, 0]
             result: *CURATOR_OPERATOR_EOA
         getRoleMemberCount:
-          - args: [ *DEFAULT_ADMIN_ROLE ]
+          - args: [*DEFAULT_ADMIN_ROLE]
             result: 0
-          - args: [ *ADMIN_ROLE ]
+          - args: [*ADMIN_ROLE]
             result: 1
-          - args: [ *ADMIN_DELEGATE_ROLE ]
+          - args: [*ADMIN_DELEGATE_ROLE]
             result: 0
-          - args: [ *OPERATOR ]
+          - args: [*OPERATOR]
             result: 1
         hasRole:
-          - args: [ *DEFAULT_ADMIN_ROLE, *DEPLOYER ]
+          - args: [*DEFAULT_ADMIN_ROLE, *DEPLOYER]
             result: false
-          - args: [ *ADMIN_ROLE, *DEPLOYER ]
+          - args: [*ADMIN_ROLE, *DEPLOYER]
             result: false
-          - args: [ *ADMIN_DELEGATE_ROLE, *DEPLOYER ]
+          - args: [*ADMIN_DELEGATE_ROLE, *DEPLOYER]
             result: false
-          - args: [ *OPERATOR, *DEPLOYER ]
+          - args: [*OPERATOR, *DEPLOYER]
             result: false
         isAdmin:
-          - args: [ *DEPLOYER ]
+          - args: [*DEPLOYER]
             result: false
-          - args: [ *AdminMsig ]
+          - args: [*AdminMsig]
             result: true
         isOperator:
-          - args: [ *DEPLOYER ]
+          - args: [*DEPLOYER]
             result: false
-          - args: [ *CURATOR_OPERATOR_EOA ]
+          - args: [*CURATOR_OPERATOR_EOA]
             result: true
         maxAllowedRemainder: *MAX_ALLOWED_REMAINDER
         requireAdmin:
-          - args: [ *DEPLOYER ]
+          - args: [*DEPLOYER]
             mustRevert: true
-          - args: [ *AdminMsig ]
+          - args: [*AdminMsig]
             result: []
         requireAtLeastOperator:
-          - args: [ *DEPLOYER ]
+          - args: [*DEPLOYER]
             mustRevert: true
-          - args: [ *CURATOR_OPERATOR_EOA ]
+          - args: [*CURATOR_OPERATOR_EOA]
             result: []
         stakingModule: *StakingModule
         supportsInterface:
-          - args: [ *ZERO_BYTES4 ]
+          - args: [*ZERO_BYTES4]
             result: false
-          - args: [ *FULL_BYTES4 ]
+          - args: [*FULL_BYTES4]
             result: false
         vault: *TransparentUpgradeableProxy
     TransparentUpgradeableProxy:
@@ -558,94 +557,94 @@ l1:
         OPERATOR: *OPERATOR
         Q96: *Q96
         allowance:
-          - args: [ *ZERO_ADDRESS, *ZERO_ADDRESS ]
+          - args: [*ZERO_ADDRESS, *ZERO_ADDRESS]
             result: 0
-          - args: [ *TransparentUpgradeableProxy, *DEPLOYER ]
+          - args: [*TransparentUpgradeableProxy, *DEPLOYER]
             result: 0
         analyzeRequest:
         balanceOf:
-          - args: [ *ZERO_ADDRESS ]
+          - args: [*ZERO_ADDRESS]
             result: 0
-          - args: [ *DEPLOYER ]
+          - args: [*DEPLOYER]
             result: 0
-        baseTvl: [ [*WSTETH, *WETH], [*WSTETH_TVL, *WETH_TVL] ]
+        baseTvl: [[*WSTETH, *WETH], [*WSTETH_TVL, *WETH_TVL]]
         calculateStack:
         configurator: *VaultConfigurator
         decimals: *DECIMALS
         getRoleAdmin:
-          - args: [ *DEFAULT_ADMIN_ROLE ]
+          - args: [*DEFAULT_ADMIN_ROLE]
             result: *DEFAULT_ADMIN_ROLE
-          - args: [ *ADMIN_ROLE ]
+          - args: [*ADMIN_ROLE]
             result: *ADMIN_ROLE
-          - args: [ *ADMIN_DELEGATE_ROLE ]
+          - args: [*ADMIN_DELEGATE_ROLE]
             result: *ADMIN_ROLE
-          - args: [ *OPERATOR ]
+          - args: [*OPERATOR]
             result: *ADMIN_DELEGATE_ROLE
         getRoleMember:
-          - args: [ *DEFAULT_ADMIN_ROLE, 0 ]
+          - args: [*DEFAULT_ADMIN_ROLE, 0]
             mustRevert: true
-          - args: [ *ADMIN_ROLE, 0 ]
+          - args: [*ADMIN_ROLE, 0]
             result: *AdminMsig
-          - args: [ *ADMIN_DELEGATE_ROLE, 0 ]
+          - args: [*ADMIN_DELEGATE_ROLE, 0]
             mustRevert: true
-          - args: [ *OPERATOR, 0 ]
+          - args: [*OPERATOR, 0]
             result: *CuratorAdminMsig
-          - args: [ *OPERATOR, 1 ]
+          - args: [*OPERATOR, 1]
             result: *SimpleDVTStakingStrategy
         getRoleMemberCount:
-          - args: [ *DEFAULT_ADMIN_ROLE ]
+          - args: [*DEFAULT_ADMIN_ROLE]
             result: 0
-          - args: [ *ADMIN_ROLE ]
+          - args: [*ADMIN_ROLE]
             result: 1
-          - args: [ *ADMIN_DELEGATE_ROLE ]
+          - args: [*ADMIN_DELEGATE_ROLE]
             result: 0
-          - args: [ *OPERATOR ]
+          - args: [*OPERATOR]
             result: 2
         hasRole:
-          - args: [ *DEFAULT_ADMIN_ROLE, *DEPLOYER ]
+          - args: [*DEFAULT_ADMIN_ROLE, *DEPLOYER]
             result: false
-          - args: [ *ADMIN_ROLE, *DEPLOYER ]
+          - args: [*ADMIN_ROLE, *DEPLOYER]
             result: false
-          - args: [ *ADMIN_DELEGATE_ROLE, *DEPLOYER ]
+          - args: [*ADMIN_DELEGATE_ROLE, *DEPLOYER]
             result: false
-          - args: [ *OPERATOR, *DEPLOYER ]
+          - args: [*OPERATOR, *DEPLOYER]
             result: false
         isAdmin:
-          - args: [ *DEPLOYER ]
+          - args: [*DEPLOYER]
             result: false
-          - args: [ *AdminMsig ]
+          - args: [*AdminMsig]
             result: true
         isOperator:
-          - args: [ *DEPLOYER ]
+          - args: [*DEPLOYER]
             result: false
-          - args: [ *CuratorAdminMsig ]
+          - args: [*CuratorAdminMsig]
             result: true
         isUnderlyingToken:
-          - args: [ *WSTETH ]
+          - args: [*WSTETH]
             result: true
-          - args: [ *WETH ]
+          - args: [*WETH]
             result: true
-          - args: [ *STETH ]
+          - args: [*STETH]
             result: false
-          - args: [ *TransparentUpgradeableProxy ]
+          - args: [*TransparentUpgradeableProxy]
             result: false
         name: *TOKEN_NAME
-        pendingWithdrawers: [ "0x2b5303771e86B5C1476F35e36BF8A914212ee553" ]
+        pendingWithdrawers: ["0x2b5303771e86B5C1476F35e36BF8A914212ee553"]
         pendingWithdrawersCount: 1
         requireAdmin:
-          - args: [ *DEPLOYER ]
+          - args: [*DEPLOYER]
             mustRevert: true
-          - args: [ *AdminMsig ]
+          - args: [*AdminMsig]
             result: []
         requireAtLeastOperator:
-          - args: [ *DEPLOYER ]
+          - args: [*DEPLOYER]
             mustRevert: true
-          - args: [ *CuratorAdminMsig ]
+          - args: [*CuratorAdminMsig]
             result: []
         supportsInterface:
-          - args: [ *ZERO_BYTES4 ]
+          - args: [*ZERO_BYTES4]
             result: false
-          - args: [ *FULL_BYTES4 ]
+          - args: [*FULL_BYTES4]
             result: false
         symbol: *TOKEN_SYMBOL
         totalSupply: *WETH_TVL
@@ -653,7 +652,7 @@ l1:
         underlyingTokens: [*WSTETH, *WETH]
         underlyingTvl: [[*WSTETH, *WETH], [*WSTETH_TVL, *WETH_TVL]]
         withdrawalRequest:
-          - args: [ *DEPLOYER ]
+          - args: [*DEPLOYER]
             result: [*ZERO_ADDRESS, 0, *ZERO_BYTES32, [], 0, 0]
       implementationChecks:
         ADMIN_DELEGATE_ROLE: *ADMIN_DELEGATE_ROLE
@@ -663,100 +662,100 @@ l1:
         OPERATOR: *OPERATOR
         Q96: *Q96
         allowance:
-          - args: [ *ZERO_ADDRESS, *ZERO_ADDRESS ]
+          - args: [*ZERO_ADDRESS, *ZERO_ADDRESS]
             result: 0
-          - args: [ *TransparentUpgradeableProxy, *DEPLOYER ]
+          - args: [*TransparentUpgradeableProxy, *DEPLOYER]
             result: 0
         analyzeRequest:
         balanceOf:
-          - args: [ *ZERO_ADDRESS ]
+          - args: [*ZERO_ADDRESS]
             result: 0
-          - args: [ *DEPLOYER ]
+          - args: [*DEPLOYER]
             result: 0
         baseTvl: [[], []]
         calculateStack:
         configurator: *VAULT_CONFIGURATOR_AUX
         decimals: *DECIMALS
         getRoleAdmin:
-          - args: [ *DEFAULT_ADMIN_ROLE ]
+          - args: [*DEFAULT_ADMIN_ROLE]
             result: *DEFAULT_ADMIN_ROLE
-          - args: [ *ADMIN_ROLE ]
+          - args: [*ADMIN_ROLE]
             result: *ADMIN_ROLE
-          - args: [ *ADMIN_DELEGATE_ROLE ]
+          - args: [*ADMIN_DELEGATE_ROLE]
             result: *ADMIN_ROLE
-          - args: [ *OPERATOR ]
+          - args: [*OPERATOR]
             result: *ADMIN_DELEGATE_ROLE
         getRoleMember:
-          - args: [ *DEFAULT_ADMIN_ROLE, 0 ]
+          - args: [*DEFAULT_ADMIN_ROLE, 0]
             mustRevert: true
-          - args: [ *ADMIN_ROLE, 0 ]
+          - args: [*ADMIN_ROLE, 0]
             result: *DEAD_ADDRESS
-          - args: [ *ADMIN_DELEGATE_ROLE, 0 ]
+          - args: [*ADMIN_DELEGATE_ROLE, 0]
             mustRevert: true
-          - args: [ *OPERATOR, 0 ]
+          - args: [*OPERATOR, 0]
             result: *DEAD_ADDRESS
         getRoleMemberCount:
-          - args: [ *DEFAULT_ADMIN_ROLE ]
+          - args: [*DEFAULT_ADMIN_ROLE]
             result: 0
-          - args: [ *ADMIN_ROLE ]
+          - args: [*ADMIN_ROLE]
             result: 1
-          - args: [ *ADMIN_DELEGATE_ROLE ]
+          - args: [*ADMIN_DELEGATE_ROLE]
             result: 0
-          - args: [ *OPERATOR ]
+          - args: [*OPERATOR]
             result: 1
         hasRole:
-          - args: [ *DEFAULT_ADMIN_ROLE, *DEPLOYER ]
+          - args: [*DEFAULT_ADMIN_ROLE, *DEPLOYER]
             result: false
-          - args: [ *ADMIN_ROLE, *DEPLOYER ]
+          - args: [*ADMIN_ROLE, *DEPLOYER]
             result: false
-          - args: [ *ADMIN_DELEGATE_ROLE, *DEPLOYER ]
+          - args: [*ADMIN_DELEGATE_ROLE, *DEPLOYER]
             result: false
-          - args: [ *OPERATOR, *DEPLOYER ]
+          - args: [*OPERATOR, *DEPLOYER]
             result: false
         isAdmin:
-          - args: [ *DEPLOYER ]
+          - args: [*DEPLOYER]
             result: false
-          - args: [ *DEAD_ADDRESS ]
+          - args: [*DEAD_ADDRESS]
             result: true
         isOperator:
-          - args: [ *DEPLOYER ]
+          - args: [*DEPLOYER]
             result: false
-          - args: [ *DEAD_ADDRESS ]
+          - args: [*DEAD_ADDRESS]
             result: true
         isUnderlyingToken:
-          - args: [ *WSTETH ]
+          - args: [*WSTETH]
             result: false
-          - args: [ *WETH ]
+          - args: [*WETH]
             result: false
-          - args: [ *STETH ]
+          - args: [*STETH]
             result: false
-          - args: [ *TransparentUpgradeableProxy ]
+          - args: [*TransparentUpgradeableProxy]
             result: false
         name: ""
         pendingWithdrawers: []
         pendingWithdrawersCount: 0
         requireAdmin:
-          - args: [ *DEPLOYER ]
+          - args: [*DEPLOYER]
             mustRevert: true
-          - args: [ *DEAD_ADDRESS ]
+          - args: [*DEAD_ADDRESS]
             result: []
         requireAtLeastOperator:
-          - args: [ *DEPLOYER ]
+          - args: [*DEPLOYER]
             mustRevert: true
-          - args: [ *DEAD_ADDRESS ]
+          - args: [*DEAD_ADDRESS]
             result: []
         supportsInterface:
-          - args: [ *ZERO_BYTES4 ]
+          - args: [*ZERO_BYTES4]
             result: false
-          - args: [ *FULL_BYTES4 ]
+          - args: [*FULL_BYTES4]
             result: false
         symbol: ""
         totalSupply: 0
         tvlModules: []
         underlyingTokens: []
-        underlyingTvl: [[],[]]
+        underlyingTvl: [[], []]
         withdrawalRequest:
-          - args: [ *DEPLOYER ]
+          - args: [*DEPLOYER]
             result: [*ZERO_ADDRESS, 0, *ZERO_BYTES32, [], 0, 0]
     ProxyAdmin:
       name: ProxyAdmin
@@ -779,7 +778,7 @@ l1:
         encodeTransactionData:
         getChainId: 1
         getModulesPaginated:
-        getOwners: [*ADMIN_0,*ADMIN_1,*ADMIN_2,*ADMIN_3,*ADMIN_4,*ADMIN_5,*ADMIN_6,*ADMIN_7]
+        getOwners: [*ADMIN_0, *ADMIN_1, *ADMIN_2, *ADMIN_3, *ADMIN_4, *ADMIN_5, *ADMIN_6, *ADMIN_7]
         getStorageAt:
         getThreshold: *THRESHOLD
         getTransactionHash:
@@ -808,7 +807,7 @@ l1:
         encodeTransactionData:
         getChainId: 1
         getModulesPaginated:
-        getOwners: [*ADMIN_0,*ADMIN_1,*ADMIN_2,*ADMIN_3,*ADMIN_4,*ADMIN_5,*ADMIN_6,*ADMIN_7]
+        getOwners: [*ADMIN_0, *ADMIN_1, *ADMIN_2, *ADMIN_3, *ADMIN_4, *ADMIN_5, *ADMIN_6, *ADMIN_7]
         getStorageAt:
         getThreshold: *THRESHOLD
         getTransactionHash:

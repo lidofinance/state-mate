@@ -31,7 +31,7 @@ misc:
   - &BNB_TEST_CCE_ACTIONS_SET_COUNT 3
 
 deployed:
-# Newly deployed contracts
+  # Newly deployed contracts
   l1:
     - &sepProxyAdmin "0x7BE89331452883D335C2556d1863CD2925E76afc"
     - &sepCCC "0x9d8548963Fa0a9BE7C434cA482dd5b79E8062d3A"

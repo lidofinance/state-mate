@@ -57,11 +57,11 @@ l1:
         proxy__getImplementation: *l1TokenBridgeImpl
         proxy__getIsOssified: false
       ozNonEnumerableAcl:
-        *DEFAULT_ADMIN_ROLE : [ *l1Agent ]
-        *DEPOSITS_DISABLER_ROLE : [ *l1Agent, *l1EmergencyBreaksMultisig ]
-        *DEPOSITS_ENABLER_ROLE : [ *l1Agent ]
-        *WITHDRAWALS_DISABLER_ROLE : [ *l1Agent, *l1EmergencyBreaksMultisig ]
-        *WITHDRAWALS_ENABLER_ROLE : [ *l1Agent ]
+        *DEFAULT_ADMIN_ROLE : [*l1Agent]
+        *DEPOSITS_DISABLER_ROLE : [*l1Agent, *l1EmergencyBreaksMultisig]
+        *DEPOSITS_ENABLER_ROLE : [*l1Agent]
+        *WITHDRAWALS_DISABLER_ROLE : [*l1Agent, *l1EmergencyBreaksMultisig]
+        *WITHDRAWALS_ENABLER_ROLE : [*l1Agent]
       checks:
         DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
         DEPOSITS_DISABLER_ROLE: *DEPOSITS_DISABLER_ROLE
@@ -69,15 +69,15 @@ l1:
         WITHDRAWALS_DISABLER_ROLE: *WITHDRAWALS_DISABLER_ROLE
         WITHDRAWALS_ENABLER_ROLE: *WITHDRAWALS_ENABLER_ROLE
         getRoleAdmin:
-          - args: [ *DEFAULT_ADMIN_ROLE ]
+          - args: [*DEFAULT_ADMIN_ROLE]
             result: *DEFAULT_ADMIN_ROLE
-          - args: [ *DEPOSITS_DISABLER_ROLE ]
+          - args: [*DEPOSITS_DISABLER_ROLE]
             result: *DEFAULT_ADMIN_ROLE
-          - args: [ *DEPOSITS_ENABLER_ROLE ]
+          - args: [*DEPOSITS_ENABLER_ROLE]
             result: *DEFAULT_ADMIN_ROLE
-          - args: [ *WITHDRAWALS_DISABLER_ROLE ]
+          - args: [*WITHDRAWALS_DISABLER_ROLE]
             result: *DEFAULT_ADMIN_ROLE
-          - args: [ *WITHDRAWALS_ENABLER_ROLE ]
+          - args: [*WITHDRAWALS_ENABLER_ROLE]
             result: *DEFAULT_ADMIN_ROLE
         hasRole: null # checked automatically by ozNonEnumerableAcl section
         isDepositsEnabled: true
@@ -141,11 +141,11 @@ l2:
         proxy__getImplementation: *l2TokenBridgeImpl
         proxy__getIsOssified: false
       ozNonEnumerableAcl:
-        *DEFAULT_ADMIN_ROLE : [ *l2GovExecutor ]
-        *DEPOSITS_DISABLER_ROLE : [ *l2GovExecutor, *l2EmergencyBreaksMultisig ]
-        *DEPOSITS_ENABLER_ROLE : [ *l2GovExecutor ]
-        *WITHDRAWALS_DISABLER_ROLE : [ *l2GovExecutor, *l2EmergencyBreaksMultisig ]
-        *WITHDRAWALS_ENABLER_ROLE : [ *l2GovExecutor ]
+        *DEFAULT_ADMIN_ROLE : [*l2GovExecutor]
+        *DEPOSITS_DISABLER_ROLE : [*l2GovExecutor, *l2EmergencyBreaksMultisig]
+        *DEPOSITS_ENABLER_ROLE : [*l2GovExecutor]
+        *WITHDRAWALS_DISABLER_ROLE : [*l2GovExecutor, *l2EmergencyBreaksMultisig]
+        *WITHDRAWALS_ENABLER_ROLE : [*l2GovExecutor]
       checks:
         DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
         DEPOSITS_DISABLER_ROLE: *DEPOSITS_DISABLER_ROLE
@@ -153,15 +153,15 @@ l2:
         WITHDRAWALS_DISABLER_ROLE: *WITHDRAWALS_DISABLER_ROLE
         WITHDRAWALS_ENABLER_ROLE: *WITHDRAWALS_ENABLER_ROLE
         getRoleAdmin:
-          - args: [ *DEFAULT_ADMIN_ROLE ]
+          - args: [*DEFAULT_ADMIN_ROLE]
             result: *DEFAULT_ADMIN_ROLE
-          - args: [ *DEPOSITS_DISABLER_ROLE ]
+          - args: [*DEPOSITS_DISABLER_ROLE]
             result: *DEFAULT_ADMIN_ROLE
-          - args: [ *DEPOSITS_ENABLER_ROLE ]
+          - args: [*DEPOSITS_ENABLER_ROLE]
             result: *DEFAULT_ADMIN_ROLE
-          - args: [ *WITHDRAWALS_DISABLER_ROLE ]
+          - args: [*WITHDRAWALS_DISABLER_ROLE]
             result: *DEFAULT_ADMIN_ROLE
-          - args: [ *WITHDRAWALS_ENABLER_ROLE ]
+          - args: [*WITHDRAWALS_ENABLER_ROLE]
             result: *DEFAULT_ADMIN_ROLE
         hasRole: null # checked automatically by ozNonEnumerableAcl section
         isDepositsEnabled: true
