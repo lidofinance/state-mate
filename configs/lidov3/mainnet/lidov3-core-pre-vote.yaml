@@ -12,10 +12,10 @@ deployed:
     # --- Core protocol ---
     - &lidoLocator "0xC1d0b3DE6792Bf6b4b37EccdcC24e45978Cfd2Eb"
     - &lidoLocatorOldImplAddress "0x2C298963FB763f74765829722a1ebe0784f4F5Cf"
-    - &lidoLocatorNewImplAddress "0x00000000000000000000000000000000544f444f" # TODO
+    - &lidoLocatorNewImplAddress "0x26329a3D4cF2F89923b5c4C14a25A2485cD01aA2"
     - &lido "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84"
     - &lidoOldImplAddress "0x17144556fd3424EDC8Fc8A4C940B2D04936d17eb"
-    - &lidoNewImplAddress "0x00000000000000000000000000000000544f444f" # TODO
+    - &lidoNewImplAddress "0xD0b9826e0EAf6dE91CE7A6783Cd6fd137ae422Ec"
     - &wstETH "0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0"
     - &wstETHReferralStaker "0xa88f0329C2c4ce51ba3fc619BBf44efE7120Dd0d"
     - &eip712StETH "0x8F73e4C2A6D852bb4ab2A45E6a9CF5715b3228B7"
@@ -27,11 +27,11 @@ deployed:
     - &withdrawalQueueERC721ImplAddress "0xE42C659Dc09109566720EA8b2De186c2Be7D94D9"
     - &withdrawalVault "0xb9d7934878b5fb9610b3fe8a5e441e8fad7e293f"
     - &withdrawalVaultImplAddress "0x7D2BAa6094E1C4B60Da4cbAF4A77C3f4694fD53D"
-    - &accounting "0x00000000000000000000000000000000544f444f" # TODO
-    - &accountingImplAddress "0x00000000000000000000000000000000544f444f" # TODO
+    - &accounting "0xc9158c756D2a510eaC85792C847798a30dE20D46"
+    - &accountingImplAddress "0x1bE2Ee7D32e3F9C4ecd5b6BfF69306ACb8Ab239e"
     - &oldBurner "0xD15a672319Cf0352560eE76d9e89eAB0889046D3"
-    - &newBurder "0x00000000000000000000000000000000544f444f" # TODO
-    - &newBurnerImplAddress "0x00000000000000000000000000000000544f444f" # TODO
+    - &newBurner "0xD140f4f3C515E1a328F6804C5426d9e8b883ED50"
+    - &newBurnerImplAddress "0x0D3C621B5c3CE33159BeabB5E2B0D9bE3c68B590"
     - &mevBoostRelayAllowedList "0xF95f069F9AD107938F6ba802a3da87892298610E"
     - &minFirstAllocationStrategy "0x7e70De6D1877B3711b2bEDa7BA00013C7142d993"
     - &triggerableWithdrawalsGateway "0xDC00116a0D3E064427dA2600449cfD2566B3037B"
@@ -39,35 +39,34 @@ deployed:
 
     # --- stVaults system contracts ---
 
-    - &vaultHub "0x00000000000000000000000000000000544f444f" # TODO
-    - &vaultHubImplAddress "0x00000000000000000000000000000000544f444f" # TODO
-    - &predepositGuarantee "0x00000000000000000000000000000000544f444f" # TODO
-    - &predepositGuaranteeImplAddress "0x00000000000000000000000000000000544f444f" # TODO
-    - &operatorGrid "0x00000000000000000000000000000000544f444f" # TODO
-    - &operatorGridImplAddress "0x00000000000000000000000000000000544f444f" # TODO
+    - &vaultHub "0xdcC04F506E24495E9F2599A7b214522647363669"
+    - &vaultHubImplAddress "0xB4c523f115C40df5A9981DB804b488B0a9012002"
+    - &predepositGuarantee "0x7B49b203A100E326B84886dCC0e2c426f9b8cbBd"
+    - &predepositGuaranteeImplAddress "0x85cBc70D06CfD02D176c7e8474636cF9fCa414eA"
+    - &operatorGrid "0x79e2685C1DD4756AC709a6CeE7C6cC960128B031"
+    - &operatorGridImplAddress "0x0d442cD3D42F05D27596bEB3185dBC43A6840308"
 
     # --- stVaults factory stack ---
-    - &stakingVaultFactory "0x00000000000000000000000000000000544f444f" # TODO
-    - &stakingVaultBeacon "0x00000000000000000000000000000000544f444f" # TODO
-    - &stakingVaultImplAddress "0x00000000000000000000000000000000544f444f" # TODO
-    - &dashboardImplAddress "0x00000000000000000000000000000000544f444f" # TODO
-    - &consolidationRequestsValidator "0x00000000000000000000000000000000544f444f" # TODO
-    - &pinnedBeaconProxy "0x00000000000000000000000000000000544f444f" # TODO
+    - &stakingVaultFactory "0x676c573946ba7a34243f576C1F966F0ce5068739"
+    - &stakingVaultBeacon "0x5D8508D1eA725d35a61886658FB4BD7795027f6C"
+    - &stakingVaultImplAddress "0xDAEf26cE8ba47d297e22A4318c1ACC5dB12dD3d6"
+    - &dashboardImplAddress "0x08e197D82BC33Ddb7f3081f9aC31F3647cFabD46"
+    - &consolidationRequestsValidator "0x6c5e18E4d335f16EA7a938eD3D35F11bCa390104"
 
     # --- Oracle contracts ---
     - &accountingOracle "0x852deD011285fe67063a08005c71a85690503Cee"
     - &accountingOracleOldImplAddress "0xE9906E543274cebcd335d2C560094089e9547e8d"
-    - &accountingOracleNewImplAddress "0x00000000000000000000000000000000544f444f" # TODO
+    - &accountingOracleNewImplAddress "0xb2295820F5286BE40c2da8102eB2cDB24aD608Be"
     - &hashConsensusForAccountingOracle "0xD624B08C83bAECF0807Dd2c6880C3154a5F0B288"
 
     - &validatorsExitBusOracle "0x0De4Ea0184c2ad0BacA7183356Aea5B8d5Bf5c6e"
     - &validatorsExitBusOracleImplAddress "0x905A211eD6830Cfc95643f0bE2ff64E7f3bf9b94"
     - &hashConsensusForValidatorsExitBusOracle "0x7FaDB6358950c5fAA66Cb5EB8eE5147De3df355a"
     - &oldOracleReportSanityChecker "0x6232397ebac4f5772e53285b26c47914e9461e75"
-    - &newOracleReportSanityChecker "0x00000000000000000000000000000000544f444f" # TODO
+    - &newOracleReportSanityChecker "0x4c42eF565ED49aDcC459a53C3abDCa86617E2f63"
     - &oracleDaemonConfig "0xbf05A929c3D7885a6aeAd833a992dA6E5ac23b09"
-    - &lazyOracle "0x00000000000000000000000000000000544f444f" # TODO
-    - &lazyOracleImplAddress "0x00000000000000000000000000000000544f444f" # TODO
+    - &lazyOracle "0x4fA3c917BB8f8CD9d056C5DDF0a38bd1834c43F9"
+    - &lazyOracleImplAddress "0xD517eA3605340291285136cee64F9a64A664F76C"
     - &tokenRateNotifier "0xe6793B9e4FbA7DE0ee833F9D02bba7DB5EB27823"
     - &legacyOracle "0x442af784A788A5bd6F42A01Ebe9F287a871243fb"
 
@@ -94,7 +93,7 @@ deployed:
     - &gateSealFactory "0x6c82877cac5a7a739f16ca0a89c0a328b8764a24"
     - &gateSealVEBAndTWG "0xA6BC802fAa064414AA62117B4a53D27fFfF741F1"
     - &gateSealWithdrawalQueue "0x8A854C4E750CDf24f138f34A9061b2f556066912"
-    - &gateSealVaulthubAndPredepositGuarantee "0x00000000000000000000000000000000544f444f" # TODO
+    - &gateSealVaulthubAndPredepositGuarantee "0x9c2D30177DB12334998EB554f5d4E6dD44458167"
     - &gateSealCSAccounting "0xE1686C2E90eb41a48356c1cC7FaA17629af3ADB3"
 
     # --- Staking modules ---
@@ -114,7 +113,7 @@ deployed:
     - &easyTrack "0xF0211b7660680B49De1A7E9f25C65660F0a13Fea"
     - &evmScriptExecutor "0xFE5986E06210aC1eCC1aDCafc0cc7f8D63B3F977"
     - &callsScript "0x5cEb19e1890f677c3676d5ecDF7c501eBA01A054"
-    - &vaultsAdapter "0x00000000000000000000000000000000544f444f" # TODO
+    - &vaultsAdapter "0x8cDA09f41970A8f4416b6bA4696a2f09a6080c76"
 
     # --- Committees (Safe msigs) ---
     - &resealManager "0x7914b5a1539b97Bd0bbd155757F25FD79A522d24"
@@ -151,6 +150,7 @@ misc:
 
   # --- General numeric constants ---
   - &MAX_UINT256 "115792089237316195423570985008687907853269984665640564039457584007913129639935"
+  - &MAX_UINT64 "18446744073709551615"
   - &DECIMALS_18 18
 
   # --- EIP-712 domain separators ---
@@ -253,7 +253,7 @@ misc:
   - &MAX_REWARD_RATIO 65535
 
 eoa:
-  - &deployer "0xAD2F7e30AeA89f6D45D942D0f52aFB8B395965f2" # TODO: Check
+  - &deployer "0x55Bc991b2edF3DDb4c520B222bE4F378418ff0fA"
 
 roles:
   # Lido
@@ -894,75 +894,73 @@ l1:
         WITHDRAWAL_REQUEST: null
         getWithdrawalRequestFee: null
 
-    # TODO: remove this
-    # accounting:
-    #   name: Accounting
-    #   address: *accounting
-    #   proxyName: OssifiableProxy
-    #   implementation: *accountingImplAddress
-    #   proxyChecks:
-    #     proxy__getAdmin: *aragonAgent
-    #     proxy__getImplementation: *accountingImplAddress
-    #     proxy__getIsOssified: false
-    #   checks:
-    #     LIDO: *lido
-    #     LIDO_LOCATOR: *lidoLocator
-    #     simulateOracleReport: null
-    #     handleOracleReport: null
-    #   implementationChecks:
-    #     LIDO: *lido
-    #     LIDO_LOCATOR: *lidoLocator
-    #     simulateOracleReport: null
-    #     handleOracleReport: null
+    accounting:
+      name: Accounting
+      address: *accounting
+      proxyName: OssifiableProxy
+      implementation: *accountingImplAddress
+      proxyChecks:
+        proxy__getAdmin: *aragonAgent
+        proxy__getImplementation: *accountingImplAddress
+        proxy__getIsOssified: false
+      checks:
+        LIDO: *lido
+        LIDO_LOCATOR: *lidoLocator
+        simulateOracleReport: null
+        handleOracleReport: null
+      implementationChecks:
+        LIDO: *lido
+        LIDO_LOCATOR: *lidoLocator
+        simulateOracleReport: null
+        handleOracleReport: null
 
-    # TODO: remove this
-    # newBurder:
-    #   name: Burner
-    #   address: *newBurder
-    #   proxyName: OssifiableProxy
-    #   implementation: *newBurnerImplAddress
-    #   proxyChecks:
-    #     proxy__getAdmin: *aragonAgent
-    #     proxy__getImplementation: *newBurnerImplAddress
-    #     proxy__getIsOssified: false
-    #   checks:
-    #     DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
-    #     LIDO: *lido
-    #     LOCATOR: *lidoLocator
-    #     REQUEST_BURN_MY_STETH_ROLE: *REQUEST_BURN_MY_STETH_ROLE
-    #     REQUEST_BURN_SHARES_ROLE: *REQUEST_BURN_SHARES_ROLE
-    #     getContractVersion: *BURNER_VERSION
-    #     isMigrationAllowed: false
-    #     getCoverSharesBurnt: null
-    #     getExcessStETH: null
-    #     getNonCoverSharesBurnt: null
-    #     getRoleAdmin: null
-    #     getRoleMember: null
-    #     getRoleMemberCount: null
-    #     getSharesRequestedToBurn: null
-    #     hasRole: null
-    #     supportsInterface: null
-    #   ozAcl:
-    #     *DEFAULT_ADMIN_ROLE : [*aragonAgent]
-    #     *REQUEST_BURN_MY_STETH_ROLE : []
-    #     *REQUEST_BURN_SHARES_ROLE : [*accounting, *CSAccounting]
-    #   implementationChecks:
-    #     DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
-    #     LIDO: *lido
-    #     LOCATOR: *lidoLocator
-    #     REQUEST_BURN_MY_STETH_ROLE: *REQUEST_BURN_MY_STETH_ROLE
-    #     REQUEST_BURN_SHARES_ROLE: *REQUEST_BURN_SHARES_ROLE
-    #     getContractVersion: *MAX_UINT256
-    #     isMigrationAllowed: false
-    #     getCoverSharesBurnt: null
-    #     getExcessStETH: null
-    #     getNonCoverSharesBurnt: null
-    #     getRoleAdmin: null
-    #     getRoleMember: null
-    #     getRoleMemberCount: null
-    #     getSharesRequestedToBurn: null
-    #     hasRole: null
-    #     supportsInterface: null
+    newBurner:
+      name: Burner
+      address: *newBurner
+      proxyName: OssifiableProxy
+      implementation: *newBurnerImplAddress
+      proxyChecks:
+        proxy__getAdmin: *aragonAgent
+        proxy__getImplementation: *newBurnerImplAddress
+        proxy__getIsOssified: false
+      checks:
+        DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
+        LIDO: *lido
+        LOCATOR: *lidoLocator
+        REQUEST_BURN_MY_STETH_ROLE: *REQUEST_BURN_MY_STETH_ROLE
+        REQUEST_BURN_SHARES_ROLE: *REQUEST_BURN_SHARES_ROLE
+        getContractVersion: *BURNER_VERSION
+        isMigrationAllowed: false
+        getCoverSharesBurnt: null
+        getExcessStETH: null
+        getNonCoverSharesBurnt: null
+        getRoleAdmin: null
+        getRoleMember: null
+        getRoleMemberCount: null
+        getSharesRequestedToBurn: null
+        hasRole: null
+        supportsInterface: null
+      ozAcl:
+        *DEFAULT_ADMIN_ROLE : [*aragonAgent]
+        *REQUEST_BURN_MY_STETH_ROLE : []
+        *REQUEST_BURN_SHARES_ROLE : [*accounting, *CSAccounting]
+      implementationChecks:
+        DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
+        LIDO: *lido
+        LOCATOR: *lidoLocator
+        REQUEST_BURN_MY_STETH_ROLE: *REQUEST_BURN_MY_STETH_ROLE
+        REQUEST_BURN_SHARES_ROLE: *REQUEST_BURN_SHARES_ROLE
+        getContractVersion: *MAX_UINT256
+        isMigrationAllowed: false
+        getCoverSharesBurnt: null
+        getExcessStETH: null
+        getNonCoverSharesBurnt: null
+        getRoleAdmin: null
+        getRoleMember: null
+        getRoleMemberCount: null
+        getSharesRequestedToBurn: null
+        hasRole: null
+        supportsInterface: null
 
     CSAccounting:
       name: CSAccounting
@@ -1131,426 +1129,387 @@ l1:
         SLOTS_PER_EPOCH: *SLOTS_PER_EPOCH
         SLOTS_PER_HISTORICAL_ROOT: *SLOTS_PER_HISTORICAL_ROOT
 
-    # vaultHub:
-    #   name: VaultHub
-    #   address: *vaultHub
-    #   proxyName: OssifiableProxy
-    #   implementation: *vaultHubImplAddress
-    #   proxyChecks:
-    #     proxy__getAdmin: *aragonAgent
-    #     proxy__getImplementation: *vaultHubImplAddress
-    #     proxy__getIsOssified: false
-    #   checks:
-    #     CONNECT_DEPOSIT: *ONE_ETH_WEI
-    #     CONSENSUS_CONTRACT: *hashConsensusForAccountingOracle
-    #     MAX_RELATIVE_SHARE_LIMIT_BP: *MAX_RELATIVE_SHARE_LIMIT_BP
-    #     REPORT_FRESHNESS_DELTA: *REPORT_FRESHNESS_DELTA
-    #     LIDO: *lido
-    #     LIDO_LOCATOR: *lidoLocator
-    #     PAUSE_INFINITELY: *MAX_UINT256
-    #     DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
-    #     PAUSE_ROLE: *OZ_PAUSE_ROLE
-    #     RESUME_ROLE: *OZ_RESUME_ROLE
-    #     VAULT_MASTER_ROLE: *VAULT_MASTER_ROLE
-    #     BAD_DEBT_MASTER_ROLE: *BAD_DEBT_MASTER_ROLE
-    #     REDEMPTION_MASTER_ROLE: *REDEMPTION_MASTER_ROLE
-    #     VALIDATOR_EXIT_ROLE: *VALIDATOR_EXIT_ROLE
-    #     getResumeSinceTimestamp: 0
-    #     isPaused: false
-    #     batchVaultsInfo: null
-    #     getRoleAdmin: null
-    #     getRoleMember: null
-    #     getRoleMemberCount: null
-    #     getRoleMembers: null
-    #     hasRole: null
-    #     isVaultHealthyAsOfLatestReport: null
-    #     latestReportData: null
-    #     rebalanceShortfall: null
-    #     badDebtToInternalize: null
-    #     healthShortfallShares: null
-    #     isPendingDisconnect: null
-    #     isReportFresh: null
-    #     isVaultConnected: null
-    #     isVaultHealthy: null
-    #     latestReport: null
-    #     liabilityShares: null
-    #     locked: null
-    #     maxLockableValue: null
-    #     obligations: null
-    #     obligationsShortfallValue: null
-    #     settleableLidoFeesValue: null
-    #     totalMintingCapacityShares: null
-    #     totalValue: null
-    #     vaultByIndex: null
-    #     vaultConnection: null
-    #     vaultRecord: null
-    #     withdrawableValue: null
-    #     supportsInterface: null
-    #     vaultSocket: null
-    #     vaultsCount: null
-    #   ozAcl:
-    #     *DEFAULT_ADMIN_ROLE : [*aragonAgent]
-    #     *OZ_PAUSE_ROLE : [*gateSealVaulthubAndPredepositGuarantee]
-    #     *OZ_RESUME_ROLE : []
-    #     *VAULT_MASTER_ROLE : [*aragonAgent]
-    #     *BAD_DEBT_MASTER_ROLE : [*vaultsAdapter]
-    #     *REDEMPTION_MASTER_ROLE : [*aragonAgent, *vaultsAdapter] # WARNING: must be none for mainnet
-    #     *VALIDATOR_EXIT_ROLE : [*vaultsAdapter]
-    #   implementationChecks:
-    #     CONNECT_DEPOSIT: *ONE_ETH_WEI
-    #     CONSENSUS_CONTRACT: *hashConsensusForAccountingOracle
-    #     MAX_RELATIVE_SHARE_LIMIT_BP: *MAX_RELATIVE_SHARE_LIMIT_BP
-    #     REPORT_FRESHNESS_DELTA: *REPORT_FRESHNESS_DELTA
-    #     LIDO: *lido
-    #     LIDO_LOCATOR: *lidoLocator
-    #     PAUSE_INFINITELY: *MAX_UINT256
-    #     DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
-    #     PAUSE_ROLE: *OZ_PAUSE_ROLE
-    #     RESUME_ROLE: *OZ_RESUME_ROLE
-    #     VAULT_MASTER_ROLE: *VAULT_MASTER_ROLE
-    #     BAD_DEBT_MASTER_ROLE: *BAD_DEBT_MASTER_ROLE
-    #     REDEMPTION_MASTER_ROLE: *REDEMPTION_MASTER_ROLE
-    #     VALIDATOR_EXIT_ROLE: *VALIDATOR_EXIT_ROLE
-    #     getResumeSinceTimestamp: *MAX_UINT256
-    #     isPaused: true
-    #     batchVaultsInfo: null
-    #     getRoleAdmin: null
-    #     getRoleMember: null
-    #     getRoleMemberCount: null
-    #     getRoleMembers: null
-    #     hasRole: null
-    #     isVaultHealthyAsOfLatestReport: null
-    #     latestReportData: null
-    #     rebalanceShortfall: null
-    #     badDebtToInternalize: null
-    #     healthShortfallShares: null
-    #     isPendingDisconnect: null
-    #     isReportFresh: null
-    #     isVaultConnected: null
-    #     isVaultHealthy: null
-    #     latestReport: null
-    #     liabilityShares: null
-    #     locked: null
-    #     maxLockableValue: null
-    #     obligations: null
-    #     obligationsShortfallValue: null
-    #     settleableLidoFeesValue: null
-    #     totalMintingCapacityShares: null
-    #     totalValue: null
-    #     vaultByIndex: null
-    #     vaultConnection: null
-    #     vaultRecord: null
-    #     withdrawableValue: null
-    #     supportsInterface: null
-    #     vaultSocket: null
-    #     vaultsCount: null
+    vaultHub:
+      name: VaultHub
+      address: *vaultHub
+      proxyName: OssifiableProxy
+      implementation: *vaultHubImplAddress
+      proxyChecks:
+        proxy__getAdmin: *aragonAgent
+        proxy__getImplementation: *vaultHubImplAddress
+        proxy__getIsOssified: false
+      checks:
+        CONNECT_DEPOSIT: *ONE_ETH_WEI
+        CONSENSUS_CONTRACT: *hashConsensusForAccountingOracle
+        MAX_RELATIVE_SHARE_LIMIT_BP: *MAX_RELATIVE_SHARE_LIMIT_BP
+        REPORT_FRESHNESS_DELTA: *REPORT_FRESHNESS_DELTA
+        LIDO: *lido
+        LIDO_LOCATOR: *lidoLocator
+        PAUSE_INFINITELY: *MAX_UINT256
+        DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
+        PAUSE_ROLE: *OZ_PAUSE_ROLE
+        RESUME_ROLE: *OZ_RESUME_ROLE
+        VAULT_MASTER_ROLE: *VAULT_MASTER_ROLE
+        BAD_DEBT_MASTER_ROLE: *BAD_DEBT_MASTER_ROLE
+        REDEMPTION_MASTER_ROLE: *REDEMPTION_MASTER_ROLE
+        VALIDATOR_EXIT_ROLE: *VALIDATOR_EXIT_ROLE
+        getResumeSinceTimestamp: 0
+        isPaused: false
+        batchVaultsInfo: null
+        getRoleAdmin: null
+        getRoleMember: null
+        getRoleMemberCount: null
+        getRoleMembers: null
+        hasRole: null
+        isVaultHealthyAsOfLatestReport: null
+        latestReportData: null
+        rebalanceShortfall: null
+        badDebtToInternalize: null
+        healthShortfallShares: null
+        isPendingDisconnect: null
+        isReportFresh: null
+        isVaultConnected: null
+        isVaultHealthy: null
+        latestReport: null
+        liabilityShares: null
+        locked: null
+        maxLockableValue: null
+        obligations: null
+        obligationsShortfallValue: null
+        settleableLidoFeesValue: null
+        totalMintingCapacityShares: null
+        totalValue: null
+        vaultByIndex: null
+        vaultConnection: null
+        vaultRecord: null
+        withdrawableValue: null
+        supportsInterface: null
+        vaultSocket: null
+        vaultsCount: null
+      ozAcl:
+        *DEFAULT_ADMIN_ROLE : [*aragonAgent]
+        *OZ_PAUSE_ROLE : [*gateSealVaulthubAndPredepositGuarantee]
+        *OZ_RESUME_ROLE : []
+        *VAULT_MASTER_ROLE : [*aragonAgent]
+        *BAD_DEBT_MASTER_ROLE : [*vaultsAdapter]
+        *REDEMPTION_MASTER_ROLE : [*aragonAgent, *vaultsAdapter] # WARNING: must be none for mainnet
+        *VALIDATOR_EXIT_ROLE : [*vaultsAdapter]
+      implementationChecks:
+        CONNECT_DEPOSIT: *ONE_ETH_WEI
+        CONSENSUS_CONTRACT: *hashConsensusForAccountingOracle
+        MAX_RELATIVE_SHARE_LIMIT_BP: *MAX_RELATIVE_SHARE_LIMIT_BP
+        REPORT_FRESHNESS_DELTA: *REPORT_FRESHNESS_DELTA
+        LIDO: *lido
+        LIDO_LOCATOR: *lidoLocator
+        PAUSE_INFINITELY: *MAX_UINT256
+        DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
+        PAUSE_ROLE: *OZ_PAUSE_ROLE
+        RESUME_ROLE: *OZ_RESUME_ROLE
+        VAULT_MASTER_ROLE: *VAULT_MASTER_ROLE
+        BAD_DEBT_MASTER_ROLE: *BAD_DEBT_MASTER_ROLE
+        REDEMPTION_MASTER_ROLE: *REDEMPTION_MASTER_ROLE
+        VALIDATOR_EXIT_ROLE: *VALIDATOR_EXIT_ROLE
+        getResumeSinceTimestamp: *MAX_UINT256
+        isPaused: true
+        batchVaultsInfo: null
+        getRoleAdmin: null
+        getRoleMember: null
+        getRoleMemberCount: null
+        getRoleMembers: null
+        hasRole: null
+        isVaultHealthyAsOfLatestReport: null
+        latestReportData: null
+        rebalanceShortfall: null
+        badDebtToInternalize: null
+        healthShortfallShares: null
+        isPendingDisconnect: null
+        isReportFresh: null
+        isVaultConnected: null
+        isVaultHealthy: null
+        latestReport: null
+        liabilityShares: null
+        locked: null
+        maxLockableValue: null
+        obligations: null
+        obligationsShortfallValue: null
+        settleableLidoFeesValue: null
+        totalMintingCapacityShares: null
+        totalValue: null
+        vaultByIndex: null
+        vaultConnection: null
+        vaultRecord: null
+        withdrawableValue: null
+        supportsInterface: null
+        vaultSocket: null
+        vaultsCount: null
 
-    # predepositGuarantee:
-    #   name: PredepositGuarantee
-    #   address: *predepositGuarantee
-    #   proxyName: OssifiableProxy
-    #   implementation: *predepositGuaranteeImplAddress
-    #   proxyChecks:
-    #     proxy__getAdmin: *aragonAgent
-    #     proxy__getImplementation: *predepositGuaranteeImplAddress
-    #     proxy__getIsOssified: false
-    #   checks:
-    #     PREDEPOSIT_AMOUNT: *ONE_ETH_WEI
-    #     ACTIVATION_DEPOSIT_AMOUNT: *ACTIVATION_DEPOSIT_AMOUNT
-    #     MAX_TOPUP_AMOUNT: *MAX_TOPUP_AMOUNT
-    #     BEACON_ROOTS: *contract4788
-    #     DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
-    #     DEPOSIT_DOMAIN: *DEPOSIT_DOMAIN
-    #     GI_FIRST_VALIDATOR_CURR: *GI_FIRST_VALIDATOR_CURR
-    #     GI_FIRST_VALIDATOR_PREV: *GI_FIRST_VALIDATOR_CURR
-    #     GI_PUBKEY_WC_PARENT: *GI_PUBKEY_WC_PARENT
-    #     GI_STATE_ROOT: *GI_STATE_ROOT
-    #     MIN_SUPPORTED_WC_VERSION: 1
-    #     MAX_SUPPORTED_WC_VERSION: 2
-    #     PIVOT_SLOT: 0
-    #     PAUSE_INFINITELY: *MAX_UINT256
-    #     PAUSE_ROLE: *OZ_PAUSE_ROLE
-    #     RESUME_ROLE: *OZ_RESUME_ROLE
-    #     getResumeSinceTimestamp: 0
-    #     isPaused: false
-    #     claimableRefund: null
-    #     getRoleAdmin: null
-    #     getRoleMember: null
-    #     getRoleMemberCount: null
-    #     getRoleMembers: null
-    #     hasRole: null
-    #     nodeOperatorBalance: null
-    #     nodeOperatorDepositor: null
-    #     nodeOperatorGuarantor: null
-    #     pendingActivations: null
-    #     supportsInterface: null
-    #     validatePubKeyWCProof: null
-    #     verifyDepositMessage: null
-    #     unlockedBalance: null
-    #     validatorStatus: null
-    #   ozAcl:
-    #     *DEFAULT_ADMIN_ROLE : [*aragonAgent]
-    #     *OZ_PAUSE_ROLE : [*gateSealVaulthubAndPredepositGuarantee]
-    #     *OZ_RESUME_ROLE : []
-    #   implementationChecks:
-    #     PREDEPOSIT_AMOUNT: *ONE_ETH_WEI
-    #     ACTIVATION_DEPOSIT_AMOUNT: *ACTIVATION_DEPOSIT_AMOUNT
-    #     MAX_TOPUP_AMOUNT: *MAX_TOPUP_AMOUNT
-    #     BEACON_ROOTS: *contract4788
-    #     DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
-    #     DEPOSIT_DOMAIN: *DEPOSIT_DOMAIN
-    #     GI_FIRST_VALIDATOR_CURR: *GI_FIRST_VALIDATOR_CURR
-    #     GI_FIRST_VALIDATOR_PREV: *GI_FIRST_VALIDATOR_CURR
-    #     GI_PUBKEY_WC_PARENT: *GI_PUBKEY_WC_PARENT
-    #     GI_STATE_ROOT: *GI_STATE_ROOT
-    #     MIN_SUPPORTED_WC_VERSION: 1
-    #     MAX_SUPPORTED_WC_VERSION: 2
-    #     PIVOT_SLOT: 0
-    #     PAUSE_INFINITELY: *MAX_UINT256
-    #     PAUSE_ROLE: *OZ_PAUSE_ROLE
-    #     RESUME_ROLE: *OZ_RESUME_ROLE
-    #     getResumeSinceTimestamp: *MAX_UINT256
-    #     isPaused: true
-    #     claimableRefund: null
-    #     getRoleAdmin: null
-    #     getRoleMember: null
-    #     getRoleMemberCount: null
-    #     getRoleMembers: null
-    #     hasRole: null
-    #     nodeOperatorBalance: null
-    #     nodeOperatorDepositor: null
-    #     nodeOperatorGuarantor: null
-    #     pendingActivations: null
-    #     supportsInterface: null
-    #     validatePubKeyWCProof: null
-    #     verifyDepositMessage: null
-    #     unlockedBalance: null
-    #     validatorStatus: null
+    predepositGuarantee:
+      name: PredepositGuarantee
+      address: *predepositGuarantee
+      proxyName: OssifiableProxy
+      implementation: *predepositGuaranteeImplAddress
+      proxyChecks:
+        proxy__getAdmin: *aragonAgent
+        proxy__getImplementation: *predepositGuaranteeImplAddress
+        proxy__getIsOssified: false
+      checks:
+        PREDEPOSIT_AMOUNT: *ONE_ETH_WEI
+        ACTIVATION_DEPOSIT_AMOUNT: *ACTIVATION_DEPOSIT_AMOUNT
+        MAX_TOPUP_AMOUNT: *MAX_TOPUP_AMOUNT
+        BEACON_ROOTS: *contract4788
+        DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
+        DEPOSIT_DOMAIN: *DEPOSIT_DOMAIN
+        GI_FIRST_VALIDATOR_CURR: *GI_FIRST_VALIDATOR_CURR
+        GI_FIRST_VALIDATOR_PREV: *GI_FIRST_VALIDATOR_CURR
+        GI_PUBKEY_WC_PARENT: *GI_PUBKEY_WC_PARENT
+        GI_STATE_ROOT: *GI_STATE_ROOT
+        MIN_SUPPORTED_WC_VERSION: 1
+        MAX_SUPPORTED_WC_VERSION: 2
+        PIVOT_SLOT: 0
+        PAUSE_INFINITELY: *MAX_UINT256
+        PAUSE_ROLE: *OZ_PAUSE_ROLE
+        RESUME_ROLE: *OZ_RESUME_ROLE
+        getResumeSinceTimestamp: 0
+        isPaused: false
+        claimableRefund: null
+        getRoleAdmin: null
+        getRoleMember: null
+        getRoleMemberCount: null
+        getRoleMembers: null
+        hasRole: null
+        nodeOperatorBalance: null
+        nodeOperatorDepositor: null
+        nodeOperatorGuarantor: null
+        pendingActivations: null
+        supportsInterface: null
+        validatePubKeyWCProof: null
+        verifyDepositMessage: null
+        unlockedBalance: null
+        validatorStatus: null
+      ozAcl:
+        *DEFAULT_ADMIN_ROLE : [*aragonAgent]
+        *OZ_PAUSE_ROLE : [*gateSealVaulthubAndPredepositGuarantee]
+        *OZ_RESUME_ROLE : []
+      implementationChecks:
+        PREDEPOSIT_AMOUNT: *ONE_ETH_WEI
+        ACTIVATION_DEPOSIT_AMOUNT: *ACTIVATION_DEPOSIT_AMOUNT
+        MAX_TOPUP_AMOUNT: *MAX_TOPUP_AMOUNT
+        BEACON_ROOTS: *contract4788
+        DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
+        DEPOSIT_DOMAIN: *DEPOSIT_DOMAIN
+        GI_FIRST_VALIDATOR_CURR: *GI_FIRST_VALIDATOR_CURR
+        GI_FIRST_VALIDATOR_PREV: *GI_FIRST_VALIDATOR_CURR
+        GI_PUBKEY_WC_PARENT: *GI_PUBKEY_WC_PARENT
+        GI_STATE_ROOT: *GI_STATE_ROOT
+        MIN_SUPPORTED_WC_VERSION: 1
+        MAX_SUPPORTED_WC_VERSION: 2
+        PIVOT_SLOT: 0
+        PAUSE_INFINITELY: *MAX_UINT256
+        PAUSE_ROLE: *OZ_PAUSE_ROLE
+        RESUME_ROLE: *OZ_RESUME_ROLE
+        getResumeSinceTimestamp: *MAX_UINT256
+        isPaused: true
+        claimableRefund: null
+        getRoleAdmin: null
+        getRoleMember: null
+        getRoleMemberCount: null
+        getRoleMembers: null
+        hasRole: null
+        nodeOperatorBalance: null
+        nodeOperatorDepositor: null
+        nodeOperatorGuarantor: null
+        pendingActivations: null
+        supportsInterface: null
+        validatePubKeyWCProof: null
+        verifyDepositMessage: null
+        unlockedBalance: null
+        validatorStatus: null
 
-    # operatorGrid:
-    #   name: OperatorGrid
-    #   address: *operatorGrid
-    #   proxyName: OssifiableProxy
-    #   implementation: *operatorGridImplAddress
-    #   proxyChecks:
-    #     proxy__getAdmin: *aragonAgent
-    #     proxy__getImplementation: *operatorGridImplAddress
-    #     proxy__getIsOssified: false
-    #   checks:
-    #     DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
-    #     DEFAULT_TIER_ID: *DEFAULT_TIER_ID
-    #     DEFAULT_TIER_OPERATOR: *DEFAULT_TIER_OPERATOR
-    #     LIDO_LOCATOR: *lidoLocator
-    #     REGISTRY_ROLE: *REGISTRY_ROLE
-    #     MAX_CONFIRM_EXPIRY: *DURATION_30_DAYS
-    #     MIN_CONFIRM_EXPIRY: *DURATION_1_HOUR
-    #     confirmation: null
-    #     effectiveShareLimit: null
-    #     getConfirmExpiry: null
-    #     isVaultInJail: null
-    #     tiersCount: null
-    #     vaultTierInfo: null
-    #     getRoleAdmin: null
-    #     getRoleMember: null
-    #     getRoleMemberCount: null
-    #     getRoleMembers: null
-    #     group: null
-    #     hasRole: null
-    #     nodeOperatorAddress: null
-    #     nodeOperatorCount: null
-    #     pendingRequest: null
-    #     pendingRequests: null
-    #     pendingRequestsCount: null
-    #     supportsInterface: null
-    #     tier: null
-    #     vaultInfo: null
-    #   ozAcl:
-    #     *DEFAULT_ADMIN_ROLE : [*aragonAgent]
-    #     *REGISTRY_ROLE : [*aragonAgent, *evmScriptExecutor, *vaultsAdapter]
-    #   implementationChecks:
-    #     DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
-    #     DEFAULT_TIER_ID: *DEFAULT_TIER_ID
-    #     DEFAULT_TIER_OPERATOR: *DEFAULT_TIER_OPERATOR
-    #     LIDO_LOCATOR: *lidoLocator
-    #     REGISTRY_ROLE: *REGISTRY_ROLE
-    #     MAX_CONFIRM_EXPIRY: *DURATION_30_DAYS
-    #     MIN_CONFIRM_EXPIRY: *DURATION_1_HOUR
-    #     nodeOperatorCount: 0
-    #     getRoleAdmin: null
-    #     getRoleMember: null
-    #     getRoleMemberCount: null
-    #     getRoleMembers: null
-    #     group: null
-    #     hasRole: null
-    #     nodeOperatorAddress: null
-    #     pendingRequest: null
-    #     pendingRequests: null
-    #     pendingRequestsCount: null
-    #     supportsInterface: null
-    #     tier: null
-    #     vaultInfo: null
+    operatorGrid:
+      name: OperatorGrid
+      address: *operatorGrid
+      proxyName: OssifiableProxy
+      implementation: *operatorGridImplAddress
+      proxyChecks:
+        proxy__getAdmin: *aragonAgent
+        proxy__getImplementation: *operatorGridImplAddress
+        proxy__getIsOssified: false
+      checks:
+        DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
+        DEFAULT_TIER_ID: *DEFAULT_TIER_ID
+        DEFAULT_TIER_OPERATOR: *DEFAULT_TIER_OPERATOR
+        LIDO_LOCATOR: *lidoLocator
+        REGISTRY_ROLE: *REGISTRY_ROLE
+        MAX_CONFIRM_EXPIRY: *DURATION_30_DAYS
+        MIN_CONFIRM_EXPIRY: *DURATION_1_HOUR
+        confirmation: null
+        effectiveShareLimit: null
+        getConfirmExpiry: null
+        isVaultInJail: null
+        tiersCount: null
+        vaultTierInfo: null
+        getRoleAdmin: null
+        getRoleMember: null
+        getRoleMemberCount: null
+        getRoleMembers: null
+        group: null
+        hasRole: null
+        nodeOperatorAddress: null
+        nodeOperatorCount: null
+        pendingRequest: null
+        pendingRequests: null
+        pendingRequestsCount: null
+        supportsInterface: null
+        tier: null
+        vaultInfo: null
+      ozAcl:
+        *DEFAULT_ADMIN_ROLE : [*aragonAgent]
+        *REGISTRY_ROLE : [*aragonAgent, *evmScriptExecutor, *vaultsAdapter]
+      implementationChecks:
+        DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
+        DEFAULT_TIER_ID: *DEFAULT_TIER_ID
+        DEFAULT_TIER_OPERATOR: *DEFAULT_TIER_OPERATOR
+        LIDO_LOCATOR: *lidoLocator
+        REGISTRY_ROLE: *REGISTRY_ROLE
+        MAX_CONFIRM_EXPIRY: *DURATION_30_DAYS
+        MIN_CONFIRM_EXPIRY: *DURATION_1_HOUR
+        nodeOperatorCount: 0
+        getRoleAdmin: null
+        getRoleMember: null
+        getRoleMemberCount: null
+        getRoleMembers: null
+        group: null
+        hasRole: null
+        nodeOperatorAddress: null
+        pendingRequest: null
+        pendingRequests: null
+        pendingRequestsCount: null
+        supportsInterface: null
+        tier: null
+        vaultInfo: null
 
-    # stakingVaultFactory:
-    #   name: VaultFactory
-    #   address: *stakingVaultFactory
-    #   checks:
-    #     PREVIOUS_FACTORY: "0xf0Cf0c852Bb2b41eF8171399a71be79aa67e6295"
-    #     BEACON: *stakingVaultBeacon
-    #     DASHBOARD_IMPL: *dashboardImplAddress
-    #     LIDO_LOCATOR: *lidoLocator
-    #     deployedVaults: null
+    stakingVaultFactory:
+      name: VaultFactory
+      address: *stakingVaultFactory
+      checks:
+        PREVIOUS_FACTORY: "0xf0Cf0c852Bb2b41eF8171399a71be79aa67e6295"
+        BEACON: *stakingVaultBeacon
+        DASHBOARD_IMPL: *dashboardImplAddress
+        LIDO_LOCATOR: *lidoLocator
+        deployedVaults: null
 
-    # stakingVaultBeacon:
-    #   name: UpgradeableBeacon
-    #   address: *stakingVaultBeacon
-    #   checks:
-    #     implementation: *stakingVaultImplAddress
-    #     owner: *aragonAgent
+    stakingVaultBeacon:
+      name: UpgradeableBeacon
+      address: *stakingVaultBeacon
+      checks:
+        implementation: *stakingVaultImplAddress
+        owner: *aragonAgent
 
-    # stakingVaultImplAddress:
-    #   name: StakingVault
-    #   address: *stakingVaultImplAddress
-    #   checks:
-    #     DEPOSIT_CONTRACT: *contractDeposit
-    #     beaconChainDepositsPaused: false
-    #     depositor: *ZERO_ADDRESS
-    #     getInitializedVersion: *MAX_UINT64
-    #     nodeOperator: *ZERO_ADDRESS
-    #     owner: *ZERO_ADDRESS
-    #     version: *VERSION_1
-    #     withdrawalCredentials: "0x020000000000000000000000e96be4fb723e68e7b96244b7399c64a58bcd0062"
-    #     availableBalance: null
-    #     calculateValidatorWithdrawalFee: null
-    #     pendingOwner: null
-    #     renounceOwnership: null
-    #     stagedBalance: null
+    stakingVaultImplAddress:
+      name: StakingVault
+      address: *stakingVaultImplAddress
+      checks:
+        DEPOSIT_CONTRACT: *contractDeposit
+        beaconChainDepositsPaused: false
+        depositor: *ZERO_ADDRESS
+        getInitializedVersion: *MAX_UINT64
+        nodeOperator: *ZERO_ADDRESS
+        owner: *ZERO_ADDRESS
+        version: *VERSION_1
+        withdrawalCredentials: "0x020000000000000000000000e96be4fb723e68e7b96244b7399c64a58bcd0062"
+        availableBalance: null
+        calculateValidatorWithdrawalFee: null
+        pendingOwner: null
+        renounceOwnership: null
+        stagedBalance: null
 
-    # dashboardImplAddress:
-    #   name: Dashboard
-    #   address: *dashboardImplAddress
-    #   checks:
-    #     DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
-    #     MIN_CONFIRM_EXPIRY: *DURATION_1_HOUR
-    #     MAX_CONFIRM_EXPIRY: *DURATION_30_DAYS
-    #     STETH: *lido
-    #     WSTETH: *wstETH
-    #     VAULT_HUB: *vaultHub
-    #     LIDO_LOCATOR: *lidoLocator
-    #     MINT_ROLE: *MINT_ROLE
-    #     NODE_OPERATOR_MANAGER_ROLE: *NODE_OPERATOR_MANAGER_ROLE
-    #     PAUSE_BEACON_CHAIN_DEPOSITS_ROLE: *PAUSE_BEACON_CHAIN_DEPOSITS_ROLE
-    #     REBALANCE_ROLE: *REBALANCE_ROLE
-    #     REQUEST_VALIDATOR_EXIT_ROLE: *REQUEST_VALIDATOR_EXIT_ROLE
-    #     RESUME_BEACON_CHAIN_DEPOSITS_ROLE: *RESUME_BEACON_CHAIN_DEPOSITS_ROLE
-    #     TRIGGER_VALIDATOR_WITHDRAWAL_ROLE: *TRIGGER_VALIDATOR_WITHDRAWAL_ROLE
-    #     VOLUNTARY_DISCONNECT_ROLE: *VOLUNTARY_DISCONNECT_ROLE
-    #     WITHDRAW_ROLE: *WITHDRAW_ROLE
-    #     BURN_ROLE: *BURN_ROLE
-    #     COLLECT_VAULT_ERC20_ROLE: *COLLECT_VAULT_ERC20_ROLE
-    #     FUND_ON_RECEIVE_FLAG_SLOT: *FUND_ON_RECEIVE_FLAG_SLOT
-    #     FUND_ROLE: *FUND_ROLE
-    #     NODE_OPERATOR_FEE_EXEMPT_ROLE: *NODE_OPERATOR_FEE_EXEMPT_ROLE
-    #     NODE_OPERATOR_PROVE_UNKNOWN_VALIDATOR_ROLE: *NODE_OPERATOR_PROVE_UNKNOWN_VALIDATOR_ROLE
-    #     NODE_OPERATOR_UNGUARANTEED_DEPOSIT_ROLE: *NODE_OPERATOR_UNGUARANTEED_DEPOSIT_ROLE
-    #     VAULT_CONFIGURATION_ROLE: *VAULT_CONFIGURATION_ROLE
-    #     confirmingRoles: [*ZERO_BYTES32, *NODE_OPERATOR_MANAGER_ROLE]
-    #     getConfirmExpiry: *DURATION_1_DAY
-    #     initialized: true
-    #     liabilityShares: 0
-    #     confirmations: null
-    #     getRoleAdmin: null
-    #     getRoleMember: null
-    #     getRoleMemberCount: null
-    #     getRoleMembers: null
-    #     hasRole: null
-    #     supportsInterface: null
-    #     # Coverage-only entries for non-mutable functions
-    #     accruedFee: null
-    #     confirmation: null
-    #     feeRate: null
-    #     feeRecipient: null
-    #     healthShortfallShares: null
-    #     latestCorrectionTimestamp: null
-    #     latestReport: null
-    #     locked: null
-    #     maxLockableValue: null
-    #     minimalReserve: null
-    #     obligations: null
-    #     obligationsShortfallValue: null
-    #     pdgPolicy: null
-    #     remainingMintingCapacityShares: null
-    #     settledGrowth: null
-    #     stakingVault: null
-    #     totalMintingCapacityShares: null
-    #     totalValue: null
-    #     vaultConnection: null
-    #     withdrawableValue: null
-    #     feeLeftover: null
-    #   ozAcl:
-    #     *NODE_OPERATOR_MANAGER_ROLE : []
-    #     *PAUSE_BEACON_CHAIN_DEPOSITS_ROLE : []
-    #     *REBALANCE_ROLE : []
-    #     *REQUEST_VALIDATOR_EXIT_ROLE : []
-    #     *RESUME_BEACON_CHAIN_DEPOSITS_ROLE : []
-    #     *TRIGGER_VALIDATOR_WITHDRAWAL_ROLE : []
-    #     *VOLUNTARY_DISCONNECT_ROLE : []
-    #     *WITHDRAW_ROLE : []
-    #     *BURN_ROLE : []
-    #     *COLLECT_VAULT_ERC20_ROLE : []
-    #     *FUND_ON_RECEIVE_FLAG_SLOT : []
-    #     *FUND_ROLE : []
-    #     *NODE_OPERATOR_FEE_EXEMPT_ROLE : []
-    #     *NODE_OPERATOR_PROVE_UNKNOWN_VALIDATOR_ROLE : []
-    #     *NODE_OPERATOR_UNGUARANTEED_DEPOSIT_ROLE : []
-    #     *VAULT_CONFIGURATION_ROLE : []
+    dashboardImplAddress:
+      name: Dashboard
+      address: *dashboardImplAddress
+      checks:
+        DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
+        MIN_CONFIRM_EXPIRY: *DURATION_1_HOUR
+        MAX_CONFIRM_EXPIRY: *DURATION_30_DAYS
+        STETH: *lido
+        WSTETH: *wstETH
+        VAULT_HUB: *vaultHub
+        LIDO_LOCATOR: *lidoLocator
+        MINT_ROLE: *MINT_ROLE
+        NODE_OPERATOR_MANAGER_ROLE: *NODE_OPERATOR_MANAGER_ROLE
+        PAUSE_BEACON_CHAIN_DEPOSITS_ROLE: *PAUSE_BEACON_CHAIN_DEPOSITS_ROLE
+        REBALANCE_ROLE: *REBALANCE_ROLE
+        REQUEST_VALIDATOR_EXIT_ROLE: *REQUEST_VALIDATOR_EXIT_ROLE
+        RESUME_BEACON_CHAIN_DEPOSITS_ROLE: *RESUME_BEACON_CHAIN_DEPOSITS_ROLE
+        TRIGGER_VALIDATOR_WITHDRAWAL_ROLE: *TRIGGER_VALIDATOR_WITHDRAWAL_ROLE
+        VOLUNTARY_DISCONNECT_ROLE: *VOLUNTARY_DISCONNECT_ROLE
+        WITHDRAW_ROLE: *WITHDRAW_ROLE
+        BURN_ROLE: *BURN_ROLE
+        COLLECT_VAULT_ERC20_ROLE: *COLLECT_VAULT_ERC20_ROLE
+        FUND_ON_RECEIVE_FLAG_SLOT: *FUND_ON_RECEIVE_FLAG_SLOT
+        FUND_ROLE: *FUND_ROLE
+        NODE_OPERATOR_FEE_EXEMPT_ROLE: *NODE_OPERATOR_FEE_EXEMPT_ROLE
+        NODE_OPERATOR_PROVE_UNKNOWN_VALIDATOR_ROLE: *NODE_OPERATOR_PROVE_UNKNOWN_VALIDATOR_ROLE
+        NODE_OPERATOR_UNGUARANTEED_DEPOSIT_ROLE: *NODE_OPERATOR_UNGUARANTEED_DEPOSIT_ROLE
+        VAULT_CONFIGURATION_ROLE: *VAULT_CONFIGURATION_ROLE
+        confirmingRoles: [*ZERO_BYTES32, *NODE_OPERATOR_MANAGER_ROLE]
+        getConfirmExpiry: *DURATION_1_DAY
+        initialized: true
+        liabilityShares: 0
+        confirmations: null
+        getRoleAdmin: null
+        getRoleMember: null
+        getRoleMemberCount: null
+        getRoleMembers: null
+        hasRole: null
+        supportsInterface: null
+        # Coverage-only entries for non-mutable functions
+        accruedFee: null
+        confirmation: null
+        feeRate: null
+        feeRecipient: null
+        healthShortfallShares: null
+        latestCorrectionTimestamp: null
+        latestReport: null
+        locked: null
+        maxLockableValue: null
+        minimalReserve: null
+        obligations: null
+        obligationsShortfallValue: null
+        pdgPolicy: null
+        remainingMintingCapacityShares: null
+        settledGrowth: null
+        stakingVault: null
+        totalMintingCapacityShares: null
+        totalValue: null
+        vaultConnection: null
+        withdrawableValue: null
+        feeLeftover: null
+      ozAcl:
+        *NODE_OPERATOR_MANAGER_ROLE : []
+        *PAUSE_BEACON_CHAIN_DEPOSITS_ROLE : []
+        *REBALANCE_ROLE : []
+        *REQUEST_VALIDATOR_EXIT_ROLE : []
+        *RESUME_BEACON_CHAIN_DEPOSITS_ROLE : []
+        *TRIGGER_VALIDATOR_WITHDRAWAL_ROLE : []
+        *VOLUNTARY_DISCONNECT_ROLE : []
+        *WITHDRAW_ROLE : []
+        *BURN_ROLE : []
+        *COLLECT_VAULT_ERC20_ROLE : []
+        *FUND_ON_RECEIVE_FLAG_SLOT : []
+        *FUND_ROLE : []
+        *NODE_OPERATOR_FEE_EXEMPT_ROLE : []
+        *NODE_OPERATOR_PROVE_UNKNOWN_VALIDATOR_ROLE : []
+        *NODE_OPERATOR_UNGUARANTEED_DEPOSIT_ROLE : []
+        *VAULT_CONFIGURATION_ROLE : []
 
-    # consolidationRequestsValidator:
-    #   name: ValidatorConsolidationRequests
-    #   address: *consolidationRequestsValidator
-    #   checks:
-    #     CONSOLIDATION_REQUEST_PREDEPLOY_ADDRESS: "0x0000BBdDc7CE488642fb579F8B00f3a590007251"
-    #     LIDO_LOCATOR: *lidoLocator
-    #     getConsolidationRequestFee: null
-    #     getConsolidationRequestsAndFeeExemptionEncodedCalls: null
-
-    # TODO: need to update state-mate code to make it work as
-    # pinnedBeaconProxy:
-    #   name: PinnedBeaconProxy
-    #   address: *pinnedBeaconProxy
-    #   proxyName: PinnedBeaconProxy
-    #   implementation: *stakingVaultImplAddress
-    #   proxyChecks:
-    #     implementation: *stakingVaultImplAddress
-    #     isOssified: false
-    #   checks:
-    #     DEPOSIT_CONTRACT: *DEPOSIT_CONTRACT
-    #     PUBLIC_KEY_LENGTH: 48
-    #     beaconChainDepositsPaused: false
-    #     depositor: *ZERO_ADDRESS
-    #     getInitializedVersion: 0
-    #     inOutDelta: 0
-    #     isReportFresh: true
-    #     latestReport: [0, 0, 0]
-    #     locked: 0
-    #     nodeOperator: *ZERO_ADDRESS
-    #     ossified: false
-    #     owner: *ZERO_ADDRESS
-    #     totalValue: 0
-    #     unlocked: 0
-    #     vaultHub: *vaultHub
-    #     version: 1
-    #     withdrawalCredentials: "0x020000000000000000000000f19e48c5ad2f8abb452f5a6ab9cb104e70495e08"
-    #     availableBalance: null
-    #     calculateValidatorWithdrawalFee: null
-    #     vaultHubAuthorized: null
-    #     stagedBalance: null
-    #   implementationChecks:
-    #     DEPOSIT_CONTRACT: *DEPOSIT_CONTRACT
-    #     beaconChainDepositsPaused: false
-    #     getInitializedVersion: *MAX_UINT64
-    #     owner: *ZERO_ADDRESS
-    #     version: 1
-    #     withdrawalCredentials: "0x020000000000000000000000e96be4fb723e68e7b96244b7399c64a58bcd0062"
+    consolidationRequestsValidator:
+      name: ValidatorConsolidationRequests
+      address: *consolidationRequestsValidator
+      checks:
+        CONSOLIDATION_REQUEST_PREDEPLOY_ADDRESS: "0x0000BBdDc7CE488642fb579F8B00f3a590007251"
+        LIDO_LOCATOR: *lidoLocator
+        getConsolidationRequestFee: null
+        getConsolidationRequestsAndFeeExemptionEncodedCalls: null
 
     accountingOracle:
       name: AccountingOracle
@@ -1856,64 +1815,64 @@ l1:
         *DEFAULT_ADMIN_ROLE : [*aragonAgent]
         *ORACLE_DAEMON_CONFIG_MANAGER_ROLE : []
 
-    # lazyOracle:
-    #   name: LazyOracle
-    #   address: *lazyOracle
-    #   proxyName: OssifiableProxy
-    #   implementation: *lazyOracleImplAddress
-    #   proxyChecks:
-    #     proxy__getAdmin: *aragonAgent
-    #     proxy__getImplementation: *lazyOracleImplAddress
-    #     proxy__getIsOssified: false
-    #   checks:
-    #     DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
-    #     LIDO_LOCATOR: *lidoLocator
-    #     MAX_LIDO_FEE_RATE_PER_SECOND: *MAX_LIDO_FEE_RATE_PER_SECOND
-    #     MAX_QUARANTINE_PERIOD: *DURATION_30_DAYS
-    #     MAX_REWARD_RATIO: *MAX_REWARD_RATIO
-    #     UPDATE_SANITY_PARAMS_ROLE: *UPDATE_SANITY_PARAMS_ROLE
-    #     batchValidatorStages: null
-    #     batchVaultsInfo: null
-    #     getRoleAdmin: null
-    #     getRoleMember: null
-    #     getRoleMembers: null
-    #     getRoleMemberCount: null
-    #     hasRole: null
-    #     supportsInterface: null
-    #     latestReportData: null
-    #     latestReportTimestamp: null
-    #     maxLidoFeeRatePerSecond: null
-    #     maxRewardRatioBP: null
-    #     quarantinePeriod: null
-    #     vaultInfo: null
-    #     vaultQuarantine: null
-    #     vaultsCount: null
-    #   ozAcl:
-    #     *DEFAULT_ADMIN_ROLE : [*aragonAgent]
-    #     *UPDATE_SANITY_PARAMS_ROLE : [*aragonAgent] # WARNING: must be zero
-    #   implementationChecks:
-    #     DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
-    #     LIDO_LOCATOR: *lidoLocator
-    #     MAX_LIDO_FEE_RATE_PER_SECOND: *MAX_LIDO_FEE_RATE_PER_SECOND
-    #     MAX_QUARANTINE_PERIOD: *DURATION_30_DAYS
-    #     MAX_REWARD_RATIO: *MAX_REWARD_RATIO
-    #     UPDATE_SANITY_PARAMS_ROLE: *UPDATE_SANITY_PARAMS_ROLE
-    #     batchValidatorStages: null
-    #     batchVaultsInfo: null
-    #     getRoleAdmin: null
-    #     getRoleMember: null
-    #     getRoleMembers: null
-    #     getRoleMemberCount: null
-    #     hasRole: null
-    #     supportsInterface: null
-    #     latestReportData: null
-    #     latestReportTimestamp: null
-    #     maxLidoFeeRatePerSecond: null
-    #     maxRewardRatioBP: null
-    #     quarantinePeriod: null
-    #     vaultInfo: null
-    #     vaultQuarantine: null
-    #     vaultsCount: null
+    lazyOracle:
+      name: LazyOracle
+      address: *lazyOracle
+      proxyName: OssifiableProxy
+      implementation: *lazyOracleImplAddress
+      proxyChecks:
+        proxy__getAdmin: *aragonAgent
+        proxy__getImplementation: *lazyOracleImplAddress
+        proxy__getIsOssified: false
+      checks:
+        DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
+        LIDO_LOCATOR: *lidoLocator
+        MAX_LIDO_FEE_RATE_PER_SECOND: *MAX_LIDO_FEE_RATE_PER_SECOND
+        MAX_QUARANTINE_PERIOD: *DURATION_30_DAYS
+        MAX_REWARD_RATIO: *MAX_REWARD_RATIO
+        UPDATE_SANITY_PARAMS_ROLE: *UPDATE_SANITY_PARAMS_ROLE
+        batchValidatorStages: null
+        batchVaultsInfo: null
+        getRoleAdmin: null
+        getRoleMember: null
+        getRoleMembers: null
+        getRoleMemberCount: null
+        hasRole: null
+        supportsInterface: null
+        latestReportData: null
+        latestReportTimestamp: null
+        maxLidoFeeRatePerSecond: null
+        maxRewardRatioBP: null
+        quarantinePeriod: null
+        vaultInfo: null
+        vaultQuarantine: null
+        vaultsCount: null
+      ozAcl:
+        *DEFAULT_ADMIN_ROLE : [*aragonAgent]
+        *UPDATE_SANITY_PARAMS_ROLE : [*aragonAgent] # WARNING: must be zero
+      implementationChecks:
+        DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
+        LIDO_LOCATOR: *lidoLocator
+        MAX_LIDO_FEE_RATE_PER_SECOND: *MAX_LIDO_FEE_RATE_PER_SECOND
+        MAX_QUARANTINE_PERIOD: *DURATION_30_DAYS
+        MAX_REWARD_RATIO: *MAX_REWARD_RATIO
+        UPDATE_SANITY_PARAMS_ROLE: *UPDATE_SANITY_PARAMS_ROLE
+        batchValidatorStages: null
+        batchVaultsInfo: null
+        getRoleAdmin: null
+        getRoleMember: null
+        getRoleMembers: null
+        getRoleMemberCount: null
+        hasRole: null
+        supportsInterface: null
+        latestReportData: null
+        latestReportTimestamp: null
+        maxLidoFeeRatePerSecond: null
+        maxRewardRatioBP: null
+        quarantinePeriod: null
+        vaultInfo: null
+        vaultQuarantine: null
+        vaultsCount: null
 
     aragon-kernel:
       name: Kernel
@@ -2419,15 +2378,15 @@ l1:
         get_expiry_timestamp: 1789207187
         is_expired: false
 
-    # gateSealVaulthubAndPredepositGuarantee:
-    #   name: GateSeal
-    #   address: *gateSealVaulthubAndPredepositGuarantee
-    #   checks:
-    #     get_sealing_committee: *sealCommittee
-    #     get_seal_duration_seconds: *DURATION_2_WEEKS
-    #     get_sealables: [*vaultHub, *predepositGuarantee]
-    #     get_expiry_timestamp: 1791454296
-    #     is_expired: false
+    gateSealVaulthubAndPredepositGuarantee:
+      name: GateSeal
+      address: *gateSealVaulthubAndPredepositGuarantee
+      checks:
+        get_sealing_committee: *sealCommittee
+        get_seal_duration_seconds: *DURATION_2_WEEKS
+        get_sealables: [*vaultHub, *predepositGuarantee]
+        get_expiry_timestamp: 1791454296
+        is_expired: false
 
     gateSealVEBAndTWG:
       name: GateSeal
