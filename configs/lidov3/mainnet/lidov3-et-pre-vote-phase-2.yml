@@ -1,0 +1,66 @@
+# yaml-language-server: $schema=../../schemas/main-schema.json
+parameters:
+  - &trustedCaller "0x18A1065c81b0Cc356F1b1C843ddd5E14e4AefffF"
+  - &initialValidatorExitFeeLimit "100000000000000000"
+  - &maxGroupShareLimit "1000000000000000000000000"
+  - &maxDefaultTierShareLimit "1000000000000000000000000"
+
+misc:
+  - &DEFAULT_TIER_OPERATOR "0xFFfFfFffFFfffFFfFFfFFFFFffFFFffffFfFFFfF"
+  - &locator "0xC1d0b3DE6792Bf6b4b37EccdcC24e45978Cfd2Eb"
+  - &evmScriptExecutor "0xFE5986E06210aC1eCC1aDCafc0cc7f8D63B3F977"
+  - &withdrawalRequestPredeployAddress "0x00000961Ef480Eb55e80D19ad83579A64c007002"
+  - &ET_CANCEL_ROLE "0x9f959e00d95122f5cbd677010436cf273ef535b86b056afc172852144b9491d7"
+  - &ZERO_BYTES32 "0x0000000000000000000000000000000000000000000000000000000000000000"
+  - &EASYTRACK_MAX_MOTIONS_LIMIT 24
+  - &EASYTRACK_MAX_OBJECTIONS_THRESHOLD 500
+  - &EASYTRACK_MIN_MOTION_DURATION 172800 # 2 days
+  - &ET_PAUSE_ROLE "0x139c2898040ef16910dc9f44dc697df79363da767d8bc92f2e310312b816e46d"
+  - &ET_UNPAUSE_ROLE "0x265b220c5a8891efdd9e1b1b7fa72f257bd5169f8d87e319cf3dad6ff52b94ae"
+  - &ldo "0x5A98FcBEA516Cf06857215779Fd812CA3beF1B32"
+  - &ET_FIRST_FACTORY "0xFeBd8FAC16De88206d4b18764e826AF38546AfE0"
+  - &ET_LAST_FACTORY "0x8aa34dAaF0fC263203A15Bcfa0Ed926D466e59F3"
+  - &EMERGENCY_BRAKES "0x73b047fe6337183A454c5217241D780a932777bD"
+
+deployed:
+  l1:
+    - &RegisterGroupsInOperatorGrid "0x00000000000000000000000000000000544f444f" # TODO
+    - &UpdateGroupsShareLimitInOperatorGrid "0x00000000000000000000000000000000544f444f" # TODO
+    - &AlterTiersInOperatorGrid "0x00000000000000000000000000000000544f444f" # TODO
+
+l1:
+  rpcUrl: REMOTE_RPC_URL
+  explorerHostname: api.etherscan.io/v2/api
+  explorerTokenEnv: ETHERSCAN_TOKEN
+  chainId: 1
+  contracts:
+    # TODO: add checks for all factories
+    RegisterGroupsInOperatorGrid:
+      name: RegisterGroupsInOperatorGrid
+      address: *RegisterGroupsInOperatorGrid
+      checks:
+        DEFAULT_TIER_OPERATOR: *DEFAULT_TIER_OPERATOR
+        createEVMScript: null
+        decodeEVMScriptCallData: null
+        lidoLocator: *locator
+        maxShareLimit: *maxGroupShareLimit
+        trustedCaller: *trustedCaller
+    UpdateGroupsShareLimitInOperatorGrid:
+      name: UpdateGroupsShareLimitInOperatorGrid
+      address: *UpdateGroupsShareLimitInOperatorGrid
+      checks:
+        createEVMScript: null
+        decodeEVMScriptCallData: null
+        lidoLocator: *locator
+        maxShareLimit: *maxGroupShareLimit
+        trustedCaller: *trustedCaller
+    AlterTiersInOperatorGrid:
+      name: AlterTiersInOperatorGrid
+      address: *AlterTiersInOperatorGrid
+      checks:
+        createEVMScript: null
+        decodeEVMScriptCallData: null
+        defaultTierMaxShareLimit: *maxDefaultTierShareLimit
+        lidoLocator: *locator
+        trustedCaller: *trustedCaller
+

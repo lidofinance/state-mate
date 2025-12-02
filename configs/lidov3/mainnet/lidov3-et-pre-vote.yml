@@ -2,7 +2,7 @@
 parameters:
   - &trustedCaller "0x18A1065c81b0Cc356F1b1C843ddd5E14e4AefffF"
   - &initialValidatorExitFeeLimit "100000000000000000"
-  - &maxGroupShareLimit "1000000000000000000000000"
+  - &maxGroupShareLimit "50000000000000000000000"
   - &maxDefaultTierShareLimit "0"
 
 misc:
