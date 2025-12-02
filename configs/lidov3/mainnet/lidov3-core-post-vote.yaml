@@ -137,7 +137,7 @@ misc:
   # --- Chain and deployment constants ---
   - &CHAIN_ID "1"
   - &GENESIS_TIME "1606824023"
-  - &DEPOSIT_DOMAIN "0x0000000000000000000000000000000000000000000000000000000000000000"
+  - &DEPOSIT_DOMAIN "0x03000000f5a5fd42d16a20302798ef6ed309979b43003d2320d9f0e8ea9831a9"
 
   # --- Lido versioning and credentials ---
   - &LIDO_VERSION_OLD 2
@@ -164,7 +164,7 @@ misc:
 
   # --- General numeric constants ---
   - &MAX_UINT256 "115792089237316195423570985008687907853269984665640564039457584007913129639935"
-  - &MAX_UINT64 "18446744073709551616"
+  - &MAX_UINT64 "18446744073709551615"
   - &DECIMALS_18 18
 
   # --- EIP-712 domain separators ---
@@ -1204,6 +1204,7 @@ l1:
         latestReportData: null
         rebalanceShortfall: null
         badDebtToInternalize: null
+        badDebtToInternalizeForLastRefSlot: null
         healthShortfallShares: null
         isPendingDisconnect: null
         isReportFresh: null
@@ -1227,8 +1228,8 @@ l1:
         vaultsCount: null
       ozAcl:
         *DEFAULT_ADMIN_ROLE : [*aragonAgent]
-        *OZ_PAUSE_ROLE : [*gateSealVaulthubAndPredepositGuarantee]
-        *OZ_RESUME_ROLE : []
+        *OZ_PAUSE_ROLE : [*gateSealVaulthubAndPredepositGuarantee, *resealManager]
+        *OZ_RESUME_ROLE : [*resealManager]
         *VAULT_MASTER_ROLE : [*aragonAgent]
         *BAD_DEBT_MASTER_ROLE : [*vaultsAdapter]
         *REDEMPTION_MASTER_ROLE : [] # WARNING: must be none for mainnet
@@ -1327,8 +1328,8 @@ l1:
         validatorStatus: null
       ozAcl:
         *DEFAULT_ADMIN_ROLE : [*aragonAgent]
-        *OZ_PAUSE_ROLE : [*gateSealVaulthubAndPredepositGuarantee]
-        *OZ_RESUME_ROLE : []
+        *OZ_PAUSE_ROLE : [*gateSealVaulthubAndPredepositGuarantee, *resealManager]
+        *OZ_RESUME_ROLE : [*resealManager]
       implementationChecks:
         PREDEPOSIT_AMOUNT: *ONE_ETH_WEI
         ACTIVATION_DEPOSIT_AMOUNT: *ACTIVATION_DEPOSIT_AMOUNT
@@ -1925,7 +1926,9 @@ l1:
         quarantinePeriod: 99999 # TODO
         vaultInfo: null
         vaultQuarantine: null
+        quarantineValue: null
         vaultsCount: 0
+        batchValidatorStatuses: null
       ozAcl:
         *DEFAULT_ADMIN_ROLE : [*aragonAgent]
         *UPDATE_SANITY_PARAMS_ROLE : [*aragonAgent] # WARNING: must be zero
@@ -2174,10 +2177,10 @@ l1:
         getRecoveryVault: *aragonAgent
         CHANGE_PERIOD_ROLE: "0xd35e458bacdd5343c2f050f574554b2f417a8ea38d6a9a65ce2225dbe8bb9a9d"
         CHANGE_BUDGETS_ROLE: "0xd79730e82bfef7d2f9639b9d10bf37ebb662b22ae2211502a00bdf7b2cc3a23a"
-        periodsLength: 1
+        periodsLength: 61
         appId: *FINANCE_APP_ID
         EXECUTE_PAYMENTS_ROLE: "0x563165d3eae48bcb0a092543ca070d989169c98357e9a1b324ec5da44bab75fd"
-        currentPeriodId: 0
+        currentPeriodId: 60
         getEVMScriptRegistry: *aragonEvmScriptRegistry
         getPeriodDuration: *DURATION_30_DAYS
         kernel: *aragonKernel
@@ -2577,7 +2580,7 @@ l1:
         get_sealing_committee: *resealCommittee
         get_seal_duration_seconds: *DURATION_2_WEEKS
         get_sealables: [*vaultHub, *predepositGuarantee]
-        get_expiry_timestamp: 1791454296
+        get_expiry_timestamp: 1791454296 # TODO
         is_expired: false
 
     gateSealVEBAndTWG:
