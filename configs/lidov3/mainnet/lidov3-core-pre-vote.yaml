@@ -12,10 +12,10 @@ deployed:
     # --- Core protocol ---
     - &lidoLocator "0xC1d0b3DE6792Bf6b4b37EccdcC24e45978Cfd2Eb"
     - &lidoLocatorOldImplAddress "0x2C298963FB763f74765829722a1ebe0784f4F5Cf"
-    - &lidoLocatorNewImplAddress "0x26329a3D4cF2F89923b5c4C14a25A2485cD01aA2" # TODO
+    - &lidoLocatorNewImplAddress "0x2f8779042EFaEd4c53db2Ce293eB6B3f7096C72d"
     - &lido "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84"
     - &lidoOldImplAddress "0x17144556fd3424EDC8Fc8A4C940B2D04936d17eb"
-    - &lidoNewImplAddress "0xD0b9826e0EAf6dE91CE7A6783Cd6fd137ae422Ec" # TODO
+    - &lidoNewImplAddress "0x6ca84080381E43938476814be61B779A8bB6a600"
     - &wstETH "0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0"
     - &wstETHReferralStaker "0xa88f0329C2c4ce51ba3fc619BBf44efE7120Dd0d"
     - &eip712StETH "0x8F73e4C2A6D852bb4ab2A45E6a9CF5715b3228B7"
@@ -27,53 +27,53 @@ deployed:
     - &withdrawalQueueERC721ImplAddress "0xE42C659Dc09109566720EA8b2De186c2Be7D94D9"
     - &withdrawalVault "0xb9d7934878b5fb9610b3fe8a5e441e8fad7e293f"
     - &withdrawalVaultImplAddress "0x7D2BAa6094E1C4B60Da4cbAF4A77C3f4694fD53D"
-    - &accounting "0xc9158c756D2a510eaC85792C847798a30dE20D46" # TODO
-    - &accountingImplAddress "0x1bE2Ee7D32e3F9C4ecd5b6BfF69306ACb8Ab239e" # TODO
+    - &accounting "0x23ED611be0e1a820978875C0122F92260804cdDf"
+    - &accountingImplAddress "0xd43a3E984071F40d5d840f60708Af0e9526785df"
     - &oldBurner "0xD15a672319Cf0352560eE76d9e89eAB0889046D3"
-    - &newBurner "0xD140f4f3C515E1a328F6804C5426d9e8b883ED50" # TODO
-    - &newBurnerImplAddress "0x0D3C621B5c3CE33159BeabB5E2B0D9bE3c68B590" # TODO
+    - &newBurner "0xE76c52750019b80B43E36DF30bf4060EB73F573a"
+    - &newBurnerImplAddress "0xEe1E3B4f047122650086985f794f0dB5f10Ae49D"
     - &minFirstAllocationStrategy "0x7e70De6D1877B3711b2bEDa7BA00013C7142d993"
     - &triggerableWithdrawalsGateway "0xDC00116a0D3E064427dA2600449cfD2566B3037B"
     - &validatorExitDelayVerifier "0xbDb567672c867DB533119C2dcD4FB9d8b44EC82f"
 
     # --- stVaults system contracts ---
 
-    - &vaultHub "0xdcC04F506E24495E9F2599A7b214522647363669" # TODO
-    - &vaultHubImplAddress "0xB4c523f115C40df5A9981DB804b488B0a9012002" # TODO
-    - &predepositGuarantee "0x7B49b203A100E326B84886dCC0e2c426f9b8cbBd" # TODO
-    - &predepositGuaranteeImplAddress "0x85cBc70D06CfD02D176c7e8474636cF9fCa414eA" # TODO
-    - &operatorGrid "0x79e2685C1DD4756AC709a6CeE7C6cC960128B031" # TODO
-    - &operatorGridImplAddress "0x0d442cD3D42F05D27596bEB3185dBC43A6840308" # TODO
+    - &vaultHub "0x1d201BE093d847f6446530Efb0E8Fb426d176709"
+    - &vaultHubImplAddress "0x7c7d957D0752AB732E73400624C4a1eb1cb6CF50"
+    - &predepositGuarantee "0xF4bF42c6D6A0E38825785048124DBAD6c9eaaac3"
+    - &predepositGuaranteeImplAddress "0xCC08C36BD5bb78FDcB10F35B404ada6Ffc71a023"
+    - &operatorGrid "0xC69685E89Cefc327b43B7234AC646451B27c544d"
+    - &operatorGridImplAddress "0xA612E30D71d7D54aEaf4e5A21023F3F270932C2C"
 
     # --- stVaults factory stack ---
-    - &stakingVaultFactory "0x676c573946ba7a34243f576C1F966F0ce5068739" # TODO
-    - &stakingVaultBeacon "0x5D8508D1eA725d35a61886658FB4BD7795027f6C" # TODO
-    - &stakingVaultImplAddress "0xDAEf26cE8ba47d297e22A4318c1ACC5dB12dD3d6" # TODO
-    - &dashboardImplAddress "0x08e197D82BC33Ddb7f3081f9aC31F3647cFabD46" # TODO
-    - &consolidationRequestsValidator "0x6c5e18E4d335f16EA7a938eD3D35F11bCa390104" # TODO
+    - &stakingVaultFactory "0x02Ca7772FF14a9F6c1a08aF385aA96bb1b34175A"
+    - &stakingVaultBeacon "0x5FbE8cEf9CCc56ad245736D3C5bAf82ad54Ca789"
+    - &stakingVaultImplAddress "0x06A56487494aa080deC7Bf69128EdA9225784553"
+    - &dashboardImplAddress "0x294825c2764c7D412dc32d87E2242c4f1D989AF3"
+    - &consolidationRequestsValidator "0xaC4Aae7123248684C405A4b0038C1560EC7fE018"
 
     # --- Oracle contracts ---
     - &accountingOracle "0x852deD011285fe67063a08005c71a85690503Cee"
     - &accountingOracleOldImplAddress "0xE9906E543274cebcd335d2C560094089e9547e8d"
-    - &accountingOracleNewImplAddress "0xb2295820F5286BE40c2da8102eB2cDB24aD608Be" # TODO
+    - &accountingOracleNewImplAddress "0x1455B96780A93e08abFE41243Db92E2fCbb0141c"
     - &hashConsensusForAccountingOracle "0xD624B08C83bAECF0807Dd2c6880C3154a5F0B288"
 
     - &validatorsExitBusOracle "0x0De4Ea0184c2ad0BacA7183356Aea5B8d5Bf5c6e"
     - &validatorsExitBusOracleImplAddress "0x905A211eD6830Cfc95643f0bE2ff64E7f3bf9b94"
     - &hashConsensusForValidatorsExitBusOracle "0x7FaDB6358950c5fAA66Cb5EB8eE5147De3df355a"
     - &oldOracleReportSanityChecker "0x6232397ebac4f5772e53285b26c47914e9461e75"
-    - &newOracleReportSanityChecker "0x4c42eF565ED49aDcC459a53C3abDCa86617E2f63" # TODO
+    - &newOracleReportSanityChecker "0xf1647c86E6D7959f638DD9CE1d90e2F3C9503129"
     - &oracleDaemonConfig "0xbf05A929c3D7885a6aeAd833a992dA6E5ac23b09"
-    - &lazyOracle "0x4fA3c917BB8f8CD9d056C5DDF0a38bd1834c43F9" # TODO
-    - &lazyOracleImplAddress "0xD517eA3605340291285136cee64F9a64A664F76C" # TODO
+    - &lazyOracle "0x5DB427080200c235F2Ae8Cd17A7be87921f7AD6c"
+    - &lazyOracleImplAddress "0x47f3a6b1E70F7Ec7dBC3CB510B1fdB948C863a5B"
     - &oldTokenRateNotifier "0xe6793B9e4FbA7DE0ee833F9D02bba7DB5EB27823"
-    - &newTokenRateNotifier "0x7c7419E1964188C6133051dF541cf2a525AA1038" # TODO
+    - &newTokenRateNotifier "0x25e35855783bec3E49355a29e110f02Ed8b05ba9"
     - &legacyOracle "0x442af784A788A5bd6F42A01Ebe9F287a871243fb"
 
     # --- V3 Voting stack ---
-    - &v3TemporaryAdmin "0xD97D2666DC2FB490e9348a8BD17E9572a35b4F9D" # TODO
-    - &v3VoteScript "0x7e2ef38FeDFEc1e768E55D63cb0273a726d0a318" # TODO
-    - &v3Template "0x2AE2847a77a1d24100be2163AfdC49B06DC808E4" # TODO
+    - &v3TemporaryAdmin "0xf738A2C7d69694B618dbB547C1c5A152D7958f06"
+    - &v3VoteScript "0xa47Ca1d2029D8e735237ea4E74c607426d4aA07e"
+    - &v3Template "0x34E01ecFebd403370b0879C628f8A5319dDb8507"
 
     # --- DAO & Aragon apps ---
     - &aragonRepoBase "0xa8A358E9bbB9fF60D4B89CBE5b2FE88f98b51B9D"
@@ -102,7 +102,7 @@ deployed:
     - &gateSealFactory "0x6c82877cac5a7a739f16ca0a89c0a328b8764a24"
     - &gateSealVEBAndTWG "0xA6BC802fAa064414AA62117B4a53D27fFfF741F1"
     - &gateSealWithdrawalQueue "0x8A854C4E750CDf24f138f34A9061b2f556066912"
-    - &gateSealVaulthubAndPredepositGuarantee "0x9c2D30177DB12334998EB554f5d4E6dD44458167" # TODO
+    - &gateSealVaulthubAndPredepositGuarantee "0x881dAd714679A6FeaA636446A0499101375A365c"
     - &gateSealCSAccounting "0xE1686C2E90eb41a48356c1cC7FaA17629af3ADB3"
 
     # --- Staking modules ---
@@ -122,16 +122,16 @@ deployed:
     - &easyTrack "0xF0211b7660680B49De1A7E9f25C65660F0a13Fea"
     - &evmScriptExecutor "0xFE5986E06210aC1eCC1aDCafc0cc7f8D63B3F977"
     - &callsScript "0x5cEb19e1890f677c3676d5ecDF7c501eBA01A054"
-    - &vaultsAdapter "0x8cDA09f41970A8f4416b6bA4696a2f09a6080c76" # TODO
-    - &etfAlterTiersInOperatorGrid "0x25AB9D07356E8a3F95a5905f597c93CD8F31990b" # TODO
-    - &etfForceValidatorExitsInVaultHub "0x6D0F542591eF4f8ebA8c77a11dc3676D9E9F7e66" # TODO
-    - &etfRegisterGroupsInOperatorGrid "0x9Ba3E4aDDe415943A831b97F9f7B8b842052b709" # TODO
-    - &etfRegisterTiersInOperatorGrid "0x663cE8Aa1ded537Dc319529e71DE6BAb2E7D0747" # TODO
-    - &etfSetJailStatusInOperatorGrid "0x88D32aABa5B6A972D82E55D26B212eBeca07C983" # TODO
-    - &etfSetLiabilitySharesTargetInVaultHub "0xf61601787E84d89c30911e5A48d9CA630eC47044" # TODO
-    - &etfSocializeBadDebtInVaultHub "0xD60671a489948641954736A0e7272137b3A335CE" # TODO
-    - &etfUpdateGroupsShareLimitInOperatorGrid "0xAEDB8D15197984D39152A2814e0BdCDAEED5462d" # TODO
-    - &etfUpdateVaultsFeesInOperatorGrid "0x7DCf0746ff2F77A36ceC8E318b59dc8a8A5c066e" # TODO
+    - &vaultsAdapter "0xe2DE6d2DefF15588a71849c0429101F8ca9FB14D"
+    - &etfAlterTiersInOperatorGrid "0xa29173C7BCf39dA48D5E404146A652d7464aee14"
+    - &etfForceValidatorExitsInVaultHub "0x6C968cD89CA358fbAf57B18e77a8973Fa869a6aA"
+    - &etfRegisterGroupsInOperatorGrid "0x194A46DA1947E98c9D79af13E06Cfbee0D8610cC"
+    - &etfRegisterTiersInOperatorGrid "0x5292A1284e4695B95C0840CF8ea25A818751C17F"
+    - &etfSetJailStatusInOperatorGrid "0x93F1DEE4473Ee9F42c8257C201e33a6Da30E5d67"
+    - &etfSetLiabilitySharesTargetInVaultHub "0x4E5Cc771c7b77f1417fa6BA9262d83C6CCc1e969"
+    - &etfSocializeBadDebtInVaultHub "0x1dF50522A1D868C12bF71747Bb6F24A18Fe6d32C"
+    - &etfUpdateGroupsShareLimitInOperatorGrid "0x8Bdc726a3147D8187820391D7c6F9F942606aEe6"
+    - &etfUpdateVaultsFeesInOperatorGrid "0x5C3bDFa3E7f312d8cf72F56F2b797b026f6B471c"
 
     # --- Committees (Safe msigs) ---
     - &resealManager "0x7914b5a1539b97Bd0bbd155757F25FD79A522d24"
@@ -210,6 +210,8 @@ misc:
   - &DURATION_28_DAYS 2419200
   - &DURATION_30_DAYS 2592000
   - &DURATION_1_YEAR 31536000
+  - &UTC_14 50400
+  - &UTC_23 82800
 
   # --- Percentage bases & voting parameters ---
   - &VOTING_SUPPORT_REQUIRED_PCT 500000000000000000
@@ -1219,7 +1221,7 @@ l1:
         *DEFAULT_ADMIN_ROLE : [*aragonAgent]
         *OZ_PAUSE_ROLE : [*gateSealVaulthubAndPredepositGuarantee, *resealManager]
         *OZ_RESUME_ROLE : [*resealManager]
-        *VAULT_MASTER_ROLE : [*aragonAgent]
+        *VAULT_MASTER_ROLE : []
         *BAD_DEBT_MASTER_ROLE : [*vaultsAdapter]
         *REDEMPTION_MASTER_ROLE : []
         *VALIDATOR_EXIT_ROLE : [*vaultsAdapter]
@@ -1393,7 +1395,7 @@ l1:
         vaultInfo: null
       ozAcl:
         *DEFAULT_ADMIN_ROLE : [*aragonAgent]
-        *REGISTRY_ROLE : [*aragonAgent, *evmScriptExecutor, *vaultsAdapter]
+        *REGISTRY_ROLE : [*evmScriptExecutor, *vaultsAdapter]
       implementationChecks:
         DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
         DEFAULT_TIER_ID: *DEFAULT_TIER_ID
@@ -1445,7 +1447,7 @@ l1:
         nodeOperator: *ZERO_ADDRESS
         owner: *ZERO_ADDRESS
         version: *VERSION_1
-        withdrawalCredentials: "0x020000000000000000000000daef26ce8ba47d297e22a4318c1acc5db12dd3d6" # TODO
+        withdrawalCredentials: "0x02000000000000000000000006a56487494aa080dec7bf69128eda9225784553"
         availableBalance: null
         calculateValidatorWithdrawalFee: null
         pendingOwner: null
@@ -1925,10 +1927,11 @@ l1:
       name: V3VoteScript
       address: *v3VoteScript
       checks:
-        ENABLED_DAY_SPAN_START: 50400 # 14 UTC
-        ENABLED_DAY_SPAN_END: 82800 # 23 UTC
+        ENABLED_DAY_SPAN_START: *UTC_14
+        ENABLED_DAY_SPAN_END: *UTC_23
         TEMPLATE: *v3Template
-        VOTE_ITEMS_COUNT: 18
+        VOTING_ITEMS_COUNT: 8
+        DG_ITEMS_COUNT: 18
         getEVMScript: null
         getEVMScriptByteCode: null
         getVoteItems: null
@@ -1936,7 +1939,7 @@ l1:
         isValidVoteScript: null
         params:
           - args: []
-            result: [*v3Template, *LIDO_APP_ID, *timeConstraints]
+            result: [*v3Template, *timeConstraints, 8192, 8192]
         getNewVoteCallBytecode: null
 
     v3Template:
@@ -1948,7 +1951,6 @@ l1:
         ACCOUNTING_ORACLE: *accountingOracle
         ACL: *aragonAcl
         AGENT: *aragonAgent
-        ARAGON_APP_LIDO_REPO: *aragonAppLidoRepo
         BURNER: *newBurner
         CSM_ACCOUNTING: *CSAccounting
         CSM_MODULE_NAME: "Community Staking"
@@ -1962,7 +1964,6 @@ l1:
         ETF_REGISTER_GROUPS_IN_OPERATOR_GRID: *etfRegisterGroupsInOperatorGrid
         ETF_REGISTER_TIERS_IN_OPERATOR_GRID: *etfRegisterTiersInOperatorGrid
         ETF_SET_JAIL_STATUS_IN_OPERATOR_GRID: *etfSetJailStatusInOperatorGrid
-        ETF_SET_LIABILITY_SHARES_TARGET_IN_VAULT_HUB: *etfSetLiabilitySharesTargetInVaultHub
         ETF_SOCIALIZE_BAD_DEBT_IN_VAULT_HUB: *etfSocializeBadDebtInVaultHub
         ETF_UPDATE_GROUPS_SHARE_LIMIT_IN_OPERATOR_GRID: *etfUpdateGroupsShareLimitInOperatorGrid
         ETF_UPDATE_VAULTS_FEES_IN_OPERATOR_GRID: *etfUpdateVaultsFeesInOperatorGrid
@@ -2019,6 +2020,7 @@ l1:
         initialTotalShares: null
         isUpgradeFinished: false
         upgradeBlockNumber: null
+        LIDO_APP_ID: *LIDO_APP_ID
 
     aragon-kernel:
       name: Kernel
@@ -2531,7 +2533,7 @@ l1:
         get_sealing_committee: *sealCommittee
         get_seal_duration_seconds: *DURATION_2_WEEKS
         get_sealables: [*vaultHub, *predepositGuarantee]
-        get_expiry_timestamp: 1795710119 # TODO
+        get_expiry_timestamp: 1796302499 # Thursday, December 3, 2026 12:54:59 PM
         is_expired: false
 
     gateSealVEBAndTWG:

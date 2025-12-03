@@ -80,13 +80,12 @@ l1:
           - args: [39]
             result: *ForceValidatorExitsInVaultHub
           - args: [40]
-            result: *SetLiabilitySharesTargetInVaultHub
-          - args: [41]
             result: *SocializeBadDebtInVaultHub
-          - args: [42]
+          - args: [41]
             mustRevert: true
         evmScriptFactoryPermissions: null
-        getEVMScriptFactories: [
+        getEVMScriptFactories:
+          [
             *ET_FIRST_FACTORY,
             0x7E8eFfAb3083fB26aCE6832bFcA4C377905F97d7,
             0x9721c0f77E3Ea40eD592B9DCf3032DaF269c0306,
@@ -127,9 +126,8 @@ l1:
             *SetJailStatusInOperatorGrid,
             *UpdateVaultsFeesInOperatorGrid,
             *ForceValidatorExitsInVaultHub,
-            *SetLiabilitySharesTargetInVaultHub,
             *SocializeBadDebtInVaultHub,
-          ] # TODO: NEW
+          ]
         getMotion: null
         getMotions: null
         getRoleAdmin: null
@@ -161,7 +159,7 @@ l1:
           - args: [*SocializeBadDebtInVaultHub]
             result: true
           - args: [*SetLiabilitySharesTargetInVaultHub]
-            result: true
+            result: false
         motionDuration: 259200
         motions: null
         motionsCountLimit: 20

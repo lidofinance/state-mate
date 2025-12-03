@@ -24,12 +24,14 @@ jobs:
           # Lido V3 configs - Mainnet
           - config: configs/lidov3/mainnet/lidov3-core-pre-vote.yaml
             network: ethereum-mainnet
-          - config: configs/lidov3/mainnet/lidov3-core-post-vote.yaml
-            network: ethereum-mainnet
+          #- config: configs/lidov3/mainnet/lidov3-core-post-vote.yaml
+          #  network: ethereum-mainnet
           - config: configs/lidov3/mainnet/lidov3-et-pre-vote.yml
             network: ethereum-mainnet
-          - config: configs/lidov3/mainnet/lidov3-et-post-vote.yml
+          - config: configs/lidov3/mainnet/lidov3-et-pre-vote-phase-2.yml
             network: ethereum-mainnet
+          #- config: configs/lidov3/mainnet/lidov3-et-post-vote.yml
+          #  network: ethereum-mainnet
 
           # Lido V3 configs - Hoodi Testnet
           - config: configs/lidov3/hoodi/lidov3-testnet.yaml
