@@ -33,12 +33,6 @@ jobs:
           #- config: configs/lidov3/mainnet/lidov3-et-post-vote.yml
           #  network: ethereum-mainnet
 
-          # Lido V3 configs - Hoodi Testnet
-          - config: configs/lidov3/hoodi/lidov3-testnet.yaml
-            network: ethereum-hoodi
-          - config: configs/lidov3/hoodi/lidov3-et-testnet.yml
-            network: ethereum-hoodi
-
     env:
       # Explorer API tokens
       ETHERSCAN_TOKEN: ${{ secrets.ETHERSCAN_TOKEN }}
