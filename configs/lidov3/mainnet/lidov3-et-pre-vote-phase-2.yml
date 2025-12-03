@@ -25,9 +25,9 @@ misc:
 deployed:
   l1:
     - &EasyTrack "0xF0211b7660680B49De1A7E9f25C65660F0a13Fea"
-    - &RegisterGroupsInOperatorGrid "0xede963FC7eaf77f254Df134B1d7037682D918F22" # TODO
-    - &UpdateGroupsShareLimitInOperatorGrid "0xD07A4aD6487B14952B6f4d8661722425865d2A12" # TODO
-    - &AlterTiersInOperatorGrid "0xc34C698A8CEBd19201063524068C12c4ed1Cd987" # TODO
+    - &RegisterGroupsInOperatorGrid "0xE73842AEbEC99Dacf2aAEec61409fD01A033f478"
+    - &UpdateGroupsShareLimitInOperatorGrid "0xf23559De8ab37fF7a154384B0822dA867Cfa7Eac"
+    - &AlterTiersInOperatorGrid "0x73f80240ad9363d5d3C5C3626953C351cA36Bfe9"
 
 l1:
   rpcUrl: REMOTE_RPC_URL
