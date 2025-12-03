@@ -63,17 +63,6 @@ jobs:
       - name: Install dependencies
         run: yarn install --immutable
 
-      - name: Restore ABI cache
-        uses: actions/cache@v4
-        with:
-          path: |
-            configs/**/abi/
-            configs/**/abis.json.gz
-          key: abi-cache-${{ matrix.config }}-${{ hashFiles(matrix.config) }}
-          restore-keys: |
-            abi-cache-${{ matrix.config }}-
-            abi-cache-
-
       - name: Run state-mate
         run: |
           yarn start ${{ matrix.config }}
