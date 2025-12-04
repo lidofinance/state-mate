@@ -1,0 +1,80 @@
+# yaml-language-server: $schema=../../schemas/main-schema.json
+
+deployed:
+  l1:
+    - &AgreementV2 "0xe19f54e8322214839a87408f084aa14ebefe9e87"
+    - &SafeProxy "0xA1E2CD361e17ba10DCfAe3aA33f463DcB53a2Ffd"
+    - &Safe "0x41675C099F32341bf84BFc5382aF534df5C7461a"
+
+parameters:
+  - &VERSION "1.4.1"
+  - &CHAIN_ID "1"
+
+l1:
+  rpcUrl: RPC_URL
+  explorerHostname: api.etherscan.io/v2/api
+  explorerTokenEnv: ETHERSCAN_TOKEN
+  chainId: 1
+  contracts:
+    AgreementV2:
+      name: AgreementV2
+      address: *AgreementV2
+      checks:
+        getDetails: null # to complex data for verification
+        owner: *SafeProxy
+    SafeProxy:
+      name: Safe
+      address: *SafeProxy
+      proxyName: SafeProxy
+      implementation: *Safe
+      proxyChecks: {}
+      checks:
+        VERSION: *VERSION
+        approvedHashes: null
+        checkNSignatures: null
+        checkSignatures: null
+        domainSeparator: "0x965dfb7ee8d2bc4b2d58946fdccb96aa276db99e4fd748006414c8e5d4cd04b9"
+        encodeTransactionData: null
+        getChainId: *CHAIN_ID
+        getModulesPaginated: null
+        getOwners:
+          - "0xCDDf6b6CffFa7b61b3048916C9C1262F6410C01f" # Nikita_K
+          - "0x9777AF8c6727D57F74f7d381AD47eB4A65f042Ff" # tamtamchik
+          - "0x912e21CdA3D7012146da4Df33309d860a9eb0bEb" # George
+          - "0x235750Acd5F02A88be3cBF96BB9635DAeB22B203" # n0guest
+          - "0x59F8D74Fe49d5ebEAc069E3baf07eB4b614BD5A7" # TheDZhon
+        getStorageAt: null
+        getThreshold: 4 # 4/5 signatures required
+        getTransactionHash: null
+        isModuleEnabled: null
+        isOwner: null
+        nonce: null # 0 as initial value, but will increase
+        signedMessages: null
+      implementationChecks:
+        VERSION: *VERSION
+        approvedHashes: null
+        checkNSignatures: null
+        checkSignatures: null
+        domainSeparator: "0xc4864056e21022913a49884ba9fb4035364d5c2ab8b40f0305583ae419c72f86"
+        encodeTransactionData: null
+        getChainId: *CHAIN_ID
+        getModulesPaginated: null
+        getOwners:
+          mustRevert: true
+        getStorageAt: null
+        getThreshold: 1
+        getTransactionHash: null
+        isModuleEnabled: null
+        isOwner:
+          - args: ["0xCDDf6b6CffFa7b61b3048916C9C1262F6410C01f"] # Nikita_K
+            result: false
+          - args: ["0x9777AF8c6727D57F74f7d381AD47eB4A65f042Ff"] # tamtamchik
+            result: false
+          - args: ["0x912e21CdA3D7012146da4Df33309d860a9eb0bEb"] # George
+            result: false
+          - args: ["0x235750Acd5F02A88be3cBF96BB9635DAeB22B203"] # n0guest
+            result: false
+          - args: ["0x59F8D74Fe49d5ebEAc069E3baf07eB4b614BD5A7"] # TheDZhon
+            result: false
+        nonce: 0
+        signedMessages: null
