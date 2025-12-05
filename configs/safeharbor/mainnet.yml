@@ -87,17 +87,17 @@ misc:
           - ["0xFdab48c4D627e500207e9AF29c98579d90Ea0ad4", 2] # Community SM / VettedGateFactory
           - ["0xF0211b7660680B49De1A7E9f25C65660F0a13Fea", 2] # EasyTrack
           - ["0xFE5986E06210aC1eCC1aDCafc0cc7f8D63B3F977", 2] # EVMScriptExecutor
-          - ["0x23ED611be0e1a820978875C0122F92260804cdDf", 2] # CS Exit Request Lib
-          - ["0x1d201BE093d847f6446530Efb0E8Fb426d176709", 2] # CS Keys Lib
-          - ["0xF4bF42c6D6A0E38825785048124DBAD6c9eaaac3", 2] # CS Target Validators Lib
-          - ["0xC69685E89Cefc327b43B7234AC646451B27c544d", 2] # CS Keys Manager Lib
-          - ["0x02Ca7772FF14a9F6c1a08aF385aA96bb1b34175A", 2] # CS Batch Enqueue Lib
-          - ["0x5FbE8cEf9CCc56ad245736D3C5bAf82ad54Ca789", 2] # CS Enqueue Lib
-          - ["0x06A56487494aa080deC7Bf69128EdA9225784553", 2] # CS Queue Lib
-          - ["0x294825c2764c7D412dc32d87E2242c4f1D989AF3", 2] # CS Nonce Lib
-          - ["0xaC4Aae7123248684C405A4b0038C1560EC7fE018", 2] # CS Signal Lib
-          - ["0x5DB427080200c235F2Ae8Cd17A7be87921f7AD6c", 2] # CS Asset Recoverer Lib
-          - ["0x881dAd714679A6FeaA636446A0499101375A365c", 2] # CS Performance Oracle
+          - ["0x23ED611be0e1a820978875C0122F92260804cdDf", 2] # Lido V3 Accounting
+          - ["0x1d201BE093d847f6446530Efb0E8Fb426d176709", 2] # Lido V3 VaultHub
+          - ["0xF4bF42c6D6A0E38825785048124DBAD6c9eaaac3", 2] # Lido V3 PredepositGuarantee
+          - ["0xC69685E89Cefc327b43B7234AC646451B27c544d", 2] # Lido V3 OperatorGrid
+          - ["0x02Ca7772FF14a9F6c1a08aF385aA96bb1b34175A", 2] # Lido V3 StakingVaultFactory
+          - ["0x5FbE8cEf9CCc56ad245736D3C5bAf82ad54Ca789", 2] # Lido V3 StakingVaultBeacon
+          - ["0x06A56487494aa080deC7Bf69128EdA9225784553", 2] # Lido V3 StakingVaultImplementation
+          - ["0x294825c2764c7D412dc32d87E2242c4f1D989AF3", 2] # Lido V3 DashboardImplementation
+          - ["0xaC4Aae7123248684C405A4b0038C1560EC7fE018", 2] # Lido V3 ValidatorConsolidationRequests
+          - ["0x5DB427080200c235F2Ae8Cd17A7be87921f7AD6c", 2] # Lido V3 LazyOracle
+          - ["0x881dAd714679A6FeaA636446A0499101375A365c", 2] # GateSeal (VaultHub and PredepositGuarantee)
         - "eip155:1"
     # Bounty terms: [expiry, maxBounty, active, dateModified, terms, maxBountyCritical]
     - - 10
