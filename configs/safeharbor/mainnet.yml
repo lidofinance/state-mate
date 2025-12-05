@@ -10,8 +10,82 @@ parameters:
   - &SAFE_VERSION "1.4.1"
   - &CHAIN_ID "1"
 
-# Agreement details for Safe Harbor program - getDetails() return value
-# Structure: [protocolName, [[contactName, contactEmail]], [[recoveryAddr, [[contractAddr, severity]...], chainId]], [expiry, maxBounty, active, dateModified, terms, maxBountyCritical], docUrl]
+# Agreement details (AgreementDetailsV2 struct below) for Safe Harbor program - getDetails() return value
+# ------------------------------------------------------------
+# /// @notice Struct that contains the details of the agreement.
+# struct AgreementDetailsV2 {
+#     // The name of the protocol adopting the agreement.
+#     string protocolName;
+#     // The contact details (required for pre-notifying).
+#     Contact[] contactDetails;
+#     // The scope and recovery address by chain.
+#     Chain[] chains;
+#     // The terms of the agreement.
+#     BountyTerms bountyTerms;
+#     // IPFS hash of the actual agreement document, which confirms all terms.
+#     string agreementURI;
+# }
+# /// @notice Struct that contains the contact details of the agreement.
+# struct Contact {
+#     string name;
+#     // This person's contact details (email, phone, telegram handle, etc.)
+#     string contact;
+# }
+# /// @notice Struct that contains the details of an agreement by chain.
+# struct Chain {
+#     // The address to which recovered assets will be sent.
+#     string assetRecoveryAddress;
+#     // The accounts in scope for the agreement.
+#     Account[] accounts;
+#     // The CAIP-2 chain ID. Please refer to the CAIP-2 standard for more details.
+#     // https://github.com/ChainAgnostic/CAIPs/blob/main/CAIPs/caip-2.md
+#     string caip2ChainId;
+# }
+# /// @notice Struct that contains the details of an account in an agreement.
+# struct Account {
+#     // The address of the account (EOA or smart contract).
+#     string accountAddress;
+#     // The scope of child contracts included in the agreement.
+#     ChildContractScope childContractScope;
+# }
+# /// @notice Enum that defines the inclusion of child contracts in an agreement.
+# enum ChildContractScope {
+#     // No child contracts are included.
+#     None,
+#     // Only child contracts that were created before the time of this agreement are included.
+#     ExistingOnly,
+#     // All child contracts, both existing and new, are included.
+#     All,
+#     // Only child contracts that were created after the time of this agreement are included.
+#     FutureOnly
+# }
+# /// @notice Struct that contains the terms of the bounty for the agreement.
+# struct BountyTerms {
+#     // Percentage of the recovered funds a Whitehat receives as their bounty (0-100).
+#     uint256 bountyPercentage;
+#     // The maximum bounty in USD.
+#     uint256 bountyCapUSD;
+#     // Whether the whitehat can retain their bounty or must return all funds to
+#     // the asset recovery address.
+#     bool retainable;
+#     // The identity verification requirements on the whitehat.
+#     IdentityRequirements identity;
+#     // The diligence requirements placed on eligible whitehats. Only applicable for Named whitehats.
+#     string diligenceRequirements;
+#     // Optional. Caps the total USD value of bounties paid across all whitehats for a single exploit.
+#     // If set to 0, no aggregate cap applies and each whitehat may receive up to bountyCapUSD individually.
+#     uint256 aggregateBountyCapUSD;
+# }
+# /// @notice Whitehat identity verification requirements.
+# enum IdentityRequirements {
+#     // The whitehat will be subject to no KYC requirements.
+#     Anonymous,
+#     // The whitehat must provide a pseudonym.
+#     Pseudonymous,
+#     // The whitehat must confirm their legal name.
+#     Named
+# }
+
 misc:
   - &AGREEMENT_DETAILS # Protocol name
     - "Lido on Ethereum"
@@ -29,7 +103,7 @@ misc:
           - ["0x388C818CA8B9251b393131C08a736A67ccB19297", 2] # Execution Layer Rewards Vault
           - ["0x889edC2eDab5f40e902b864aD4d7AdE8E412F9B1", 2] # Withdrawal Queue ERC721 (proxy)
           - ["0xb9d7934878b5fb9610b3fe8a5e441e8fad7e293f", 2] # Withdrawal Vault (proxy)
-          - ["0xE76c52750019b80B43E36DF30bf4060EB73F573a", 2] # Burner
+          - ["0xE76c52750019b80B43E36DF30bf4060EB73F573a", 2] # Burner (proxy)
           - ["0xf95f069f9ad107938f6ba802a3da87892298610e", 2] # MEV Boost Relay Allowed List
           - ["0xDC00116a0D3E064427dA2600449cfD2566B3037B", 2] # Triggerable Withdrawals Gateway
           - ["0xbDb567672c867DB533119C2dcD4FB9d8b44EC82f", 2] # Validator Exit Delay Verifier
@@ -99,7 +173,7 @@ misc:
           - ["0x5DB427080200c235F2Ae8Cd17A7be87921f7AD6c", 2] # Lido V3 LazyOracle (proxy)
           - ["0x881dAd714679A6FeaA636446A0499101375A365c", 2] # GateSeal (VaultHub and PredepositGuarantee)
         - "eip155:1"
-    # Bounty terms: [expiry, maxBounty, active, dateModified, terms, maxBountyCritical]
+    # Bounty terms: [bountyPercentage, bountyCapUSD, retainable, identity, diligenceRequirements, aggregateBountyCapUSD]
     - - 10
       - 2000000
       - false
