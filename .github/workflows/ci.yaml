@@ -32,6 +32,8 @@ jobs:
             network: ethereum-mainnet
           #- config: configs/lidov3/mainnet/lidov3-et-post-vote.yml
           #  network: ethereum-mainnet
+          - config: configs/safeharbor/mainnet.yml
+            network: ethereum-mainnet
 
     env:
       # Explorer API tokens
