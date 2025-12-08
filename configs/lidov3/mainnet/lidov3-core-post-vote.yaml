@@ -2299,10 +2299,10 @@ l1:
         getRecoveryVault: *ZERO_ADDRESS
         CHANGE_PERIOD_ROLE: "0xd35e458bacdd5343c2f050f574554b2f417a8ea38d6a9a65ce2225dbe8bb9a9d"
         CHANGE_BUDGETS_ROLE: "0xd79730e82bfef7d2f9639b9d10bf37ebb662b22ae2211502a00bdf7b2cc3a23a"
-        periodsLength: 61
+        periodsLength: 62
         appId: *FINANCE_APP_ID
         EXECUTE_PAYMENTS_ROLE: "0x563165d3eae48bcb0a092543ca070d989169c98357e9a1b324ec5da44bab75fd"
-        currentPeriodId: 60
+        currentPeriodId: 61
         getEVMScriptRegistry: *aragonEvmScriptRegistry
         getPeriodDuration: *DURATION_30_DAYS
         kernel: *aragonKernel
