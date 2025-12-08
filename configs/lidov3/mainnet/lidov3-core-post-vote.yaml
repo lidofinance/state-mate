@@ -86,7 +86,7 @@ deployed:
 
     # --- V3 Voting stack ---
     - &v3TemporaryAdmin "0xf738A2C7d69694B618dbB547C1c5A152D7958f06"
-    - &v3VoteScript "0xa47Ca1d2029D8e735237ea4E74c607426d4aA07e"
+    - &v3VoteScript "0xf2BeCc7aF0AA50DaD54781e06d5ce1A7eAD59AfA"
     - &v3Template "0x34E01ecFebd403370b0879C628f8A5319dDb8507"
 
     # --- DAO & Aragon apps ---
