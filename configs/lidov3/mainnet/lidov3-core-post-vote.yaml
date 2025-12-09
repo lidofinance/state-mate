@@ -86,7 +86,7 @@ deployed:
 
     # --- V3 Voting stack ---
     - &v3TemporaryAdmin "0xf738A2C7d69694B618dbB547C1c5A152D7958f06"
-    - &v3VoteScript "0xf2BeCc7aF0AA50DaD54781e06d5ce1A7eAD59AfA"
+    - &v3VoteScript "0xE1F4c16908fCE6935b5Ad38C6e3d58830fe86442"
     - &v3Template "0x34E01ecFebd403370b0879C628f8A5319dDb8507"
 
     # --- DAO & Aragon apps ---
@@ -1344,8 +1344,8 @@ l1:
         PAUSE_INFINITELY: *MAX_UINT256
         PAUSE_ROLE: *OZ_PAUSE_ROLE
         RESUME_ROLE: *OZ_RESUME_ROLE
-        getResumeSinceTimestamp: 0
-        isPaused: false
+        getResumeSinceTimestamp: *MAX_UINT256 # PAUSE_INFINITELY, uint(256).max
+        isPaused: true # Deliberately paused
         claimableRefund: null
         getRoleAdmin: null
         getRoleMember: null
@@ -1987,7 +1987,7 @@ l1:
         ENABLED_DAY_SPAN_END: *UTC_23
         TEMPLATE: *v3Template
         VOTING_ITEMS_COUNT: 8
-        DG_ITEMS_COUNT: 18
+        DG_ITEMS_COUNT: 21
         getEVMScript: null
         getEVMScriptByteCode: null
         getVoteItems: null
