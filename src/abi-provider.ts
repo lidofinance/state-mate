@@ -335,6 +335,15 @@ export function flushAbiUpdates(): void {
   }
 }
 
+/**
+ * Resets the cached ABI mode so it will be re-determined on next access.
+ * This should be called after downloading ABIs to ensure the mode is
+ * correctly detected based on newly created files.
+ */
+export function resetAbiModeCache(): void {
+  g_abiMode = null;
+}
+
 function _findAbiPath(contractName: string, contractAddress: string, shouldThrow: { shouldThrow: true }): string;
 
 function _findAbiPath(

@@ -5,7 +5,8 @@ import { loadAbiFromFile } from "src/abi-provider";
 import { EntryField } from "src/common";
 import { loadContract } from "src/explorer-provider";
 import { log, LogCommand, logHeader2, WARNING_MARK } from "src/logger";
-import { ContractEntry } from "src/typebox";
+import { ContractEntry, isTypeOfTB, ProxyContractEntryTB } from "src/typebox";
+import { Abi } from "src/types";
 
 import { incChecks, incErrors, SectionValidatorBase, setErrorContext } from "./base";
 
@@ -20,8 +21,30 @@ export class OzNonEnumerableAclSectionValidator extends SectionValidatorBase {
     }
   }
 
+  /**
+   * For proxy contracts, prefer loading ABI from the implementation address
+   * since the proxy delegates calls to the implementation.
+   * Falls back to the proxy address ABI if implementation ABI is not available.
+   */
+  protected _loadAbiWithImplementationFallback(contractEntry: ContractEntry): Abi {
+    const { name, address } = contractEntry;
+
+    // Check if this is a proxy contract with an implementation
+    if (isTypeOfTB(contractEntry, ProxyContractEntryTB) && contractEntry.implementation) {
+      try {
+        // Try to load implementation ABI first
+        return loadAbiFromFile(name, contractEntry.implementation);
+      } catch {
+        // Fall back to proxy address ABI
+        log(`  (Using proxy ABI as implementation ABI for ${name} at ${contractEntry.implementation} was not found)`);
+      }
+    }
+
+    return loadAbiFromFile(name, address);
+  }
+
   protected async _validate(contractEntry: ContractEntry) {
-    const abi = loadAbiFromFile(contractEntry.name, contractEntry.address);
+    const abi = this._loadAbiWithImplementationFallback(contractEntry);
     const contract = loadContract(contractEntry.address, abi, this.provider); //TODO to move out from this method
 
     log(

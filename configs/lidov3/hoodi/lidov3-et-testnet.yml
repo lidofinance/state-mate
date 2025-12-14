@@ -1,0 +1,120 @@
+# yaml-language-server: $schema=../../schemas/main-schema.json
+parameters:
+  - &trustedCaller "0xeBe5948787Bb3a565F67ccD93cb85A91960c472a"
+  - &initialValidatorExitFeeLimit "100000000000000000"
+  - &maxGroupShareLimit "500000000000000000000000"
+  - &maxDefaultTierShareLimit "500000000000000000000000"
+
+misc:
+  - &DEFAULT_TIER_OPERATOR "0xFFfFfFffFFfffFFfFFfFFFFFffFFFffffFfFFFfF"
+  - &locator "0xe2EF9536DAAAEBFf5b1c130957AB3E80056b06D8"
+  - &evmScriptExecutor "0x79a20FD0FA36453B2F45eAbab19bfef43575Ba9E"
+  - &withdrawalRequestPredeployAddress "0x00000961Ef480Eb55e80D19ad83579A64c007002"
+
+deployed:
+  l1:
+    - &RegisterGroupsInOperatorGrid "0xfEF8B796Fea42b3C68E342364Adcf88F1d6145a6"
+    - &UpdateGroupsShareLimitInOperatorGrid "0x56Ff87F41a8CF795764E15E496124240Ac17695b"
+    - &RegisterTiersInOperatorGrid "0x4DF806111AC58e93d90E6D2fBE8522a76be6F499"
+    - &AlterTiersInOperatorGrid "0xF21f98cac0Ba38f02b4d5be1667cc345929E8877"
+    - &VaultsAdapter "0xBC2bb8310730F3D2b514Cb26f7e0A8776De879Ac"
+    - &SetJailStatusInOperatorGrid "0xc3FA83D65a900303e1d99cDBBF762c6630562c04"
+    - &UpdateVaultsFeesInOperatorGrid "0x351426775c75aB5127de860Cdcaf1953F1D622a2"
+    - &ForceValidatorExitsInVaultHub "0x83DfE5Fe8ac8b7DB38c020F4F54BF09b65D92c63"
+    - &SocializeBadDebtInVaultHub "0xa11906bBBBaC5207b8FDA4F7F294d7EcB8dcc758"
+    - &SetLiabilitySharesTargetInVaultHub "0xc5dCd2A9642ceA9B71A632BF5b8ff52424Ea1B40"
+
+l1:
+  rpcUrl: HOODI_REMOTE_RPC_URL
+  explorerHostname: api.etherscan.io/v2/api
+  explorerTokenEnv: ETHERSCAN_TOKEN
+  chainId: 560048
+  contracts:
+    RegisterGroupsInOperatorGrid:
+      name: RegisterGroupsInOperatorGrid
+      address: *RegisterGroupsInOperatorGrid
+      checks:
+        DEFAULT_TIER_OPERATOR: *DEFAULT_TIER_OPERATOR
+        createEVMScript: null
+        decodeEVMScriptCallData: null
+        lidoLocator: *locator
+        maxShareLimit: *maxGroupShareLimit
+        trustedCaller: *trustedCaller
+    UpdateGroupsShareLimitInOperatorGrid:
+      name: UpdateGroupsShareLimitInOperatorGrid
+      address: *UpdateGroupsShareLimitInOperatorGrid
+      checks:
+        createEVMScript: null
+        decodeEVMScriptCallData: null
+        lidoLocator: *locator
+        maxShareLimit: *maxGroupShareLimit
+        trustedCaller: *trustedCaller
+    RegisterTiersInOperatorGrid:
+      name: RegisterTiersInOperatorGrid
+      address: *RegisterTiersInOperatorGrid
+      checks:
+        DEFAULT_TIER_OPERATOR: *DEFAULT_TIER_OPERATOR
+        createEVMScript: null
+        decodeEVMScriptCallData: null
+        lidoLocator: *locator
+        trustedCaller: *trustedCaller
+    AlterTiersInOperatorGrid:
+      name: AlterTiersInOperatorGrid
+      address: *AlterTiersInOperatorGrid
+      checks:
+        createEVMScript: null
+        decodeEVMScriptCallData: null
+        defaultTierMaxShareLimit: *maxDefaultTierShareLimit
+        lidoLocator: *locator
+        trustedCaller: *trustedCaller
+    VaultsAdapter:
+      name: VaultsAdapter
+      address: *VaultsAdapter
+      checks:
+        WITHDRAWAL_REQUEST_PREDEPLOY_ADDRESS: *withdrawalRequestPredeployAddress
+        evmScriptExecutor: *evmScriptExecutor
+        lidoLocator: *locator
+        trustedCaller: *trustedCaller
+        validatorExitFeeLimit: *initialValidatorExitFeeLimit
+    SetJailStatusInOperatorGrid:
+      name: SetJailStatusInOperatorGrid
+      address: *SetJailStatusInOperatorGrid
+      checks:
+        createEVMScript: null
+        decodeEVMScriptCallData: null
+        trustedCaller: *trustedCaller
+        vaultsAdapter: *VaultsAdapter
+    UpdateVaultsFeesInOperatorGrid:
+      name: UpdateVaultsFeesInOperatorGrid
+      address: *UpdateVaultsFeesInOperatorGrid
+      checks:
+        createEVMScript: null
+        decodeEVMScriptCallData: null
+        lidoLocator: *locator
+        trustedCaller: *trustedCaller
+        vaultsAdapter: *VaultsAdapter
+    ForceValidatorExitsInVaultHub:
+      name: ForceValidatorExitsInVaultHub
+      address: *ForceValidatorExitsInVaultHub
+      checks:
+        WITHDRAWAL_REQUEST_PREDEPLOY_ADDRESS: *withdrawalRequestPredeployAddress
+        createEVMScript: null
+        decodeEVMScriptCallData: null
+        trustedCaller: *trustedCaller
+        vaultsAdapter: *VaultsAdapter
+    SocializeBadDebtInVaultHub:
+      name: SocializeBadDebtInVaultHub
+      address: *SocializeBadDebtInVaultHub
+      checks:
+        createEVMScript: null
+        decodeEVMScriptCallData: null
+        trustedCaller: *trustedCaller
+        vaultsAdapter: *VaultsAdapter
+    SetLiabilitySharesTargetInVaultHub:
+      name: SetLiabilitySharesTargetInVaultHub
+      address: *SetLiabilitySharesTargetInVaultHub
+      checks:
+        createEVMScript: null
+        decodeEVMScriptCallData: null
+        trustedCaller: *trustedCaller
+        vaultsAdapter: *VaultsAdapter

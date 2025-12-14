@@ -1,0 +1,118 @@
+name: Configuration Tests
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+      - feat/**
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  test:
+    name: Test ${{ matrix.config }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Lido V3 configs - Mainnet
+          - config: configs/lidov3/mainnet/lidov3-core-pre-vote.yaml
+            network: ethereum-mainnet
+          #- config: configs/lidov3/mainnet/lidov3-core-post-vote.yaml
+          #  network: ethereum-mainnet
+          - config: configs/lidov3/mainnet/lidov3-et-pre-vote.yml
+            network: ethereum-mainnet
+          - config: configs/lidov3/mainnet/lidov3-et-pre-vote-phase-2.yml
+            network: ethereum-mainnet
+          #- config: configs/lidov3/mainnet/lidov3-et-post-vote.yml
+          #  network: ethereum-mainnet
+          - config: configs/safeharbor/mainnet.yml
+            network: ethereum-mainnet
+
+    env:
+      # Explorer API tokens
+      ETHERSCAN_TOKEN: ${{ secrets.ETHERSCAN_TOKEN }}
+
+      # Ethereum RPC URLs
+      REMOTE_RPC_URL: ${{ secrets.MAINNET_REMOTE_RPC_URL }}
+      HOODI_REMOTE_RPC_URL: ${{ secrets.HOODI_REMOTE_RPC_URL }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "yarn"
+
+      - name: Install dependencies
+        run: yarn install --immutable
+
+      - name: Run state-mate
+        run: |
+          yarn start ${{ matrix.config }}
+
+  lint:
+    name: Lint and Format Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "yarn"
+
+      - name: Install dependencies
+        run: yarn install --immutable
+
+      - name: Run linter
+        run: yarn lint
+
+      - name: Check formatting
+        run: yarn format
+
+  schemas:
+    name: Validate Schemas
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "yarn"
+
+      - name: Install dependencies
+        run: yarn install --immutable
+
+      - name: Generate schemas
+        run: yarn schemas
+
+      - name: Check if schemas are up to date
+        run: |
+          if ! git diff --exit-code schemas/; then
+            echo "Error: Schema files are not up to date. Please run 'yarn schemas' and commit the changes."
+            exit 1
+          fi

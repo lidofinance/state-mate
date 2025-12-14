@@ -25,13 +25,13 @@ misc:
 
 deployed:
   l1:
-    - &lidoLocatorImpl "0x2C298963FB763f74765829722a1ebe0784f4F5Cf"  # Done
-    - &accountingOracleImpl "0xE9906E543274cebcd335d2C560094089e9547e8d"  # Done
+    - &lidoLocatorImpl "0x2C298963FB763f74765829722a1ebe0784f4F5Cf" # Done
+    - &accountingOracleImpl "0xE9906E543274cebcd335d2C560094089e9547e8d" # Done
     - &validatorExitBusOracleImpl "0x905A211eD6830Cfc95643f0bE2ff64E7f3bf9b94" # Done
-    - &withdrawalVaultImpl "0x7D2BAa6094E1C4B60Da4cbAF4A77C3f4694fD53D"  # Done
-    - &stakingRouterImpl "0x226f9265CBC37231882b7409658C18bB7738173A"  # Done
-    - &nodeOperatorRegistryImpl "0x6828b023e737f96B168aCd0b5c6351971a4F81aE"  # Done
-    - &validatorExitDelayVerifier "0xbDb567672c867DB533119C2dcD4FB9d8b44EC82f"  # Done
+    - &withdrawalVaultImpl "0x7D2BAa6094E1C4B60Da4cbAF4A77C3f4694fD53D" # Done
+    - &stakingRouterImpl "0x226f9265CBC37231882b7409658C18bB7738173A" # Done
+    - &nodeOperatorRegistryImpl "0x6828b023e737f96B168aCd0b5c6351971a4F81aE" # Done
+    - &validatorExitDelayVerifier "0xbDb567672c867DB533119C2dcD4FB9d8b44EC82f" # Done
     - &triggerableWithdrawalsGateway "0xDC00116a0D3E064427dA2600449cfD2566B3037B"
     - &wqGateSeal "0x8A854C4E750CDf24f138f34A9061b2f556066912"
     - &twGateSeal "0xA6BC802fAa064414AA62117B4a53D27fFfF741F1"
@@ -61,7 +61,8 @@ l1:
       checks:
         accountingOracle: *accountingOracle
         burner: *burner
-        coreComponents: [*elRewardsVault, *oracleReportSanityChecker, *stakingRouter, *treasury, *withdrawalQueue, *withdrawalVault]
+        coreComponents:
+          [*elRewardsVault, *oracleReportSanityChecker, *stakingRouter, *treasury, *withdrawalQueue, *withdrawalVault]
         depositSecurityModule: *depositSecurityModule
         elRewardsVault: *elRewardsVault
         legacyOracle: *legacyOracle
@@ -105,9 +106,9 @@ l1:
         getRoleAdmin: null
         getRoleMember: null
         getRoleMemberCount:
-          - args: [ *STAKING_MODULE_UNVETTING_ROLE ]
+          - args: [*STAKING_MODULE_UNVETTING_ROLE]
             result: 0
-          - args: [ *DEFAULT_ADMIN_ROLE ]
+          - args: [*DEFAULT_ADMIN_ROLE]
             result: 0
         getStakingFeeAggregateDistribution: null
         getStakingFeeAggregateDistributionE4Precision: null
@@ -172,16 +173,16 @@ l1:
         getUnusedSigningKeyCount: null
         hasInitialized: null
         isOperatorPenalized:
-          - args: [ 1 ]
+          - args: [1]
             result: false
         isOperatorPenaltyCleared:
-          - args: [ 1 ]
+          - args: [1]
             result: true
         exitDeadlineThreshold:
-          - args: [ 1 ]
+          - args: [1]
             result: 0
         isValidatorExitingKeyReported:
-          - args: [ "0x95F00b016bB31b7182D96D25074684518246E42a" ]
+          - args: ["0x95F00b016bB31b7182D96D25074684518246E42a"]
             result: false
         isPetrified: null
         kernel: null
@@ -226,7 +227,7 @@ l1:
         GENESIS_TIME: 1606824023
         MANAGE_CONSENSUS_CONTRACT_ROLE: *MANAGE_CONSENSUS_CONTRACT_ROLE
         MANAGE_CONSENSUS_VERSION_ROLE: *MANAGE_CONSENSUS_VERSION_ROLE
-        PAUSE_INFINITELY: 115792089237316195423570985008687907853269984665640564039457584007913129639935  # type(uint256).max
+        PAUSE_INFINITELY: 115792089237316195423570985008687907853269984665640564039457584007913129639935 # type(uint256).max
         PAUSE_ROLE: *PAUSE_ROLE
         RESUME_ROLE: *RESUME_ROLE
         SECONDS_PER_SLOT: 12
@@ -292,14 +293,14 @@ l1:
         TWR_LIMIT_POSITION: null
         TW_EXIT_LIMIT_MANAGER_ROLE: *TW_EXIT_LIMIT_MANAGER_ROLE
         VERSION: 1
-        getExitRequestLimitFullInfo: [11200,1,48,11200,11200]  # [max, countPerFrame, frameInSlots, preLimit==max, curLimit==max]
+        getExitRequestLimitFullInfo: [11200, 1, 48, 11200, 11200] # [max, countPerFrame, frameInSlots, preLimit==max, curLimit==max]
         getResumeSinceTimestamp: 0
         getRoleAdmin: null
         getRoleMember:
-          - args: [ *DEFAULT_ADMIN_ROLE, 0 ]
+          - args: [*DEFAULT_ADMIN_ROLE, 0]
             result: *agent
         getRoleMemberCount:
-          - args: [ *DEFAULT_ADMIN_ROLE ]
+          - args: [*DEFAULT_ADMIN_ROLE]
             result: 1
         hasRole: null
         isPaused: false
@@ -309,16 +310,16 @@ l1:
       address: *wqGateSeal
       checks:
         get_sealing_committee: *gateSealCommittee
-        get_seal_duration_seconds: 1209600  # 2 weeks
+        get_seal_duration_seconds: 1209600 # 2 weeks
         get_sealables: [*withdrawalQueue]
-        get_expiry_timestamp: 1789207187  # Should be in one year. It is ok it fails.
+        get_expiry_timestamp: 1789207187 # Should be in one year. It is ok it fails.
         is_expired: false
     twGateSeal:
       name: TwGateSeal
       address: *twGateSeal
       checks:
         get_sealing_committee: *gateSealCommittee
-        get_seal_duration_seconds: 1209600  # 2 weeks
+        get_seal_duration_seconds: 1209600 # 2 weeks
         get_sealables: [*triggerableWithdrawalsGateway, *validatorsExitBusOracle]
-        get_expiry_timestamp: 1789207187  # Should be in one year. It is ok it fails.
+        get_expiry_timestamp: 1789207187 # Should be in one year. It is ok it fails.
         is_expired: false
