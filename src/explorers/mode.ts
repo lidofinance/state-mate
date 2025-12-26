@@ -29,7 +29,7 @@ async function modeGetContractInfoCallback(
   _chainId?: number | string,
 ): Promise<ContractInfo> {
   if (!isModeResponseOkResult(response.result[0])) {
-    logErrorAndExit(`It seems, explorer response has changed`);
+    logErrorAndExit(`It seems, Mode explorer response has changed`);
   }
 
   const { ContractName, ImplementationAddress } = response.result[0];
