@@ -1421,7 +1421,7 @@ l1:
         effectiveShareLimit: null
         getConfirmExpiry: null
         isVaultInJail: null
-        tiersCount: 1 # WARN: IMPORTANT, default tier only
+        tiersCount: null
         vaultTierInfo: null
         getRoleAdmin: null
         getRoleMember: null
@@ -1430,7 +1430,7 @@ l1:
         group: null
         hasRole: null
         nodeOperatorAddress: null
-        nodeOperatorCount: 0 # WARN: IMPORTANT
+        nodeOperatorCount: null
         pendingRequest: null
         pendingRequests: null
         pendingRequestsCount: null
