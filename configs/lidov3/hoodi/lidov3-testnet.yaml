@@ -5,7 +5,7 @@ deployed:
   l1:
     # --- Core protocol ---
     - &lidoLocator "0xe2EF9536DAAAEBFf5b1c130957AB3E80056b06D8"
-    - &lidoLocatorImplAddress "0x778Dc3a94B24D0Cd66E36d3ED8d47cAa622688F6"
+    - &lidoLocatorImplAddress "0x751A4AA1A29Bc0C0E587aa04c3EABF0797F9B1A4"
     - &lido "0x3508A952176b3c15387C97BE809eaffB1982176a"
     - &lidoImplAddress "0x4f9143Dba1f1BbFa535528254592f3396E229e53"
     - &wstETH "0x7E99eE3C66636DE415D2d7C880938F2f40f94De4"
@@ -19,7 +19,7 @@ deployed:
     - &withdrawalVault "0x4473dCDDbf77679A643BdB654dbd86D67F8d32f2"
     - &withdrawalVaultImplAddress "0xfe7A58960Af333eAdeAeC39149F9d6A71dc3E668"
     - &accounting "0x9b5b78D1C9A3238bF24662067e34c57c83E8c354"
-    - &accountingImplAddress "0x41f0765b56d4f6b6AF231c217886ea7A8D1e7640"
+    - &accountingImplAddress "0xd7eb46d18a07F78ed07201E1C7F7A4933967da6D"
     - &burner "0xb2c99cd38a2636a6281a849C8de938B3eF4A7C3D"
     - &burnerImplAddress "0xBb77f95A29D1ccE1A54F6ED9144D48be38D43dbC"
     - &minFirstAllocationStrategy "0x6d1a9bBFF97f7565e9532FEB7b499982848E5e07"
@@ -31,13 +31,13 @@ deployed:
     - &predepositGuarantee "0xa5F55f3402beA2B14AE15Dae1b6811457D43581d"
     - &predepositGuaranteeImplAddress "0x6D2c164Be7cc36b03aBd0e2e133bE03A30ad3358"
     - &operatorGrid "0x501e678182bB5dF3f733281521D3f3D1aDe69917"
-    - &operatorGridImplAddress "0x0f7b5BFA0FC13F2b8218a1624a5aF4055500cAe0"
+    - &operatorGridImplAddress "0x4c29A1D1e14BaD29650c8B91Ad91c5AEdF5fd811"
 
     # --- stVaults factory stack ---
-    - &stakingVaultFactory "0x1d10DB6a66EF8D2A6f6D36Ad4dc7092Ef7C12569"
+    - &stakingVaultFactory "0x7Ba269a03eeD86f2f54CB04CA3b4b7626636Df4E"
     - &stakingVaultBeacon "0xb3e6a8B6A752d3bb905A1B3Ef12bbdeE77E8160e"
     - &stakingVaultImplAddress "0xE96BE4FB723e68e7b96244b7399C64a58bcD0062"
-    - &dashboardImplAddress "0x7D25D43D5a69ae0521440211C655C11840aF0FD6"
+    - &dashboardImplAddress "0x38131D5548Be57A34937521fe427a23f49e1e2d4"
     - &consolidationRequestsValidator "0xbf95Cd394cC03cD03fEA62A435ac347314877f1d"
     - &pinnedBeaconProxy "0x3e144aEd003b5AE6953A99B78dD34154CF3F8c76"
 
@@ -49,6 +49,7 @@ deployed:
     - &validatorsExitBusOracleImplAddress "0x7E6d9C9C44417bf2EaF69685981646e9752D623A"
     - &hashConsensusForValidatorsExitBusOracle "0x30308CD8844fb2DB3ec4D056F1d475a802DCA07c"
     - &oracleReportSanityChecker "0x53417BA942bC86492bAF46FAbA8769f246422388"
+    - &postTokenRebaseReceiver "0x9c53d0075eA00ad77dDAd1b71E67bb97AaBC1e3D"
     - &oracleDaemonConfig "0x2a833402e3F46fFC1ecAb3598c599147a78731a9"
     - &lazyOracle "0xf41491C79C30e8f4862d3F4A5b790171adB8e04A"
     - &lazyOracleImplAddress "0x4e3b9fd9F713e5dbA86255febD4c402794135095"
@@ -101,6 +102,7 @@ deployed:
     - &CSAccountingImplAddress "0xD32b59d6054b94516f8EEE2A84C3c33DaF1d06B8"
     - &CSFeeDistributor "0xaCd9820b0A2229a82dc1A0770307ce5522FF3582"
     - &CSVettedGate "0x10a254E724fe2b7f305F76f3F116a3969c53845f"
+    - &CSEjector "0x777bd76326E4aDcD353b03AD45b33BAF41048476"
 
     # --- Easy Track ---
     - &easyTrack "0x284D91a7D47850d21A6DEaaC6E538AC7E5E6fc2a"
@@ -204,7 +206,7 @@ misc:
   - &HASH_CONSENSUS_FAST_LANE 75
   - &HC_AO_START 39833
   - &HC_VEB_START 39843
-  - &HASH_CONSENSUS_QUORUM 6
+  - &HASH_CONSENSUS_QUORUM 7
 
   # --- Node/operator limits ---
   - &MAX_NODE_OPERATORS_COUNT 200
@@ -254,6 +256,7 @@ eoa:
   - &superManager "0xE28f573b732632fdE03BD5507A7d475383e8512E"
   - &oracleManager "0x4022E0754d0cB6905B54306105D3346d1547988b"
   - &nomManager "0xF865A1d43D36c713B4DA085f32b7d1e9739B9275"
+  - &csmManager "0x4AF43Ee34a6fcD1fEcA1e1F832124C763561dA53"
   - &resealCommittee "0x83BCE68B4e8b7071b2a664a26e6D3Bc17eEe3102" # WARNING: same as deployer!
 
 roles:
@@ -425,11 +428,11 @@ l1:
           - *oracleReportSanityChecker
           - *burner
           - *withdrawalQueueERC721
-          - *ZERO_ADDRESS
+          - *postTokenRebaseReceiver
           - *stakingRouter
           - *vaultHub
         oracleReportSanityChecker: *oracleReportSanityChecker
-        postTokenRebaseReceiver: *ZERO_ADDRESS
+        postTokenRebaseReceiver: *postTokenRebaseReceiver
         predepositGuarantee: *predepositGuarantee
         lazyOracle: *lazyOracle
         triggerableWithdrawalsGateway: *triggerableWithdrawalsGateway
@@ -463,11 +466,11 @@ l1:
           - *oracleReportSanityChecker
           - *burner
           - *withdrawalQueueERC721
-          - *ZERO_ADDRESS
+          - *postTokenRebaseReceiver
           - *stakingRouter
           - *vaultHub
         oracleReportSanityChecker: *oracleReportSanityChecker
-        postTokenRebaseReceiver: *ZERO_ADDRESS
+        postTokenRebaseReceiver: *postTokenRebaseReceiver
         predepositGuarantee: *predepositGuarantee
         lazyOracle: *lazyOracle
         triggerableWithdrawalsGateway: *triggerableWithdrawalsGateway
@@ -1046,9 +1049,9 @@ l1:
         supportsInterface: null
         totalBondShares: null
       ozAcl:
-        *DEFAULT_ADMIN_ROLE : [*aragonAgent, "0x4AF43Ee34a6fcD1fEcA1e1F832124C763561dA53"] # WARNING: who is this?
-        *CS_MANAGE_BOND_CURVES_ROLE : ["0x4AF43Ee34a6fcD1fEcA1e1F832124C763561dA53"] # WARNING: who is this?
-        *CS_SET_BOND_CURVE_ROLE : [*CSVettedGate, "0x4AF43Ee34a6fcD1fEcA1e1F832124C763561dA53"] # WARNING: who is this?
+        *DEFAULT_ADMIN_ROLE : [*aragonAgent, *csmManager]
+        *CS_MANAGE_BOND_CURVES_ROLE : [*csmManager]
+        *CS_SET_BOND_CURVE_ROLE : [*CSVettedGate, *csmManager]
         *CS_RECOVERER_ROLE : []
         *CS_RESUME_ROLE : [*resealManager]
         *CS_PAUSE_ROLE : [*resealManager, *gateSealCSAccounting]
@@ -1212,11 +1215,11 @@ l1:
         vaultsCount: null
       ozAcl:
         *DEFAULT_ADMIN_ROLE : [*aragonAgent]
-        *OZ_PAUSE_ROLE : [*gateSealVaulthubAndPredepositGuarantee]
-        *OZ_RESUME_ROLE : []
-        *VAULT_MASTER_ROLE : [*aragonAgent]
+        *OZ_PAUSE_ROLE : [*gateSealVaulthubAndPredepositGuarantee, *resealManager]
+        *OZ_RESUME_ROLE : [*resealManager]
+        *VAULT_MASTER_ROLE : []
         *BAD_DEBT_MASTER_ROLE : [*vaultsAdapter]
-        *REDEMPTION_MASTER_ROLE : [*aragonAgent, *vaultsAdapter] # WARNING: must be none for mainnet
+        *REDEMPTION_MASTER_ROLE : []
         *VALIDATOR_EXIT_ROLE : [*vaultsAdapter]
       implementationChecks:
         CONNECT_DEPOSIT: *ONE_ETH_WEI
@@ -1294,7 +1297,7 @@ l1:
         PAUSE_INFINITELY: *MAX_UINT256
         PAUSE_ROLE: *OZ_PAUSE_ROLE
         RESUME_ROLE: *OZ_RESUME_ROLE
-        getResumeSinceTimestamp: 0
+        getResumeSinceTimestamp: null
         isPaused: false
         claimableRefund: null
         getRoleAdmin: null
@@ -1313,8 +1316,8 @@ l1:
         validatorStatus: null
       ozAcl:
         *DEFAULT_ADMIN_ROLE : [*aragonAgent]
-        *OZ_PAUSE_ROLE : [*gateSealVaulthubAndPredepositGuarantee]
-        *OZ_RESUME_ROLE : []
+        *OZ_PAUSE_ROLE : [*gateSealVaulthubAndPredepositGuarantee, *resealManager]
+        *OZ_RESUME_ROLE : [*resealManager]
       implementationChecks:
         PREDEPOSIT_AMOUNT: *ONE_ETH_WEI
         ACTIVATION_DEPOSIT_AMOUNT: *ACTIVATION_DEPOSIT_AMOUNT
@@ -1389,7 +1392,7 @@ l1:
         vaultInfo: null
       ozAcl:
         *DEFAULT_ADMIN_ROLE : [*aragonAgent]
-        *REGISTRY_ROLE : [*aragonAgent, *evmScriptExecutor, *vaultsAdapter]
+        *REGISTRY_ROLE : [*evmScriptExecutor, *vaultsAdapter]
       implementationChecks:
         DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
         DEFAULT_TIER_ID: *DEFAULT_TIER_ID
@@ -1417,7 +1420,7 @@ l1:
       name: VaultFactory
       address: *stakingVaultFactory
       checks:
-        PREVIOUS_FACTORY: "0xf0Cf0c852Bb2b41eF8171399a71be79aa67e6295"
+        PREVIOUS_FACTORY: "0x1d10DB6a66EF8D2A6f6D36Ad4dc7092Ef7C12569"
         BEACON: *stakingVaultBeacon
         DASHBOARD_IMPL: *dashboardImplAddress
         LIDO_LOCATOR: *lidoLocator
@@ -1509,6 +1512,8 @@ l1:
         vaultConnection: null
         withdrawableValue: null
         feeLeftover: null
+        renounceRole:
+          mustRevert: true
       ozAcl:
         *NODE_OPERATOR_MANAGER_ROLE : []
         *PAUSE_BEACON_CHAIN_DEPOSITS_ROLE : []
@@ -2162,17 +2167,17 @@ l1:
         getRecoveryVault: *aragonAgent
         CHANGE_PERIOD_ROLE: "0xd35e458bacdd5343c2f050f574554b2f417a8ea38d6a9a65ce2225dbe8bb9a9d"
         CHANGE_BUDGETS_ROLE: "0xd79730e82bfef7d2f9639b9d10bf37ebb662b22ae2211502a00bdf7b2cc3a23a"
-        periodsLength: 1
+        periodsLength: null
         appId: *FINANCE_APP_ID
         EXECUTE_PAYMENTS_ROLE: "0x563165d3eae48bcb0a092543ca070d989169c98357e9a1b324ec5da44bab75fd"
-        currentPeriodId: 0
+        currentPeriodId: null
         getEVMScriptRegistry: *aragonEvmScriptRegistry
         getPeriodDuration: *DURATION_30_DAYS
         kernel: *aragonKernel
         paymentsNextIndex: 1
         isPetrified: false
         MANAGE_PAYMENTS_ROLE: "0x30597dd103acfaef0649675953d9cb22faadab7e9d9ed57acc1c429d04b80777"
-        transactionsNextIndex: 1
+        transactionsNextIndex: null
         vault: *aragonAgent
         getBudget: null
         getEVMScriptExecutor: null

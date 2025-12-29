@@ -21,12 +21,16 @@ jobs:
       fail-fast: false
       matrix:
         include:
+          # Lido V3 configs - Mainnet
           - config: configs/lidov3/mainnet/lidov3-core-post-vote.yaml
             network: ethereum-mainnet
           - config: configs/lidov3/mainnet/lidov3-et-post-vote.yml
             network: ethereum-mainnet
           - config: configs/safeharbor/mainnet.yml
             network: ethereum-mainnet
+          # Lido V3 configs - Hoodi
+          - config: configs/lidov3/hoodi/lidov3-testnet.yaml
+            network: hoodi-testnet
 
     env:
       # Explorer API tokens
