@@ -20,7 +20,8 @@
     "test": "ts-node src/test-util/app.ts",
     "test:unit": "vitest run",
     "test:unit:watch": "vitest",
-    "schemas": "ts-node src/gen-schemas.ts"
+    "schemas": "ts-node src/gen-schemas.ts",
+    "clear-cache": "ts-node src/clear-cache.ts"
   },
   "lint-staged": {
     "./**.{ts,md,json}": [
