@@ -156,7 +156,7 @@ misc:
   # --- Chain and deployment constants ---
   - &CHAIN_ID "1"
   - &GENESIS_TIME "1606824023"
-  - &DEPOSIT_DOMAIN "0x03000000f5a5fd42d16a20302798ef6ed309979b43003d2320d9f0e8ea9831a9" # TODO
+  - &DEPOSIT_DOMAIN "0x03000000f5a5fd42d16a20302798ef6ed309979b43003d2320d9f0e8ea9831a9"
 
   # --- Lido versioning and credentials ---
   - &LIDO_VERSION_OLD 2
@@ -302,7 +302,7 @@ misc:
   - &INFINITE_ALLOWANCE "115792089237316195423570985008687907853269984665640564039457584007913129639935"
   - &INITIAL_MAX_EXTERNAL_RATIO_BP "300" # 3%
 eoa:
-  - &deployer "0xAD2F7e30AeA89f6D45D942D0f52aFB8B395965f2" #TODO: Check
+  - &deployer "0xAD2F7e30AeA89f6D45D942D0f52aFB8B395965f2"
 
 roles:
   # Lido
@@ -767,7 +767,7 @@ l1:
         *DEFAULT_ADMIN_ROLE : [*aragonAgent]
         *MANAGE_WITHDRAWAL_CREDENTIALS_ROLE : []
         *REPORT_EXITED_VALIDATORS_ROLE : [*accountingOracle]
-        *REPORT_REWARDS_MINTED_ROLE : [*accounting] # TODO: NEW
+        *REPORT_REWARDS_MINTED_ROLE : [*accounting]
         *STAKING_MODULE_MANAGE_ROLE : [*aragonAgent]
         *STAKING_MODULE_UNVETTING_ROLE : [*depositSecurityModule]
         *UNSAFE_SET_EXITED_VALIDATORS_ROLE : []
@@ -998,8 +998,8 @@ l1:
         REQUEST_BURN_MY_STETH_ROLE: *REQUEST_BURN_MY_STETH_ROLE
         REQUEST_BURN_SHARES_ROLE: *REQUEST_BURN_SHARES_ROLE
         getContractVersion: *BURNER_VERSION
-        isMigrationAllowed: false # TODO: NEW
-        getCoverSharesBurnt: *COVER_SHARES_BURNT # TODO: NEW
+        isMigrationAllowed: false
+        getCoverSharesBurnt: *COVER_SHARES_BURNT
         getExcessStETH: 0
         getNonCoverSharesBurnt: null
         getRoleAdmin: null
@@ -1267,7 +1267,7 @@ l1:
         *OZ_RESUME_ROLE : [*resealManager]
         *VAULT_MASTER_ROLE : []
         *BAD_DEBT_MASTER_ROLE : [*vaultsAdapter]
-        *REDEMPTION_MASTER_ROLE : [] # TODO: NEW
+        *REDEMPTION_MASTER_ROLE : []
         *VALIDATOR_EXIT_ROLE : [*vaultsAdapter]
       implementationChecks:
         CONNECT_DEPOSIT: *ONE_ETH_WEI
@@ -1421,7 +1421,7 @@ l1:
         effectiveShareLimit: null
         getConfirmExpiry: null
         isVaultInJail: null
-        tiersCount: 1 # WARN: IMPORTANT, default tier only
+        tiersCount: null
         vaultTierInfo: null
         getRoleAdmin: null
         getRoleMember: null
@@ -1430,7 +1430,7 @@ l1:
         group: null
         hasRole: null
         nodeOperatorAddress: null
-        nodeOperatorCount: 0 # WARN: IMPORTANT
+        nodeOperatorCount: null
         pendingRequest: null
         pendingRequests: null
         pendingRequestsCount: null
@@ -1892,9 +1892,9 @@ l1:
             result: 0x08ca
           - args: ["EXIT_EVENTS_LOOKBACK_WINDOW_IN_SLOTS"]
             result: 0x0189c0
-          - args: ["SLASHING_RESERVE_WE_RIGHT_SHIFT"] # TODO: NEW
+          - args: ["SLASHING_RESERVE_WE_RIGHT_SHIFT"]
             result: 0x2000
-          - args: ["SLASHING_RESERVE_WE_LEFT_SHIFT"] # TODO: NEW
+          - args: ["SLASHING_RESERVE_WE_LEFT_SHIFT"]
             result: 0x2000
         getList: null
         getRoleAdmin: null
