@@ -20,7 +20,6 @@
 ---
 parameters:
   - &contract4788 "0x000F3df6D732807Ef1319fB7B8bB8522d0Beac02"
-  - &contractDeposit "0x00000000219ab540356cBB839Cbe05303d7705Fa"
 
 deployed:
   l1:
@@ -114,9 +113,6 @@ misc:
   - &DEFAULT_TIER_RESERVATION_FEE 0
   - &MAX_RELATIVE_SHARE_LIMIT_BP 1000
   - &REPORT_FRESHNESS_DELTA 172800
-
-  # --- VaultsAdapter limits ---
-  - &VAULTS_ADAPTER_LIMIT "1000000000000000000000000" # 1,000,000e18
 
   # --- Time durations (in seconds) ---
   - &DURATION_1_HOUR 3600
