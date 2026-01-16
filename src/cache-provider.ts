@@ -34,11 +34,13 @@ let g_eventScanCache: EventScansCache | null = null;
 let g_cacheDirectory: string | null = null;
 let g_creationBlockCacheDirty = false;
 let g_eventScanCacheDirty = false;
+let g_cacheDisabled = false;
 
 export type RoleHoldersMap = Map<string, Set<string>>;
 
-export function initCacheDirectory(configPath: string): void {
+export function initCacheDirectory(configPath: string, options?: { disabled?: boolean }): void {
   g_cacheDirectory = path.join(path.dirname(configPath), CACHE_DIR_NAME);
+  g_cacheDisabled = options?.disabled ?? false;
 }
 
 function getCacheDirectory(): string {
@@ -104,12 +106,18 @@ function loadEventScansCache(): EventScansCache {
 }
 
 export function loadCreationBlockFromCache(address: string): ContractCreationCacheEntry | null {
+  if (g_cacheDisabled) {
+    return null;
+  }
   const cache = loadCreationBlocksCache();
   const normalizedAddress = address.toLowerCase();
   return cache.entries[normalizedAddress] ?? null;
 }
 
 export function saveCreationBlockToCache(address: string, blockNumber: number, txHash: string, deployer: string): void {
+  if (g_cacheDisabled) {
+    return;
+  }
   const cache = loadCreationBlocksCache();
   const normalizedAddress = address.toLowerCase();
   cache.entries[normalizedAddress] = { blockNumber, txHash, deployer };
@@ -117,6 +125,9 @@ export function saveCreationBlockToCache(address: string, blockNumber: number, t
 }
 
 export function loadEventScanFromCache(address: string, currentBlock: number): RoleHoldersMap | null {
+  if (g_cacheDisabled) {
+    return null;
+  }
   const cache = loadEventScansCache();
   const normalizedAddress = address.toLowerCase();
   const entry = cache.entries[normalizedAddress];
@@ -139,6 +150,9 @@ export function loadEventScanFromCache(address: string, currentBlock: number): R
 }
 
 export function getLastScannedBlock(address: string): number | null {
+  if (g_cacheDisabled) {
+    return null;
+  }
   const cache = loadEventScansCache();
   const normalizedAddress = address.toLowerCase();
   const entry = cache.entries[normalizedAddress];
@@ -146,6 +160,9 @@ export function getLastScannedBlock(address: string): number | null {
 }
 
 export function getCachedRoleHolders(address: string): RoleHoldersMap | null {
+  if (g_cacheDisabled) {
+    return null;
+  }
   const cache = loadEventScansCache();
   const normalizedAddress = address.toLowerCase();
   const entry = cache.entries[normalizedAddress];
@@ -162,6 +179,9 @@ export function getCachedRoleHolders(address: string): RoleHoldersMap | null {
 }
 
 export function saveEventScanToCache(address: string, roleHolders: RoleHoldersMap, lastScannedBlock: number): void {
+  if (g_cacheDisabled) {
+    return;
+  }
   const cache = loadEventScansCache();
   const normalizedAddress = address.toLowerCase();
 
@@ -196,10 +216,24 @@ export function flushCacheUpdates(): void {
   }
 }
 
+export function clearCacheDirectory(): void {
+  const cacheDirectory = getCacheDirectory();
+  if (fs.existsSync(cacheDirectory)) {
+    fs.rmSync(cacheDirectory, { recursive: true });
+    log(`  Cleared cache directory: ${cacheDirectory}`);
+  }
+  // Reset in-memory caches after clearing disk cache
+  g_creationBlockCache = null;
+  g_eventScanCache = null;
+  g_creationBlockCacheDirty = false;
+  g_eventScanCacheDirty = false;
+}
+
 export function clearCacheState(): void {
   g_creationBlockCache = null;
   g_eventScanCache = null;
   g_cacheDirectory = null;
   g_creationBlockCacheDirty = false;
   g_eventScanCacheDirty = false;
+  g_cacheDisabled = false;
 }

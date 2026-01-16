@@ -5,6 +5,7 @@ import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import {
+  clearCacheDirectory,
   clearCacheState,
   flushCacheUpdates,
   initCacheDirectory,
@@ -158,6 +159,63 @@ describe("cache-provider", () => {
       const result = loadCreationBlockFromCache(address);
       expect(result).not.toBeNull();
       expect(result?.blockNumber).toBe(12_345);
+    });
+  });
+
+  describe("cache disabled", () => {
+    beforeEach(() => {
+      // Re-initialize with cache disabled
+      clearCacheState();
+      initCacheDirectory(testConfigPath, { disabled: true });
+    });
+
+    it("returns null for creation block when disabled", () => {
+      const address = "0x1234567890123456789012345678901234567890";
+      saveCreationBlockToCache(address, 12_345, "0xhash", "0xdeployer");
+      const result = loadCreationBlockFromCache(address);
+      expect(result).toBeNull();
+    });
+
+    it("returns null for event scan when disabled", () => {
+      const address = "0x1234567890123456789012345678901234567890";
+      const roleHolders: RoleHoldersMap = new Map();
+      roleHolders.set("role1", new Set(["holder1"]));
+
+      saveEventScanToCache(address, roleHolders, 100_000);
+      const result = loadEventScanFromCache(address, 100_000);
+      expect(result).toBeNull();
+    });
+
+    it("does not write to disk when disabled", () => {
+      const address = "0x1234567890123456789012345678901234567890";
+      saveCreationBlockToCache(address, 12_345, "0xhash", "0xdeployer");
+      flushCacheUpdates();
+
+      const cacheFile = path.join(testDirectory, "cache", "creation-blocks.json");
+      expect(fs.existsSync(cacheFile)).toBe(false);
+    });
+  });
+
+  describe("clearCacheDirectory", () => {
+    it("removes cache directory and clears in-memory cache", () => {
+      const address = "0x1234567890123456789012345678901234567890";
+      saveCreationBlockToCache(address, 12_345, "0xhash", "0xdeployer");
+      flushCacheUpdates();
+
+      const cacheDirectory = path.join(testDirectory, "cache");
+      expect(fs.existsSync(cacheDirectory)).toBe(true);
+
+      clearCacheDirectory();
+
+      expect(fs.existsSync(cacheDirectory)).toBe(false);
+      // In-memory cache is also cleared
+      const result = loadCreationBlockFromCache(address);
+      expect(result).toBeNull();
+    });
+
+    it("handles non-existent cache directory gracefully", () => {
+      // clearCacheDirectory should not throw if cache dir doesn't exist
+      expect(() => clearCacheDirectory()).not.toThrow();
     });
   });
 });

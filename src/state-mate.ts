@@ -12,7 +12,7 @@ import * as YAML from "yaml";
 
 import { checkAllAbi, flushAbiUpdates, renameAllAbiToLowerCase, resetAbiModeCache } from "./abi-provider";
 import { doGenerateBoilerplate } from "./boilerplate-generator";
-import { flushCacheUpdates, initCacheDirectory } from "./cache-provider";
+import { clearCacheDirectory, flushCacheUpdates, initCacheDirectory } from "./cache-provider";
 import { parseCmdLineArguments } from "./cli-parser";
 import { printError, readUrlOrFromEnvironment } from "./common";
 import { loadContractInfoFromExplorer } from "./explorer-provider";
@@ -112,7 +112,12 @@ function validateJsonWithSchema<T extends TSchema>(
 
 async function doChecks(jsonDocument: EntireDocument) {
   // Initialize cache directory for event scanning
-  initCacheDirectory(g_Arguments.configPath);
+  initCacheDirectory(g_Arguments.configPath, { disabled: g_Arguments.noCache });
+
+  // Clear cache if requested
+  if (g_Arguments.clearCache) {
+    clearCacheDirectory();
+  }
 
   for (const [sectionTitle, section] of Object.entries(jsonDocument)) {
     if (isTypeOfTB(section, NetworkSectionTB)) await checkNetworkSection(sectionTitle, section);
