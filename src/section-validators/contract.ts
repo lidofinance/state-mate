@@ -8,13 +8,13 @@ import { CheckLevel, clearErrorContext, needCheck, SectionValidatorBase, setErro
 import { ChecksSectionValidator } from "./checks";
 import { ImplementationChecksSectionValidator } from "./implementation-checks";
 import { OzAclSectionValidator } from "./oz-acl";
-import { OzNonEnumerableAclSectionValidator } from "./oz-non-enumerable-acl";
+import { ExplorerInfo, OzNonEnumerableAclSectionValidator } from "./oz-non-enumerable-acl";
 import { ProxyCheckSectionValidator } from "./proxy-check";
 
 export class ContractSectionValidator {
   private map: Map<EntryField, SectionValidatorBase> = new Map();
 
-  constructor(provider: JsonRpcProvider) {
+  constructor(provider: JsonRpcProvider, explorerInfo?: ExplorerInfo) {
     const sections = [
       EntryField.checks,
       EntryField.proxyChecks,
@@ -33,7 +33,7 @@ export class ContractSectionValidator {
           break;
         }
         case EntryField.ozNonEnumerableAcl: {
-          this.map.set(section, new OzNonEnumerableAclSectionValidator(provider));
+          this.map.set(section, new OzNonEnumerableAclSectionValidator(provider, explorerInfo));
           break;
         }
         case EntryField.implementationChecks: {

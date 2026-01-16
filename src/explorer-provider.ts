@@ -1,8 +1,9 @@
 import chalk from "chalk";
 import { Contract, JsonRpcProvider } from "ethers";
 
+import { loadCreationBlockFromCache, saveCreationBlockToCache } from "./cache-provider";
 import { printError } from "./common";
-import { EtherscanHandler } from "./explorers/etherscan";
+import { ContractCreationResult, getContractCreation, EtherscanHandler } from "./explorers/etherscan";
 import { ModeHandler } from "./explorers/mode";
 import { LogCommand, logError, logErrorAndExit, logReplaceLine } from "./logger";
 import {
@@ -190,5 +191,60 @@ function _parseJson(response: string): unknown {
     return JSON.parse(response);
   } catch (error) {
     logError(`Failed to parse JSON: ${printError(error)} \nResponse: ${chalk.yellow(response)}`);
+  }
+}
+
+export interface ContractCreationInfo {
+  txHash: string;
+  blockNumber: number;
+  deployer: string;
+}
+
+export async function getContractCreationBlock(
+  address: string,
+  explorerHostname: string,
+  provider: JsonRpcProvider,
+  explorerKey?: string,
+  chainId?: number | string,
+): Promise<ContractCreationInfo | null> {
+  // Check cache first
+  const cached = loadCreationBlockFromCache(address);
+  if (cached) {
+    return cached;
+  }
+
+  // Fetch from explorer
+  const creationResult: ContractCreationResult | null = await getContractCreation(
+    address,
+    explorerHostname,
+    explorerKey,
+    chainId,
+  );
+
+  if (!creationResult) {
+    return null;
+  }
+
+  // Get block number from transaction receipt
+  try {
+    const receipt = await provider.getTransactionReceipt(creationResult.txHash);
+    if (!receipt) {
+      logError(`Could not get transaction receipt for ${creationResult.txHash}`);
+      return null;
+    }
+
+    const info: ContractCreationInfo = {
+      txHash: creationResult.txHash,
+      blockNumber: receipt.blockNumber,
+      deployer: creationResult.deployer,
+    };
+
+    // Save to cache
+    saveCreationBlockToCache(address, info.blockNumber, info.txHash, info.deployer);
+
+    return info;
+  } catch (error) {
+    logError(`Error getting transaction receipt: ${(error as Error).message}`);
+    return null;
   }
 }

@@ -18,6 +18,8 @@
     "format:fix": "prettier . --ignore-path .gitignore --write",
     "postinstall": "husky",
     "test": "ts-node src/test-util/app.ts",
+    "test:unit": "vitest run",
+    "test:unit:watch": "vitest",
     "schemas": "ts-node src/gen-schemas.ts"
   },
   "lint-staged": {
@@ -52,7 +54,8 @@
     "lint-staged": "^15.2.7",
     "prettier": "^3.3.2",
     "ts-node": ">=8.0.0",
-    "typescript": "^5.4.5"
+    "typescript": "^5.4.5",
+    "vitest": "^2.0.0"
   },
   "dependencies": {
     "@inquirer/prompts": "^5.1.2",

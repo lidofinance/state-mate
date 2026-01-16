@@ -21,3 +21,6 @@ reports
 
 # pycharm
 .idea
+
+# Auto-generated schemas
+schemas/

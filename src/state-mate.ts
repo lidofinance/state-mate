@@ -12,6 +12,7 @@ import * as YAML from "yaml";
 
 import { checkAllAbi, flushAbiUpdates, renameAllAbiToLowerCase, resetAbiModeCache } from "./abi-provider";
 import { doGenerateBoilerplate } from "./boilerplate-generator";
+import { flushCacheUpdates, initCacheDirectory } from "./cache-provider";
 import { parseCmdLineArguments } from "./cli-parser";
 import { printError, readUrlOrFromEnvironment } from "./common";
 import { loadContractInfoFromExplorer } from "./explorer-provider";
@@ -110,9 +111,15 @@ function validateJsonWithSchema<T extends TSchema>(
 }
 
 async function doChecks(jsonDocument: EntireDocument) {
+  // Initialize cache directory for event scanning
+  initCacheDirectory(g_Arguments.configPath);
+
   for (const [sectionTitle, section] of Object.entries(jsonDocument)) {
     if (isTypeOfTB(section, NetworkSectionTB)) await checkNetworkSection(sectionTitle, section);
   }
+
+  // Flush any pending cache updates
+  flushCacheUpdates();
   if (g_Arguments.checkOnly) {
     log(
       `\n${WARNING_MARK}${WARNING_MARK}${WARNING_MARK} Checks run only for "${chalk.bold(chalk.blue(g_Arguments.checkOnlyCmdArg))}"\n`,
@@ -204,7 +211,17 @@ async function checkNetworkSection(sectionTitle: string, section: NetworkSection
   }
   const rpcUrl = readUrlOrFromEnvironment(section.rpcUrl);
   const provider = new JsonRpcProvider(rpcUrl);
-  const contractSectionChecker = new ContractSectionValidator(provider);
+
+  // Build explorer info for exhaustive ACL checks
+  const explorerInfo = section.explorerHostname
+    ? {
+        hostname: section.explorerHostname,
+        key: section.explorerTokenEnv ? process.env[section.explorerTokenEnv] : undefined,
+        chainId: section.chainId,
+      }
+    : undefined;
+
+  const contractSectionChecker = new ContractSectionValidator(provider, explorerInfo);
 
   for (const contractAlias in section.contracts) {
     const contractEntry = section.contracts[contractAlias];

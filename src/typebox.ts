@@ -42,6 +42,17 @@ export function isTypeOfTB<T extends TSchema>(value: unknown, schema: T): value 
 
 const OzNonEnumerableAclTB = Type.Readonly(Type.Record(EthereumStringTB, EthereumStringArrayTB));
 
+export const OzNonEnumerableAclOptionsTB = Type.Readonly(
+  Type.Object(
+    {
+      exhaustive: Type.Optional(Type.Boolean()),
+      eventBatchSize: Type.Optional(Type.Number()),
+    },
+    { additionalProperties: false },
+  ),
+);
+export type OzNonEnumerableAclOptions = Static<typeof OzNonEnumerableAclOptionsTB>;
+
 export const PlainValueTB = Type.Readonly(Type.Union([Type.Null(), Type.String(), Type.Boolean(), Type.Number()]));
 export const PlainValueArrayTB = Type.Readonly(Type.Array(PlainValueTB));
 // Support deeper nesting for complex tuple returns (e.g., Safe Harbor Agreement details)
@@ -156,6 +167,7 @@ const RegularContractEntryTB = Type.Readonly(
       name: Type.String(),
       checks: RegularChecksTB,
       ozNonEnumerableAcl: Type.Optional(OzNonEnumerableAclTB),
+      ozNonEnumerableAclOptions: Type.Optional(OzNonEnumerableAclOptionsTB),
       ozAcl: Type.Optional(OzAclChecksTB),
     },
     { additionalProperties: false },
