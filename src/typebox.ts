@@ -46,7 +46,7 @@ export const OzNonEnumerableAclOptionsTB = Type.Readonly(
   Type.Object(
     {
       exhaustive: Type.Optional(Type.Boolean()),
-      eventBatchSize: Type.Optional(Type.Number()),
+      eventBatchSize: Type.Optional(Type.Integer({ minimum: 1 })),
     },
     { additionalProperties: false },
   ),

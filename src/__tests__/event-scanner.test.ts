@@ -17,6 +17,7 @@ function createMockLog(
   account: string,
   sender: string,
   blockNumber: number,
+  logIndex: number,
   txHash: string,
 ): Log {
   // Pad addresses to 32 bytes (topics are 32 bytes)
@@ -31,7 +32,7 @@ function createMockLog(
     // These are not used by parseRoleEvent but required by Log type
     address: "0x1234567890123456789012345678901234567890",
     data: "0x",
-    index: 0,
+    index: logIndex,
     transactionIndex: 0,
     removed: false,
     blockHash: "0x" + "0".repeat(64),
@@ -50,7 +51,7 @@ describe("parseRoleEvent", () => {
   const testSender = "0xabcdef1234567890abcdef1234567890abcdef12";
 
   it("correctly parses RoleGranted events", () => {
-    const log = createMockLog(ROLE_GRANTED_TOPIC, testRole, testAccount, testSender, 12_345, "0xabc123");
+    const log = createMockLog(ROLE_GRANTED_TOPIC, testRole, testAccount, testSender, 12_345, 3, "0xabc123");
 
     const result = parseRoleEvent(log);
 
@@ -58,11 +59,12 @@ describe("parseRoleEvent", () => {
     expect(result.role).toBe(testRole);
     expect(result.account).toBe(testAccount.toLowerCase());
     expect(result.blockNumber).toBe(12_345);
+    expect(result.logIndex).toBe(3);
     expect(result.transactionHash).toBe("0xabc123");
   });
 
   it("correctly parses RoleRevoked events", () => {
-    const log = createMockLog(ROLE_REVOKED_TOPIC, testRole, testAccount, testSender, 12_346, "0xdef456");
+    const log = createMockLog(ROLE_REVOKED_TOPIC, testRole, testAccount, testSender, 12_346, 1, "0xdef456");
 
     const result = parseRoleEvent(log);
 
@@ -70,6 +72,7 @@ describe("parseRoleEvent", () => {
     expect(result.role).toBe(testRole);
     expect(result.account).toBe(testAccount.toLowerCase());
     expect(result.blockNumber).toBe(12_346);
+    expect(result.logIndex).toBe(1);
   });
 });
 
@@ -82,8 +85,24 @@ describe("buildRoleHoldersFromEvents", () => {
 
   it("builds correct map from grant events", () => {
     const events: RoleEvent[] = [
-      { role: roleA, account: holder1, sender, blockNumber: 100, transactionHash: "0x1", eventType: "granted" },
-      { role: roleA, account: holder2, sender, blockNumber: 101, transactionHash: "0x2", eventType: "granted" },
+      {
+        role: roleA,
+        account: holder1,
+        sender,
+        blockNumber: 100,
+        logIndex: 0,
+        transactionHash: "0x1",
+        eventType: "granted",
+      },
+      {
+        role: roleA,
+        account: holder2,
+        sender,
+        blockNumber: 101,
+        logIndex: 0,
+        transactionHash: "0x2",
+        eventType: "granted",
+      },
     ];
 
     const result = buildRoleHoldersFromEvents(events);
@@ -95,8 +114,24 @@ describe("buildRoleHoldersFromEvents", () => {
 
   it("handles revoke events correctly", () => {
     const events: RoleEvent[] = [
-      { role: roleA, account: holder1, sender, blockNumber: 100, transactionHash: "0x1", eventType: "granted" },
-      { role: roleA, account: holder1, sender, blockNumber: 200, transactionHash: "0x2", eventType: "revoked" },
+      {
+        role: roleA,
+        account: holder1,
+        sender,
+        blockNumber: 100,
+        logIndex: 0,
+        transactionHash: "0x1",
+        eventType: "granted",
+      },
+      {
+        role: roleA,
+        account: holder1,
+        sender,
+        blockNumber: 200,
+        logIndex: 0,
+        transactionHash: "0x2",
+        eventType: "revoked",
+      },
     ];
 
     const result = buildRoleHoldersFromEvents(events);
@@ -108,8 +143,24 @@ describe("buildRoleHoldersFromEvents", () => {
   it("processes events in chronological order", () => {
     // Events are out of order but should be sorted by block number
     const events: RoleEvent[] = [
-      { role: roleA, account: holder1, sender, blockNumber: 200, transactionHash: "0x2", eventType: "revoked" },
-      { role: roleA, account: holder1, sender, blockNumber: 100, transactionHash: "0x1", eventType: "granted" },
+      {
+        role: roleA,
+        account: holder1,
+        sender,
+        blockNumber: 200,
+        logIndex: 0,
+        transactionHash: "0x2",
+        eventType: "revoked",
+      },
+      {
+        role: roleA,
+        account: holder1,
+        sender,
+        blockNumber: 100,
+        logIndex: 0,
+        transactionHash: "0x1",
+        eventType: "granted",
+      },
     ];
 
     const result = buildRoleHoldersFromEvents(events);
@@ -120,8 +171,24 @@ describe("buildRoleHoldersFromEvents", () => {
 
   it("handles multiple roles per address", () => {
     const events: RoleEvent[] = [
-      { role: roleA, account: holder1, sender, blockNumber: 100, transactionHash: "0x1", eventType: "granted" },
-      { role: roleB, account: holder1, sender, blockNumber: 101, transactionHash: "0x2", eventType: "granted" },
+      {
+        role: roleA,
+        account: holder1,
+        sender,
+        blockNumber: 100,
+        logIndex: 0,
+        transactionHash: "0x1",
+        eventType: "granted",
+      },
+      {
+        role: roleB,
+        account: holder1,
+        sender,
+        blockNumber: 101,
+        logIndex: 0,
+        transactionHash: "0x2",
+        eventType: "granted",
+      },
     ];
 
     const result = buildRoleHoldersFromEvents(events);
@@ -138,9 +205,33 @@ describe("buildRoleHoldersFromEvents", () => {
 
   it("handles grant-revoke-grant sequence", () => {
     const events: RoleEvent[] = [
-      { role: roleA, account: holder1, sender, blockNumber: 100, transactionHash: "0x1", eventType: "granted" },
-      { role: roleA, account: holder1, sender, blockNumber: 200, transactionHash: "0x2", eventType: "revoked" },
-      { role: roleA, account: holder1, sender, blockNumber: 300, transactionHash: "0x3", eventType: "granted" },
+      {
+        role: roleA,
+        account: holder1,
+        sender,
+        blockNumber: 100,
+        logIndex: 0,
+        transactionHash: "0x1",
+        eventType: "granted",
+      },
+      {
+        role: roleA,
+        account: holder1,
+        sender,
+        blockNumber: 200,
+        logIndex: 1,
+        transactionHash: "0x2",
+        eventType: "revoked",
+      },
+      {
+        role: roleA,
+        account: holder1,
+        sender,
+        blockNumber: 300,
+        logIndex: 0,
+        transactionHash: "0x3",
+        eventType: "granted",
+      },
     ];
 
     const result = buildRoleHoldersFromEvents(events);
@@ -160,7 +251,15 @@ describe("mergeRoleHolders", () => {
     base.set(roleA, new Set([holder1]));
 
     const newEvents: RoleEvent[] = [
-      { role: roleA, account: holder2, sender, blockNumber: 200, transactionHash: "0x2", eventType: "granted" },
+      {
+        role: roleA,
+        account: holder2,
+        sender,
+        blockNumber: 200,
+        logIndex: 0,
+        transactionHash: "0x2",
+        eventType: "granted",
+      },
     ];
 
     const result = mergeRoleHolders(base, newEvents);
@@ -175,7 +274,15 @@ describe("mergeRoleHolders", () => {
     base.set(roleA, new Set([holder1]));
 
     const newEvents: RoleEvent[] = [
-      { role: roleA, account: holder2, sender, blockNumber: 200, transactionHash: "0x2", eventType: "granted" },
+      {
+        role: roleA,
+        account: holder2,
+        sender,
+        blockNumber: 200,
+        logIndex: 0,
+        transactionHash: "0x2",
+        eventType: "granted",
+      },
     ];
 
     mergeRoleHolders(base, newEvents);
@@ -189,7 +296,15 @@ describe("mergeRoleHolders", () => {
     base.set(roleA, new Set([holder1]));
 
     const newEvents: RoleEvent[] = [
-      { role: roleA, account: holder1, sender, blockNumber: 200, transactionHash: "0x2", eventType: "revoked" },
+      {
+        role: roleA,
+        account: holder1,
+        sender,
+        blockNumber: 200,
+        logIndex: 0,
+        transactionHash: "0x2",
+        eventType: "revoked",
+      },
     ];
 
     const result = mergeRoleHolders(base, newEvents);

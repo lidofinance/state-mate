@@ -132,7 +132,12 @@ export class OzNonEnumerableAclSectionValidator extends SectionValidatorBase {
   private async _validateExhaustive(contractEntry: ContractEntry) {
     const { address } = contractEntry;
     const eventAddress = address; // Events are emitted from proxy address where storage lives
-    const batchSize = contractEntry.ozNonEnumerableAclOptions?.eventBatchSize ?? DEFAULT_EVENT_BATCH_SIZE;
+    let batchSize = contractEntry.ozNonEnumerableAclOptions?.eventBatchSize ?? DEFAULT_EVENT_BATCH_SIZE;
+
+    if (!Number.isInteger(batchSize) || batchSize <= 0) {
+      log(`${WARNING_MARK}: Invalid eventBatchSize "${batchSize}". Using default ${DEFAULT_EVENT_BATCH_SIZE} instead.`);
+      batchSize = DEFAULT_EVENT_BATCH_SIZE;
+    }
 
     log(`  Performing exhaustive ACL check via event scanning...`);
 
@@ -213,15 +218,32 @@ export class OzNonEnumerableAclSectionValidator extends SectionValidatorBase {
     const contract = loadContract(contractEntry.address, abi, this.provider);
 
     const expectedRoles = contractEntry.ozNonEnumerableAcl!;
-    const allConfiguredRoles = new Set(Object.keys(expectedRoles));
+    const normalizedExpectedRoles: Record<string, string[]> = {};
+    for (const [role, holders] of Object.entries(expectedRoles)) {
+      normalizedExpectedRoles[role.toLowerCase()] = holders;
+    }
+    const allConfiguredRoles = new Set(Object.keys(normalizedExpectedRoles));
+    const normalizedActualRoleHolders: RoleHoldersMap = new Map();
+    for (const [role, holders] of actualRoleHolders) {
+      const normalizedRole = role.toLowerCase();
+      if (!normalizedActualRoleHolders.has(normalizedRole)) {
+        normalizedActualRoleHolders.set(normalizedRole, new Set());
+      }
+      const normalizedHolders = normalizedActualRoleHolders.get(normalizedRole)!;
+      for (const holder of holders) {
+        normalizedHolders.add(holder.toLowerCase());
+      }
+    }
 
     // Check each configured role
     for (const role of allConfiguredRoles) {
-      const expectedHolders = new Set(expectedRoles[role].map((h) => h.toLowerCase()));
-      const actualHolders = actualRoleHolders.get(role) ?? new Set();
+      const expectedHolders = new Set(normalizedExpectedRoles[role].map((h) => h.toLowerCase()));
+      const actualHolders = normalizedActualRoleHolders.get(role) ?? new Set();
 
       log(`  Role: ${role}`);
-      log(`    Expected holders: ${expectedRoles[role].length}, Actual holders from events: ${actualHolders.size}`);
+      log(
+        `    Expected holders: ${normalizedExpectedRoles[role].length}, Actual holders from events: ${actualHolders.size}`,
+      );
 
       // Check expected holders are present
       for (const expectedHolder of expectedHolders) {
@@ -237,7 +259,7 @@ export class OzNonEnumerableAclSectionValidator extends SectionValidatorBase {
     }
 
     // Check for roles in events but not in config
-    for (const [role, holders] of actualRoleHolders) {
+    for (const [role, holders] of normalizedActualRoleHolders) {
       if (!allConfiguredRoles.has(role) && holders.size > 0) {
         log(`${WARNING_MARK}: Unconfigured role ${role} has ${holders.size} holder(s):`);
         for (const holder of holders) {

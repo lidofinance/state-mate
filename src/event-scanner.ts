@@ -14,6 +14,7 @@ export interface RoleEvent {
   account: string;
   sender: string;
   blockNumber: number;
+  logIndex: number;
   transactionHash: string;
   eventType: "granted" | "revoked";
 }
@@ -36,7 +37,7 @@ export function parseRoleEvent(eventLog: Log): RoleEvent {
   // topics[1] = role (bytes32, indexed)
   // topics[2] = account (address, indexed)
   // topics[3] = sender (address, indexed)
-  const role = eventLog.topics[1];
+  const role = eventLog.topics[1].toLowerCase();
   const account = "0x" + eventLog.topics[2].slice(26); // Extract address from 32-byte topic
   const sender = "0x" + eventLog.topics[3].slice(26);
 
@@ -45,6 +46,7 @@ export function parseRoleEvent(eventLog: Log): RoleEvent {
     account: account.toLowerCase(),
     sender: sender.toLowerCase(),
     blockNumber: eventLog.blockNumber,
+    logIndex: eventLog.index,
     transactionHash: eventLog.transactionHash,
     eventType: isGrant ? "granted" : "revoked",
   };
@@ -54,8 +56,8 @@ export function buildRoleHoldersFromEvents(events: RoleEvent[]): RoleHoldersMap 
   const roleHolders: RoleHoldersMap = new Map();
 
   // Sort events by block number to process chronologically
-  // For events in the same block, maintain original order (log index)
-  const sortedEvents = [...events].sort((a, b) => a.blockNumber - b.blockNumber);
+  // For events in the same block, sort by log index
+  const sortedEvents = [...events].sort((a, b) => a.blockNumber - b.blockNumber || a.logIndex - b.logIndex);
 
   for (const event of sortedEvents) {
     if (!roleHolders.has(event.role)) {
@@ -82,7 +84,7 @@ export function mergeRoleHolders(base: RoleHoldersMap, newEvents: RoleEvent[]): 
   }
 
   // Apply new events
-  const sortedEvents = [...newEvents].sort((a, b) => a.blockNumber - b.blockNumber);
+  const sortedEvents = [...newEvents].sort((a, b) => a.blockNumber - b.blockNumber || a.logIndex - b.logIndex);
 
   for (const event of sortedEvents) {
     if (!result.has(event.role)) {

@@ -51,6 +51,15 @@ describe("OzNonEnumerableAclOptionsTB schema", () => {
     };
     expect(isTypeOfTB(invalid, OzNonEnumerableAclOptionsTB)).toBe(false);
   });
+
+  it("rejects zero or negative eventBatchSize", () => {
+    expect(isTypeOfTB({ eventBatchSize: 0 }, OzNonEnumerableAclOptionsTB)).toBe(false);
+    expect(isTypeOfTB({ eventBatchSize: -1 }, OzNonEnumerableAclOptionsTB)).toBe(false);
+  });
+
+  it("rejects non-integer eventBatchSize", () => {
+    expect(isTypeOfTB({ eventBatchSize: 1.5 }, OzNonEnumerableAclOptionsTB)).toBe(false);
+  });
 });
 
 describe("ProxyContractEntryTB with ozNonEnumerableAclOptions", () => {

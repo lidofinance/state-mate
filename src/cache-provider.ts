@@ -199,6 +199,9 @@ export function saveEventScanToCache(address: string, roleHolders: RoleHoldersMa
 }
 
 export function flushCacheUpdates(): void {
+  if (g_cacheDisabled) {
+    return;
+  }
   ensureCacheDirectory();
 
   if (g_creationBlockCacheDirty && g_creationBlockCache) {

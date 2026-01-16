@@ -89,7 +89,7 @@ yarn start path/to/config.seed.yaml --generate
 
 Config is a yaml file that contains all the required addresses, parameters, view functions with their expected results for verification. The outline of the config is given below,
 
-```yaml
+````yaml
 # Sample config
 
 parameters:
@@ -124,7 +124,22 @@ l1:
         getFoo: *FOO
       ozAcl:
         *DEFAULT_ADMIN_ROLE : [*adminMultisig]
-```
+
+### Exhaustive non-enumerable OZ ACL checks
+
+For `ozNonEnumerableAcl`, you can opt into exhaustive checks that scan role events to detect every current role holder:
+
+```yaml
+ozNonEnumerableAclOptions:
+  exhaustive: true
+  eventBatchSize: 5000
+````
+
+When `exhaustive: true`, any role that appears in events but is **not** listed in `ozNonEnumerableAcl` is treated as an error. Make sure all roles that can exist on the contract are present in the config.
+
+Use `--cache` to enable local caching for event scans, and adjust `eventBatchSize` if your RPC provider enforces stricter log limits.
+
+````
 
 ### ABIs
 
@@ -141,7 +156,7 @@ For large projects with many contracts, you can consolidate all individual ABI f
 
 ```sh
 yarn consolidate-abi path/to/config/abi --compress
-```
+````
 
 This command:
 
