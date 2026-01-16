@@ -22,7 +22,7 @@ export function parseCmdLineArguments() {
     )
     .option("--generate", "generate a populated config from the seed one")
     .option("--update-abi", "download all ABIs replacing existing files")
-    .option("--no-cache", "disable caching for exhaustive ACL checks")
+    .option("--cache", "enable caching for exhaustive ACL checks")
     .option("--clear-cache", "clear the cache directory before running")
     .parse();
 
@@ -51,7 +51,7 @@ export function parseCmdLineArguments() {
     checkOnlyCmdArg: options.only,
     generate: options.generate,
     updateAbi: options.updateAbi,
-    noCache: options.cache === false, // --no-cache sets options.cache to false
+    cacheEnabled: options.cache === true, // --cache explicitly enables caching
     clearCache: options.clearCache,
   };
 }

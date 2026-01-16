@@ -111,8 +111,8 @@ function validateJsonWithSchema<T extends TSchema>(
 }
 
 async function doChecks(jsonDocument: EntireDocument) {
-  // Initialize cache directory for event scanning
-  initCacheDirectory(g_Arguments.configPath, { disabled: g_Arguments.noCache });
+  // Initialize cache directory for event scanning (disabled by default, enabled with --cache)
+  initCacheDirectory(g_Arguments.configPath, { disabled: !g_Arguments.cacheEnabled });
 
   // Clear cache if requested
   if (g_Arguments.clearCache) {
