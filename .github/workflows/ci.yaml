@@ -21,10 +21,15 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # Lido V3 configs - Mainnet
+          # Lido V3 configs - Mainnet (Phase 1)
           - config: configs/lidov3/mainnet/lidov3-core-post-vote.yaml
             network: ethereum-mainnet
           - config: configs/lidov3/mainnet/lidov3-et-post-vote.yml
+            network: ethereum-mainnet
+          # Lido V3 configs - Mainnet (Phase 2)
+          - config: configs/lidov3/mainnet/lidov3-core-post-phase-2.yaml
+            network: ethereum-mainnet
+          - config: configs/lidov3/mainnet/lidov3-et-post-vote-phase-2.yml
             network: ethereum-mainnet
           - config: configs/safeharbor/mainnet.yml
             network: ethereum-mainnet
