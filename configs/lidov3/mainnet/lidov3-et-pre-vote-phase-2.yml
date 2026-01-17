@@ -30,7 +30,7 @@ deployed:
     - &AlterTiersInOperatorGrid "0x73f80240ad9363d5d3C5C3626953C351cA36Bfe9"
 
 l1:
-  rpcUrl: REMOTE_RPC_URL
+  rpcUrl: MAINNET_REMOTE_RPC_URL
   explorerHostname: api.etherscan.io/v2/api
   explorerTokenEnv: ETHERSCAN_TOKEN
   chainId: 1
