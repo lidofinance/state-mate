@@ -29,7 +29,7 @@ deployed:
     - &vaultHub "0x4C9fFC325392090F789255b9948Ab1659b797964"
     - &vaultHubImplAddress "0x932d97b59B8846796469C129AB1b83c2a855a3F7"
     - &predepositGuarantee "0xa5F55f3402beA2B14AE15Dae1b6811457D43581d"
-    - &predepositGuaranteeImplAddress "0x6D2c164Be7cc36b03aBd0e2e133bE03A30ad3358"
+    - &predepositGuaranteeImplAddress "0xd1245b75d243a7e0b655479043f9c30b3e8717f5"
     - &operatorGrid "0x501e678182bB5dF3f733281521D3f3D1aDe69917"
     - &operatorGridImplAddress "0x4c29A1D1e14BaD29650c8B91Ad91c5AEdF5fd811"
 
@@ -107,7 +107,7 @@ deployed:
     # --- Easy Track ---
     - &easyTrack "0x284D91a7D47850d21A6DEaaC6E538AC7E5E6fc2a"
     - &evmScriptExecutor "0x79a20FD0FA36453B2F45eAbab19bfef43575Ba9E"
-    - &vaultsAdapter "0xBC2bb8310730F3D2b514Cb26f7e0A8776De879Ac"
+    - &vaultsAdapter "0x854CF0D7446Faa7AdDFE557cc8aa9FA9b7017910"
 
     # ------
     - &apmRegistryFactory "0xcA98541C98bCd77123eE74C4a37b8BDfd792C4b6"
@@ -206,7 +206,8 @@ misc:
   - &HASH_CONSENSUS_FAST_LANE 75
   - &HC_AO_START 39833
   - &HC_VEB_START 39843
-  - &HASH_CONSENSUS_QUORUM 7
+  - &HASH_CONSENSUS_QUORUM_AO 5
+  - &HASH_CONSENSUS_QUORUM_VEBO 7
 
   # --- Node/operator limits ---
   - &MAX_NODE_OPERATORS_COUNT 200
@@ -1659,7 +1660,7 @@ l1:
           - *HC_AO_START
           - *HASH_CONSENSUS_FAST_LANE
           - *SLOTS_PER_EPOCH
-        getQuorum: *HASH_CONSENSUS_QUORUM
+        getQuorum: *HASH_CONSENSUS_QUORUM_AO
         getReportProcessor: *accountingOracle
         getConsensusState: null
         getConsensusStateForMember: null
@@ -1777,7 +1778,7 @@ l1:
           - *HC_VEB_START
           - *HASH_CONSENSUS_FAST_LANE
           - *SLOTS_PER_EPOCH
-        getQuorum: *HASH_CONSENSUS_QUORUM
+        getQuorum: *HASH_CONSENSUS_QUORUM_VEBO
         getReportProcessor: *validatorsExitBusOracle
         getConsensusState: null
         getConsensusStateForMember: null
