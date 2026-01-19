@@ -42,7 +42,7 @@ jobs:
       ETHERSCAN_TOKEN: ${{ secrets.ETHERSCAN_TOKEN }}
 
       # Ethereum RPC URLs
-      REMOTE_RPC_URL: ${{ secrets.MAINNET_REMOTE_RPC_URL }}
+      MAINNET_REMOTE_RPC_URL: ${{ secrets.MAINNET_REMOTE_RPC_URL }}
       HOODI_REMOTE_RPC_URL: ${{ secrets.HOODI_REMOTE_RPC_URL }}
 
     steps:

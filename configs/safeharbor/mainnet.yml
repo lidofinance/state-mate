@@ -184,7 +184,7 @@ misc:
     - "https://bafybeigvd7z4iemq7vrdcczgyu2afm7egxwrggftiplydc3vdrdmgccwvu.ipfs.w3s.link/The_SEAL_Whitehat_Safe_Harbor_Agremeent_V1_01.pdf"
 
 l1:
-  rpcUrl: REMOTE_RPC_URL # https://ethereum-rpc.publicnode.com
+  rpcUrl: MAINNET_REMOTE_RPC_URL # https://ethereum-rpc.publicnode.com
   explorerHostname: api.etherscan.io/v2/api
   explorerTokenEnv: ETHERSCAN_TOKEN
   chainId: *CHAIN_ID
