@@ -48,7 +48,7 @@ l1:
         pendingDefaultAdminDelay: [0, 0]
         supportsInterface:
         symbol: "wstETH"
-        totalSupply: 0
+        totalSupply: null
       implementationChecks:
         BURNER_ROLE: *BURNER_ROLE
         DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
