@@ -1,4 +1,25 @@
 # yaml-language-server: $schema=../../schemas/main-schema.json
+
+#
+# Lido V3 Phase 2 - Easy Track Post-Vote Configuration
+#
+# This configuration represents the Easy Track state AFTER the Phase 2 vote is enacted.
+# It validates that the new Phase 2 factories have been added to Easy Track and the
+# old Phase 1 factories have been removed.
+#
+# New factories added in Phase 2:
+# - RegisterGroupsInOperatorGrid: 0xE73842AEbEC99Dacf2aAEec61409fD01A033f478
+# - UpdateGroupsShareLimitInOperatorGrid: 0xf23559De8ab37fF7a154384B0822dA867Cfa7Eac
+# - AlterTiersInOperatorGrid: 0x73f80240ad9363d5d3C5C3626953C351cA36Bfe9
+# - SetJailStatusInOperatorGrid: 0x6a4f33F05E7412A11100353724Bb6a152Cf0D305
+# - UpdateVaultsFeesInOperatorGrid: 0xDfA0bc38113B6d53c2881573FD764CEEFf468610
+# - ForceValidatorExitsInVaultHub: 0x6F5c0A5a824773E8f8285bC5aA59ea0Aab2A6400
+# - SocializeBadDebtInVaultHub: 0xaf35A63a4114B7481589fDD9FDB3e35Fd65fAed7
+# - SetLiabilitySharesTargetInVaultHub: 0x647DeE7bF33e44829e6430F7A08F63b3319694f0
+#
+# New VaultsAdapter: 0x28F9Ac198C4E0FA6A9Ad2c2f97CB38F1A3120f27
+#
+
 parameters:
   - &trustedCaller "0x18A1065c81b0Cc356F1b1C843ddd5E14e4AefffF"
   - &initialValidatorExitFeeLimit "100000000000000000"
@@ -19,18 +40,29 @@ misc:
   - &ET_UNPAUSE_ROLE "0x265b220c5a8891efdd9e1b1b7fa72f257bd5169f8d87e319cf3dad6ff52b94ae"
   - &ldo "0x5A98FcBEA516Cf06857215779Fd812CA3beF1B32"
   - &ET_FIRST_FACTORY "0xFeBd8FAC16De88206d4b18764e826AF38546AfE0"
-  - &ET_LAST_FACTORY "0x8aa34dAaF0fC263203A15Bcfa0Ed926D466e59F3"
   - &EMERGENCY_BRAKES "0x73b047fe6337183A454c5217241D780a932777bD"
+
+  # -- Max fees ---
+  - &maxInfraFeeBP "100" # 1%
+  - &maxLiquidityFeeBP "1000" # 10%
+  - &maxReservationFeeBP "0" # 0%
 
 deployed:
   l1:
     - &EasyTrack "0xF0211b7660680B49De1A7E9f25C65660F0a13Fea"
     - &RegisterGroupsInOperatorGrid "0xE73842AEbEC99Dacf2aAEec61409fD01A033f478"
     - &UpdateGroupsShareLimitInOperatorGrid "0xf23559De8ab37fF7a154384B0822dA867Cfa7Eac"
+    - &RegisterTiersInOperatorGrid "0x5292A1284e4695B95C0840CF8ea25A818751C17F"
     - &AlterTiersInOperatorGrid "0x73f80240ad9363d5d3C5C3626953C351cA36Bfe9"
+    - &VaultsAdapter "0x28F9Ac198C4E0FA6A9Ad2c2f97CB38F1A3120f27"
+    - &SetJailStatusInOperatorGrid "0x6a4f33F05E7412A11100353724Bb6a152Cf0D305"
+    - &UpdateVaultsFeesInOperatorGrid "0xDfA0bc38113B6d53c2881573FD764CEEFf468610"
+    - &ForceValidatorExitsInVaultHub "0x6F5c0A5a824773E8f8285bC5aA59ea0Aab2A6400"
+    - &SocializeBadDebtInVaultHub "0xaf35A63a4114B7481589fDD9FDB3e35Fd65fAed7"
+    - &SetLiabilitySharesTargetInVaultHub "0x647DeE7bF33e44829e6430F7A08F63b3319694f0"
 
 l1:
-  rpcUrl: MAINNET_REMOTE_RPC_URL
+  rpcUrl: REMOTE_RPC_URL
   explorerHostname: api.etherscan.io/v2/api
   explorerTokenEnv: ETHERSCAN_TOKEN
   chainId: 1
@@ -51,9 +83,23 @@ l1:
         evmScriptFactories:
           - args: [0]
             result: *ET_FIRST_FACTORY
-          - args: [32]
-            result: *ET_LAST_FACTORY
           - args: [33]
+            result: *SetJailStatusInOperatorGrid
+          - args: [34]
+            result: *AlterTiersInOperatorGrid
+          - args: [35]
+            result: *RegisterTiersInOperatorGrid
+          - args: [36]
+            result: *RegisterGroupsInOperatorGrid
+          - args: [37]
+            result: *UpdateGroupsShareLimitInOperatorGrid
+          - args: [38]
+            result: *ForceValidatorExitsInVaultHub
+          - args: [39]
+            result: *SocializeBadDebtInVaultHub
+          - args: [40]
+            result: *UpdateVaultsFeesInOperatorGrid
+          - args: [41]
             mustRevert: true
         evmScriptFactoryPermissions: null
         getEVMScriptFactories:
@@ -90,7 +136,15 @@ l1:
             0x161a4552A625844c822954C5AcBac928ee0f399B,
             0xBc5642bDD6F2a54b01A75605aAe9143525D97308,
             0xB7668B5485d0f826B86a75b0115e088bB9ee03eE,
-            *ET_LAST_FACTORY,
+            0x8aa34dAaF0fC263203A15Bcfa0Ed926D466e59F3,
+            *SetJailStatusInOperatorGrid,
+            *AlterTiersInOperatorGrid,
+            *RegisterTiersInOperatorGrid,
+            *RegisterGroupsInOperatorGrid,
+            *UpdateGroupsShareLimitInOperatorGrid,
+            *ForceValidatorExitsInVaultHub,
+            *SocializeBadDebtInVaultHub,
+            *UpdateVaultsFeesInOperatorGrid,
           ]
         getMotion: null
         getMotions: null
@@ -102,13 +156,25 @@ l1:
         isEVMScriptFactory:
           - args: [*ET_FIRST_FACTORY]
             result: true
-          - args: [*ET_LAST_FACTORY]
-            result: true
           - args: [*RegisterGroupsInOperatorGrid]
-            result: false
+            result: true
           - args: [*UpdateGroupsShareLimitInOperatorGrid]
-            result: false
+            result: true
+          - args: [*RegisterTiersInOperatorGrid]
+            result: true
           - args: [*AlterTiersInOperatorGrid]
+            result: true
+          - args: [*VaultsAdapter]
+            result: false
+          - args: [*SetJailStatusInOperatorGrid]
+            result: true
+          - args: [*UpdateVaultsFeesInOperatorGrid]
+            result: true
+          - args: [*ForceValidatorExitsInVaultHub]
+            result: true
+          - args: [*SocializeBadDebtInVaultHub]
+            result: true
+          - args: [*SetLiabilitySharesTargetInVaultHub]
             result: false
         motionDuration: 259200
         motions: null
@@ -117,7 +183,6 @@ l1:
         objectionsThreshold: 50
         paused: false
         supportsInterface: null
-
     RegisterGroupsInOperatorGrid:
       name: RegisterGroupsInOperatorGrid
       address: *RegisterGroupsInOperatorGrid
@@ -128,7 +193,6 @@ l1:
         lidoLocator: *locator
         maxShareLimit: *maxGroupShareLimit
         trustedCaller: *trustedCaller
-
     UpdateGroupsShareLimitInOperatorGrid:
       name: UpdateGroupsShareLimitInOperatorGrid
       address: *UpdateGroupsShareLimitInOperatorGrid
@@ -138,7 +202,15 @@ l1:
         lidoLocator: *locator
         maxShareLimit: *maxGroupShareLimit
         trustedCaller: *trustedCaller
-
+    RegisterTiersInOperatorGrid:
+      name: RegisterTiersInOperatorGrid
+      address: *RegisterTiersInOperatorGrid
+      checks:
+        DEFAULT_TIER_OPERATOR: *DEFAULT_TIER_OPERATOR
+        createEVMScript: null
+        decodeEVMScriptCallData: null
+        lidoLocator: *locator
+        trustedCaller: *trustedCaller
     AlterTiersInOperatorGrid:
       name: AlterTiersInOperatorGrid
       address: *AlterTiersInOperatorGrid
@@ -148,3 +220,57 @@ l1:
         defaultTierMaxShareLimit: *maxDefaultTierShareLimit
         lidoLocator: *locator
         trustedCaller: *trustedCaller
+    VaultsAdapter:
+      name: VaultsAdapter
+      address: *VaultsAdapter
+      checks:
+        WITHDRAWAL_REQUEST_PREDEPLOY_ADDRESS: *withdrawalRequestPredeployAddress
+        evmScriptExecutor: *evmScriptExecutor
+        lidoLocator: *locator
+        trustedCaller: *trustedCaller
+        validatorExitFeeLimit: *initialValidatorExitFeeLimit
+    SetJailStatusInOperatorGrid:
+      name: SetJailStatusInOperatorGrid
+      address: *SetJailStatusInOperatorGrid
+      checks:
+        createEVMScript: null
+        decodeEVMScriptCallData: null
+        trustedCaller: *trustedCaller
+        vaultsAdapter: *VaultsAdapter
+    UpdateVaultsFeesInOperatorGrid:
+      name: UpdateVaultsFeesInOperatorGrid
+      address: *UpdateVaultsFeesInOperatorGrid
+      checks:
+        createEVMScript: null
+        decodeEVMScriptCallData: null
+        lidoLocator: *locator
+        trustedCaller: *trustedCaller
+        vaultsAdapter: *VaultsAdapter
+        maxInfraFeeBP: *maxInfraFeeBP
+        maxLiquidityFeeBP: *maxLiquidityFeeBP
+        maxReservationFeeBP: *maxReservationFeeBP
+    ForceValidatorExitsInVaultHub:
+      name: ForceValidatorExitsInVaultHub
+      address: *ForceValidatorExitsInVaultHub
+      checks:
+        WITHDRAWAL_REQUEST_PREDEPLOY_ADDRESS: *withdrawalRequestPredeployAddress
+        createEVMScript: null
+        decodeEVMScriptCallData: null
+        trustedCaller: *trustedCaller
+        vaultsAdapter: *VaultsAdapter
+    SocializeBadDebtInVaultHub:
+      name: SocializeBadDebtInVaultHub
+      address: *SocializeBadDebtInVaultHub
+      checks:
+        createEVMScript: null
+        decodeEVMScriptCallData: null
+        trustedCaller: *trustedCaller
+        vaultsAdapter: *VaultsAdapter
+    SetLiabilitySharesTargetInVaultHub:
+      name: SetLiabilitySharesTargetInVaultHub
+      address: *SetLiabilitySharesTargetInVaultHub
+      checks:
+        createEVMScript: null
+        decodeEVMScriptCallData: null
+        trustedCaller: *trustedCaller
+        vaultsAdapter: *VaultsAdapter
