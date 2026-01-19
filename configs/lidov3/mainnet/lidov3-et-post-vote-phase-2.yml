@@ -84,21 +84,21 @@ l1:
           - args: [0]
             result: *ET_FIRST_FACTORY
           - args: [33]
-            result: *AlterTiersInOperatorGrid
+            result: *SetJailStatusInOperatorGrid
           - args: [34]
-            result: *RegisterGroupsInOperatorGrid
+            result: *AlterTiersInOperatorGrid
           - args: [35]
             result: *RegisterTiersInOperatorGrid
           - args: [36]
-            result: *UpdateGroupsShareLimitInOperatorGrid
+            result: *RegisterGroupsInOperatorGrid
           - args: [37]
-            result: *SetJailStatusInOperatorGrid
+            result: *UpdateGroupsShareLimitInOperatorGrid
           - args: [38]
-            result: *UpdateVaultsFeesInOperatorGrid
-          - args: [39]
             result: *ForceValidatorExitsInVaultHub
-          - args: [40]
+          - args: [39]
             result: *SocializeBadDebtInVaultHub
+          - args: [40]
+            result: *UpdateVaultsFeesInOperatorGrid
           - args: [41]
             mustRevert: true
         evmScriptFactoryPermissions: null
@@ -137,14 +137,14 @@ l1:
             0xBc5642bDD6F2a54b01A75605aAe9143525D97308,
             0xB7668B5485d0f826B86a75b0115e088bB9ee03eE,
             0x8aa34dAaF0fC263203A15Bcfa0Ed926D466e59F3,
-            *AlterTiersInOperatorGrid,
-            *RegisterGroupsInOperatorGrid,
-            *RegisterTiersInOperatorGrid,
-            *UpdateGroupsShareLimitInOperatorGrid,
             *SetJailStatusInOperatorGrid,
-            *UpdateVaultsFeesInOperatorGrid,
+            *AlterTiersInOperatorGrid,
+            *RegisterTiersInOperatorGrid,
+            *RegisterGroupsInOperatorGrid,
+            *UpdateGroupsShareLimitInOperatorGrid,
             *ForceValidatorExitsInVaultHub,
             *SocializeBadDebtInVaultHub,
+            *UpdateVaultsFeesInOperatorGrid,
           ]
         getMotion: null
         getMotions: null
