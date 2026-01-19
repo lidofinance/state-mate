@@ -19,7 +19,6 @@ misc:
   - &ET_UNPAUSE_ROLE "0x265b220c5a8891efdd9e1b1b7fa72f257bd5169f8d87e319cf3dad6ff52b94ae"
   - &ldo "0x5A98FcBEA516Cf06857215779Fd812CA3beF1B32"
   - &ET_FIRST_FACTORY "0xFeBd8FAC16De88206d4b18764e826AF38546AfE0"
-  - &ET_EX_LAST_FACTORY "0x8aa34dAaF0fC263203A15Bcfa0Ed926D466e59F3"
   - &EMERGENCY_BRAKES "0x73b047fe6337183A454c5217241D780a932777bD"
 
   # -- Max fees ---
@@ -63,8 +62,6 @@ l1:
         evmScriptFactories:
           - args: [0]
             result: *ET_FIRST_FACTORY
-          - args: [32]
-            result: *ET_EX_LAST_FACTORY
           - args: [33]
             result: *AlterTiersInOperatorGrid
           - args: [34]
@@ -118,7 +115,7 @@ l1:
             0x161a4552A625844c822954C5AcBac928ee0f399B,
             0xBc5642bDD6F2a54b01A75605aAe9143525D97308,
             0xB7668B5485d0f826B86a75b0115e088bB9ee03eE,
-            *ET_EX_LAST_FACTORY,
+            0x8aa34dAaF0fC263203A15Bcfa0Ed926D466e59F3,
             *AlterTiersInOperatorGrid,
             *RegisterGroupsInOperatorGrid,
             *RegisterTiersInOperatorGrid,
@@ -137,8 +134,6 @@ l1:
             result: true
         isEVMScriptFactory:
           - args: [*ET_FIRST_FACTORY]
-            result: true
-          - args: [*ET_EX_LAST_FACTORY]
             result: true
           - args: [*RegisterGroupsInOperatorGrid]
             result: true
