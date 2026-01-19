@@ -2,6 +2,7 @@ import chalk from "chalk";
 import { Contract, JsonRpcProvider } from "ethers";
 
 import { printError } from "./common";
+import { BlockscoutHandler } from "./explorers/blockscout";
 import { EtherscanHandler } from "./explorers/etherscan";
 import { ModeHandler } from "./explorers/mode";
 import { LogCommand, logError, logErrorAndExit, logReplaceLine } from "./logger";
@@ -80,13 +81,15 @@ export async function loadContractInfoFromExplorer(
   explorerKey?: string,
   chainId?: number | string,
 ): Promise<ContractInfo | undefined> {
-  return loadContractInfo(
-    explorerHostname.includes("mode.network") ? new ModeHandler() : new EtherscanHandler(),
-    address,
-    explorerHostname,
-    explorerKey,
-    chainId,
-  );
+  let explorer: IExplorerHandler;
+  if (explorerHostname.includes("mode.network")) {
+    explorer = new ModeHandler();
+  } else if (explorerHostname.includes("blockscout.com")) {
+    explorer = new BlockscoutHandler();
+  } else {
+    explorer = new EtherscanHandler();
+  }
+  return loadContractInfo(explorer, address, explorerHostname, explorerKey, chainId);
 }
 
 export async function loadContractInfo(
