@@ -22,6 +22,7 @@ export function parseCmdLineArguments() {
     )
     .option("--generate", "generate a populated config from the seed one")
     .option("--update-abi", "download all ABIs replacing existing files")
+    .option("--cache", "enable caching for exhaustive ACL checks")
     .parse();
 
   const configPath = program.args[0];
@@ -49,5 +50,6 @@ export function parseCmdLineArguments() {
     checkOnlyCmdArg: options.only,
     generate: options.generate,
     updateAbi: options.updateAbi,
+    cacheEnabled: options.cache === true, // --cache explicitly enables caching
   };
 }
