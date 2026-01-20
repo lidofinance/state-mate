@@ -104,7 +104,8 @@ function loadConsolidatedAbis(): Record<string, Abi> {
       logErrorAndExit(`Consolidated ABI file ${chalk.magenta(consolidatedFile.path)} is not a valid JSON object`);
     }
 
-    g_consolidatedAbis = parsed as Record<string, Abi>;
+    const { normalized } = normalizeConsolidatedAbiKeys(parsed as Record<string, Abi>);
+    g_consolidatedAbis = normalized;
 
     // Validate all ABIs
     for (const [key, abi] of Object.entries(g_consolidatedAbis)) {
@@ -182,17 +183,11 @@ export function renameAllAbiToLowerCase() {
   if (mode === "consolidated") {
     // For consolidated mode, ensure all keys have lowercase addresses
     const abis = loadConsolidatedAbis();
-    let changed = false;
-    const newAbis: Record<string, Abi> = {};
-
-    for (const [key, abi] of Object.entries(abis)) {
-      const newKey = toLowerCaseAddress(key);
-      newAbis[newKey] = abi;
-      if (key !== newKey) {
-        log(`The ABI key renamed from ${chalk.yellow(key)} to ${chalk.yellow(newKey)}`);
-        changed = true;
-      }
-    }
+    const { normalized: newAbis, renamed: changed } = normalizeConsolidatedAbiKeys(abis, {
+      onRename: (from, to) => {
+        log(`The ABI key renamed from ${chalk.yellow(from)} to ${chalk.yellow(to)}`);
+      },
+    });
 
     if (changed) {
       const consolidatedFile = getConsolidatedAbiPathToUse();
@@ -398,6 +393,27 @@ function toLowerCaseAddress(fileName: string): string {
   const address = match[0];
 
   return fileName.replace(address, address.toLowerCase());
+}
+
+function normalizeConsolidatedAbiKeys(
+  abis: Record<string, Abi>,
+  options: { onRename?: (from: string, to: string) => void } = {},
+): { normalized: Record<string, Abi>; renamed: boolean } {
+  const normalized: Record<string, Abi> = {};
+  let renamed = false;
+
+  for (const [key, abi] of Object.entries(abis)) {
+    const normalizedKey = toLowerCaseAddress(key);
+
+    if (normalizedKey !== key) {
+      renamed = true;
+      options.onRename?.(key, normalizedKey);
+    }
+
+    normalized[normalizedKey] = abi;
+  }
+
+  return { normalized: normalized, renamed };
 }
 
 function _renameAbiIfNeed(fileName: string): void {

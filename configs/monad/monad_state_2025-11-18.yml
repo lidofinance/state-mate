@@ -1,0 +1,126 @@
+# yaml-language-server: $schema=../../schemas/main-schema.json
+
+misc:
+  - &ZERO_ADDRESS "0x0000000000000000000000000000000000000000"
+roles:
+  - &BURNER_ROLE "0x3c11d16cbaffd01df69ce1c404f6340ee057498f5f00246190ea54220576a848"
+  - &DEFAULT_ADMIN_ROLE "0x0000000000000000000000000000000000000000000000000000000000000000"
+  - &MINTER_ROLE "0x9f2df0fed2c77648de5860a4cc508cd0818c85b8b8a1ab4ceeef8d981c8956a6"
+  - &ADMIN_ROLE "0xa49807205ce4d355092ef5a8a18f56e8913cf4a201fbe287825b095693c21775"
+  - &BYPASSER_ROLE "0xa1b2b8005de234c4b8ce8cd0be058239056e0d54f6097825b5117101469d5a8d"
+  - &CANCELLER_ROLE "0xfd643c72710c63c0180259aba6b2d05451e3591a24e58b62239378085726f783"
+  - &EXECUTOR_ROLE "0xd8aa0f3194971a2a116679f7c2090f6939c8d4e01a2a8d7e41d55e5351469e63"
+  - &PROPOSER_ROLE "0xb09aa5aeb3702cfd50b6b62bc4532604938f21248a27a1d5ca736082b6819cc1"
+deployed:
+  l1:
+    - &tpuProxy "0x10Aeaf63194db8d453d4D85a06E5eFE1dd0b5417"
+    - &proxyAdmin "0x3D3Fd6557AD67fA1B30A5FF30dA32AEB26db7eEe"
+    - &impl "0xa132F089492CcE5f1D79483a9e4552f37266ed01"
+    - &rbacTimelock "0x0c43bb1A15A1FF1CbDdFF2B8F9518C1B0d3B17E2"
+l1:
+  rpcUrl: "MONAD_RPC_URL"
+  explorerHostname: "mainnet-beta.monvision.io"
+  explorerTokenEnv: "MONAD_API_KEY"
+  contracts:
+    tpuProxy:
+      name: BurnMintERC20Transparent
+      address: *tpuProxy
+      proxyName: TransparentUpgradeableProxy
+      implementation: *impl
+      proxyChecks: {}
+      checks:
+        BURNER_ROLE: *BURNER_ROLE
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        MINTER_ROLE: *MINTER_ROLE
+        allowance:
+        balanceOf:
+        decimals: 18
+        defaultAdmin: *rbacTimelock
+        defaultAdminDelay: 0
+        defaultAdminDelayIncreaseWait: 432000
+        getCCIPAdmin: *rbacTimelock
+        getRoleAdmin:
+        hasRole:
+        maxSupply: 0
+        name: "Wrapped liquid staked Ether 2.0"
+        owner: *rbacTimelock
+        pendingDefaultAdmin: [*ZERO_ADDRESS, 0]
+        pendingDefaultAdminDelay: [0, 0]
+        supportsInterface:
+        symbol: "wstETH"
+        totalSupply: 0
+      implementationChecks:
+        BURNER_ROLE: *BURNER_ROLE
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        MINTER_ROLE: *MINTER_ROLE
+        allowance:
+        balanceOf:
+        decimals: 0
+        defaultAdmin: *ZERO_ADDRESS
+        defaultAdminDelay: 0
+        defaultAdminDelayIncreaseWait: 432000
+        getCCIPAdmin: *ZERO_ADDRESS
+        getRoleAdmin:
+        hasRole:
+        maxSupply: 0
+        name: ""
+        owner: *ZERO_ADDRESS
+        pendingDefaultAdmin: [*ZERO_ADDRESS, 0]
+        pendingDefaultAdminDelay: [0, 0]
+        supportsInterface:
+        symbol: ""
+        totalSupply: 0
+    proxyAdmin:
+      name: ProxyAdmin
+      address: *proxyAdmin
+      checks:
+        UPGRADE_INTERFACE_VERSION: 5.0.0
+        owner: *rbacTimelock
+    impl:
+      name: BurnMintERC20Transparent
+      address: *impl
+      checks:
+        BURNER_ROLE: *BURNER_ROLE
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        MINTER_ROLE: *MINTER_ROLE
+        allowance:
+        balanceOf:
+        decimals: 0
+        defaultAdmin: *ZERO_ADDRESS
+        defaultAdminDelay: 0
+        defaultAdminDelayIncreaseWait: 432000
+        getCCIPAdmin: *ZERO_ADDRESS
+        getRoleAdmin:
+        hasRole:
+        maxSupply: 0
+        name: ""
+        owner: *ZERO_ADDRESS
+        pendingDefaultAdmin: [*ZERO_ADDRESS, 0]
+        pendingDefaultAdminDelay: [0, 0]
+        supportsInterface:
+        symbol: ""
+        totalSupply: 0
+    rbacTimelock:
+      name: RBACTimelock
+      address: *rbacTimelock
+      checks:
+        ADMIN_ROLE: *ADMIN_ROLE
+        BYPASSER_ROLE: *BYPASSER_ROLE
+        CANCELLER_ROLE: *CANCELLER_ROLE
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        EXECUTOR_ROLE: *EXECUTOR_ROLE
+        PROPOSER_ROLE: *PROPOSER_ROLE
+        getBlockedFunctionSelectorAt:
+        getBlockedFunctionSelectorCount: 0
+        getMinDelay: 10800
+        getRoleAdmin:
+        getRoleMember:
+        getRoleMemberCount:
+        getTimestamp:
+        hasRole:
+        hashOperationBatch:
+        isOperation:
+        isOperationDone:
+        isOperationPending:
+        isOperationReady:
+        supportsInterface:
