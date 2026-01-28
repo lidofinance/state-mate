@@ -3,8 +3,8 @@
 
 deployed:
   l1:
-    - &vaultsWrapperFactory "0x06639923B260D5009daD1f8c34a03e5B81f1e5c9"
-    - &lidoLocator "0xC1d0b3DE6792Bf6b4b37EccdcC24e45978Cfd2Eb"
+    - &vaultsWrapperFactory "0x06639923B260D5009daD1f8c34a03e5B81f1e5c9" # Vaults Wrapper Factory (deployed)
+    - &lidoLocator "0xC1d0b3DE6792Bf6b4b37EccdcC24e45978Cfd2Eb" # Lido Locator (proxy)
 
 l1:
   rpcUrl: https://ethereum-rpc.publicnode.com

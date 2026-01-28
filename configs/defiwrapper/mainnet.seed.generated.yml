@@ -1,8 +1,8 @@
 # yaml-language-server: $schema=../../schemas/main-schema.json
 deployed:
   l1:
-    - &vaultsWrapperFactory "0x06639923B260D5009daD1f8c34a03e5B81f1e5c9"
-    - &lidoLocator "0xC1d0b3DE6792Bf6b4b37EccdcC24e45978Cfd2Eb"
+    - &vaultsWrapperFactory "0x06639923B260D5009daD1f8c34a03e5B81f1e5c9" # Vaults Wrapper Factory (deployed)
+    - &lidoLocator "0xC1d0b3DE6792Bf6b4b37EccdcC24e45978Cfd2Eb" # Lido Locator (proxy)
 
 l1:
   rpcUrl: https://ethereum-rpc.publicnode.com
@@ -19,18 +19,18 @@ l1:
         DEPLOY_START_FINISH_SPAN_SECONDS: "86400"
         DISTRIBUTOR_FACTORY: "0x20bd26E89542CaEeAfdc20121C7f8BC24539B3f6"
         DUMMY_IMPLEMENTATION: "0x78850Bc268cF71424F183b6b71E7Ddd362e80Bd6"
-        LAZY_ORACLE: "0x5DB427080200c235F2Ae8Cd17A7be87921f7AD6c"
-        STETH: "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84"
+        LAZY_ORACLE: "0x5DB427080200c235F2Ae8Cd17A7be87921f7AD6c" # Lazy Oracle (proxy)
+        STETH: "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84" # Lido stETH token (proxy)
         STRATEGY_POOL_TYPE: "0x5374765374726174656779506f6f6c000000000000000000000000000000000f"
         STV_POOL_FACTORY: "0x846a6341Bd38a201Bcd8012f4FCD55C244b67a35"
         STV_POOL_TYPE: "0x537476506f6f6c00000000000000000000000000000000000000000000000007"
         STV_STETH_POOL_FACTORY: "0xE6054A1092bAEe5b87f6e558980b04d8922eE009"
         STV_STETH_POOL_TYPE: "0x5374765374455448506f6f6c000000000000000000000000000000000000000c"
         TIMELOCK_FACTORY: "0x8A5186Ad9A479F1341Fd12359b5D612f42b5fE14"
-        VAULT_FACTORY: "0x02Ca7772FF14a9F6c1a08aF385aA96bb1b34175A"
-        VAULT_HUB: "0x1d201BE093d847f6446530Efb0E8Fb426d176709"
+        VAULT_FACTORY: "0x02Ca7772FF14a9F6c1a08aF385aA96bb1b34175A" # Staking Vault Factory
+        VAULT_HUB: "0x1d201BE093d847f6446530Efb0E8Fb426d176709" # Vault Hub (proxy)
         WITHDRAWAL_QUEUE_FACTORY: "0x36dAA1E4E7E7a80fE5fccBF0e5275FFde88938Fa"
-        WSTETH: "0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0"
+        WSTETH: "0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0" # wstETH token
         derivePoolType:
           args:
             - - false
@@ -47,49 +47,51 @@ l1:
       name: LidoLocator
       address: *lidoLocator
       proxyName: OssifiableProxy
-      implementation: "0x2f8779042efaed4c53db2ce293eb6b3f7096c72d"
+      implementation: "0x2f8779042efaed4c53db2ce293eb6b3f7096c72d" # Lido Locator (impl)
       proxyChecks:
-        proxy__getAdmin: "0x3e40D73EB977Dc6a537aF587D48316feE66E9C8c"
-        proxy__getImplementation: "0x2f8779042EFaEd4c53db2Ce293eB6B3f7096C72d"
+        proxy__getAdmin: "0x3e40D73EB977Dc6a537aF587D48316feE66E9C8c" # Aragon Agent (Lido DAO)
+        proxy__getImplementation: "0x2f8779042EFaEd4c53db2Ce293eB6B3f7096C72d" # Lido Locator (impl)
         proxy__getIsOssified: false
       checks:
-        accounting: "0x23ED611be0e1a820978875C0122F92260804cdDf"
-        accountingOracle: "0x852deD011285fe67063a08005c71a85690503Cee"
-        burner: "0xE76c52750019b80B43E36DF30bf4060EB73F573a"
+        accounting: "0x23ED611be0e1a820978875C0122F92260804cdDf" # Accounting (proxy)
+        accountingOracle: "0x852deD011285fe67063a08005c71a85690503Cee" # AccountingOracle (proxy)
+        burner: "0xE76c52750019b80B43E36DF30bf4060EB73F573a" # Burner (proxy)
+        # coreComponents order: elRewardsVault, oracleReportSanityChecker, stakingRouter, treasury, withdrawalQueue, withdrawalVault
         coreComponents:
-          - "0x388C818CA8B9251b393131C08a736A67ccB19297"
-          - "0xf1647c86E6D7959f638DD9CE1d90e2F3C9503129"
-          - "0xFdDf38947aFB03C621C71b06C9C70bce73f12999"
-          - "0x3e40D73EB977Dc6a537aF587D48316feE66E9C8c"
-          - "0x889edC2eDab5f40e902b864aD4d7AdE8E412F9B1"
-          - "0xB9D7934878B5FB9610B3fE8A5e441e8fad7E293f"
-        depositSecurityModule: "0xfFA96D84dEF2EA035c7AB153D8B991128e3d72fD"
-        elRewardsVault: "0x388C818CA8B9251b393131C08a736A67ccB19297"
-        lazyOracle: "0x5DB427080200c235F2Ae8Cd17A7be87921f7AD6c"
-        lido: "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84"
-        operatorGrid: "0xC69685E89Cefc327b43B7234AC646451B27c544d"
-        oracleDaemonConfig: "0xbf05A929c3D7885a6aeAd833a992dA6E5ac23b09"
+          - "0x388C818CA8B9251b393131C08a736A67ccB19297" # Execution Layer Rewards Vault
+          - "0xf1647c86E6D7959f638DD9CE1d90e2F3C9503129" # OracleReportSanityChecker
+          - "0xFdDf38947aFB03C621C71b06C9C70bce73f12999" # StakingRouter (proxy)
+          - "0x3e40D73EB977Dc6a537aF587D48316feE66E9C8c" # Treasury (Aragon Agent)
+          - "0x889edC2eDab5f40e902b864aD4d7AdE8E412F9B1" # WithdrawalQueueERC721 (proxy)
+          - "0xB9D7934878B5FB9610B3fE8A5e441e8fad7E293f" # WithdrawalVault (proxy)
+        depositSecurityModule: "0xfFA96D84dEF2EA035c7AB153D8B991128e3d72fD" # Deposit Security Module
+        elRewardsVault: "0x388C818CA8B9251b393131C08a736A67ccB19297" # Execution Layer Rewards Vault
+        lazyOracle: "0x5DB427080200c235F2Ae8Cd17A7be87921f7AD6c" # Lazy Oracle (proxy)
+        lido: "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84" # Lido and stETH token (proxy)
+        operatorGrid: "0xC69685E89Cefc327b43B7234AC646451B27c544d" # Operator Grid (proxy)
+        oracleDaemonConfig: "0xbf05A929c3D7885a6aeAd833a992dA6E5ac23b09" # OracleDaemonConfig
+        # oracleReportComponents order: accountingOracle, oracleReportSanityChecker, burner, withdrawalQueue, postTokenRebaseReceiver, stakingRouter, vaultHub
         oracleReportComponents:
-          - "0x852deD011285fe67063a08005c71a85690503Cee"
-          - "0xf1647c86E6D7959f638DD9CE1d90e2F3C9503129"
-          - "0xE76c52750019b80B43E36DF30bf4060EB73F573a"
-          - "0x889edC2eDab5f40e902b864aD4d7AdE8E412F9B1"
-          - "0x25e35855783bec3E49355a29e110f02Ed8b05ba9"
-          - "0xFdDf38947aFB03C621C71b06C9C70bce73f12999"
-          - "0x1d201BE093d847f6446530Efb0E8Fb426d176709"
-        oracleReportSanityChecker: "0xf1647c86E6D7959f638DD9CE1d90e2F3C9503129"
-        postTokenRebaseReceiver: "0x25e35855783bec3E49355a29e110f02Ed8b05ba9"
-        predepositGuarantee: "0xF4bF42c6D6A0E38825785048124DBAD6c9eaaac3"
-        stakingRouter: "0xFdDf38947aFB03C621C71b06C9C70bce73f12999"
-        treasury: "0x3e40D73EB977Dc6a537aF587D48316feE66E9C8c"
-        triggerableWithdrawalsGateway: "0xDC00116a0D3E064427dA2600449cfD2566B3037B"
-        validatorExitDelayVerifier: "0xbDb567672c867DB533119C2dcD4FB9d8b44EC82f"
-        validatorsExitBusOracle: "0x0De4Ea0184c2ad0BacA7183356Aea5B8d5Bf5c6e"
-        vaultFactory: "0x02Ca7772FF14a9F6c1a08aF385aA96bb1b34175A"
-        vaultHub: "0x1d201BE093d847f6446530Efb0E8Fb426d176709"
-        withdrawalQueue: "0x889edC2eDab5f40e902b864aD4d7AdE8E412F9B1"
-        withdrawalVault: "0xB9D7934878B5FB9610B3fE8A5e441e8fad7E293f"
-        wstETH: "0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0"
+          - "0x852deD011285fe67063a08005c71a85690503Cee" # AccountingOracle (proxy)
+          - "0xf1647c86E6D7959f638DD9CE1d90e2F3C9503129" # OracleReportSanityChecker
+          - "0xE76c52750019b80B43E36DF30bf4060EB73F573a" # Burner (proxy)
+          - "0x889edC2eDab5f40e902b864aD4d7AdE8E412F9B1" # WithdrawalQueueERC721 (proxy)
+          - "0x25e35855783bec3E49355a29e110f02Ed8b05ba9" # postTokenRebaseReceiver
+          - "0xFdDf38947aFB03C621C71b06C9C70bce73f12999" # StakingRouter (proxy)
+          - "0x1d201BE093d847f6446530Efb0E8Fb426d176709" # VaultHub (proxy)
+        oracleReportSanityChecker: "0xf1647c86E6D7959f638DD9CE1d90e2F3C9503129" # OracleReportSanityChecker
+        postTokenRebaseReceiver: "0x25e35855783bec3E49355a29e110f02Ed8b05ba9" # postTokenRebaseReceiver
+        predepositGuarantee: "0xF4bF42c6D6A0E38825785048124DBAD6c9eaaac3" # Predeposit Guarantee (proxy)
+        stakingRouter: "0xFdDf38947aFB03C621C71b06C9C70bce73f12999" # StakingRouter (proxy)
+        treasury: "0x3e40D73EB977Dc6a537aF587D48316feE66E9C8c" # Treasury (Aragon Agent)
+        triggerableWithdrawalsGateway: "0xDC00116a0D3E064427dA2600449cfD2566B3037B" # Triggerable Withdrawals Gateway
+        validatorExitDelayVerifier: "0xbDb567672c867DB533119C2dcD4FB9d8b44EC82f" # Validator Exit Delay Verifier
+        validatorsExitBusOracle: "0x0De4Ea0184c2ad0BacA7183356Aea5B8d5Bf5c6e" # ValidatorsExitBusOracle (proxy)
+        vaultFactory: "0x02Ca7772FF14a9F6c1a08aF385aA96bb1b34175A" # Staking Vault Factory
+        vaultHub: "0x1d201BE093d847f6446530Efb0E8Fb426d176709" # VaultHub (proxy)
+        withdrawalQueue: "0x889edC2eDab5f40e902b864aD4d7AdE8E412F9B1" # WithdrawalQueueERC721 (proxy)
+        withdrawalVault: "0xB9D7934878B5FB9610B3fE8A5e441e8fad7E293f" # WithdrawalVault (proxy)
+        wstETH: "0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0" # wstETH token
       implementationChecks:
         accounting: "0x23ED611be0e1a820978875C0122F92260804cdDf"
         accountingOracle: "0x852deD011285fe67063a08005c71a85690503Cee"
