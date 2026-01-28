@@ -1,4 +1,5 @@
-# yaml-language-server: $schema=../../schemas/main-schema.json
+---
+# yaml-language-server: $schema=./../../schemas/seed-schema.json
 
 deployed:
   l1:
