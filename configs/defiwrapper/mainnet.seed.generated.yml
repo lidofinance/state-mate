@@ -1,5 +1,6 @@
 # yaml-language-server: $schema=../../schemas/main-schema.json
-parameters: # Constants used across checks (anchors)
+
+parameters:
   # Common constants
   - &ZERO_ADDRESS "0x0000000000000000000000000000000000000000" # Zero address sentinel
   - &ZERO_BYTES32 "0x0000000000000000000000000000000000000000000000000000000000000000" # Zero bytes32 sentinel
@@ -12,67 +13,51 @@ parameters: # Constants used across checks (anchors)
   - &STV_STETH_POOL_TYPE "0x5374765374455448506f6f6c000000000000000000000000000000000000000c" # "StvStETHPool"
   - &STRATEGY_POOL_TYPE "0x5374765374726174656779506f6f6c000000000000000000000000000000000f" # "StvStrategyPool"
 
-misc: # Reference addresses (anchors)
-  # Lido core addresses (mainnet)
+misc:
+  # Lido core addresses (mainnet), https://docs.lido.fi/deployed-contracts/#core-protocol
   - &LIDO_STETH "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84" # Lido stETH token (proxy)
   - &LIDO_WSTETH "0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0" # wstETH token
-  - &LIDO_TREASURY_AGENT "0x3e40D73EB977Dc6a537aF587D48316feE66E9C8c" # Treasury (Aragon Agent)
   - &LIDO_VAULT_FACTORY "0x02Ca7772FF14a9F6c1a08aF385aA96bb1b34175A" # Staking Vault Factory
   - &LIDO_VAULT_HUB "0x1d201BE093d847f6446530Efb0E8Fb426d176709" # VaultHub (proxy)
   - &LIDO_LAZY_ORACLE "0x5DB427080200c235F2Ae8Cd17A7be87921f7AD6c" # Lazy Oracle (proxy)
-  - &LIDO_ACCOUNTING "0x23ED611be0e1a820978875C0122F92260804cdDf" # Accounting (proxy)
-  - &LIDO_ACCOUNTING_ORACLE "0x852deD011285fe67063a08005c71a85690503Cee" # AccountingOracle (proxy)
-  - &LIDO_ORACLE_REPORT_SANITY "0xf1647c86E6D7959f638DD9CE1d90e2F3C9503129" # OracleReportSanityChecker
-  - &LIDO_BURNER "0xE76c52750019b80B43E36DF30bf4060EB73F573a" # Burner (proxy)
-  - &LIDO_STAKING_ROUTER "0xFdDf38947aFB03C621C71b06C9C70bce73f12999" # StakingRouter (proxy)
-  - &LIDO_EL_REWARDS_VAULT "0x388C818CA8B9251b393131C08a736A67ccB19297" # Execution Layer Rewards Vault
-  - &LIDO_WITHDRAWAL_QUEUE "0x889edC2eDab5f40e902b864aD4d7AdE8E412F9B1" # WithdrawalQueueERC721 (proxy)
-  - &LIDO_WITHDRAWAL_VAULT "0xB9D7934878B5FB9610B3fE8A5e441e8fad7E293f" # WithdrawalVault (proxy)
-  - &LIDO_ORACLE_DAEMON_CONFIG "0xbf05A929c3D7885a6aeAd833a992dA6E5ac23b09" # OracleDaemonConfig
-  - &LIDO_OPERATOR_GRID "0xC69685E89Cefc327b43B7234AC646451B27c544d" # Operator Grid (proxy)
-  - &LIDO_POST_TOKEN_REBASE_RECEIVER "0x25e35855783bec3E49355a29e110f02Ed8b05ba9" # postTokenRebaseReceiver
-  - &LIDO_PREDEPOSIT_GUARANTEE "0xF4bF42c6D6A0E38825785048124DBAD6c9eaaac3" # Predeposit Guarantee (proxy)
-  - &LIDO_TRIGGERABLE_WITHDRAWALS_GATEWAY "0xDC00116a0D3E064427dA2600449cfD2566B3037B" # Triggerable Withdrawals Gateway
-  - &LIDO_VALIDATOR_EXIT_DELAY_VERIFIER "0xbDb567672c867DB533119C2dcD4FB9d8b44EC82f" # Validator Exit Delay Verifier
-  - &LIDO_VALIDATORS_EXIT_BUS_ORACLE "0x0De4Ea0184c2ad0BacA7183356Aea5B8d5Bf5c6e" # ValidatorsExitBusOracle (proxy)
 
-deployed: # Addresses to fetch ABIs from explorers
-  l1: # L1 deployment list
+deployed:
+  l1:
     - &vaultsWrapperFactory "0x06639923B260D5009daD1f8c34a03e5B81f1e5c9" # Vaults Wrapper Factory (deployed)
-    - &lidoLocator "0xC1d0b3DE6792Bf6b4b37EccdcC24e45978Cfd2Eb" # Lido Locator (proxy)
+    - &dummyImplementation "0x78850Bc268cF71424F183b6b71E7Ddd362e80Bd6" # DummyImplementation deployed by factory
     - &stvPoolFactory "0x846a6341Bd38a201Bcd8012f4FCD55C244b67a35" # StvPoolFactory
     - &stvStEthPoolFactory "0xE6054A1092bAEe5b87f6e558980b04d8922eE009" # StvStETHPoolFactory
     - &withdrawalQueueFactory "0x36dAA1E4E7E7a80fE5fccBF0e5275FFde88938Fa" # WithdrawalQueueFactory
     - &distributorFactory "0x20bd26E89542CaEeAfdc20121C7f8BC24539B3f6" # DistributorFactory
     - &timelockFactory "0x8A5186Ad9A479F1341Fd12359b5D612f42b5fE14" # TimelockFactory
 
-l1: # L1 network configuration
-  rpcUrl: https://ethereum-rpc.publicnode.com # Ethereum mainnet RPC
-  explorerHostname: api.etherscan.io # Etherscan API hostname
-  chainId: 1 # Ethereum mainnet chainId
-  explorerTokenEnv: ETHERSCAN_TOKEN # env var for Etherscan key
-  contracts: # Contracts to check on L1
-    vaultsWrapperFactory: # Vaults Wrapper Factory
-      name: Factory # Verified contract name
-      address: *vaultsWrapperFactory # Factory address (anchor)
-      checks: # Expected view results
-        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE # OZ DEFAULT_ADMIN_ROLE
+l1:
+  rpcUrl: REMOTE_RPC_URL # https://ethereum-rpc.publicnode.com
+  explorerHostname: api.etherscan.io
+  chainId: 1
+  explorerTokenEnv: ETHERSCAN_TOKEN
+  contracts:
+    vaultsWrapperFactory:
+      name: Factory
+      address: *vaultsWrapperFactory
+      checks:
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
         DEPLOY_FINISHED: *DEPLOY_FINISHED # type(uint256).max
         DEPLOY_START_FINISH_SPAN_SECONDS: *ONE_DAY_SECONDS # 1 day
-        DISTRIBUTOR_FACTORY: "0x20bd26E89542CaEeAfdc20121C7f8BC24539B3f6" # DistributorFactory
-        DUMMY_IMPLEMENTATION: "0x78850Bc268cF71424F183b6b71E7Ddd362e80Bd6" # DummyImplementation deployed by factory
-        LAZY_ORACLE: *LIDO_LAZY_ORACLE # Lazy Oracle (proxy)
-        STETH: *LIDO_STETH # Lido stETH token (proxy)
-        STRATEGY_POOL_TYPE: *STRATEGY_POOL_TYPE # Pool type: StvStrategyPool
-        STV_POOL_FACTORY: "0x846a6341Bd38a201Bcd8012f4FCD55C244b67a35" # StvPoolFactory
-        STV_POOL_TYPE: *STV_POOL_TYPE # Pool type: StvPool
-        STV_STETH_POOL_FACTORY: "0xE6054A1092bAEe5b87f6e558980b04d8922eE009" # StvStETHPoolFactory
-        STV_STETH_POOL_TYPE: *STV_STETH_POOL_TYPE # Pool type: StvStETHPool
-        TIMELOCK_FACTORY: "0x8A5186Ad9A479F1341Fd12359b5D612f42b5fE14" # TimelockFactory
-        VAULT_FACTORY: *LIDO_VAULT_FACTORY # Staking Vault Factory
-        VAULT_HUB: *LIDO_VAULT_HUB # Vault Hub (proxy)
-        WITHDRAWAL_QUEUE_FACTORY: "0x36dAA1E4E7E7a80fE5fccBF0e5275FFde88938Fa" # WithdrawalQueueFactory
-        WSTETH: *LIDO_WSTETH # wstETH token
+        DISTRIBUTOR_FACTORY: *distributorFactory # DistributorFactory
+        DUMMY_IMPLEMENTATION: *dummyImplementation # DummyImplementation deployed by factory
+        LAZY_ORACLE: *LIDO_LAZY_ORACLE
+        STETH: *LIDO_STETH
+        STRATEGY_POOL_TYPE: *STRATEGY_POOL_TYPE
+        STV_POOL_FACTORY: *stvPoolFactory
+        STV_POOL_TYPE: *STV_POOL_TYPE
+        STV_STETH_POOL_FACTORY: *stvStEthPoolFactory
+        STV_STETH_POOL_TYPE: *STV_STETH_POOL_TYPE
+        TIMELOCK_FACTORY: *timelockFactory
+        VAULT_FACTORY: *LIDO_VAULT_FACTORY
+        VAULT_HUB: *LIDO_VAULT_HUB
+        WITHDRAWAL_QUEUE_FACTORY: *withdrawalQueueFactory
+        WSTETH: *LIDO_WSTETH
         derivePoolType: # Factory helper to compute pool type
           args: # AuxiliaryPoolConfig + strategyFactory
             - - false # allowListEnabled
@@ -85,110 +70,27 @@ l1: # L1 network configuration
           args: # bytes32 key
             - *ZERO_BYTES32 # zero key
           result: "0" # not started
-    lidoLocator: # Lido Locator proxy
-      name: LidoLocator # Implementation ABI name
-      address: *lidoLocator # Proxy address
-      proxyName: OssifiableProxy # Proxy ABI name
-      implementation: "0x2f8779042efaed4c53db2ce293eb6b3f7096c72d" # Lido Locator (impl)
-      proxyChecks: # Proxy state checks
-        proxy__getAdmin: *LIDO_TREASURY_AGENT # Aragon Agent (Lido DAO)
-        proxy__getImplementation: "0x2f8779042EFaEd4c53db2Ce293eB6B3f7096C72d" # Lido Locator (impl)
-        proxy__getIsOssified: false # Proxy not ossified
-      checks: # LidoLocator view checks
-        accounting: *LIDO_ACCOUNTING # Accounting (proxy)
-        accountingOracle: *LIDO_ACCOUNTING_ORACLE # AccountingOracle (proxy)
-        burner: *LIDO_BURNER # Burner (proxy)
-        # coreComponents order: elRewardsVault, oracleReportSanityChecker, stakingRouter, treasury, withdrawalQueue, withdrawalVault
-        coreComponents: # Tuple: EL rewards, sanity checker, staking router, treasury, withdrawal queue, withdrawal vault
-          - *LIDO_EL_REWARDS_VAULT # Execution Layer Rewards Vault
-          - *LIDO_ORACLE_REPORT_SANITY # OracleReportSanityChecker
-          - *LIDO_STAKING_ROUTER # StakingRouter (proxy)
-          - *LIDO_TREASURY_AGENT # Treasury (Aragon Agent)
-          - *LIDO_WITHDRAWAL_QUEUE # WithdrawalQueueERC721 (proxy)
-          - *LIDO_WITHDRAWAL_VAULT # WithdrawalVault (proxy)
-        depositSecurityModule: "0xfFA96D84dEF2EA035c7AB153D8B991128e3d72fD" # Deposit Security Module
-        elRewardsVault: *LIDO_EL_REWARDS_VAULT # Execution Layer Rewards Vault
-        lazyOracle: *LIDO_LAZY_ORACLE # Lazy Oracle (proxy)
-        lido: *LIDO_STETH # Lido and stETH token (proxy)
-        operatorGrid: *LIDO_OPERATOR_GRID # Operator Grid (proxy)
-        oracleDaemonConfig: *LIDO_ORACLE_DAEMON_CONFIG # OracleDaemonConfig
-        # oracleReportComponents order: accountingOracle, oracleReportSanityChecker, burner, withdrawalQueue, postTokenRebaseReceiver, stakingRouter, vaultHub
-        oracleReportComponents: # Tuple: accountingOracle, sanity checker, burner, withdrawal queue, postTokenRebaseReceiver, staking router, vault hub
-          - *LIDO_ACCOUNTING_ORACLE # AccountingOracle (proxy)
-          - *LIDO_ORACLE_REPORT_SANITY # OracleReportSanityChecker
-          - *LIDO_BURNER # Burner (proxy)
-          - *LIDO_WITHDRAWAL_QUEUE # WithdrawalQueueERC721 (proxy)
-          - *LIDO_POST_TOKEN_REBASE_RECEIVER # postTokenRebaseReceiver
-          - *LIDO_STAKING_ROUTER # StakingRouter (proxy)
-          - *LIDO_VAULT_HUB # VaultHub (proxy)
-        oracleReportSanityChecker: *LIDO_ORACLE_REPORT_SANITY # OracleReportSanityChecker
-        postTokenRebaseReceiver: *LIDO_POST_TOKEN_REBASE_RECEIVER # postTokenRebaseReceiver
-        predepositGuarantee: *LIDO_PREDEPOSIT_GUARANTEE # Predeposit Guarantee (proxy)
-        stakingRouter: *LIDO_STAKING_ROUTER # StakingRouter (proxy)
-        treasury: *LIDO_TREASURY_AGENT # Treasury (Aragon Agent)
-        triggerableWithdrawalsGateway: *LIDO_TRIGGERABLE_WITHDRAWALS_GATEWAY # Triggerable Withdrawals Gateway
-        validatorExitDelayVerifier: *LIDO_VALIDATOR_EXIT_DELAY_VERIFIER # Validator Exit Delay Verifier
-        validatorsExitBusOracle: *LIDO_VALIDATORS_EXIT_BUS_ORACLE # ValidatorsExitBusOracle (proxy)
-        vaultFactory: *LIDO_VAULT_FACTORY # Staking Vault Factory
-        vaultHub: *LIDO_VAULT_HUB # VaultHub (proxy)
-        withdrawalQueue: *LIDO_WITHDRAWAL_QUEUE # WithdrawalQueueERC721 (proxy)
-        withdrawalVault: *LIDO_WITHDRAWAL_VAULT # WithdrawalVault (proxy)
-        wstETH: *LIDO_WSTETH # wstETH token
-      implementationChecks: # Same checks on implementation address
-        accounting: *LIDO_ACCOUNTING # Accounting (impl view)
-        accountingOracle: *LIDO_ACCOUNTING_ORACLE # AccountingOracle (impl view)
-        burner: *LIDO_BURNER # Burner (impl view)
-        coreComponents: # Core components tuple (impl)
-          - *LIDO_EL_REWARDS_VAULT # EL Rewards Vault
-          - *LIDO_ORACLE_REPORT_SANITY # OracleReportSanityChecker
-          - *LIDO_STAKING_ROUTER # StakingRouter
-          - *LIDO_TREASURY_AGENT # Treasury (Aragon Agent)
-          - *LIDO_WITHDRAWAL_QUEUE # WithdrawalQueueERC721
-          - *LIDO_WITHDRAWAL_VAULT # WithdrawalVault
-        depositSecurityModule: "0xfFA96D84dEF2EA035c7AB153D8B991128e3d72fD" # Deposit Security Module
-        elRewardsVault: *LIDO_EL_REWARDS_VAULT # EL Rewards Vault
-        lazyOracle: *LIDO_LAZY_ORACLE # Lazy Oracle
-        lido: *LIDO_STETH # Lido/stETH token
-        operatorGrid: *LIDO_OPERATOR_GRID # Operator Grid
-        oracleDaemonConfig: *LIDO_ORACLE_DAEMON_CONFIG # OracleDaemonConfig
-        oracleReportComponents: # Oracle report tuple (impl)
-          - *LIDO_ACCOUNTING_ORACLE # AccountingOracle
-          - *LIDO_ORACLE_REPORT_SANITY # OracleReportSanityChecker
-          - *LIDO_BURNER # Burner
-          - *LIDO_WITHDRAWAL_QUEUE # WithdrawalQueueERC721
-          - *LIDO_POST_TOKEN_REBASE_RECEIVER # postTokenRebaseReceiver
-          - *LIDO_STAKING_ROUTER # StakingRouter
-          - *LIDO_VAULT_HUB # VaultHub
-        oracleReportSanityChecker: *LIDO_ORACLE_REPORT_SANITY # OracleReportSanityChecker
-        postTokenRebaseReceiver: *LIDO_POST_TOKEN_REBASE_RECEIVER # postTokenRebaseReceiver
-        predepositGuarantee: *LIDO_PREDEPOSIT_GUARANTEE # Predeposit Guarantee
-        stakingRouter: *LIDO_STAKING_ROUTER # StakingRouter
-        treasury: *LIDO_TREASURY_AGENT # Treasury agent
-        triggerableWithdrawalsGateway: *LIDO_TRIGGERABLE_WITHDRAWALS_GATEWAY # Triggerable Withdrawals Gateway
-        validatorExitDelayVerifier: *LIDO_VALIDATOR_EXIT_DELAY_VERIFIER # Validator Exit Delay Verifier
-        validatorsExitBusOracle: *LIDO_VALIDATORS_EXIT_BUS_ORACLE # ValidatorsExitBusOracle
-        vaultFactory: *LIDO_VAULT_FACTORY # Vault Factory
-        vaultHub: *LIDO_VAULT_HUB # Vault Hub
-        withdrawalQueue: *LIDO_WITHDRAWAL_QUEUE # Withdrawal Queue
-        withdrawalVault: *LIDO_WITHDRAWAL_VAULT # Withdrawal Vault
-        wstETH: *LIDO_WSTETH # wstETH token
-    stvPoolFactory: # StvPoolFactory contract
-      name: StvPoolFactory # Contract name
-      address: *stvPoolFactory # Factory address
+    stvPoolFactory:
+      name: StvPoolFactory
+      address: *stvPoolFactory
       checks: {} # No view/pure functions in ABI
-    stvStEthPoolFactory: # StvStETHPoolFactory contract
-      name: StvStETHPoolFactory # Contract name
-      address: *stvStEthPoolFactory # Factory address
+    stvStEthPoolFactory:
+      name: StvStETHPoolFactory
+      address: *stvStEthPoolFactory
       checks: {} # No view/pure functions in ABI
-    withdrawalQueueFactory: # WithdrawalQueueFactory contract
-      name: WithdrawalQueueFactory # Contract name
-      address: *withdrawalQueueFactory # Factory address
+    withdrawalQueueFactory:
+      name: WithdrawalQueueFactory
+      address: *withdrawalQueueFactory
       checks: {} # No view/pure functions in ABI
-    distributorFactory: # DistributorFactory contract
-      name: DistributorFactory # Contract name
-      address: *distributorFactory # Factory address
+    distributorFactory:
+      name: DistributorFactory
+      address: *distributorFactory
       checks: {} # No view/pure functions in ABI
-    timelockFactory: # TimelockFactory contract
-      name: TimelockFactory # Contract name
-      address: *timelockFactory # Factory address
+    timelockFactory:
+      name: TimelockFactory
+      address: *timelockFactory
+      checks: {} # No view/pure functions in ABI
+    dummyImplementation:
+      name: DummyImplementation
+      address: *dummyImplementation
       checks: {} # No view/pure functions in ABI
