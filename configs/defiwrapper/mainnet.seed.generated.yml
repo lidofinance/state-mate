@@ -3,6 +3,7 @@
 parameters:
   # Common constants
   - &ZERO_ADDRESS "0x0000000000000000000000000000000000000000" # Zero address sentinel
+  - &NON_ZERO_ADDRESS "0x0000000000000000000000000000000000000001" # Non-zero address sentinel
   - &ZERO_BYTES32 "0x0000000000000000000000000000000000000000000000000000000000000000" # Zero bytes32 sentinel
   - &ONE_DAY_SECONDS "86400" # 1 day in seconds
   - &DEFAULT_ADMIN_ROLE "0x0000000000000000000000000000000000000000000000000000000000000000" # OZ default admin role
@@ -59,13 +60,27 @@ l1:
         WITHDRAWAL_QUEUE_FACTORY: *withdrawalQueueFactory
         WSTETH: *LIDO_WSTETH
         derivePoolType: # Factory helper to compute pool type
-          args: # AuxiliaryPoolConfig + strategyFactory
-            - - false # allowListEnabled
-              - *ZERO_ADDRESS # allowListManager
-              - false # mintingEnabled
-              - "0" # reserveRatioGapBP
-            - *ZERO_ADDRESS # strategyFactory
-          result: *STV_POOL_TYPE # expected pool type
+          - args: # AuxiliaryPoolConfig + strategyFactory
+              - - false # allowListEnabled
+                - *ZERO_ADDRESS # allowListManager
+                - false # mintingEnabled
+                - "0" # reserveRatioGapBP
+              - *ZERO_ADDRESS # strategyFactory
+            result: *STV_POOL_TYPE # expected pool type
+          - args: # AuxiliaryPoolConfig + strategyFactory
+              - - false # allowListEnabled
+                - *ZERO_ADDRESS # allowListManager
+                - true # mintingEnabled
+                - "0" # reserveRatioGapBP
+              - *ZERO_ADDRESS # strategyFactory
+            result: *STV_STETH_POOL_TYPE # expected pool type
+          - args: # AuxiliaryPoolConfig + strategyFactory
+              - - true # allowListEnabled
+                - *ZERO_ADDRESS # allowListManager
+                - true # mintingEnabled
+                - "0" # reserveRatioGapBP
+              - *NON_ZERO_ADDRESS # strategyFactory
+            result: *STRATEGY_POOL_TYPE # expected pool type
         intermediateState: # mapping(bytes32 => uint256) view
           args: # bytes32 key
             - *ZERO_BYTES32 # zero key
