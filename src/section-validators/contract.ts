@@ -10,6 +10,7 @@ import { ImplementationChecksSectionValidator } from "./implementation-checks";
 import { OzAclSectionValidator } from "./oz-acl";
 import { OzNonEnumerableAclSectionValidator } from "./oz-non-enumerable-acl";
 import { ProxyCheckSectionValidator } from "./proxy-check";
+import { StorageSectionValidator } from "./storage";
 
 export class ContractSectionValidator {
   private map: Map<EntryField, SectionValidatorBase> = new Map();
@@ -17,6 +18,7 @@ export class ContractSectionValidator {
   constructor(provider: JsonRpcProvider) {
     const sections = [
       EntryField.checks,
+      EntryField.storage,
       EntryField.proxyChecks,
       EntryField.ozNonEnumerableAcl,
       EntryField.implementationChecks,
@@ -26,6 +28,10 @@ export class ContractSectionValidator {
       switch (section) {
         case EntryField.checks: {
           this.map.set(section, new ChecksSectionValidator(provider, section));
+          break;
+        }
+        case EntryField.storage: {
+          this.map.set(section, new StorageSectionValidator(provider));
           break;
         }
         case EntryField.proxyChecks: {
@@ -69,6 +75,11 @@ export class ContractSectionValidator {
       logHeader2(EntryField.checks);
       setErrorContext({ checksType: EntryField.checks });
       await this.map.get(EntryField.checks)!.validateSection(contractEntry, contractAlias);
+    }
+
+    if (needCheck(CheckLevel.checksType, EntryField.storage)) {
+      setErrorContext({ checksType: EntryField.storage });
+      await this.map.get(EntryField.storage)!.validateSection(contractEntry, contractAlias);
     }
 
     if (needCheck(CheckLevel.checksType, EntryField.proxyChecks)) {
