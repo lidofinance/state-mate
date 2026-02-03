@@ -10,7 +10,13 @@ import chalk from "chalk";
 import { JsonRpcProvider } from "ethers";
 import * as YAML from "yaml";
 
-import { checkAllAbi, flushAbiUpdates, renameAllAbiToLowerCase, resetAbiModeCache } from "./abi-provider";
+import {
+  abiExistsForAddress,
+  checkAllAbi,
+  flushAbiUpdates,
+  renameAllAbiToLowerCase,
+  resetAbiModeCache,
+} from "./abi-provider";
 import { doGenerateBoilerplate } from "./boilerplate-generator";
 import { parseCmdLineArguments } from "./cli-parser";
 import { printError, readUrlOrFromEnvironment } from "./common";
@@ -182,6 +188,11 @@ async function iterateLoadedContracts<T extends EntireDocument | SeedDocument>(
         log(`\n${WARNING_MARK} ${chalk.yellow(`The env var ${explorerTokenEnv} is not set`)}\n`);
       }
       for (const address of addresses) {
+        // Skip explorer call if ABI already exists and we only want to update missing
+        if (g_Arguments.updateAbiMissingOnly && abiExistsForAddress(address)) {
+          log(`ABI ${chalk.magenta(address)} ${chalk.green("Skipped (exists)")}`);
+          continue;
+        }
         const contractInfo = await loadContractInfoFromExplorer(
           address,
           explorerHostname,

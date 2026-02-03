@@ -22,6 +22,7 @@ export function parseCmdLineArguments() {
     )
     .option("--generate", "generate a populated config from the seed one")
     .option("--update-abi", "download all ABIs replacing existing files")
+    .option("--update-abi-missing", "download only missing ABIs (skip existing)")
     .parse();
 
   const configPath = program.args[0];
@@ -48,6 +49,7 @@ export function parseCmdLineArguments() {
     checkOnly,
     checkOnlyCmdArg: options.only,
     generate: options.generate,
-    updateAbi: options.updateAbi,
+    updateAbi: options.updateAbi || options.updateAbiMissing,
+    updateAbiMissingOnly: options.updateAbiMissing,
   };
 }

@@ -165,6 +165,27 @@ export function loadAbiFromFile(contractName: string, address: string): Abi | ne
   }
 }
 
+export function abiExistsForAddress(address: string): boolean {
+  address = address.toLowerCase();
+  const mode = determineAbiMode();
+
+  if (mode === "consolidated") {
+    const abis = loadConsolidatedAbis();
+    // Check if any key contains this address
+    return Object.keys(abis).some((key) => key.toLowerCase().includes(address));
+  } else if (mode === "individual") {
+    // Check if any file in the abi directory contains this address
+    if (!fs.existsSync(g_Arguments.abiDirPath)) return false;
+    try {
+      const files = fs.readdirSync(g_Arguments.abiDirPath);
+      return files.some((file) => file.toLowerCase().includes(address));
+    } catch {
+      return false;
+    }
+  }
+  return false;
+}
+
 export async function checkAllAbi(contractInfo: ContractInfo) {
   const { contractName, address, abi, implementation } = contractInfo;
   await _checkAbi(contractName, address, abi);
@@ -262,9 +283,15 @@ async function _checkAbi(contractName: string, address: string, abiFromExplorer:
     }
   }
 
-  if (abiExists && savedAbi && !jsonDiff.diffString(savedAbi, abiFromExplorer)) {
-    logHandler.success("Matched");
-    return;
+  if (abiExists && savedAbi) {
+    if (g_Arguments.updateAbiMissingOnly) {
+      logHandler.success("Skipped (exists)");
+      return;
+    }
+    if (!jsonDiff.diffString(savedAbi, abiFromExplorer)) {
+      logHandler.success("Matched");
+      return;
+    }
   }
 
   const abiFileNameToSave =
