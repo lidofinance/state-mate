@@ -14,9 +14,12 @@ export class ProxyCheckSectionValidator extends SectionValidatorBase {
   }
   override async validateSection(contractEntry: ContractEntry, contractAlias: string, basePath?: string) {
     if (isTypeOfTB(contractEntry, ProxyContractEntryTB) && contractEntry.proxyChecks) {
-      logHeader2(basePath ? `${basePath}/${this.sectionName}` : this.sectionName);
-
       const { address, proxyName, proxyChecks } = contractEntry;
+
+      // Skip if no checks defined
+      if (Object.keys(proxyChecks).length === 0) return;
+
+      logHeader2(basePath ? `${basePath}/${this.sectionName}` : this.sectionName);
 
       const abi = loadAbiFromFile(proxyName, address);
       this._reportNonCoveredNonMutableChecks(contractAlias, abi, Object.keys(proxyChecks));

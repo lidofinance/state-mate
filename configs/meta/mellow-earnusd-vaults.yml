@@ -75,15 +75,6 @@ deployed:
     - &redirectingDepositHook "0x00000004d3B17e5391eb571dDb8fDF95646ca827"
     - &oracleHelper "0x000000005F543c38d5ea6D0bF10A50974Eb55E35"
 
-    # --- Actors ---
-    - &proxyAdmin "0x81698f87C6482bF1ce9bFcfC0F103C4A0Adf0Af0"
-    - &lazyVaultAdmin "0x0Dd73341d6158a72b4D224541f1094188f57076E"
-    - &activeVaultAdmin "0x982aB69785f5329BB59c36B19CBd4865353fEf10"
-    - &curator "0xe5abcc40196174Ae0d12153dE286F0D8E401769d"
-    - &subvaultCurator "0x7e681274F9F6606abf544d694531F171Cc104985"
-    - &oracleUpdater "0x93a797643d74fC81e7A51F3f84a9D78F930435D1"
-    - &treasury "0xcCf2daba8Bb04a232a2fDA0D01010D4EF6C69B85"
-
     # ========================================
     # earnUSD VAULT (Main)
     # ========================================
@@ -119,6 +110,17 @@ deployed:
     - &earnUSD_verifier1 "0xAC18cD2c0e02E15b3CFe6681352737CcDa4b19C1"
     - &earnUSD_verifier1ProxyAdmin "0x5a70838168510f04ff813c9e31c77b8d9b984c9c"
 
+    # --- Actors (Metavault) ---
+    - &proxyAdmin "0x81698f87C6482bF1ce9bFcfC0F103C4A0Adf0Af0"
+    - &lazyVaultAdmin "0x0Dd73341d6158a72b4D224541f1094188f57076E"
+    - &activeVaultAdmin "0x982aB69785f5329BB59c36B19CBd4865353fEf10"
+    - &curator "0xe5abcc40196174Ae0d12153dE286F0D8E401769d"
+    - &oracleUpdater "0x93a797643d74fC81e7A51F3f84a9D78F930435D1"
+    - &treasury "0xcCf2daba8Bb04a232a2fDA0D01010D4EF6C69B85"
+    - &lidoPauser "0xA916fD5252160A7E56A6405741De76dc0Da5A0Cd"
+    - &mellowPauser "0x6E887aF318c6b29CEE42Ea28953Bd0BAdb3cE638"
+    - &subvaultCurator "0x7e681274F9F6606abf544d694531F171Cc104985" # Placeholder address
+
     # ========================================
     # earnUSDc VAULT (Conservative)
     # ========================================
@@ -145,6 +147,13 @@ deployed:
     - &earnUSDc_timelockController "0xe343d9b325c9360C920209c506503205CfDF825f"
     - &earnUSDc_oracleSubmitter "0xeE2a2B77Ee1B27BF2D68A7496f52dd551873681D"
 
+    # --- Actors (earnUSDc) ---
+    - &earnUSDc_activeVaultAdmin "0xBeEDb9475F2D08Aa3661881e657fD9Caf4f83532" # SH
+    - &earnUSDc_curator "0xCd9250bF7C2e8327B6Ddd053Eccbc145a5d0De30" # SH
+    - &earnUSDc_oracleUpdater "0x1EED44d056eC91a4dC8f2BB4771573e0007CB969" # SH
+    - &earnUSDc_curatorPauser "0x656339B0BDc398Aa3Ae2C1Fc71Cc6549993DD29C" # SH
+    - &earnUSDc_temporaryAdmin "0x7e681274F9F6606abf544d694531F171Cc104985" # Lido
+
     # ========================================
     # earnUSDe VAULT (Experimental)
     # ========================================
@@ -170,6 +179,13 @@ deployed:
     - &earnUSDe_riskManagerProxyAdmin "0x9ba947c995d89ff3c8908f038b9460fc8bd2808e"
     - &earnUSDe_timelockController "0x18f49CC03eA8680F05c842b0c487505629D6C6c3"
     - &earnUSDe_oracleSubmitter "0xaE6cbc23982a11D28F3cAc011cDF891aD1627626"
+
+    # --- Actors (earnUSDe) ---
+    - &earnUSDe_activeVaultAdmin "0x5037B1A8Fd9aB941d57fbfc4435148C3C9b48b14" # Edge
+    - &earnUSDe_curator "0x3236FdfE07f2886Af61c0A559aFc2c5869D06009" # Edge
+    - &earnUSDe_oracleUpdater "0x317838e80ca05a29DE3a9bbB1596047F45ceaD72" # Edge
+    - &earnUSDe_curatorPauser "0x306D9086Aff2a55F2990882bA8685112FEe332d3" # Edge
+    - &earnUSDe_temporaryAdmin "0x7e681274F9F6606abf544d694531F171Cc104985" # Lido
 
 misc:
   # --- Addresses / Zero values ---
@@ -537,29 +553,14 @@ l1:
         hasAsset:
         hasQueue:
         hasRole:
-          # Verify deployer has no roles
-          - args: [*DEFAULT_ADMIN_ROLE, *deployer]
-            result: false
-          - args: [*CREATE_QUEUE_ROLE, *deployer]
-            result: false
-          - args: [*CREATE_SUBVAULT_ROLE, *deployer]
-            result: false
-          - args: [*DISCONNECT_SUBVAULT_ROLE, *deployer]
-            result: false
-          - args: [*PULL_LIQUIDITY_ROLE, *deployer]
-            result: false
-          - args: [*PUSH_LIQUIDITY_ROLE, *deployer]
-            result: false
-          - args: [*RECONNECT_SUBVAULT_ROLE, *deployer]
-            result: false
-          - args: [*REMOVE_QUEUE_ROLE, *deployer]
-            result: false
-          - args: [*SET_HOOK_ROLE, *deployer]
-            result: false
-          - args: [*SET_QUEUE_LIMIT_ROLE, *deployer]
-            result: false
-          - args: [*SET_QUEUE_STATUS_ROLE, *deployer]
-            result: false
+          - args: [*ALLOW_CALL_ROLE, *activeVaultAdmin] # CHECK: should this role be set already?
+            result: true
+          - args: [*CALLER_ROLE, *curator] # CHECK: should this role be set already?
+            result: true
+          - args: [*DISALLOW_CALL_ROLE, *activeVaultAdmin] # CHECK: should this role be set already?
+            result: true
+          - args: [*SET_MERKLE_ROOT_ROLE, *earnUSD_timelockController] # CHECK: should this role be set already?
+            result: true
         hasSubvault:
         hasSupportedRole:
         isDepositQueue:
@@ -636,33 +637,10 @@ l1:
         *PULL_LIQUIDITY_ROLE : [*curator]
         *PUSH_LIQUIDITY_ROLE : [*curator]
         *SET_FLAGS_ROLE : [*earnUSD_timelockController]
-        *SET_MERKLE_ROOT_ROLE : [*earnUSD_timelockController]
-        *SET_QUEUE_STATUS_ROLE : [*earnUSD_timelockController]
+        *SET_MERKLE_ROOT_ROLE : [*earnUSD_timelockController] # CHECK: should this be activeVaultAdmin?
+        *SET_QUEUE_STATUS_ROLE : [*earnUSD_timelockController] # CHECK: should this be activeVaultAdmin?
         *SUBMIT_REPORTS_ROLE : [*earnUSD_oracleSubmitter]
-        *ACCEPT_REPORT_ROLE : [*earnUSD_oracleSubmitter]
-        # vault roles (not yet granted)
-        *CREATE_QUEUE_ROLE : []
-        *CREATE_SUBVAULT_ROLE : []
-        *DISCONNECT_SUBVAULT_ROLE : []
-        *RECONNECT_SUBVAULT_ROLE : []
-        *REMOVE_QUEUE_ROLE : []
-        *SET_HOOK_ROLE : []
-        *SET_QUEUE_LIMIT_ROLE : []
-        # shareManager roles (not yet granted)
-        *SET_ACCOUNT_INFO_ROLE : []
-        *SET_WHITELIST_MERKLE_ROOT_ROLE : []
-        # riskManager roles (not yet granted)
-        *DISALLOW_SUBVAULT_ASSETS_ROLE : []
-        *MODIFY_PENDING_ASSETS_ROLE : []
-        # oracle roles (not yet granted)
-        *ADD_SUPPORTED_ASSETS_ROLE : []
-        *REMOVE_SUPPORTED_ASSETS_ROLE : []
-        *SET_SECURITY_PARAMS_ROLE : []
-        # verifier roles (not yet granted)
-        *ALLOW_CALL_ROLE : []
-        *DISALLOW_CALL_ROLE : []
-        # sync deposit queue roles (not yet granted)
-        *SET_SYNC_DEPOSIT_PARAMS_ROLE : []
+        *ACCEPT_REPORT_ROLE : [*earnUSD_oracleSubmitter] # CHECK: should this be activeVaultAdmin?
 
     # --- Deposit/Sync/Redeem Queues ---
     earnUSD_depositQueueUSDC:
@@ -894,12 +872,8 @@ l1:
         updatedAt:
       ozAcl:
         *DEFAULT_ADMIN_ROLE : [*lazyVaultAdmin]
-        *SUBMIT_REPORTS_ROLE : [*earnUSD_oracleSubmitter]
-        *ACCEPT_REPORT_ROLE : [*earnUSD_oracleSubmitter]
-        # oracle roles (not yet granted)
-        *ADD_SUPPORTED_ASSETS_ROLE : []
-        *REMOVE_SUPPORTED_ASSETS_ROLE : []
-        *SET_SECURITY_PARAMS_ROLE : []
+        *SUBMIT_REPORTS_ROLE : [*oracleUpdater]
+        *ACCEPT_REPORT_ROLE : [*lazyVaultAdmin]
 
     # --- ShareManager ---
     earnUSD_shareManager:
@@ -1081,11 +1055,11 @@ l1:
           # PROPOSER_ROLE holders
           - args: [*PROPOSER_ROLE, *lazyVaultAdmin]
             result: true
-          # EXECUTOR_ROLE - not granted to anyone
-          - args: [*EXECUTOR_ROLE, *lazyVaultAdmin]
-            result: false
-          - args: [*EXECUTOR_ROLE, *ZERO_ADDRESS]
-            result: false
+          # EXECUTOR_ROLE holders
+          - args: [*EXECUTOR_ROLE, *lidoPauser]
+            result: true
+          - args: [*EXECUTOR_ROLE, *mellowPauser]
+            result: true
           # Verify deployer has no roles
           - args: [*DEFAULT_ADMIN_ROLE, *deployer]
             result: false
@@ -1222,29 +1196,14 @@ l1:
         hasAsset:
         hasQueue:
         hasRole:
-          # Verify deployer has no roles
-          - args: [*DEFAULT_ADMIN_ROLE, *deployer]
-            result: false
-          - args: [*CREATE_QUEUE_ROLE, *deployer]
-            result: false
-          - args: [*CREATE_SUBVAULT_ROLE, *deployer]
-            result: false
-          - args: [*DISCONNECT_SUBVAULT_ROLE, *deployer]
-            result: false
-          - args: [*PULL_LIQUIDITY_ROLE, *deployer]
-            result: false
-          - args: [*PUSH_LIQUIDITY_ROLE, *deployer]
-            result: false
-          - args: [*RECONNECT_SUBVAULT_ROLE, *deployer]
-            result: false
-          - args: [*REMOVE_QUEUE_ROLE, *deployer]
-            result: false
-          - args: [*SET_HOOK_ROLE, *deployer]
-            result: false
-          - args: [*SET_QUEUE_LIMIT_ROLE, *deployer]
-            result: false
-          - args: [*SET_QUEUE_STATUS_ROLE, *deployer]
-            result: false
+          - args: [*ALLOW_CALL_ROLE, *earnUSDc_curator] # CHECK: should this role be set already?
+            result: true
+          - args: [*CALLER_ROLE, *earnUSDc_curator] # CHECK: should this role be set already?
+            result: true
+          - args: [*DISALLOW_CALL_ROLE, *earnUSDc_activeVaultAdmin] # CHECK: should this role be set already?
+            result: true
+          - args: [*SET_MERKLE_ROOT_ROLE, *earnUSDc_timelockController] # CHECK: should this role be set already?
+            result: true
         hasSubvault:
         hasSupportedRole:
         isDepositQueue:
@@ -1311,43 +1270,29 @@ l1:
         supportsInterface:
         verifierFactory: *verifierFactory
       ozAcl:
+        # The problem here is that is uses activeVaultAdmin in most roles
         *DEFAULT_ADMIN_ROLE : [*lazyVaultAdmin]
-        *SET_VAULT_LIMIT_ROLE : [*activeVaultAdmin]
-        *SET_SUBVAULT_LIMIT_ROLE : [*activeVaultAdmin]
-        *ALLOW_SUBVAULT_ASSETS_ROLE : [*activeVaultAdmin]
-        *MODIFY_VAULT_BALANCE_ROLE : [*activeVaultAdmin]
-        *MODIFY_SUBVAULT_BALANCE_ROLE : [*activeVaultAdmin]
-        *CALLER_ROLE : [*subvaultCurator]
-        *PULL_LIQUIDITY_ROLE : [*subvaultCurator]
-        *PUSH_LIQUIDITY_ROLE : [*subvaultCurator]
+        # *SET_VAULT_LIMIT_ROLE : [*earnUSDc_activeVaultAdmin]
+        *SET_VAULT_LIMIT_ROLE : [*earnUSDc_temporaryAdmin] # TEMPORARY: to be changed back to earnUSDc_activeVaultAdmin
+        # *SET_SUBVAULT_LIMIT_ROLE : [*earnUSDc_activeVaultAdmin]
+        *SET_SUBVAULT_LIMIT_ROLE : [*earnUSDc_temporaryAdmin] # TEMPORARY: to be changed back to earnUSDc_activeVaultAdmin
+        # *ALLOW_SUBVAULT_ASSETS_ROLE : [*earnUSDc_activeVaultAdmin]
+        *ALLOW_SUBVAULT_ASSETS_ROLE : [*earnUSDc_temporaryAdmin] # TEMPORARY: to be changed back to earnUSDc_activeVaultAdmin
+        # *MODIFY_VAULT_BALANCE_ROLE : [*earnUSDc_activeVaultAdmin]
+        *MODIFY_VAULT_BALANCE_ROLE : [*earnUSDc_temporaryAdmin] # TEMPORARY: to be changed back to earnUSDc_activeVaultAdmin
+        # *MODIFY_SUBVAULT_BALANCE_ROLE : [*earnUSDc_activeVaultAdmin]
+        *MODIFY_SUBVAULT_BALANCE_ROLE : [*earnUSDc_temporaryAdmin] # TEMPORARY: to be changed back to earnUSDc_activeVaultAdmin
+        # *CALLER_ROLE : [*earnUSDc_curator]
+        *CALLER_ROLE : [*earnUSDc_temporaryAdmin] # TEMPORARY: to be changed back to earnUSDc_curator
+        # *PULL_LIQUIDITY_ROLE : [*earnUSDc_curator]
+        *PULL_LIQUIDITY_ROLE : [*earnUSDc_temporaryAdmin] # TEMPORARY: to be changed back to earnUSDc_curator
+        # *PUSH_LIQUIDITY_ROLE : [*earnUSDc_curator]
+        *PUSH_LIQUIDITY_ROLE : [*earnUSDc_temporaryAdmin] # TEMPORARY: to be changed back to earnUSDc_curator
         *SET_FLAGS_ROLE : [*earnUSDc_timelockController]
-        *SET_MERKLE_ROOT_ROLE : [*earnUSDc_timelockController]
-        *SET_QUEUE_STATUS_ROLE : [*earnUSDc_timelockController]
+        *SET_MERKLE_ROOT_ROLE : [*earnUSDc_timelockController] # CHECK: should this be earnUSDc_activeVaultAdmin?
+        *SET_QUEUE_STATUS_ROLE : [*earnUSDc_timelockController] # CHECK: should this be earnUSDc_activeVaultAdmin?
         *SUBMIT_REPORTS_ROLE : [*earnUSDc_oracleSubmitter]
-        *ACCEPT_REPORT_ROLE : [*earnUSDc_oracleSubmitter]
-        # vault roles (not yet granted)
-        *CREATE_QUEUE_ROLE : []
-        *CREATE_SUBVAULT_ROLE : []
-        *DISCONNECT_SUBVAULT_ROLE : []
-        *RECONNECT_SUBVAULT_ROLE : []
-        *REMOVE_QUEUE_ROLE : []
-        *SET_HOOK_ROLE : []
-        *SET_QUEUE_LIMIT_ROLE : []
-        # shareManager roles (not yet granted)
-        *SET_ACCOUNT_INFO_ROLE : []
-        *SET_WHITELIST_MERKLE_ROOT_ROLE : []
-        # riskManager roles (not yet granted)
-        *DISALLOW_SUBVAULT_ASSETS_ROLE : []
-        *MODIFY_PENDING_ASSETS_ROLE : []
-        # oracle roles (not yet granted)
-        *ADD_SUPPORTED_ASSETS_ROLE : []
-        *REMOVE_SUPPORTED_ASSETS_ROLE : []
-        *SET_SECURITY_PARAMS_ROLE : []
-        # verifier roles (not yet granted)
-        *ALLOW_CALL_ROLE : []
-        *DISALLOW_CALL_ROLE : []
-        # sync deposit queue roles (not yet granted)
-        *SET_SYNC_DEPOSIT_PARAMS_ROLE : []
+        *ACCEPT_REPORT_ROLE : [*earnUSDc_oracleSubmitter] # CHECK: should this be earnUSDc_activeVaultAdmin?
 
     # --- Deposit/Sync/Redeem Queues ---
     earnUSDc_depositQueueUSDC:
@@ -1579,12 +1524,9 @@ l1:
         updatedAt:
       ozAcl:
         *DEFAULT_ADMIN_ROLE : [*lazyVaultAdmin]
-        *SUBMIT_REPORTS_ROLE : [*earnUSDc_oracleSubmitter]
-        *ACCEPT_REPORT_ROLE : [*earnUSDc_oracleSubmitter]
-        # oracle roles (not yet granted)
-        *ADD_SUPPORTED_ASSETS_ROLE : []
-        *REMOVE_SUPPORTED_ASSETS_ROLE : []
-        *SET_SECURITY_PARAMS_ROLE : []
+        # *SUBMIT_REPORTS_ROLE : [*earnUSDc_oracleUpdater]
+        *SUBMIT_REPORTS_ROLE : [*earnUSDc_temporaryAdmin] # TEMPORARY: to be changed back to earnUSDc_oracleUpdater
+        *ACCEPT_REPORT_ROLE : [*lazyVaultAdmin] # CHECK: should this be earnUSDc_activeVaultAdmin?
 
     # --- ShareManager ---
     earnUSDc_shareManager:
@@ -1766,11 +1708,15 @@ l1:
           # PROPOSER_ROLE holders
           - args: [*PROPOSER_ROLE, *lazyVaultAdmin]
             result: true
-          # EXECUTOR_ROLE - not granted to anyone
-          - args: [*EXECUTOR_ROLE, *lazyVaultAdmin]
-            result: false
-          - args: [*EXECUTOR_ROLE, *ZERO_ADDRESS]
-            result: false
+          # EXECUTOR_ROLE holders
+          - args: [*EXECUTOR_ROLE, *lidoPauser]
+            result: true
+          - args: [*EXECUTOR_ROLE, *mellowPauser]
+            result: true
+          # - args: [*EXECUTOR_ROLE, *earnUSDc_curatorPauser]
+          # result: true
+          - args: [*EXECUTOR_ROLE, *earnUSDc_temporaryAdmin] # TEMPORARY: to be changed back to earnUSDc_curatorPauser
+            result: true
           # Verify deployer has no roles
           - args: [*DEFAULT_ADMIN_ROLE, *deployer]
             result: false
@@ -1907,29 +1853,14 @@ l1:
         hasAsset:
         hasQueue:
         hasRole:
-          # Verify deployer has no roles
-          - args: [*DEFAULT_ADMIN_ROLE, *deployer]
-            result: false
-          - args: [*CREATE_QUEUE_ROLE, *deployer]
-            result: false
-          - args: [*CREATE_SUBVAULT_ROLE, *deployer]
-            result: false
-          - args: [*DISCONNECT_SUBVAULT_ROLE, *deployer]
-            result: false
-          - args: [*PULL_LIQUIDITY_ROLE, *deployer]
-            result: false
-          - args: [*PUSH_LIQUIDITY_ROLE, *deployer]
-            result: false
-          - args: [*RECONNECT_SUBVAULT_ROLE, *deployer]
-            result: false
-          - args: [*REMOVE_QUEUE_ROLE, *deployer]
-            result: false
-          - args: [*SET_HOOK_ROLE, *deployer]
-            result: false
-          - args: [*SET_QUEUE_LIMIT_ROLE, *deployer]
-            result: false
-          - args: [*SET_QUEUE_STATUS_ROLE, *deployer]
-            result: false
+          - args: [*ALLOW_CALL_ROLE, *earnUSDe_curator] # CHECK: should this role be set already?
+            result: true
+          - args: [*CALLER_ROLE, *earnUSDe_curator] # CHECK: should this role be set already?
+            result: true
+          - args: [*DISALLOW_CALL_ROLE, *earnUSDe_activeVaultAdmin] # CHECK: should this role be set already?
+            result: true
+          - args: [*SET_MERKLE_ROOT_ROLE, *earnUSDe_timelockController] # CHECK: should this role be set already?
+            result: true
         hasSubvault:
         hasSupportedRole:
         isDepositQueue:
@@ -1996,43 +1927,29 @@ l1:
         supportsInterface:
         verifierFactory: *verifierFactory
       ozAcl:
+        # The problem here is that is uses activeVaultAdmin in most roles
         *DEFAULT_ADMIN_ROLE : [*lazyVaultAdmin]
-        *SET_VAULT_LIMIT_ROLE : [*activeVaultAdmin]
-        *SET_SUBVAULT_LIMIT_ROLE : [*activeVaultAdmin]
-        *ALLOW_SUBVAULT_ASSETS_ROLE : [*activeVaultAdmin]
-        *MODIFY_VAULT_BALANCE_ROLE : [*activeVaultAdmin]
-        *MODIFY_SUBVAULT_BALANCE_ROLE : [*activeVaultAdmin]
-        *CALLER_ROLE : [*subvaultCurator]
-        *PULL_LIQUIDITY_ROLE : [*subvaultCurator]
-        *PUSH_LIQUIDITY_ROLE : [*subvaultCurator]
+        # *SET_VAULT_LIMIT_ROLE : [*earnUSDe_activeVaultAdmin]
+        *SET_VAULT_LIMIT_ROLE : [*earnUSDe_temporaryAdmin] # TEMPORARY: to be changed back to earnUSDe_activeVaultAdmin
+        # *SET_SUBVAULT_LIMIT_ROLE : [*earnUSDe_activeVaultAdmin]
+        *SET_SUBVAULT_LIMIT_ROLE : [*earnUSDe_temporaryAdmin] # TEMPORARY: to be changed back to earnUSDe_activeVaultAdmin
+        # *ALLOW_SUBVAULT_ASSETS_ROLE : [*earnUSDe_activeVaultAdmin]
+        *ALLOW_SUBVAULT_ASSETS_ROLE : [*earnUSDe_temporaryAdmin] # TEMPORARY: to be changed back to earnUSDe_activeVaultAdmin
+        # *MODIFY_VAULT_BALANCE_ROLE : [*earnUSDe_activeVaultAdmin]
+        *MODIFY_VAULT_BALANCE_ROLE : [*earnUSDe_temporaryAdmin] # TEMPORARY: to be changed back to earnUSDe_activeVaultAdmin
+        # *MODIFY_SUBVAULT_BALANCE_ROLE : [*earnUSDe_activeVaultAdmin]
+        *MODIFY_SUBVAULT_BALANCE_ROLE : [*earnUSDe_temporaryAdmin] # TEMPORARY: to be changed back to earnUSDe_activeVaultAdmin
+        # *CALLER_ROLE : [*earnUSDe_curator]
+        *CALLER_ROLE : [*earnUSDe_temporaryAdmin] # TEMPORARY: to be changed back to earnUSDe_curator
+        # *PULL_LIQUIDITY_ROLE : [*earnUSDe_curator]
+        *PULL_LIQUIDITY_ROLE : [*earnUSDe_temporaryAdmin] # TEMPORARY: to be changed back to earnUSDe_curator
+        # *PUSH_LIQUIDITY_ROLE : [*earnUSDe_curator]
+        *PUSH_LIQUIDITY_ROLE : [*earnUSDe_temporaryAdmin] # TEMPORARY: to be changed back to earnUSDe_curator
         *SET_FLAGS_ROLE : [*earnUSDe_timelockController]
-        *SET_MERKLE_ROOT_ROLE : [*earnUSDe_timelockController]
-        *SET_QUEUE_STATUS_ROLE : [*earnUSDe_timelockController]
+        *SET_MERKLE_ROOT_ROLE : [*earnUSDe_timelockController] # CHECK: should this be earnUSDe_activeVaultAdmin?
+        *SET_QUEUE_STATUS_ROLE : [*earnUSDe_timelockController] # CHECK: should this be earnUSDe_activeVaultAdmin?
         *SUBMIT_REPORTS_ROLE : [*earnUSDe_oracleSubmitter]
-        *ACCEPT_REPORT_ROLE : [*earnUSDe_oracleSubmitter]
-        # vault roles (not yet granted)
-        *CREATE_QUEUE_ROLE : []
-        *CREATE_SUBVAULT_ROLE : []
-        *DISCONNECT_SUBVAULT_ROLE : []
-        *RECONNECT_SUBVAULT_ROLE : []
-        *REMOVE_QUEUE_ROLE : []
-        *SET_HOOK_ROLE : []
-        *SET_QUEUE_LIMIT_ROLE : []
-        # shareManager roles (not yet granted)
-        *SET_ACCOUNT_INFO_ROLE : []
-        *SET_WHITELIST_MERKLE_ROOT_ROLE : []
-        # riskManager roles (not yet granted)
-        *DISALLOW_SUBVAULT_ASSETS_ROLE : []
-        *MODIFY_PENDING_ASSETS_ROLE : []
-        # oracle roles (not yet granted)
-        *ADD_SUPPORTED_ASSETS_ROLE : []
-        *REMOVE_SUPPORTED_ASSETS_ROLE : []
-        *SET_SECURITY_PARAMS_ROLE : []
-        # verifier roles (not yet granted)
-        *ALLOW_CALL_ROLE : []
-        *DISALLOW_CALL_ROLE : []
-        # sync deposit queue roles (not yet granted)
-        *SET_SYNC_DEPOSIT_PARAMS_ROLE : []
+        *ACCEPT_REPORT_ROLE : [*earnUSDe_oracleSubmitter] # CHECK: should this be earnUSDe_activeVaultAdmin?
 
     # --- Deposit/Sync/Redeem Queues ---
     earnUSDe_depositQueueUSDC:
@@ -2264,12 +2181,9 @@ l1:
         updatedAt:
       ozAcl:
         *DEFAULT_ADMIN_ROLE : [*lazyVaultAdmin]
-        *SUBMIT_REPORTS_ROLE : [*earnUSDe_oracleSubmitter]
-        *ACCEPT_REPORT_ROLE : [*earnUSDe_oracleSubmitter]
-        # oracle roles (not yet granted)
-        *ADD_SUPPORTED_ASSETS_ROLE : []
-        *REMOVE_SUPPORTED_ASSETS_ROLE : []
-        *SET_SECURITY_PARAMS_ROLE : []
+        # *SUBMIT_REPORTS_ROLE : [*earnUSDe_oracleUpdater]
+        *SUBMIT_REPORTS_ROLE : [*earnUSDe_temporaryAdmin] # TEMPORARY: to be changed back to earnUSDe_oracleUpdater
+        *ACCEPT_REPORT_ROLE : [*lazyVaultAdmin] # CHECK: should this be earnUSDe_activeVaultAdmin?
 
     # --- ShareManager ---
     earnUSDe_shareManager:
@@ -2451,11 +2365,15 @@ l1:
           # PROPOSER_ROLE holders
           - args: [*PROPOSER_ROLE, *lazyVaultAdmin]
             result: true
-          # EXECUTOR_ROLE - not granted to anyone
-          - args: [*EXECUTOR_ROLE, *lazyVaultAdmin]
-            result: false
-          - args: [*EXECUTOR_ROLE, *ZERO_ADDRESS]
-            result: false
+          # EXECUTOR_ROLE holders
+          - args: [*EXECUTOR_ROLE, *lidoPauser]
+            result: true
+          - args: [*EXECUTOR_ROLE, *mellowPauser]
+            result: true
+          # - args: [*EXECUTOR_ROLE, *earnUSDe_curatorPauser]
+          #   result: true
+          - args: [*EXECUTOR_ROLE, *earnUSDe_temporaryAdmin] # TEMPORARY: to be changed back to earnUSDe_curatorPauser
+            result: true
           # Verify deployer has no roles
           - args: [*DEFAULT_ADMIN_ROLE, *deployer]
             result: false
