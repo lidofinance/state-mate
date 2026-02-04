@@ -6,53 +6,66 @@
 deployed:
   l1:
     # --- Base contracts deployment (VERIFIED by Nethermind)---
-    # - &factoryImplementation "0x0000000397b71C8f3182Fd40D247330D218fdC72"
-    # - &factoryFactory "0x0000000f9686896836C39cf721141922Ce42639f"
-    # - &consensusFactory "0xaEEB06CBd91A18b51a2D30b61477eAeE3a9633C3"
-    # - &consensusFactoryImplementation "0x00000002a31593ed3d7f7bb76c4b27af8f223ee9"
-    # - &consensusImplementation "0x0000000167598d2C78E2313fD5328E16bD9A0b13"
-    # - &depositQueueFactory "0xBB92A7B9695750e1234BaB18F83b73686dd09854"
-    # - &depositQueueFactoryImplementation "0x00000002A31593ED3D7f7BB76c4b27Af8F223eE9"
+    # Factories
+    - &factoryImplementation "0x0000000397b71C8f3182Fd40D247330D218fdC72"
+    - &factoryFactory "0x0000000f9686896836C39cf721141922Ce42639f"
+    - &consensusFactory "0xaEEB06CBd91A18b51a2D30b61477eAeE3a9633C3"
+    - &consensusImplementation "0x0000000167598d2C78E2313fD5328E16bD9A0b13"
+    - &depositQueueFactory "0xBB92A7B9695750e1234BaB18F83b73686dd09854"
     - &depositQueueImplementation "0x00000006dA9f179BFE250Dd1c51cD2d3581930c8"
-    # - &signatureDepositQueueImplementation "0x00000003887dfBCEbD1e4097Ad89B690de7eFbf9"
-    # - &feeManagerFactory "0xF7223356819Ea48f25880b6c2ab3e907CC336D45"
-    # - &feeManagerImplementation "0x0000000dE74e5D51651326E0A3e1ACA94bEAF6E1"
-    # - &oracleFactory "0x0CdFf250C7a071fdc72340D820C5C8e29507Aaad"
-    # - &oracleImplementation "0x0000000F0d3D1c31b72368366A4049C05E291D58"
-    # - &redeemQueueFactory "0xfe76b5fd238553D65Ce6dd0A572C0fda629F8421"
-    # - &redeemQueueImplementation "0x0000000285805eac535DADdb9648F1E10DfdC411"
-    # - &signatureRedeemQueueImplementation "0x0000000b2082667589A16c4cF18e9f923781c471"
-    # - &riskManagerFactory "0xa51E4FA916b939Fa451520D2B7600c740d86E5A0"
-    # - &riskManagerImplementation "0x0000000714cf2851baC1AE2f41871862e9D216fD"
-    # - &shareManagerFactory "0x952f39AA62E94db3Ad0d1C7D1E43C1a8519E45D8"
-    # - &tokenizedShareManagerImplementation "0x0000000E8eb7173fA1a3ba60eCA325bcB6aaf378"
-    # - &basicShareManagerImplementation "0x00000005564AAE40D88e2F08dA71CBe156767977"
-    # - &subvaultFactory "0x75FE0d73d3C64cdC1C6449D9F977Be6857c4d011"
-    # - &subvaultImplementation "0x0000000E535B4E063f8372933A55470e67910a66"
-    # - &verifierFactory "0x04B30b1e98950e6A13550d84e991bE0d734C2c61"
-    # - &verifierImplementation "0x000000047Fc878662006E78D5174FB4285637966"
-    # - &vaultFactory "0x4E38F679e46B3216f0bd4B314E9C429AFfB1dEE3"
-    - &vaultImplementation "0x0000000615B2771511dAa693aC07BE5622869E01"
-    # - &bitmaskVerifier "0x0000000263Fb29C3D6B0C5837883519eF05ea20A"
-    # - &eigenLayerVerifierFactory "0x77A83AcBf7A6df20f1D681b4810437d74AE790F8"
-    # - &eigenLayerVerifier "0x00000003F82051A8B2F020B79e94C3DC94E89B81"
-    # - &ERC20VerifierFactory "0x2e234F4E1b7934d5F4bEAE3fF2FDC109f5C42F1d"
-    # - &ERC20Verifier "0x00000009207D366cBB8549837F8Ae4bf800Af2D6"
-    # - &symbioticVerifierFactory "0x41C443F10a92D597e6c9E271140BC94c10f5159F"
-    # - &symbioticVerifier "0x00000000cBC6f5d4348496FfA22Cf014b9DA394B"
-    # - &swapFactory "0xE3575055a24d8642DFA3a51ec766Ef2db2671659"
-    # - &swapModuleImplementation "0x00000000d681E85e5783588f87A9573Cb97Eda01"
     - &syncDepositQueueImplementation "0x000000002E2aeaC5Fe65AaB6fE2E6AE0e44F1A3A"
-    - &redeemQueueImplementation "0x000000000c139266ba06170ed1deaca6d11903c1"
+    - &signatureDepositQueueImplementation "0x00000003887dfBCEbD1e4097Ad89B690de7eFbf9"
+    - &feeManagerFactory "0xF7223356819Ea48f25880b6c2ab3e907CC336D45"
+    - &feeManagerImplementation "0x0000000dE74e5D51651326E0A3e1ACA94bEAF6E1"
+    - &oracleFactory "0x0CdFf250C7a071fdc72340D820C5C8e29507Aaad"
     - &oracleImplementation "0x0000000F0d3D1c31b72368366A4049C05E291D58"
-    - &shareManagerImplementation "0x0000000e8eb7173fa1a3ba60eca325bcb6aaf378"
-    - &feeManagerImplementation "0x0000000de74e5d51651326e0a3e1aca94beaf6e1"
-    - &riskManagerImplementation "0x0000000714cf2851bac1ae2f41871862e9d216fd"
-    # - &vaultConfigurator "0x000000028be48f9E62E13403480B60C4822C5aa5"
-    # - &basicRedeemHook "0x0000000637f1b1ccDA4Af2dB6CDDf5e5Ec45fd93"
-    # - &redirectingDepositHook "0x00000004d3B17e5391eb571dDb8fDF95646ca827"
-    # - &lidoDepositHook "0x000000065d1A7bD71f52886910aaBE6555b7317c"
-    # - &oracleHelper "0x000000005F543c38d5ea6D0bF10A50974Eb55E35"
+    - &redeemQueueFactory "0xfe76b5fd238553D65Ce6dd0A572C0fda629F8421"
+    - &redeemQueueImplementation "0x000000000c139266BA06170Ed1DeacA6d11903c1"
+    - &signatureRedeemQueueImplementation "0x0000000b2082667589A16c4cF18e9f923781c471"
+    - &riskManagerFactory "0xa51E4FA916b939Fa451520D2B7600c740d86E5A0"
+    - &riskManagerImplementation "0x0000000714cf2851baC1AE2f41871862e9D216fD"
+    - &shareManagerFactory "0x952f39AA62E94db3Ad0d1C7D1E43C1a8519E45D8"
+    - &shareManagerImplementation "0x0000000E8eb7173fA1a3ba60eCA325bcB6aaf378"
+    - &basicShareManagerImplementation "0x00000005564AAE40D88e2F08dA71CBe156767977"
+    - &subvaultFactory "0x75FE0d73d3C64cdC1C6449D9F977Be6857c4d011"
+    - &subvaultImplementation "0x0000000E535B4E063f8372933A55470e67910a66"
+    - &verifierFactory "0x04B30b1e98950e6A13550d84e991bE0d734C2c61"
+    - &verifierImplementation "0x000000047Fc878662006E78D5174FB4285637966"
+    - &vaultFactory "0x4E38F679e46B3216f0bd4B314E9C429AFfB1dEE3"
+    - &vaultImplementation "0x0000000615B2771511dAa693aC07BE5622869E01"
+    # Specialized verifiers
+    - &bitmaskVerifier "0x0000000263Fb29C3D6B0C5837883519eF05ea20A"
+    - &eigenLayerVerifierFactory "0x77A83AcBf7A6df20f1D681b4810437d74AE790F8"
+    - &eigenLayerVerifier "0x00000003F82051A8B2F020B79e94C3DC94E89B81"
+    - &erc20VerifierFactory "0x2e234F4E1b7934d5F4bEAE3fF2FDC109f5C42F1d"
+    - &erc20Verifier "0x00000009207D366cBB8549837F8Ae4bf800Af2D6"
+    - &symbioticVerifierFactory "0x41C443F10a92D597e6c9E271140BC94c10f5159F"
+    - &symbioticVerifier "0x00000000cBC6f5d4348496FfA22Cf014b9DA394B"
+    # Swap module
+    - &swapModuleFactory "0xE3575055a24d8642DFA3a51ec766Ef2db2671659"
+    - &swapModuleImplementation "0x00000000d681E85e5783588f87A9573Cb97Eda01"
+    # Factory ProxyAdmins
+    - &factoryFactoryProxyAdmin "0xf004f5876d352533fb8b244f1f6227caa8eff867"
+    - &depositQueueFactoryProxyAdmin "0x77da14f966385b19c6e2d99a4448dcfc6fc53985"
+    - &redeemQueueFactoryProxyAdmin "0xfce5f4f214288248f827390223f825dfb8c452be"
+    - &feeManagerFactoryProxyAdmin "0x34be100c59e7214ac3382cd5d3e143e8d5107692"
+    - &oracleFactoryProxyAdmin "0x03b10bc6ccaa3e7e894f7d0bac1003bb843f14bf"
+    - &riskManagerFactoryProxyAdmin "0x2ebd4375f9ded72ed36d49973aebf182e0e4482c"
+    - &shareManagerFactoryProxyAdmin "0x93ef6f26bfdce31ca6d12ccf51e5be9a95586b08"
+    - &subvaultFactoryProxyAdmin "0xc70e0e18dd7e6239e2808f48ea9be4cd77b405af"
+    - &verifierFactoryProxyAdmin "0xc5e76f98c8b6d3f536c2ea77de170de34a259341"
+    - &vaultFactoryProxyAdmin "0xe7afa247103bdc7de9054241669741a425fa5a26"
+    - &consensusFactoryProxyAdmin "0x50104e78c849b94d9d895e7888bc464cc1811f89"
+    - &eigenLayerVerifierFactoryProxyAdmin "0xd9d37156529646743b990973a2c3bad98ceb70a9"
+    - &erc20VerifierFactoryProxyAdmin "0x8283eeb88ff09bd49cdce79887c9b7854eca0697"
+    - &symbioticVerifierFactoryProxyAdmin "0xc885556d679e959da6331f0590d8c8d4a9302848"
+    - &swapModuleFactoryProxyAdmin "0x214cc3e0bf23e141739deae7014b1c1fdb3b4e21"
+    # Configurator and hooks
+    - &vaultConfigurator "0x000000028be48f9E62E13403480B60C4822C5aa5"
+    - &basicRedeemHook "0x0000000637f1b1ccDA4Af2dB6CDDf5e5Ec45fd93"
+    - &redirectingDepositHook "0x00000004d3B17e5391eb571dDb8fDF95646ca827"
+    - &lidoDepositHook "0x000000065d1A7bD71f52886910aaBE6555b7317c"
+    - &oracleHelper "0x000000005F543c38d5ea6D0bF10A50974Eb55E35"
 
     # --- earnETH Vault ---
     - &vaultProxyAdmin "0x8b781593b273391428fe0e9ded0c2ffc3d6bff37"
@@ -1388,3 +1401,692 @@ l1:
         isOperationPending:
         isOperationReady:
         supportsInterface:
+
+    # ===========================================
+    # Base Infrastructure Contracts
+    # ===========================================
+
+    # --- Factory ProxyAdmins ---
+    factoryFactoryProxyAdmin:
+      name: ProxyAdmin
+      address: *factoryFactoryProxyAdmin
+      checks:
+        UPGRADE_INTERFACE_VERSION: "5.0.0"
+        owner: *proxyAdmin
+
+    depositQueueFactoryProxyAdmin:
+      name: ProxyAdmin
+      address: *depositQueueFactoryProxyAdmin
+      checks:
+        UPGRADE_INTERFACE_VERSION: "5.0.0"
+        owner: *proxyAdmin
+
+    redeemQueueFactoryProxyAdmin:
+      name: ProxyAdmin
+      address: *redeemQueueFactoryProxyAdmin
+      checks:
+        UPGRADE_INTERFACE_VERSION: "5.0.0"
+        owner: *proxyAdmin
+
+    feeManagerFactoryProxyAdmin:
+      name: ProxyAdmin
+      address: *feeManagerFactoryProxyAdmin
+      checks:
+        UPGRADE_INTERFACE_VERSION: "5.0.0"
+        owner: *proxyAdmin
+
+    oracleFactoryProxyAdmin:
+      name: ProxyAdmin
+      address: *oracleFactoryProxyAdmin
+      checks:
+        UPGRADE_INTERFACE_VERSION: "5.0.0"
+        owner: *proxyAdmin
+
+    riskManagerFactoryProxyAdmin:
+      name: ProxyAdmin
+      address: *riskManagerFactoryProxyAdmin
+      checks:
+        UPGRADE_INTERFACE_VERSION: "5.0.0"
+        owner: *proxyAdmin
+
+    shareManagerFactoryProxyAdmin:
+      name: ProxyAdmin
+      address: *shareManagerFactoryProxyAdmin
+      checks:
+        UPGRADE_INTERFACE_VERSION: "5.0.0"
+        owner: *proxyAdmin
+
+    subvaultFactoryProxyAdmin:
+      name: ProxyAdmin
+      address: *subvaultFactoryProxyAdmin
+      checks:
+        UPGRADE_INTERFACE_VERSION: "5.0.0"
+        owner: *proxyAdmin
+
+    verifierFactoryProxyAdmin:
+      name: ProxyAdmin
+      address: *verifierFactoryProxyAdmin
+      checks:
+        UPGRADE_INTERFACE_VERSION: "5.0.0"
+        owner: *proxyAdmin
+
+    vaultFactoryProxyAdmin:
+      name: ProxyAdmin
+      address: *vaultFactoryProxyAdmin
+      checks:
+        UPGRADE_INTERFACE_VERSION: "5.0.0"
+        owner: *proxyAdmin
+
+    consensusFactoryProxyAdmin:
+      name: ProxyAdmin
+      address: *consensusFactoryProxyAdmin
+      checks:
+        UPGRADE_INTERFACE_VERSION: "5.0.0"
+        owner: *proxyAdmin
+
+    eigenLayerVerifierFactoryProxyAdmin:
+      name: ProxyAdmin
+      address: *eigenLayerVerifierFactoryProxyAdmin
+      checks:
+        UPGRADE_INTERFACE_VERSION: "5.0.0"
+        owner: *proxyAdmin
+
+    erc20VerifierFactoryProxyAdmin:
+      name: ProxyAdmin
+      address: *erc20VerifierFactoryProxyAdmin
+      checks:
+        UPGRADE_INTERFACE_VERSION: "5.0.0"
+        owner: *proxyAdmin
+
+    symbioticVerifierFactoryProxyAdmin:
+      name: ProxyAdmin
+      address: *symbioticVerifierFactoryProxyAdmin
+      checks:
+        UPGRADE_INTERFACE_VERSION: "5.0.0"
+        owner: *proxyAdmin
+
+    swapModuleFactoryProxyAdmin:
+      name: ProxyAdmin
+      address: *swapModuleFactoryProxyAdmin
+      checks:
+        UPGRADE_INTERFACE_VERSION: "5.0.0"
+        owner: *proxyAdmin
+
+    # --- Factories (Proxies) ---
+    # All factories owned by proxyAdmin (not deployer)
+    factoryFactory:
+      name: Factory
+      address: *factoryFactory
+      proxyName: TransparentUpgradeableProxy
+      implementation: *factoryImplementation
+      proxyChecks: {}
+      storage:
+        - slot: *EIP1967_ADMIN_SLOT
+          expected: *factoryFactoryProxyAdmin
+          label: admin
+        - slot: *EIP1967_IMPLEMENTATION_SLOT
+          expected: *factoryImplementation
+          label: implementation
+      checks:
+        owner: *proxyAdmin
+        entities:
+        entityAt:
+        implementations:
+        implementationAt:
+        isBlacklisted:
+        isEntity:
+        proposalAt:
+        proposals:
+      implementationChecks:
+        owner: *ZERO_ADDRESS
+        entities: 0
+        implementations: 0
+
+    depositQueueFactory:
+      name: Factory
+      address: *depositQueueFactory
+      proxyName: TransparentUpgradeableProxy
+      implementation: *factoryImplementation
+      proxyChecks: {}
+      storage:
+        - slot: *EIP1967_ADMIN_SLOT
+          expected: *depositQueueFactoryProxyAdmin
+          label: admin
+        - slot: *EIP1967_IMPLEMENTATION_SLOT
+          expected: *factoryImplementation
+          label: implementation
+      checks:
+        owner: *proxyAdmin
+        entities:
+        entityAt:
+        implementations:
+        implementationAt:
+        isBlacklisted:
+        isEntity:
+        proposalAt:
+        proposals:
+      implementationChecks:
+        owner: *ZERO_ADDRESS
+        entities: 0
+        implementations: 0
+
+    redeemQueueFactory:
+      name: Factory
+      address: *redeemQueueFactory
+      proxyName: TransparentUpgradeableProxy
+      implementation: *factoryImplementation
+      proxyChecks: {}
+      storage:
+        - slot: *EIP1967_ADMIN_SLOT
+          expected: *redeemQueueFactoryProxyAdmin
+          label: admin
+        - slot: *EIP1967_IMPLEMENTATION_SLOT
+          expected: *factoryImplementation
+          label: implementation
+      checks:
+        owner: *proxyAdmin
+        entities:
+        entityAt:
+        implementations:
+        implementationAt:
+        isBlacklisted:
+        isEntity:
+        proposalAt:
+        proposals:
+      implementationChecks:
+        owner: *ZERO_ADDRESS
+        entities: 0
+        implementations: 0
+
+    feeManagerFactory:
+      name: Factory
+      address: *feeManagerFactory
+      proxyName: TransparentUpgradeableProxy
+      implementation: *factoryImplementation
+      proxyChecks: {}
+      storage:
+        - slot: *EIP1967_ADMIN_SLOT
+          expected: *feeManagerFactoryProxyAdmin
+          label: admin
+        - slot: *EIP1967_IMPLEMENTATION_SLOT
+          expected: *factoryImplementation
+          label: implementation
+      checks:
+        owner: *proxyAdmin
+        entities:
+        entityAt:
+        implementations:
+        implementationAt:
+        isBlacklisted:
+        isEntity:
+        proposalAt:
+        proposals:
+      implementationChecks:
+        owner: *ZERO_ADDRESS
+        entities: 0
+        implementations: 0
+
+    oracleFactory:
+      name: Factory
+      address: *oracleFactory
+      proxyName: TransparentUpgradeableProxy
+      implementation: *factoryImplementation
+      proxyChecks: {}
+      storage:
+        - slot: *EIP1967_ADMIN_SLOT
+          expected: *oracleFactoryProxyAdmin
+          label: admin
+        - slot: *EIP1967_IMPLEMENTATION_SLOT
+          expected: *factoryImplementation
+          label: implementation
+      checks:
+        owner: *proxyAdmin
+        entities:
+        entityAt:
+        implementations:
+        implementationAt:
+        isBlacklisted:
+        isEntity:
+        proposalAt:
+        proposals:
+      implementationChecks:
+        owner: *ZERO_ADDRESS
+        entities: 0
+        implementations: 0
+
+    riskManagerFactory:
+      name: Factory
+      address: *riskManagerFactory
+      proxyName: TransparentUpgradeableProxy
+      implementation: *factoryImplementation
+      proxyChecks: {}
+      storage:
+        - slot: *EIP1967_ADMIN_SLOT
+          expected: *riskManagerFactoryProxyAdmin
+          label: admin
+        - slot: *EIP1967_IMPLEMENTATION_SLOT
+          expected: *factoryImplementation
+          label: implementation
+      checks:
+        owner: *proxyAdmin
+        entities:
+        entityAt:
+        implementations:
+        implementationAt:
+        isBlacklisted:
+        isEntity:
+        proposalAt:
+        proposals:
+      implementationChecks:
+        owner: *ZERO_ADDRESS
+        entities: 0
+        implementations: 0
+
+    shareManagerFactory:
+      name: Factory
+      address: *shareManagerFactory
+      proxyName: TransparentUpgradeableProxy
+      implementation: *factoryImplementation
+      proxyChecks: {}
+      storage:
+        - slot: *EIP1967_ADMIN_SLOT
+          expected: *shareManagerFactoryProxyAdmin
+          label: admin
+        - slot: *EIP1967_IMPLEMENTATION_SLOT
+          expected: *factoryImplementation
+          label: implementation
+      checks:
+        owner: *proxyAdmin
+        entities:
+        entityAt:
+        implementations:
+        implementationAt:
+        isBlacklisted:
+        isEntity:
+        proposalAt:
+        proposals:
+      implementationChecks:
+        owner: *ZERO_ADDRESS
+        entities: 0
+        implementations: 0
+
+    subvaultFactory:
+      name: Factory
+      address: *subvaultFactory
+      proxyName: TransparentUpgradeableProxy
+      implementation: *factoryImplementation
+      proxyChecks: {}
+      storage:
+        - slot: *EIP1967_ADMIN_SLOT
+          expected: *subvaultFactoryProxyAdmin
+          label: admin
+        - slot: *EIP1967_IMPLEMENTATION_SLOT
+          expected: *factoryImplementation
+          label: implementation
+      checks:
+        owner: *proxyAdmin
+        entities:
+        entityAt:
+        implementations:
+        implementationAt:
+        isBlacklisted:
+        isEntity:
+        proposalAt:
+        proposals:
+      implementationChecks:
+        owner: *ZERO_ADDRESS
+        entities: 0
+        implementations: 0
+
+    verifierFactory:
+      name: Factory
+      address: *verifierFactory
+      proxyName: TransparentUpgradeableProxy
+      implementation: *factoryImplementation
+      proxyChecks: {}
+      storage:
+        - slot: *EIP1967_ADMIN_SLOT
+          expected: *verifierFactoryProxyAdmin
+          label: admin
+        - slot: *EIP1967_IMPLEMENTATION_SLOT
+          expected: *factoryImplementation
+          label: implementation
+      checks:
+        owner: *proxyAdmin
+        entities:
+        entityAt:
+        implementations:
+        implementationAt:
+        isBlacklisted:
+        isEntity:
+        proposalAt:
+        proposals:
+      implementationChecks:
+        owner: *ZERO_ADDRESS
+        entities: 0
+        implementations: 0
+
+    vaultFactory:
+      name: Factory
+      address: *vaultFactory
+      proxyName: TransparentUpgradeableProxy
+      implementation: *factoryImplementation
+      proxyChecks: {}
+      storage:
+        - slot: *EIP1967_ADMIN_SLOT
+          expected: *vaultFactoryProxyAdmin
+          label: admin
+        - slot: *EIP1967_IMPLEMENTATION_SLOT
+          expected: *factoryImplementation
+          label: implementation
+      checks:
+        owner: *proxyAdmin
+        entities:
+        entityAt:
+        implementations:
+        implementationAt:
+        isBlacklisted:
+        isEntity:
+        proposalAt:
+        proposals:
+      implementationChecks:
+        owner: *ZERO_ADDRESS
+        entities: 0
+        implementations: 0
+
+    consensusFactory:
+      name: Factory
+      address: *consensusFactory
+      proxyName: TransparentUpgradeableProxy
+      implementation: *factoryImplementation
+      proxyChecks: {}
+      storage:
+        - slot: *EIP1967_ADMIN_SLOT
+          expected: *consensusFactoryProxyAdmin
+          label: admin
+        - slot: *EIP1967_IMPLEMENTATION_SLOT
+          expected: *factoryImplementation
+          label: implementation
+      checks:
+        owner: *proxyAdmin
+        entities:
+        entityAt:
+        implementations:
+        implementationAt:
+        isBlacklisted:
+        isEntity:
+        proposalAt:
+        proposals:
+      implementationChecks:
+        owner: *ZERO_ADDRESS
+        entities: 0
+        implementations: 0
+
+    eigenLayerVerifierFactory:
+      name: Factory
+      address: *eigenLayerVerifierFactory
+      proxyName: TransparentUpgradeableProxy
+      implementation: *factoryImplementation
+      proxyChecks: {}
+      storage:
+        - slot: *EIP1967_ADMIN_SLOT
+          expected: *eigenLayerVerifierFactoryProxyAdmin
+          label: admin
+        - slot: *EIP1967_IMPLEMENTATION_SLOT
+          expected: *factoryImplementation
+          label: implementation
+      checks:
+        owner: *proxyAdmin
+        entities:
+        entityAt:
+        implementations:
+        implementationAt:
+        isBlacklisted:
+        isEntity:
+        proposalAt:
+        proposals:
+      implementationChecks:
+        owner: *ZERO_ADDRESS
+        entities: 0
+        implementations: 0
+
+    erc20VerifierFactory:
+      name: Factory
+      address: *erc20VerifierFactory
+      proxyName: TransparentUpgradeableProxy
+      implementation: *factoryImplementation
+      proxyChecks: {}
+      storage:
+        - slot: *EIP1967_ADMIN_SLOT
+          expected: *erc20VerifierFactoryProxyAdmin
+          label: admin
+        - slot: *EIP1967_IMPLEMENTATION_SLOT
+          expected: *factoryImplementation
+          label: implementation
+      checks:
+        owner: *proxyAdmin
+        entities:
+        entityAt:
+        implementations:
+        implementationAt:
+        isBlacklisted:
+        isEntity:
+        proposalAt:
+        proposals:
+      implementationChecks:
+        owner: *ZERO_ADDRESS
+        entities: 0
+        implementations: 0
+
+    symbioticVerifierFactory:
+      name: Factory
+      address: *symbioticVerifierFactory
+      proxyName: TransparentUpgradeableProxy
+      implementation: *factoryImplementation
+      proxyChecks: {}
+      storage:
+        - slot: *EIP1967_ADMIN_SLOT
+          expected: *symbioticVerifierFactoryProxyAdmin
+          label: admin
+        - slot: *EIP1967_IMPLEMENTATION_SLOT
+          expected: *factoryImplementation
+          label: implementation
+      checks:
+        owner: *proxyAdmin
+        entities:
+        entityAt:
+        implementations:
+        implementationAt:
+        isBlacklisted:
+        isEntity:
+        proposalAt:
+        proposals:
+      implementationChecks:
+        owner: *ZERO_ADDRESS
+        entities: 0
+        implementations: 0
+
+    swapModuleFactory:
+      name: Factory
+      address: *swapModuleFactory
+      proxyName: TransparentUpgradeableProxy
+      implementation: *factoryImplementation
+      proxyChecks: {}
+      storage:
+        - slot: *EIP1967_ADMIN_SLOT
+          expected: *swapModuleFactoryProxyAdmin
+          label: admin
+        - slot: *EIP1967_IMPLEMENTATION_SLOT
+          expected: *factoryImplementation
+          label: implementation
+      checks:
+        owner: *proxyAdmin
+        entities:
+        entityAt:
+        implementations:
+        implementationAt:
+        isBlacklisted:
+        isEntity:
+        proposalAt:
+        proposals:
+      implementationChecks:
+        owner: *ZERO_ADDRESS
+        entities: 0
+        implementations: 0
+
+    # --- Implementations with Access Control ---
+    # Verify no roles are granted on implementation contracts
+    eigenLayerVerifierImpl:
+      name: EigenLayerVerifier
+      address: *eigenLayerVerifier
+      checks:
+        ASSET_ROLE: *ASSET_ROLE
+        CALLER_ROLE: *EL_CALLER_ROLE
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        MELLOW_VAULT_ROLE: *MELLOW_VAULT_ROLE
+        OPERATOR_ROLE: *OPERATOR_ROLE
+        RECEIVER_ROLE: *RECEIVER_ROLE
+        STRATEGY_ROLE: *STRATEGY_ROLE
+        delegationManager:
+        getRoleAdmin:
+        getRoleMember:
+        getRoleMembers:
+        hasSupportedRole:
+        rewardsCoordinator:
+        strategyManager:
+        supportedRoleAt:
+        supportedRoles:
+        supportsInterface:
+        verifyCall:
+        hasRole:
+          - args: [*DEFAULT_ADMIN_ROLE, *deployer]
+            result: false
+        getRoleMemberCount:
+          - args: [*DEFAULT_ADMIN_ROLE]
+            result: 0
+
+    erc20VerifierImpl:
+      name: ERC20Verifier
+      address: *erc20Verifier
+      checks:
+        ASSET_ROLE: *ERC20_ASSET_ROLE
+        CALLER_ROLE: *ERC20_CALLER_ROLE
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        RECIPIENT_ROLE: *ERC20_RECIPIENT_ROLE
+        getRoleAdmin:
+        getRoleMember:
+        getRoleMembers:
+        hasSupportedRole:
+        supportedRoleAt:
+        supportedRoles:
+        supportsInterface:
+        verifyCall:
+        hasRole:
+          - args: [*DEFAULT_ADMIN_ROLE, *deployer]
+            result: false
+        getRoleMemberCount:
+          - args: [*DEFAULT_ADMIN_ROLE]
+            result: 0
+
+    symbioticVerifierImpl:
+      name: SymbioticVerifier
+      address: *symbioticVerifier
+      checks:
+        CALLER_ROLE: *SYMBIOTIC_CALLER_ROLE
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        MELLOW_VAULT_ROLE: *SYMBIOTIC_MELLOW_VAULT_ROLE
+        SYMBIOTIC_FARM_ROLE: *SYMBIOTIC_FARM_ROLE
+        SYMBIOTIC_VAULT_ROLE: *SYMBIOTIC_VAULT_ROLE
+        farmFactory:
+        getRoleAdmin:
+        getRoleMember:
+        getRoleMembers:
+        hasSupportedRole:
+        supportedRoleAt:
+        supportedRoles:
+        supportsInterface:
+        vaultFactory:
+        verifyCall:
+        hasRole:
+          - args: [*DEFAULT_ADMIN_ROLE, *deployer]
+            result: false
+        getRoleMemberCount:
+          - args: [*DEFAULT_ADMIN_ROLE]
+            result: 0
+
+    swapModuleImpl:
+      name: SwapModule
+      address: *swapModuleImplementation
+      checks:
+        BASE_MULTIPLIER:
+        CALLER_ROLE:
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        MAX_MULTIPLIER:
+        MIN_MULTIPLIER:
+        ROUTER_ROLE:
+        SET_SLIPPAGE_ROLE:
+        TOKEN_IN_ROLE:
+        TOKEN_OUT_ROLE:
+        checkCowswapOrder:
+        checkMultiplier:
+        checkParams:
+        cowswapSettlement:
+        cowswapVaultRelayer:
+        customMultiplier:
+        defaultMultiplier:
+        evaluate:
+        getRoleAdmin:
+        getRoleMember:
+        getRoleMembers:
+        hasSupportedRole:
+        oracle:
+        subvault:
+        supportedRoleAt:
+        supportedRoles:
+        supportsInterface:
+        weth:
+        hasRole:
+          - args: [*DEFAULT_ADMIN_ROLE, *deployer]
+            result: false
+        getRoleMemberCount:
+          - args: [*DEFAULT_ADMIN_ROLE]
+            result: 0
+
+    # --- Hooks (No access control) ---
+    basicRedeemHook:
+      name: BasicRedeemHook
+      address: *basicRedeemHook
+      checks:
+        getLiquidAssets:
+
+    redirectingDepositHook:
+      name: RedirectingDepositHook
+      address: *redirectingDepositHook
+      checks:
+        callHook:
+
+    lidoDepositHook:
+      name: LidoDepositHook
+      address: *lidoDepositHook
+      checks:
+        nextHook:
+        steth:
+        weth:
+        wsteth:
+
+    # --- Other Infrastructure ---
+    vaultConfigurator:
+      name: VaultConfigurator
+      address: *vaultConfigurator
+      checks:
+        feeManagerFactory: *feeManagerFactory
+        oracleFactory: *oracleFactory
+        riskManagerFactory: *riskManagerFactory
+        shareManagerFactory: *shareManagerFactory
+        vaultFactory: *vaultFactory
+
+    oracleHelper:
+      name: OracleHelper
+      address: *oracleHelper
+      checks:
+        getPricesD18:
