@@ -531,6 +531,14 @@ l1:
         hasAsset:
         hasQueue:
         hasRole:
+          - args: [*ALLOW_CALL_ROLE, *activeVaultAdmin] # CHECK: should this role be set already?
+            result: true
+          - args: [*CALLER_ROLE, *curator] # CHECK: should this role be set already?
+            result: true
+          - args: [*DISALLOW_CALL_ROLE, *activeVaultAdmin] # CHECK: should this role be set already?
+            result: true
+          - args: [*SET_MERKLE_ROOT_ROLE, *timelockController] # CHECK: should this role be set already?
+            result: true
         hasSubvault:
         hasSupportedRole:
         isDepositQueue:
@@ -560,33 +568,10 @@ l1:
         *PULL_LIQUIDITY_ROLE : [*curator]
         *PUSH_LIQUIDITY_ROLE : [*curator]
         *SET_FLAGS_ROLE : [*timelockController]
-        *SET_MERKLE_ROOT_ROLE : [*timelockController]
-        *SET_QUEUE_STATUS_ROLE : [*timelockController]
+        *SET_MERKLE_ROOT_ROLE : [*timelockController] # CHECK: should this be activeVaultAdmin?
+        *SET_QUEUE_STATUS_ROLE : [*timelockController] # CHECK: should this be activeVaultAdmin?
         *SUBMIT_REPORTS_ROLE : [*oracleSubmitter]
-        *ACCEPT_REPORT_ROLE : [*oracleSubmitter]
-        # vault roles (not yet granted)
-        *CREATE_QUEUE_ROLE : []
-        *CREATE_SUBVAULT_ROLE : []
-        *DISCONNECT_SUBVAULT_ROLE : []
-        *RECONNECT_SUBVAULT_ROLE : []
-        *REMOVE_QUEUE_ROLE : []
-        *SET_HOOK_ROLE : []
-        *SET_QUEUE_LIMIT_ROLE : []
-        # shareManager roles (not yet granted)
-        *SET_ACCOUNT_INFO_ROLE : []
-        *SET_WHITELIST_MERKLE_ROOT_ROLE : []
-        # riskManager roles (not yet granted)
-        *DISALLOW_SUBVAULT_ASSETS_ROLE : []
-        *MODIFY_PENDING_ASSETS_ROLE : []
-        # oracle roles (not yet granted)
-        *ADD_SUPPORTED_ASSETS_ROLE : []
-        *REMOVE_SUPPORTED_ASSETS_ROLE : []
-        *SET_SECURITY_PARAMS_ROLE : []
-        # verifier roles (not yet granted)
-        *ALLOW_CALL_ROLE : []
-        *DISALLOW_CALL_ROLE : []
-        # sync deposit queue roles (not yet granted)
-        *SET_SYNC_DEPOSIT_PARAMS_ROLE : []
+        *ACCEPT_REPORT_ROLE : [*oracleSubmitter] # CHECK: should this be activeVaultAdmin?
 
     depositQueueETH:
       name: DepositQueue
@@ -1075,6 +1060,8 @@ l1:
         updatedAt:
       ozAcl:
         *DEFAULT_ADMIN_ROLE : [*lazyVaultAdmin]
+        *SUBMIT_REPORTS_ROLE : [*oracleUpdater]
+        *ACCEPT_REPORT_ROLE : [*lazyVaultAdmin] # CHECK: should this be activeVaultAdmin?
 
     shareManager:
       name: TokenizedShareManager
@@ -1380,11 +1367,11 @@ l1:
           # PROPOSER_ROLE holders
           - args: [*PROPOSER_ROLE, *lazyVaultAdmin]
             result: true
-          # EXECUTOR_ROLE - not granted to anyone
-          - args: [*EXECUTOR_ROLE, *lazyVaultAdmin]
-            result: false
-          - args: [*EXECUTOR_ROLE, *ZERO_ADDRESS]
-            result: false
+          # EXECUTOR_ROLE holders
+          - args: [*EXECUTOR_ROLE, *lidoPauser]
+            result: true
+          - args: [*EXECUTOR_ROLE, *mellowPauser]
+            result: true
           # Verify deployer has no roles
           - args: [*DEFAULT_ADMIN_ROLE, *deployer]
             result: false

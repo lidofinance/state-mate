@@ -21,16 +21,7 @@ import { doGenerateBoilerplate } from "./boilerplate-generator";
 import { parseCmdLineArguments } from "./cli-parser";
 import { printError, readUrlOrFromEnvironment } from "./common";
 import { loadContractInfoFromExplorer } from "./explorer-provider";
-import {
-  log,
-  logError,
-  logErrorAndExit,
-  logFinalStatus,
-  logHeader1,
-  logWarningStatus,
-  SUCCESS_MARK,
-  WARNING_MARK,
-} from "./logger";
+import { FAILURE_MARK, log, logError, logErrorAndExit, logHeader1, SUCCESS_MARK, WARNING_MARK } from "./logger";
 import { g_error_details, g_errors, g_total_checks } from "./section-validators/base";
 import { ContractSectionValidator } from "./section-validators/contract";
 import {
@@ -124,13 +115,16 @@ async function doChecks(jsonDocument: EntireDocument) {
   for (const [sectionTitle, section] of Object.entries(jsonDocument)) {
     if (isTypeOfTB(section, NetworkSectionTB)) await checkNetworkSection(sectionTitle, section);
   }
+  // Show final summary (outside the tree)
+  log(""); // Separator line
+  const statusMark = g_errors ? FAILURE_MARK : SUCCESS_MARK;
+  const statusMessage = g_errors
+    ? `${g_total_checks} checks, ${chalk.red(`${g_errors} errors`)}`
+    : `${g_total_checks} checks passed`;
+  log(`${statusMark} ${chalk.bold("Total:")} ${statusMessage}`);
+
   if (g_Arguments.checkOnly) {
-    logWarningStatus(`filtered: ${chalk.yellow(`"${g_Arguments.checkOnlyCmdArg}"`)}`);
-  } else {
-    const statusMessage = g_errors
-      ? `${g_total_checks} checks, ${chalk.red(`${g_errors} errors`)}`
-      : `${g_total_checks} checks passed`;
-    logFinalStatus(statusMessage, g_errors === 0);
+    log(`${WARNING_MARK} filtered: ${chalk.yellow(`"${g_Arguments.checkOnlyCmdArg}"`)}`);
   }
 
   if (g_errors) {

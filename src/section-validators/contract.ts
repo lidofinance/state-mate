@@ -124,6 +124,6 @@ export class ContractSectionValidator {
     const statusMessage = errors
       ? `${checks} checks, ${chalk.red(`${errors} ${errors === 1 ? "error" : "errors"}`)}`
       : `${checks} checks passed`;
-    logFinalStatus(statusMessage, errors === 0, false);
+    logFinalStatus(statusMessage, errors === 0, true);
   }
 }
