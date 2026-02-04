@@ -208,6 +208,9 @@ roles:
   - &SET_SECURITY_PARAMS_ROLE "0x79abe62d91dbd05fcda41b212f4c8c1f1d8be54ccddf859de3ccd1361b71fcb6"
   - &SUBMIT_REPORTS_ROLE "0xb54eea9408efadf36da92cc5ecd8af0f45d6dd90de54634bbc5a2113ddcb505d"
 
+  # --- Deployer ---
+  - &deployer "0x5C0F3DE4ba6AD53bb8E27f965170A52671e525Bf"
+
 l1:
   rpcUrl: L1_MAINNET_RPC_URL
   explorerHostname: api.etherscan.io/v2/api
@@ -411,6 +414,29 @@ l1:
         hasAsset:
         hasQueue:
         hasRole:
+          # Verify deployer has no roles
+          - args: [*DEFAULT_ADMIN_ROLE, *deployer]
+            result: false
+          - args: [*CREATE_QUEUE_ROLE, *deployer]
+            result: false
+          - args: [*CREATE_SUBVAULT_ROLE, *deployer]
+            result: false
+          - args: [*DISCONNECT_SUBVAULT_ROLE, *deployer]
+            result: false
+          - args: [*PULL_LIQUIDITY_ROLE, *deployer]
+            result: false
+          - args: [*PUSH_LIQUIDITY_ROLE, *deployer]
+            result: false
+          - args: [*RECONNECT_SUBVAULT_ROLE, *deployer]
+            result: false
+          - args: [*REMOVE_QUEUE_ROLE, *deployer]
+            result: false
+          - args: [*SET_HOOK_ROLE, *deployer]
+            result: false
+          - args: [*SET_QUEUE_LIMIT_ROLE, *deployer]
+            result: false
+          - args: [*SET_QUEUE_STATUS_ROLE, *deployer]
+            result: false
         hasSubvault:
         hasSupportedRole:
         isDepositQueue:
@@ -1345,6 +1371,15 @@ l1:
           - args: [*EXECUTOR_ROLE, *lazyVaultAdmin]
             result: false
           - args: [*EXECUTOR_ROLE, *ZERO_ADDRESS]
+            result: false
+          # Verify deployer has no roles
+          - args: [*DEFAULT_ADMIN_ROLE, *deployer]
+            result: false
+          - args: [*CANCELLER_ROLE, *deployer]
+            result: false
+          - args: [*PROPOSER_ROLE, *deployer]
+            result: false
+          - args: [*EXECUTOR_ROLE, *deployer]
             result: false
         hashOperation:
         hashOperationBatch:

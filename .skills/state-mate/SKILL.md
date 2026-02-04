@@ -271,8 +271,13 @@ For comprehensive role verification:
 1. List all role constants in `roles` section
 2. Add roles with members to ozAcl with their holders
 3. Add roles without members as empty arrays `[]`
+4. Add deployer address to verify no roles remain on it
 
 ```yaml
+deployed:
+  l1:
+    - &deployer "0x..."  # Add deployer address for verification
+
 ozAcl:
   # Roles with members
   *DEFAULT_ADMIN_ROLE : [*admin]
@@ -281,6 +286,26 @@ ozAcl:
   *FUTURE_ROLE : []
   *ANOTHER_UNUSED_ROLE : []
 ```
+
+### Verifying Deployer Has No Roles
+
+After deployment, verify the deployer address has renounced all roles. Add deployer to hasRole checks with `result: false`:
+
+```yaml
+deployed:
+  l1:
+    - &deployer "0x..."
+
+# In contract checks:
+checks:
+  hasRole:
+    - args: [*DEFAULT_ADMIN_ROLE, *deployer]
+      result: false
+    - args: [*OPERATOR_ROLE, *deployer]
+      result: false
+```
+
+Or with ozAcl, just ensure deployer is NOT in any role's holder list.
 
 ## Running Checks
 
@@ -310,9 +335,10 @@ yarn start configs/path/to/config.yml --update-abi-missing
 - Run with `--update-abi` to download ABIs
 - Check that contract name matches ABI filename
 
-### "getRoleMemberCount reverted"
+### "getRoleMemberCount reverted" or "no matching function"
 - Contract uses standard AccessControl, not AccessControlEnumerable
 - Remove ozAcl section, use hasRole checks instead
+- Some contracts (e.g., Oracle) may not expose role management functions at all - skip role checks for these
 
 ### Function check fails with wrong value
 - Run check to see actual value in error output
