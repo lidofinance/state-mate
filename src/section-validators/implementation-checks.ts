@@ -12,13 +12,13 @@ export class ImplementationChecksSectionValidator extends ChecksSectionValidator
     super(provider, EntryField.implementationChecks);
   }
 
-  override async validateSection(contractEntry: ContractEntry, contractAlias: string) {
+  override async validateSection(contractEntry: ContractEntry, contractAlias: string, basePath?: string) {
     if (
       isTypeOfTB(contractEntry, ProxyContractEntryTB) &&
       contractEntry.implementation &&
       contractEntry.implementationChecks
     ) {
-      logHeader2(this.sectionName);
+      logHeader2(basePath ? `${basePath}/${this.sectionName}` : this.sectionName);
       const { implementation, name, implementationChecks } = contractEntry;
 
       const allNonMutable = getNonMutables(loadAbiFromFile(name, implementation));

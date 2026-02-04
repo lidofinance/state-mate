@@ -1,9 +1,24 @@
 import * as readline from "node:readline";
 
 import chalk from "chalk";
+
 export const SUCCESS_MARK = chalk.green("✔");
 export const FAILURE_MARK = chalk.red("✘");
 export const WARNING_MARK = chalk.yellow("⚠");
+
+// Tree drawing characters (gray colored)
+const TREE_BRANCH = chalk.gray("├──");
+const TREE_LAST = chalk.gray("└──");
+const TREE_PIPE = chalk.gray("│  ");
+const TREE_SPACE = "   ";
+
+// Track current item prefix for tree structure
+let itemPrefix = "";
+
+export function getItemPrefix(): string {
+  return itemPrefix;
+}
+
 export class LogCommand {
   private description: string;
 
@@ -15,7 +30,8 @@ export class LogCommand {
   public printResult(statusSymbol: string, result: string): void {
     readline.cursorTo(process.stdout, 0);
     readline.clearLine(process.stdout, 0);
-    process.stdout.write(`${statusSymbol} ${this.description}: ${chalk.yellow(result)}\n`);
+    const prefix = getItemPrefix();
+    process.stdout.write(`${prefix}${statusSymbol} ${this.description}: ${chalk.yellow(result)}\n`);
   }
 
   public success(result: string): void {
@@ -31,24 +47,41 @@ export class LogCommand {
   }
 
   private initialPrint(): void {
-    const indent = "  "; // SUCCESS_MARK printed length
-    process.stdout.write(`${indent}${this.description}: ...`);
+    const prefix = getItemPrefix();
+    process.stdout.write(`${prefix}  ${this.description}: ...`);
   }
 }
 
 export function logHeader1(argument: string) {
-  const length = "=====  =====".length + argument.length;
-  const middleLine = chalk.grey(`===== ${chalk.blueBright(argument)} =====`);
-  const headerFooter = chalk.grey("=".repeat(length));
-  log(`\n${headerFooter}\n${middleLine}\n${headerFooter}`);
+  log(`\n${chalk.blueBright(argument)}`);
+  itemPrefix = "";
 }
 
-export function logHeader2(argument: unknown) {
-  log(chalk.gray(`\n===== ${chalk.magenta(argument)} =====`));
+export function logHeader2(path: string) {
+  log(`${TREE_BRANCH} ${chalk.magenta(path)}`);
+  itemPrefix = TREE_PIPE;
+}
+
+export function logSubHeader(path: string, isLast: boolean = false) {
+  const branch = isLast ? TREE_LAST : TREE_BRANCH;
+  log(`${TREE_PIPE}${branch} ${chalk.magenta(path)}`);
+  itemPrefix = TREE_PIPE + (isLast ? TREE_SPACE : TREE_PIPE);
 }
 
 export function logMethodSkipped(methodName: string) {
-  log(`${WARNING_MARK} .${methodName}: ${chalk.yellow("skipped")}`);
+  const prefix = getItemPrefix();
+  log(`${prefix}${WARNING_MARK} .${methodName}: ${chalk.yellow("skipped")}`);
+}
+
+export function logFinalStatus(message: string, isSuccess: boolean, isLast: boolean = true) {
+  const mark = isSuccess ? SUCCESS_MARK : FAILURE_MARK;
+  const branch = isLast ? TREE_LAST : TREE_BRANCH;
+  log(`${branch} ${mark} ${message}`);
+  itemPrefix = "";
+}
+
+export function logWarningStatus(message: string) {
+  log(`${TREE_LAST} ${WARNING_MARK} ${message}`);
 }
 
 export function log(argument: unknown) {
@@ -62,12 +95,12 @@ export function logReplaceLine(argument: unknown) {
 }
 
 export function logError(argument: unknown) {
-  console.error(`ERROR: ${String(argument)}`);
-  console.error();
-  console.trace();
+  const prefix = getItemPrefix();
+  console.error(`${prefix}ERROR: ${String(argument)}`);
 }
 
 export function logErrorAndExit(argument: unknown): never {
   logError(argument);
+  console.trace();
   process.exit(1);
 }

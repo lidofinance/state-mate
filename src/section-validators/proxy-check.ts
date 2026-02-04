@@ -12,9 +12,9 @@ export class ProxyCheckSectionValidator extends SectionValidatorBase {
   constructor(provider: JsonRpcProvider) {
     super(provider, EntryField.proxyChecks);
   }
-  override async validateSection(contractEntry: ContractEntry, contractAlias: string) {
+  override async validateSection(contractEntry: ContractEntry, contractAlias: string, basePath?: string) {
     if (isTypeOfTB(contractEntry, ProxyContractEntryTB) && contractEntry.proxyChecks) {
-      logHeader2(this.sectionName);
+      logHeader2(basePath ? `${basePath}/${this.sectionName}` : this.sectionName);
 
       const { address, proxyName, proxyChecks } = contractEntry;
 

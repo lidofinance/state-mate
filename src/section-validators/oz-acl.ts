@@ -1,8 +1,7 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { JsonRpcProvider, Interface, Contract } from "ethers";
 
 import { EntryField } from "src/common";
-import { logError, logHeader2 } from "src/logger";
+import { logError, logHeader2, logSubHeader } from "src/logger";
 import { ContractEntry, StaticCallResult } from "src/typebox";
 
 import { SectionValidatorBase } from "./base";
@@ -18,16 +17,20 @@ export class OzAclSectionValidator extends SectionValidatorBase {
     super(provider, sectionName);
   }
 
-  override async validateSection(contractEntry: ContractEntry, contractAlias: string) {
+  override async validateSection(contractEntry: ContractEntry, contractAlias: string, basePath?: string) {
     if (contractEntry.ozAcl) {
-      logHeader2(this.sectionName);
+      const sectionPath = basePath ? `${basePath}/${this.sectionName}` : this.sectionName;
+      logHeader2(sectionPath);
 
       const address = contractEntry.address;
       const iface = new Interface(ACCESS_CONTROL_ABI);
       const contract = new Contract(address, iface, this.provider);
 
-      for (const [role, expectedAddrs] of Object.entries(contractEntry.ozAcl)) {
-        logHeader2(`Role: ${role}`);
+      const roles = Object.entries(contractEntry.ozAcl);
+      for (let index = 0; index < roles.length; index++) {
+        const [role, expectedAddrs] = roles[index];
+        const isLastRole = index === roles.length - 1;
+        logSubHeader(`Role:${role}`, isLastRole);
 
         // Get actual role member count
         const actualCount = await contract.getRoleMemberCount(role);
