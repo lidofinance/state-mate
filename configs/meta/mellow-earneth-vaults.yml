@@ -531,14 +531,6 @@ l1:
         hasAsset:
         hasQueue:
         hasRole:
-          - args: [*ALLOW_CALL_ROLE, *activeVaultAdmin] # CHECK: should this role be set already?
-            result: true
-          - args: [*CALLER_ROLE, *curator] # CHECK: should this role be set already?
-            result: true
-          - args: [*DISALLOW_CALL_ROLE, *activeVaultAdmin] # CHECK: should this role be set already?
-            result: true
-          - args: [*SET_MERKLE_ROOT_ROLE, *timelockController] # CHECK: should this role be set already?
-            result: true
         hasSubvault:
         hasSupportedRole:
         isDepositQueue:
@@ -568,10 +560,10 @@ l1:
         *PULL_LIQUIDITY_ROLE : [*curator]
         *PUSH_LIQUIDITY_ROLE : [*curator]
         *SET_FLAGS_ROLE : [*timelockController]
-        *SET_MERKLE_ROOT_ROLE : [*timelockController] # CHECK: should this be activeVaultAdmin?
-        *SET_QUEUE_STATUS_ROLE : [*timelockController] # CHECK: should this be activeVaultAdmin?
+        *SET_MERKLE_ROOT_ROLE : [*timelockController]
+        *SET_QUEUE_STATUS_ROLE : [*timelockController]
         *SUBMIT_REPORTS_ROLE : [*oracleSubmitter]
-        *ACCEPT_REPORT_ROLE : [*oracleSubmitter] # CHECK: should this be activeVaultAdmin?
+        *ACCEPT_REPORT_ROLE : [*oracleSubmitter]
 
     depositQueueETH:
       name: DepositQueue
@@ -1061,7 +1053,7 @@ l1:
       ozAcl:
         *DEFAULT_ADMIN_ROLE : [*lazyVaultAdmin]
         *SUBMIT_REPORTS_ROLE : [*oracleUpdater]
-        *ACCEPT_REPORT_ROLE : [*lazyVaultAdmin] # CHECK: should this be activeVaultAdmin?
+        *ACCEPT_REPORT_ROLE : [*lazyVaultAdmin]
 
     shareManager:
       name: TokenizedShareManager
