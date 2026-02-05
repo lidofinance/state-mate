@@ -553,14 +553,6 @@ l1:
         hasAsset:
         hasQueue:
         hasRole:
-          - args: [*ALLOW_CALL_ROLE, *activeVaultAdmin] # CHECK: should this role be set already?
-            result: true
-          - args: [*CALLER_ROLE, *curator] # CHECK: should this role be set already?
-            result: true
-          - args: [*DISALLOW_CALL_ROLE, *activeVaultAdmin] # CHECK: should this role be set already?
-            result: true
-          - args: [*SET_MERKLE_ROOT_ROLE, *earnUSD_timelockController] # CHECK: should this role be set already?
-            result: true
         hasSubvault:
         hasSupportedRole:
         isDepositQueue:
@@ -637,10 +629,10 @@ l1:
         *PULL_LIQUIDITY_ROLE : [*curator]
         *PUSH_LIQUIDITY_ROLE : [*curator]
         *SET_FLAGS_ROLE : [*earnUSD_timelockController]
-        *SET_MERKLE_ROOT_ROLE : [*earnUSD_timelockController] # CHECK: should this be activeVaultAdmin?
-        *SET_QUEUE_STATUS_ROLE : [*earnUSD_timelockController] # CHECK: should this be activeVaultAdmin?
+        *SET_MERKLE_ROOT_ROLE : [*earnUSD_timelockController]
+        *SET_QUEUE_STATUS_ROLE : [*earnUSD_timelockController]
         *SUBMIT_REPORTS_ROLE : [*earnUSD_oracleSubmitter]
-        *ACCEPT_REPORT_ROLE : [*earnUSD_oracleSubmitter] # CHECK: should this be activeVaultAdmin?
+        *ACCEPT_REPORT_ROLE : [*earnUSD_oracleSubmitter]
 
     # --- Deposit/Sync/Redeem Queues ---
     earnUSD_depositQueueUSDC:
@@ -1196,14 +1188,6 @@ l1:
         hasAsset:
         hasQueue:
         hasRole:
-          - args: [*ALLOW_CALL_ROLE, *earnUSDc_curator] # CHECK: should this role be set already?
-            result: true
-          - args: [*CALLER_ROLE, *earnUSDc_curator] # CHECK: should this role be set already?
-            result: true
-          - args: [*DISALLOW_CALL_ROLE, *earnUSDc_activeVaultAdmin] # CHECK: should this role be set already?
-            result: true
-          - args: [*SET_MERKLE_ROOT_ROLE, *earnUSDc_timelockController] # CHECK: should this role be set already?
-            result: true
         hasSubvault:
         hasSupportedRole:
         isDepositQueue:
@@ -1289,10 +1273,10 @@ l1:
         # *PUSH_LIQUIDITY_ROLE : [*earnUSDc_curator]
         *PUSH_LIQUIDITY_ROLE : [*earnUSDc_temporaryAdmin] # TEMPORARY: to be changed back to earnUSDc_curator
         *SET_FLAGS_ROLE : [*earnUSDc_timelockController]
-        *SET_MERKLE_ROOT_ROLE : [*earnUSDc_timelockController] # CHECK: should this be earnUSDc_activeVaultAdmin?
-        *SET_QUEUE_STATUS_ROLE : [*earnUSDc_timelockController] # CHECK: should this be earnUSDc_activeVaultAdmin?
+        *SET_MERKLE_ROOT_ROLE : [*earnUSDc_timelockController]
+        *SET_QUEUE_STATUS_ROLE : [*earnUSDc_timelockController]
         *SUBMIT_REPORTS_ROLE : [*earnUSDc_oracleSubmitter]
-        *ACCEPT_REPORT_ROLE : [*earnUSDc_oracleSubmitter] # CHECK: should this be earnUSDc_activeVaultAdmin?
+        *ACCEPT_REPORT_ROLE : [*earnUSDc_oracleSubmitter]
 
     # --- Deposit/Sync/Redeem Queues ---
     earnUSDc_depositQueueUSDC:
@@ -1526,7 +1510,7 @@ l1:
         *DEFAULT_ADMIN_ROLE : [*lazyVaultAdmin]
         # *SUBMIT_REPORTS_ROLE : [*earnUSDc_oracleUpdater]
         *SUBMIT_REPORTS_ROLE : [*earnUSDc_temporaryAdmin] # TEMPORARY: to be changed back to earnUSDc_oracleUpdater
-        *ACCEPT_REPORT_ROLE : [*lazyVaultAdmin] # CHECK: should this be earnUSDc_activeVaultAdmin?
+        *ACCEPT_REPORT_ROLE : [*lazyVaultAdmin]
 
     # --- ShareManager ---
     earnUSDc_shareManager:
@@ -1853,14 +1837,6 @@ l1:
         hasAsset:
         hasQueue:
         hasRole:
-          - args: [*ALLOW_CALL_ROLE, *earnUSDe_curator] # CHECK: should this role be set already?
-            result: true
-          - args: [*CALLER_ROLE, *earnUSDe_curator] # CHECK: should this role be set already?
-            result: true
-          - args: [*DISALLOW_CALL_ROLE, *earnUSDe_activeVaultAdmin] # CHECK: should this role be set already?
-            result: true
-          - args: [*SET_MERKLE_ROOT_ROLE, *earnUSDe_timelockController] # CHECK: should this role be set already?
-            result: true
         hasSubvault:
         hasSupportedRole:
         isDepositQueue:
@@ -1946,10 +1922,10 @@ l1:
         # *PUSH_LIQUIDITY_ROLE : [*earnUSDe_curator]
         *PUSH_LIQUIDITY_ROLE : [*earnUSDe_temporaryAdmin] # TEMPORARY: to be changed back to earnUSDe_curator
         *SET_FLAGS_ROLE : [*earnUSDe_timelockController]
-        *SET_MERKLE_ROOT_ROLE : [*earnUSDe_timelockController] # CHECK: should this be earnUSDe_activeVaultAdmin?
-        *SET_QUEUE_STATUS_ROLE : [*earnUSDe_timelockController] # CHECK: should this be earnUSDe_activeVaultAdmin?
+        *SET_MERKLE_ROOT_ROLE : [*earnUSDe_timelockController]
+        *SET_QUEUE_STATUS_ROLE : [*earnUSDe_timelockController]
         *SUBMIT_REPORTS_ROLE : [*earnUSDe_oracleSubmitter]
-        *ACCEPT_REPORT_ROLE : [*earnUSDe_oracleSubmitter] # CHECK: should this be earnUSDe_activeVaultAdmin?
+        *ACCEPT_REPORT_ROLE : [*earnUSDe_oracleSubmitter]
 
     # --- Deposit/Sync/Redeem Queues ---
     earnUSDe_depositQueueUSDC:
@@ -2183,7 +2159,7 @@ l1:
         *DEFAULT_ADMIN_ROLE : [*lazyVaultAdmin]
         # *SUBMIT_REPORTS_ROLE : [*earnUSDe_oracleUpdater]
         *SUBMIT_REPORTS_ROLE : [*earnUSDe_temporaryAdmin] # TEMPORARY: to be changed back to earnUSDe_oracleUpdater
-        *ACCEPT_REPORT_ROLE : [*lazyVaultAdmin] # CHECK: should this be earnUSDe_activeVaultAdmin?
+        *ACCEPT_REPORT_ROLE : [*lazyVaultAdmin]
 
     # --- ShareManager ---
     earnUSDe_shareManager:

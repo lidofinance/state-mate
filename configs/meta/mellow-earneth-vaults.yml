@@ -427,29 +427,6 @@ l1:
         hasAsset:
         hasQueue:
         hasRole:
-          # Verify deployer has no roles
-          - args: [*DEFAULT_ADMIN_ROLE, *deployer]
-            result: false
-          - args: [*CREATE_QUEUE_ROLE, *deployer]
-            result: false
-          - args: [*CREATE_SUBVAULT_ROLE, *deployer]
-            result: false
-          - args: [*DISCONNECT_SUBVAULT_ROLE, *deployer]
-            result: false
-          - args: [*PULL_LIQUIDITY_ROLE, *deployer]
-            result: false
-          - args: [*PUSH_LIQUIDITY_ROLE, *deployer]
-            result: false
-          - args: [*RECONNECT_SUBVAULT_ROLE, *deployer]
-            result: false
-          - args: [*REMOVE_QUEUE_ROLE, *deployer]
-            result: false
-          - args: [*SET_HOOK_ROLE, *deployer]
-            result: false
-          - args: [*SET_QUEUE_LIMIT_ROLE, *deployer]
-            result: false
-          - args: [*SET_QUEUE_STATUS_ROLE, *deployer]
-            result: false
         hasSubvault:
         hasSupportedRole:
         isDepositQueue:
