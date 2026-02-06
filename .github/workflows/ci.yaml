@@ -21,28 +21,23 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # Lido V3 configs - Mainnet
-          - config: configs/lidov3/mainnet/lidov3-core-pre-vote.yaml
+          # Lido V3 configs - Mainnet (Phase 2)
+          - config: configs/lidov3/mainnet/lidov3-core-post-phase-2.yaml
             network: ethereum-mainnet
-          - config: configs/lidov3/mainnet/lidov3-core-post-vote.yaml
+          - config: configs/lidov3/mainnet/lidov3-et-post-vote-phase-2.yml
             network: ethereum-mainnet
-          - config: configs/lidov3/mainnet/lidov3-et-pre-vote.yml
+          - config: configs/safeharbor/mainnet.yml
             network: ethereum-mainnet
-          - config: configs/lidov3/mainnet/lidov3-et-post-vote.yml
-            network: ethereum-mainnet
-
-          # Lido V3 configs - Hoodi Testnet
+          # Lido V3 configs - Hoodi
           - config: configs/lidov3/hoodi/lidov3-testnet.yaml
-            network: ethereum-hoodi
-          - config: configs/lidov3/hoodi/lidov3-et-testnet.yml
-            network: ethereum-hoodi
+            network: hoodi-testnet
 
     env:
       # Explorer API tokens
       ETHERSCAN_TOKEN: ${{ secrets.ETHERSCAN_TOKEN }}
 
       # Ethereum RPC URLs
-      REMOTE_RPC_URL: ${{ secrets.MAINNET_REMOTE_RPC_URL }}
+      MAINNET_REMOTE_RPC_URL: ${{ secrets.MAINNET_REMOTE_RPC_URL }}
       HOODI_REMOTE_RPC_URL: ${{ secrets.HOODI_REMOTE_RPC_URL }}
 
     steps:
@@ -60,17 +55,6 @@ jobs:
 
       - name: Install dependencies
         run: yarn install --immutable
-
-      - name: Restore ABI cache
-        uses: actions/cache@v4
-        with:
-          path: |
-            configs/**/abi/
-            configs/**/abis.json.gz
-          key: abi-cache-${{ matrix.config }}-${{ hashFiles(matrix.config) }}
-          restore-keys: |
-            abi-cache-${{ matrix.config }}-
-            abi-cache-
 
       - name: Run state-mate
         run: |

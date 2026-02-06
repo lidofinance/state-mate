@@ -15,7 +15,8 @@
 # - Ethereum spec params for AO and PDG
 #
 
-# Source of truth: https://docs.lido.fi/deployed-contracts/hoodi/
+# Source of truth: https://docs.lido.fi/deployed-contracts/
+---
 parameters:
   - &contract4788 "0x000F3df6D732807Ef1319fB7B8bB8522d0Beac02"
   - &contractDeposit "0x00000000219ab540356cBB839Cbe05303d7705Fa"
@@ -25,10 +26,10 @@ deployed:
     # --- Core protocol ---
     - &lidoLocator "0xC1d0b3DE6792Bf6b4b37EccdcC24e45978Cfd2Eb"
     - &lidoLocatorOldImplAddress "0x2C298963FB763f74765829722a1ebe0784f4F5Cf"
-    - &lidoLocatorNewImplAddress "0x00000000000000000000000000000000544f444f" # TODO
+    - &lidoLocatorNewImplAddress "0x2f8779042EFaEd4c53db2Ce293eB6B3f7096C72d"
     - &lido "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84"
     - &lidoOldImplAddress "0x17144556fd3424EDC8Fc8A4C940B2D04936d17eb"
-    - &lidoNewImplAddress "0x00000000000000000000000000000000544f444f" # TODO
+    - &lidoNewImplAddress "0x6ca84080381E43938476814be61B779A8bB6a600"
     - &wstETH "0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0"
     - &wstETHReferralStaker "0xa88f0329C2c4ce51ba3fc619BBf44efE7120Dd0d"
     - &eip712StETH "0x8F73e4C2A6D852bb4ab2A45E6a9CF5715b3228B7"
@@ -40,48 +41,53 @@ deployed:
     - &withdrawalQueueERC721ImplAddress "0xE42C659Dc09109566720EA8b2De186c2Be7D94D9"
     - &withdrawalVault "0xb9d7934878b5fb9610b3fe8a5e441e8fad7e293f"
     - &withdrawalVaultImplAddress "0x7D2BAa6094E1C4B60Da4cbAF4A77C3f4694fD53D"
-    - &accounting "0x00000000000000000000000000000000544f444f" # TODO
-    - &accountingImplAddress "0x00000000000000000000000000000000544f444f" # TODO
+    - &accounting "0x23ED611be0e1a820978875C0122F92260804cdDf"
+    - &accountingImplAddress "0xd43a3E984071F40d5d840f60708Af0e9526785df"
     - &oldBurner "0xD15a672319Cf0352560eE76d9e89eAB0889046D3"
-    - &newBurner "0x00000000000000000000000000000000544f444f" # TODO
-    - &newBurnerImplAddress "0x00000000000000000000000000000000544f444f" # TODO
-    - &mevBoostRelayAllowedList "0xF95f069F9AD107938F6ba802a3da87892298610E" # TODO: add checks ?
+    - &newBurner "0xE76c52750019b80B43E36DF30bf4060EB73F573a"
+    - &newBurnerImplAddress "0xEe1E3B4f047122650086985f794f0dB5f10Ae49D"
     - &minFirstAllocationStrategy "0x7e70De6D1877B3711b2bEDa7BA00013C7142d993"
     - &triggerableWithdrawalsGateway "0xDC00116a0D3E064427dA2600449cfD2566B3037B"
     - &validatorExitDelayVerifier "0xbDb567672c867DB533119C2dcD4FB9d8b44EC82f"
 
     # --- stVaults system contracts ---
 
-    - &vaultHub "0x00000000000000000000000000000000544f444f" # TODO
-    - &vaultHubImplAddress "0x00000000000000000000000000000000544f444f" # TODO
-    - &predepositGuarantee "0x00000000000000000000000000000000544f444f" # TODO
-    - &predepositGuaranteeImplAddress "0x00000000000000000000000000000000544f444f" # TODO
-    - &operatorGrid "0x00000000000000000000000000000000544f444f" # TODO
-    - &operatorGridImplAddress "0x00000000000000000000000000000000544f444f" # TODO
+    - &vaultHub "0x1d201BE093d847f6446530Efb0E8Fb426d176709"
+    - &vaultHubImplAddress "0x7c7d957D0752AB732E73400624C4a1eb1cb6CF50"
+    - &predepositGuarantee "0xF4bF42c6D6A0E38825785048124DBAD6c9eaaac3"
+    - &predepositGuaranteeImplAddress "0xCC08C36BD5bb78FDcB10F35B404ada6Ffc71a023"
+    - &operatorGrid "0xC69685E89Cefc327b43B7234AC646451B27c544d"
+    - &operatorGridImplAddress "0xA612E30D71d7D54aEaf4e5A21023F3F270932C2C"
 
     # --- stVaults factory stack ---
-    - &stakingVaultFactory "0x00000000000000000000000000000000544f444f" # TODO
-    - &stakingVaultBeacon "0x00000000000000000000000000000000544f444f" # TODO
-    - &stakingVaultImplAddress "0x00000000000000000000000000000000544f444f" # TODO
-    - &dashboardImplAddress "0x00000000000000000000000000000000544f444f" # TODO
-    - &consolidationRequestsValidator "0x00000000000000000000000000000000544f444f" # TODO
-    - &pinnedBeaconProxy "0x00000000000000000000000000000000544f444f" # TODO
+    - &stakingVaultFactory "0x02Ca7772FF14a9F6c1a08aF385aA96bb1b34175A"
+    - &stakingVaultBeacon "0x5FbE8cEf9CCc56ad245736D3C5bAf82ad54Ca789"
+    - &stakingVaultImplAddress "0x06A56487494aa080deC7Bf69128EdA9225784553"
+    - &dashboardImplAddress "0x294825c2764c7D412dc32d87E2242c4f1D989AF3"
+    - &consolidationRequestsValidator "0xaC4Aae7123248684C405A4b0038C1560EC7fE018"
 
     # --- Oracle contracts ---
     - &accountingOracle "0x852deD011285fe67063a08005c71a85690503Cee"
     - &accountingOracleOldImplAddress "0xE9906E543274cebcd335d2C560094089e9547e8d"
-    - &accountingOracleNewImplAddress "0x00000000000000000000000000000000544f444f" # TODO
+    - &accountingOracleNewImplAddress "0x1455B96780A93e08abFE41243Db92E2fCbb0141c"
     - &hashConsensusForAccountingOracle "0xD624B08C83bAECF0807Dd2c6880C3154a5F0B288"
+
     - &validatorsExitBusOracle "0x0De4Ea0184c2ad0BacA7183356Aea5B8d5Bf5c6e"
     - &validatorsExitBusOracleImplAddress "0x905A211eD6830Cfc95643f0bE2ff64E7f3bf9b94"
     - &hashConsensusForValidatorsExitBusOracle "0x7FaDB6358950c5fAA66Cb5EB8eE5147De3df355a"
     - &oldOracleReportSanityChecker "0x6232397ebac4f5772e53285b26c47914e9461e75"
-    - &newOracleReportSanityChecker "0x00000000000000000000000000000000544f444f" # TODO
+    - &newOracleReportSanityChecker "0xf1647c86E6D7959f638DD9CE1d90e2F3C9503129"
     - &oracleDaemonConfig "0xbf05A929c3D7885a6aeAd833a992dA6E5ac23b09"
-    - &lazyOracle "0x00000000000000000000000000000000544f444f" # TODO
-    - &lazyOracleImplAddress "0x00000000000000000000000000000000544f444f" # TODO
-    - &tokenRateNotifier "0xe6793B9e4FbA7DE0ee833F9D02bba7DB5EB27823"
+    - &lazyOracle "0x5DB427080200c235F2Ae8Cd17A7be87921f7AD6c"
+    - &lazyOracleImplAddress "0x47f3a6b1E70F7Ec7dBC3CB510B1fdB948C863a5B"
+    - &oldTokenRateNotifier "0xe6793B9e4FbA7DE0ee833F9D02bba7DB5EB27823"
+    - &newTokenRateNotifier "0x25e35855783bec3E49355a29e110f02Ed8b05ba9"
     - &legacyOracle "0x442af784A788A5bd6F42A01Ebe9F287a871243fb"
+
+    # --- V3 Voting stack ---
+    - &v3TemporaryAdmin "0xf738A2C7d69694B618dbB547C1c5A152D7958f06"
+    - &v3VoteScript "0xE1F4c16908fCE6935b5Ad38C6e3d58830fe86442"
+    - &v3Template "0x34E01ecFebd403370b0879C628f8A5319dDb8507"
 
     # --- DAO & Aragon apps ---
     - &aragonRepoBase "0xa8A358E9bbB9fF60D4B89CBE5b2FE88f98b51B9D"
@@ -100,13 +106,17 @@ deployed:
     - &aragonAclImplAddress "0x9f3b9198911054B122fDb865f8A5Ac516201c339"
     - &aragonEvmScriptRegistry "0x853cc0D5917f49B57B8e9F89e491F5E18919093A"
     - &aragonEvmScriptRegistryImplAddress "0xBF1Ce0Bc4EdaAD8e576b3b55e19c4C15Cf6999eb"
+    - &aragonAppLidoRepo "0xF5Dc67E54FC96F993CD06073f71ca732C1E654B1"
+    - &dualGovernance "0xC1db28B3301331277e307FDCfF8DE28242A4486E"
+    - &elRewardsVault "0x388C818CA8B9251b393131C08a736A67ccB19297"
+    - &timeConstraints "0x2a30F5aC03187674553024296bed35Aa49749DDa"
 
     # --- GateSeal ---
     - &gateSealBlueprint "0xEe06EA501f7d9DC6F4200385A8D910182D155d3e"
     - &gateSealFactory "0x6c82877cac5a7a739f16ca0a89c0a328b8764a24"
     - &gateSealVEBAndTWG "0xA6BC802fAa064414AA62117B4a53D27fFfF741F1"
     - &gateSealWithdrawalQueue "0x8A854C4E750CDf24f138f34A9061b2f556066912"
-    - &gateSealVaulthubAndPredepositGuarantee "0x00000000000000000000000000000000544f444f" # TODO
+    - &gateSealVaulthubAndPredepositGuarantee "0x881dAd714679A6FeaA636446A0499101375A365c"
     - &gateSealCSAccounting "0xE1686C2E90eb41a48356c1cC7FaA17629af3ADB3"
 
     # --- Staking modules ---
@@ -116,17 +126,26 @@ deployed:
 
     # --- CSM ---
     - &CSModule "0xdA7dE2ECdDfccC6c3AF10108Db212ACBBf9EA83F"
-    - &CSModuleImplAddress "0x1eB6d4da13ca9566c17F526aE0715325d7a07665"
     - &CSAccounting "0x4d72BFF1BeaC69925F8Bd12526a39BAAb069e5Da"
     - &CSAccountingImplAddress "0x6f09d2426c7405C5546413e6059F884D2D03f449"
     - &CSFeeDistributor "0xD99CC66fEC647E68294C6477B40fC7E0F6F618D0"
     - &CSVettedGate "0xB314D4A76C457c93150d308787939063F4Cc67E0"
+    - &CSEjector "0xc72b58aa02E0e98cF8A4a0E9Dce75e763800802C"
 
     # --- Easy Track ---
     - &easyTrack "0xF0211b7660680B49De1A7E9f25C65660F0a13Fea"
     - &evmScriptExecutor "0xFE5986E06210aC1eCC1aDCafc0cc7f8D63B3F977"
     - &callsScript "0x5cEb19e1890f677c3676d5ecDF7c501eBA01A054"
-    - &vaultsAdapter "0x00000000000000000000000000000000544f444f" # TODO
+    - &vaultsAdapter "0xe2DE6d2DefF15588a71849c0429101F8ca9FB14D"
+    - &etfAlterTiersInOperatorGrid "0xa29173C7BCf39dA48D5E404146A652d7464aee14"
+    - &etfForceValidatorExitsInVaultHub "0x6C968cD89CA358fbAf57B18e77a8973Fa869a6aA"
+    - &etfRegisterGroupsInOperatorGrid "0x194A46DA1947E98c9D79af13E06Cfbee0D8610cC"
+    - &etfRegisterTiersInOperatorGrid "0x5292A1284e4695B95C0840CF8ea25A818751C17F"
+    - &etfSetJailStatusInOperatorGrid "0x93F1DEE4473Ee9F42c8257C201e33a6Da30E5d67"
+    - &etfSetLiabilitySharesTargetInVaultHub "0x4E5Cc771c7b77f1417fa6BA9262d83C6CCc1e969"
+    - &etfSocializeBadDebtInVaultHub "0x1dF50522A1D868C12bF71747Bb6F24A18Fe6d32C"
+    - &etfUpdateGroupsShareLimitInOperatorGrid "0x8Bdc726a3147D8187820391D7c6F9F942606aEe6"
+    - &etfUpdateVaultsFeesInOperatorGrid "0x5C3bDFa3E7f312d8cf72F56F2b797b026f6B471c"
 
     # --- Committees (Safe msigs) ---
     - &resealManager "0x7914b5a1539b97Bd0bbd155757F25FD79A522d24"
@@ -137,7 +156,7 @@ misc:
   # --- Chain and deployment constants ---
   - &CHAIN_ID "1"
   - &GENESIS_TIME "1606824023"
-  - &DEPOSIT_DOMAIN "0x0000000000000000000000000000000000000000000000000000000000000000"
+  - &DEPOSIT_DOMAIN "0x03000000f5a5fd42d16a20302798ef6ed309979b43003d2320d9f0e8ea9831a9"
 
   # --- Lido versioning and credentials ---
   - &LIDO_VERSION_OLD 2
@@ -161,10 +180,9 @@ misc:
   - &ZERO_BYTES32 "0x0000000000000000000000000000000000000000000000000000000000000000"
   - &DEFAULT_ADMIN_ROLE "0x0000000000000000000000000000000000000000000000000000000000000000"
 
-
   # --- General numeric constants ---
   - &MAX_UINT256 "115792089237316195423570985008687907853269984665640564039457584007913129639935"
-  - &MAX_UINT64 "18446744073709551616"
+  - &MAX_UINT64 "18446744073709551615"
   - &DECIMALS_18 18
 
   # --- EIP-712 domain separators ---
@@ -189,8 +207,15 @@ misc:
   - &MAX_TOPUP_AMOUNT 2016000000000000000000
   - &DEFAULT_TIER_ID 0
   - &DEFAULT_TIER_OPERATOR "0xFFfFfFffFFfffFFfFFfFFFFFffFFFffffFfFFFfF"
+  - &DEFAULT_TIER_RR 5000
+  - &DEFAULT_TIER_SHARE_LIMIT 0
+  - &DEFAULT_TIER_SHARE_FRT 4975
+  - &DEFAULT_TIER_INFRA_FEE 100
+  - &DEFAULT_TIER_LIQUIDITY_FEE 650
+  - &DEFAULT_TIER_RESERVATION_FEE 0
   - &MAX_RELATIVE_SHARE_LIMIT_BP 1000
   - &REPORT_FRESHNESS_DELTA 172800
+  - &COVER_SHARES_BURNT 14684898881648297203
 
   # --- Derived and frequently reused spec constants ---
   - &SLOTS_PER_EPOCH 32
@@ -206,6 +231,8 @@ misc:
   - &DURATION_28_DAYS 2419200
   - &DURATION_30_DAYS 2592000
   - &DURATION_1_YEAR 31536000
+  - &UTC_14 50400
+  - &UTC_23 82800
 
   # --- Percentage bases & voting parameters ---
   - &VOTING_SUPPORT_REQUIRED_PCT 500000000000000000
@@ -265,9 +292,17 @@ misc:
   # --- LazyOracle, reward, and fee constants ---
   - &MAX_LIDO_FEE_RATE_PER_SECOND 10000000000000000000
   - &MAX_REWARD_RATIO 65535
+  - &REWARD_RATIO_BP 350
+  - &QUARANTINE_PERIOD 259200
 
+  # --- V3 Template ---
+  - &UPGRADE_NOT_STARTED 0
+  - &UPGRADE_STARTED_SLOT "0x058d69f67a3d86c424c516d23a070ff8bed34431617274caa2049bd702675e3f"
+  - &EXPIRE_SINCE_INCLUSIVE 1768435200
+  - &INFINITE_ALLOWANCE "115792089237316195423570985008687907853269984665640564039457584007913129639935"
+  - &INITIAL_MAX_EXTERNAL_RATIO_BP "300" # 3%
 eoa:
-  - &deployer "0xAD2F7e30AeA89f6D45D942D0f52aFB8B395965f2" #TODO: Check
+  - &deployer "0xAD2F7e30AeA89f6D45D942D0f52aFB8B395965f2"
 
 roles:
   # Lido
@@ -306,7 +341,6 @@ roles:
 
   # VaultHub
   - &VAULT_MASTER_ROLE "0x479bc4a51d27fbdc8e51b5b1ebd3dcd58bd229090980bff226f8930587e69ce3"
-  - &VAULT_REGISTRY_ROLE "0xeb0a9f61937ee79c98f577dbb4d3832abbad74e3f10502b060c64762d2b075f8"
   - &BAD_DEBT_MASTER_ROLE "0xa85bab4b576ca359fa6ae02ab8744b5c85c7e7ed4d7e0bca7b5b64580ac5d17d"
   - &REDEMPTION_MASTER_ROLE "0x44f007e8cc2a08047a03d8d9c295057454942eb49ee3ced9c87e9b9406f21174"
   - &VALIDATOR_EXIT_ROLE "0x2159c5943234d9f3a7225b9a743ea06e4a0d0ba5ed82889e867759a8a9eb7883"
@@ -403,7 +437,7 @@ roles:
   - &CS_PAUSE_ROLE "0x139c2898040ef16910dc9f44dc697df79363da767d8bc92f2e310312b816e46d"
 
 l1:
-  rpcUrl: REMOTE_RPC_URL # https://ethereum-rpc.publicnode.com
+  rpcUrl: MAINNET_REMOTE_RPC_URL # https://ethereum-rpc.publicnode.com
   explorerHostname: api.etherscan.io
   explorerTokenEnv: ETHERSCAN_TOKEN
   chainId: *CHAIN_ID
@@ -438,11 +472,11 @@ l1:
           - *newOracleReportSanityChecker
           - *newBurner
           - *withdrawalQueueERC721
-          - *ZERO_ADDRESS
+          - *newTokenRateNotifier
           - *stakingRouter
           - *vaultHub
         oracleReportSanityChecker: *newOracleReportSanityChecker
-        postTokenRebaseReceiver: *tokenRateNotifier
+        postTokenRebaseReceiver: *newTokenRateNotifier
         predepositGuarantee: *predepositGuarantee
         lazyOracle: *lazyOracle
         triggerableWithdrawalsGateway: *triggerableWithdrawalsGateway
@@ -455,8 +489,6 @@ l1:
         withdrawalQueue: *withdrawalQueueERC721
         withdrawalVault: *withdrawalVault
         wstETH: *wstETH
-        legacyOracle:
-          - mustRevert
       implementationChecks:
         accounting: *accounting
         accountingOracle: *accountingOracle
@@ -478,11 +510,11 @@ l1:
           - *newOracleReportSanityChecker
           - *newBurner
           - *withdrawalQueueERC721
-          - *ZERO_ADDRESS
+          - *newTokenRateNotifier
           - *stakingRouter
           - *vaultHub
         oracleReportSanityChecker: *newOracleReportSanityChecker
-        postTokenRebaseReceiver: *ZERO_ADDRESS
+        postTokenRebaseReceiver: *newTokenRateNotifier
         predepositGuarantee: *predepositGuarantee
         lazyOracle: *lazyOracle
         triggerableWithdrawalsGateway: *triggerableWithdrawalsGateway
@@ -495,8 +527,7 @@ l1:
         withdrawalQueue: *withdrawalQueueERC721
         withdrawalVault: *withdrawalVault
         wstETH: *wstETH
-        legacyOracle:
-          - mustRevert
+
     lido:
       name: Lido
       address: *lido
@@ -515,7 +546,7 @@ l1:
         isStakingPaused: false
         RESUME_ROLE: *LIDO_RESUME_ROLE
         decimals: *DECIMALS_18
-        getRecoveryVault: *aragonAgent
+        getRecoveryVault: *ZERO_ADDRESS
         getTreasury: *aragonAgent
         isStopped: false
         getWithdrawalCredentials: *LIDO_WITHDRAWAL_CREDENTIALS
@@ -525,7 +556,7 @@ l1:
           - *EIP712_VERSION
           - *CHAIN_ID
           - *lido
-        getContractVersion: *LIDO_VERSION_NEW
+        getContractVersion: *LIDO_VERSION_NEW # IMPORTANT
         symbol: *LIDO_SYMBOL
         getEIP712StETH: *eip712StETH
         getEVMScriptRegistry: *aragonEvmScriptRegistry
@@ -696,7 +727,7 @@ l1:
         REPORT_VALIDATOR_EXITING_STATUS_ROLE: *REPORT_VALIDATOR_EXITING_STATUS_ROLE
         REPORT_VALIDATOR_EXIT_TRIGGERED_ROLE: *REPORT_VALIDATOR_EXIT_TRIGGERED_ROLE
         MANAGE_WITHDRAWAL_CREDENTIALS_ROLE: *MANAGE_WITHDRAWAL_CREDENTIALS_ROLE
-        DEPOSIT_CONTRACT: *DEPOSIT_CONTRACT
+        DEPOSIT_CONTRACT: *contractDeposit
         FEE_PRECISION_POINTS: *FEE_PRECISION_POINTS
         TOTAL_BASIS_POINTS: *TOTAL_BASIS_POINTS
         MAX_STAKING_MODULES_COUNT: *MAX_STAKING_MODULES_COUNT
@@ -736,7 +767,7 @@ l1:
         *DEFAULT_ADMIN_ROLE : [*aragonAgent]
         *MANAGE_WITHDRAWAL_CREDENTIALS_ROLE : []
         *REPORT_EXITED_VALIDATORS_ROLE : [*accountingOracle]
-        *REPORT_REWARDS_MINTED_ROLE : [*lido]
+        *REPORT_REWARDS_MINTED_ROLE : [*accounting]
         *STAKING_MODULE_MANAGE_ROLE : [*aragonAgent]
         *STAKING_MODULE_UNVETTING_ROLE : [*depositSecurityModule]
         *UNSAFE_SET_EXITED_VALIDATORS_ROLE : []
@@ -750,7 +781,7 @@ l1:
         UNSAFE_SET_EXITED_VALIDATORS_ROLE: *UNSAFE_SET_EXITED_VALIDATORS_ROLE
         REPORT_VALIDATOR_EXITING_STATUS_ROLE: *REPORT_VALIDATOR_EXITING_STATUS_ROLE
         REPORT_VALIDATOR_EXIT_TRIGGERED_ROLE: *REPORT_VALIDATOR_EXIT_TRIGGERED_ROLE
-        DEPOSIT_CONTRACT: *DEPOSIT_CONTRACT
+        DEPOSIT_CONTRACT: *contractDeposit
         FEE_PRECISION_POINTS: *FEE_PRECISION_POINTS
         MAX_STAKING_MODULES_COUNT: *MAX_STAKING_MODULES_COUNT
         MAX_STAKING_MODULE_NAME_LENGTH: *MAX_STAKING_MODULE_NAME_LENGTH
@@ -946,12 +977,10 @@ l1:
         LIDO: *lido
         LIDO_LOCATOR: *lidoLocator
         simulateOracleReport: null
-        handleOracleReport: null
       implementationChecks:
         LIDO: *lido
         LIDO_LOCATOR: *lidoLocator
         simulateOracleReport: null
-        handleOracleReport: null
 
     newBurner:
       name: Burner
@@ -970,13 +999,13 @@ l1:
         REQUEST_BURN_SHARES_ROLE: *REQUEST_BURN_SHARES_ROLE
         getContractVersion: *BURNER_VERSION
         isMigrationAllowed: false
-        getCoverSharesBurnt: null
-        getExcessStETH: null
+        getCoverSharesBurnt: *COVER_SHARES_BURNT
+        getExcessStETH: 0
         getNonCoverSharesBurnt: null
         getRoleAdmin: null
         getRoleMember: null
         getRoleMemberCount: null
-        getSharesRequestedToBurn: null
+        getSharesRequestedToBurn: [0, 0]
         hasRole: null
         supportsInterface: null
       ozAcl:
@@ -1019,7 +1048,7 @@ l1:
         MANAGE_BOND_CURVES_ROLE: *CS_MANAGE_BOND_CURVES_ROLE
         MAX_BOND_LOCK_PERIOD: *DURATION_1_YEAR
         MAX_CURVE_LENGTH: *MAX_CURVE_LENGTH
-        MIN_BOND_LOCK_PERIOD: *DURATION_1_DAY
+        MIN_BOND_LOCK_PERIOD: *DURATION_28_DAYS
         MIN_CURVE_LENGTH: *MIN_CURVE_LENGTH
         MODULE: *CSModule
         PAUSE_INFINITELY: *MAX_UINT256
@@ -1077,7 +1106,7 @@ l1:
         MANAGE_BOND_CURVES_ROLE: *CS_MANAGE_BOND_CURVES_ROLE
         MAX_BOND_LOCK_PERIOD: *DURATION_1_YEAR
         MAX_CURVE_LENGTH: *MAX_CURVE_LENGTH
-        MIN_BOND_LOCK_PERIOD: *DURATION_1_DAY
+        MIN_BOND_LOCK_PERIOD: *DURATION_28_DAYS
         MIN_CURVE_LENGTH: *MIN_CURVE_LENGTH
         MODULE: *CSModule
         PAUSE_INFINITELY: *MAX_UINT256
@@ -1146,6 +1175,12 @@ l1:
         hasRole: null
         isPaused: false
         supportsInterface: null
+      ozAcl:
+        *DEFAULT_ADMIN_ROLE : [*aragonAgent]
+        *ADD_FULL_WITHDRAWAL_REQUEST_ROLE : [*CSEjector, *validatorsExitBusOracle]
+        *TWG_PAUSE_ROLE : [*gateSealVEBAndTWG, *resealManager]
+        *TWG_RESUME_ROLE : [*resealManager]
+        *TW_EXIT_LIMIT_MANAGER_ROLE : []
 
     validatorExitDelayVerifier:
       name: ValidatorExitDelayVerifier
@@ -1204,6 +1239,7 @@ l1:
         latestReportData: null
         rebalanceShortfall: null
         badDebtToInternalize: null
+        badDebtToInternalizeForLastRefSlot: null
         healthShortfallShares: null
         isPendingDisconnect: null
         isReportFresh: null
@@ -1227,11 +1263,11 @@ l1:
         vaultsCount: null
       ozAcl:
         *DEFAULT_ADMIN_ROLE : [*aragonAgent]
-        *OZ_PAUSE_ROLE : [*gateSealVaulthubAndPredepositGuarantee]
-        *OZ_RESUME_ROLE : []
-        *VAULT_MASTER_ROLE : [*aragonAgent]
+        *OZ_PAUSE_ROLE : [*gateSealVaulthubAndPredepositGuarantee, *resealManager]
+        *OZ_RESUME_ROLE : [*resealManager]
+        *VAULT_MASTER_ROLE : []
         *BAD_DEBT_MASTER_ROLE : [*vaultsAdapter]
-        *REDEMPTION_MASTER_ROLE : [] # WARNING: must be none for mainnet
+        *REDEMPTION_MASTER_ROLE : []
         *VALIDATOR_EXIT_ROLE : [*vaultsAdapter]
       implementationChecks:
         CONNECT_DEPOSIT: *ONE_ETH_WEI
@@ -1304,12 +1340,12 @@ l1:
         GI_STATE_ROOT: *GI_STATE_ROOT
         MIN_SUPPORTED_WC_VERSION: 1
         MAX_SUPPORTED_WC_VERSION: 2
-        PIVOT_SLOT: 11649024
+        PIVOT_SLOT: 0
         PAUSE_INFINITELY: *MAX_UINT256
         PAUSE_ROLE: *OZ_PAUSE_ROLE
         RESUME_ROLE: *OZ_RESUME_ROLE
-        getResumeSinceTimestamp: 0
-        isPaused: false
+        getResumeSinceTimestamp: *MAX_UINT256 # PAUSE_INFINITELY, uint(256).max
+        isPaused: true # Deliberately paused
         claimableRefund: null
         getRoleAdmin: null
         getRoleMember: null
@@ -1327,8 +1363,8 @@ l1:
         validatorStatus: null
       ozAcl:
         *DEFAULT_ADMIN_ROLE : [*aragonAgent]
-        *OZ_PAUSE_ROLE : [*gateSealVaulthubAndPredepositGuarantee]
-        *OZ_RESUME_ROLE : []
+        *OZ_PAUSE_ROLE : [*gateSealVaulthubAndPredepositGuarantee, *resealManager]
+        *OZ_RESUME_ROLE : [*resealManager]
       implementationChecks:
         PREDEPOSIT_AMOUNT: *ONE_ETH_WEI
         ACTIVATION_DEPOSIT_AMOUNT: *ACTIVATION_DEPOSIT_AMOUNT
@@ -1342,7 +1378,7 @@ l1:
         GI_STATE_ROOT: *GI_STATE_ROOT
         MIN_SUPPORTED_WC_VERSION: 1
         MAX_SUPPORTED_WC_VERSION: 2
-        PIVOT_SLOT: 11649024
+        PIVOT_SLOT: 0
         PAUSE_INFINITELY: *MAX_UINT256
         PAUSE_ROLE: *OZ_PAUSE_ROLE
         RESUME_ROLE: *OZ_RESUME_ROLE
@@ -1385,7 +1421,7 @@ l1:
         effectiveShareLimit: null
         getConfirmExpiry: null
         isVaultInJail: null
-        tiersCount: 0 # WARN: IMPORTANT
+        tiersCount: null
         vaultTierInfo: null
         getRoleAdmin: null
         getRoleMember: null
@@ -1394,16 +1430,28 @@ l1:
         group: null
         hasRole: null
         nodeOperatorAddress: null
-        nodeOperatorCount: 0 # WARN: IMPORTANT
+        nodeOperatorCount: null
         pendingRequest: null
         pendingRequests: null
         pendingRequestsCount: null
         supportsInterface: null
-        tier: null
+        tier:
+          - args: [*DEFAULT_TIER_ID]
+            result:
+              [
+                *DEFAULT_TIER_OPERATOR,
+                *DEFAULT_TIER_SHARE_LIMIT,
+                0,
+                *DEFAULT_TIER_RR,
+                *DEFAULT_TIER_SHARE_FRT,
+                *DEFAULT_TIER_INFRA_FEE,
+                *DEFAULT_TIER_LIQUIDITY_FEE,
+                *DEFAULT_TIER_RESERVATION_FEE,
+              ]
         vaultInfo: null
       ozAcl:
         *DEFAULT_ADMIN_ROLE : [*aragonAgent]
-        *REGISTRY_ROLE : [*aragonAgent, *evmScriptExecutor, *vaultsAdapter]
+        *REGISTRY_ROLE : [*evmScriptExecutor, *vaultsAdapter]
       implementationChecks:
         DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
         DEFAULT_TIER_ID: *DEFAULT_TIER_ID
@@ -1455,7 +1503,7 @@ l1:
         nodeOperator: *ZERO_ADDRESS
         owner: *ZERO_ADDRESS
         version: *VERSION_1
-        withdrawalCredentials: "0x00000000000000000000000000000000544f444f" # TODO
+        withdrawalCredentials: "0x02000000000000000000000006a56487494aa080dec7bf69128eda9225784553"
         availableBalance: null
         calculateValidatorWithdrawalFee: null
         pendingOwner: null
@@ -1523,7 +1571,9 @@ l1:
         vaultConnection: null
         withdrawableValue: null
         feeLeftover: null
+        renounceRole: null # removed recently
       ozAcl:
+        *DEFAULT_ADMIN_ROLE : []
         *NODE_OPERATOR_MANAGER_ROLE : []
         *PAUSE_BEACON_CHAIN_DEPOSITS_ROLE : []
         *REBALANCE_ROLE : []
@@ -1549,44 +1599,6 @@ l1:
         LIDO_LOCATOR: *lidoLocator
         getConsolidationRequestFee: null
         getConsolidationRequestsAndFeeExemptionEncodedCalls: null
-
-    pinnedBeaconProxy:
-      name: PinnedBeaconProxy
-      address: *pinnedBeaconProxy
-      proxyName: PinnedBeaconProxy
-      implementation: *stakingVaultImplAddress
-      proxyChecks:
-        implementation: *stakingVaultImplAddress
-        isOssified: false
-      checks:
-        DEPOSIT_CONTRACT: *contractDeposit
-        PUBLIC_KEY_LENGTH: 48
-        beaconChainDepositsPaused: false
-        depositor: *ZERO_ADDRESS
-        getInitializedVersion: 0
-        inOutDelta: 0
-        isReportFresh: true
-        latestReport: [0, 0, 0]
-        locked: 0
-        nodeOperator: *ZERO_ADDRESS
-        ossified: false
-        owner: *ZERO_ADDRESS
-        totalValue: 0
-        unlocked: 0
-        vaultHub: *vaultHub
-        version: 1
-        withdrawalCredentials: "0x00000000000000000000000000000000544f444f" # TODO
-        availableBalance: null
-        calculateValidatorWithdrawalFee: null
-        vaultHubAuthorized: null
-        stagedBalance: null
-      implementationChecks:
-        DEPOSIT_CONTRACT: *contractDeposit
-        beaconChainDepositsPaused: false
-        getInitializedVersion: *MAX_UINT64
-        owner: *ZERO_ADDRESS
-        version: 1
-        withdrawalCredentials: "0x00000000000000000000000000000000544f444f" # TODO
 
     accountingOracle:
       name: AccountingOracle
@@ -1921,14 +1933,16 @@ l1:
         latestReportData: null
         latestReportTimestamp: null
         maxLidoFeeRatePerSecond: null
-        maxRewardRatioBP: 99999 # TODO
-        quarantinePeriod: 99999 # TODO
+        maxRewardRatioBP: *REWARD_RATIO_BP
+        quarantinePeriod: *QUARANTINE_PERIOD
         vaultInfo: null
         vaultQuarantine: null
-        vaultsCount: 0
+        quarantineValue: null
+        vaultsCount: null
+        batchValidatorStatuses: null
       ozAcl:
         *DEFAULT_ADMIN_ROLE : [*aragonAgent]
-        *UPDATE_SANITY_PARAMS_ROLE : [*aragonAgent] # WARNING: must be zero
+        *UPDATE_SANITY_PARAMS_ROLE : [] # WARNING: must be zero
       implementationChecks:
         DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
         LIDO_LOCATOR: *lidoLocator
@@ -1953,6 +1967,117 @@ l1:
         vaultQuarantine: null
         vaultsCount: null
 
+    v3TemporaryAdmin:
+      name: V3TemporaryAdmin
+      address: *v3TemporaryAdmin
+      checks:
+        DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
+        getCsmAccountingAddress:
+          - args: [*stakingRouter]
+            result: *CSAccounting
+        AGENT: *aragonAgent
+        CSM_MODULE_NAME: "Community Staking"
+        isSetupComplete: true
+
+    v3VoteScript:
+      name: V3VoteScript
+      address: *v3VoteScript
+      checks:
+        ENABLED_DAY_SPAN_START: *UTC_14
+        ENABLED_DAY_SPAN_END: *UTC_23
+        TEMPLATE: *v3Template
+        VOTING_ITEMS_COUNT: 8
+        DG_ITEMS_COUNT: 21
+        getEVMScript: null
+        getEVMScriptByteCode: null
+        getVoteItems: null
+        getVotingVoteItems: null
+        isValidVoteScript: null
+        params:
+          - args: []
+            result: [*v3Template, *timeConstraints, 8192, 8192]
+        getNewVoteCallBytecode: null
+
+    v3Template:
+      name: V3Template
+      address: *v3Template
+      checks:
+        DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
+        ACCOUNTING: *accounting
+        ACCOUNTING_ORACLE: *accountingOracle
+        ACL: *aragonAcl
+        AGENT: *aragonAgent
+        BURNER: *newBurner
+        CSM_ACCOUNTING: *CSAccounting
+        CSM_MODULE_NAME: "Community Staking"
+        CURATED_MODULE_NAME: "curated-onchain-v1"
+        DASHBOARD_IMPL: *dashboardImplAddress
+        DUAL_GOVERNANCE: *dualGovernance
+        EASY_TRACK: *easyTrack
+        EL_REWARDS_VAULT: *elRewardsVault
+        ETF_ALTER_TIERS_IN_OPERATOR_GRID: *etfAlterTiersInOperatorGrid
+        ETF_FORCE_VALIDATOR_EXITS_IN_VAULT_HUB: *etfForceValidatorExitsInVaultHub
+        ETF_REGISTER_GROUPS_IN_OPERATOR_GRID: *etfRegisterGroupsInOperatorGrid
+        ETF_REGISTER_TIERS_IN_OPERATOR_GRID: *etfRegisterTiersInOperatorGrid
+        ETF_SET_JAIL_STATUS_IN_OPERATOR_GRID: *etfSetJailStatusInOperatorGrid
+        ETF_SOCIALIZE_BAD_DEBT_IN_VAULT_HUB: *etfSocializeBadDebtInVaultHub
+        ETF_UPDATE_GROUPS_SHARE_LIMIT_IN_OPERATOR_GRID: *etfUpdateGroupsShareLimitInOperatorGrid
+        ETF_UPDATE_VAULTS_FEES_IN_OPERATOR_GRID: *etfUpdateVaultsFeesInOperatorGrid
+        EVM_SCRIPT_EXECUTOR: *evmScriptExecutor
+        EXPECTED_FINAL_ACCOUNTING_ORACLE_CONSENSUS_VERSION: *AO_CONSENSUS_VERSION_NEW
+        EXPECTED_FINAL_ACCOUNTING_ORACLE_VERSION: *AO_CONTRACT_VERSION_NEW
+        EXPECTED_FINAL_LIDO_VERSION: *LIDO_VERSION_NEW
+        EXPIRE_SINCE_INCLUSIVE: *EXPIRE_SINCE_INCLUSIVE
+        GATE_SEAL: *gateSealVaulthubAndPredepositGuarantee
+        INFINITE_ALLOWANCE: *INFINITE_ALLOWANCE
+        INITIAL_MAX_EXTERNAL_RATIO_BP: *INITIAL_MAX_EXTERNAL_RATIO_BP
+        KERNEL: *aragonKernel
+        LAZY_ORACLE: *lazyOracle
+        LIDO: *lido
+        LOCATOR: *lidoLocator
+        NEW_ACCOUNTING_ORACLE_IMPL: *accountingOracleNewImplAddress
+        NEW_LIDO_IMPL: *lidoNewImplAddress
+        NEW_LOCATOR_IMPL: *lidoLocatorNewImplAddress
+        NEW_TOKEN_RATE_NOTIFIER: *newTokenRateNotifier
+        NODE_OPERATORS_REGISTRY: *nodeOperatorsRegistry
+        OLD_ACCOUNTING_ORACLE_IMPL: *accountingOracleOldImplAddress
+        OLD_BURNER: *oldBurner
+        OLD_LIDO_IMPL: *lidoOldImplAddress
+        OLD_LOCATOR_IMPL: *lidoLocatorOldImplAddress
+        OLD_TOKEN_RATE_NOTIFIER: *oldTokenRateNotifier
+        OPERATOR_GRID: *operatorGrid
+        ORACLE_DAEMON_CONFIG: *oracleDaemonConfig
+        ORACLE_REPORT_SANITY_CHECKER: *newOracleReportSanityChecker
+        PREDEPOSIT_GUARANTEE: *predepositGuarantee
+        RESEAL_MANAGER: *resealManager
+        SIMPLE_DVT: *simpleDvt
+        SIMPLE_DVT_MODULE_NAME: "SimpleDVT"
+        STAKING_ROUTER: *stakingRouter
+        STAKING_VAULT_IMPL: *stakingVaultImplAddress
+        UPGRADEABLE_BEACON: *stakingVaultBeacon
+        UPGRADE_NOT_STARTED: *UPGRADE_NOT_STARTED
+        UPGRADE_STARTED_SLOT: *UPGRADE_STARTED_SLOT
+        VALIDATORS_EXIT_BUS_ORACLE: *validatorsExitBusOracle
+        VAULTS_ADAPTER: *vaultsAdapter
+        VAULT_FACTORY: *stakingVaultFactory
+        VAULT_HUB: *vaultHub
+        VOTING: *aragonVoting
+        WITHDRAWAL_QUEUE: *withdrawalQueueERC721
+        WSTETH: *wstETH
+        contractsWithBurnerAllowances:
+          - args: [0]
+            result: *withdrawalQueueERC721
+          - args: [1]
+            result: *CSAccounting
+          - args: [2]
+            mustRevert: true
+        initialOldBurnerStethSharesBalance: null
+        initialTotalPooledEther: null
+        initialTotalShares: null
+        isUpgradeFinished: true
+        upgradeBlockNumber: null
+        LIDO_APP_ID: *LIDO_APP_ID
+
     aragon-kernel:
       name: Kernel
       address: *aragonKernel
@@ -1963,14 +2088,14 @@ l1:
         apps: null
         isDepositable: false
         implementation: *aragonKernelImplAddress
-        recoveryVaultAppId: "0x701a4fd1f5174d12a0f1d9ad2c88d0ad11ab6aad0ac72b7d9ce621815f8016a9"
+        recoveryVaultAppId: *ZERO_BYTES32
       checks:
         hasInitialized: true
         KERNEL_APP_ID: *KERNEL_APP_ID
         APP_ADDR_NAMESPACE: "0xd6f028ca0e8edb4a8c9757ca4fdccab25fa1e0317da1188108f7d2dee14902fb"
-        getRecoveryVault: *aragonAgent
+        getRecoveryVault: *ZERO_ADDRESS
         CORE_NAMESPACE: "0xc681a85306374a5ab27f0bbc385296a54bcd314a1948b6cf61c4ea1bc44bb9f8"
-        recoveryVaultAppId: "0x701a4fd1f5174d12a0f1d9ad2c88d0ad11ab6aad0ac72b7d9ce621815f8016a9"
+        recoveryVaultAppId: *ZERO_BYTES32
         getInitializationBlock: 11473216
         APP_MANAGER_ROLE: "0xb6d92708f3d4817afc106147d969e229ced5c46e65e0a5002a0d391287762bd0"
         APP_BASES_NAMESPACE: "0xf1f3eb40f5bc1ad1344716ced8b8a0431d840b5783aea1fd01786bc26f35ac0f"
@@ -2033,7 +2158,7 @@ l1:
       checks:
         hasInitialized: true
         UNSAFELY_MODIFY_VOTE_TIME_ROLE: "0x068ca51c9d69625c7add396c98ca4f3b27d894c3b973051ad3ee53017d7094ea"
-        getRecoveryVault: *aragonAgent
+        getRecoveryVault: *ZERO_ADDRESS
         MODIFY_QUORUM_ROLE: "0xad15e7261800b4bb73f1b69d3864565ffb1fd00cb93cf14fe48da8f1f2149f39"
         objectionPhaseTime: *VOTING_OBJECTION_PHASE_TIME
         MODIFY_SUPPORT_ROLE: "0xda3972983e62bdf826c4b807c4c9c2b8a941e1f83dfa76d53d6aeac11e1be650"
@@ -2109,7 +2234,7 @@ l1:
       checks:
         hasInitialized: true
         MAX_VESTINGS_PER_ADDRESS: *MAX_VESTINGS_PER_ADDRESS
-        getRecoveryVault: *aragonAgent
+        getRecoveryVault: *ZERO_ADDRESS
         appId: *TOKEN_MANAGER_APP_ID
         ISSUE_ROLE: "0x2406f1e99f79cea012fb88c5c36566feaeefee0f4b98d3a376b49310222b53c4"
         getEVMScriptRegistry: *aragonEvmScriptRegistry
@@ -2171,20 +2296,20 @@ l1:
       checks:
         hasInitialized: true
         CREATE_PAYMENTS_ROLE: "0x5de467a460382d13defdc02aacddc9c7d6605d6d4e0b8bd2f70732cae8ea17bc"
-        getRecoveryVault: *aragonAgent
+        getRecoveryVault: *ZERO_ADDRESS
         CHANGE_PERIOD_ROLE: "0xd35e458bacdd5343c2f050f574554b2f417a8ea38d6a9a65ce2225dbe8bb9a9d"
         CHANGE_BUDGETS_ROLE: "0xd79730e82bfef7d2f9639b9d10bf37ebb662b22ae2211502a00bdf7b2cc3a23a"
-        periodsLength: 1
+        periodsLength: null
         appId: *FINANCE_APP_ID
         EXECUTE_PAYMENTS_ROLE: "0x563165d3eae48bcb0a092543ca070d989169c98357e9a1b324ec5da44bab75fd"
-        currentPeriodId: 0
+        currentPeriodId: null
         getEVMScriptRegistry: *aragonEvmScriptRegistry
         getPeriodDuration: *DURATION_30_DAYS
         kernel: *aragonKernel
-        paymentsNextIndex: 1
+        paymentsNextIndex: null
         isPetrified: false
         MANAGE_PAYMENTS_ROLE: "0x30597dd103acfaef0649675953d9cb22faadab7e9d9ed57acc1c429d04b80777"
-        transactionsNextIndex: 1
+        transactionsNextIndex: null
         vault: *aragonAgent
         getBudget: null
         getEVMScriptExecutor: null
@@ -2247,7 +2372,7 @@ l1:
         ERC1271_RETURN_INVALID_SIGNATURE: "0x00000000"
         TRANSFER_ROLE: "0x8502233096d909befbda0999bb8ea2f3a6be3c138b9fbf003752a4c8bce86f6c"
         getProtectedTokensLength: 0
-        getRecoveryVault: *aragonAgent
+        getRecoveryVault: *ZERO_ADDRESS
         RUN_SCRIPT_ROLE: "0xb421f7ad7646747f3051c50c0b8e2377839296cd4973e27f63821d73e390338f"
         SAFE_EXECUTE_ROLE: "0x0a1ad7b87f5846153c6d5a1f761d71c7d0cfd122384f56066cd33239b7933694"
         REMOVE_PROTECTED_TOKEN_ROLE: "0x71eee93d500f6f065e38b27d242a756466a00a52a1dbcd6b4260f01a8640402a"
@@ -2255,7 +2380,7 @@ l1:
         DESIGNATE_SIGNER_ROLE: "0x23ce341656c3f14df6692eebd4757791e33662b7dcf9970c8308303da5472b7c"
         EXECUTE_ROLE: "0xcebf517aa4440d1d125e0355aae64401211d0848a23c02cc5d29a14822580ba4"
         appId: *AGENT_APP_ID
-        getInitializationBlock: 727
+        getInitializationBlock: 11473216
         ERC1271_RETURN_VALID_SIGNATURE: "0x20c13b0b"
         getEVMScriptRegistry: *aragonEvmScriptRegistry
         designatedSigner: *ZERO_ADDRESS
@@ -2322,7 +2447,7 @@ l1:
       checks:
         hasInitialized: true
         NO_PERMISSION: *ZERO_BYTES32
-        getRecoveryVault: *aragonAgent
+        getRecoveryVault: *ZERO_ADDRESS
         CREATE_PERMISSIONS_ROLE: "0x0b719b33c83b8e5d300c521cb8b54ae9bd933996a14bef8c2f4e0285d2d2400a"
         appId: *DEFAULT_ACL_APP_ID
         getEVMScriptRegistry: *aragonEvmScriptRegistry
@@ -2362,16 +2487,6 @@ l1:
         getEVMScriptRegistry: null
         getPermissionManager: null
 
-    apm-registry-factory:
-      name: APMRegistryFactory
-      address: *apmRegistryFactory
-      checks:
-        registryBase: *aragonApmRegistryImplAddress
-        ensSubdomainRegistrarBase: *ensSubdomainRegistrarImplAddress
-        ens: *ens
-        daoFactory: *daoFactory
-        repoBase: *aragonRepoBase
-
     aragon-evm-script-registry:
       name: EVMScriptRegistry
       address: *aragonEvmScriptRegistry
@@ -2386,9 +2501,9 @@ l1:
       checks:
         hasInitialized: true
         REGISTRY_ADD_EXECUTOR_ROLE: "0xc4e90f38eea8c4212a009ca7b8947943ba4d4a58d19b683417f65291d1cd9ed2"
-        getRecoveryVault: *aragonAgent
+        getRecoveryVault: *ZERO_ADDRESS
         appId: "0xddbcfd564f642ab5627cf68b9b7d374fb4f8a36e941a75d89c87998cef03bd61"
-        getInitializationBlock: 727
+        getInitializationBlock: 11473216
         getEVMScriptRegistry: *aragonEvmScriptRegistry
         REGISTRY_MANAGER_ROLE: "0xf7a450ef335e1892cb42c8ca72e7242359d7711924b75db5717410da3f614aa3"
         kernel: *aragonKernel
@@ -2423,86 +2538,6 @@ l1:
         getInitializationBlock: *MAX_UINT256
         isPetrified: true
 
-    aragon-lido-apm:
-      name: APMRegistry
-      address: *lidoApm
-      proxyName: AppProxyUpgradeable
-      implementation: *aragonApmRegistryImplAddress
-      proxyChecks:
-        proxyType: *PROXY_TYPE_APP_PROXY_UPGRADEABLE
-        isDepositable: false
-        implementation: "0x2D7EF7C6BEDA2a18E4c32151A758B8b081f5C2d7"
-        appId: *LIDO_APM_APP_ID
-        kernel: "0xfce76fdBF71D2A30Cd1a5a00C1fcb3A46044af78"
-      checks:
-        hasInitialized: true
-        registrar: "0xf0E2d6f345Ab54630F2867BBcC64879Ad6a30C68"
-        getRecoveryVault: *ZERO_ADDRESS
-        ens: "0x6d4995cA535179d4126cC153C386bc9C13B92ba3"
-        CREATE_REPO_ROLE: "0x2a9494d64846c9fdbf0158785aa330d8bc9caf45af27fa0e8898eb4d55adcea6"
-        appId: *LIDO_APM_APP_ID
-        getInitializationBlock: 721
-        getEVMScriptRegistry: "0x15464fF12B3a857ee43ba08185D53648d9c2F8d7"
-        kernel: "0xfce76fdBF71D2A30Cd1a5a00C1fcb3A46044af78"
-        isPetrified: false
-        getEVMScriptExecutor: null
-        allowRecoverability: null
-        canPerform: null
-      implementationChecks:
-        hasInitialized: false
-        registrar: *ZERO_ADDRESS
-        ens: *ZERO_ADDRESS
-        CREATE_REPO_ROLE: "0x2a9494d64846c9fdbf0158785aa330d8bc9caf45af27fa0e8898eb4d55adcea6"
-        appId: *ZERO_BYTES32
-        getInitializationBlock: *MAX_UINT256
-        kernel: *ZERO_ADDRESS
-        isPetrified: true
-        getEVMScriptExecutor: null
-        getRecoveryVault: null
-        allowRecoverability: null
-        canPerform: null
-        getEVMScriptRegistry: null
-
-    aragon-apm-registry:
-      name: APMRegistry
-      address: *aragonApmRegistry
-      proxyName: AppProxyUpgradeable
-      implementation: *aragonApmRegistryImplAddress
-      proxyChecks:
-        proxyType: *PROXY_TYPE_APP_PROXY_UPGRADEABLE
-        isDepositable: false
-        implementation: "0x2D7EF7C6BEDA2a18E4c32151A758B8b081f5C2d7"
-        appId: *APM_REGISTRY_APP_ID
-        kernel: "0xa8331ECa4817b33eFe8e70dC6c667eE9B530AC5b"
-      checks:
-        hasInitialized: true
-        getRecoveryVault: *ZERO_ADDRESS
-        ens: "0x6d4995cA535179d4126cC153C386bc9C13B92ba3"
-        CREATE_REPO_ROLE: "0x2a9494d64846c9fdbf0158785aa330d8bc9caf45af27fa0e8898eb4d55adcea6"
-        appId: *APM_REGISTRY_APP_ID
-        getEVMScriptRegistry: "0xa5BDA9a9f08c44bC7f579A89e1aa9cfB324c2991"
-        kernel: "0xa8331ECa4817b33eFe8e70dC6c667eE9B530AC5b"
-        isPetrified: false
-        getEVMScriptExecutor: null
-        registrar: null
-        allowRecoverability: null
-        getInitializationBlock: null
-        canPerform: null
-      implementationChecks:
-        hasInitialized: false
-        registrar: *ZERO_ADDRESS
-        ens: *ZERO_ADDRESS
-        CREATE_REPO_ROLE: "0x2a9494d64846c9fdbf0158785aa330d8bc9caf45af27fa0e8898eb4d55adcea6"
-        appId: *ZERO_BYTES32
-        getInitializationBlock: *MAX_UINT256
-        kernel: *ZERO_ADDRESS
-        isPetrified: true
-        getEVMScriptExecutor: null
-        getRecoveryVault: null
-        allowRecoverability: null
-        canPerform: null
-        getEVMScriptRegistry: null
-
     aragon-repo-base:
       name: Repo
       address: *aragonRepoBase
@@ -2524,20 +2559,6 @@ l1:
         getEVMScriptRegistry: null
         isValidBump: null
         getLatest: null
-
-    aragonID:
-      name: FIFSResolvingRegistrar
-      address: *aragonID
-      checks:
-        rootNode: "0x7e74a86b6e146964fb965db04dc2590516da77f720bb6759337bf5632415fd86"
-
-    daoFactory:
-      name: DAOFactory
-      address: *daoFactory
-      checks:
-        baseACL: "0x866Ad4D7283C4dcF00A01c1884DCDa98c2F1aE0A"
-        regFactory: *evmScriptRegistryFactory
-        baseKernel: "0x14dDb33F1D85997Bc35546e7E8CC306F5A7B9DD1"
 
     gateSealBlueprint:
       name: GateSeal
@@ -2564,30 +2585,30 @@ l1:
       name: GateSeal
       address: *gateSealWithdrawalQueue
       checks:
-        get_sealing_committee: *resealCommittee
+        get_sealing_committee: *sealCommittee
         get_seal_duration_seconds: *DURATION_2_WEEKS
         get_sealables: [*withdrawalQueueERC721]
-        get_expiry_timestamp: 1784217696
+        get_expiry_timestamp: 1789207187
         is_expired: false
 
     gateSealVaulthubAndPredepositGuarantee:
       name: GateSeal
       address: *gateSealVaulthubAndPredepositGuarantee
       checks:
-        get_sealing_committee: *resealCommittee
+        get_sealing_committee: *sealCommittee
         get_seal_duration_seconds: *DURATION_2_WEEKS
         get_sealables: [*vaultHub, *predepositGuarantee]
-        get_expiry_timestamp: 1791454296
+        get_expiry_timestamp: 1796302499 # Thursday, December 3, 2026 12:54:59 PM
         is_expired: false
 
     gateSealVEBAndTWG:
       name: GateSeal
       address: *gateSealVEBAndTWG
       checks:
-        get_sealing_committee: *resealCommittee
+        get_sealing_committee: *sealCommittee
         get_seal_duration_seconds: *DURATION_2_WEEKS
         get_sealables: [*triggerableWithdrawalsGateway, *validatorsExitBusOracle]
-        get_expiry_timestamp: 1784217696
+        get_expiry_timestamp: 1789207187
         is_expired: false
 
     node-operators-registry:
@@ -2604,7 +2625,7 @@ l1:
       checks:
         hasInitialized: true
         getType: "0x637572617465642d6f6e636861696e2d76310000000000000000000000000000"
-        getRecoveryVault: *aragonAgent
+        getRecoveryVault: *ZERO_ADDRESS
         STAKING_ROUTER_ROLE: *STAKING_ROUTER_ROLE
         appId: *NODE_OPERATORS_REGISTRY_APP_ID
         MANAGE_NODE_OPERATOR_ROLE: *MANAGE_NODE_OPERATOR_ROLE
@@ -2698,7 +2719,7 @@ l1:
       checks:
         hasInitialized: true
         getType: "0x637572617465642d6f6e636861696e2d76310000000000000000000000000000"
-        getRecoveryVault: *aragonAgent
+        getRecoveryVault: *ZERO_ADDRESS
         STAKING_ROUTER_ROLE: *STAKING_ROUTER_ROLE
         appId: *SIMPLE_DVT_APP_ID
         MANAGE_NODE_OPERATOR_ROLE: *MANAGE_NODE_OPERATOR_ROLE
@@ -2777,28 +2798,6 @@ l1:
         getSigningKey: null
         getTotalSigningKeyCount: null
         isOperatorPenaltyCleared: null
-
-    # TODO
-    # evmScriptRegistryFactory:
-    #   name: EVMScriptRegistryFactory
-    #   address: *evmScriptRegistryFactory
-    #   checks:
-    #     baseReg: "0xA75A76Ca92068c8fe1fA2665795805aA4610999E"
-    #     baseCallScript: *callsScript
-
-    lidoTemplate:
-      name: LidoTemplate
-      address: *lidoTemplate
-      checks:
-        getConfig:
-          [
-            "0x2cE254Fd852d6B5023b1B2355ae96A8d752a47cf",
-            *daoFactory,
-            *ens,
-            *miniMeTokenFactory,
-            *aragonID,
-            *apmRegistryFactory,
-          ]
 
     easyTrack:
       name: EasyTrack

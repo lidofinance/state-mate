@@ -1,0 +1,111 @@
+# yaml-language-server: $schema=../../schemas/main-schema.json
+
+parameters:
+  # Common constants
+  - &ZERO_ADDRESS "0x0000000000000000000000000000000000000000" # Zero address sentinel
+  - &NON_ZERO_ADDRESS "0x0000000000000000000000000000000000000001" # Non-zero address sentinel
+  - &ZERO_BYTES32 "0x0000000000000000000000000000000000000000000000000000000000000000" # Zero bytes32 sentinel
+  - &ONE_DAY_SECONDS "86400" # 1 day in seconds
+  - &DEFAULT_ADMIN_ROLE "0x0000000000000000000000000000000000000000000000000000000000000000" # OZ default admin role
+  - &DEPLOY_FINISHED "115792089237316195423570985008687907853269984665640564039457584007913129639935" # type(uint256).max
+
+  # Pool type identifiers (bytes32-encoded short strings)
+  - &STV_POOL_TYPE "0x537476506f6f6c00000000000000000000000000000000000000000000000007" # "StvPool"
+  - &STV_STETH_POOL_TYPE "0x5374765374455448506f6f6c000000000000000000000000000000000000000c" # "StvStETHPool"
+  - &STRATEGY_POOL_TYPE "0x5374765374726174656779506f6f6c000000000000000000000000000000000f" # "StvStrategyPool"
+
+misc:
+  # Lido core addresses (mainnet), https://docs.lido.fi/deployed-contracts/#core-protocol
+  - &LIDO_STETH "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84" # Lido stETH token (proxy)
+  - &LIDO_WSTETH "0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0" # wstETH token
+  - &LIDO_VAULT_FACTORY "0x02Ca7772FF14a9F6c1a08aF385aA96bb1b34175A" # Staking Vault Factory
+  - &LIDO_VAULT_HUB "0x1d201BE093d847f6446530Efb0E8Fb426d176709" # VaultHub (proxy)
+  - &LIDO_LAZY_ORACLE "0x5DB427080200c235F2Ae8Cd17A7be87921f7AD6c" # Lazy Oracle (proxy)
+
+deployed:
+  l1:
+    - &vaultsWrapperFactory "0x3f221b8E5bC098cC6C23611BEeacaeCfD77e1587" # Vaults Wrapper Factory (deployed)
+    - &dummyImplementation "0x468029A88b6f75Eb1D13BB291fC3B82fc2C0232F" # DummyImplementation deployed by factory
+    - &stvPoolFactory "0x5Def7fBC0211351139B928f307EDC794af845Bde" # StvPoolFactory
+    - &stvStEthPoolFactory "0x671978CEEa7DAf405fA08E930E1047d1b7b21a69" # StvStETHPoolFactory
+    - &withdrawalQueueFactory "0xB011531857B6006479627e776feB6c0cEA5fc74a" # WithdrawalQueueFactory
+    - &distributorFactory "0x9FD67B2D5b88BeBaC741EE50510cf808B4854a5F" # DistributorFactory
+    - &timelockFactory "0x15f2C9ea98e5564d25A46eE39D19704476998786" # TimelockFactory
+
+l1:
+  rpcUrl: REMOTE_RPC_URL # https://ethereum-rpc.publicnode.com
+  explorerHostname: api.etherscan.io
+  chainId: 1
+  explorerTokenEnv: ETHERSCAN_TOKEN
+  contracts:
+    vaultsWrapperFactory:
+      name: Factory
+      address: *vaultsWrapperFactory
+      checks:
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        DEPLOY_FINISHED: *DEPLOY_FINISHED # type(uint256).max
+        DEPLOY_START_FINISH_SPAN_SECONDS: *ONE_DAY_SECONDS # 1 day
+        DISTRIBUTOR_FACTORY: *distributorFactory # DistributorFactory
+        DUMMY_IMPLEMENTATION: *dummyImplementation # DummyImplementation deployed by factory
+        LAZY_ORACLE: *LIDO_LAZY_ORACLE
+        STETH: *LIDO_STETH
+        STRATEGY_POOL_TYPE: *STRATEGY_POOL_TYPE
+        STV_POOL_FACTORY: *stvPoolFactory
+        STV_POOL_TYPE: *STV_POOL_TYPE
+        STV_STETH_POOL_FACTORY: *stvStEthPoolFactory
+        STV_STETH_POOL_TYPE: *STV_STETH_POOL_TYPE
+        TIMELOCK_FACTORY: *timelockFactory
+        VAULT_FACTORY: *LIDO_VAULT_FACTORY
+        VAULT_HUB: *LIDO_VAULT_HUB
+        WITHDRAWAL_QUEUE_FACTORY: *withdrawalQueueFactory
+        WSTETH: *LIDO_WSTETH
+        derivePoolType: # Factory helper to compute pool type
+          - args: # AuxiliaryPoolConfig + strategyFactory
+              - - false # allowListEnabled
+                - *ZERO_ADDRESS # allowListManager
+                - false # mintingEnabled
+                - "0" # reserveRatioGapBP
+              - *ZERO_ADDRESS # strategyFactory
+            result: *STV_POOL_TYPE # expected pool type
+          - args: # AuxiliaryPoolConfig + strategyFactory
+              - - false # allowListEnabled
+                - *ZERO_ADDRESS # allowListManager
+                - true # mintingEnabled
+                - "0" # reserveRatioGapBP
+              - *ZERO_ADDRESS # strategyFactory
+            result: *STV_STETH_POOL_TYPE # expected pool type
+          - args: # AuxiliaryPoolConfig + strategyFactory
+              - - true # allowListEnabled
+                - *ZERO_ADDRESS # allowListManager
+                - true # mintingEnabled
+                - "0" # reserveRatioGapBP
+              - *NON_ZERO_ADDRESS # strategyFactory
+            result: *STRATEGY_POOL_TYPE # expected pool type
+        intermediateState: # mapping(bytes32 => uint256) view
+          args: # bytes32 key
+            - *ZERO_BYTES32 # zero key
+          result: "0" # not started
+    stvPoolFactory:
+      name: StvPoolFactory
+      address: *stvPoolFactory
+      checks: {} # No view/pure functions in ABI
+    stvStEthPoolFactory:
+      name: StvStETHPoolFactory
+      address: *stvStEthPoolFactory
+      checks: {} # No view/pure functions in ABI
+    withdrawalQueueFactory:
+      name: WithdrawalQueueFactory
+      address: *withdrawalQueueFactory
+      checks: {} # No view/pure functions in ABI
+    distributorFactory:
+      name: DistributorFactory
+      address: *distributorFactory
+      checks: {} # No view/pure functions in ABI
+    timelockFactory:
+      name: TimelockFactory
+      address: *timelockFactory
+      checks: {} # No view/pure functions in ABI
+    dummyImplementation:
+      name: DummyImplementation
+      address: *dummyImplementation
+      checks: {} # No view/pure functions in ABI

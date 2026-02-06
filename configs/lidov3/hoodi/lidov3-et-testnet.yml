@@ -10,6 +10,9 @@ misc:
   - &locator "0xe2EF9536DAAAEBFf5b1c130957AB3E80056b06D8"
   - &evmScriptExecutor "0x79a20FD0FA36453B2F45eAbab19bfef43575Ba9E"
   - &withdrawalRequestPredeployAddress "0x00000961Ef480Eb55e80D19ad83579A64c007002"
+  - &maxInfraFeeBP "100" # 1%
+  - &maxLiquidityFeeBP "1000" # 10%
+  - &maxReservationFeeBP "0" # 0%
 
 deployed:
   l1:
@@ -17,11 +20,11 @@ deployed:
     - &UpdateGroupsShareLimitInOperatorGrid "0x56Ff87F41a8CF795764E15E496124240Ac17695b"
     - &RegisterTiersInOperatorGrid "0x4DF806111AC58e93d90E6D2fBE8522a76be6F499"
     - &AlterTiersInOperatorGrid "0xF21f98cac0Ba38f02b4d5be1667cc345929E8877"
-    - &VaultsAdapter "0xBC2bb8310730F3D2b514Cb26f7e0A8776De879Ac"
-    - &SetJailStatusInOperatorGrid "0xc3FA83D65a900303e1d99cDBBF762c6630562c04"
-    - &UpdateVaultsFeesInOperatorGrid "0x351426775c75aB5127de860Cdcaf1953F1D622a2"
-    - &ForceValidatorExitsInVaultHub "0x83DfE5Fe8ac8b7DB38c020F4F54BF09b65D92c63"
-    - &SocializeBadDebtInVaultHub "0xa11906bBBBaC5207b8FDA4F7F294d7EcB8dcc758"
+    - &VaultsAdapter "0x854CF0D7446Faa7AdDFE557cc8aa9FA9b7017910"
+    - &SetJailStatusInOperatorGrid "0x395E6AF61B6Ba3EC0E72E168A2Ec8204589F357c"
+    - &UpdateVaultsFeesInOperatorGrid "0x2D5b8B082d618A8d5DeFE3f4c2b2869e3f1C1a3D"
+    - &ForceValidatorExitsInVaultHub "0x820e9924C2059d37871acd6eccB578e4a3B15c30"
+    - &SocializeBadDebtInVaultHub "0x01C9dB53D7a87c3e47D537c925921fB735bEe6c9"
     - &SetLiabilitySharesTargetInVaultHub "0xc5dCd2A9642ceA9B71A632BF5b8ff52424Ea1B40"
 
 l1:
@@ -40,6 +43,7 @@ l1:
         lidoLocator: *locator
         maxShareLimit: *maxGroupShareLimit
         trustedCaller: *trustedCaller
+
     UpdateGroupsShareLimitInOperatorGrid:
       name: UpdateGroupsShareLimitInOperatorGrid
       address: *UpdateGroupsShareLimitInOperatorGrid
@@ -49,6 +53,7 @@ l1:
         lidoLocator: *locator
         maxShareLimit: *maxGroupShareLimit
         trustedCaller: *trustedCaller
+
     RegisterTiersInOperatorGrid:
       name: RegisterTiersInOperatorGrid
       address: *RegisterTiersInOperatorGrid
@@ -58,6 +63,7 @@ l1:
         decodeEVMScriptCallData: null
         lidoLocator: *locator
         trustedCaller: *trustedCaller
+
     AlterTiersInOperatorGrid:
       name: AlterTiersInOperatorGrid
       address: *AlterTiersInOperatorGrid
@@ -67,6 +73,7 @@ l1:
         defaultTierMaxShareLimit: *maxDefaultTierShareLimit
         lidoLocator: *locator
         trustedCaller: *trustedCaller
+
     VaultsAdapter:
       name: VaultsAdapter
       address: *VaultsAdapter
@@ -76,6 +83,7 @@ l1:
         lidoLocator: *locator
         trustedCaller: *trustedCaller
         validatorExitFeeLimit: *initialValidatorExitFeeLimit
+
     SetJailStatusInOperatorGrid:
       name: SetJailStatusInOperatorGrid
       address: *SetJailStatusInOperatorGrid
@@ -84,6 +92,7 @@ l1:
         decodeEVMScriptCallData: null
         trustedCaller: *trustedCaller
         vaultsAdapter: *VaultsAdapter
+
     UpdateVaultsFeesInOperatorGrid:
       name: UpdateVaultsFeesInOperatorGrid
       address: *UpdateVaultsFeesInOperatorGrid
@@ -93,6 +102,10 @@ l1:
         lidoLocator: *locator
         trustedCaller: *trustedCaller
         vaultsAdapter: *VaultsAdapter
+        maxInfraFeeBP: *maxInfraFeeBP
+        maxLiquidityFeeBP: *maxLiquidityFeeBP
+        maxReservationFeeBP: *maxReservationFeeBP
+
     ForceValidatorExitsInVaultHub:
       name: ForceValidatorExitsInVaultHub
       address: *ForceValidatorExitsInVaultHub
@@ -102,6 +115,7 @@ l1:
         decodeEVMScriptCallData: null
         trustedCaller: *trustedCaller
         vaultsAdapter: *VaultsAdapter
+
     SocializeBadDebtInVaultHub:
       name: SocializeBadDebtInVaultHub
       address: *SocializeBadDebtInVaultHub
@@ -110,6 +124,8 @@ l1:
         decodeEVMScriptCallData: null
         trustedCaller: *trustedCaller
         vaultsAdapter: *VaultsAdapter
+
+    # TODO: need to be updated before use
     SetLiabilitySharesTargetInVaultHub:
       name: SetLiabilitySharesTargetInVaultHub
       address: *SetLiabilitySharesTargetInVaultHub
@@ -117,4 +133,4 @@ l1:
         createEVMScript: null
         decodeEVMScriptCallData: null
         trustedCaller: *trustedCaller
-        vaultsAdapter: *VaultsAdapter
+        vaultsAdapter: "0xBC2bb8310730F3D2b514Cb26f7e0A8776De879Ac"

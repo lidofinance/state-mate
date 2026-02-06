@@ -44,9 +44,14 @@ const OzNonEnumerableAclTB = Type.Readonly(Type.Record(EthereumStringTB, Ethereu
 
 export const PlainValueTB = Type.Readonly(Type.Union([Type.Null(), Type.String(), Type.Boolean(), Type.Number()]));
 export const PlainValueArrayTB = Type.Readonly(Type.Array(PlainValueTB));
-const PlainValueOrArray = Type.Readonly(Type.Array(Type.Union([PlainValueTB, PlainValueArrayTB])));
+// Support deeper nesting for complex tuple returns (e.g., Safe Harbor Agreement details)
+// Uses Unsafe type to allow arbitrary depth arrays without hitting TypeScript recursion limits
 
-export const ArgumentsTB = Type.Readonly(Type.Array(Type.Union([PlainValueTB, PlainValueArrayTB])));
+type DeepArray = (null | string | boolean | number | DeepArray)[];
+const DeepNestedArrayTB = Type.Unsafe<DeepArray>(Type.Array(Type.Any()));
+const PlainValueOrArray = Type.Readonly(Type.Array(Type.Union([PlainValueTB, PlainValueArrayTB, DeepNestedArrayTB])));
+
+export const ArgumentsTB = Type.Readonly(Type.Array(Type.Union([PlainValueTB, PlainValueArrayTB, DeepNestedArrayTB])));
 
 const ArbitraryObjectTB = Type.Readonly(Type.Record(Type.String(), PlainValueTB));
 
