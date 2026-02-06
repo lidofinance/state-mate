@@ -45,13 +45,17 @@ export class ChecksSectionValidator extends SectionValidatorBase {
 
     // Check if this is a proxy contract with an implementation
     if (isTypeOfTB(contractEntry, ProxyContractEntryTB) && contractEntry.implementation) {
-      try {
-        // Try to load implementation ABI first
-        return loadAbiFromFile(name, contractEntry.implementation);
-      } catch {
-        // Fall back to proxy address ABI
-        log(`  (Using proxy ABI as implementation ABI for ${name} at ${contractEntry.implementation} was not found)`);
+      // Try implementation ABI with strict contract name match.
+      // If the implementation ABI is saved under a different name, fall back to proxy ABI.
+      const implementationAbi = loadAbiFromFile(name, contractEntry.implementation, {
+        allowAddressFallback: false,
+        failSilently: true,
+      });
+      if (implementationAbi) {
+        return implementationAbi;
       }
+      // Fall back to proxy address ABI
+      log(`  (Using proxy ABI as implementation ABI for ${name} at ${contractEntry.implementation} was not found)`);
     }
 
     return loadAbiFromFile(name, address);
