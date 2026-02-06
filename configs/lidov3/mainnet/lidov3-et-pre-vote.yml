@@ -1,0 +1,237 @@
+# yaml-language-server: $schema=../../schemas/main-schema.json
+parameters:
+  - &trustedCaller "0x18A1065c81b0Cc356F1b1C843ddd5E14e4AefffF"
+  - &initialValidatorExitFeeLimit "100000000000000000"
+  - &maxGroupShareLimit "50000000000000000000000"
+  - &maxDefaultTierShareLimit "0"
+
+misc:
+  - &DEFAULT_TIER_OPERATOR "0xFFfFfFffFFfffFFfFFfFFFFFffFFFffffFfFFFfF"
+  - &locator "0xC1d0b3DE6792Bf6b4b37EccdcC24e45978Cfd2Eb"
+  - &evmScriptExecutor "0xFE5986E06210aC1eCC1aDCafc0cc7f8D63B3F977"
+  - &withdrawalRequestPredeployAddress "0x00000961Ef480Eb55e80D19ad83579A64c007002"
+  - &ET_CANCEL_ROLE "0x9f959e00d95122f5cbd677010436cf273ef535b86b056afc172852144b9491d7"
+  - &ZERO_BYTES32 "0x0000000000000000000000000000000000000000000000000000000000000000"
+  - &EASYTRACK_MAX_MOTIONS_LIMIT 24
+  - &EASYTRACK_MAX_OBJECTIONS_THRESHOLD 500
+  - &EASYTRACK_MIN_MOTION_DURATION 172800 # 2 days
+  - &ET_PAUSE_ROLE "0x139c2898040ef16910dc9f44dc697df79363da767d8bc92f2e310312b816e46d"
+  - &ET_UNPAUSE_ROLE "0x265b220c5a8891efdd9e1b1b7fa72f257bd5169f8d87e319cf3dad6ff52b94ae"
+  - &ldo "0x5A98FcBEA516Cf06857215779Fd812CA3beF1B32"
+  - &ET_FIRST_FACTORY "0xFeBd8FAC16De88206d4b18764e826AF38546AfE0"
+  - &ET_LAST_FACTORY "0x8aa34dAaF0fC263203A15Bcfa0Ed926D466e59F3"
+  - &EMERGENCY_BRAKES "0x73b047fe6337183A454c5217241D780a932777bD"
+
+  # -- Max fees ---
+  - &maxInfraFeeBP "100" # 1%
+  - &maxLiquidityFeeBP "1000" # 10%
+  - &maxReservationFeeBP "0" # 0%
+
+deployed:
+  l1:
+    - &EasyTrack "0xF0211b7660680B49De1A7E9f25C65660F0a13Fea"
+    - &RegisterGroupsInOperatorGrid "0x194A46DA1947E98c9D79af13E06Cfbee0D8610cC"
+    - &UpdateGroupsShareLimitInOperatorGrid "0x8Bdc726a3147D8187820391D7c6F9F942606aEe6"
+    - &RegisterTiersInOperatorGrid "0x5292A1284e4695B95C0840CF8ea25A818751C17F"
+    - &AlterTiersInOperatorGrid "0xa29173C7BCf39dA48D5E404146A652d7464aee14"
+    - &VaultsAdapter "0xe2DE6d2DefF15588a71849c0429101F8ca9FB14D"
+    - &SetJailStatusInOperatorGrid "0x93F1DEE4473Ee9F42c8257C201e33a6Da30E5d67"
+    - &UpdateVaultsFeesInOperatorGrid "0x5C3bDFa3E7f312d8cf72F56F2b797b026f6B471c"
+    - &ForceValidatorExitsInVaultHub "0x6C968cD89CA358fbAf57B18e77a8973Fa869a6aA"
+    - &SocializeBadDebtInVaultHub "0x1dF50522A1D868C12bF71747Bb6F24A18Fe6d32C"
+    - &SetLiabilitySharesTargetInVaultHub "0x4E5Cc771c7b77f1417fa6BA9262d83C6CCc1e969"
+
+l1:
+  rpcUrl: MAINNET_REMOTE_RPC_URL
+  explorerHostname: api.etherscan.io/v2/api
+  explorerTokenEnv: ETHERSCAN_TOKEN
+  chainId: 1
+  contracts:
+    EasyTrack:
+      name: EasyTrack
+      address: *EasyTrack
+      checks:
+        CANCEL_ROLE: *ET_CANCEL_ROLE
+        DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
+        MAX_MOTIONS_LIMIT: *EASYTRACK_MAX_MOTIONS_LIMIT
+        MAX_OBJECTIONS_THRESHOLD: *EASYTRACK_MAX_OBJECTIONS_THRESHOLD
+        MIN_MOTION_DURATION: *EASYTRACK_MIN_MOTION_DURATION
+        PAUSE_ROLE: *ET_PAUSE_ROLE
+        UNPAUSE_ROLE: *ET_UNPAUSE_ROLE
+        canObjectToMotion: null
+        evmScriptExecutor: *evmScriptExecutor
+        evmScriptFactories:
+          - args: [0]
+            result: *ET_FIRST_FACTORY
+          - args: [32]
+            result: *ET_LAST_FACTORY
+          - args: [33]
+            mustRevert: true
+        evmScriptFactoryPermissions: null
+        getEVMScriptFactories:
+          [
+            *ET_FIRST_FACTORY,
+            0x7E8eFfAb3083fB26aCE6832bFcA4C377905F97d7,
+            0x9721c0f77E3Ea40eD592B9DCf3032DaF269c0306,
+            0xF6B6E7997338C48Ea3a8BCfa4BB64a315fDa76f4,
+            0xBd2b6dC189EefD51B273F5cb2d99BA1ce565fb8C,
+            0x48c135Ff690C2Aa7F5B11C539104B5855A4f9252,
+            0x200dA0b6a9905A377CF8D469664C65dB267009d1,
+            0x00A3D6260f70b1660c8646Ef25D0820EFFd7bE60,
+            0x00caAeF11EC545B192f16313F53912E453c91458,
+            0x22010d1747CaFc370b1f1FBBa61022A313c5693b,
+            0x935cb3366Faf2cFC415B2099d1F974Fd27202b77,
+            0x1F2b79FE297B7098875930bBA6dd17068103897E,
+            0xE1f6BaBb445F809B97e3505Ea91749461050F780,
+            0xbD08f9D6BF1D25Cc7407E4855dF1d46C2043B3Ea,
+            0x1F809D2cb72a5Ab13778811742050eDa876129b6,
+            0xd30Dc38EdEfc21875257e8A3123503075226E14B,
+            0xf2476f967C826722F5505eDfc4b2561A34033477,
+            0x6b7863f2c7dEE99D3b744fDAEDbEB1aeCC025535,
+            0x6AB39a8Be67D9305799c3F8FdFc95Caf3150d17c,
+            0xcAa3AF7460E83E665EEFeC73a7a542E5005C9639,
+            0xCBb418F6f9BFd3525CE6aADe8F74ECFEfe2DB5C8,
+            0x8B82C1546D47330335a48406cc3a50Da732672E7,
+            0xD75778b855886Fc5e1eA7D6bFADA9EB68b35C19D,
+            0xe5656eEe7eeD02bdE009d77C88247BC8271e26Eb,
+            0x7d509BFF310d9460b1F613e4e40d342201a83Ae4,
+            0x589e298964b9181D9938B84bB034C3BB9024E2C0,
+            0xE31A0599A6772BCf9b2bFc9e25cf941e793c9a7D,
+            0x6e04aED774B7c89BB43721AcDD7D03C872a51B69,
+            0x0d2aefA542aFa8d9D1Ec35376068B88042FEF5f6,
+            0x161a4552A625844c822954C5AcBac928ee0f399B,
+            0xBc5642bDD6F2a54b01A75605aAe9143525D97308,
+            0xB7668B5485d0f826B86a75b0115e088bB9ee03eE,
+            *ET_LAST_FACTORY,
+          ]
+        getMotion: null
+        getMotions: null
+        getRoleAdmin: null
+        governanceToken: *ldo
+        hasRole:
+          - args: [*ET_PAUSE_ROLE, *EMERGENCY_BRAKES]
+            result: true
+        isEVMScriptFactory:
+          - args: [*ET_FIRST_FACTORY]
+            result: true
+          - args: [*ET_LAST_FACTORY]
+            result: true
+          - args: [*RegisterGroupsInOperatorGrid]
+            result: false
+          - args: [*UpdateGroupsShareLimitInOperatorGrid]
+            result: false
+          - args: [*RegisterTiersInOperatorGrid]
+            result: false
+          - args: [*AlterTiersInOperatorGrid]
+            result: false
+          - args: [*VaultsAdapter]
+            result: false
+          - args: [*SetJailStatusInOperatorGrid]
+            result: false
+          - args: [*UpdateVaultsFeesInOperatorGrid]
+            result: false
+          - args: [*ForceValidatorExitsInVaultHub]
+            result: false
+          - args: [*SocializeBadDebtInVaultHub]
+            result: false
+          - args: [*SetLiabilitySharesTargetInVaultHub]
+            result: false
+        motionDuration: 259200
+        motions: null
+        motionsCountLimit: 20
+        objections: null
+        objectionsThreshold: 50
+        paused: false
+        supportsInterface: null
+
+    RegisterGroupsInOperatorGrid:
+      name: RegisterGroupsInOperatorGrid
+      address: *RegisterGroupsInOperatorGrid
+      checks:
+        DEFAULT_TIER_OPERATOR: *DEFAULT_TIER_OPERATOR
+        createEVMScript: null
+        decodeEVMScriptCallData: null
+        lidoLocator: *locator
+        maxShareLimit: *maxGroupShareLimit
+        trustedCaller: *trustedCaller
+    UpdateGroupsShareLimitInOperatorGrid:
+      name: UpdateGroupsShareLimitInOperatorGrid
+      address: *UpdateGroupsShareLimitInOperatorGrid
+      checks:
+        createEVMScript: null
+        decodeEVMScriptCallData: null
+        lidoLocator: *locator
+        maxShareLimit: *maxGroupShareLimit
+        trustedCaller: *trustedCaller
+    RegisterTiersInOperatorGrid:
+      name: RegisterTiersInOperatorGrid
+      address: *RegisterTiersInOperatorGrid
+      checks:
+        DEFAULT_TIER_OPERATOR: *DEFAULT_TIER_OPERATOR
+        createEVMScript: null
+        decodeEVMScriptCallData: null
+        lidoLocator: *locator
+        trustedCaller: *trustedCaller
+    AlterTiersInOperatorGrid:
+      name: AlterTiersInOperatorGrid
+      address: *AlterTiersInOperatorGrid
+      checks:
+        createEVMScript: null
+        decodeEVMScriptCallData: null
+        defaultTierMaxShareLimit: *maxDefaultTierShareLimit
+        lidoLocator: *locator
+        trustedCaller: *trustedCaller
+    VaultsAdapter:
+      name: VaultsAdapter
+      address: *VaultsAdapter
+      checks:
+        WITHDRAWAL_REQUEST_PREDEPLOY_ADDRESS: *withdrawalRequestPredeployAddress
+        evmScriptExecutor: *evmScriptExecutor
+        lidoLocator: *locator
+        trustedCaller: *trustedCaller
+        validatorExitFeeLimit: *initialValidatorExitFeeLimit
+    SetJailStatusInOperatorGrid:
+      name: SetJailStatusInOperatorGrid
+      address: *SetJailStatusInOperatorGrid
+      checks:
+        createEVMScript: null
+        decodeEVMScriptCallData: null
+        trustedCaller: *trustedCaller
+        vaultsAdapter: *VaultsAdapter
+    UpdateVaultsFeesInOperatorGrid:
+      name: UpdateVaultsFeesInOperatorGrid
+      address: *UpdateVaultsFeesInOperatorGrid
+      checks:
+        createEVMScript: null
+        decodeEVMScriptCallData: null
+        lidoLocator: *locator
+        trustedCaller: *trustedCaller
+        vaultsAdapter: *VaultsAdapter
+        maxInfraFeeBP: *maxInfraFeeBP
+        maxLiquidityFeeBP: *maxLiquidityFeeBP
+        maxReservationFeeBP: *maxReservationFeeBP
+    ForceValidatorExitsInVaultHub:
+      name: ForceValidatorExitsInVaultHub
+      address: *ForceValidatorExitsInVaultHub
+      checks:
+        WITHDRAWAL_REQUEST_PREDEPLOY_ADDRESS: *withdrawalRequestPredeployAddress
+        createEVMScript: null
+        decodeEVMScriptCallData: null
+        trustedCaller: *trustedCaller
+        vaultsAdapter: *VaultsAdapter
+    SocializeBadDebtInVaultHub:
+      name: SocializeBadDebtInVaultHub
+      address: *SocializeBadDebtInVaultHub
+      checks:
+        createEVMScript: null
+        decodeEVMScriptCallData: null
+        trustedCaller: *trustedCaller
+        vaultsAdapter: *VaultsAdapter
+    SetLiabilitySharesTargetInVaultHub:
+      name: SetLiabilitySharesTargetInVaultHub
+      address: *SetLiabilitySharesTargetInVaultHub
+      checks:
+        createEVMScript: null
+        decodeEVMScriptCallData: null
+        trustedCaller: *trustedCaller
+        vaultsAdapter: *VaultsAdapter

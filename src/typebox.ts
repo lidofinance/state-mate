@@ -44,9 +44,14 @@ const OzNonEnumerableAclTB = Type.Readonly(Type.Record(EthereumStringTB, Ethereu
 
 export const PlainValueTB = Type.Readonly(Type.Union([Type.Null(), Type.String(), Type.Boolean(), Type.Number()]));
 export const PlainValueArrayTB = Type.Readonly(Type.Array(PlainValueTB));
-const PlainValueOrArray = Type.Readonly(Type.Array(Type.Union([PlainValueTB, PlainValueArrayTB])));
+// Support deeper nesting for complex tuple returns (e.g., Safe Harbor Agreement details)
+// Uses Unsafe type to allow arbitrary depth arrays without hitting TypeScript recursion limits
 
-export const ArgumentsTB = Type.Readonly(Type.Array(Type.Union([PlainValueTB, PlainValueArrayTB])));
+type DeepArray = (null | string | boolean | number | DeepArray)[];
+const DeepNestedArrayTB = Type.Unsafe<DeepArray>(Type.Array(Type.Any()));
+const PlainValueOrArray = Type.Readonly(Type.Array(Type.Union([PlainValueTB, PlainValueArrayTB, DeepNestedArrayTB])));
+
+export const ArgumentsTB = Type.Readonly(Type.Array(Type.Union([PlainValueTB, PlainValueArrayTB, DeepNestedArrayTB])));
 
 const ArbitraryObjectTB = Type.Readonly(Type.Record(Type.String(), PlainValueTB));
 
@@ -104,6 +109,8 @@ const ProxyChecksTB = Type.Readonly(
         implementation: Type.Optional(Type.Union([EthereumStringTB, Type.Null()])),
         proxy_getAdmin: Type.Optional(Type.Union([EthereumStringTB, Type.Null()])),
         proxy_getIsOssified: Type.Optional(Type.Union([Type.Boolean(), Type.Null()])),
+        // For proxies exposing plain isOssified() (e.g., PinnedBeaconProxy)
+        isOssified: Type.Optional(Type.Union([Type.Boolean(), Type.Null()])),
       },
       { additionalProperties: false },
     ),
@@ -140,6 +147,8 @@ const RegularChecksTB = Type.Readonly(Type.Record(Type.String(), ChecksEntryValu
 
 const ImplementationChecksTB = Type.Optional(RegularChecksTB);
 
+const OzAclChecksTB = Type.Readonly(Type.Record(Type.String(), EthereumStringArrayTB, { additionalProperties: false }));
+
 const RegularContractEntryTB = Type.Readonly(
   Type.Object(
     {
@@ -147,11 +156,12 @@ const RegularContractEntryTB = Type.Readonly(
       name: Type.String(),
       checks: RegularChecksTB,
       ozNonEnumerableAcl: Type.Optional(OzNonEnumerableAclTB),
+      ozAcl: Type.Optional(OzAclChecksTB),
     },
     { additionalProperties: false },
   ),
 );
-const OzAclChecksTB = Type.Readonly(Type.Record(Type.String(), EthereumStringArrayTB, { additionalProperties: false }));
+
 export const ProxyContractEntryTB = Type.Readonly(
   Type.Object(
     {
@@ -160,7 +170,6 @@ export const ProxyContractEntryTB = Type.Readonly(
       implementation: Type.Optional(EthereumStringTB),
       proxyChecks: Type.Optional(Type.Union([ProxyChecksTB, Sr2ProxyChecksTB, AragonProxyChecksTB])),
       implementationChecks: ImplementationChecksTB,
-      ozAcl: Type.Optional(OzAclChecksTB),
     },
     { additionalProperties: false },
   ),

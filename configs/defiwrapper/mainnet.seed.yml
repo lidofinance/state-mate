@@ -1,0 +1,17 @@
+---
+# yaml-language-server: $schema=./../../schemas/seed-schema.json
+
+deployed:
+  l1:
+    - &vaultsWrapperFactory "0x3f221b8E5bC098cC6C23611BEeacaeCfD77e1587" # Vaults Wrapper Factory (deployed)
+    - &stvPoolFactory "0x5Def7fBC0211351139B928f307EDC794af845Bde" # StvPoolFactory
+    - &stvStEthPoolFactory "0x671978CEEa7DAf405fA08E930E1047d1b7b21a69" # StvStETHPoolFactory
+    - &withdrawalQueueFactory "0xB011531857B6006479627e776feB6c0cEA5fc74a" # WithdrawalQueueFactory
+    - &distributorFactory "0x9FD67B2D5b88BeBaC741EE50510cf808B4854a5F" # DistributorFactory
+    - &timelockFactory "0x15f2C9ea98e5564d25A46eE39D19704476998786" # TimelockFactory
+
+l1:
+  rpcUrl: REMOTE_RPC_URL # https://ethereum-rpc.publicnode.com
+  explorerHostname: api.etherscan.io
+  chainId: 1
+  explorerTokenEnv: ETHERSCAN_TOKEN

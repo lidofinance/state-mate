@@ -1,0 +1,263 @@
+# yaml-language-server: $schema=../../schemas/main-schema.json
+
+deployed:
+  l1:
+    - &AgreementV2 "0xe19f54e8322214839a87408f084aa14ebefe9e87"
+    - &SafeProxy "0xA1E2CD361e17ba10DCfAe3aA33f463DcB53a2Ffd"
+    - &Safe "0x41675C099F32341bf84BFc5382aF534df5C7461a"
+
+parameters:
+  - &SAFE_VERSION "1.4.1"
+  - &CHAIN_ID "1"
+
+# Agreement details (AgreementDetailsV2 struct below) for Safe Harbor program - getDetails() return value
+# ------------------------------------------------------------
+# /// @notice Struct that contains the details of the agreement.
+# struct AgreementDetailsV2 {
+#     // The name of the protocol adopting the agreement.
+#     string protocolName;
+#     // The contact details (required for pre-notifying).
+#     Contact[] contactDetails;
+#     // The scope and recovery address by chain.
+#     Chain[] chains;
+#     // The terms of the agreement.
+#     BountyTerms bountyTerms;
+#     // IPFS hash of the actual agreement document, which confirms all terms.
+#     string agreementURI;
+# }
+# /// @notice Struct that contains the contact details of the agreement.
+# struct Contact {
+#     string name;
+#     // This person's contact details (email, phone, telegram handle, etc.)
+#     string contact;
+# }
+# /// @notice Struct that contains the details of an agreement by chain.
+# struct Chain {
+#     // The address to which recovered assets will be sent.
+#     string assetRecoveryAddress;
+#     // The accounts in scope for the agreement.
+#     Account[] accounts;
+#     // The CAIP-2 chain ID. Please refer to the CAIP-2 standard for more details.
+#     // https://github.com/ChainAgnostic/CAIPs/blob/main/CAIPs/caip-2.md
+#     string caip2ChainId;
+# }
+# /// @notice Struct that contains the details of an account in an agreement.
+# struct Account {
+#     // The address of the account (EOA or smart contract).
+#     string accountAddress;
+#     // The scope of child contracts included in the agreement.
+#     ChildContractScope childContractScope;
+# }
+# /// @notice Enum that defines the inclusion of child contracts in an agreement.
+# enum ChildContractScope {
+#     // No child contracts are included.
+#     None,
+#     // Only child contracts that were created before the time of this agreement are included.
+#     ExistingOnly,
+#     // All child contracts, both existing and new, are included.
+#     All,
+#     // Only child contracts that were created after the time of this agreement are included.
+#     FutureOnly
+# }
+# /// @notice Struct that contains the terms of the bounty for the agreement.
+# struct BountyTerms {
+#     // Percentage of the recovered funds a Whitehat receives as their bounty (0-100).
+#     uint256 bountyPercentage;
+#     // The maximum bounty in USD.
+#     uint256 bountyCapUSD;
+#     // Whether the whitehat can retain their bounty or must return all funds to
+#     // the asset recovery address.
+#     bool retainable;
+#     // The identity verification requirements on the whitehat.
+#     IdentityRequirements identity;
+#     // The diligence requirements placed on eligible whitehats. Only applicable for Named whitehats.
+#     string diligenceRequirements;
+#     // Optional. Caps the total USD value of bounties paid across all whitehats for a single exploit.
+#     // If set to 0, no aggregate cap applies and each whitehat may receive up to bountyCapUSD individually.
+#     uint256 aggregateBountyCapUSD;
+# }
+# /// @notice Whitehat identity verification requirements.
+# enum IdentityRequirements {
+#     // The whitehat will be subject to no KYC requirements.
+#     Anonymous,
+#     // The whitehat must provide a pseudonym.
+#     Pseudonymous,
+#     // The whitehat must confirm their legal name.
+#     Named
+# }
+
+misc:
+  - &AGREEMENT_DETAILS # Protocol name
+    - "Lido on Ethereum"
+    # Security contacts: [[name, email]]
+    - - ["Security Team", "safeharbor@lido.fi"]
+    # Asset recovery: [[recoveryAddress, [[contractAddress, severity]...], chainId]]
+    - - - "0x2e59A20f205bB85a89C53f1936454680651E618e"
+        - - ["0xC1d0b3DE6792Bf6b4b37EccdcC24e45978Cfd2Eb", 2] # Lido Locator (proxy)
+          - ["0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84", 2] # Lido and stETH token (proxy)
+          - ["0x7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0", 2] # wstETH
+          - ["0xa88f0329C2c4ce51ba3fc619BBf44efE7120Dd0d", 2] # wstETH referral staker
+          - ["0x8F73e4C2A6D852bb4ab2A45E6a9CF5715b3228B7", 2] # EIP-712 helper for stETH
+          - ["0xFdDf38947aFB03C621C71b06C9C70bce73f12999", 2] # StakingRouter (proxy)
+          - ["0xffa96d84def2ea035c7ab153d8b991128e3d72fd", 2] # Deposit Security Module
+          - ["0x388C818CA8B9251b393131C08a736A67ccB19297", 2] # Execution Layer Rewards Vault
+          - ["0x889edC2eDab5f40e902b864aD4d7AdE8E412F9B1", 2] # Withdrawal Queue ERC721 (proxy)
+          - ["0xb9d7934878b5fb9610b3fe8a5e441e8fad7e293f", 2] # Withdrawal Vault (proxy)
+          - ["0xE76c52750019b80B43E36DF30bf4060EB73F573a", 2] # Burner (proxy)
+          - ["0xf95f069f9ad107938f6ba802a3da87892298610e", 2] # MEV Boost Relay Allowed List
+          - ["0xDC00116a0D3E064427dA2600449cfD2566B3037B", 2] # Triggerable Withdrawals Gateway
+          - ["0xbDb567672c867DB533119C2dcD4FB9d8b44EC82f", 2] # Validator Exit Delay Verifier
+          - ["0x852deD011285fe67063a08005c71a85690503Cee", 2] # AccountingOracle (proxy)
+          - ["0xD624B08C83bAECF0807Dd2c6880C3154a5F0B288", 2] # Accounting Oracle / HashConsensus
+          - ["0x0De4Ea0184c2ad0BacA7183356Aea5B8d5Bf5c6e", 2] # ValidatorsExitBusOracle (proxy)
+          - ["0x7FaDB6358950c5fAA66Cb5EB8eE5147De3df355a", 2] # Validators Exit Bus / HashConsensus
+          - ["0xf1647c86E6D7959f638DD9CE1d90e2F3C9503129", 2] # OracleReportSanityChecker
+          - ["0xbf05A929c3D7885a6aeAd833a992dA6E5ac23b09", 2] # OracleDaemonConfig
+          - ["0xb8FFC3Cd6e7Cf5a098A1c92F48009765B24088Dc", 2] # Lido DAO (Kernel) (proxy)
+          - ["0x5A98FcBEA516Cf06857215779Fd812CA3beF1B32", 2] # LDO token
+          - ["0x2e59A20f205bB85a89C53f1936454680651E618e", 2] # Aragon Voting (proxy)
+          - ["0xf73a1260d222f447210581DDf212D915c09a3249", 2] # Aragon Token Manager (proxy)
+          - ["0xB9E5CBB9CA5b0d659238807E84D0176930753d86", 2] # Aragon Finance (proxy)
+          - ["0x3e40D73EB977Dc6a537aF587D48316feE66E9C8c", 2] # Aragon Agent (proxy)
+          - ["0x9895f0f17cc1d1891b6f18ee0b483b6f221b37bb", 2] # Aragon ACL (proxy)
+          - ["0x853cc0D5917f49B57B8e9F89e491F5E18919093A", 2] # EVMScriptRegistry (proxy)
+          - ["0x0cb113890b04b49455dfe06554e2d784598a29c9", 2] # Aragon PM (proxy)
+          - ["0x4ee3118e3858e8d7164a634825bfe0f73d99c792", 2] # Voting Repo (proxy)
+          - ["0xF5Dc67E54FC96F993CD06073f71ca732C1E654B1", 2] # Lido App Repo (proxy)
+          - ["0x0D97E876ad14DB2b183CFeEB8aa1A5C788eB1831", 2] # Node Operators Registry Repo
+          - ["0x2325b0a607808dE42D918DB07F925FFcCfBb2968", 2] # Simple DVT Repo
+          - ["0x8B3f33234ABD88493c0Cd28De33D583B70beDe35", 2] # Insurance Fund
+          - ["0xEe06EA501f7d9DC6F4200385A8D910182D155d3e", 2] # GateSeal Blueprint
+          - ["0x6c82877cac5a7a739f16ca0a89c0a328b8764a24", 2] # GateSeal Factory
+          - ["0xA6BC802fAa064414AA62117B4a53D27fFfF741F1", 2] # GateSeal (VEB and TWG)
+          - ["0x8A854C4E750CDf24f138f34A9061b2f556066912", 2] # GateSeal (Withdrawal Queue)
+          - ["0xCE0425301C85c5Ea2A0873A2dEe44d78E02D2316", 2] # Emergency Protected Timelock
+          - ["0x23E0B465633FF5178808F4A75186E2F2F9537021", 2] # Admin Executor
+          - ["0xC1db28B3301331277e307FDCfF8DE28242A4486E", 2] # Dual Governance
+          - ["0xa1692Af6FDfdD1030E4E9c4Bc429986FA64CB5EF", 2] # Dual Governance Config Provider
+          - ["0x553337946F2FAb8911774b20025fa776B76a7CcE", 2] # Emergency Governance
+          - ["0x165813A31446a98c84E20Dda8C101BB3C8228e1c", 2] # Veto Signaling Escrow (proxy)
+          - ["0x7914b5a1539b97Bd0bbd155757F25FD79A522d24", 2] # Reseal Manager
+          - ["0xf65614d73952Be91ce0aE7Dd9cFf25Ba15bEE2f5", 2] # Tiebreaker Core Committee
+          - ["0x3D3ba54D54bbFF40F2Dfa2A8e27bD4dE3dab2951", 2] # Builders Sub Committee
+          - ["0xDBfa0B8A15a503f25224fcA5F84a3853230A715C", 2] # Node Operators Sub Committee
+          - ["0xBF048f2111497B6Df5E062811f5fC422804D4baE", 2] # Ethereum Ecosystem Sub Committee
+          - ["0x2a30F5aC03187674553024296bed35Aa49749DDa", 2] # Time Constraints
+          - ["0x55032650b14df07b85bF18A3a3eC8E0Af2e028d5", 2] # Curated SM / Node Operators Registry (proxy)
+          - ["0xaE7B191A31f627b4eB1d4DaC64eaB9976995b433", 2] # Simple DVT SM / Node Operators Registry (proxy)
+          - ["0xcF33a38111d0B1246A3F38a838fb41D626B454f0", 2] # Community SM / PermissionlessGate
+          - ["0xB314D4A76C457c93150d308787939063F4Cc67E0", 2] # Community SM / VettedGate (proxy)
+          - ["0xdA7dE2ECdDfccC6c3AF10108Db212ACBBf9EA83F", 2] # Community SM / CSModule (proxy)
+          - ["0x4d72BFF1BeaC69925F8Bd12526a39BAAb069e5Da", 2] # Community SM / CSAccounting (proxy)
+          - ["0x9D28ad303C90DF524BA960d7a2DAC56DcC31e428", 2] # Community SM / CSParametersRegistry (proxy)
+          - ["0xD99CC66fEC647E68294C6477B40fC7E0F6F618D0", 2] # Community SM / CSFeeDistributor (proxy)
+          - ["0xdC5FE1782B6943f318E05230d688713a560063DC", 2] # Community SM / CSVerifier
+          - ["0xE1686C2E90eb41a48356c1cC7FaA17629af3ADB3", 2] # Community SM / CSGateSeal
+          - ["0x4D4074628678Bd302921c20573EEa1ed38DdF7FB", 2] # Community SM / CSFeeOracle (proxy)
+          - ["0x71093efF8D8599b5fA340D665Ad60fA7C80688e4", 2] # Community SM / HashConsensus
+          - ["0xaa328816027F2D32B9F56d190BC9Fa4A5C07637f", 2] # Community SM / CSStrikes
+          - ["0xc72b58aa02E0e98cF8A4a0E9Dce75e763800802C", 2] # Community SM / CSEjector
+          - ["0x06cd61045f958A209a0f8D746e103eCc625f4193", 2] # Community SM / CSExitPenalties (proxy)
+          - ["0xFdab48c4D627e500207e9AF29c98579d90Ea0ad4", 2] # Community SM / VettedGateFactory
+          - ["0xF0211b7660680B49De1A7E9f25C65660F0a13Fea", 2] # EasyTrack
+          - ["0xFE5986E06210aC1eCC1aDCafc0cc7f8D63B3F977", 2] # EVMScriptExecutor
+          - ["0x23ED611be0e1a820978875C0122F92260804cdDf", 2] # Lido V3 Accounting (proxy)
+          - ["0x1d201BE093d847f6446530Efb0E8Fb426d176709", 2] # Lido V3 VaultHub (proxy)
+          - ["0xF4bF42c6D6A0E38825785048124DBAD6c9eaaac3", 2] # Lido V3 PredepositGuarantee (proxy)
+          - ["0xC69685E89Cefc327b43B7234AC646451B27c544d", 2] # Lido V3 OperatorGrid (proxy)
+          - ["0x02Ca7772FF14a9F6c1a08aF385aA96bb1b34175A", 2] # Lido V3 StakingVaultFactory
+          - ["0x5FbE8cEf9CCc56ad245736D3C5bAf82ad54Ca789", 2] # Lido V3 StakingVaultBeacon
+          - ["0x06A56487494aa080deC7Bf69128EdA9225784553", 2] # Lido V3 StakingVaultImplementation
+          - ["0x294825c2764c7D412dc32d87E2242c4f1D989AF3", 2] # Lido V3 DashboardImplementation
+          - ["0xaC4Aae7123248684C405A4b0038C1560EC7fE018", 2] # Lido V3 ValidatorConsolidationRequests
+          - ["0x5DB427080200c235F2Ae8Cd17A7be87921f7AD6c", 2] # Lido V3 LazyOracle (proxy)
+          - ["0x881dAd714679A6FeaA636446A0499101375A365c", 2] # GateSeal (VaultHub and PredepositGuarantee)
+        - "eip155:1"
+    # Bounty terms: [bountyPercentage, bountyCapUSD, retainable, identity, diligenceRequirements, aggregateBountyCapUSD]
+    - - 10
+      - 2000000
+      - false
+      - 0
+      - "As a condition to eligibility for any bounty under the Safe Harbor program, a Whitehat represents, warrants, and covenants that they:\n\n- are at least 18 or the age of majority in their jurisdiction (whichever is higher) and have full legal capacity;\n- are not (i) a citizen or resident of, located, incorporated, or otherwise established in any jurisdiction that is the subject of comprehensive sanctions or an embargo administered or enforced by the United States, United Kingdom, European Union, or United Nations, or (ii) a person that is, or that is owned or controlled by, or acting on behalf of, any person that is the subject of any sanctions administered or enforced by any of those authorities;\n- are not (and for the prior 12 months have not been) an employee, contractor, or service provider of any Lido Labs or Lido Ecosystem affiliate, nor an immediate family member of such a person, and are not acting on their behalf or receiving any advice from the said persons;\n- The Whitehat further acknowledges that the Lido Labs, acting solely in its diligence-support capacity, may require additional information (including information relating to their identity and jurisdiction) and may provide Lido DAO with all information gathered as a result of this diligence check and an assessment of whether making such payment would violate, or would present an undue risk of violating, any applicable law or regulation (including sanctions, anti–money laundering, or anti–terrorist–financing laws). Lido Labs will not make any payment determinations, which remain exclusively within the authority of Lido DAO. These representations, warranties, and acknowledgements are continuing and are conditions precedent to eligibility for any bounty.\n\nThese representations, warranties, and acknowledgements are continuing and are conditions precedent to eligibility for any bounty."
+      - 2000000
+    # Agreement document URL
+    - "https://bafybeigvd7z4iemq7vrdcczgyu2afm7egxwrggftiplydc3vdrdmgccwvu.ipfs.w3s.link/The_SEAL_Whitehat_Safe_Harbor_Agremeent_V1_01.pdf"
+
+l1:
+  rpcUrl: MAINNET_REMOTE_RPC_URL # https://ethereum-rpc.publicnode.com
+  explorerHostname: api.etherscan.io/v2/api
+  explorerTokenEnv: ETHERSCAN_TOKEN
+  chainId: *CHAIN_ID
+  contracts:
+    AgreementV2:
+      name: AgreementV2
+      address: *AgreementV2
+      checks:
+        getDetails: *AGREEMENT_DETAILS
+        owner: *SafeProxy
+    SafeProxy:
+      name: Safe
+      address: *SafeProxy
+      proxyName: SafeProxy
+      implementation: *Safe
+      proxyChecks: {}
+      checks:
+        VERSION: *SAFE_VERSION
+        approvedHashes: null
+        checkNSignatures: null
+        checkSignatures: null
+        domainSeparator: "0x965dfb7ee8d2bc4b2d58946fdccb96aa276db99e4fd748006414c8e5d4cd04b9"
+        encodeTransactionData: null
+        getChainId: *CHAIN_ID
+        getModulesPaginated: null
+        getOwners:
+          - "0xCDDf6b6CffFa7b61b3048916C9C1262F6410C01f" # Nikita_K
+          - "0x9777AF8c6727D57F74f7d381AD47eB4A65f042Ff" # tamtamchik
+          - "0x912e21CdA3D7012146da4Df33309d860a9eb0bEb" # George
+          - "0x235750Acd5F02A88be3cBF96BB9635DAeB22B203" # n0guest
+          - "0x59F8D74Fe49d5ebEAc069E3baf07eB4b614BD5A7" # TheDZhon
+        getStorageAt: null
+        getThreshold: 4 # 4/5 signatures required
+        getTransactionHash: null
+        isModuleEnabled: null
+        isOwner:
+          - args: ["0xCDDf6b6CffFa7b61b3048916C9C1262F6410C01f"] # Nikita_K
+            result: true
+          - args: ["0x9777AF8c6727D57F74f7d381AD47eB4A65f042Ff"] # tamtamchik
+            result: true
+          - args: ["0x912e21CdA3D7012146da4Df33309d860a9eb0bEb"] # George
+            result: true
+          - args: ["0x235750Acd5F02A88be3cBF96BB9635DAeB22B203"] # n0guest
+            result: true
+          - args: ["0x59F8D74Fe49d5ebEAc069E3baf07eB4b614BD5A7"] # TheDZhon
+            result: true
+        nonce: null # 0 as initial value, but will increase
+        signedMessages: null
+      implementationChecks:
+        VERSION: *SAFE_VERSION
+        approvedHashes: null
+        checkNSignatures: null
+        checkSignatures: null
+        domainSeparator: "0xc4864056e21022913a49884ba9fb4035364d5c2ab8b40f0305583ae419c72f86"
+        encodeTransactionData: null
+        getChainId: *CHAIN_ID
+        getModulesPaginated: null
+        getOwners:
+          mustRevert: true
+        getStorageAt: null
+        getThreshold: 1
+        getTransactionHash: null
+        isModuleEnabled: null
+        isOwner:
+          - args: ["0xCDDf6b6CffFa7b61b3048916C9C1262F6410C01f"] # Nikita_K
+            result: false
+          - args: ["0x9777AF8c6727D57F74f7d381AD47eB4A65f042Ff"] # tamtamchik
+            result: false
+          - args: ["0x912e21CdA3D7012146da4Df33309d860a9eb0bEb"] # George
+            result: false
+          - args: ["0x235750Acd5F02A88be3cBF96BB9635DAeB22B203"] # n0guest
+            result: false
+          - args: ["0x59F8D74Fe49d5ebEAc069E3baf07eB4b614BD5A7"] # TheDZhon
+            result: false
+        nonce: 0
+        signedMessages: null
