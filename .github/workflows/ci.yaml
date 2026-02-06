@@ -26,11 +26,18 @@ jobs:
             network: ethereum-mainnet
           - config: configs/lidov3/mainnet/lidov3-et-post-vote-phase-2.yml
             network: ethereum-mainnet
+          # SafeHarbor configs
           - config: configs/safeharbor/mainnet.yml
             network: ethereum-mainnet
           # Lido V3 configs - Hoodi
           - config: configs/lidov3/hoodi/lidov3-testnet.yaml
             network: hoodi-testnet
+          # Mellow stRATEGY configs - Mainnet
+          - config: configs/mellow_strategy/mellow-strategy.yml
+            network: ethereum-mainnet
+          # DeFiWrapper configs
+          - config: configs/defiwrapper/mainnet.seed.generated.yml
+            network: ethereum-mainnet
 
     env:
       # Explorer API tokens
@@ -39,6 +46,8 @@ jobs:
       # Ethereum RPC URLs
       MAINNET_REMOTE_RPC_URL: ${{ secrets.MAINNET_REMOTE_RPC_URL }}
       HOODI_REMOTE_RPC_URL: ${{ secrets.HOODI_REMOTE_RPC_URL }}
+      PLASMA_RPC_URL: ${{ secrets.PLASMA_RPC_URL }}
+      ARB_RPC_URL: ${{ secrets.ARB_RPC_URL }}
 
     steps:
       - name: Checkout repository
