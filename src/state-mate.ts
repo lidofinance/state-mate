@@ -153,6 +153,11 @@ async function downloadAndCheckAllAbi<T extends EntireDocument | SeedDocument>(j
   flushAbiUpdates();
   // Reset ABI mode cache so newly downloaded ABIs are detected in subsequent checks
   resetAbiModeCache();
+
+  log(
+    `\n💡 To consolidate individual ABI files into a single compressed file, run:\n` +
+      `   ${chalk.cyan(`yarn consolidate-abi ${path.relative(process.cwd(), abiDirectoryPath)}`)}\n`,
+  );
 }
 
 async function iterateLoadedContracts<T extends EntireDocument | SeedDocument>(
