@@ -205,7 +205,7 @@ deployed:
     - &MELLOW_PAUSER "0xa6278B726d4AA09D14f9E820D7785FAd82E7196F"
 
 l1:
-  rpcUrl: ETH_RPC_URL # Mainnet RPC URL
+  rpcUrl: MAINNET_REMOTE_RPC_URL # Mainnet RPC URL
   explorerHostname: api.etherscan.io
   chainId: 1
   explorerTokenEnv: ETHERSCAN_TOKEN
