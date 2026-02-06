@@ -83,6 +83,7 @@ parameters:
   - &EXT_MELLOW_SIGNER_2 "0xe49384e6Aca6A26c82Eaa161A9211fA60fEee3Ef"
   - &EXT_MELLOW_SIGNER_3 "0x112C1aAB1463A32eD8B1f5F2e8b5244D876Ef740"
   - &EXT_MELLOW_SIGNER_4 "0x1f3E4c3dBF27056CD7881D8eb376B1D7815757a6"
+  - &EXT_MELLOW_SIGNER_5 "0x5fa3B054D91aF2e1dC76124D7E774044697b942e"
 
   # --- Thresholds for msigs ---
   - &PROXY_ADMIN_THRESHOLD 5
@@ -1064,7 +1065,7 @@ l1:
           - args: [*ACCEPT_REPORT_ROLE]
             result: []
           - args: [*SET_MERKLE_ROOT_ROLE]
-            result: [*ACTIVE_VAULT_ADMIN, *timelockController]
+            result: [*LAZY_VAULT_ADMIN, *timelockController]
           - args: [*ALLOW_CALL_ROLE]
             result: []
           - args: [*DISALLOW_CALL_ROLE]
@@ -1146,7 +1147,7 @@ l1:
           - args: [0]
             result: *subvault0
         subvaultFactory: *subvaultFactory
-        subvaults: 1
+        subvaults: 2
         supportedRoleAt:
           - args: [0]
             result: *DEFAULT_ADMIN_ROLE
@@ -1154,7 +1155,9 @@ l1:
             result: *SET_MERKLE_ROOT_ROLE
           - args: [2]
             result: *CALLER_ROLE
-        supportedRoles: 3
+          - args: [3]
+            result: *CREATE_SUBVAULT_ROLE
+        supportedRoles: 4
         supportsInterface:
         verifierFactory: *verifierFactory
       implementationChecks:
@@ -1393,11 +1396,11 @@ l1:
         DISALLOW_CALL_ROLE: *DISALLOW_CALL_ROLE
         SET_MERKLE_ROOT_ROLE: *SET_MERKLE_ROOT_ROLE
         allowedCallAt:
-        allowedCalls: 0
+        allowedCalls: 1
         getVerificationResult:
         hashCall:
         isAllowedCall:
-        merkleRoot: "0x35999536cdd0d8e2e1caf419aee4ef7a32add6278a626915fa0024047fd7f883"
+        merkleRoot: "0xb66c6f56357f781b2956b6f202d2b019cb3078bf3c65463626d9cd4fa652c33b"
         vault: *vault
         verifyCall:
       implementationChecks:
@@ -1553,7 +1556,7 @@ l1:
         getTransactionHash:
         isModuleEnabled:
         isOwner:
-        nonce: 1
+        nonce: 5
         signedMessages:
       implementationChecks:
         VERSION:
@@ -1599,7 +1602,7 @@ l1:
         getTransactionHash:
         isModuleEnabled:
         isOwner:
-        nonce: 1
+        nonce: 3
         signedMessages:
       implementationChecks:
         VERSION:
@@ -1634,6 +1637,7 @@ l1:
         getChainId: 9745
         getModulesPaginated:
         getOwners:
+          - *EXT_MELLOW_SIGNER_5
           - *EXT_MELLOW_SIGNER_2
           - *MELLOW_SIGNER_2
           - *MELLOW_SIGNER_3
@@ -1645,7 +1649,7 @@ l1:
         getTransactionHash:
         isModuleEnabled:
         isOwner:
-        nonce: 1
+        nonce: 17
         signedMessages:
       implementationChecks:
         VERSION:
