@@ -125,6 +125,33 @@ deployed:
     - &basicRedeemHook "0x0000000637f1b1ccDA4Af2dB6CDDf5e5Ec45fd93"
     - &redirectingDepositHook "0x00000004d3B17e5391eb571dDb8fDF95646ca827"
     - &oracleHelper "0x000000005F543c38d5ea6D0bF10A50974Eb55E35"
+    - &swapModuleFactory "0x8471a3BC64f14c5272368FDD8FdD197EeD964FEf"
+
+    # --- Additional factory entities ---
+    - &feeManager1 "0x21f310b9e0cc1f2836F2Ab28930D40536429b4EE"
+    - &feeManager2 "0x264bBB105BfeFE97a6a849166b919b821F61F1b5"
+    - &oracle1 "0xFf747809ff473A6dB6c592a27fDABD3A4b233a7D"
+    - &oracle2 "0x60B3CE1C0F7DbAF5bc0c369f248Bb535049f136b"
+    - &riskManager1 "0xF5CB3F97605D274899d7c19601d5E6AEc78bBca0"
+    - &riskManager2 "0xC1b8f75b302FC12AAC8b917EbFD62058C73Be682"
+    - &shareManager1 "0xc7efceD90D47C747E90A0E4CDDABB04d401f18a0"
+    - &shareManager2 "0x6e55964EeA205F2e62378018b298C969ED568faa"
+    - &subvault1 "0xb487aC8076e30D825d79B49066cC110956960E81"
+    - &subvault2 "0x0e7fe721F629939293b0494Be1B9c2eFe4675D82"
+    - &subvault3 "0x3C14C3d0557a361cBF026a1F8D295989dbA24962"
+    - &subvault4 "0x2c87C0FAB2b67F627873CE816a092eEf6b04fC65"
+    - &subvault5 "0xB767EDeDd5Ef0D032bD611038a329D77e5d4691e"
+    - &subvault6 "0xdb6236242718C6fbD9229B86F862960aA9fFd73E"
+    - &subvault7 "0x7696731721dddeC1502F35C52d9c83a768227daE"
+    - &verifier1 "0x723CC2e0C44421ecc3b1EC5A61125E41Ce097012"
+    - &verifier2 "0x7bd40AEfc58F3fa45eEFe5aE598D53E7555170b6"
+    - &verifier3 "0x650aCd5264DD12754e1BC458175a349c14fAEBd9"
+    - &verifier4 "0x22D7aAb52E5D12AD54da07b256ACEe9A19D0aC58"
+    - &verifier5 "0xbDb8EfB64Dc945667147c8b83AD9f711ebD73bce"
+    - &verifier6 "0xF33eC139c97C0E9237894D2c282634162279D525"
+    - &verifier7 "0xaD1b3eA06027DF987D1320E1f4D0F1B58230250c"
+    - &vault1 "0x60Ff685a16D9a283ddfbF29d60ACe73978dda83b"
+    - &vault2 "0x04fF39d2641031C520761D8c589cC095AdC78e16"
 
     # --- strETH deployment ---
     - &vault "0x841e213864046111E43d237703d71FaBe91Ef9e0"
@@ -143,7 +170,7 @@ deployed:
     - &CURATOR "0x5Dbf9287787A5825beCb0321A276C9c92d570a75"
 
 l1:
-  rpcUrl: PLASMA_RPC_URL # Mainnet RPC URL
+  rpcUrl: "https://rpc.plasma.to" # Mainnet RPC URL
   explorerHostname: api.etherscan.io
   explorerTokenEnv: ETHERSCAN_TOKEN
   chainId: 9745
@@ -158,10 +185,12 @@ l1:
       implementation: *factoryImplementation
       proxyChecks: {}
       checks:
-        entities: 11
+        entities: 12
         entityAt:
-          - args: [11]
+          - args: [12]
             mustRevert: true
+          - args: [11]
+            result: *swapModuleFactory
           - args: [10]
             result: *ERC20VerifierFactory
           - args: [9]
@@ -192,6 +221,8 @@ l1:
           - args: [*factoryImplementation]
             result: false
         isEntity:
+          - args: [*swapModuleFactory]
+            result: true
           - args: [*ERC20VerifierFactory]
             result: true
           - args: [*vaultFactory]
@@ -328,10 +359,14 @@ l1:
       implementation: *feeManagerImplementation
       proxyChecks: {}
       checks:
-        entities: 1
+        entities: 3
         entityAt:
-          - args: [1]
+          - args: [3]
             mustRevert: true
+          - args: [2]
+            result: *feeManager2
+          - args: [1]
+            result: *feeManager1
           - args: [0]
             result: *feeManager
         implementationAt:
@@ -344,6 +379,10 @@ l1:
           - args: [*feeManagerImplementation]
             result: false
         isEntity:
+          - args: [*feeManager2]
+            result: true
+          - args: [*feeManager1]
+            result: true
           - args: [*feeManager]
             result: true
         owner: *PROXY_ADMIN
@@ -368,12 +407,16 @@ l1:
       implementation: *oracleImplementation
       proxyChecks: {}
       checks:
-        entities: 1
+        entities: 3
         entityAt:
-          - args: [1]
+          - args: [3]
             mustRevert: true
+          - args: [2]
+            result: *oracle2
+          - args: [1]
+            result: *oracle1
           - args: [0]
-            result: "0x4F00f500b3BB85Eb9186E6aB34d07406ED467Dc2" # ???
+            result: *oracle
         implementationAt:
           - args: [0]
             result: *oracleImplementation
@@ -384,7 +427,11 @@ l1:
           - args: [*oracleImplementation]
             result: false
         isEntity:
-          - args: ["0x4F00f500b3BB85Eb9186E6aB34d07406ED467Dc2"]
+          - args: [*oracle2]
+            result: true
+          - args: [*oracle1]
+            result: true
+          - args: [*oracle]
             result: true
         owner: *PROXY_ADMIN
         proposalAt:
@@ -468,12 +515,16 @@ l1:
       implementation: *factoryImplementation
       proxyChecks: {}
       checks:
-        entities: 1
+        entities: 3
         entityAt:
-          - args: [1]
+          - args: [3]
             mustRevert: true
+          - args: [2]
+            result: *riskManager2
+          - args: [1]
+            result: *riskManager1
           - args: [0]
-            result: "0xB865714580818423Faee47d023aA122585c5DaC4" # ???
+            result: *riskManager
         implementationAt:
           - args: [0]
             result: *riskManagerImplementation
@@ -484,7 +535,11 @@ l1:
           - args: [*riskManagerImplementation]
             result: false
         isEntity:
-          - args: ["0xB865714580818423Faee47d023aA122585c5DaC4"]
+          - args: [*riskManager2]
+            result: true
+          - args: [*riskManager1]
+            result: true
+          - args: [*riskManager]
             result: true
         owner: *PROXY_ADMIN
         proposalAt:
@@ -508,12 +563,16 @@ l1:
       implementation: *tokenizedShareManagerImplementation
       proxyChecks: {}
       checks:
-        entities: 1
+        entities: 3
         entityAt:
-          - args: [1]
+          - args: [3]
             mustRevert: true
+          - args: [2]
+            result: *shareManager2
+          - args: [1]
+            result: *shareManager1
           - args: [0]
-            result: "0xA3F87638aE301F0928f298c70fCa9B503a84d8Da"
+            result: *shareManager
         implementations: 2
         implementationAt:
           - args: [0]
@@ -528,7 +587,11 @@ l1:
           - args: [*basicShareManagerImplementation]
             result: false
         isEntity:
-          - args: ["0xA3F87638aE301F0928f298c70fCa9B503a84d8Da"]
+          - args: [*shareManager2]
+            result: true
+          - args: [*shareManager1]
+            result: true
+          - args: [*shareManager]
             result: true
         owner: *PROXY_ADMIN
         proposalAt:
@@ -596,10 +659,24 @@ l1:
       implementation: *subvaultImplementation
       proxyChecks: {}
       checks:
-        entities: 1
+        entities: 8
         entityAt:
-          - args: [1]
+          - args: [8]
             mustRevert: true
+          - args: [7]
+            result: *subvault7
+          - args: [6]
+            result: *subvault6
+          - args: [5]
+            result: *subvault5
+          - args: [4]
+            result: *subvault4
+          - args: [3]
+            result: *subvault3
+          - args: [2]
+            result: *subvault2
+          - args: [1]
+            result: *subvault1
           - args: [0]
             result: *subvault0
         implementations: 1
@@ -610,6 +687,20 @@ l1:
           - args: [*subvaultImplementation]
             result: false
         isEntity:
+          - args: [*subvault7]
+            result: true
+          - args: [*subvault6]
+            result: true
+          - args: [*subvault5]
+            result: true
+          - args: [*subvault4]
+            result: true
+          - args: [*subvault3]
+            result: true
+          - args: [*subvault2]
+            result: true
+          - args: [*subvault1]
+            result: true
           - args: [*subvault0]
             result: true
         owner: *PROXY_ADMIN
@@ -634,10 +725,24 @@ l1:
       implementation: *verifierImplementation
       proxyChecks: {}
       checks:
-        entities: 1
+        entities: 8
         entityAt:
-          - args: [1]
+          - args: [8]
             mustRevert: true
+          - args: [7]
+            result: *verifier7
+          - args: [6]
+            result: *verifier6
+          - args: [5]
+            result: *verifier5
+          - args: [4]
+            result: *verifier4
+          - args: [3]
+            result: *verifier3
+          - args: [2]
+            result: *verifier2
+          - args: [1]
+            result: *verifier1
           - args: [0]
             result: *verifier0
         implementationAt:
@@ -650,6 +755,20 @@ l1:
           - args: [*verifierImplementation]
             result: false
         isEntity:
+          - args: [*verifier7]
+            result: true
+          - args: [*verifier6]
+            result: true
+          - args: [*verifier5]
+            result: true
+          - args: [*verifier4]
+            result: true
+          - args: [*verifier3]
+            result: true
+          - args: [*verifier2]
+            result: true
+          - args: [*verifier1]
+            result: true
           - args: [*verifier0]
             result: true
         owner: *PROXY_ADMIN
@@ -674,10 +793,14 @@ l1:
       implementation: *vaultImplementation
       proxyChecks: {}
       checks:
-        entities: 1
+        entities: 3
         entityAt:
-          - args: [1]
+          - args: [3]
             mustRevert: true
+          - args: [2]
+            result: *vault2
+          - args: [1]
+            result: *vault1
           - args: [0]
             result: *vault
         implementationAt:
@@ -690,6 +813,10 @@ l1:
           - args: [*vaultImplementation]
             result: false
         isEntity:
+          - args: [*vault2]
+            result: true
+          - args: [*vault1]
+            result: true
           - args: [*vault]
             result: true
         owner: *PROXY_ADMIN

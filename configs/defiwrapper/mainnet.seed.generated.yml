@@ -33,7 +33,7 @@ deployed:
     - &timelockFactory "0x15f2C9ea98e5564d25A46eE39D19704476998786" # TimelockFactory
 
 l1:
-  rpcUrl: REMOTE_RPC_URL # https://ethereum-rpc.publicnode.com
+  rpcUrl: MAINNET_REMOTE_RPC_URL # https://ethereum-rpc.publicnode.com
   explorerHostname: api.etherscan.io
   chainId: 1
   explorerTokenEnv: ETHERSCAN_TOKEN

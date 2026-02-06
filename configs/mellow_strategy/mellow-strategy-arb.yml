@@ -125,6 +125,7 @@ deployed:
     - &basicRedeemHook "0x0000000637f1b1ccDA4Af2dB6CDDf5e5Ec45fd93"
     - &redirectingDepositHook "0x00000004d3B17e5391eb571dDb8fDF95646ca827"
     - &oracleHelper "0x000000005F543c38d5ea6D0bF10A50974Eb55E35"
+    - &swapModuleFactory "0x1B6C06E8ff3E2DD310E20a70a6a2Be048Fa26Dbd"
 
     # --- strETH deployment ---
     - &vault "0x40330720039352B309c70A5028322D1481F496d1"
@@ -136,6 +137,15 @@ deployed:
     - &verifier0 "0x022a33293aeD00E59E93D354D3810249Fa33d7D4"
     - &timelockController "0xda1674c1135eA98A311a3b4aa11865266ab52A7C"
 
+    # --- msvUSD deployment (present in shared core factories) ---
+    - &msvVault "0x13515096066708d14a06eAA2600c5c692954242E"
+    - &msvOracle "0xEF98fE4631d05e7Ab7Ffba49e7bd6D12F77D5585"
+    - &msvShareManager "0x92A27960f0AAD5c1dC6a9974fea813793D346FF7"
+    - &msvFeeManager "0xBE64F682F29a1B7351e79041bd77CB52c0b38656"
+    - &msvRiskManager "0x03f44997f7dC6070503aD4276aABB8568FFa7c64"
+    - &msvSubvault0 "0x9214Fb3563BC6FE429c608071CBc5278b0e43639"
+    - &msvVerifier0 "0x9488a58AE40D4ba7a1d555f160EF4942aD779AF7"
+
     # --- Actors (multisigs) ---
     - &PROXY_ADMIN "0x81698f87C6482bF1ce9bFcfC0F103C4A0Adf0Af0"
     - &LAZY_VAULT_ADMIN "0xAbE20D266Ae54b9Ae30492dEa6B6407bF18fEeb5"
@@ -143,7 +153,7 @@ deployed:
     - &CURATOR "0x5Dbf9287787A5825beCb0321A276C9c92d570a75"
 
 l1:
-  rpcUrl: ARB_RPC_URL # Mainnet RPC URL
+  rpcUrl: "https://arb1.arbitrum.io/rpc"
   explorerHostname: api.etherscan.io
   explorerTokenEnv: ETHERSCAN_TOKEN
   chainId: 42161
@@ -158,10 +168,12 @@ l1:
       implementation: *factoryImplementation
       proxyChecks: {}
       checks:
-        entities: 11
+        entities: 12
         entityAt:
-          - args: [11]
+          - args: [12]
             mustRevert: true
+          - args: [11]
+            result: *swapModuleFactory
           - args: [10]
             result: *ERC20VerifierFactory
           - args: [9]
@@ -192,6 +204,8 @@ l1:
           - args: [*factoryImplementation]
             result: false
         isEntity:
+          - args: [*swapModuleFactory]
+            result: true
           - args: [*ERC20VerifierFactory]
             result: true
           - args: [*vaultFactory]
@@ -328,10 +342,12 @@ l1:
       implementation: *feeManagerImplementation
       proxyChecks: {}
       checks:
-        entities: 1
+        entities: 2
         entityAt:
-          - args: [1]
+          - args: [2]
             mustRevert: true
+          - args: [1]
+            result: *msvFeeManager
           - args: [0]
             result: *feeManager
         implementationAt:
@@ -344,6 +360,8 @@ l1:
           - args: [*feeManagerImplementation]
             result: false
         isEntity:
+          - args: [*msvFeeManager]
+            result: true
           - args: [*feeManager]
             result: true
         owner: *PROXY_ADMIN
@@ -368,12 +386,14 @@ l1:
       implementation: *oracleImplementation
       proxyChecks: {}
       checks:
-        entities: 1
+        entities: 2
         entityAt:
-          - args: [1]
+          - args: [2]
             mustRevert: true
+          - args: [1]
+            result: *msvOracle
           - args: [0]
-            result: "0x4F00f500b3BB85Eb9186E6aB34d07406ED467Dc2" # ???
+            result: *oracle
         implementationAt:
           - args: [0]
             result: *oracleImplementation
@@ -384,7 +404,9 @@ l1:
           - args: [*oracleImplementation]
             result: false
         isEntity:
-          - args: ["0x4F00f500b3BB85Eb9186E6aB34d07406ED467Dc2"]
+          - args: [*msvOracle]
+            result: true
+          - args: [*oracle]
             result: true
         owner: *PROXY_ADMIN
         proposalAt:
@@ -468,12 +490,14 @@ l1:
       implementation: *factoryImplementation
       proxyChecks: {}
       checks:
-        entities: 1
+        entities: 2
         entityAt:
-          - args: [1]
+          - args: [2]
             mustRevert: true
+          - args: [1]
+            result: *msvRiskManager
           - args: [0]
-            result: "0xB865714580818423Faee47d023aA122585c5DaC4" # ???
+            result: *riskManager
         implementationAt:
           - args: [0]
             result: *riskManagerImplementation
@@ -484,7 +508,9 @@ l1:
           - args: [*riskManagerImplementation]
             result: false
         isEntity:
-          - args: ["0xB865714580818423Faee47d023aA122585c5DaC4"]
+          - args: [*msvRiskManager]
+            result: true
+          - args: [*riskManager]
             result: true
         owner: *PROXY_ADMIN
         proposalAt:
@@ -508,12 +534,14 @@ l1:
       implementation: *tokenizedShareManagerImplementation
       proxyChecks: {}
       checks:
-        entities: 1
+        entities: 2
         entityAt:
-          - args: [1]
+          - args: [2]
             mustRevert: true
+          - args: [1]
+            result: *msvShareManager
           - args: [0]
-            result: "0xA3F87638aE301F0928f298c70fCa9B503a84d8Da"
+            result: *shareManager
         implementations: 2
         implementationAt:
           - args: [0]
@@ -528,7 +556,9 @@ l1:
           - args: [*basicShareManagerImplementation]
             result: false
         isEntity:
-          - args: ["0xA3F87638aE301F0928f298c70fCa9B503a84d8Da"]
+          - args: [*msvShareManager]
+            result: true
+          - args: [*shareManager]
             result: true
         owner: *PROXY_ADMIN
         proposalAt:
@@ -596,12 +626,14 @@ l1:
       implementation: *subvaultImplementation
       proxyChecks: {}
       checks:
-        entities: 1
+        entities: 2
         entityAt:
-          - args: [1]
+          - args: [2]
             mustRevert: true
+          - args: [1]
+            result: *msvSubvault0
           - args: [0]
-            result: "0x222fa99C485a088564eb43fAA50Bc10b2497CDB2" # ???
+            result: *subvault0
         implementations: 1
         implementationAt:
           - args: [0]
@@ -610,7 +642,9 @@ l1:
           - args: [*subvaultImplementation]
             result: false
         isEntity:
-          - args: ["0x222fa99C485a088564eb43fAA50Bc10b2497CDB2"]
+          - args: [*msvSubvault0]
+            result: true
+          - args: [*subvault0]
             result: true
         owner: *PROXY_ADMIN
         proposalAt:
@@ -634,12 +668,14 @@ l1:
       implementation: *verifierImplementation
       proxyChecks: {}
       checks:
-        entities: 1
+        entities: 2
         entityAt:
-          - args: [6]
+          - args: [2]
             mustRevert: true
+          - args: [1]
+            result: *msvVerifier0
           - args: [0]
-            result: "0x022a33293aeD00E59E93D354D3810249Fa33d7D4" # ???
+            result: *verifier0
         implementationAt:
           - args: [0]
             result: *verifierImplementation
@@ -650,7 +686,9 @@ l1:
           - args: [*verifierImplementation]
             result: false
         isEntity:
-          - args: ["0x022a33293aeD00E59E93D354D3810249Fa33d7D4"]
+          - args: [*msvVerifier0]
+            result: true
+          - args: [*verifier0]
             result: true
         owner: *PROXY_ADMIN
         proposalAt:
@@ -674,12 +712,14 @@ l1:
       implementation: *vaultImplementation
       proxyChecks: {}
       checks:
-        entities: 1
+        entities: 2
         entityAt:
-          - args: [1]
+          - args: [2]
             mustRevert: true
+          - args: [1]
+            result: *msvVault
           - args: [0]
-            result: "0x40330720039352B309c70A5028322D1481F496d1" # ???
+            result: *vault
         implementationAt:
           - args: [0]
             result: *vaultImplementation
@@ -690,7 +730,9 @@ l1:
           - args: [*vaultImplementation]
             result: false
         isEntity:
-          - args: ["0x40330720039352B309c70A5028322D1481F496d1"]
+          - args: [*msvVault]
+            result: true
+          - args: [*vault]
             result: true
         owner: *PROXY_ADMIN
         proposalAt:
