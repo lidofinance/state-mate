@@ -27,12 +27,53 @@ async function sleep(timeoutMs: number) {
 }
 
 function isEtherResponseOkResult(object: unknown): object is EtherResponseOkResult {
-  return isCommonResponseOkResult(object) && "Implementation" in object && typeof object.Implementation === "string";
+  if (!isCommonResponseOkResult(object)) {
+    return false;
+  }
+
+  const result = object as Partial<EtherResponseOkResult>;
+
+  if (result.Implementation !== undefined && typeof result.Implementation !== "string") {
+    return false;
+  }
+
+  if (result.ImplementationAddress !== undefined && typeof result.ImplementationAddress !== "string") {
+    return false;
+  }
+
+  if (
+    result.ImplementationAddresses !== undefined &&
+    (!Array.isArray(result.ImplementationAddresses) ||
+      result.ImplementationAddresses.some((entry) => typeof entry !== "string"))
+  ) {
+    return false;
+  }
+
+  if (result.IsProxy !== undefined && typeof result.IsProxy !== "string") {
+    return false;
+  }
+
+  if (result.IsProxy === "true") {
+    return Boolean(
+      result.Implementation ||
+        result.ImplementationAddress ||
+        (result.ImplementationAddresses && result.ImplementationAddresses.length > 0),
+    );
+  }
+
+  return true;
 }
 
 type EtherResponseOkResult = CommonResponseOkResult & {
-  Implementation: string;
+  Implementation?: string;
+  ImplementationAddress?: string;
+  ImplementationAddresses?: string[];
+  IsProxy?: string;
 };
+
+function getImplementationAddress(result: EtherResponseOkResult) {
+  return result.Implementation ?? result.ImplementationAddress ?? result.ImplementationAddresses?.[0];
+}
 
 async function etherRateLimitHandler(
   sourcesResponse: ResponseBad,
@@ -60,10 +101,11 @@ async function etherGetContractInfoCallback(
   chainId?: number | string,
 ): Promise<ContractInfo> {
   if (!isEtherResponseOkResult(response.result[0])) {
-    logErrorAndExit(`It seems, explorer response has changed`);
+    logErrorAndExit(`It seems, Etherscan response has changed`);
   }
 
-  const { ContractName, Implementation: implementationAddress } = response.result[0];
+  const { ContractName } = response.result[0];
+  const implementationAddress = getImplementationAddress(response.result[0]);
 
   let implementation;
   if (implementationAddress) {

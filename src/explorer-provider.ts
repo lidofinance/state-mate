@@ -185,6 +185,7 @@ function _getExplorerApiUrl(
   if (explorerKey) {
     url = `${url}&apikey=${explorerKey}`;
   }
+
   return url;
 }
 
