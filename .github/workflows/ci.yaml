@@ -35,9 +35,9 @@ jobs:
           # Mellow stRATEGY configs - Mainnet
           - config: configs/mellow_strategy/mellow-strategy.yml
             network: ethereum-mainnet
-          - config: configs/mellow_strategy/mellow-plasma.yml
+          - config: configs/mellow_strategy/mellow-strategy-plasma.yml
             network: plasma
-          - config: configs/mellow_strategy/mellow-arb.yml
+          - config: configs/mellow_strategy/mellow-strategy-arb.yml
             network: arbitrum
           # DeFiWrapper configs
           - config: configs/defiwrapper/mainnet.seed.generated.yml
