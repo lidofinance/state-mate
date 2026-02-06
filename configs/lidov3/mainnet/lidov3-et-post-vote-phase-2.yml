@@ -62,7 +62,7 @@ deployed:
     - &SetLiabilitySharesTargetInVaultHub "0x647DeE7bF33e44829e6430F7A08F63b3319694f0"
 
 l1:
-  rpcUrl: MAINNET_REMOTE_RPC_URL
+  rpcUrl: REMOTE_RPC_URL
   explorerHostname: api.etherscan.io/v2/api
   explorerTokenEnv: ETHERSCAN_TOKEN
   chainId: 1
