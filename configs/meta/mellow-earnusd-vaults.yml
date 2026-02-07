@@ -74,6 +74,8 @@ deployed:
     - &basicRedeemHook "0x0000000637f1b1ccDA4Af2dB6CDDf5e5Ec45fd93"
     - &redirectingDepositHook "0x00000004d3B17e5391eb571dDb8fDF95646ca827"
     - &oracleHelper "0x000000005F543c38d5ea6D0bF10A50974Eb55E35"
+    # MellowAccountV1 (shared implementation)
+    - &mellowAccountV1Implementation "0x00000000028e2bc6fabc9e8b9c7d5d411982ff8e"
 
     # ========================================
     # earnUSD VAULT (Main)
@@ -124,61 +126,63 @@ deployed:
     # ========================================
     # earnUSDc VAULT (Conservative)
     # ========================================
-    - &earnUSDc_vault "0xdd1f1E4aE980cE03051315e30d163d2A062bf8Ec"
-    - &earnUSDc_vaultProxyAdmin "0x453c7342f1cbd3e8e9c3ac806b27510d4bc911ef"
-    - &earnUSDc_depositQueueUSDC "0x3953CD609f888D3748aBfEed7D4d62948B6d8fa6"
-    - &earnUSDc_depositQueueUSDCProxyAdmin "0x952534161de24e03ea4bed7094d04028fe8984e2"
-    - &earnUSDc_syncDepositQueueUSDC "0xDA553484df08C00a821ddCA1EB835114e1e3bc40"
-    - &earnUSDc_syncDepositQueueUSDCProxyAdmin "0xd20bb6081353286823409d0aa0d68e7128d627dd"
-    - &earnUSDc_redeemQueueUSDC "0xa738BAb41309B012b500B9B2E5E00DaE43E024E7"
-    - &earnUSDc_redeemQueueUSDCProxyAdmin "0xcd319c2db31cbc3f7acfe69099c2134ac1c62138"
-    - &earnUSDc_depositQueueUSDT "0xe697deefe974f62AE26C25838851aF74E04EE398"
-    - &earnUSDc_depositQueueUSDTProxyAdmin "0x46d6f9ab6eb3add1f09b5008edaaca432ab7afb2"
-    - &earnUSDc_syncDepositQueueUSDT "0x8682750F5142EAb8B53506015C232C6eFEDea1f6"
-    - &earnUSDc_syncDepositQueueUSDTProxyAdmin "0xde21e9e5712c673f440b3a000a8b9910c611a632"
-    - &earnUSDc_oracle "0x2501a412d2306b2194FadD350d3b0c8076497dc1"
-    - &earnUSDc_oracleProxyAdmin "0x17cee6b0617cc4773ef0df13d731c14a54c0fcb3"
-    - &earnUSDc_shareManager "0x5f9F33b9F3A6a1bf47b22d64061B4B27F613Af36"
-    - &earnUSDc_shareManagerProxyAdmin "0x46530bbd6b34a1a3ec150cdbbc90ca86935c634e"
-    - &earnUSDc_feeManager "0x332109F08B764Be54C920f75CdD875463c0F8895"
-    - &earnUSDc_feeManagerProxyAdmin "0x393c06abfd3d333e7cbb60106d5bbcd3c1a9b06e"
-    - &earnUSDc_riskManager "0x9214E0D594090D18F06791edef90E7dD60a3C1cd"
-    - &earnUSDc_riskManagerProxyAdmin "0xb5975b4bc9ef09cc7e66a4fa4c69b8efd6c97148"
-    - &earnUSDc_timelockController "0xe343d9b325c9360C920209c506503205CfDF825f"
-    - &earnUSDc_oracleSubmitter "0xeE2a2B77Ee1B27BF2D68A7496f52dd551873681D"
+    - &earnUSDc_vault "0x8F281A5fC4Fc588842923DE678ccC48Fc36AB631"
+    - &earnUSDc_vaultProxyAdmin "0x4a7d5249a769d8ac9592d5be1628307c8857ba49"
+    - &earnUSDc_depositQueueUSDC "0x739188DCee93fF298141B6d3d6B63327D8832297"
+    - &earnUSDc_depositQueueUSDCProxyAdmin "0x6b4ab3afa27383230932c7f7b3fcfd6aedb7e7ef"
+    - &earnUSDc_syncDepositQueueUSDC "0x1fd7315B06eD86736EE319941bC624074274e87a"
+    - &earnUSDc_syncDepositQueueUSDCProxyAdmin "0xfacbbfa9f833ea6c30bdd40ebfcf0d6d94c78dfa"
+    - &earnUSDc_redeemQueueUSDC "0xaa1634d0f7F2a6263E25b6Ab1A12Ef0C4D9a30dD"
+    - &earnUSDc_redeemQueueUSDCProxyAdmin "0x2f8124d0eb4921fd2acd592c788183d3dd6819df"
+    - &earnUSDc_depositQueueUSDT "0x96a042b5B83e574F9dBc2Bc6056aD879FD71FbF1"
+    - &earnUSDc_depositQueueUSDTProxyAdmin "0xea71bf46b452be8fd5cea71bef2df7a34150ce70"
+    - &earnUSDc_syncDepositQueueUSDT "0xDb323240e2090F6d286CF610C7407ecBf5C01eEb"
+    - &earnUSDc_syncDepositQueueUSDTProxyAdmin "0xf3a65ca8988c8771f8b78edbcbdb6afbfb61438e"
+    - &earnUSDc_oracle "0x92616e18304a6A6D33A7edd89a9998C0df734AB9"
+    - &earnUSDc_oracleProxyAdmin "0x9d201f3b1db6d672b2561f72f395e7c6fc008a1b"
+    - &earnUSDc_shareManager "0x3341F548cC9D3De05E44b40967f54e19d8889081"
+    - &earnUSDc_shareManagerProxyAdmin "0xb857fc91f68066d7133481dce8ac6ce0c558481d"
+    - &earnUSDc_feeManager "0x363C6A0AF3917b4f08Cb1D0308eCaEF97b760d7d"
+    - &earnUSDc_feeManagerProxyAdmin "0x4dad4402e1f08e514074f91a94e362bba37a3687"
+    - &earnUSDc_riskManager "0x98cA76347cdB297d34cAE4F172259378F4627170"
+    - &earnUSDc_riskManagerProxyAdmin "0xf5ff8423c102da6bd9903bba0e5ff70e1167d8f0"
+    - &earnUSDc_timelockController "0x01327Cae0ced4443FBE7681FD3923DD1C43c1408"
+    - &earnUSDc_oracleSubmitter "0x0351e5ebA388bA319dc1a80124B94Bc8bfF4bc38"
 
     # --- Actors (earnUSDc) ---
     - &earnUSDc_activeVaultAdmin "0xBeEDb9475F2D08Aa3661881e657fD9Caf4f83532" # SH
     - &earnUSDc_curator "0xCd9250bF7C2e8327B6Ddd053Eccbc145a5d0De30" # SH
-    - &earnUSDc_oracleUpdater "0x1EED44d056eC91a4dC8f2BB4771573e0007CB969" # SH
+    - &earnUSDc_oracleUpdater "0x7e681274F9F6606abf544d694531F171Cc104985"
     - &earnUSDc_curatorPauser "0x656339B0BDc398Aa3Ae2C1Fc71Cc6549993DD29C" # SH
     - &earnUSDc_temporaryAdmin "0x7e681274F9F6606abf544d694531F171Cc104985" # Lido
 
     # ========================================
     # earnUSDe VAULT (Experimental)
     # ========================================
-    - &earnUSDe_vault "0x6f4cd5d8C9e3962139Da896B63A8eceD8771b15E"
-    - &earnUSDe_vaultProxyAdmin "0x0877c25ad293e14adff17e1e30fe5752a3813496"
-    - &earnUSDe_depositQueueUSDC "0xa4EDE330603f069F2057E6fB8782361CE2639BF9"
-    - &earnUSDe_depositQueueUSDCProxyAdmin "0x39a0d615c62c4a7c8b56bf50ed477ee2dc3bca2a"
-    - &earnUSDe_syncDepositQueueUSDC "0xae60D58CC04C0d4A78DB896a8166257d72EFb03b"
-    - &earnUSDe_syncDepositQueueUSDCProxyAdmin "0x6b3eb2354e5a51ee5f4ff14636cff8c0e8fd3d35"
-    - &earnUSDe_redeemQueueUSDC "0x1375BC62f5575ec2a46aE66e99e05a8b05125b46"
-    - &earnUSDe_redeemQueueUSDCProxyAdmin "0x2edfbceffc28bd9059608cd6d361e026ff29b7a8"
-    - &earnUSDe_depositQueueUSDT "0x697D146f8D595adA101d257AfB87Ca5b220B3053"
-    - &earnUSDe_depositQueueUSDTProxyAdmin "0x93e914ccb8602a4afb5d57c0a4d3000e267a361a"
-    - &earnUSDe_syncDepositQueueUSDT "0x02D0Ac9bC1980a901C14cC95a9a6cb68bb7866D3"
-    - &earnUSDe_syncDepositQueueUSDTProxyAdmin "0x8f0b9e8d9e5f6e929554acf2be2b7a2bcf9e36d3"
-    - &earnUSDe_oracle "0x6Eb2238069F04b2407F6C3dE015fB3cD4B8a92ea"
-    - &earnUSDe_oracleProxyAdmin "0x80864769e0bf6b60969ac8119c87b865dbefe3ed"
-    - &earnUSDe_shareManager "0xC0d572Ee1bcb143E10896D9496aa64B7EA9803dF"
-    - &earnUSDe_shareManagerProxyAdmin "0xe2ef1ada48e22768b223f1144f55450a94bac736"
-    - &earnUSDe_feeManager "0xEb38Ff6B8c88898f552B91F45B42B0bF6881BdB9"
-    - &earnUSDe_feeManagerProxyAdmin "0x434cee4d522d276e345d132fd147d7189f7c56cd"
-    - &earnUSDe_riskManager "0x402889bbEFE177bD029D19a27faEC8d4B3040EF7"
-    - &earnUSDe_riskManagerProxyAdmin "0x9ba947c995d89ff3c8908f038b9460fc8bd2808e"
-    - &earnUSDe_timelockController "0x18f49CC03eA8680F05c842b0c487505629D6C6c3"
-    - &earnUSDe_oracleSubmitter "0xaE6cbc23982a11D28F3cAc011cDF891aD1627626"
+    - &earnUSDe_vault "0x2816f240109845661ba27b3D0148f211c5921553"
+    - &earnUSDe_vaultProxyAdmin "0xb96585196e5cfaf82bb8436d2e182e8559cb59f0"
+    - &earnUSDe_depositQueueUSDC "0x2B1AA4E755Ffa8103FB03A0ee886ce9A2D723024"
+    - &earnUSDe_depositQueueUSDCProxyAdmin "0x16b760b44fb2e7f7eaca24cfc2bd971e7f830870"
+    - &earnUSDe_syncDepositQueueUSDC "0xc611c4506941761aCce51E56f6E5E103562ABda0"
+    - &earnUSDe_syncDepositQueueUSDCProxyAdmin "0x44cc7416ff13ca61dc3a87892e0dd2dc79e3f28c"
+    - &earnUSDe_redeemQueueUSDC "0xC03691144bf5f0357f982a189ccF58a65d834889"
+    - &earnUSDe_redeemQueueUSDCProxyAdmin "0xb43be350d55d93cb2a8df83b341143d34042e60a"
+    - &earnUSDe_depositQueueUSDT "0x8a5B0FF53185eEE20ed07e908e2e35e4ebA69Bac"
+    - &earnUSDe_depositQueueUSDTProxyAdmin "0x166626d2f6836669de3877a9a8cd0fb3bceedfe0"
+    - &earnUSDe_syncDepositQueueUSDT "0x21261537e8a8882dF48bF68DFb600182131e6Eae"
+    - &earnUSDe_syncDepositQueueUSDTProxyAdmin "0x91b931dcfc00cb0df0e2a822f81ad3549ff718d4"
+    - &earnUSDe_oracle "0x57667bAa0e70f2d053FE62eD340735e6b3710633"
+    - &earnUSDe_oracleProxyAdmin "0x898a5f9295296ceee7d7c5c39cc502c9ca1bb5a8"
+    - &earnUSDe_shareManager "0xB7DEDB49cFC2F664B12f80DEDac066c5fc723CF3"
+    - &earnUSDe_shareManagerProxyAdmin "0x88f654616b6729e737245074ac6a011300661046"
+    - &earnUSDe_feeManager "0x7A05a68857276884D4596c27fDeb4730eb13165B"
+    - &earnUSDe_feeManagerProxyAdmin "0xde04a1406ca0d1a52f1a99e40eb46b86be073f2f"
+    - &earnUSDe_riskManager "0x663fDF2a67fc7DF1f144818dE96092ce73E11547"
+    - &earnUSDe_riskManagerProxyAdmin "0x7a35f627d675b825f3445b312d18dbf9b6e7f9af"
+    - &earnUSDe_timelockController "0xf58221ea16b0D914aC7BdD8554b399f5918b704e"
+    - &earnUSDe_oracleSubmitter "0xD5eeBFc70143ee7A76758c8A80bD5A5939FAc6FC"
+    - &earnUSDe_mellowAccountV1 "0x7Dfe5841f9b2744c1510D822f6301fcD43182cB0"
+    - &earnUSDe_mellowAccountV1ProxyAdmin "0x8270243421bc078499a41e1ecf2c49ec7028c407"
 
     # --- Actors (earnUSDe) ---
     - &earnUSDe_activeVaultAdmin "0x5037B1A8Fd9aB941d57fbfc4435148C3C9b48b14" # Edge
@@ -629,7 +633,7 @@ l1:
         *PULL_LIQUIDITY_ROLE : [*curator]
         *PUSH_LIQUIDITY_ROLE : [*curator]
         *SET_FLAGS_ROLE : [*earnUSD_timelockController]
-        *SET_MERKLE_ROOT_ROLE : [*earnUSD_timelockController]
+        *SET_MERKLE_ROOT_ROLE : [*earnUSD_timelockController, *lazyVaultAdmin]
         *SET_QUEUE_STATUS_ROLE : [*earnUSD_timelockController]
         *SUBMIT_REPORTS_ROLE : [*earnUSD_oracleSubmitter]
         *ACCEPT_REPORT_ROLE : [*earnUSD_oracleSubmitter]
@@ -1203,7 +1207,7 @@ l1:
         subvaultFactory: *subvaultFactory
         subvaults: 0
         supportedRoleAt:
-        supportedRoles: 14
+        supportedRoles: 6
         supportsInterface:
         verifierFactory: *verifierFactory
       implementationChecks:
@@ -1254,24 +1258,15 @@ l1:
         supportsInterface:
         verifierFactory: *verifierFactory
       ozAcl:
-        # The problem here is that is uses activeVaultAdmin in most roles
         *DEFAULT_ADMIN_ROLE : [*lazyVaultAdmin]
-        # *SET_VAULT_LIMIT_ROLE : [*earnUSDc_activeVaultAdmin]
-        *SET_VAULT_LIMIT_ROLE : [*earnUSDc_temporaryAdmin] # TEMPORARY: to be changed back to earnUSDc_activeVaultAdmin
-        # *SET_SUBVAULT_LIMIT_ROLE : [*earnUSDc_activeVaultAdmin]
-        *SET_SUBVAULT_LIMIT_ROLE : [*earnUSDc_temporaryAdmin] # TEMPORARY: to be changed back to earnUSDc_activeVaultAdmin
-        # *ALLOW_SUBVAULT_ASSETS_ROLE : [*earnUSDc_activeVaultAdmin]
-        *ALLOW_SUBVAULT_ASSETS_ROLE : [*earnUSDc_temporaryAdmin] # TEMPORARY: to be changed back to earnUSDc_activeVaultAdmin
-        # *MODIFY_VAULT_BALANCE_ROLE : [*earnUSDc_activeVaultAdmin]
-        *MODIFY_VAULT_BALANCE_ROLE : [*earnUSDc_temporaryAdmin] # TEMPORARY: to be changed back to earnUSDc_activeVaultAdmin
-        # *MODIFY_SUBVAULT_BALANCE_ROLE : [*earnUSDc_activeVaultAdmin]
-        *MODIFY_SUBVAULT_BALANCE_ROLE : [*earnUSDc_temporaryAdmin] # TEMPORARY: to be changed back to earnUSDc_activeVaultAdmin
-        # *CALLER_ROLE : [*earnUSDc_curator]
-        *CALLER_ROLE : [*earnUSDc_temporaryAdmin] # TEMPORARY: to be changed back to earnUSDc_curator
-        # *PULL_LIQUIDITY_ROLE : [*earnUSDc_curator]
-        *PULL_LIQUIDITY_ROLE : [*earnUSDc_temporaryAdmin] # TEMPORARY: to be changed back to earnUSDc_curator
-        # *PUSH_LIQUIDITY_ROLE : [*earnUSDc_curator]
-        *PUSH_LIQUIDITY_ROLE : [*earnUSDc_temporaryAdmin] # TEMPORARY: to be changed back to earnUSDc_curator
+        *SET_VAULT_LIMIT_ROLE : []
+        *SET_SUBVAULT_LIMIT_ROLE : []
+        *ALLOW_SUBVAULT_ASSETS_ROLE : []
+        *MODIFY_VAULT_BALANCE_ROLE : []
+        *MODIFY_SUBVAULT_BALANCE_ROLE : []
+        *CALLER_ROLE : []
+        *PULL_LIQUIDITY_ROLE : []
+        *PUSH_LIQUIDITY_ROLE : []
         *SET_FLAGS_ROLE : [*earnUSDc_timelockController]
         *SET_MERKLE_ROOT_ROLE : [*earnUSDc_timelockController]
         *SET_QUEUE_STATUS_ROLE : [*earnUSDc_timelockController]
@@ -1508,8 +1503,7 @@ l1:
         updatedAt:
       ozAcl:
         *DEFAULT_ADMIN_ROLE : [*lazyVaultAdmin]
-        # *SUBMIT_REPORTS_ROLE : [*earnUSDc_oracleUpdater]
-        *SUBMIT_REPORTS_ROLE : [*earnUSDc_temporaryAdmin] # TEMPORARY: to be changed back to earnUSDc_oracleUpdater
+        *SUBMIT_REPORTS_ROLE : [*earnUSDc_oracleUpdater]
         *ACCEPT_REPORT_ROLE : [*lazyVaultAdmin]
 
     # --- ShareManager ---
@@ -1697,10 +1691,8 @@ l1:
             result: true
           - args: [*EXECUTOR_ROLE, *mellowPauser]
             result: true
-          # - args: [*EXECUTOR_ROLE, *earnUSDc_curatorPauser]
-          # result: true
-          - args: [*EXECUTOR_ROLE, *earnUSDc_temporaryAdmin] # TEMPORARY: to be changed back to earnUSDc_curatorPauser
-            result: true
+          - args: [*EXECUTOR_ROLE, *earnUSDc_curatorPauser]
+            result: false
           # Verify deployer has no roles
           - args: [*DEFAULT_ADMIN_ROLE, *deployer]
             result: false
@@ -1903,24 +1895,15 @@ l1:
         supportsInterface:
         verifierFactory: *verifierFactory
       ozAcl:
-        # The problem here is that is uses activeVaultAdmin in most roles
         *DEFAULT_ADMIN_ROLE : [*lazyVaultAdmin]
-        # *SET_VAULT_LIMIT_ROLE : [*earnUSDe_activeVaultAdmin]
-        *SET_VAULT_LIMIT_ROLE : [*earnUSDe_temporaryAdmin] # TEMPORARY: to be changed back to earnUSDe_activeVaultAdmin
-        # *SET_SUBVAULT_LIMIT_ROLE : [*earnUSDe_activeVaultAdmin]
-        *SET_SUBVAULT_LIMIT_ROLE : [*earnUSDe_temporaryAdmin] # TEMPORARY: to be changed back to earnUSDe_activeVaultAdmin
-        # *ALLOW_SUBVAULT_ASSETS_ROLE : [*earnUSDe_activeVaultAdmin]
-        *ALLOW_SUBVAULT_ASSETS_ROLE : [*earnUSDe_temporaryAdmin] # TEMPORARY: to be changed back to earnUSDe_activeVaultAdmin
-        # *MODIFY_VAULT_BALANCE_ROLE : [*earnUSDe_activeVaultAdmin]
-        *MODIFY_VAULT_BALANCE_ROLE : [*earnUSDe_temporaryAdmin] # TEMPORARY: to be changed back to earnUSDe_activeVaultAdmin
-        # *MODIFY_SUBVAULT_BALANCE_ROLE : [*earnUSDe_activeVaultAdmin]
-        *MODIFY_SUBVAULT_BALANCE_ROLE : [*earnUSDe_temporaryAdmin] # TEMPORARY: to be changed back to earnUSDe_activeVaultAdmin
-        # *CALLER_ROLE : [*earnUSDe_curator]
-        *CALLER_ROLE : [*earnUSDe_temporaryAdmin] # TEMPORARY: to be changed back to earnUSDe_curator
-        # *PULL_LIQUIDITY_ROLE : [*earnUSDe_curator]
-        *PULL_LIQUIDITY_ROLE : [*earnUSDe_temporaryAdmin] # TEMPORARY: to be changed back to earnUSDe_curator
-        # *PUSH_LIQUIDITY_ROLE : [*earnUSDe_curator]
-        *PUSH_LIQUIDITY_ROLE : [*earnUSDe_temporaryAdmin] # TEMPORARY: to be changed back to earnUSDe_curator
+        *SET_VAULT_LIMIT_ROLE : [*earnUSDe_activeVaultAdmin]
+        *SET_SUBVAULT_LIMIT_ROLE : [*earnUSDe_activeVaultAdmin]
+        *ALLOW_SUBVAULT_ASSETS_ROLE : [*earnUSDe_activeVaultAdmin]
+        *MODIFY_VAULT_BALANCE_ROLE : [*earnUSDe_activeVaultAdmin]
+        *MODIFY_SUBVAULT_BALANCE_ROLE : [*earnUSDe_activeVaultAdmin]
+        *CALLER_ROLE : [*earnUSDe_mellowAccountV1]
+        *PULL_LIQUIDITY_ROLE : [*earnUSDe_mellowAccountV1]
+        *PUSH_LIQUIDITY_ROLE : [*earnUSDe_mellowAccountV1]
         *SET_FLAGS_ROLE : [*earnUSDe_timelockController]
         *SET_MERKLE_ROOT_ROLE : [*earnUSDe_timelockController]
         *SET_QUEUE_STATUS_ROLE : [*earnUSDe_timelockController]
@@ -2157,8 +2140,7 @@ l1:
         updatedAt:
       ozAcl:
         *DEFAULT_ADMIN_ROLE : [*lazyVaultAdmin]
-        # *SUBMIT_REPORTS_ROLE : [*earnUSDe_oracleUpdater]
-        *SUBMIT_REPORTS_ROLE : [*earnUSDe_temporaryAdmin] # TEMPORARY: to be changed back to earnUSDe_oracleUpdater
+        *SUBMIT_REPORTS_ROLE : [*earnUSDe_oracleUpdater]
         *ACCEPT_REPORT_ROLE : [*lazyVaultAdmin]
 
     # --- ShareManager ---
@@ -2346,9 +2328,7 @@ l1:
             result: true
           - args: [*EXECUTOR_ROLE, *mellowPauser]
             result: true
-          # - args: [*EXECUTOR_ROLE, *earnUSDe_curatorPauser]
-          #   result: true
-          - args: [*EXECUTOR_ROLE, *earnUSDe_temporaryAdmin] # TEMPORARY: to be changed back to earnUSDe_curatorPauser
+          - args: [*EXECUTOR_ROLE, *earnUSDe_curatorPauser]
             result: true
           # Verify deployer has no roles
           - args: [*DEFAULT_ADMIN_ROLE, *deployer]
@@ -2366,6 +2346,40 @@ l1:
         isOperationPending:
         isOperationReady:
         supportsInterface:
+
+    # --- MellowAccountV1 (earnUSDe) ---
+    earnUSDe_mellowAccountV1ProxyAdmin:
+      name: ProxyAdmin
+      address: *earnUSDe_mellowAccountV1ProxyAdmin
+      checks:
+        UPGRADE_INTERFACE_VERSION: "5.0.0"
+        owner: *proxyAdmin
+
+    earnUSDe_mellowAccountV1:
+      name: MellowAccountV1
+      address: *earnUSDe_mellowAccountV1
+      proxyName: TransparentUpgradeableProxy
+      implementation: *mellowAccountV1Implementation
+      proxyChecks: {}
+      storage:
+        - slot: *EIP1967_ADMIN_SLOT
+          expected: *earnUSDe_mellowAccountV1ProxyAdmin
+          label: admin
+        - slot: *EIP1967_IMPLEMENTATION_SLOT
+          expected: *mellowAccountV1Implementation
+          label: implementation
+      checks:
+        initialize:
+        multicall:
+        owner: *earnUSDe_curator
+        renounceOwnership:
+        transferOwnership:
+      implementationChecks:
+        initialize:
+        multicall:
+        owner: *ZERO_ADDRESS
+        renounceOwnership:
+        transferOwnership:
 
     # ===========================================
     # Base Infrastructure Contracts
