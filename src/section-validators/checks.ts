@@ -22,7 +22,8 @@ export class ChecksSectionValidator extends SectionValidatorBase {
     super(provider, sectionName);
   }
 
-  override async validateSection(contractEntry: ContractEntry, contractAlias: string) {
+  override async validateSection(contractEntry: ContractEntry, contractAlias: string, basePath?: string) {
+    void basePath; // Used for interface compatibility - header printed by contract.ts
     const { address, checks } = contractEntry;
     const abi = this._loadAbiWithImplementationFallback(contractEntry);
     this._reportNonCoveredNonMutableChecks(contractAlias, abi, Object.keys(checks));

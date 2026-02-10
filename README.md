@@ -161,6 +161,12 @@ Use the `--update-abi` option to download all ABIs, overwriting existing files:
 yarn start path/to/config.yaml --update-abi
 ```
 
+To download only missing ABIs (without updating existing ones):
+
+```sh
+yarn start path/to/config.yaml --update-abi-missing
+```
+
 ## 🔧 Contributing
 
 Any contributions to this project are welcome. Please fork the repository and submit pull requests with detailed descriptions of your changes. Or you can submit an issue, bug report or feature request.
