@@ -4,6 +4,7 @@ description: Configure and verify state-mate YAML for EVM smart contract state c
 ---
 
 # State-Mate Skills
+
 Name: state-mate
 
 This document describes patterns and processes for configuring state-mate YAML files to verify smart contract states on EVM chains.
@@ -16,7 +17,7 @@ state-mate validates contract states against a YAML-based description. It calls 
 
 ```yaml
 deployed:
-  l1:  # or l2, etc.
+  l1: # or l2, etc.
     - &contractAddress "0x..."
     - &proxyAdminAddress "0x..."
     - &implementationAddress "0x..."
@@ -32,7 +33,7 @@ roles:
   - &SOME_ROLE "0x..."
 
 l1:
-  rpcUrl: L1_MAINNET_RPC_URL  # env variable name
+  rpcUrl: L1_MAINNET_RPC_URL # env variable name
   explorerHostname: api.etherscan.io/v2/api
   explorerTokenEnv: ETHERSCAN_TOKEN
   chainId: 1
@@ -92,6 +93,7 @@ proxyAdminName:
 ## Function Check Patterns
 
 ### Simple Value Check
+
 ```yaml
 checks:
   functionName: expectedValue
@@ -100,13 +102,15 @@ checks:
 ```
 
 ### Skipped Functions (Require Arguments or Complex)
+
 ```yaml
 checks:
-  functionWithArgs:  # Empty value = skipped
+  functionWithArgs: # Empty value = skipped
   anotherComplexFunction:
 ```
 
 ### Function with Arguments
+
 ```yaml
 checks:
   balanceOf:
@@ -120,6 +124,7 @@ checks:
 ```
 
 ### Function That Must Revert
+
 ```yaml
 checks:
   functionAt:
@@ -130,10 +135,11 @@ checks:
 ```
 
 ### Tuple/Array Return Values
+
 ```yaml
 checks:
   flags: [false, false, false, false, false, 0]
-  getState:  # Complex tuple - skip if too complex
+  getState: # Complex tuple - skip if too complex
 ```
 
 ## Access Control Patterns
@@ -167,6 +173,7 @@ checks:
 ```
 
 **How to detect which pattern to use:**
+
 ```bash
 # If this succeeds, use ozAcl
 cast call $CONTRACT "getRoleMemberCount(bytes32)(uint256)" $ROLE --rpc-url $RPC_URL
@@ -186,6 +193,7 @@ checks:
 ```
 
 Run state-mate - the error output shows expected vs actual:
+
 ```
 ✗ .merkleRoot: expected REPLACEME, got 0xb13b0c93...
 ```
@@ -225,15 +233,17 @@ cast call $CONTRACT "hasRole(bytes32,address)(bool)" $ROLE $ADDRESS --rpc-url $R
 ### Adding a New Proxy Contract
 
 1. Add addresses to `deployed` section:
+
 ```yaml
 deployed:
   l1:
     - &newContract "0x..."
-    - &newContractProxyAdmin "0x..."  # Discover via storage slot
-    - &newContractImplementation "0x..."  # Discover via storage slot
+    - &newContractProxyAdmin "0x..." # Discover via storage slot
+    - &newContractImplementation "0x..." # Discover via storage slot
 ```
 
 2. Add ProxyAdmin contract:
+
 ```yaml
 newContractProxyAdmin:
   name: ProxyAdmin
@@ -244,6 +254,7 @@ newContractProxyAdmin:
 ```
 
 3. Add main contract with proxy config:
+
 ```yaml
 newContract:
   name: NewContract
@@ -332,25 +343,30 @@ yarn start configs/path/to/config.yml --update-abi-missing
 ## Troubleshooting
 
 ### "ABI not found" Error
+
 - Run with `--update-abi` to download ABIs
 - Check that contract name matches ABI filename
 
 ### "getRoleMemberCount reverted" or "no matching function"
+
 - Contract uses standard AccessControl, not AccessControlEnumerable
 - Remove ozAcl section, use hasRole checks instead
 - Some contracts (e.g., Oracle) may not expose role management functions at all - skip role checks for these
 
 ### Function check fails with wrong value
+
 - Run check to see actual value in error output
 - Update expected value in config
 
 ### "Invalid address" in deployed section
+
 - Remove placeholder values like "REPLACEME"
 - Discover actual addresses before adding to config
 
 ## Implementation Checks Guidelines
 
 For `implementationChecks`, use uninitialized/default values:
+
 - Addresses: `*ZERO_ADDRESS`
 - Bytes32: `*ZERO_BYTES32`
 - Numbers: `0`
