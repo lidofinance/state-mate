@@ -417,7 +417,7 @@ roles:
   - &CS_PAUSE_ROLE "0x139c2898040ef16910dc9f44dc697df79363da767d8bc92f2e310312b816e46d"
 
 l1:
-  rpcUrl: REMOTE_RPC_URL # https://ethereum-rpc.publicnode.com
+  rpcUrl: MAINNET_REMOTE_RPC_URL # https://ethereum-rpc.publicnode.com
   explorerHostname: api.etherscan.io
   explorerTokenEnv: ETHERSCAN_TOKEN
   chainId: *CHAIN_ID

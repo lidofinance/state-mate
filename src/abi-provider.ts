@@ -17,6 +17,8 @@ let g_consolidatedAbis: Record<string, Abi> | null = null;
 let g_pendingAbiUpdates: Record<string, Abi> | null = null;
 const CONSOLIDATED_ABI_FILENAME = "abis.json";
 const CONSOLIDATED_ABI_FILENAME_GZ = "abis.json.gz";
+const ADDRESS_REGEX = /0x[0-9a-fA-F]{40}/;
+const CONSOLIDATED_KEYS_PREVIEW_LIMIT = 40;
 
 function getConsolidatedAbiPath(): string {
   // Place abis.json alongside the config file, not in the abi subdirectory
@@ -104,7 +106,8 @@ function loadConsolidatedAbis(): Record<string, Abi> {
       logErrorAndExit(`Consolidated ABI file ${chalk.magenta(consolidatedFile.path)} is not a valid JSON object`);
     }
 
-    g_consolidatedAbis = parsed as Record<string, Abi>;
+    const { normalized } = normalizeConsolidatedAbiKeys(parsed as Record<string, Abi>);
+    g_consolidatedAbis = normalized;
 
     // Validate all ABIs
     for (const [key, abi] of Object.entries(g_consolidatedAbis)) {
@@ -125,42 +128,93 @@ function getAbiKey(contractName: string, address?: string): string {
   return address ? `${contractName}-${address}` : contractName;
 }
 
-export function loadAbiFromFile(contractName: string, address: string): Abi | never {
+function extractAddress(value: string): string | null {
+  const match = value.match(ADDRESS_REGEX);
+  return match?.[0]?.toLowerCase() ?? null;
+}
+
+function findAbiKeysByAddress(keys: string[], address: string): string[] {
+  const normalizedAddress = address.toLowerCase();
+  return keys.filter((key) => extractAddress(key) === normalizedAddress);
+}
+
+function formatConsolidatedKeys(keys: string[]): string {
+  if (keys.length <= CONSOLIDATED_KEYS_PREVIEW_LIMIT) {
+    return keys.join(", ");
+  }
+  const preview = keys.slice(0, CONSOLIDATED_KEYS_PREVIEW_LIMIT).join(", ");
+  return `${preview}, ... (+${keys.length - CONSOLIDATED_KEYS_PREVIEW_LIMIT} more)`;
+}
+
+type LoadAbiOptions = {
+  allowAddressFallback?: boolean;
+  failSilently?: boolean;
+};
+
+export function loadAbiFromFile(contractName: string, address: string): Abi | never;
+
+export function loadAbiFromFile(contractName: string, address: string, options: LoadAbiOptions): Abi | null | never;
+
+export function loadAbiFromFile(
+  contractName: string,
+  address: string,
+  options: LoadAbiOptions = {},
+): Abi | null | never {
+  const { allowAddressFallback = true, failSilently = false } = options;
   address = address.toLowerCase();
   const mode = determineAbiMode();
 
   if (mode === "consolidated") {
     const abis = loadConsolidatedAbis();
     const key = getAbiKey(contractName, address);
+    const allKeys = Object.keys(abis);
 
     // Try with address first, then without
     let abi = abis[key];
     if (!abi && address) {
       abi = abis[contractName];
     }
+    if (!abi && address && allowAddressFallback) {
+      const addressMatches = findAbiKeysByAddress(allKeys, address);
+      if (addressMatches.length === 1) {
+        abi = abis[addressMatches[0]];
+      } else if (addressMatches.length > 1) {
+        const message =
+          `ABI lookup for ${chalk.yellow(key)} is ambiguous.\n` +
+          `The following consolidated ABI keys match address ${chalk.yellow(address)}:\n` +
+          `${addressMatches.join(", ")}\n\n` +
+          `Please align the contract ${chalk.yellow("name")} in YAML or keep a unique ABI key per address.`;
+
+        if (failSilently) return null;
+        logErrorAndExit(message);
+      }
+    }
 
     if (!abi) {
-      logErrorAndExit(
+      const message =
         `ABI not found in consolidated file for ${chalk.yellow(key)}\n` +
-          `Available keys: ${Object.keys(abis).join(", ")}\n\n` +
-          chalk.yellow.bold(`Try running with the '--update-abi' option to download the ABI`),
-      );
+        `Available keys: ${formatConsolidatedKeys(allKeys)}\n\n` +
+        chalk.yellow.bold(`Try running with the '--update-abi' option to download the ABI`);
+      if (failSilently) return null;
+      logErrorAndExit(message);
     }
 
     return abi;
   } else if (mode === "individual") {
     let abiPath;
     try {
-      abiPath = _findAbiPath(contractName, address, { shouldThrow: true });
+      abiPath = _findAbiPath(contractName, address, { shouldThrow: true, allowAddressFallback });
     } catch (error) {
-      logErrorAndExit(
+      const message =
         `Error finding ABI file for contract
         ${contractName} in ${g_Arguments.abiDirPath}: ${printError(error)}\n\n` +
-          chalk.yellow.bold(`Try running with the '--update-abi' option to download the unnecessary ABI`),
-      );
+        chalk.yellow.bold(`Try running with the '--update-abi' option to download the unnecessary ABI`);
+      if (failSilently) return null;
+      logErrorAndExit(message);
     }
     return loadAbiFromAbiPath(abiPath);
   } else {
+    if (failSilently) return null;
     logErrorAndExit(`No ABI files found in ${chalk.magenta(g_Arguments.abiDirPath)}`);
   }
 }
@@ -203,17 +257,11 @@ export function renameAllAbiToLowerCase() {
   if (mode === "consolidated") {
     // For consolidated mode, ensure all keys have lowercase addresses
     const abis = loadConsolidatedAbis();
-    let changed = false;
-    const newAbis: Record<string, Abi> = {};
-
-    for (const [key, abi] of Object.entries(abis)) {
-      const newKey = toLowerCaseAddress(key);
-      newAbis[newKey] = abi;
-      if (key !== newKey) {
-        log(`The ABI key renamed from ${chalk.yellow(key)} to ${chalk.yellow(newKey)}`);
-        changed = true;
-      }
-    }
+    const { normalized: newAbis, renamed: changed } = normalizeConsolidatedAbiKeys(abis, {
+      onRename: (from, to) => {
+        log(`The ABI key renamed from ${chalk.yellow(from)} to ${chalk.yellow(to)}`);
+      },
+    });
 
     if (changed) {
       const consolidatedFile = getConsolidatedAbiPathToUse();
@@ -371,18 +419,24 @@ export function resetAbiModeCache(): void {
   g_abiMode = null;
 }
 
-function _findAbiPath(contractName: string, contractAddress: string, shouldThrow: { shouldThrow: true }): string;
+function _findAbiPath(
+  contractName: string,
+  contractAddress: string,
+  shouldThrow: { shouldThrow: true; allowAddressFallback?: boolean },
+): string;
 
 function _findAbiPath(
   contractName: string,
   contractAddress: string,
-  shouldThrow?: { shouldThrow: false },
+  shouldThrow?: { shouldThrow: false; allowAddressFallback?: boolean },
 ): string | null;
 
 function _findAbiPath(
   contractName: string,
   contractAddress: string,
-  { shouldThrow }: { shouldThrow?: boolean } = { shouldThrow: false },
+  { shouldThrow, allowAddressFallback = true }: { shouldThrow?: boolean; allowAddressFallback?: boolean } = {
+    shouldThrow: false,
+  },
 ): string | null {
   if (!contractName || !g_Arguments.abiDirPath) return null;
 
@@ -398,15 +452,30 @@ function _findAbiPath(
   let abiFileName = abiVariantsName.find((variantPath) =>
     fs.existsSync(path.join(g_Arguments.abiDirPath, variantPath)),
   );
+  let abiDirectoryContent: string[] = [];
   if (!abiFileName) {
     try {
-      const abiDirectoryContent = fs.readdirSync(g_Arguments.abiDirPath);
+      abiDirectoryContent = fs.readdirSync(g_Arguments.abiDirPath);
 
       abiFileName = abiDirectoryContent.find((fileName) => {
         return abiVariantsName.find((variantName) => {
           return toLowerCaseAddress(fileName) === variantName;
         });
       });
+
+      if (!abiFileName && contractAddress && allowAddressFallback) {
+        const addressMatches = findAbiKeysByAddress(abiDirectoryContent, contractAddress).filter((fileName) =>
+          fileName.endsWith(".json"),
+        );
+        if (addressMatches.length === 1) {
+          abiFileName = addressMatches[0];
+        } else if (addressMatches.length > 1 && shouldThrow) {
+          throw new Error(
+            `ABI lookup for ${contractName}-${contractAddress} is ambiguous. ` +
+              `Matching files by address: ${addressMatches.join(", ")}`,
+          );
+        }
+      }
     } catch (error) {
       logErrorAndExit(`Failed to read ${chalk.yellow(g_Arguments.abiDirPath)}:\n ${printError(error)}`);
     }
@@ -419,12 +488,32 @@ function _findAbiPath(
 }
 
 function toLowerCaseAddress(fileName: string): string {
-  const match = fileName.match(/0x[0-9a-fA-F]{40}/);
+  const match = fileName.match(ADDRESS_REGEX);
   if (!match) return fileName;
 
   const address = match[0];
-
   return fileName.replace(address, address.toLowerCase());
+}
+
+function normalizeConsolidatedAbiKeys(
+  abis: Record<string, Abi>,
+  options: { onRename?: (from: string, to: string) => void } = {},
+): { normalized: Record<string, Abi>; renamed: boolean } {
+  const normalized: Record<string, Abi> = {};
+  let renamed = false;
+
+  for (const [key, abi] of Object.entries(abis)) {
+    const normalizedKey = toLowerCaseAddress(key);
+
+    if (normalizedKey !== key) {
+      renamed = true;
+      options.onRename?.(key, normalizedKey);
+    }
+
+    normalized[normalizedKey] = abi;
+  }
+
+  return { normalized: normalized, renamed };
 }
 
 function _renameAbiIfNeed(fileName: string): void {
