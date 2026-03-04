@@ -10,23 +10,23 @@ deployed:
     - &factoryImplementation "0x0000000397b71C8f3182Fd40D247330D218fdC72"
     - &factoryFactory "0x0000000f9686896836C39cf721141922Ce42639f"
     - &consensusFactory "0xaEEB06CBd91A18b51a2D30b61477eAeE3a9633C3"
-    - &consensusImplementation "0x0000000167598d2C78E2313fD5328E16bD9A0b13"
+
     - &depositQueueFactory "0xBB92A7B9695750e1234BaB18F83b73686dd09854"
     - &depositQueueImplementation "0x00000006dA9f179BFE250Dd1c51cD2d3581930c8"
     - &syncDepositQueueImplementation "0x000000002E2aeaC5Fe65AaB6fE2E6AE0e44F1A3A"
-    - &signatureDepositQueueImplementation "0x00000003887dfBCEbD1e4097Ad89B690de7eFbf9"
+
     - &feeManagerFactory "0xF7223356819Ea48f25880b6c2ab3e907CC336D45"
     - &feeManagerImplementation "0x0000000dE74e5D51651326E0A3e1ACA94bEAF6E1"
     - &oracleFactory "0x0CdFf250C7a071fdc72340D820C5C8e29507Aaad"
     - &oracleImplementation "0x0000000F0d3D1c31b72368366A4049C05E291D58"
     - &redeemQueueFactory "0xfe76b5fd238553D65Ce6dd0A572C0fda629F8421"
     - &redeemQueueImplementation "0x000000000c139266BA06170Ed1DeacA6d11903c1"
-    - &signatureRedeemQueueImplementation "0x0000000b2082667589A16c4cF18e9f923781c471"
+
     - &riskManagerFactory "0xa51E4FA916b939Fa451520D2B7600c740d86E5A0"
     - &riskManagerImplementation "0x0000000714cf2851baC1AE2f41871862e9D216fD"
     - &shareManagerFactory "0x952f39AA62E94db3Ad0d1C7D1E43C1a8519E45D8"
-    - &shareManagerImplementation "0x0000000E8eb7173fA1a3ba60eCA325bcB6aaf378"
-    - &basicShareManagerImplementation "0x00000005564AAE40D88e2F08dA71CBe156767977"
+
+    - &burnableShareManagerImplementation "0x000000000c79D2B5cD58AE545afc83030233D7B6"
     - &subvaultFactory "0x75FE0d73d3C64cdC1C6449D9F977Be6857c4d011"
     - &subvaultImplementation "0x0000000E535B4E063f8372933A55470e67910a66"
     - &verifierFactory "0x04B30b1e98950e6A13550d84e991bE0d734C2c61"
@@ -34,7 +34,7 @@ deployed:
     - &vaultFactory "0x4E38F679e46B3216f0bd4B314E9C429AFfB1dEE3"
     - &vaultImplementation "0x0000000615B2771511dAa693aC07BE5622869E01"
     # Specialized verifiers
-    - &bitmaskVerifier "0x0000000263Fb29C3D6B0C5837883519eF05ea20A"
+
     - &eigenLayerVerifierFactory "0x77A83AcBf7A6df20f1D681b4810437d74AE790F8"
     - &eigenLayerVerifier "0x00000003F82051A8B2F020B79e94C3DC94E89B81"
     - &erc20VerifierFactory "0x2e234F4E1b7934d5F4bEAE3fF2FDC109f5C42F1d"
@@ -134,11 +134,54 @@ misc:
   - &DEFAULT_ADMIN_ROLE "0x0000000000000000000000000000000000000000000000000000000000000000"
   - &ETH "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"
   - &WETH "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
-  - &LIDO_STETH "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84"
+
   - &LIDO_WSTETH "0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0"
   - &GGV "0xef417FCE1883c6653E7dC6AF7c6F85CCDE84Aa09"
   - &STRETH "0xcd3c0F51798D1daA92Fb192E57844Ae6cEE8a6c7"
   - &DVstETH "0x5E362eb2c0706Bd1d134689eC75176018385430B"
+
+  # --- Safe implementations ---
+  - &SAFE_IMPL_1_3_0 "0xd9db270c1b5e3bd161e8c8503c55ceabee709552"
+  - &SAFE_IMPL_1_4_1 "0x41675c099f32341bf84bfc5382af534df5c7461a"
+
+  # --- Multisig thresholds ---
+  - &PROXY_ADMIN_THRESHOLD 5
+  - &LAZY_VAULT_ADMIN_THRESHOLD 5
+  - &ACTIVE_VAULT_ADMIN_THRESHOLD 3
+  - &CURATOR_THRESHOLD 3
+  - &ORACLE_UPDATER_THRESHOLD 3
+  - &TREASURY_THRESHOLD 4
+  - &LIDO_PAUSER_THRESHOLD 3
+  - &MELLOW_PAUSER_THRESHOLD 1
+
+  # --- Lido signers ---
+  - &LIDO_SIGNER_1 "0x59F8D74Fe49d5ebEAc069E3baf07eB4b614BD5A7"
+  - &LIDO_SIGNER_2 "0x9777AF8c6727D57F74f7d381AD47eB4A65f042Ff"
+  - &LIDO_SIGNER_3 "0xEA685f0AF4A0BF5E7D6729b2C63eDF574D3EE27f"
+  - &LIDO_SIGNER_4 "0xFB864C1127ff77215d0A8e652bB632F526A4A89f"
+  - &LIDO_SIGNER_5 "0x912e21CdA3D7012146da4Df33309d860a9eb0bEb"
+  - &LIDO_SIGNER_6 "0x73B254db9cb71a129C4E73aF087D71Ac7d34a8d7"
+
+  - &LIDO_SIGNER_7 "0x59d07dc34B135B17b87840a86BFF7302039E7EDf"
+  - &LIDO_SIGNER_8 "0x04e7C0350241b818eE5c92cc260008C9898F41cf"
+  - &LIDO_SIGNER_9 "0x8ecd93982FfbB2f937ADa6c6e50d1950974081C0"
+  - &LIDO_SIGNER_10 "0x75D95fF8D48E2Ca5c4235322A8AC8e52A76124cD"
+  - &LIDO_SIGNER_11 "0xE6CD29BF19769E44534099d241abAa07aa8c8E9a"
+  - &LIDO_SIGNER_12 "0x8aA493BcD7f989caD67dd3CB48A4c2E6b40FeDB0"
+  - &LIDO_SIGNER_13 "0xf2374BCb265505002055942D070459a4d2011012"
+
+  # --- Mellow signers ---
+  - &MELLOW_SIGNER_1 "0x44A388BBD782AE1D7f4542aEb6C3569E2CfdF5a1"
+  - &MELLOW_SIGNER_2 "0x185111c113d9B19Ea4C424D3cD8628A1ee09Be6A"
+  - &MELLOW_SIGNER_3 "0x06C3992a6067bEA8FB3Af7F004EdEbC13656761F"
+  - &MELLOW_SIGNER_4 "0x8888843c607F4Bbd6aD72128F478085256Bdd15D"
+
+  # --- Ext Mellow signers ---
+  - &EXT_MELLOW_SIGNER_1 "0x78Eb634731bE1957D370BEcbbD254F427Af5D13b"
+  - &EXT_MELLOW_SIGNER_2 "0xe49384e6Aca6A26c82Eaa161A9211fA60fEee3Ef"
+  - &EXT_MELLOW_SIGNER_3 "0x112C1aAB1463A32eD8B1f5F2e8b5244D876Ef740"
+  - &EXT_MELLOW_SIGNER_4 "0x1f3E4c3dBF27056CD7881D8eb376B1D7815757a6"
+  - &EXT_MELLOW_SIGNER_5 "0x5fa3B054D91aF2e1dC76124D7E774044697b942e"
 
   # --- EIP-1967 Storage Slots ---
   - &EIP1967_ADMIN_SLOT "0xb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d6103"
@@ -447,7 +490,7 @@ l1:
         subvaults: 2
         supportedRoleAt:
           - args: [14]
-            mustRevert: true
+            result: *SET_SECURITY_PARAMS_ROLE
           - args: [13]
             result: *ACCEPT_REPORT_ROLE
           - args: [12]
@@ -476,7 +519,7 @@ l1:
             result: *SET_VAULT_LIMIT_ROLE
           - args: [0]
             result: *DEFAULT_ADMIN_ROLE
-        supportedRoles: 14
+        supportedRoles: 15
         supportsInterface:
         verifierFactory: *verifierFactory
       implementationChecks:
@@ -541,6 +584,7 @@ l1:
         *SET_QUEUE_STATUS_ROLE : [*timelockController]
         *SUBMIT_REPORTS_ROLE : [*oracleSubmitter]
         *ACCEPT_REPORT_ROLE : [*oracleSubmitter]
+        *SET_SECURITY_PARAMS_ROLE : [*lazyVaultAdmin]
 
     depositQueueETH:
       name: DepositQueue
@@ -738,7 +782,7 @@ l1:
       checks:
         asset: *LIDO_WSTETH
         batchAt:
-        canBeRemoved: false
+        canBeRemoved: true
         claimableOf:
         getState:
         requestsOf:
@@ -1033,17 +1077,17 @@ l1:
         *ACCEPT_REPORT_ROLE : [*lazyVaultAdmin]
 
     shareManager:
-      name: TokenizedShareManager
+      name: BurnableTokenizedShareManager
       address: *shareManager
       proxyName: TransparentUpgradeableProxy
-      implementation: *shareManagerImplementation
+      implementation: *burnableShareManagerImplementation
       proxyChecks: {}
       storage:
         - slot: *EIP1967_ADMIN_SLOT
           expected: *shareManagerProxyAdmin
           label: admin
         - slot: *EIP1967_IMPLEMENTATION_SLOT
-          expected: *shareManagerImplementation
+          expected: *burnableShareManagerImplementation
           label: implementation
       checks:
         SET_ACCOUNT_INFO_ROLE: *SET_ACCOUNT_INFO_ROLE
@@ -1357,6 +1401,393 @@ l1:
         isOperationPending:
         isOperationReady:
         supportsInterface:
+
+    # ===========================================
+    # Multisig Contracts
+    # ===========================================
+
+    proxyAdmin_multisig:
+      name: GnosisSafe
+      address: *proxyAdmin
+      proxyName: GnosisSafeProxy
+      implementation: *SAFE_IMPL_1_3_0
+      proxyChecks: {}
+      checks:
+        VERSION: 1.3.0
+        approvedHashes:
+        checkNSignatures:
+        checkSignatures:
+        domainSeparator:
+        encodeTransactionData:
+        getChainId: 1
+        getModulesPaginated:
+        getOwners:
+          - *LIDO_SIGNER_3
+          - *LIDO_SIGNER_2
+          - *LIDO_SIGNER_4
+          - *LIDO_SIGNER_1
+          - *MELLOW_SIGNER_2
+          - *MELLOW_SIGNER_3
+          - *MELLOW_SIGNER_1
+          - *MELLOW_SIGNER_4
+        getStorageAt:
+        getThreshold: *PROXY_ADMIN_THRESHOLD
+        getTransactionHash:
+        isModuleEnabled:
+        isOwner:
+        nonce:
+        signedMessages:
+      implementationChecks:
+        VERSION: 1.3.0
+        approvedHashes:
+        checkNSignatures:
+        checkSignatures:
+        domainSeparator:
+        encodeTransactionData:
+        getChainId:
+        getModulesPaginated:
+        getOwners:
+        getStorageAt:
+        getThreshold: 1
+        getTransactionHash:
+        isModuleEnabled:
+        isOwner:
+        nonce: 0
+        signedMessages:
+
+    lazyVaultAdmin_multisig:
+      name: Safe
+      address: *lazyVaultAdmin
+      proxyName: SafeProxy
+      implementation: *SAFE_IMPL_1_4_1
+      proxyChecks: {}
+      checks:
+        VERSION: 1.4.1
+        approvedHashes:
+        checkNSignatures:
+        checkSignatures:
+        domainSeparator:
+        encodeTransactionData:
+        getChainId: 1
+        getModulesPaginated:
+        getOwners:
+          - *LIDO_SIGNER_5
+          - *LIDO_SIGNER_10
+          - *LIDO_SIGNER_6
+          - *LIDO_SIGNER_4
+          - *LIDO_SIGNER_2
+          - *LIDO_SIGNER_1
+          - *LIDO_SIGNER_7
+          - *LIDO_SIGNER_9
+        getStorageAt:
+        getThreshold: *LAZY_VAULT_ADMIN_THRESHOLD
+        getTransactionHash:
+        isModuleEnabled:
+        isOwner:
+        nonce:
+        signedMessages:
+      implementationChecks:
+        VERSION: 1.4.1
+        approvedHashes:
+        checkNSignatures:
+        checkSignatures:
+        domainSeparator:
+        encodeTransactionData:
+        getChainId:
+        getModulesPaginated:
+        getOwners:
+        getStorageAt:
+        getThreshold: 1
+        getTransactionHash:
+        isModuleEnabled:
+        isOwner:
+        nonce: 0
+        signedMessages:
+
+    activeVaultAdmin_multisig:
+      name: Safe
+      address: *activeVaultAdmin
+      proxyName: SafeProxy
+      implementation: *SAFE_IMPL_1_4_1
+      proxyChecks: {}
+      checks:
+        VERSION: 1.4.1
+        approvedHashes:
+        checkNSignatures:
+        checkSignatures:
+        domainSeparator:
+        encodeTransactionData:
+        getChainId: 1
+        getModulesPaginated:
+        getOwners:
+          - *EXT_MELLOW_SIGNER_2
+          - *MELLOW_SIGNER_2
+          - *MELLOW_SIGNER_3
+          - *MELLOW_SIGNER_1
+          - *MELLOW_SIGNER_4
+          - *EXT_MELLOW_SIGNER_4
+        getStorageAt:
+        getThreshold: *ACTIVE_VAULT_ADMIN_THRESHOLD
+        getTransactionHash:
+        isModuleEnabled:
+        isOwner:
+        nonce:
+        signedMessages:
+      implementationChecks:
+        VERSION: 1.4.1
+        approvedHashes:
+        checkNSignatures:
+        checkSignatures:
+        domainSeparator:
+        encodeTransactionData:
+        getChainId:
+        getModulesPaginated:
+        getOwners:
+        getStorageAt:
+        getThreshold: 1
+        getTransactionHash:
+        isModuleEnabled:
+        isOwner:
+        nonce: 0
+        signedMessages:
+
+    curator_multisig:
+      name: Safe
+      address: *curator
+      proxyName: SafeProxy
+      implementation: *SAFE_IMPL_1_4_1
+      proxyChecks: {}
+      checks:
+        VERSION: 1.4.1
+        approvedHashes:
+        checkNSignatures:
+        checkSignatures:
+        domainSeparator:
+        encodeTransactionData:
+        getChainId: 1
+        getModulesPaginated:
+        getOwners:
+          - *LIDO_SIGNER_6
+          - *LIDO_SIGNER_10
+          - *LIDO_SIGNER_2
+          - *LIDO_SIGNER_1
+          - *LIDO_SIGNER_7
+          - *LIDO_SIGNER_9
+        getStorageAt:
+        getThreshold: *CURATOR_THRESHOLD
+        getTransactionHash:
+        isModuleEnabled:
+        isOwner:
+        nonce:
+        signedMessages:
+      implementationChecks:
+        VERSION: 1.4.1
+        approvedHashes:
+        checkNSignatures:
+        checkSignatures:
+        domainSeparator:
+        encodeTransactionData:
+        getChainId:
+        getModulesPaginated:
+        getOwners:
+        getStorageAt:
+        getThreshold: 1
+        getTransactionHash:
+        isModuleEnabled:
+        isOwner:
+        nonce: 0
+        signedMessages:
+
+    oracleUpdater_multisig:
+      name: Safe
+      address: *oracleUpdater
+      proxyName: SafeProxy
+      implementation: *SAFE_IMPL_1_4_1
+      proxyChecks: {}
+      checks:
+        VERSION: 1.4.1
+        approvedHashes:
+        checkNSignatures:
+        checkSignatures:
+        domainSeparator:
+        encodeTransactionData:
+        getChainId: 1
+        getModulesPaginated:
+        getOwners:
+          - *EXT_MELLOW_SIGNER_5
+          - *EXT_MELLOW_SIGNER_2
+          - *MELLOW_SIGNER_2
+          - *MELLOW_SIGNER_3
+          - *MELLOW_SIGNER_1
+          - *MELLOW_SIGNER_4
+          - *EXT_MELLOW_SIGNER_4
+        getStorageAt:
+        getThreshold: *ORACLE_UPDATER_THRESHOLD
+        getTransactionHash:
+        isModuleEnabled:
+        isOwner:
+        nonce:
+        signedMessages:
+      implementationChecks:
+        VERSION: 1.4.1
+        approvedHashes:
+        checkNSignatures:
+        checkSignatures:
+        domainSeparator:
+        encodeTransactionData:
+        getChainId:
+        getModulesPaginated:
+        getOwners:
+        getStorageAt:
+        getThreshold: 1
+        getTransactionHash:
+        isModuleEnabled:
+        isOwner:
+        nonce: 0
+        signedMessages:
+
+    treasury_multisig:
+      name: Safe
+      address: *treasury
+      proxyName: SafeProxy
+      implementation: *SAFE_IMPL_1_4_1
+      proxyChecks: {}
+      checks:
+        VERSION: 1.4.1
+        approvedHashes:
+        checkNSignatures:
+        checkSignatures:
+        domainSeparator:
+        encodeTransactionData:
+        getChainId: 1
+        getModulesPaginated:
+        getOwners:
+          - *LIDO_SIGNER_11
+          - *LIDO_SIGNER_12
+          - *LIDO_SIGNER_8
+          - *LIDO_SIGNER_13
+          - *LIDO_SIGNER_10
+          - *LIDO_SIGNER_7
+          - *LIDO_SIGNER_9
+        getStorageAt:
+        getThreshold: *TREASURY_THRESHOLD
+        getTransactionHash:
+        isModuleEnabled:
+        isOwner:
+        nonce:
+        signedMessages:
+      implementationChecks:
+        VERSION: 1.4.1
+        approvedHashes:
+        checkNSignatures:
+        checkSignatures:
+        domainSeparator:
+        encodeTransactionData:
+        getChainId:
+        getModulesPaginated:
+        getOwners:
+        getStorageAt:
+        getThreshold: 1
+        getTransactionHash:
+        isModuleEnabled:
+        isOwner:
+        nonce: 0
+        signedMessages:
+
+    lidoPauser_multisig:
+      name: Safe
+      address: *lidoPauser
+      proxyName: SafeProxy
+      implementation: *SAFE_IMPL_1_4_1
+      proxyChecks: {}
+      checks:
+        VERSION: 1.4.1
+        approvedHashes:
+        checkNSignatures:
+        checkSignatures:
+        domainSeparator:
+        encodeTransactionData:
+        getChainId: 1
+        getModulesPaginated:
+        getOwners:
+          - *LIDO_SIGNER_7
+          - *LIDO_SIGNER_8
+          - *LIDO_SIGNER_9
+          - *LIDO_SIGNER_1
+          - *LIDO_SIGNER_10
+        getStorageAt:
+        getThreshold: *LIDO_PAUSER_THRESHOLD
+        getTransactionHash:
+        isModuleEnabled:
+        isOwner:
+        nonce:
+        signedMessages:
+      implementationChecks:
+        VERSION: 1.4.1
+        approvedHashes:
+        checkNSignatures:
+        checkSignatures:
+        domainSeparator:
+        encodeTransactionData:
+        getChainId:
+        getModulesPaginated:
+        getOwners:
+        getStorageAt:
+        getThreshold: 1
+        getTransactionHash:
+        isModuleEnabled:
+        isOwner:
+        nonce: 0
+        signedMessages:
+
+    mellowPauser_multisig:
+      name: Safe
+      address: *mellowPauser
+      proxyName: SafeProxy
+      implementation: *SAFE_IMPL_1_4_1
+      proxyChecks: {}
+      checks:
+        VERSION: 1.4.1
+        approvedHashes:
+        checkNSignatures:
+        checkSignatures:
+        domainSeparator:
+        encodeTransactionData:
+        getChainId: 1
+        getModulesPaginated:
+        getOwners:
+          - *EXT_MELLOW_SIGNER_1
+          - *EXT_MELLOW_SIGNER_2
+          - *EXT_MELLOW_SIGNER_3
+          - *EXT_MELLOW_SIGNER_4
+          - *MELLOW_SIGNER_2
+          - *MELLOW_SIGNER_3
+          - *MELLOW_SIGNER_1
+          - *MELLOW_SIGNER_4
+        getStorageAt:
+        getThreshold: *MELLOW_PAUSER_THRESHOLD
+        getTransactionHash:
+        isModuleEnabled:
+        isOwner:
+        nonce:
+        signedMessages:
+      implementationChecks:
+        VERSION: 1.4.1
+        approvedHashes:
+        checkNSignatures:
+        checkSignatures:
+        domainSeparator:
+        encodeTransactionData:
+        getChainId:
+        getModulesPaginated:
+        getOwners:
+        getStorageAt:
+        getThreshold: 1
+        getTransactionHash:
+        isModuleEnabled:
+        isOwner:
+        nonce: 0
+        signedMessages:
 
     # ===========================================
     # Base Infrastructure Contracts
