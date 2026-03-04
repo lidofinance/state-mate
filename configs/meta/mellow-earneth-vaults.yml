@@ -1,31 +1,25 @@
 # yaml-language-server: $schema=../../../schemas/main-schema.json
 # Source config for Mellow Flexible Vaults on Ethereum Mainnet
 # GitHub: https://github.com/mellow-finance/flexible-vaults
-# Commit: 685be8395aef17e41615cf0bfebfbfbd51c3b582
 
 deployed:
   l1:
     # --- Base contracts deployment (VERIFIED by Nethermind)---
-    # Factories
     - &factoryImplementation "0x0000000397b71C8f3182Fd40D247330D218fdC72"
     - &factoryFactory "0x0000000f9686896836C39cf721141922Ce42639f"
     - &consensusFactory "0xaEEB06CBd91A18b51a2D30b61477eAeE3a9633C3"
-
     - &depositQueueFactory "0xBB92A7B9695750e1234BaB18F83b73686dd09854"
     - &depositQueueImplementation "0x00000006dA9f179BFE250Dd1c51cD2d3581930c8"
     - &syncDepositQueueImplementation "0x000000002E2aeaC5Fe65AaB6fE2E6AE0e44F1A3A"
-
     - &feeManagerFactory "0xF7223356819Ea48f25880b6c2ab3e907CC336D45"
     - &feeManagerImplementation "0x0000000dE74e5D51651326E0A3e1ACA94bEAF6E1"
     - &oracleFactory "0x0CdFf250C7a071fdc72340D820C5C8e29507Aaad"
     - &oracleImplementation "0x0000000F0d3D1c31b72368366A4049C05E291D58"
     - &redeemQueueFactory "0xfe76b5fd238553D65Ce6dd0A572C0fda629F8421"
     - &redeemQueueImplementation "0x000000000c139266BA06170Ed1DeacA6d11903c1"
-
     - &riskManagerFactory "0xa51E4FA916b939Fa451520D2B7600c740d86E5A0"
     - &riskManagerImplementation "0x0000000714cf2851baC1AE2f41871862e9D216fD"
     - &shareManagerFactory "0x952f39AA62E94db3Ad0d1C7D1E43C1a8519E45D8"
-
     - &burnableShareManagerImplementation "0x000000000c79D2B5cD58AE545afc83030233D7B6"
     - &subvaultFactory "0x75FE0d73d3C64cdC1C6449D9F977Be6857c4d011"
     - &subvaultImplementation "0x0000000E535B4E063f8372933A55470e67910a66"
@@ -33,18 +27,20 @@ deployed:
     - &verifierImplementation "0x000000047Fc878662006E78D5174FB4285637966"
     - &vaultFactory "0x4E38F679e46B3216f0bd4B314E9C429AFfB1dEE3"
     - &vaultImplementation "0x0000000615B2771511dAa693aC07BE5622869E01"
-    # Specialized verifiers
-
     - &eigenLayerVerifierFactory "0x77A83AcBf7A6df20f1D681b4810437d74AE790F8"
     - &eigenLayerVerifier "0x00000003F82051A8B2F020B79e94C3DC94E89B81"
     - &erc20VerifierFactory "0x2e234F4E1b7934d5F4bEAE3fF2FDC109f5C42F1d"
     - &erc20Verifier "0x00000009207D366cBB8549837F8Ae4bf800Af2D6"
     - &symbioticVerifierFactory "0x41C443F10a92D597e6c9E271140BC94c10f5159F"
     - &symbioticVerifier "0x00000000cBC6f5d4348496FfA22Cf014b9DA394B"
-    # Swap module
     - &swapModuleFactory "0xE3575055a24d8642DFA3a51ec766Ef2db2671659"
     - &swapModuleImplementation "0x00000000d681E85e5783588f87A9573Cb97Eda01"
-    # Factory ProxyAdmins
+    - &vaultConfigurator "0x000000028be48f9E62E13403480B60C4822C5aa5"
+    - &basicRedeemHook "0x0000000637f1b1ccDA4Af2dB6CDDf5e5Ec45fd93"
+    - &redirectingDepositHook "0x00000004d3B17e5391eb571dDb8fDF95646ca827"
+    - &lidoDepositHook "0x000000065d1A7bD71f52886910aaBE6555b7317c"
+    - &oracleHelper "0x000000005F543c38d5ea6D0bF10A50974Eb55E35"
+
     - &factoryFactoryProxyAdmin "0xf004f5876d352533fb8b244f1f6227caa8eff867"
     - &depositQueueFactoryProxyAdmin "0x77da14f966385b19c6e2d99a4448dcfc6fc53985"
     - &redeemQueueFactoryProxyAdmin "0xfce5f4f214288248f827390223f825dfb8c452be"
@@ -60,12 +56,6 @@ deployed:
     - &erc20VerifierFactoryProxyAdmin "0x8283eeb88ff09bd49cdce79887c9b7854eca0697"
     - &symbioticVerifierFactoryProxyAdmin "0xc885556d679e959da6331f0590d8c8d4a9302848"
     - &swapModuleFactoryProxyAdmin "0x214cc3e0bf23e141739deae7014b1c1fdb3b4e21"
-    # Configurator and hooks
-    - &vaultConfigurator "0x000000028be48f9E62E13403480B60C4822C5aa5"
-    - &basicRedeemHook "0x0000000637f1b1ccDA4Af2dB6CDDf5e5Ec45fd93"
-    - &redirectingDepositHook "0x00000004d3B17e5391eb571dDb8fDF95646ca827"
-    - &lidoDepositHook "0x000000065d1A7bD71f52886910aaBE6555b7317c"
-    - &oracleHelper "0x000000005F543c38d5ea6D0bF10A50974Eb55E35"
 
     # --- earnETH Vault ---
     - &vaultProxyAdmin "0x8b781593b273391428fe0e9ded0c2ffc3d6bff37"
@@ -273,6 +263,8 @@ l1:
   explorerTokenEnv: ETHERSCAN_TOKEN
   chainId: 1
   contracts:
+    # --- Proxy Admins ---
+
     vaultProxyAdmin:
       name: ProxyAdmin
       address: *vaultProxyAdmin
@@ -426,6 +418,8 @@ l1:
       checks:
         UPGRADE_INTERFACE_VERSION: "5.0.0"
         owner: *proxyAdmin
+
+    # --- Vault Contracts ---
 
     vault:
       name: Vault
@@ -1402,9 +1396,7 @@ l1:
         isOperationReady:
         supportsInterface:
 
-    # ===========================================
-    # Multisig Contracts
-    # ===========================================
+    # --- Multisig Contracts ---
 
     proxyAdmin_multisig:
       name: GnosisSafe
@@ -1789,11 +1781,8 @@ l1:
         nonce: 0
         signedMessages:
 
-    # ===========================================
-    # Base Infrastructure Contracts
-    # ===========================================
+    # --- Core Infrastructure Contracts ---
 
-    # --- Factory ProxyAdmins ---
     factoryFactoryProxyAdmin:
       name: ProxyAdmin
       address: *factoryFactoryProxyAdmin
@@ -1899,8 +1888,6 @@ l1:
         UPGRADE_INTERFACE_VERSION: "5.0.0"
         owner: *proxyAdmin
 
-    # --- Factories (Proxies) ---
-    # All factories owned by proxyAdmin (not deployer)
     factoryFactory:
       name: Factory
       address: *factoryFactory
@@ -2321,8 +2308,6 @@ l1:
         entities: 0
         implementations: 0
 
-    # --- Implementations with Access Control ---
-    # Verify no roles are granted on implementation contracts
     eigenLayerVerifierImpl:
       name: EigenLayerVerifier
       address: *eigenLayerVerifier
@@ -2439,7 +2424,6 @@ l1:
           - args: [*DEFAULT_ADMIN_ROLE]
             result: 0
 
-    # --- Hooks (No access control) ---
     basicRedeemHook:
       name: BasicRedeemHook
       address: *basicRedeemHook
@@ -2461,7 +2445,6 @@ l1:
         weth:
         wsteth:
 
-    # --- Other Infrastructure ---
     vaultConfigurator:
       name: VaultConfigurator
       address: *vaultConfigurator
