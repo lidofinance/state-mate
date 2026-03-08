@@ -159,6 +159,7 @@ misc:
   - &LIDO_SIGNER_11 "0xE6CD29BF19769E44534099d241abAa07aa8c8E9a"
   - &LIDO_SIGNER_12 "0x8aA493BcD7f989caD67dd3CB48A4c2E6b40FeDB0"
   - &LIDO_SIGNER_13 "0xf2374BCb265505002055942D070459a4d2011012"
+  - &LIDO_SIGNER_14 "0x169f2eE844275449739801695bf29C4b5f2007F3"
 
   # --- Mellow signers ---
   - &MELLOW_SIGNER_1 "0x44A388BBD782AE1D7f4542aEb6C3569E2CfdF5a1"
@@ -1048,13 +1049,13 @@ l1:
         acceptedAt:
         baseAsset: *ETH
         decimals: 18
-        getRate: "1000000000000000000"
+        getRate:
         getRoleAdmin:
         getRoleMember:
         getRoleMemberCount:
         getRoleMembers:
         hasRole:
-        latestAnswer: "1000000000000000000"
+        latestAnswer:
         latestRoundData:
         oracle: *oracle
         reportAt:
@@ -1088,9 +1089,9 @@ l1:
         SET_FLAGS_ROLE: *SET_FLAGS_ROLE
         SET_WHITELIST_MERKLE_ROOT_ROLE: *SET_WHITELIST_MERKLE_ROOT_ROLE
         accounts:
-        activeShares: 0
+        activeShares:
         activeSharesOf:
-        allocatedShares: 0
+        allocatedShares:
         allowance:
         balanceOf:
         claimableSharesOf:
@@ -1100,8 +1101,8 @@ l1:
         name: "Lido Earn ETH"
         sharesOf:
         symbol: "earnETH"
-        totalShares: 0
-        totalSupply: 0
+        totalShares:
+        totalSupply:
         updateChecks:
         vault: *vault
         whitelistMerkleRoot: *ZERO_BYTES32
@@ -1269,7 +1270,7 @@ l1:
         getVerificationResult:
         hashCall:
         isAllowedCall:
-        merkleRoot:
+        merkleRoot: "0xe7a368e36fd1e20517f4d671392131a9944dc0c477b50ad3288a980f7b2bdddc"
         vault: *vault
         verifyCall:
       implementationChecks:
@@ -1333,7 +1334,7 @@ l1:
         getVerificationResult:
         hashCall:
         isAllowedCall:
-        merkleRoot:
+        merkleRoot: "0xe8a03ddbb577e1dc2a1bfb92931a8b69dce457fa9d6674554c4661bd5174e96a"
         vault: *vault
         verifyCall:
       implementationChecks:
@@ -1561,8 +1562,7 @@ l1:
         getOwners:
           - *LIDO_SIGNER_6
           - *LIDO_SIGNER_10
-          - *LIDO_SIGNER_2
-          - *LIDO_SIGNER_1
+          - *LIDO_SIGNER_14
           - *LIDO_SIGNER_7
           - *LIDO_SIGNER_9
         getStorageAt:
@@ -1656,7 +1656,7 @@ l1:
         getOwners:
           - *LIDO_SIGNER_11
           - *LIDO_SIGNER_12
-          - *LIDO_SIGNER_8
+          - *LIDO_SIGNER_6
           - *LIDO_SIGNER_13
           - *LIDO_SIGNER_10
           - *LIDO_SIGNER_7
