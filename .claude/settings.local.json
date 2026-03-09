@@ -12,6 +12,7 @@
       "Bash(cast chain-id:*)",
       "Bash(gh api:*)",
       "Bash(gh pr:*)",
+      "Bash(gh run:*)",
       "WebFetch(domain:etherscan.io)"
     ]
   }

@@ -2433,8 +2433,10 @@ l1:
         owner: *proxyAdmin
         entities:
         entityAt:
-        implementations:
+        implementations: 1
         implementationAt:
+          - args: [0]
+            result: *factoryImplementation
         isBlacklisted:
         isEntity:
         proposalAt:
@@ -2461,8 +2463,16 @@ l1:
         owner: *proxyAdmin
         entities:
         entityAt:
-        implementations:
+        implementations: 4
         implementationAt:
+          - args: [0]
+            result: *depositQueueImplementation
+          - args: [1]
+            result: "0x00000003887dfBCEbD1e4097Ad89B690de7eFbf9"
+          - args: [2]
+            result: "0x000000002E2aeaC5Fe65AaB6fE2E6AE0e44F1A3A"
+          - args: [3]
+            result: *syncDepositQueueImplementation
         isBlacklisted:
         isEntity:
         proposalAt:
@@ -2489,8 +2499,14 @@ l1:
         owner: *proxyAdmin
         entities:
         entityAt:
-        implementations:
+        implementations: 3
         implementationAt:
+          - args: [0]
+            result: "0x0000000285805eac535DADdb9648F1E10DfdC411"
+          - args: [1]
+            result: "0x0000000b2082667589A16c4cF18e9f923781c471"
+          - args: [2]
+            result: *redeemQueueImplementation
         isBlacklisted:
         isEntity:
         proposalAt:
@@ -2517,8 +2533,10 @@ l1:
         owner: *proxyAdmin
         entities:
         entityAt:
-        implementations:
+        implementations: 1
         implementationAt:
+          - args: [0]
+            result: *feeManagerImplementation
         isBlacklisted:
         isEntity:
         proposalAt:
@@ -2545,8 +2563,10 @@ l1:
         owner: *proxyAdmin
         entities:
         entityAt:
-        implementations:
+        implementations: 1
         implementationAt:
+          - args: [0]
+            result: *oracleImplementation
         isBlacklisted:
         isEntity:
         proposalAt:
@@ -2573,8 +2593,10 @@ l1:
         owner: *proxyAdmin
         entities:
         entityAt:
-        implementations:
+        implementations: 1
         implementationAt:
+          - args: [0]
+            result: *riskManagerImplementation
         isBlacklisted:
         isEntity:
         proposalAt:
@@ -2601,8 +2623,14 @@ l1:
         owner: *proxyAdmin
         entities:
         entityAt:
-        implementations:
+        implementations: 3
         implementationAt:
+          - args: [0]
+            result: *shareManagerImplementation
+          - args: [1]
+            result: "0x00000005564AAE40D88e2F08dA71CBe156767977"
+          - args: [2]
+            result: "0x000000000c79D2B5cD58AE545afc83030233D7B6"
         isBlacklisted:
         isEntity:
         proposalAt:
@@ -2629,8 +2657,10 @@ l1:
         owner: *proxyAdmin
         entities:
         entityAt:
-        implementations:
+        implementations: 1
         implementationAt:
+          - args: [0]
+            result: *subvaultImplementation
         isBlacklisted:
         isEntity:
         proposalAt:
@@ -2657,8 +2687,10 @@ l1:
         owner: *proxyAdmin
         entities:
         entityAt:
-        implementations:
+        implementations: 1
         implementationAt:
+          - args: [0]
+            result: *verifierImplementation
         isBlacklisted:
         isEntity:
         proposalAt:
@@ -2685,8 +2717,10 @@ l1:
         owner: *proxyAdmin
         entities:
         entityAt:
-        implementations:
+        implementations: 1
         implementationAt:
+          - args: [0]
+            result: *vaultImplementation
         isBlacklisted:
         isEntity:
         proposalAt:
@@ -2713,8 +2747,10 @@ l1:
         owner: *proxyAdmin
         entities:
         entityAt:
-        implementations:
+        implementations: 1
         implementationAt:
+          - args: [0]
+            result: "0x0000000167598d2C78E2313fD5328E16bD9A0b13"
         isBlacklisted:
         isEntity:
         proposalAt:
@@ -2741,8 +2777,10 @@ l1:
         owner: *proxyAdmin
         entities:
         entityAt:
-        implementations:
+        implementations: 1
         implementationAt:
+          - args: [0]
+            result: *eigenLayerVerifier
         isBlacklisted:
         isEntity:
         proposalAt:
@@ -2769,8 +2807,10 @@ l1:
         owner: *proxyAdmin
         entities:
         entityAt:
-        implementations:
+        implementations: 1
         implementationAt:
+          - args: [0]
+            result: *erc20Verifier
         isBlacklisted:
         isEntity:
         proposalAt:
@@ -2797,8 +2837,10 @@ l1:
         owner: *proxyAdmin
         entities:
         entityAt:
-        implementations:
+        implementations: 1
         implementationAt:
+          - args: [0]
+            result: *symbioticVerifier
         isBlacklisted:
         isEntity:
         proposalAt:
@@ -2825,8 +2867,10 @@ l1:
         owner: *proxyAdmin
         entities:
         entityAt:
-        implementations:
+        implementations: 1
         implementationAt:
+          - args: [0]
+            result: *swapModuleImplementation
         isBlacklisted:
         isEntity:
         proposalAt:
