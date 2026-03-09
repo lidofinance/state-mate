@@ -27,7 +27,7 @@ roles:
   - &SOME_ROLE "0x..."
 
 l1:
-  rpcUrl: L1_MAINNET_RPC_URL  # env variable name (not the URL itself)
+  rpcUrl: L1_MAINNET_RPC_URL # env variable name (not the URL itself)
   explorerHostname: api.etherscan.io/v2/api
   explorerTokenEnv: ETHERSCAN_TOKEN
   chainId: 1
@@ -105,6 +105,7 @@ multisig_name:
 ```
 
 Detect if an address is a Safe:
+
 ```bash
 cast call $ADDRESS "VERSION()(string)" --rpc-url $RPC_URL
 # Safe → returns "1.4.1"; EOA → reverts
@@ -155,7 +156,7 @@ checks:
 
 ```yaml
 checks:
-  functionWithArgs:  # Empty value = skipped
+  functionWithArgs: # Empty value = skipped
   anotherComplexFunction:
 ```
 
@@ -191,7 +192,7 @@ checks:
   # params: [fieldA, fieldB, fieldC]
   params: [1000, 86400, 3600]
 
-  simpleParams: [200, 86400]  # [penaltyRate, maxAge(seconds)]
+  simpleParams: [200, 86400] # [penaltyRate, maxAge(seconds)]
 
   flags: [false, false, false, 0]
 ```
@@ -245,6 +246,7 @@ checks:
 ```
 
 Run state-mate — error output shows actual value:
+
 ```
 ✗ .unknownValue: expected REPLACEME, got 0xb13b0c93...
 ```
@@ -305,14 +307,14 @@ yarn start config.yml --update-abi                       # Re-download all ABIs
 
 For `implementationChecks`, use uninitialized/default values since the implementation stores no state:
 
-| Type | Default |
-|------|---------|
-| Address | `*ZERO_ADDRESS` |
-| Bytes32 | `*ZERO_BYTES32` |
-| Number | `0` |
-| String | `""` |
-| Boolean | `false` |
-| Tuple | All zeros: `[0, 0, 0, ...]` |
+| Type    | Default                     |
+| ------- | --------------------------- |
+| Address | `*ZERO_ADDRESS`             |
+| Bytes32 | `*ZERO_BYTES32`             |
+| Number  | `0`                         |
+| String  | `""`                        |
+| Boolean | `false`                     |
+| Tuple   | All zeros: `[0, 0, 0, ...]` |
 
 ## Best Practices
 
@@ -348,6 +350,7 @@ For `implementationChecks`, use uninitialized/default values since the implement
 ### Ambiguous function overloads
 
 Use the full signature with cast:
+
 ```bash
 cast call $CONTRACT "itemAt(bool,uint256)(address)" true 0 --rpc-url $RPC_URL
 ```

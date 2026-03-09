@@ -225,14 +225,12 @@ export function abiExistsForAddress(address: string): boolean {
 
   if (mode === "consolidated") {
     const abis = loadConsolidatedAbis();
-    // Check if any key contains this address
-    return Object.keys(abis).some((key) => key.toLowerCase().includes(address));
+    return findAbiKeysByAddress(Object.keys(abis), address).length > 0;
   } else if (mode === "individual") {
-    // Check if any file in the abi directory contains this address
     if (!fs.existsSync(g_Arguments.abiDirPath)) return false;
     try {
       const files = fs.readdirSync(g_Arguments.abiDirPath);
-      return files.some((file) => file.toLowerCase().includes(address));
+      return findAbiKeysByAddress(files, address).length > 0;
     } catch {
       return false;
     }

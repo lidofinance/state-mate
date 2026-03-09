@@ -30,7 +30,7 @@ export class OzAclSectionValidator extends SectionValidatorBase {
       for (let index = 0; index < roles.length; index++) {
         const [role, expectedAddrs] = roles[index];
         const isLastRole = index === roles.length - 1;
-        logSubHeader(`Role:${role}`, isLastRole);
+        logSubHeader(`Role: ${role}`, isLastRole);
 
         // Get actual role member count
         const actualCount = await contract.getRoleMemberCount(role);
