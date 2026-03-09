@@ -10,7 +10,7 @@ deployed:
     - &consensusFactory "0xaEEB06CBd91A18b51a2D30b61477eAeE3a9633C3"
     - &depositQueueFactory "0xBB92A7B9695750e1234BaB18F83b73686dd09854"
     - &depositQueueImplementation "0x00000006dA9f179BFE250Dd1c51cD2d3581930c8"
-    - &syncDepositQueueImplementation "0x000000002E2aeaC5Fe65AaB6fE2E6AE0e44F1A3A"
+    - &syncDepositQueueImplementation "0x000000000b98f77a017b5d3468400c5C597a3Bde"
     - &feeManagerFactory "0xF7223356819Ea48f25880b6c2ab3e907CC336D45"
     - &feeManagerImplementation "0x0000000dE74e5D51651326E0A3e1ACA94bEAF6E1"
     - &oracleFactory "0x0CdFf250C7a071fdc72340D820C5C8e29507Aaad"
@@ -62,30 +62,30 @@ deployed:
     - &vault "0x6a37725ca7f4CE81c004c955f7280d5C704a249e"
     - &depositQueueETH "0x1db7094Ef0D994B0b62f6Cd67dB801ad194999A8"
     - &depositQueueETHProxyAdmin "0x94bc347b510ae93226fdfbd6b41a6a057cd6a05e"
-    - &syncDepositQueueETH "0x4a1d5dd96d6AA2Ba82e748E941d4425cb117dE84"
-    - &syncDepositQueueETHProxyAdmin "0xe88109d65829156e3f8309adc5d7e0379e9ab935"
+    - &syncDepositQueueETH "0xb99394f8b95d426Cb2F013B857C74aCC924b20D5"
+    - &syncDepositQueueETHProxyAdmin "0xE4b1CaCA6FF8c04a2f8BC863BD3C1e2922EF2313"
     - &depositQueueWETH "0x3Fc48660d02e59fBedD0a5Cc18a5580D1f8dD6A4"
     - &depositQueueWETHProxyAdmin "0xec20dd518e7a70304c4453bcbd988fc7eab4bd84"
-    - &syncDepositQueueWETH "0x3B374Be4c02D7367a1fDDCcDbc2EAA708BB220a0"
-    - &syncDepositQueueWETHProxyAdmin "0x1d3cc7ef37b7104444560b2019d471bf8c0b86c6"
+    - &syncDepositQueueWETH "0xCe6C2505fEF74d2dE10FCF1d534cB73eCc837976"
+    - &syncDepositQueueWETHProxyAdmin "0xe7b24BE0dcaE1539661C4c42abdcE070e432D130"
     - &depositQueueWstETH "0xe39EED9A454C4918F8d0682062777cB251cd513F"
     - &depositQueueWstETHProxyAdmin "0xef3d010d1ce6a4f7427bb13223808f64c6a50b94"
-    - &syncDepositQueueWstETH "0xD39ceac8EAfc9c8dBf52319B900CA6623730d4BA"
-    - &syncDepositQueueWstETHProxyAdmin "0xcb4cba8dc464a7c7eb37f0773040a438d77dd2a6"
+    - &syncDepositQueueWstETH "0xECD2Bfe725fa14f5Ed86e9bDcc0eA4b34A4ed522"
+    - &syncDepositQueueWstETHProxyAdmin "0x529f500F569Ac7552aDDd3b2aF374Fa4535e9a0E"
     - &redeemQueueWstETH "0x095bFAca9f1c6F2B063Cd67C6d6bfcd0c3aaB7b4"
     - &redeemQueueWstETHProxyAdmin "0x87ba1e6d4410ae361773d219c00d427024a62079"
     - &depositQueueGG "0x411172F1E5310d03b38128F2a294F2e33c691B30"
     - &depositQueueGGProxyAdmin "0xef9d907a485728cb8096cd47fbb6861acd739be8"
-    - &syncDepositQueueGG "0xDc6D33047F57fCb54A6944889c5A2779EAB355a2"
-    - &syncDepositQueueGGProxyAdmin "0x923d773c296805fc2904ae29a90e854ffa382460"
+    - &syncDepositQueueGG "0x2792004b709E3E88b8FCCb06c3C5e1A6dff0EC2B"
+    - &syncDepositQueueGGProxyAdmin "0xb3312a94BC9a38526632E4a28E9347015d20c4E4"
     - &depositQueueStrETH "0x268ea1cc674cdaE200c4609E7b09d03Dc618E663"
     - &depositQueueStrETHProxyAdmin "0x9f2db5fbd61afad6e8581f13194e0dc43236d3ba"
-    - &syncDepositQueueStrETH "0x2161D9e85C73e7753f6Be8d0D5afBEAf416A8C58"
-    - &syncDepositQueueStrETHProxyAdmin "0x1f168aa99960e64c067ffc72c1c278443c1a2c14"
+    - &syncDepositQueueStrETH "0xA4F23f56442C01a478af20fe06b9F5f8f05aDD96"
+    - &syncDepositQueueStrETHProxyAdmin "0xF9BD69848275acc43b3B367Dd98EDd2a626202Af"
     - &depositQueueDVstETH "0x4bDd2Ea1E20acb13f2758190c92a84175107A86f"
     - &depositQueueDVstETHProxyAdmin "0x677016c88e6d77155a3c7eea820d54f43274786a"
-    - &syncDepositQueueDVstETH "0x07d82e01c73494F9b7965ED12eBDbF58E1057fBb"
-    - &syncDepositQueueDVstETHProxyAdmin "0x824a71550fb071e6d202419ec6440159b7474f1d"
+    - &syncDepositQueueDVstETH "0xA80f247b92C79740b0610b754403D5cb0bf216b5"
+    - &syncDepositQueueDVstETHProxyAdmin "0x195ff2C1FA52790DAA1936d0151C2337c368e5f4"
     - &oracle "0xAda1f4c24603aB2fe5aBd35BCD12370e98A20358"
     - &oracleProxyAdmin "0xc7cbd334ca805ada4ff01fb8851ee064793c1cdf"
     - &oracleSubmitter "0xFbD83f7C531D35D99392a5A20bb5F1e75E97076e"
@@ -125,7 +125,8 @@ misc:
   - &ETH "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"
   - &WETH "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
 
-  - &LIDO_WSTETH "0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0"
+  - &STETH "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84"
+  - &WSTETH "0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0"
   - &GGV "0xef417FCE1883c6653E7dC6AF7c6F85CCDE84Aa09"
   - &STRETH "0xcd3c0F51798D1daA92Fb192E57844Ae6cEE8a6c7"
   - &DVstETH "0x5E362eb2c0706Bd1d134689eC75176018385430B"
@@ -151,7 +152,6 @@ misc:
   - &LIDO_SIGNER_4 "0xFB864C1127ff77215d0A8e652bB632F526A4A89f"
   - &LIDO_SIGNER_5 "0x912e21CdA3D7012146da4Df33309d860a9eb0bEb"
   - &LIDO_SIGNER_6 "0x73B254db9cb71a129C4E73aF087D71Ac7d34a8d7"
-
   - &LIDO_SIGNER_7 "0x59d07dc34B135B17b87840a86BFF7302039E7EDf"
   - &LIDO_SIGNER_8 "0x04e7C0350241b818eE5c92cc260008C9898F41cf"
   - &LIDO_SIGNER_9 "0x8ecd93982FfbB2f937ADa6c6e50d1950974081C0"
@@ -247,6 +247,12 @@ roles:
 
   # --- Roles: sync deposit queue ---
   - &SET_SYNC_DEPOSIT_PARAMS_ROLE "0x07c44dbab396497d56fa954370602fee5a40eebde0c94923e44fcf920c918f87"
+
+  # --- Roles: swap module ---
+  - &ROUTER_ROLE "0x59a256c4d42df67b80d5d3fdaf91897a0d929e43a43a5f8e1a88cbd1476e5d90"
+  - &SET_SLIPPAGE_ROLE "0x32a83f2101a3db03d031fa7d978ba44116bbbd832fcef7908374354ae8de2b38"
+  - &TOKEN_IN_ROLE "0x35f08086aac3799af637e5e9fa5ff324170893731444bf3a9d1edc368bcbfaeb"
+  - &TOKEN_OUT_ROLE "0x9d556436fc766d4a6d24fe48c90073bc03600d7556265a3217def4578d7c2531"
 
   # --- Roles: oracle ---
   - &ACCEPT_REPORT_ROLE "0x341f4b58682c3a888bdb3eb9a8a4452a6e847be8a380eb3d742794b4f9ac0ab3"
@@ -448,14 +454,54 @@ l1:
         SET_QUEUE_LIMIT_ROLE: *SET_QUEUE_LIMIT_ROLE
         SET_QUEUE_STATUS_ROLE: *SET_QUEUE_STATUS_ROLE
         assetAt:
+          - args: [0]
+            result: *ETH
+          - args: [1]
+            result: *WETH
+          - args: [2]
+            result: *WSTETH
+          - args: [3]
+            result: *GGV
+          - args: [4]
+            result: *STRETH
+          - args: [5]
+            result: *DVstETH
         claimableSharesOf:
         defaultDepositHook: *redirectingDepositHook
         defaultRedeemHook: *basicRedeemHook
         depositQueueFactory: *depositQueueFactory
         feeManager: *feeManager
-        getAssetCount:
+        getAssetCount: 6
         getHook:
-        getQueueCount:
+          # Deposit queues → redirectingDepositHook
+          - args: [*depositQueueETH]
+            result: *redirectingDepositHook
+          - args: [*syncDepositQueueETH]
+            result: *redirectingDepositHook
+          - args: [*depositQueueWETH]
+            result: *redirectingDepositHook
+          - args: [*syncDepositQueueWETH]
+            result: *redirectingDepositHook
+          - args: [*depositQueueWstETH]
+            result: *redirectingDepositHook
+          - args: [*syncDepositQueueWstETH]
+            result: *redirectingDepositHook
+          - args: [*depositQueueGG]
+            result: *redirectingDepositHook
+          - args: [*syncDepositQueueGG]
+            result: *redirectingDepositHook
+          - args: [*depositQueueStrETH]
+            result: *redirectingDepositHook
+          - args: [*syncDepositQueueStrETH]
+            result: *redirectingDepositHook
+          - args: [*depositQueueDVstETH]
+            result: *redirectingDepositHook
+          - args: [*syncDepositQueueDVstETH]
+            result: *redirectingDepositHook
+          # Redeem queue → basicRedeemHook
+          - args: [*redeemQueueWstETH]
+            result: *basicRedeemHook
+        getQueueCount: 13
         getLiquidAssets:
         getRoleAdmin:
         getRoleMember:
@@ -463,15 +509,141 @@ l1:
         getRoleMembers:
         getStorageAt:
         hasAsset:
+          - args: [*ETH]
+            result: true
+          - args: [*WETH]
+            result: true
+          - args: [*WSTETH]
+            result: true
+          - args: [*GGV]
+            result: true
+          - args: [*STRETH]
+            result: true
+          - args: [*DVstETH]
+            result: true
         hasQueue:
+          - args: [*depositQueueETH]
+            result: true
+          - args: [*syncDepositQueueETH]
+            result: true
+          - args: [*depositQueueWETH]
+            result: true
+          - args: [*syncDepositQueueWETH]
+            result: true
+          - args: [*depositQueueWstETH]
+            result: true
+          - args: [*redeemQueueWstETH]
+            result: true
+          - args: [*syncDepositQueueWstETH]
+            result: true
+          - args: [*depositQueueGG]
+            result: true
+          - args: [*syncDepositQueueGG]
+            result: true
+          - args: [*depositQueueStrETH]
+            result: true
+          - args: [*syncDepositQueueStrETH]
+            result: true
+          - args: [*depositQueueDVstETH]
+            result: true
+          - args: [*syncDepositQueueDVstETH]
+            result: true
         hasRole:
         hasSubvault:
+          - args: [*subvault0]
+            result: true
+          - args: [*subvault1]
+            result: true
         hasSupportedRole:
         isDepositQueue:
+          - args: [*depositQueueETH]
+            result: true
+          - args: [*syncDepositQueueETH]
+            result: true
+          - args: [*depositQueueWETH]
+            result: true
+          - args: [*syncDepositQueueWETH]
+            result: true
+          - args: [*depositQueueWstETH]
+            result: true
+          - args: [*syncDepositQueueWstETH]
+            result: true
+          - args: [*depositQueueGG]
+            result: true
+          - args: [*syncDepositQueueGG]
+            result: true
+          - args: [*depositQueueStrETH]
+            result: true
+          - args: [*syncDepositQueueStrETH]
+            result: true
+          - args: [*depositQueueDVstETH]
+            result: true
+          - args: [*syncDepositQueueDVstETH]
+            result: true
+          - args: [*redeemQueueWstETH]
+            result: false
         isPausedQueue:
+          - args: [*depositQueueETH]
+            result: false
+          - args: [*syncDepositQueueETH]
+            result: false
+          - args: [*depositQueueWETH]
+            result: false
+          - args: [*syncDepositQueueWETH]
+            result: false
+          - args: [*depositQueueWstETH]
+            result: false
+          - args: [*redeemQueueWstETH]
+            result: false
+          - args: [*syncDepositQueueWstETH]
+            result: false
+          - args: [*depositQueueGG]
+            result: false
+          - args: [*syncDepositQueueGG]
+            result: false
+          - args: [*depositQueueStrETH]
+            result: false
+          - args: [*syncDepositQueueStrETH]
+            result: false
+          - args: [*depositQueueDVstETH]
+            result: false
+          - args: [*syncDepositQueueDVstETH]
+            result: false
         onERC721Received:
         oracle: *oracle
         queueAt:
+          # ETH - depositQueue + syncDepositQueue
+          - args: [*ETH, 0]
+            result: *depositQueueETH
+          - args: [*ETH, 1]
+            result: *syncDepositQueueETH
+          # WETH - depositQueue + syncDepositQueue
+          - args: [*WETH, 0]
+            result: *depositQueueWETH
+          - args: [*WETH, 1]
+            result: *syncDepositQueueWETH
+          # wstETH - depositQueue + redeemQueue + syncDepositQueue
+          - args: [*WSTETH, 0]
+            result: *depositQueueWstETH
+          - args: [*WSTETH, 1]
+            result: *redeemQueueWstETH
+          - args: [*WSTETH, 2]
+            result: *syncDepositQueueWstETH
+          # GGV - depositQueue + syncDepositQueue
+          - args: [*GGV, 0]
+            result: *depositQueueGG
+          - args: [*GGV, 1]
+            result: *syncDepositQueueGG
+          # STRETH - depositQueue + syncDepositQueue
+          - args: [*STRETH, 0]
+            result: *depositQueueStrETH
+          - args: [*STRETH, 1]
+            result: *syncDepositQueueStrETH
+          # DVstETH - depositQueue + syncDepositQueue
+          - args: [*DVstETH, 0]
+            result: *depositQueueDVstETH
+          - args: [*DVstETH, 1]
+            result: *syncDepositQueueDVstETH
         queueLimit: 13
         redeemQueueFactory: *redeemQueueFactory
         riskManager: *riskManager
@@ -629,7 +801,7 @@ l1:
         claim:
         claimableOf:
         name: "SyncDepositQueue"
-        syncDepositParams:
+        syncDepositParams: [200, 86400] # [penaltyD6, maxAge(seconds)]
         vault: *vault
       implementationChecks:
         SET_SYNC_DEPOSIT_PARAMS_ROLE: *SET_SYNC_DEPOSIT_PARAMS_ROLE
@@ -638,7 +810,7 @@ l1:
         claim:
         claimableOf:
         name: "SyncDepositQueue"
-        syncDepositParams:
+        syncDepositParams: [0, 0]
         vault: *ZERO_ADDRESS
 
     depositQueueWETH:
@@ -659,7 +831,7 @@ l1:
         canBeRemoved: true
         claimableOf:
         requestOf:
-        unclaimedRequests:
+        unclaimedRequests: 0
         vault: *vault
       implementationChecks:
         asset: *ZERO_ADDRESS
@@ -689,7 +861,7 @@ l1:
         claim:
         claimableOf:
         name: "SyncDepositQueue"
-        syncDepositParams:
+        syncDepositParams: [200, 86400] # [penaltyD6, maxAge(seconds)]
         vault: *vault
       implementationChecks:
         SET_SYNC_DEPOSIT_PARAMS_ROLE: *SET_SYNC_DEPOSIT_PARAMS_ROLE
@@ -715,11 +887,11 @@ l1:
           expected: *depositQueueImplementation
           label: implementation
       checks:
-        asset: *LIDO_WSTETH
+        asset: *WSTETH
         canBeRemoved: true
         claimableOf:
         requestOf:
-        unclaimedRequests:
+        unclaimedRequests: 0
         vault: *vault
       implementationChecks:
         asset: *ZERO_ADDRESS
@@ -744,12 +916,12 @@ l1:
           label: implementation
       checks:
         SET_SYNC_DEPOSIT_PARAMS_ROLE: *SET_SYNC_DEPOSIT_PARAMS_ROLE
-        asset: *LIDO_WSTETH
+        asset: *WSTETH
         canBeRemoved: true
         claim:
         claimableOf:
         name: "SyncDepositQueue"
-        syncDepositParams:
+        syncDepositParams: [200, 86400] # [penaltyD6, maxAge(seconds)]
         vault: *vault
       implementationChecks:
         SET_SYNC_DEPOSIT_PARAMS_ROLE: *SET_SYNC_DEPOSIT_PARAMS_ROLE
@@ -775,11 +947,12 @@ l1:
           expected: *redeemQueueImplementation
           label: implementation
       checks:
-        asset: *LIDO_WSTETH
+        asset: *WSTETH
         batchAt:
         canBeRemoved: true
         claimableOf:
-        getState:
+        # getState: [batchIterator, batchCount, totalDemandAssets, totalPendingShares]
+        getState: [0, 0, 0, 0]
         requestsOf:
         vault: *vault
       implementationChecks:
@@ -809,7 +982,7 @@ l1:
         canBeRemoved: true
         claimableOf:
         requestOf:
-        unclaimedRequests:
+        unclaimedRequests: 0
         vault: *vault
       implementationChecks:
         asset: *ZERO_ADDRESS
@@ -839,7 +1012,7 @@ l1:
         claim:
         claimableOf:
         name: "SyncDepositQueue"
-        syncDepositParams:
+        syncDepositParams: [200, 86400] # [penaltyD6, maxAge(seconds)]
         vault: *vault
       implementationChecks:
         SET_SYNC_DEPOSIT_PARAMS_ROLE: *SET_SYNC_DEPOSIT_PARAMS_ROLE
@@ -869,7 +1042,7 @@ l1:
         canBeRemoved: true
         claimableOf:
         requestOf:
-        unclaimedRequests:
+        unclaimedRequests: 0
         vault: *vault
       implementationChecks:
         asset: *ZERO_ADDRESS
@@ -899,7 +1072,7 @@ l1:
         claim:
         claimableOf:
         name: "SyncDepositQueue"
-        syncDepositParams:
+        syncDepositParams: [200, 86400] # [penaltyD6, maxAge(seconds)]
         vault: *vault
       implementationChecks:
         SET_SYNC_DEPOSIT_PARAMS_ROLE: *SET_SYNC_DEPOSIT_PARAMS_ROLE
@@ -929,7 +1102,7 @@ l1:
         canBeRemoved: true
         claimableOf:
         requestOf:
-        unclaimedRequests:
+        unclaimedRequests: 0
         vault: *vault
       implementationChecks:
         asset: *ZERO_ADDRESS
@@ -959,7 +1132,7 @@ l1:
         claim:
         claimableOf:
         name: "SyncDepositQueue"
-        syncDepositParams:
+        syncDepositParams: [200, 86400] # [penaltyD6, maxAge(seconds)]
         vault: *vault
       implementationChecks:
         SET_SYNC_DEPOSIT_PARAMS_ROLE: *SET_SYNC_DEPOSIT_PARAMS_ROLE
@@ -996,7 +1169,7 @@ l1:
             result: true
           - args: [*WETH]
             result: true
-          - args: [*LIDO_WSTETH]
+          - args: [*WSTETH]
             result: true
           - args: [*GGV]
             result: true
@@ -1004,14 +1177,15 @@ l1:
             result: true
           - args: [*DVstETH]
             result: true
-        securityParams:
+        # securityParams: [maxAbsDeviation, suspAbsDeviation, maxRelDeviationD18, suspRelDeviationD18, timeout, depositInterval, redeemInterval]
+        securityParams: [5000000000000000, 1000000000000000, 5000000000000000, 1000000000000000, 72000, 3600, 172800]
         supportedAssetAt:
           - args: [0]
             result: *ETH
           - args: [1]
             result: *WETH
           - args: [2]
-            result: *LIDO_WSTETH
+            result: *WSTETH
           - args: [3]
             result: *GGV
           - args: [4]
@@ -1096,6 +1270,7 @@ l1:
         balanceOf:
         claimableSharesOf:
         decimals: 18
+        # flags: [hasMintPause, hasBurnPause, hasTransferPause, hasWhitelist, hasTransferWhitelist, globalLockup]
         flags: [false, false, false, false, false, 0]
         isDepositorWhitelisted:
         name: "Lido Earn ETH"
@@ -1266,7 +1441,7 @@ l1:
         DISALLOW_CALL_ROLE: *DISALLOW_CALL_ROLE
         SET_MERKLE_ROOT_ROLE: *SET_MERKLE_ROOT_ROLE
         allowedCallAt:
-        allowedCalls:
+        allowedCalls: 0
         getVerificationResult:
         hashCall:
         isAllowedCall:
@@ -1330,7 +1505,7 @@ l1:
         DISALLOW_CALL_ROLE: *DISALLOW_CALL_ROLE
         SET_MERKLE_ROOT_ROLE: *SET_MERKLE_ROOT_ROLE
         allowedCallAt:
-        allowedCalls:
+        allowedCalls: 0
         getVerificationResult:
         hashCall:
         isAllowedCall:
@@ -1410,7 +1585,7 @@ l1:
         approvedHashes:
         checkNSignatures:
         checkSignatures:
-        domainSeparator:
+        domainSeparator: "0x90468bd6f3155511c3cb7b455a07664de4779c3a328ac577fdd4cc584ee815d0"
         encodeTransactionData:
         getChainId: 1
         getModulesPaginated:
@@ -1459,7 +1634,7 @@ l1:
         approvedHashes:
         checkNSignatures:
         checkSignatures:
-        domainSeparator:
+        domainSeparator: "0x2ef47b1e8311a6d4f0fc0c7a8d3c83300fb0a05bfe366050d72704b356e80aae"
         encodeTransactionData:
         getChainId: 1
         getModulesPaginated:
@@ -1508,7 +1683,7 @@ l1:
         approvedHashes:
         checkNSignatures:
         checkSignatures:
-        domainSeparator:
+        domainSeparator: "0x7398e42fc2fbaf2412b6203fbcfad706f92bb2334ca78dc9c6df65b5aac537ca"
         encodeTransactionData:
         getChainId: 1
         getModulesPaginated:
@@ -1555,7 +1730,7 @@ l1:
         approvedHashes:
         checkNSignatures:
         checkSignatures:
-        domainSeparator:
+        domainSeparator: "0xcbb9b3b1b7a687027a96c71f5bf0330dd604b0793f293662d1993d08f1bd5d11"
         encodeTransactionData:
         getChainId: 1
         getModulesPaginated:
@@ -1601,7 +1776,7 @@ l1:
         approvedHashes:
         checkNSignatures:
         checkSignatures:
-        domainSeparator:
+        domainSeparator: "0x0e45af53a5dc5da30adaa701abf7c076ecf7bafeb42e7b65bc1a56048344015f"
         encodeTransactionData:
         getChainId: 1
         getModulesPaginated:
@@ -1649,7 +1824,7 @@ l1:
         approvedHashes:
         checkNSignatures:
         checkSignatures:
-        domainSeparator:
+        domainSeparator: "0xf463eafe8cd1b761a1e0fd9e1f08d016237252b4af417c43077fc33f3c831d03"
         encodeTransactionData:
         getChainId: 1
         getModulesPaginated:
@@ -1697,7 +1872,7 @@ l1:
         approvedHashes:
         checkNSignatures:
         checkSignatures:
-        domainSeparator:
+        domainSeparator: "0x8bfd883cdb30b46e66a8824a700fa258b5484e6ff68f07a5a0b952405291d9a0"
         encodeTransactionData:
         getChainId: 1
         getModulesPaginated:
@@ -1743,7 +1918,7 @@ l1:
         approvedHashes:
         checkNSignatures:
         checkSignatures:
-        domainSeparator:
+        domainSeparator: "0x426446b0463851054e2340cc340877c3ada65ee70cb1fc4ebaaf68cbf9d25495"
         encodeTransactionData:
         getChainId: 1
         getModulesPaginated:
@@ -2319,15 +2494,15 @@ l1:
         OPERATOR_ROLE: *OPERATOR_ROLE
         RECEIVER_ROLE: *RECEIVER_ROLE
         STRATEGY_ROLE: *STRATEGY_ROLE
-        delegationManager:
+        delegationManager: "0x39053D51B77DC0d36036Fc1fCc8Cb819df8Ef37A"
         getRoleAdmin:
         getRoleMember:
         getRoleMembers:
         hasSupportedRole:
-        rewardsCoordinator:
-        strategyManager:
+        rewardsCoordinator: "0x7750d328b314EfFa365A0402CcfD489B80B0adda"
+        strategyManager: "0x858646372CC42E1A627fcE94aa7A7033e7CF075A"
         supportedRoleAt:
-        supportedRoles:
+        supportedRoles: 0
         supportsInterface:
         verifyCall:
         hasRole:
@@ -2350,7 +2525,7 @@ l1:
         getRoleMembers:
         hasSupportedRole:
         supportedRoleAt:
-        supportedRoles:
+        supportedRoles: 0
         supportsInterface:
         verifyCall:
         hasRole:
@@ -2369,15 +2544,15 @@ l1:
         MELLOW_VAULT_ROLE: *SYMBIOTIC_MELLOW_VAULT_ROLE
         SYMBIOTIC_FARM_ROLE: *SYMBIOTIC_FARM_ROLE
         SYMBIOTIC_VAULT_ROLE: *SYMBIOTIC_VAULT_ROLE
-        farmFactory:
+        farmFactory: "0xFEB871581C2ab2e1EEe6f7dDC7e6246cFa087A23"
         getRoleAdmin:
         getRoleMember:
         getRoleMembers:
         hasSupportedRole:
         supportedRoleAt:
-        supportedRoles:
+        supportedRoles: 0
         supportsInterface:
-        vaultFactory:
+        vaultFactory: "0xAEb6bdd95c502390db8f52c8909F703E9Af6a346"
         verifyCall:
         hasRole:
           - args: [*DEFAULT_ADMIN_ROLE, *deployer]
@@ -2390,33 +2565,33 @@ l1:
       name: SwapModule
       address: *swapModuleImplementation
       checks:
-        BASE_MULTIPLIER:
-        CALLER_ROLE:
+        BASE_MULTIPLIER: 100000000
+        CALLER_ROLE: "0xaef53ff2a64da421565efa45c50a96f070d7bb66ffc4ca806c77c72a0e763f66"
         DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
-        MAX_MULTIPLIER:
-        MIN_MULTIPLIER:
-        ROUTER_ROLE:
-        SET_SLIPPAGE_ROLE:
-        TOKEN_IN_ROLE:
-        TOKEN_OUT_ROLE:
+        MAX_MULTIPLIER: 110000000
+        MIN_MULTIPLIER: 90000000
+        ROUTER_ROLE: *ROUTER_ROLE
+        SET_SLIPPAGE_ROLE: *SET_SLIPPAGE_ROLE
+        TOKEN_IN_ROLE: *TOKEN_IN_ROLE
+        TOKEN_OUT_ROLE: *TOKEN_OUT_ROLE
         checkCowswapOrder:
         checkMultiplier:
         checkParams:
-        cowswapSettlement:
-        cowswapVaultRelayer:
+        cowswapSettlement: "0x9008D19f58AAbD9eD0D60971565AA8510560ab41"
+        cowswapVaultRelayer: "0xC92E8bdf79f0507f65a392b0ab4667716BFE0110"
         customMultiplier:
-        defaultMultiplier:
+        defaultMultiplier: 0
         evaluate:
         getRoleAdmin:
         getRoleMember:
         getRoleMembers:
         hasSupportedRole:
-        oracle:
-        subvault:
+        oracle: *ZERO_ADDRESS
+        subvault: *ZERO_ADDRESS
         supportedRoleAt:
-        supportedRoles:
+        supportedRoles: 0
         supportsInterface:
-        weth:
+        weth: *WETH
         hasRole:
           - args: [*DEFAULT_ADMIN_ROLE, *deployer]
             result: false
@@ -2440,10 +2615,10 @@ l1:
       name: LidoDepositHook
       address: *lidoDepositHook
       checks:
-        nextHook:
-        steth:
-        weth:
-        wsteth:
+        nextHook: *redirectingDepositHook
+        steth: *STETH
+        weth: *WETH
+        wsteth: *WSTETH
 
     vaultConfigurator:
       name: VaultConfigurator

@@ -189,6 +189,19 @@ misc:
   - &USDe "0x4c9EDD5852cd905f086C759E8383e09bff1E68B3"
   - &sUSDe "0x9D39A5DE30e57443BfF2A8307A4256c8797A3497"
   - &syrupUSDT "0x356B8d89c1e1239Cbbb9dE4815c39A1474d5BA7D"
+  - &WETH "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
+  - &PYUSD "0x6c3ea9036406852006290770BEdFcAbA0e23A0e8"
+  - &GHO "0x40D16FC0246aD3160Ccc09B8D0D3A2cD28aE6C2f"
+  - &AURA "0xC0c293ce456fF0ED870ADd98a0828Dd4d2903DBF"
+  - &BAL "0xba100000625a3754423978a60c9317c58a424e3D"
+
+  # --- CoW Protocol ---
+  - &cowswapSettlement "0x9008D19f58AAbD9eD0D60971565AA8510560ab41"
+  - &cowswapVaultRelayer "0xC92E8bdf79f0507f65a392b0ab4667716BFE0110"
+
+  # --- SwapModule external ---
+  - &swapModuleRouter "0x6131B5fae19EA4f9D964eAc0408E4408b66337b5"
+  - &swapModuleOracle "0x58f80f4e6367bC1CF548B819F6F0DE5F77BDF797"
 
   # --- EIP-1967 Storage Slots ---
   - &EIP1967_ADMIN_SLOT "0xb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d6103"
@@ -232,6 +245,13 @@ roles:
 
   # --- Roles: sync deposit queue ---
   - &SET_SYNC_DEPOSIT_PARAMS_ROLE "0x07c44dbab396497d56fa954370602fee5a40eebde0c94923e44fcf920c918f87"
+
+  # --- Roles: swap module ---
+  - &SM_CALLER_ROLE "0xaef53ff2a64da421565efa45c50a96f070d7bb66ffc4ca806c77c72a0e763f66"
+  - &ROUTER_ROLE "0x59a256c4d42df67b80d5d3fdaf91897a0d929e43a43a5f8e1a88cbd1476e5d90"
+  - &SET_SLIPPAGE_ROLE "0x32a83f2101a3db03d031fa7d978ba44116bbbd832fcef7908374354ae8de2b38"
+  - &TOKEN_IN_ROLE "0x35f08086aac3799af637e5e9fa5ff324170893731444bf3a9d1edc368bcbfaeb"
+  - &TOKEN_OUT_ROLE "0x9d556436fc766d4a6d24fe48c90073bc03600d7556265a3217def4578d7c2531"
 
   # --- Roles: oracle ---
   - &ACCEPT_REPORT_ROLE "0x341f4b58682c3a888bdb3eb9a8a4452a6e847be8a380eb3d742794b4f9ac0ab3"
@@ -386,14 +406,28 @@ l1:
         SET_QUEUE_LIMIT_ROLE: *SET_QUEUE_LIMIT_ROLE
         SET_QUEUE_STATUS_ROLE: *SET_QUEUE_STATUS_ROLE
         assetAt:
+          - args: [0]
+            result: *USDC
+          - args: [1]
+            result: *USDT
         claimableSharesOf:
         defaultDepositHook: *redirectingDepositHook
         defaultRedeemHook: *basicRedeemHook
         depositQueueFactory: *depositQueueFactory
         feeManager: *earnUSD_feeManager
-        getAssetCount:
+        getAssetCount: 2
         getHook:
-        getQueueCount:
+          - args: [*earnUSD_depositQueueUSDC]
+            result: *redirectingDepositHook
+          - args: [*earnUSD_syncDepositQueueUSDC]
+            result: *redirectingDepositHook
+          - args: [*earnUSD_redeemQueueUSDC]
+            result: *basicRedeemHook
+          - args: [*earnUSD_depositQueueUSDT]
+            result: *redirectingDepositHook
+          - args: [*earnUSD_syncDepositQueueUSDT]
+            result: *redirectingDepositHook
+        getQueueCount: 5
         getLiquidAssets:
         getRoleAdmin:
         getRoleMember:
@@ -401,15 +435,63 @@ l1:
         getRoleMembers:
         getStorageAt:
         hasAsset:
+          - args: [*USDC]
+            result: true
+          - args: [*USDT]
+            result: true
         hasQueue:
+          - args: [*earnUSD_depositQueueUSDC]
+            result: true
+          - args: [*earnUSD_syncDepositQueueUSDC]
+            result: true
+          - args: [*earnUSD_redeemQueueUSDC]
+            result: true
+          - args: [*earnUSD_depositQueueUSDT]
+            result: true
+          - args: [*earnUSD_syncDepositQueueUSDT]
+            result: true
         hasRole:
         hasSubvault:
+          - args: [*earnUSD_subvault0]
+            result: true
         hasSupportedRole:
         isDepositQueue:
+          - args: [*earnUSD_depositQueueUSDC]
+            result: true
+          - args: [*earnUSD_syncDepositQueueUSDC]
+            result: true
+          - args: [*earnUSD_redeemQueueUSDC]
+            result: false
+          - args: [*earnUSD_depositQueueUSDT]
+            result: true
+          - args: [*earnUSD_syncDepositQueueUSDT]
+            result: true
         isPausedQueue:
+          - args: [*earnUSD_depositQueueUSDC]
+            result: false
+          - args: [*earnUSD_syncDepositQueueUSDC]
+            result: false
+          - args: [*earnUSD_redeemQueueUSDC]
+            result: false
+          - args: [*earnUSD_depositQueueUSDT]
+            result: false
+          - args: [*earnUSD_syncDepositQueueUSDT]
+            result: false
         onERC721Received:
         oracle: *earnUSD_oracle
         queueAt:
+          # USDC - depositQueue + syncDepositQueue + redeemQueue
+          - args: [*USDC, 0]
+            result: *earnUSD_depositQueueUSDC
+          - args: [*USDC, 1]
+            result: *earnUSD_syncDepositQueueUSDC
+          - args: [*USDC, 2]
+            result: *earnUSD_redeemQueueUSDC
+          # USDT - depositQueue + syncDepositQueue
+          - args: [*USDT, 0]
+            result: *earnUSD_depositQueueUSDT
+          - args: [*USDT, 1]
+            result: *earnUSD_syncDepositQueueUSDT
         queueLimit: 5
         redeemQueueFactory: *redeemQueueFactory
         riskManager: *earnUSD_riskManager
@@ -557,11 +639,11 @@ l1:
         DISALLOW_CALL_ROLE: *DISALLOW_CALL_ROLE
         SET_MERKLE_ROOT_ROLE: *SET_MERKLE_ROOT_ROLE
         allowedCallAt:
-        allowedCalls:
+        allowedCalls: 0
         getVerificationResult:
         hashCall:
         isAllowedCall:
-        merkleRoot:
+        merkleRoot: "0x3d1503344580ab876cd12a28c6a2322b5dd90253d354a8d6666476ed011923d8"
         vault: *earnUSD_vault
         verifyCall:
       implementationChecks:
@@ -596,7 +678,7 @@ l1:
         canBeRemoved: true
         claimableOf:
         requestOf:
-        unclaimedRequests:
+        unclaimedRequests: 0
         vault: *earnUSD_vault
       implementationChecks:
         asset: *ZERO_ADDRESS
@@ -626,7 +708,7 @@ l1:
         claim:
         claimableOf:
         name: "SyncDepositQueue"
-        syncDepositParams:
+        syncDepositParams: [200, 86400] # [penaltyD6, maxAge(seconds)]
         vault: *earnUSD_vault
       implementationChecks:
         SET_SYNC_DEPOSIT_PARAMS_ROLE: *SET_SYNC_DEPOSIT_PARAMS_ROLE
@@ -635,7 +717,7 @@ l1:
         claim:
         claimableOf:
         name: "SyncDepositQueue"
-        syncDepositParams:
+        syncDepositParams: [0, 0]
         vault: *ZERO_ADDRESS
 
     earnUSD_redeemQueueUSDC:
@@ -656,7 +738,8 @@ l1:
         batchAt:
         canBeRemoved: false
         claimableOf:
-        getState:
+        # getState: [batchIterator, batchCount, totalDemandAssets, totalPendingShares]
+        getState: [0, 0, 0, 0]
         requestsOf:
         vault: *earnUSD_vault
       implementationChecks:
@@ -686,7 +769,7 @@ l1:
         canBeRemoved: true
         claimableOf:
         requestOf:
-        unclaimedRequests:
+        unclaimedRequests: 0
         vault: *earnUSD_vault
       implementationChecks:
         asset: *ZERO_ADDRESS
@@ -716,7 +799,7 @@ l1:
         claim:
         claimableOf:
         name: "SyncDepositQueue"
-        syncDepositParams:
+        syncDepositParams: [200, 86400] # [penaltyD6, maxAge(seconds)]
         vault: *earnUSD_vault
       implementationChecks:
         SET_SYNC_DEPOSIT_PARAMS_ROLE: *SET_SYNC_DEPOSIT_PARAMS_ROLE
@@ -725,7 +808,7 @@ l1:
         claim:
         claimableOf:
         name: "SyncDepositQueue"
-        syncDepositParams:
+        syncDepositParams: [0, 0]
         vault: *ZERO_ADDRESS
 
     earnUSD_oracle:
@@ -753,7 +836,8 @@ l1:
             result: true
           - args: [*USDT]
             result: true
-        securityParams:
+        # securityParams: [maxAbsDeviation, suspAbsDeviation, maxRelDeviationD18, suspRelDeviationD18, timeout, depositInterval, redeemInterval]
+        securityParams: [5000000000000000, 1000000000000000, 5000000000000000, 1000000000000000, 72000, 3600, 172800]
         supportedAssetAt:
           - args: [0]
             result: *USDC
@@ -1114,14 +1198,24 @@ l1:
         SET_QUEUE_LIMIT_ROLE: *SET_QUEUE_LIMIT_ROLE
         SET_QUEUE_STATUS_ROLE: *SET_QUEUE_STATUS_ROLE
         assetAt:
+          - args: [0]
+            result: *USDC
+          - args: [1]
+            result: *USDT
         claimableSharesOf:
         defaultDepositHook: *redirectingDepositHook
         defaultRedeemHook: *basicRedeemHook
         depositQueueFactory: *depositQueueFactory
         feeManager: *earnUSDc_feeManager
-        getAssetCount:
+        getAssetCount: 2
         getHook:
-        getQueueCount:
+          - args: [*earnUSDc_syncDepositQueueUSDC]
+            result: *redirectingDepositHook
+          - args: [*earnUSDc_redeemQueueUSDC]
+            result: *basicRedeemHook
+          - args: [*earnUSDc_syncDepositQueueUSDT]
+            result: *redirectingDepositHook
+        getQueueCount: 3
         getLiquidAssets:
         getRoleAdmin:
         getRoleMember:
@@ -1129,15 +1223,47 @@ l1:
         getRoleMembers:
         getStorageAt:
         hasAsset:
+          - args: [*USDC]
+            result: true
+          - args: [*USDT]
+            result: true
         hasQueue:
+          - args: [*earnUSDc_syncDepositQueueUSDC]
+            result: true
+          - args: [*earnUSDc_redeemQueueUSDC]
+            result: true
+          - args: [*earnUSDc_syncDepositQueueUSDT]
+            result: true
         hasRole:
         hasSubvault:
+          - args: [*earnUSDc_subvault0]
+            result: true
         hasSupportedRole:
         isDepositQueue:
+          - args: [*earnUSDc_syncDepositQueueUSDC]
+            result: true
+          - args: [*earnUSDc_redeemQueueUSDC]
+            result: false
+          - args: [*earnUSDc_syncDepositQueueUSDT]
+            result: true
         isPausedQueue:
+          - args: [*earnUSDc_syncDepositQueueUSDC]
+            result: false
+          - args: [*earnUSDc_redeemQueueUSDC]
+            result: false
+          - args: [*earnUSDc_syncDepositQueueUSDT]
+            result: false
         onERC721Received:
         oracle: *earnUSDc_oracle
         queueAt:
+          # USDC - syncDepositQueue + redeemQueue
+          - args: [*USDC, 0]
+            result: *earnUSDc_syncDepositQueueUSDC
+          - args: [*USDC, 1]
+            result: *earnUSDc_redeemQueueUSDC
+          # USDT - syncDepositQueue
+          - args: [*USDT, 0]
+            result: *earnUSDc_syncDepositQueueUSDT
         queueLimit: 3
         redeemQueueFactory: *redeemQueueFactory
         riskManager: *earnUSDc_riskManager
@@ -1285,11 +1411,11 @@ l1:
         DISALLOW_CALL_ROLE: *DISALLOW_CALL_ROLE
         SET_MERKLE_ROOT_ROLE: *SET_MERKLE_ROOT_ROLE
         allowedCallAt:
-        allowedCalls:
+        allowedCalls: 0
         getVerificationResult:
         hashCall:
         isAllowedCall:
-        merkleRoot:
+        merkleRoot: "0x1c3a764fe318890d6c5d01ec860e6ba8212dc38951ddb1b1dd71dab1e8071fed"
         vault: *earnUSDc_vault
         verifyCall:
       implementationChecks:
@@ -1326,7 +1452,7 @@ l1:
         claim:
         claimableOf:
         name: "SyncDepositQueue"
-        syncDepositParams:
+        syncDepositParams: [0, 86400] # [penaltyD6, maxAge(seconds)]
         vault: *earnUSDc_vault
       implementationChecks:
         SET_SYNC_DEPOSIT_PARAMS_ROLE: *SET_SYNC_DEPOSIT_PARAMS_ROLE
@@ -1335,7 +1461,7 @@ l1:
         claim:
         claimableOf:
         name: "SyncDepositQueue"
-        syncDepositParams:
+        syncDepositParams: [0, 0]
         vault: *ZERO_ADDRESS
 
     earnUSDc_redeemQueueUSDC:
@@ -1356,7 +1482,8 @@ l1:
         batchAt:
         canBeRemoved: false
         claimableOf:
-        getState:
+        # getState: [batchIterator, batchCount, totalDemandAssets, totalPendingShares]
+        getState: [0, 0, 0, 0]
         requestsOf:
         vault: *earnUSDc_vault
       implementationChecks:
@@ -1388,7 +1515,7 @@ l1:
         claim:
         claimableOf:
         name: "SyncDepositQueue"
-        syncDepositParams:
+        syncDepositParams: [0, 86400] # [penaltyD6, maxAge(seconds)]
         vault: *earnUSDc_vault
       implementationChecks:
         SET_SYNC_DEPOSIT_PARAMS_ROLE: *SET_SYNC_DEPOSIT_PARAMS_ROLE
@@ -1397,7 +1524,7 @@ l1:
         claim:
         claimableOf:
         name: "SyncDepositQueue"
-        syncDepositParams:
+        syncDepositParams: [0, 0]
         vault: *ZERO_ADDRESS
 
     earnUSDc_oracle:
@@ -1425,7 +1552,8 @@ l1:
             result: true
           - args: [*USDT]
             result: true
-        securityParams:
+        # securityParams: [maxAbsDeviation, suspAbsDeviation, maxRelDeviationD18, suspRelDeviationD18, timeout, depositInterval, redeemInterval]
+        securityParams: [5000000000000000, 1000000000000000, 5000000000000000, 1000000000000000, 72000, 3600, 172800]
         supportedAssetAt:
           - args: [0]
             result: *USDC
@@ -1632,6 +1760,74 @@ l1:
         subvaultState:
         vault: *ZERO_ADDRESS
         vaultState:
+
+    earnUSDc_swapModule0:
+      name: SwapModule
+      address: *earnUSDc_swapModule0
+      proxyName: TransparentUpgradeableProxy
+      implementation: *swapModuleImplementation
+      proxyChecks: {}
+      storage:
+        - slot: *EIP1967_ADMIN_SLOT
+          expected: *earnUSDc_swapModule0ProxyAdmin
+          label: admin
+        - slot: *EIP1967_IMPLEMENTATION_SLOT
+          expected: *swapModuleImplementation
+          label: implementation
+      checks:
+        BASE_MULTIPLIER: 100000000 # 1e8 (100%)
+        CALLER_ROLE: *SM_CALLER_ROLE
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        MAX_MULTIPLIER: 110000000 # 1.1e8 (110%)
+        MIN_MULTIPLIER: 90000000 # 0.9e8 (90%)
+        ROUTER_ROLE: *ROUTER_ROLE
+        SET_SLIPPAGE_ROLE: *SET_SLIPPAGE_ROLE
+        TOKEN_IN_ROLE: *TOKEN_IN_ROLE
+        TOKEN_OUT_ROLE: *TOKEN_OUT_ROLE
+        checkCowswapOrder:
+        checkMultiplier:
+        checkParams:
+        cowswapSettlement: *cowswapSettlement
+        cowswapVaultRelayer: *cowswapVaultRelayer
+        customMultiplier:
+        defaultMultiplier: 99500000 # 0.995e8 (99.5% - 0.5% max slippage)
+        evaluate:
+        getRoleAdmin:
+        getRoleMember:
+        getRoleMemberCount:
+        getRoleMembers:
+        hasRole:
+        hasSupportedRole:
+        oracle: *swapModuleOracle
+        subvault: *earnUSDc_subvault0
+        supportedRoleAt:
+        supportedRoles: 5
+        supportsInterface:
+        weth: *WETH
+      implementationChecks:
+        BASE_MULTIPLIER: 100000000 # 1e8
+        CALLER_ROLE: *SM_CALLER_ROLE
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        MAX_MULTIPLIER: 110000000 # 1.1e8
+        MIN_MULTIPLIER: 90000000 # 0.9e8
+        ROUTER_ROLE: *ROUTER_ROLE
+        SET_SLIPPAGE_ROLE: *SET_SLIPPAGE_ROLE
+        TOKEN_IN_ROLE: *TOKEN_IN_ROLE
+        TOKEN_OUT_ROLE: *TOKEN_OUT_ROLE
+        cowswapSettlement: *cowswapSettlement
+        cowswapVaultRelayer: *cowswapVaultRelayer
+        defaultMultiplier: 0
+        oracle: *ZERO_ADDRESS
+        subvault: *ZERO_ADDRESS
+        supportedRoles: 0
+        weth: *WETH
+      ozAcl:
+        *DEFAULT_ADMIN_ROLE : [*lazyVaultAdmin]
+        *SM_CALLER_ROLE : [*mellowCurator]
+        *ROUTER_ROLE : [*swapModuleRouter]
+        *SET_SLIPPAGE_ROLE : []
+        *TOKEN_IN_ROLE : [*USDC, *USDT, *sUSDe, *PYUSD, *GHO, *syrupUSDC, *AURA, *BAL, *MORPHO]
+        *TOKEN_OUT_ROLE : [*USDC, *USDT, *sUSDe, *PYUSD, *GHO, *syrupUSDC, *AURA, *BAL, *MORPHO]
 
     earnUSDc_timelockController:
       name: TimelockController
