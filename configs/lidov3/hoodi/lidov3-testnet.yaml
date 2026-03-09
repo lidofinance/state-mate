@@ -1220,7 +1220,7 @@ l1:
         *OZ_RESUME_ROLE : [*resealManager]
         *VAULT_MASTER_ROLE : []
         *BAD_DEBT_MASTER_ROLE : [*vaultsAdapter]
-        *REDEMPTION_MASTER_ROLE : []
+        *REDEMPTION_MASTER_ROLE : [*vaultsAdapter]
         *VALIDATOR_EXIT_ROLE : [*vaultsAdapter]
       implementationChecks:
         CONNECT_DEPOSIT: *ONE_ETH_WEI
