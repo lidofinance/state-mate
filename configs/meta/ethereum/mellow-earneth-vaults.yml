@@ -103,8 +103,6 @@ deployed:
     - &subvault1ProxyAdmin "0x518aa49c8ff07277eae8687858f9870f95737f2a"
     - &verifier1 "0xc0FC0B74923A80Af21B1E49633cAA309f432140F"
     - &verifier1ProxyAdmin "0x0fd1dc0ad3e08467f9f4fdca93585b452279ffc9"
-    - &subvaultImplementation "0x0000000e535b4e063f8372933a55470e67910a66"
-    - &verifierImplementation "0x000000047fc878662006e78d5174fb4285637966"
     - &timelockController "0x363Ba8843d06BA5968f55C26aB055162eDd62189"
 
     # --- Actors (multisigs) ---
@@ -177,16 +175,6 @@ misc:
   # --- EIP-1967 Storage Slots ---
   - &EIP1967_ADMIN_SLOT "0xb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d6103"
   - &EIP1967_IMPLEMENTATION_SLOT "0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc"
-
-  # --- Hooks ---
-  - &redirectingDepositHook "0x00000004d3B17e5391eb571dDb8fDF95646ca827"
-  - &basicRedeemHook "0x0000000637f1b1ccDA4Af2dB6CDDf5e5Ec45fd93"
-
-  # --- Factories ---
-  - &depositQueueFactory "0xBB92A7B9695750e1234BaB18F83b73686dd09854"
-  - &redeemQueueFactory "0xfe76b5fd238553D65Ce6dd0A572C0fda629F8421"
-  - &subvaultFactory "0x75FE0d73d3C64cdC1C6449D9F977Be6857c4d011"
-  - &verifierFactory "0x04B30b1e98950e6A13550d84e991bE0d734C2c61"
 
 roles:
   # --- Roles: share manager ---
