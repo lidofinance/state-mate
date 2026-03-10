@@ -23,7 +23,9 @@
           }
         }
       },
-      "required": ["l1"]
+      "required": [
+        "l1"
+      ]
     },
     "l1": {
       "additionalProperties": false,
@@ -49,7 +51,9 @@
           ]
         }
       },
-      "required": ["rpcUrl"]
+      "required": [
+        "rpcUrl"
+      ]
     },
     "l2": {
       "additionalProperties": false,
@@ -75,7 +79,9 @@
           ]
         }
       },
-      "required": ["rpcUrl"]
+      "required": [
+        "rpcUrl"
+      ]
     },
     "eoa": {
       "type": "array",
@@ -147,5 +153,8 @@
       }
     }
   },
-  "required": ["deployed", "l1"]
+  "required": [
+    "deployed",
+    "l1"
+  ]
 }
