@@ -27,7 +27,6 @@ deployed:
 
     - &burnableShareManagerImplementation "0x000000000c79D2B5cD58AE545afc83030233D7B6"
     - &shareManagerImplementation "0x0000000E8eb7173fA1a3ba60eCA325bcB6aaf378"
-    - &mellowAccountV1Implementation "0x00000000028e2bc6fabc9e8b9c7d5d411982ff8e"
     - &subvaultFactory "0x75FE0d73d3C64cdC1C6449D9F977Be6857c4d011"
     - &subvaultImplementation "0x0000000E535B4E063f8372933A55470e67910a66"
     - &verifierFactory "0x04B30b1e98950e6A13550d84e991bE0d734C2c61"
@@ -183,12 +182,9 @@ misc:
   # --- Tokens ---
   - &USDC "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
   - &USDT "0xdAC17F958D2ee523a2206206994597C13D831ec7"
-  - &USDS "0xdC035D45d973E3EC169d2276DDab16f1e407384F"
   - &syrupUSDC "0x80ac24aA929eaF5013f6436cdA2a7ba190f5Cc0b"
   - &MORPHO "0x58D97B57BB95320F9a05dC918Aef65434969c2B2"
-  - &USDe "0x4c9EDD5852cd905f086C759E8383e09bff1E68B3"
   - &sUSDe "0x9D39A5DE30e57443BfF2A8307A4256c8797A3497"
-  - &syrupUSDT "0x356B8d89c1e1239Cbbb9dE4815c39A1474d5BA7D"
   - &WETH "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
   - &PYUSD "0x6c3ea9036406852006290770BEdFcAbA0e23A0e8"
   - &GHO "0x40D16FC0246aD3160Ccc09B8D0D3A2cD28aE6C2f"
@@ -209,7 +205,6 @@ misc:
 
   # --- Deployer ---
   - &deployer "0x5C0F3DE4ba6AD53bb8E27f965170A52671e525Bf"
-  - &mellow_deployer "0xE98Be1E5538FCbD716C506052eB1Fd5d6fC495A3" # NO-GO! TODO: remove this role and all given permissions on-chain
 
 roles:
   # --- Roles: share manager ---

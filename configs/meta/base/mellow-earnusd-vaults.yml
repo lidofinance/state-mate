@@ -108,7 +108,6 @@ misc:
 
   # --- Deployer ---
   - &deployer "0x5C0F3DE4ba6AD53bb8E27f965170A52671e525Bf"
-  - &mellow_deployer "0xE98Be1E5538FCbD716C506052eB1Fd5d6fC495A3" # NO-GO! TODO: remove this role and all given permissions on-chain
 
 roles:
   # --- Roles: share manager ---
