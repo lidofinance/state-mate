@@ -138,9 +138,7 @@
           }
         }
       },
-      "required": [
-        "l1"
-      ]
+      "required": ["l1"]
     },
     "deployed-aux": {
       "type": "array",
@@ -341,9 +339,7 @@
                                       ]
                                     }
                                   },
-                                  "required": [
-                                    "result"
-                                  ]
+                                  "required": ["result"]
                                 },
                                 {
                                   "additionalProperties": false,
@@ -406,9 +402,7 @@
                                       "type": "boolean"
                                     }
                                   },
-                                  "required": [
-                                    "mustRevert"
-                                  ]
+                                  "required": ["mustRevert"]
                                 }
                               ]
                             },
@@ -693,9 +687,7 @@
                                         ]
                                       }
                                     },
-                                    "required": [
-                                      "result"
-                                    ]
+                                    "required": ["result"]
                                   },
                                   {
                                     "additionalProperties": false,
@@ -758,9 +750,7 @@
                                         "type": "boolean"
                                       }
                                     },
-                                    "required": [
-                                      "mustRevert"
-                                    ]
+                                    "required": ["mustRevert"]
                                   }
                                 ]
                               }
@@ -789,10 +779,7 @@
                             "type": "string"
                           }
                         },
-                        "required": [
-                          "slot",
-                          "expected"
-                        ]
+                        "required": ["slot", "expected"]
                       }
                     },
                     "ozNonEnumerableAcl": {
@@ -823,11 +810,7 @@
                       }
                     }
                   },
-                  "required": [
-                    "address",
-                    "name",
-                    "checks"
-                  ]
+                  "required": ["address", "name", "checks"]
                 },
                 {
                   "additionalProperties": false,
@@ -992,9 +975,7 @@
                                       ]
                                     }
                                   },
-                                  "required": [
-                                    "result"
-                                  ]
+                                  "required": ["result"]
                                 },
                                 {
                                   "additionalProperties": false,
@@ -1057,9 +1038,7 @@
                                       "type": "boolean"
                                     }
                                   },
-                                  "required": [
-                                    "mustRevert"
-                                  ]
+                                  "required": ["mustRevert"]
                                 }
                               ]
                             },
@@ -1344,9 +1323,7 @@
                                         ]
                                       }
                                     },
-                                    "required": [
-                                      "result"
-                                    ]
+                                    "required": ["result"]
                                   },
                                   {
                                     "additionalProperties": false,
@@ -1409,9 +1386,7 @@
                                         "type": "boolean"
                                       }
                                     },
-                                    "required": [
-                                      "mustRevert"
-                                    ]
+                                    "required": ["mustRevert"]
                                   }
                                 ]
                               }
@@ -1440,10 +1415,7 @@
                             "type": "string"
                           }
                         },
-                        "required": [
-                          "slot",
-                          "expected"
-                        ]
+                        "required": ["slot", "expected"]
                       }
                     },
                     "ozNonEnumerableAcl": {
@@ -1651,13 +1623,7 @@
                               ]
                             }
                           },
-                          "required": [
-                            "proxyType",
-                            "isDepositable",
-                            "implementation",
-                            "appId",
-                            "kernel"
-                          ]
+                          "required": ["proxyType", "isDepositable", "implementation", "appId", "kernel"]
                         },
                         {
                           "additionalProperties": false,
@@ -1722,13 +1688,7 @@
                               "type": "string"
                             }
                           },
-                          "required": [
-                            "proxyType",
-                            "apps",
-                            "isDepositable",
-                            "implementation",
-                            "recoveryVaultAppId"
-                          ]
+                          "required": ["proxyType", "apps", "isDepositable", "implementation", "recoveryVaultAppId"]
                         }
                       ]
                     },
@@ -1883,9 +1843,7 @@
                                       ]
                                     }
                                   },
-                                  "required": [
-                                    "result"
-                                  ]
+                                  "required": ["result"]
                                 },
                                 {
                                   "additionalProperties": false,
@@ -1948,9 +1906,7 @@
                                       "type": "boolean"
                                     }
                                   },
-                                  "required": [
-                                    "mustRevert"
-                                  ]
+                                  "required": ["mustRevert"]
                                 }
                               ]
                             },
@@ -2235,9 +2191,7 @@
                                         ]
                                       }
                                     },
-                                    "required": [
-                                      "result"
-                                    ]
+                                    "required": ["result"]
                                   },
                                   {
                                     "additionalProperties": false,
@@ -2300,9 +2254,7 @@
                                         "type": "boolean"
                                       }
                                     },
-                                    "required": [
-                                      "mustRevert"
-                                    ]
+                                    "required": ["mustRevert"]
                                   }
                                 ]
                               }
@@ -2312,22 +2264,14 @@
                       }
                     }
                   },
-                  "required": [
-                    "address",
-                    "name",
-                    "checks",
-                    "proxyName"
-                  ]
+                  "required": ["address", "name", "checks", "proxyName"]
                 }
               ]
             }
           }
         }
       },
-      "required": [
-        "rpcUrl",
-        "contracts"
-      ]
+      "required": ["rpcUrl", "contracts"]
     },
     "l2": {
       "additionalProperties": false,
@@ -2520,9 +2464,7 @@
                                       ]
                                     }
                                   },
-                                  "required": [
-                                    "result"
-                                  ]
+                                  "required": ["result"]
                                 },
                                 {
                                   "additionalProperties": false,
@@ -2585,9 +2527,7 @@
                                       "type": "boolean"
                                     }
                                   },
-                                  "required": [
-                                    "mustRevert"
-                                  ]
+                                  "required": ["mustRevert"]
                                 }
                               ]
                             },
@@ -2872,9 +2812,7 @@
                                         ]
                                       }
                                     },
-                                    "required": [
-                                      "result"
-                                    ]
+                                    "required": ["result"]
                                   },
                                   {
                                     "additionalProperties": false,
@@ -2937,9 +2875,7 @@
                                         "type": "boolean"
                                       }
                                     },
-                                    "required": [
-                                      "mustRevert"
-                                    ]
+                                    "required": ["mustRevert"]
                                   }
                                 ]
                               }
@@ -2968,10 +2904,7 @@
                             "type": "string"
                           }
                         },
-                        "required": [
-                          "slot",
-                          "expected"
-                        ]
+                        "required": ["slot", "expected"]
                       }
                     },
                     "ozNonEnumerableAcl": {
@@ -3002,11 +2935,7 @@
                       }
                     }
                   },
-                  "required": [
-                    "address",
-                    "name",
-                    "checks"
-                  ]
+                  "required": ["address", "name", "checks"]
                 },
                 {
                   "additionalProperties": false,
@@ -3171,9 +3100,7 @@
                                       ]
                                     }
                                   },
-                                  "required": [
-                                    "result"
-                                  ]
+                                  "required": ["result"]
                                 },
                                 {
                                   "additionalProperties": false,
@@ -3236,9 +3163,7 @@
                                       "type": "boolean"
                                     }
                                   },
-                                  "required": [
-                                    "mustRevert"
-                                  ]
+                                  "required": ["mustRevert"]
                                 }
                               ]
                             },
@@ -3523,9 +3448,7 @@
                                         ]
                                       }
                                     },
-                                    "required": [
-                                      "result"
-                                    ]
+                                    "required": ["result"]
                                   },
                                   {
                                     "additionalProperties": false,
@@ -3588,9 +3511,7 @@
                                         "type": "boolean"
                                       }
                                     },
-                                    "required": [
-                                      "mustRevert"
-                                    ]
+                                    "required": ["mustRevert"]
                                   }
                                 ]
                               }
@@ -3619,10 +3540,7 @@
                             "type": "string"
                           }
                         },
-                        "required": [
-                          "slot",
-                          "expected"
-                        ]
+                        "required": ["slot", "expected"]
                       }
                     },
                     "ozNonEnumerableAcl": {
@@ -3830,13 +3748,7 @@
                               ]
                             }
                           },
-                          "required": [
-                            "proxyType",
-                            "isDepositable",
-                            "implementation",
-                            "appId",
-                            "kernel"
-                          ]
+                          "required": ["proxyType", "isDepositable", "implementation", "appId", "kernel"]
                         },
                         {
                           "additionalProperties": false,
@@ -3901,13 +3813,7 @@
                               "type": "string"
                             }
                           },
-                          "required": [
-                            "proxyType",
-                            "apps",
-                            "isDepositable",
-                            "implementation",
-                            "recoveryVaultAppId"
-                          ]
+                          "required": ["proxyType", "apps", "isDepositable", "implementation", "recoveryVaultAppId"]
                         }
                       ]
                     },
@@ -4062,9 +3968,7 @@
                                       ]
                                     }
                                   },
-                                  "required": [
-                                    "result"
-                                  ]
+                                  "required": ["result"]
                                 },
                                 {
                                   "additionalProperties": false,
@@ -4127,9 +4031,7 @@
                                       "type": "boolean"
                                     }
                                   },
-                                  "required": [
-                                    "mustRevert"
-                                  ]
+                                  "required": ["mustRevert"]
                                 }
                               ]
                             },
@@ -4414,9 +4316,7 @@
                                         ]
                                       }
                                     },
-                                    "required": [
-                                      "result"
-                                    ]
+                                    "required": ["result"]
                                   },
                                   {
                                     "additionalProperties": false,
@@ -4479,9 +4379,7 @@
                                         "type": "boolean"
                                       }
                                     },
-                                    "required": [
-                                      "mustRevert"
-                                    ]
+                                    "required": ["mustRevert"]
                                   }
                                 ]
                               }
@@ -4491,22 +4389,14 @@
                       }
                     }
                   },
-                  "required": [
-                    "address",
-                    "name",
-                    "checks",
-                    "proxyName"
-                  ]
+                  "required": ["address", "name", "checks", "proxyName"]
                 }
               ]
             }
           }
         }
       },
-      "required": [
-        "rpcUrl",
-        "contracts"
-      ]
+      "required": ["rpcUrl", "contracts"]
     },
     "tvl": {
       "type": "array",
@@ -4739,8 +4629,5 @@
       }
     }
   },
-  "required": [
-    "deployed",
-    "l1"
-  ]
+  "required": ["deployed", "l1"]
 }

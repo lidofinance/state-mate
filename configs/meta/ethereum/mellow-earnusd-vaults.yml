@@ -670,10 +670,10 @@ l1:
           label: implementation
       checks:
         asset: *USDC
-        canBeRemoved: true
+        canBeRemoved:
         claimableOf:
         requestOf:
-        unclaimedRequests: 0
+        unclaimedRequests:
         vault: *earnUSD_vault
       implementationChecks:
         asset: *ZERO_ADDRESS
@@ -761,10 +761,10 @@ l1:
           label: implementation
       checks:
         asset: *USDT
-        canBeRemoved: true
+        canBeRemoved:
         claimableOf:
         requestOf:
-        unclaimedRequests: 0
+        unclaimedRequests:
         vault: *earnUSD_vault
       implementationChecks:
         asset: *ZERO_ADDRESS

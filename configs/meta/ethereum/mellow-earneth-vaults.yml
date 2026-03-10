@@ -971,10 +971,10 @@ l1:
           label: implementation
       checks:
         asset: *GGV
-        canBeRemoved: true
+        canBeRemoved:
         claimableOf:
         requestOf:
-        unclaimedRequests: 0
+        unclaimedRequests:
         vault: *vault
       implementationChecks:
         asset: *ZERO_ADDRESS
@@ -1031,10 +1031,10 @@ l1:
           label: implementation
       checks:
         asset: *STRETH
-        canBeRemoved: true
+        canBeRemoved:
         claimableOf:
         requestOf:
-        unclaimedRequests: 0
+        unclaimedRequests:
         vault: *vault
       implementationChecks:
         asset: *ZERO_ADDRESS
@@ -1091,10 +1091,10 @@ l1:
           label: implementation
       checks:
         asset: *DVstETH
-        canBeRemoved: true
+        canBeRemoved:
         claimableOf:
         requestOf:
-        unclaimedRequests: 0
+        unclaimedRequests:
         vault: *vault
       implementationChecks:
         asset: *ZERO_ADDRESS
