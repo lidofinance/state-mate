@@ -43,9 +43,6 @@ jobs:
             network: ethereum-mainnet
           - config: configs/meta/ethereum/mellow-earnusd-vaults.yml
             network: ethereum-mainnet
-          # Meta configs - Base
-          - config: configs/meta/base/mellow-earnusd-vaults.yml
-            network: base-mainnet
 
     env:
       # Explorer API tokens
@@ -53,11 +50,8 @@ jobs:
 
       # Ethereum RPC URLs
       MAINNET_REMOTE_RPC_URL: ${{ secrets.MAINNET_REMOTE_RPC_URL }}
-      L1_MAINNET_RPC_URL: ${{ secrets.MAINNET_REMOTE_RPC_URL }}
       HOODI_REMOTE_RPC_URL: ${{ secrets.HOODI_REMOTE_RPC_URL }}
-      BASE_RPC_URL: ${{ secrets.BASE_RPC_URL }}
-      PLASMA_RPC_URL: ${{ secrets.PLASMA_RPC_URL }}
-      ARB_RPC_URL: ${{ secrets.ARB_RPC_URL }}
+      L1_MAINNET_RPC_URL: ${{ secrets.MAINNET_REMOTE_RPC_URL }}
 
     steps:
       - name: Checkout repository
