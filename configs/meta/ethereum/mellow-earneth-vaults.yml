@@ -550,6 +550,9 @@ l1:
           - args: [*syncDepositQueueDVstETH]
             result: true
         hasRole:
+          # Verify mellow_deployer has no roles
+          - args: [*DEFAULT_ADMIN_ROLE, *mellow_deployer]
+            result: false
         hasSubvault:
           - args: [*subvault0]
             result: true
@@ -748,7 +751,7 @@ l1:
         *PULL_LIQUIDITY_ROLE : [*curator]
         *PUSH_LIQUIDITY_ROLE : [*curator]
         *SET_FLAGS_ROLE : [*timelockController]
-        *SET_MERKLE_ROOT_ROLE : [*timelockController]
+        *SET_MERKLE_ROOT_ROLE : [*timelockController, *lazyVaultAdmin]
         *SET_QUEUE_STATUS_ROLE : [*timelockController]
         *SUBMIT_REPORTS_ROLE : [*oracleSubmitter]
         *ACCEPT_REPORT_ROLE : [*oracleSubmitter]
@@ -769,14 +772,14 @@ l1:
           label: implementation
       checks:
         asset: *ETH
-        canBeRemoved: true
+        canBeRemoved:
         claimableOf:
         requestOf:
         unclaimedRequests:
         vault: *vault
       implementationChecks:
         asset: *ZERO_ADDRESS
-        canBeRemoved: true
+        canBeRemoved:
         claimableOf:
         requestOf:
         unclaimedRequests: 0
@@ -829,14 +832,14 @@ l1:
           label: implementation
       checks:
         asset: *WETH
-        canBeRemoved: true
+        canBeRemoved:
         claimableOf:
         requestOf:
-        unclaimedRequests: 0
+        unclaimedRequests:
         vault: *vault
       implementationChecks:
         asset: *ZERO_ADDRESS
-        canBeRemoved: true
+        canBeRemoved:
         claimableOf:
         requestOf:
         unclaimedRequests: 0
@@ -889,14 +892,14 @@ l1:
           label: implementation
       checks:
         asset: *WSTETH
-        canBeRemoved: true
+        canBeRemoved:
         claimableOf:
         requestOf:
-        unclaimedRequests: 0
+        unclaimedRequests:
         vault: *vault
       implementationChecks:
         asset: *ZERO_ADDRESS
-        canBeRemoved: true
+        canBeRemoved:
         claimableOf:
         requestOf:
         unclaimedRequests: 0
@@ -1230,6 +1233,9 @@ l1:
         getRoleMemberCount:
         getRoleMembers:
         hasRole:
+          # Verify mellow_deployer has no roles
+          - args: [*DEFAULT_ADMIN_ROLE, *mellow_deployer]
+            result: false
         latestAnswer:
         latestRoundData:
         oracle: *oracle
@@ -1564,6 +1570,15 @@ l1:
           - args: [*PROPOSER_ROLE, *deployer]
             result: false
           - args: [*EXECUTOR_ROLE, *deployer]
+            result: false
+          # Verify mellow_deployer has no roles
+          - args: [*DEFAULT_ADMIN_ROLE, *mellow_deployer]
+            result: false
+          - args: [*CANCELLER_ROLE, *mellow_deployer]
+            result: false
+          - args: [*PROPOSER_ROLE, *mellow_deployer]
+            result: false
+          - args: [*EXECUTOR_ROLE, *mellow_deployer]
             result: false
         hashOperation:
         hashOperationBatch:
@@ -2553,6 +2568,8 @@ l1:
         hasRole:
           - args: [*DEFAULT_ADMIN_ROLE, *deployer]
             result: false
+          - args: [*DEFAULT_ADMIN_ROLE, *mellow_deployer]
+            result: false
         getRoleMemberCount:
           - args: [*DEFAULT_ADMIN_ROLE]
             result: 0
@@ -2575,6 +2592,8 @@ l1:
         verifyCall:
         hasRole:
           - args: [*DEFAULT_ADMIN_ROLE, *deployer]
+            result: false
+          - args: [*DEFAULT_ADMIN_ROLE, *mellow_deployer]
             result: false
         getRoleMemberCount:
           - args: [*DEFAULT_ADMIN_ROLE]
@@ -2639,6 +2658,8 @@ l1:
         weth: *WETH
         hasRole:
           - args: [*DEFAULT_ADMIN_ROLE, *deployer]
+            result: false
+          - args: [*DEFAULT_ADMIN_ROLE, *mellow_deployer]
             result: false
         getRoleMemberCount:
           - args: [*DEFAULT_ADMIN_ROLE]
