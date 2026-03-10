@@ -1,0 +1,160 @@
+{
+  "additionalProperties": false,
+  "type": "object",
+  "properties": {
+    "deployed": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "l1": {
+          "type": "array",
+          "items": {
+            "format": "ethereum-string",
+            "pattern": "^(0x[a-fA-F0-9]{40}|0x[a-fA-F0-9]{64}|.+)$",
+            "type": "string"
+          }
+        },
+        "l2": {
+          "type": "array",
+          "items": {
+            "format": "ethereum-string",
+            "pattern": "^(0x[a-fA-F0-9]{40}|0x[a-fA-F0-9]{64}|.+)$",
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "l1"
+      ]
+    },
+    "l1": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "rpcUrl": {
+          "type": "string"
+        },
+        "explorerHostname": {
+          "type": "string"
+        },
+        "explorerTokenEnv": {
+          "type": "string"
+        },
+        "chainId": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "required": [
+        "rpcUrl"
+      ]
+    },
+    "l2": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "rpcUrl": {
+          "type": "string"
+        },
+        "explorerHostname": {
+          "type": "string"
+        },
+        "explorerTokenEnv": {
+          "type": "string"
+        },
+        "chainId": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "required": [
+        "rpcUrl"
+      ]
+    },
+    "eoa": {
+      "type": "array",
+      "items": {
+        "format": "ethereum-string",
+        "pattern": "^(0x[a-fA-F0-9]{40}|0x[a-fA-F0-9]{64}|.+)$",
+        "type": "string"
+      }
+    },
+    "roles": {
+      "anyOf": [
+        {
+          "type": "array",
+          "items": {
+            "format": "ethereum-string",
+            "pattern": "^(0x[a-fA-F0-9]{40}|0x[a-fA-F0-9]{64}|.+)$",
+            "type": "string"
+          }
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "misc": {
+      "type": "array",
+      "items": {
+        "anyOf": [
+          {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "number"
+              }
+            ]
+          },
+          {
+            "type": "array",
+            "items": {
+              "anyOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "number"
+                }
+              ]
+            }
+          },
+          {
+            "type": "array",
+            "items": {}
+          }
+        ]
+      }
+    }
+  },
+  "required": [
+    "deployed",
+    "l1"
+  ]
+}
