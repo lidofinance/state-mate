@@ -834,7 +834,16 @@ l1:
           - args: [*USDT]
             result: true
         # securityParams: [maxAbsDeviation, suspAbsDeviation, maxRelDeviationD18, suspRelDeviationD18, timeout, depositInterval, redeemInterval]
-        securityParams: [5000000000000000000000000000, 1000000000000000000000000000, 5000000000000000, 1000000000000000, 72000, 3600, 172800]
+        securityParams:
+          [
+            5000000000000000000000000000,
+            1000000000000000000000000000,
+            5000000000000000,
+            1000000000000000,
+            72000,
+            3600,
+            172800,
+          ]
         supportedAssetAt:
           - args: [0]
             result: *USDC
@@ -1552,7 +1561,16 @@ l1:
           - args: [*USDT]
             result: true
         # securityParams: [maxAbsDeviation, suspAbsDeviation, maxRelDeviationD18, suspRelDeviationD18, timeout, depositInterval, redeemInterval]
-        securityParams: [5000000000000000000000000000, 1000000000000000000000000000, 5000000000000000, 1000000000000000, 72000, 3600, 172800]
+        securityParams:
+          [
+            5000000000000000000000000000,
+            1000000000000000000000000000,
+            5000000000000000,
+            1000000000000000,
+            72000,
+            3600,
+            172800,
+          ]
         supportedAssetAt:
           - args: [0]
             result: *USDC

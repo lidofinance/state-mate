@@ -1421,7 +1421,7 @@ l1:
               [
                 *DEFAULT_TIER_OPERATOR,
                 *DEFAULT_TIER_SHARE_LIMIT,
-                81408919746333,
+                0,
                 *DEFAULT_TIER_RR,
                 *DEFAULT_TIER_SHARE_FRT,
                 *DEFAULT_TIER_INFRA_FEE,
