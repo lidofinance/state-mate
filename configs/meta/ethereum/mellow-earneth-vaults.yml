@@ -941,10 +941,10 @@ l1:
       checks:
         asset: *WSTETH
         batchAt:
-        canBeRemoved: true
+        canBeRemoved: false
         claimableOf:
         # getState: [batchIterator, batchCount, totalDemandAssets, totalPendingShares]
-        getState: [0, 0, 0, 0]
+        getState:
         requestsOf:
         vault: *vault
       implementationChecks:
@@ -1440,7 +1440,7 @@ l1:
         getVerificationResult:
         hashCall:
         isAllowedCall:
-        merkleRoot: "0xe7a368e36fd1e20517f4d671392131a9944dc0c477b50ad3288a980f7b2bdddc"
+        merkleRoot: "0xb571a376806e1571536b0b02ee191ec771c5ca4e908a8891eeaae3d82633dadb"
         vault: *vault
         verifyCall:
       implementationChecks:
@@ -1504,7 +1504,7 @@ l1:
         getVerificationResult:
         hashCall:
         isAllowedCall:
-        merkleRoot: "0xe8a03ddbb577e1dc2a1bfb92931a8b69dce457fa9d6674554c4661bd5174e96a"
+        merkleRoot: "0xd0b21cbe6de6f9a8f2c6054f7fe36368ecde98f0d9ac746f883fa257a7f001ca"
         vault: *vault
         verifyCall:
       implementationChecks:

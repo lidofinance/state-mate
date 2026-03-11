@@ -524,8 +524,10 @@ l1:
           - args: [0]
             result: *DEFAULT_ADMIN_ROLE
           - args: [14]
+            result: *SET_SECURITY_PARAMS_ROLE
+          - args: [15]
             mustRevert: true
-        supportedRoles: 14
+        supportedRoles: 15
         supportsInterface:
         verifierFactory: *verifierFactory
       implementationChecks:
@@ -734,7 +736,7 @@ l1:
         canBeRemoved: false
         claimableOf:
         # getState: [batchIterator, batchCount, totalDemandAssets, totalPendingShares]
-        getState: [0, 0, 0, 0]
+        getState:
         requestsOf:
         vault: *earnUSD_vault
       implementationChecks:
@@ -832,7 +834,7 @@ l1:
           - args: [*USDT]
             result: true
         # securityParams: [maxAbsDeviation, suspAbsDeviation, maxRelDeviationD18, suspRelDeviationD18, timeout, depositInterval, redeemInterval]
-        securityParams: [5000000000000000, 1000000000000000, 5000000000000000, 1000000000000000, 72000, 3600, 172800]
+        securityParams: [5000000000000000000000000000, 1000000000000000000000000000, 5000000000000000, 1000000000000000, 72000, 3600, 172800]
         supportedAssetAt:
           - args: [0]
             result: *USDC
@@ -1296,8 +1298,10 @@ l1:
           - args: [0]
             result: *DEFAULT_ADMIN_ROLE
           - args: [14]
+            result: *SET_SECURITY_PARAMS_ROLE
+          - args: [15]
             mustRevert: true
-        supportedRoles: 14
+        supportedRoles: 15
         supportsInterface:
         verifierFactory: *verifierFactory
       implementationChecks:
@@ -1475,10 +1479,10 @@ l1:
       checks:
         asset: *USDC
         batchAt:
-        canBeRemoved: false
+        canBeRemoved: true
         claimableOf:
         # getState: [batchIterator, batchCount, totalDemandAssets, totalPendingShares]
-        getState: [0, 0, 0, 0]
+        getState:
         requestsOf:
         vault: *earnUSDc_vault
       implementationChecks:
@@ -1548,7 +1552,7 @@ l1:
           - args: [*USDT]
             result: true
         # securityParams: [maxAbsDeviation, suspAbsDeviation, maxRelDeviationD18, suspRelDeviationD18, timeout, depositInterval, redeemInterval]
-        securityParams: [5000000000000000, 1000000000000000, 5000000000000000, 1000000000000000, 72000, 3600, 172800]
+        securityParams: [5000000000000000000000000000, 1000000000000000000000000000, 5000000000000000, 1000000000000000, 72000, 3600, 172800]
         supportedAssetAt:
           - args: [0]
             result: *USDC
