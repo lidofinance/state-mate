@@ -108,6 +108,7 @@ misc:
 
   # --- Deployer ---
   - &deployer "0x5C0F3DE4ba6AD53bb8E27f965170A52671e525Bf"
+  - &mellow_deployer "0xE98Be1E5538FCbD716C506052eB1Fd5d6fC495A3"
 
 roles:
   # --- Roles: share manager ---
@@ -715,6 +716,15 @@ l1:
           - args: [*PROPOSER_ROLE, *deployer]
             result: false
           - args: [*EXECUTOR_ROLE, *deployer]
+            result: false
+          # Verify mellow_deployer has no roles
+          - args: [*DEFAULT_ADMIN_ROLE, *mellow_deployer]
+            result: false
+          - args: [*CANCELLER_ROLE, *mellow_deployer]
+            result: false
+          - args: [*PROPOSER_ROLE, *mellow_deployer]
+            result: false
+          - args: [*EXECUTOR_ROLE, *mellow_deployer]
             result: false
         hashOperation:
         hashOperationBatch:

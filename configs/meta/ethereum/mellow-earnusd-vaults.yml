@@ -205,6 +205,7 @@ misc:
 
   # --- Deployer ---
   - &deployer "0x5C0F3DE4ba6AD53bb8E27f965170A52671e525Bf"
+  - &mellow_deployer "0xE98Be1E5538FCbD716C506052eB1Fd5d6fC495A3"
 
 roles:
   # --- Roles: share manager ---
@@ -588,10 +589,11 @@ l1:
         *PULL_LIQUIDITY_ROLE : [*curator]
         *PUSH_LIQUIDITY_ROLE : [*curator]
         *SET_FLAGS_ROLE : [*earnUSD_timelockController]
-        *SET_MERKLE_ROOT_ROLE : [*earnUSD_timelockController] # TODO: remove mellow_deployer from SET_MERKLE_ROOT_ROLE on-chain
+        *SET_MERKLE_ROOT_ROLE : [*earnUSD_timelockController]
         *SET_QUEUE_STATUS_ROLE : [*earnUSD_timelockController]
         *SUBMIT_REPORTS_ROLE : [*earnUSD_oracleSubmitter]
         *ACCEPT_REPORT_ROLE : [*earnUSD_oracleSubmitter]
+        *SET_SECURITY_PARAMS_ROLE : [*lazyVaultAdmin]
 
     earnUSD_subvault0:
       name: Subvault
@@ -1089,6 +1091,15 @@ l1:
             result: false
           - args: [*EXECUTOR_ROLE, *deployer]
             result: false
+          # Verify mellow_deployer has no roles
+          - args: [*DEFAULT_ADMIN_ROLE, *mellow_deployer]
+            result: false
+          - args: [*CANCELLER_ROLE, *mellow_deployer]
+            result: false
+          - args: [*PROPOSER_ROLE, *mellow_deployer]
+            result: false
+          - args: [*EXECUTOR_ROLE, *mellow_deployer]
+            result: false
         hashOperation:
         hashOperationBatch:
         isOperation:
@@ -1371,10 +1382,11 @@ l1:
         *PULL_LIQUIDITY_ROLE : [*mellowCurator]
         *PUSH_LIQUIDITY_ROLE : [*mellowCurator]
         *SET_FLAGS_ROLE : [*earnUSDc_timelockController]
-        *SET_MERKLE_ROOT_ROLE : [*earnUSDc_timelockController] # TODO: remove mellow_deployer from SET_MERKLE_ROOT_ROLE on-chain
+        *SET_MERKLE_ROOT_ROLE : [*earnUSDc_timelockController]
         *SET_QUEUE_STATUS_ROLE : [*earnUSDc_timelockController]
         *SUBMIT_REPORTS_ROLE : [*earnUSDc_oracleSubmitter]
         *ACCEPT_REPORT_ROLE : [*earnUSDc_oracleSubmitter]
+        *SET_SECURITY_PARAMS_ROLE : [*lazyVaultAdmin]
 
     earnUSDc_subvault0:
       name: Subvault
@@ -1883,6 +1895,15 @@ l1:
           - args: [*PROPOSER_ROLE, *deployer]
             result: false
           - args: [*EXECUTOR_ROLE, *deployer]
+            result: false
+          # Verify mellow_deployer has no roles
+          - args: [*DEFAULT_ADMIN_ROLE, *mellow_deployer]
+            result: false
+          - args: [*CANCELLER_ROLE, *mellow_deployer]
+            result: false
+          - args: [*PROPOSER_ROLE, *mellow_deployer]
+            result: false
+          - args: [*EXECUTOR_ROLE, *mellow_deployer]
             result: false
         hashOperation:
         hashOperationBatch:
@@ -2920,8 +2941,6 @@ l1:
         supportsInterface:
         verifyCall:
         hasRole:
-          - args: [*DEFAULT_ADMIN_ROLE, *deployer]
-            result: false
         getRoleMemberCount:
           - args: [*DEFAULT_ADMIN_ROLE]
             result: 0
@@ -2943,8 +2962,6 @@ l1:
         supportsInterface:
         verifyCall:
         hasRole:
-          - args: [*DEFAULT_ADMIN_ROLE, *deployer]
-            result: false
         getRoleMemberCount:
           - args: [*DEFAULT_ADMIN_ROLE]
             result: 0
@@ -2969,8 +2986,6 @@ l1:
         vaultFactory:
         verifyCall:
         hasRole:
-          - args: [*DEFAULT_ADMIN_ROLE, *deployer]
-            result: false
         getRoleMemberCount:
           - args: [*DEFAULT_ADMIN_ROLE]
             result: 0
@@ -3007,8 +3022,6 @@ l1:
         supportsInterface:
         weth:
         hasRole:
-          - args: [*DEFAULT_ADMIN_ROLE, *deployer]
-            result: false
         getRoleMemberCount:
           - args: [*DEFAULT_ADMIN_ROLE]
             result: 0
