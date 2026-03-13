@@ -5,7 +5,6 @@
     "source.fixAll.eslint": "always"
   },
   "files.trimTrailingWhitespace": true,
-  "typescript.validate.enable": true,
   "cSpell.words": [
     "apikey",
     "bscscan",
