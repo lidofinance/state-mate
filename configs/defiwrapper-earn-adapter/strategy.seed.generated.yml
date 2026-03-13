@@ -1,0 +1,27 @@
+# yaml-language-server: $schema=../../schemas/main-schema.json
+deployed:
+  l1:
+    - &mellowStrategyFactory "0x600dbe07673e9c3445af10b8c7f6285370964333"
+    - &strategyCallForwarder "0x542d7Ae9ad8F4b1551d32e43455B4FCCD68CF93b"
+
+l1:
+  rpcUrl: MAINNET_REMOTE_RPC_URL # https://ethereum-rpc.publicnode.com
+  explorerHostname: api.etherscan.io
+  chainId: 1
+  explorerTokenEnv: ETHERSCAN_TOKEN
+  contracts:
+    mellowStrategyFactory:
+      name: MellowStrategyFactory
+      address: *mellowStrategyFactory
+      checks:
+        ASYNC_DEPOSIT_QUEUE: 0xECD2Bfe725fa14f5Ed86e9bDcc0eA4b34A4ed522
+        ASYNC_REDEEM_QUEUE: 0x095bFAca9f1c6F2B063Cd67C6d6bfcd0c3aaB7b4
+        STRATEGY_CALL_FORWARDER_IMPLEMENTATION: 0x542d7Ae9ad8F4b1551d32e43455B4FCCD68CF93b
+        STRATEGY_ID: 0x3b0e47226370dd0daa4b28feb910df52f3fa507a32622521ef348962830e24cd
+        SYNC_DEPOSIT_QUEUE: 0xe39EED9A454C4918F8d0682062777cB251cd513F
+        VAULT: 0x6a37725ca7f4CE81c004c955f7280d5C704a249e
+    strategyCallForwarder:
+      name: StrategyCallForwarder
+      address: *strategyCallForwarder
+      checks:
+        owner: 0x0000000000000000000000000000000000000000
