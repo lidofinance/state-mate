@@ -5,7 +5,6 @@ on:
     branches:
       - main
       - develop
-      - feat/**
   pull_request:
   workflow_dispatch:
 
@@ -21,10 +20,10 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # Lido V3 configs - Mainnet (Phase 2)
-          - config: configs/lidov3/mainnet/lidov3-core-post-phase-2.yaml
+          # Lido V3 configs - Mainnet
+          - config: configs/lidov3/mainnet/lidov3-core.yaml
             network: ethereum-mainnet
-          - config: configs/lidov3/mainnet/lidov3-et-post-vote-phase-2.yml
+          - config: configs/lidov3/mainnet/lidov3-et.yml
             network: ethereum-mainnet
           # SafeHarbor configs
           - config: configs/safeharbor/mainnet.yml
@@ -38,6 +37,11 @@ jobs:
           # DeFiWrapper configs
           - config: configs/defiwrapper/mainnet.seed.generated.yml
             network: ethereum-mainnet
+          # Meta configs - Ethereum
+          - config: configs/meta/ethereum/mellow-earneth-vaults.yml
+            network: ethereum-mainnet
+          - config: configs/meta/ethereum/mellow-earnusd-vaults.yml
+            network: ethereum-mainnet
 
     env:
       # Explorer API tokens
@@ -46,8 +50,7 @@ jobs:
       # Ethereum RPC URLs
       MAINNET_REMOTE_RPC_URL: ${{ secrets.MAINNET_REMOTE_RPC_URL }}
       HOODI_REMOTE_RPC_URL: ${{ secrets.HOODI_REMOTE_RPC_URL }}
-      PLASMA_RPC_URL: ${{ secrets.PLASMA_RPC_URL }}
-      ARB_RPC_URL: ${{ secrets.ARB_RPC_URL }}
+      L1_MAINNET_RPC_URL: ${{ secrets.MAINNET_REMOTE_RPC_URL }}
 
     steps:
       - name: Checkout repository

@@ -31,6 +31,10 @@ export let g_errors: number = 0;
 export let g_total_checks: number = 0;
 export const g_error_details: ErrorDetail[] = [];
 
+// Per-contract counters
+let g_contract_errors: number = 0;
+let g_contract_checks: number = 0;
+
 let g_current_context: Partial<ErrorDetail> = {};
 
 export function setErrorContext(context: Partial<ErrorDetail>): void {
@@ -41,8 +45,18 @@ export function clearErrorContext(): void {
   g_current_context = {};
 }
 
+export function resetContractCounters(): void {
+  g_contract_errors = 0;
+  g_contract_checks = 0;
+}
+
+export function getContractStats(): { checks: number; errors: number } {
+  return { checks: g_contract_checks, errors: g_contract_errors };
+}
+
 export function incErrors(errorMessage?: string): void {
   g_errors += 1;
+  g_contract_errors += 1;
   if (errorMessage && g_current_context) {
     g_error_details.push({
       section: g_current_context.section || "unknown",
@@ -57,6 +71,7 @@ export function incErrors(errorMessage?: string): void {
 
 export function incChecks(): void {
   g_total_checks += 1;
+  g_contract_checks += 1;
 }
 
 export enum CheckLevel {
@@ -80,7 +95,11 @@ export abstract class SectionValidatorBase {
     protected sectionName: EntryField,
   ) {}
 
-  public abstract validateSection(contractEntry: ContractEntry, contractAlias: string): Promise<void>;
+  public abstract validateSection(
+    contractEntry: ContractEntry,
+    contractAlias: string,
+    basePath?: string,
+  ): Promise<void>;
 
   protected async _checkViewFunction(contract: Contract, method: string, staticCallCheck: StaticCallCheck) {
     incChecks();

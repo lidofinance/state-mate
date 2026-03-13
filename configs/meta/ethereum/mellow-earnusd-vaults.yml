@@ -1,0 +1,3055 @@
+# yaml-language-server: $schema=../../../schemas/main-schema.json
+# Source config for Mellow USD Vaults on Ethereum Mainnet
+# GitHub: https://github.com/mellow-finance/flexible-vaults
+#
+# Vaults included:
+# - earnUSD: Main vault with subvaults
+# - earnUSDc: Conservative vault
+
+deployed:
+  l1:
+    # --- Base contracts deployment (VERIFIED by Nethermind)---
+    - &factoryImplementation "0x0000000397b71C8f3182Fd40D247330D218fdC72"
+    - &factoryFactory "0x0000000f9686896836C39cf721141922Ce42639f"
+    - &consensusFactory "0xaEEB06CBd91A18b51a2D30b61477eAeE3a9633C3"
+    - &depositQueueFactory "0xBB92A7B9695750e1234BaB18F83b73686dd09854"
+    - &depositQueueImplementation "0x00000006dA9f179BFE250Dd1c51cD2d3581930c8"
+    - &syncDepositQueueImplementation "0x000000000b98f77a017b5d3468400c5c597a3bde"
+    - &feeManagerFactory "0xF7223356819Ea48f25880b6c2ab3e907CC336D45"
+    - &feeManagerImplementation "0x0000000dE74e5D51651326E0A3e1ACA94bEAF6E1"
+    - &oracleFactory "0x0CdFf250C7a071fdc72340D820C5C8e29507Aaad"
+    - &oracleImplementation "0x0000000F0d3D1c31b72368366A4049C05E291D58"
+    - &redeemQueueFactory "0xfe76b5fd238553D65Ce6dd0A572C0fda629F8421"
+    - &redeemQueueImplementation "0x000000000c139266BA06170Ed1DeacA6d11903c1"
+    - &riskManagerFactory "0xa51E4FA916b939Fa451520D2B7600c740d86E5A0"
+    - &riskManagerImplementation "0x0000000714cf2851baC1AE2f41871862e9D216fD"
+    - &shareManagerFactory "0x952f39AA62E94db3Ad0d1C7D1E43C1a8519E45D8"
+
+    - &burnableShareManagerImplementation "0x000000000c79D2B5cD58AE545afc83030233D7B6"
+    - &shareManagerImplementation "0x0000000E8eb7173fA1a3ba60eCA325bcB6aaf378"
+    - &subvaultFactory "0x75FE0d73d3C64cdC1C6449D9F977Be6857c4d011"
+    - &subvaultImplementation "0x0000000E535B4E063f8372933A55470e67910a66"
+    - &verifierFactory "0x04B30b1e98950e6A13550d84e991bE0d734C2c61"
+    - &verifierImplementation "0x000000047Fc878662006E78D5174FB4285637966"
+    - &vaultFactory "0x4E38F679e46B3216f0bd4B314E9C429AFfB1dEE3"
+    - &vaultImplementation "0x0000000615B2771511dAa693aC07BE5622869E01"
+    - &eigenLayerVerifierFactory "0x77A83AcBf7A6df20f1D681b4810437d74AE790F8"
+    - &eigenLayerVerifier "0x00000003F82051A8B2F020B79e94C3DC94E89B81"
+    - &erc20VerifierFactory "0x2e234F4E1b7934d5F4bEAE3fF2FDC109f5C42F1d"
+    - &erc20Verifier "0x00000009207D366cBB8549837F8Ae4bf800Af2D6"
+    - &symbioticVerifierFactory "0x41C443F10a92D597e6c9E271140BC94c10f5159F"
+    - &symbioticVerifier "0x00000000cBC6f5d4348496FfA22Cf014b9DA394B"
+    - &swapModuleFactory "0xE3575055a24d8642DFA3a51ec766Ef2db2671659"
+    - &swapModuleImplementation "0x00000000d681E85e5783588f87A9573Cb97Eda01"
+    - &vaultConfigurator "0x000000028be48f9E62E13403480B60C4822C5aa5"
+    - &basicRedeemHook "0x0000000637f1b1ccDA4Af2dB6CDDf5e5Ec45fd93"
+    - &redirectingDepositHook "0x00000004d3B17e5391eb571dDb8fDF95646ca827"
+    - &oracleHelper "0x000000005F543c38d5ea6D0bF10A50974Eb55E35"
+
+    - &factoryFactoryProxyAdmin "0xf004f5876d352533fb8b244f1f6227caa8eff867"
+    - &depositQueueFactoryProxyAdmin "0x77da14f966385b19c6e2d99a4448dcfc6fc53985"
+    - &redeemQueueFactoryProxyAdmin "0xfce5f4f214288248f827390223f825dfb8c452be"
+    - &feeManagerFactoryProxyAdmin "0x34be100c59e7214ac3382cd5d3e143e8d5107692"
+    - &oracleFactoryProxyAdmin "0x03b10bc6ccaa3e7e894f7d0bac1003bb843f14bf"
+    - &riskManagerFactoryProxyAdmin "0x2ebd4375f9ded72ed36d49973aebf182e0e4482c"
+    - &shareManagerFactoryProxyAdmin "0x93ef6f26bfdce31ca6d12ccf51e5be9a95586b08"
+    - &subvaultFactoryProxyAdmin "0xc70e0e18dd7e6239e2808f48ea9be4cd77b405af"
+    - &verifierFactoryProxyAdmin "0xc5e76f98c8b6d3f536c2ea77de170de34a259341"
+    - &vaultFactoryProxyAdmin "0xe7afa247103bdc7de9054241669741a425fa5a26"
+    - &consensusFactoryProxyAdmin "0x50104e78c849b94d9d895e7888bc464cc1811f89"
+    - &eigenLayerVerifierFactoryProxyAdmin "0xd9d37156529646743b990973a2c3bad98ceb70a9"
+    - &erc20VerifierFactoryProxyAdmin "0x8283eeb88ff09bd49cdce79887c9b7854eca0697"
+    - &symbioticVerifierFactoryProxyAdmin "0xc885556d679e959da6331f0590d8c8d4a9302848"
+    - &swapModuleFactoryProxyAdmin "0x214cc3e0bf23e141739deae7014b1c1fdb3b4e21"
+
+    # --- earnUSD Vault (redeployed) ---
+    - &earnUSD_vault "0x014e6DA8F283C4aF65B2AA0f201438680A004452"
+    - &earnUSD_vaultProxyAdmin "0xcf2a17f9fe0a2d817d89d7c1edd57b218c0bd20b"
+    - &earnUSD_depositQueueUSDC "0xC75E7E73B25fEa8bB23EB55CC48BA55067b5be76"
+    - &earnUSD_depositQueueUSDCProxyAdmin "0xf74aeff4a87bf3d0a06c1eabd01b5a7d3a8a18d5"
+    - &earnUSD_syncDepositQueueUSDC "0xf6AFAf6afcAe116dD37A779D50fE6c5fa6f8C8f5"
+    - &earnUSD_syncDepositQueueUSDCProxyAdmin "0x1bb9006ba5f5f7fbd5cef6c6dd40ff546c0b71db"
+    - &earnUSD_redeemQueueUSDC "0x9e36A74FE278906a76e7615263e46a83fC40c47F"
+    - &earnUSD_redeemQueueUSDCProxyAdmin "0x099874d0ae9e717fb9a8f52359a2b97551dcab0f"
+    - &earnUSD_depositQueueUSDT "0xEeC5041c47Cba1e31321AC6941Bf09Ad60645B73"
+    - &earnUSD_depositQueueUSDTProxyAdmin "0x21bb6fd0d713e99bd0eba9a1df19387d17d4a672"
+    - &earnUSD_syncDepositQueueUSDT "0x534d0bEb82C47cf703BFb9E959297658b65Ec8E9"
+    - &earnUSD_syncDepositQueueUSDTProxyAdmin "0x37e7176616a1ab7ab016d637553f4fcacc5f059b"
+    - &earnUSD_oracle "0x827044735c9708a2cf850e7Ea37EBa43bc786028"
+    - &earnUSD_oracleProxyAdmin "0x197ff65b13c9cad57fbe693e398f093a99812653"
+    - &earnUSD_shareManager "0x4Ce1ac8F43E0E5BD7A346A98aF777bF8fbeA1981"
+    - &earnUSD_shareManagerProxyAdmin "0x98a876b68eecb730e692d0ec699b3378bdc71d6f"
+    - &earnUSD_feeManager "0x72fa23f40e08eB9E45953233b2Dd9665E347e8Dc"
+    - &earnUSD_feeManagerProxyAdmin "0x291430f5db35e60d5be560ec0d524c60aaee66c5"
+    - &earnUSD_riskManager "0x7b1e06C46d4510277FC37a37bBeF65F3794fdDE4"
+    - &earnUSD_riskManagerProxyAdmin "0x5e8a12ab4eb9fc61cf8d72b52e4c8a207c3b09e6"
+    - &earnUSD_timelockController "0xdA6Da82DFF8cD29D828e4775Cc003f504A968845"
+    - &earnUSD_oracleSubmitter "0xB105DaEeFEb1390ce49172c99E3e12C607367156"
+    - &earnUSD_subvault0 "0x77B9441d5Cb89fca435190A9B6D108ad4B00ccFd"
+    - &earnUSD_subvault0ProxyAdmin "0x438211fdbdf4b424f877f623db6be3a9e38e5729"
+    - &earnUSD_verifier0 "0xB65A8E0937c77a76C3f4F86A1110f81A299CB481"
+    - &earnUSD_verifier0ProxyAdmin "0x1e706382237146c06e6d0d21f000ad0b26637746"
+
+    # --- earnUSDc Vault (redeployed, 1 subvault) ---
+    - &earnUSDc_vault "0xDF0fb76Df2c21F79798949A4E886cd22D1C085d7"
+    - &earnUSDc_vaultProxyAdmin "0x504de36f365b0ad3c941312897190af4f67f76eb"
+    - &earnUSDc_syncDepositQueueUSDC "0xEdcd9C257719799435B05C28ff9a8a34e6872bE0"
+    - &earnUSDc_syncDepositQueueUSDCProxyAdmin "0x7143799bba27f00f84a0695ce7d414a9a7221c86"
+    - &earnUSDc_redeemQueueUSDC "0x59fC26AFFF725eBb77Db8E1de14572e5eA9e87EB"
+    - &earnUSDc_redeemQueueUSDCProxyAdmin "0x260738c61b252b9fed7f9174d4642f423ad9f2e9"
+    - &earnUSDc_syncDepositQueueUSDT "0xeC3EE7F7669b7ce0aC91c4638e4b89c9F40E179F"
+    - &earnUSDc_syncDepositQueueUSDTProxyAdmin "0xe66f48139ecd710320a4f108b6c9ee9a94a25fbd"
+    - &earnUSDc_oracle "0x8d229B565A0c6Bf2d693C343bea0Ec96103dEF5f"
+    - &earnUSDc_oracleProxyAdmin "0x689d165b8c49762aeb643caa1665880742eb40fa"
+    - &earnUSDc_shareManager "0xd9543AfF8A859F6B34f80A9A230B277c89ACdda4"
+    - &earnUSDc_shareManagerProxyAdmin "0xe9fae053ab77ec83ff0495221c5540bbda8cbad2"
+    - &earnUSDc_feeManager "0x31325D52B763B1a43d5564114FA4A4ce62148716"
+    - &earnUSDc_feeManagerProxyAdmin "0xc2d7ce8746f90685e1e923494e17937f5f7794d9"
+    - &earnUSDc_riskManager "0x24d5300b6503a7358581EE5bb3651b5bC3F6f835"
+    - &earnUSDc_riskManagerProxyAdmin "0xc294004857dc9b8e8246ac8704df08722100ac4b"
+    - &earnUSDc_timelockController "0xD0e9094E7E26ff133C349ACd9993743DCc15cA5c"
+    - &earnUSDc_oracleSubmitter "0x03852b7138c6704F8F46e87768399616D31Cf733"
+    - &earnUSDc_swapModule0 "0x28c4c26b4d4eA70434906C270cF26B995583c08C"
+    - &earnUSDc_swapModule0ProxyAdmin "0x6d16e5793415e656f0dd5a0e7c9d0b5a4655cb27"
+    - &earnUSDc_subvault0 "0xD6D3a0f4dd3d48bF3653c0549aac6b3516dD933B"
+    - &earnUSDc_subvault0ProxyAdmin "0x6d0bb3b3b6d1e9cd051221353b389f3bb3d834c7"
+    - &earnUSDc_verifier0 "0x1e87c6fba77966A5Ff6BF83FAc4Ea76D978A733f"
+    - &earnUSDc_verifier0ProxyAdmin "0x47ff4a8ec8b8e815bef7a745197e06001aa75d57"
+
+    # --- Lido Actors (multisigs) ---
+    - &proxyAdmin "0x81698f87C6482bF1ce9bFcfC0F103C4A0Adf0Af0"
+    - &lazyVaultAdmin "0x0Dd73341d6158a72b4D224541f1094188f57076E"
+    - &curator "0xe5abcc40196174Ae0d12153dE286F0D8E401769d"
+    - &treasury "0xcCf2daba8Bb04a232a2fDA0D01010D4EF6C69B85"
+    - &pauser "0xA916fD5252160A7E56A6405741De76dc0Da5A0Cd"
+
+    # --- Mellow Actors (multisigs) ---
+    - &mellowActiveVaultAdmin "0x982aB69785f5329BB59c36B19CBd4865353fEf10"
+    - &mellowCurator "0x9745F161b0160a99924845BeFCE1d7b9Daee6899"
+    - &mellowOracleUpdater "0x93a797643d74fC81e7A51F3f84a9D78F930435D1"
+    - &mellowPauser "0x6E887aF318c6b29CEE42Ea28953Bd0BAdb3cE638"
+
+misc:
+  # --- Addresses / Zero values ---
+  - &ZERO_ADDRESS "0x0000000000000000000000000000000000000000"
+  - &ZERO_BYTES32 "0x0000000000000000000000000000000000000000000000000000000000000000"
+  - &DEFAULT_ADMIN_ROLE "0x0000000000000000000000000000000000000000000000000000000000000000"
+
+  # --- Safe implementations ---
+  - &SAFE_IMPL_1_3_0 "0xd9db270c1b5e3bd161e8c8503c55ceabee709552"
+  - &SAFE_IMPL_1_4_1 "0x41675c099f32341bf84bfc5382af534df5c7461a"
+
+  # --- Multisig thresholds ---
+  - &PROXY_ADMIN_THRESHOLD 5
+  - &LAZY_VAULT_ADMIN_THRESHOLD 5
+  - &MELLOW_ACTIVE_VAULT_ADMIN_THRESHOLD 3
+  - &CURATOR_THRESHOLD 3
+  - &MELLOW_CURATOR_THRESHOLD 3
+  - &MELLOW_ORACLE_UPDATER_THRESHOLD 3
+  - &TREASURY_THRESHOLD 4
+  - &PAUSER_THRESHOLD 3
+  - &MELLOW_PAUSER_THRESHOLD 1
+
+  # --- Lido signers ---
+  - &LIDO_SIGNER_1 "0x59F8D74Fe49d5ebEAc069E3baf07eB4b614BD5A7"
+  - &LIDO_SIGNER_2 "0x9777AF8c6727D57F74f7d381AD47eB4A65f042Ff"
+  - &LIDO_SIGNER_3 "0xEA685f0AF4A0BF5E7D6729b2C63eDF574D3EE27f"
+  - &LIDO_SIGNER_4 "0xFB864C1127ff77215d0A8e652bB632F526A4A89f"
+  - &LIDO_SIGNER_5 "0x912e21CdA3D7012146da4Df33309d860a9eb0bEb"
+  - &LIDO_SIGNER_6 "0x73B254db9cb71a129C4E73aF087D71Ac7d34a8d7"
+  - &LIDO_SIGNER_7 "0x59d07dc34B135B17b87840a86BFF7302039E7EDf"
+  - &LIDO_SIGNER_8 "0x04e7C0350241b818eE5c92cc260008C9898F41cf"
+  - &LIDO_SIGNER_9 "0x8ecd93982FfbB2f937ADa6c6e50d1950974081C0"
+  - &LIDO_SIGNER_10 "0x75D95fF8D48E2Ca5c4235322A8AC8e52A76124cD"
+  - &LIDO_SIGNER_11 "0xE6CD29BF19769E44534099d241abAa07aa8c8E9a"
+  - &LIDO_SIGNER_12 "0x8aA493BcD7f989caD67dd3CB48A4c2E6b40FeDB0"
+  - &LIDO_SIGNER_13 "0xf2374BCb265505002055942D070459a4d2011012"
+  - &LIDO_SIGNER_14 "0x169f2eE844275449739801695bf29C4b5f2007F3"
+
+  # --- Mellow signers ---
+  - &MELLOW_SIGNER_1 "0x44A388BBD782AE1D7f4542aEb6C3569E2CfdF5a1"
+  - &MELLOW_SIGNER_2 "0x185111c113d9B19Ea4C424D3cD8628A1ee09Be6A"
+  - &MELLOW_SIGNER_3 "0x06C3992a6067bEA8FB3Af7F004EdEbC13656761F"
+  - &MELLOW_SIGNER_4 "0x8888843c607F4Bbd6aD72128F478085256Bdd15D"
+
+  # --- Ext Mellow signers ---
+  - &EXT_MELLOW_SIGNER_1 "0x78Eb634731bE1957D370BEcbbD254F427Af5D13b"
+  - &EXT_MELLOW_SIGNER_2 "0xe49384e6Aca6A26c82Eaa161A9211fA60fEee3Ef"
+  - &EXT_MELLOW_SIGNER_3 "0x112C1aAB1463A32eD8B1f5F2e8b5244D876Ef740"
+  - &EXT_MELLOW_SIGNER_4 "0x1f3E4c3dBF27056CD7881D8eb376B1D7815757a6"
+  - &EXT_MELLOW_SIGNER_5 "0x5fa3B054D91aF2e1dC76124D7E774044697b942e"
+
+  # --- Tokens ---
+  - &USDC "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+  - &USDT "0xdAC17F958D2ee523a2206206994597C13D831ec7"
+  - &syrupUSDC "0x80ac24aA929eaF5013f6436cdA2a7ba190f5Cc0b"
+  - &MORPHO "0x58D97B57BB95320F9a05dC918Aef65434969c2B2"
+  - &sUSDe "0x9D39A5DE30e57443BfF2A8307A4256c8797A3497"
+  - &WETH "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
+  - &PYUSD "0x6c3ea9036406852006290770BEdFcAbA0e23A0e8"
+  - &GHO "0x40D16FC0246aD3160Ccc09B8D0D3A2cD28aE6C2f"
+  - &AURA "0xC0c293ce456fF0ED870ADd98a0828Dd4d2903DBF"
+  - &BAL "0xba100000625a3754423978a60c9317c58a424e3D"
+
+  # --- CoW Protocol ---
+  - &cowswapSettlement "0x9008D19f58AAbD9eD0D60971565AA8510560ab41"
+  - &cowswapVaultRelayer "0xC92E8bdf79f0507f65a392b0ab4667716BFE0110"
+
+  # --- SwapModule external ---
+  - &swapModuleRouter "0x6131B5fae19EA4f9D964eAc0408E4408b66337b5"
+  - &swapModuleOracle "0x58f80f4e6367bC1CF548B819F6F0DE5F77BDF797"
+
+  # --- EIP-1967 Storage Slots ---
+  - &EIP1967_ADMIN_SLOT "0xb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d6103"
+  - &EIP1967_IMPLEMENTATION_SLOT "0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc"
+
+  # --- Deployer ---
+  - &deployer "0x5C0F3DE4ba6AD53bb8E27f965170A52671e525Bf"
+  - &mellow_deployer "0xE98Be1E5538FCbD716C506052eB1Fd5d6fC495A3"
+
+roles:
+  # --- Roles: share manager ---
+  - &SET_ACCOUNT_INFO_ROLE "0x58258f737b9cea9d7da81a3a12943f800a9668a2494235fec0d84cc60ad04cff"
+  - &SET_FLAGS_ROLE "0x78b235a1fa2fd5e00dba7867d599bed6f088684010a7fee7b9fe05fa1082d01e"
+  - &SET_WHITELIST_MERKLE_ROOT_ROLE "0xca196afb47c2d16c8388ba0ef201b98a808acb83a856576ffc57360840a5fd99"
+
+  # --- Roles: vault ---
+  - &CREATE_QUEUE_ROLE "0x6788636e7899d6d227901dc9f8c4c785401c0991724cf908dc65388af686da6f"
+  - &CREATE_SUBVAULT_ROLE "0x85c2023fdfb1e93dedf5d18f9bc0e79347e071d12740ba71aeb84a4fcbdc4b79"
+  - &DISCONNECT_SUBVAULT_ROLE "0xf610639f4b9b8986f875fcb4e49486da5c7aa449a6942b5013fabd061e9b9fff"
+  - &PULL_LIQUIDITY_ROLE "0x68895691ff006f290ca74825ce06ed17fffab55af49f0274f49b7424f752583a"
+  - &PUSH_LIQUIDITY_ROLE "0x32a781031f04cc60b32394e40124d1e87f54273bf26d0532a115a424f6a93298"
+  - &RECONNECT_SUBVAULT_ROLE "0xb557d53a2e72d8333ffa3bf2f556678becb5e995b0e25b7dca354627e550c08f"
+  - &REMOVE_QUEUE_ROLE "0x9a4c49d6fb9452bbfe187968075d0fac7d7202d2b7f731d8cffbce9cf66756b2"
+  - &SET_HOOK_ROLE "0x627f9e4ac2dadb64d045e7e6333c09f39ed34e0e066957955d0052b46d2e83e8"
+  - &SET_QUEUE_LIMIT_ROLE "0x407fc42eadf1aba68b1d4a8c3c4aa2e8b6beac7957623f3694d0ad77bfb70e06"
+  - &SET_QUEUE_STATUS_ROLE "0x6618a6d92147bbcacfb2ef2375976fc4c529eeeaeb72a66048296571370c6946"
+
+  # --- Roles: timelock controller ---
+  - &CANCELLER_ROLE "0xfd643c72710c63c0180259aba6b2d05451e3591a24e58b62239378085726f783"
+  - &EXECUTOR_ROLE "0xd8aa0f3194971a2a116679f7c2090f6939c8d4e01a2a8d7e41d55e5351469e63"
+  - &PROPOSER_ROLE "0xb09aa5aeb3702cfd50b6b62bc4532604938f21248a27a1d5ca736082b6819cc1"
+
+  # --- Roles: risk manager ---
+  - &ALLOW_SUBVAULT_ASSETS_ROLE "0x4a899e3e648ea55418d9c99177e5c522df621b1953c0ad7e99da3711043ba1c1"
+  - &DISALLOW_SUBVAULT_ASSETS_ROLE "0x35c8c55cb15b3aef15751488f551edf793583e377f8951cf9738f035a1649ec5"
+  - &MODIFY_PENDING_ASSETS_ROLE "0xcaa6b67a612f0bc4bdf15a48dde19f543e93099681b3ceaee93d630e38bcff38"
+  - &MODIFY_SUBVAULT_BALANCE_ROLE "0xa7ecfd54b0ab6ce6ecc88746fe62beba4e9a103dbb00d88cfedffbc0c6069ce8"
+  - &MODIFY_VAULT_BALANCE_ROLE "0x94b8a54d503c6b752e707c591f9345ae8ccc138255588e460ee15622d499fdba"
+  - &SET_SUBVAULT_LIMIT_ROLE "0x253eb39d0edc77da10bbc4bcaa23c44e40e3c67ed649fbecb18a3f7c51bfbb10"
+  - &SET_VAULT_LIMIT_ROLE "0x2b2a32ecca586a148d15aea321ddbb421a2a3ac6b4d56c0a9ad9de32e84cf5c4"
+
+  # --- Roles: sync deposit queue ---
+  - &SET_SYNC_DEPOSIT_PARAMS_ROLE "0x07c44dbab396497d56fa954370602fee5a40eebde0c94923e44fcf920c918f87"
+
+  # --- Roles: swap module ---
+  - &SM_CALLER_ROLE "0xaef53ff2a64da421565efa45c50a96f070d7bb66ffc4ca806c77c72a0e763f66"
+  - &ROUTER_ROLE "0x59a256c4d42df67b80d5d3fdaf91897a0d929e43a43a5f8e1a88cbd1476e5d90"
+  - &SET_SLIPPAGE_ROLE "0x32a83f2101a3db03d031fa7d978ba44116bbbd832fcef7908374354ae8de2b38"
+  - &TOKEN_IN_ROLE "0x35f08086aac3799af637e5e9fa5ff324170893731444bf3a9d1edc368bcbfaeb"
+  - &TOKEN_OUT_ROLE "0x9d556436fc766d4a6d24fe48c90073bc03600d7556265a3217def4578d7c2531"
+
+  # --- Roles: oracle ---
+  - &ACCEPT_REPORT_ROLE "0x341f4b58682c3a888bdb3eb9a8a4452a6e847be8a380eb3d742794b4f9ac0ab3"
+  - &ADD_SUPPORTED_ASSETS_ROLE "0x73c07eddbe5b5274995c8e6cbe94d644cedc04911df3baf934188d230ca7a2cd"
+  - &REMOVE_SUPPORTED_ASSETS_ROLE "0x748ab7827e75e9f34387e3ded8598f06eb04cc7bb90fff07bc6dc2a748377021"
+  - &SET_SECURITY_PARAMS_ROLE "0x79abe62d91dbd05fcda41b212f4c8c1f1d8be54ccddf859de3ccd1361b71fcb6"
+  - &SUBMIT_REPORTS_ROLE "0xb54eea9408efadf36da92cc5ecd8af0f45d6dd90de54634bbc5a2113ddcb505d"
+
+  # --- Roles: verifier ---
+  - &ALLOW_CALL_ROLE "0x7e8318b807524ed75f0b7cc82d3cd61e590497e7502a54c698a969fa62dc0a2e"
+  - &CALLER_ROLE "0x877766a829235d063c3ba37802a4874fcf1b575d310fbe898df17d8ebabee463"
+  - &DISALLOW_CALL_ROLE "0xf3354d076b52bf34f14c15ff5c85faef55353add7b5bb69cd8ac10c4b85748cf"
+  - &SET_MERKLE_ROOT_ROLE "0xfc199f685d023b44b528c5fcb9cebfe292e64340dd5729b20761da4ad1e93024"
+
+  # --- Roles: EigenLayer verifier ---
+  - &ASSET_ROLE "0x7a2ed8c36fc77fb21dfb67d40423dad2ecf5e9539694580ecb4f6aaec99d266e"
+  - &EL_CALLER_ROLE "0x429987c65ae1b21d36923ef95ce6fcd59f7bf9663738a09ee8eefcf6f777562b"
+  - &MELLOW_VAULT_ROLE "0x935fd7b940d597b587bde3e2081c175c3c2ef95cd30a83492573ee0907ad6aaa"
+  - &OPERATOR_ROLE "0xcf0cbc050f25c592622c05ff9a7f25030deea63c230fa4d7b8d226d8c0837201"
+  - &RECEIVER_ROLE "0x59b484ad6f5409567fc5a4860c4c34866eec78f8cc4024ed3e17efb0f215d8db"
+  - &STRATEGY_ROLE "0x2eab4b6bd944eae98f56071c3f2866a8355e10331fc8a04157ddf9ee0feff1e0"
+
+  # --- Roles: ERC20 verifier ---
+  - &ERC20_ASSET_ROLE "0x8b4b1250247f1cbb35f7f69415df3cf642553a6953f81fae69e135c5feefc94b"
+  - &ERC20_CALLER_ROLE "0xc896aac795f7376adc96049886670c0e28cf66652e338a4139e37d2503456058"
+  - &ERC20_RECIPIENT_ROLE "0x7c6c5b36d31deb1f0c3cbcc15c12c0be85fe383faacee29701116ad6cfb3a29a"
+
+  # --- Roles: Symbiotic verifier ---
+  - &SYMBIOTIC_CALLER_ROLE "0x3b48a429628aa7e067d22e77e8f4703a9d84dc4efdabe07716c4d0322e7f2714"
+  - &SYMBIOTIC_MELLOW_VAULT_ROLE "0xabf80feb2ee273d208fadd5ac778f2fc719588bcc130607c0fcddd743ce6f6c1"
+  - &SYMBIOTIC_FARM_ROLE "0xefe4de88b49c8b8f17f4c2ff9d6f775c4747e6bf57255a802349a8ebf4842239"
+  - &SYMBIOTIC_VAULT_ROLE "0x909c8b12bf402721ba65c08a75ac086b15941cd32bcb6ecba9dc69a7757d1ca9"
+
+l1:
+  rpcUrl: L1_MAINNET_RPC_URL
+  explorerHostname: api.etherscan.io/v2/api
+  explorerTokenEnv: ETHERSCAN_TOKEN
+  chainId: 1
+  contracts:
+    # --- earnUSD VAULT ---
+    # --- ProxyAdmin Contracts ---
+
+    earnUSD_vaultProxyAdmin:
+      name: ProxyAdmin
+      address: *earnUSD_vaultProxyAdmin
+      checks:
+        UPGRADE_INTERFACE_VERSION: "5.0.0"
+        owner: *proxyAdmin
+
+    earnUSD_depositQueueUSDCProxyAdmin:
+      name: ProxyAdmin
+      address: *earnUSD_depositQueueUSDCProxyAdmin
+      checks:
+        UPGRADE_INTERFACE_VERSION: "5.0.0"
+        owner: *proxyAdmin
+
+    earnUSD_syncDepositQueueUSDCProxyAdmin:
+      name: ProxyAdmin
+      address: *earnUSD_syncDepositQueueUSDCProxyAdmin
+      checks:
+        UPGRADE_INTERFACE_VERSION: "5.0.0"
+        owner: *proxyAdmin
+
+    earnUSD_redeemQueueUSDCProxyAdmin:
+      name: ProxyAdmin
+      address: *earnUSD_redeemQueueUSDCProxyAdmin
+      checks:
+        UPGRADE_INTERFACE_VERSION: "5.0.0"
+        owner: *proxyAdmin
+
+    earnUSD_depositQueueUSDTProxyAdmin:
+      name: ProxyAdmin
+      address: *earnUSD_depositQueueUSDTProxyAdmin
+      checks:
+        UPGRADE_INTERFACE_VERSION: "5.0.0"
+        owner: *proxyAdmin
+
+    earnUSD_syncDepositQueueUSDTProxyAdmin:
+      name: ProxyAdmin
+      address: *earnUSD_syncDepositQueueUSDTProxyAdmin
+      checks:
+        UPGRADE_INTERFACE_VERSION: "5.0.0"
+        owner: *proxyAdmin
+
+    earnUSD_oracleProxyAdmin:
+      name: ProxyAdmin
+      address: *earnUSD_oracleProxyAdmin
+      checks:
+        UPGRADE_INTERFACE_VERSION: "5.0.0"
+        owner: *proxyAdmin
+
+    earnUSD_shareManagerProxyAdmin:
+      name: ProxyAdmin
+      address: *earnUSD_shareManagerProxyAdmin
+      checks:
+        UPGRADE_INTERFACE_VERSION: "5.0.0"
+        owner: *proxyAdmin
+
+    earnUSD_feeManagerProxyAdmin:
+      name: ProxyAdmin
+      address: *earnUSD_feeManagerProxyAdmin
+      checks:
+        UPGRADE_INTERFACE_VERSION: "5.0.0"
+        owner: *proxyAdmin
+
+    earnUSD_riskManagerProxyAdmin:
+      name: ProxyAdmin
+      address: *earnUSD_riskManagerProxyAdmin
+      checks:
+        UPGRADE_INTERFACE_VERSION: "5.0.0"
+        owner: *proxyAdmin
+
+    earnUSD_subvault0ProxyAdmin:
+      name: ProxyAdmin
+      address: *earnUSD_subvault0ProxyAdmin
+      checks:
+        UPGRADE_INTERFACE_VERSION: "5.0.0"
+        owner: *proxyAdmin
+
+    earnUSD_verifier0ProxyAdmin:
+      name: ProxyAdmin
+      address: *earnUSD_verifier0ProxyAdmin
+      checks:
+        UPGRADE_INTERFACE_VERSION: "5.0.0"
+        owner: *proxyAdmin
+
+    # --- earnUSD Vault ---
+
+    earnUSD_vault:
+      name: Vault
+      address: *earnUSD_vault
+      proxyName: TransparentUpgradeableProxy
+      implementation: *vaultImplementation
+      proxyChecks: {}
+      storage:
+        - slot: *EIP1967_ADMIN_SLOT
+          expected: *earnUSD_vaultProxyAdmin
+          label: admin
+        - slot: *EIP1967_IMPLEMENTATION_SLOT
+          expected: *vaultImplementation
+          label: implementation
+      checks:
+        CREATE_QUEUE_ROLE: *CREATE_QUEUE_ROLE
+        CREATE_SUBVAULT_ROLE: *CREATE_SUBVAULT_ROLE
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        DISCONNECT_SUBVAULT_ROLE: *DISCONNECT_SUBVAULT_ROLE
+        PULL_LIQUIDITY_ROLE: *PULL_LIQUIDITY_ROLE
+        PUSH_LIQUIDITY_ROLE: *PUSH_LIQUIDITY_ROLE
+        RECONNECT_SUBVAULT_ROLE: *RECONNECT_SUBVAULT_ROLE
+        REMOVE_QUEUE_ROLE: *REMOVE_QUEUE_ROLE
+        SET_HOOK_ROLE: *SET_HOOK_ROLE
+        SET_QUEUE_LIMIT_ROLE: *SET_QUEUE_LIMIT_ROLE
+        SET_QUEUE_STATUS_ROLE: *SET_QUEUE_STATUS_ROLE
+        assetAt:
+          - args: [0]
+            result: *USDC
+          - args: [1]
+            result: *USDT
+        claimableSharesOf:
+        defaultDepositHook: *redirectingDepositHook
+        defaultRedeemHook: *basicRedeemHook
+        depositQueueFactory: *depositQueueFactory
+        feeManager: *earnUSD_feeManager
+        getAssetCount: 2
+        getHook:
+          - args: [*earnUSD_depositQueueUSDC]
+            result: *redirectingDepositHook
+          - args: [*earnUSD_syncDepositQueueUSDC]
+            result: *redirectingDepositHook
+          - args: [*earnUSD_redeemQueueUSDC]
+            result: *basicRedeemHook
+          - args: [*earnUSD_depositQueueUSDT]
+            result: *redirectingDepositHook
+          - args: [*earnUSD_syncDepositQueueUSDT]
+            result: *redirectingDepositHook
+        getQueueCount: 5
+        getLiquidAssets:
+        getRoleAdmin:
+        getRoleMember:
+        getRoleMemberCount:
+        getRoleMembers:
+        getStorageAt:
+        hasAsset:
+          - args: [*USDC]
+            result: true
+          - args: [*USDT]
+            result: true
+        hasQueue:
+          - args: [*earnUSD_depositQueueUSDC]
+            result: true
+          - args: [*earnUSD_syncDepositQueueUSDC]
+            result: true
+          - args: [*earnUSD_redeemQueueUSDC]
+            result: true
+          - args: [*earnUSD_depositQueueUSDT]
+            result: true
+          - args: [*earnUSD_syncDepositQueueUSDT]
+            result: true
+        hasRole:
+        hasSubvault:
+          - args: [*earnUSD_subvault0]
+            result: true
+        hasSupportedRole:
+        isDepositQueue:
+          - args: [*earnUSD_depositQueueUSDC]
+            result: true
+          - args: [*earnUSD_syncDepositQueueUSDC]
+            result: true
+          - args: [*earnUSD_redeemQueueUSDC]
+            result: false
+          - args: [*earnUSD_depositQueueUSDT]
+            result: true
+          - args: [*earnUSD_syncDepositQueueUSDT]
+            result: true
+        isPausedQueue:
+          - args: [*earnUSD_depositQueueUSDC]
+            result: false
+          - args: [*earnUSD_syncDepositQueueUSDC]
+            result: false
+          - args: [*earnUSD_redeemQueueUSDC]
+            result: false
+          - args: [*earnUSD_depositQueueUSDT]
+            result: false
+          - args: [*earnUSD_syncDepositQueueUSDT]
+            result: false
+        onERC721Received:
+        oracle: *earnUSD_oracle
+        queueAt:
+          # USDC - depositQueue + syncDepositQueue + redeemQueue
+          - args: [*USDC, 0]
+            result: *earnUSD_depositQueueUSDC
+          - args: [*USDC, 1]
+            result: *earnUSD_syncDepositQueueUSDC
+          - args: [*USDC, 2]
+            result: *earnUSD_redeemQueueUSDC
+          # USDT - depositQueue + syncDepositQueue
+          - args: [*USDT, 0]
+            result: *earnUSD_depositQueueUSDT
+          - args: [*USDT, 1]
+            result: *earnUSD_syncDepositQueueUSDT
+        queueLimit: 5
+        redeemQueueFactory: *redeemQueueFactory
+        riskManager: *earnUSD_riskManager
+        shareManager: *earnUSD_shareManager
+        subvaultAt:
+        subvaultFactory: *subvaultFactory
+        subvaults: 1
+        supportedRoleAt:
+          - args: [13]
+            result: *ACCEPT_REPORT_ROLE
+          - args: [12]
+            result: *SUBMIT_REPORTS_ROLE
+          - args: [11]
+            result: *SET_QUEUE_STATUS_ROLE
+          - args: [10]
+            result: *SET_MERKLE_ROOT_ROLE
+          - args: [9]
+            result: *SET_FLAGS_ROLE
+          - args: [8]
+            result: *PUSH_LIQUIDITY_ROLE
+          - args: [7]
+            result: *PULL_LIQUIDITY_ROLE
+          - args: [6]
+            result: *CALLER_ROLE
+          - args: [5]
+            result: *MODIFY_SUBVAULT_BALANCE_ROLE
+          - args: [4]
+            result: *MODIFY_VAULT_BALANCE_ROLE
+          - args: [3]
+            result: *ALLOW_SUBVAULT_ASSETS_ROLE
+          - args: [2]
+            result: *SET_SUBVAULT_LIMIT_ROLE
+          - args: [1]
+            result: *SET_VAULT_LIMIT_ROLE
+          - args: [0]
+            result: *DEFAULT_ADMIN_ROLE
+          - args: [14]
+            result: *SET_SECURITY_PARAMS_ROLE
+          - args: [15]
+            mustRevert: true
+        supportedRoles: 15
+        supportsInterface:
+        verifierFactory: *verifierFactory
+      implementationChecks:
+        CREATE_QUEUE_ROLE: *CREATE_QUEUE_ROLE
+        CREATE_SUBVAULT_ROLE: *CREATE_SUBVAULT_ROLE
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        DISCONNECT_SUBVAULT_ROLE: *DISCONNECT_SUBVAULT_ROLE
+        PULL_LIQUIDITY_ROLE: *PULL_LIQUIDITY_ROLE
+        PUSH_LIQUIDITY_ROLE: *PUSH_LIQUIDITY_ROLE
+        RECONNECT_SUBVAULT_ROLE: *RECONNECT_SUBVAULT_ROLE
+        REMOVE_QUEUE_ROLE: *REMOVE_QUEUE_ROLE
+        SET_HOOK_ROLE: *SET_HOOK_ROLE
+        SET_QUEUE_LIMIT_ROLE: *SET_QUEUE_LIMIT_ROLE
+        SET_QUEUE_STATUS_ROLE: *SET_QUEUE_STATUS_ROLE
+        assetAt:
+        claimableSharesOf:
+        defaultDepositHook: *ZERO_ADDRESS
+        defaultRedeemHook: *ZERO_ADDRESS
+        depositQueueFactory: *depositQueueFactory
+        feeManager: *ZERO_ADDRESS
+        getAssetCount: 0
+        getHook:
+        getLiquidAssets:
+        getRoleAdmin:
+        getRoleMember:
+        getRoleMemberCount:
+        getRoleMembers:
+        getStorageAt:
+        hasAsset:
+        hasQueue:
+        hasRole:
+        hasSubvault:
+        hasSupportedRole:
+        isDepositQueue:
+        isPausedQueue:
+        onERC721Received:
+        oracle: *ZERO_ADDRESS
+        queueAt:
+        queueLimit: 0
+        redeemQueueFactory: *redeemQueueFactory
+        riskManager: *ZERO_ADDRESS
+        shareManager: *ZERO_ADDRESS
+        subvaultAt:
+        subvaultFactory: *subvaultFactory
+        subvaults: 0
+        supportedRoleAt:
+        supportedRoles: 0
+        supportsInterface:
+        verifierFactory: *verifierFactory
+      ozAcl:
+        *DEFAULT_ADMIN_ROLE : [*lazyVaultAdmin]
+        *SET_VAULT_LIMIT_ROLE : [*mellowActiveVaultAdmin]
+        *SET_SUBVAULT_LIMIT_ROLE : [*mellowActiveVaultAdmin]
+        *ALLOW_SUBVAULT_ASSETS_ROLE : [*mellowActiveVaultAdmin]
+        *MODIFY_VAULT_BALANCE_ROLE : [*mellowActiveVaultAdmin]
+        *MODIFY_SUBVAULT_BALANCE_ROLE : [*mellowActiveVaultAdmin]
+        *CALLER_ROLE : [*curator]
+        *PULL_LIQUIDITY_ROLE : [*curator]
+        *PUSH_LIQUIDITY_ROLE : [*curator]
+        *SET_FLAGS_ROLE : [*earnUSD_timelockController]
+        *SET_MERKLE_ROOT_ROLE : [*earnUSD_timelockController]
+        *SET_QUEUE_STATUS_ROLE : [*earnUSD_timelockController]
+        *SUBMIT_REPORTS_ROLE : [*earnUSD_oracleSubmitter]
+        *ACCEPT_REPORT_ROLE : [*earnUSD_oracleSubmitter]
+        *SET_SECURITY_PARAMS_ROLE : [*lazyVaultAdmin]
+
+    earnUSD_subvault0:
+      name: Subvault
+      address: *earnUSD_subvault0
+      proxyName: TransparentUpgradeableProxy
+      implementation: *subvaultImplementation
+      proxyChecks: {}
+      storage:
+        - slot: *EIP1967_ADMIN_SLOT
+          expected: *earnUSD_subvault0ProxyAdmin
+          label: admin
+        - slot: *EIP1967_IMPLEMENTATION_SLOT
+          expected: *subvaultImplementation
+          label: implementation
+      checks:
+        getStorageAt:
+        onERC721Received:
+        vault: *earnUSD_vault
+        verifier: *earnUSD_verifier0
+      implementationChecks:
+        getStorageAt:
+        onERC721Received:
+        vault: *ZERO_ADDRESS
+        verifier: *ZERO_ADDRESS
+
+    earnUSD_verifier0:
+      name: Verifier
+      address: *earnUSD_verifier0
+      proxyName: TransparentUpgradeableProxy
+      implementation: *verifierImplementation
+      proxyChecks: {}
+      storage:
+        - slot: *EIP1967_ADMIN_SLOT
+          expected: *earnUSD_verifier0ProxyAdmin
+          label: admin
+        - slot: *EIP1967_IMPLEMENTATION_SLOT
+          expected: *verifierImplementation
+          label: implementation
+      checks:
+        ALLOW_CALL_ROLE: *ALLOW_CALL_ROLE
+        CALLER_ROLE: *CALLER_ROLE
+        DISALLOW_CALL_ROLE: *DISALLOW_CALL_ROLE
+        SET_MERKLE_ROOT_ROLE: *SET_MERKLE_ROOT_ROLE
+        allowedCallAt:
+        allowedCalls: 0
+        getVerificationResult:
+        hashCall:
+        isAllowedCall:
+        merkleRoot: "0x3d1503344580ab876cd12a28c6a2322b5dd90253d354a8d6666476ed011923d8"
+        vault: *earnUSD_vault
+        verifyCall:
+      implementationChecks:
+        ALLOW_CALL_ROLE: *ALLOW_CALL_ROLE
+        CALLER_ROLE: *CALLER_ROLE
+        DISALLOW_CALL_ROLE: *DISALLOW_CALL_ROLE
+        SET_MERKLE_ROOT_ROLE: *SET_MERKLE_ROOT_ROLE
+        allowedCallAt:
+        allowedCalls:
+        getVerificationResult:
+        hashCall:
+        isAllowedCall:
+        merkleRoot: *ZERO_BYTES32
+        vault: *ZERO_ADDRESS
+        verifyCall:
+
+    earnUSD_depositQueueUSDC:
+      name: DepositQueue
+      address: *earnUSD_depositQueueUSDC
+      proxyName: TransparentUpgradeableProxy
+      implementation: *depositQueueImplementation
+      proxyChecks: {}
+      storage:
+        - slot: *EIP1967_ADMIN_SLOT
+          expected: *earnUSD_depositQueueUSDCProxyAdmin
+          label: admin
+        - slot: *EIP1967_IMPLEMENTATION_SLOT
+          expected: *depositQueueImplementation
+          label: implementation
+      checks:
+        asset: *USDC
+        canBeRemoved:
+        claimableOf:
+        requestOf:
+        unclaimedRequests:
+        vault: *earnUSD_vault
+      implementationChecks:
+        asset: *ZERO_ADDRESS
+        canBeRemoved: true
+        claimableOf:
+        requestOf:
+        unclaimedRequests: 0
+        vault: *ZERO_ADDRESS
+
+    earnUSD_syncDepositQueueUSDC:
+      name: SyncDepositQueue
+      address: *earnUSD_syncDepositQueueUSDC
+      proxyName: TransparentUpgradeableProxy
+      implementation: *syncDepositQueueImplementation
+      proxyChecks: {}
+      storage:
+        - slot: *EIP1967_ADMIN_SLOT
+          expected: *earnUSD_syncDepositQueueUSDCProxyAdmin
+          label: admin
+        - slot: *EIP1967_IMPLEMENTATION_SLOT
+          expected: *syncDepositQueueImplementation
+          label: implementation
+      checks:
+        SET_SYNC_DEPOSIT_PARAMS_ROLE: *SET_SYNC_DEPOSIT_PARAMS_ROLE
+        asset: *USDC
+        canBeRemoved: true
+        claim:
+        claimableOf:
+        name: "SyncDepositQueue"
+        syncDepositParams: [200, 86400] # [penaltyD6, maxAge(seconds)]
+        vault: *earnUSD_vault
+      implementationChecks:
+        SET_SYNC_DEPOSIT_PARAMS_ROLE: *SET_SYNC_DEPOSIT_PARAMS_ROLE
+        asset: *ZERO_ADDRESS
+        canBeRemoved: true
+        claim:
+        claimableOf:
+        name: "SyncDepositQueue"
+        syncDepositParams: [0, 0]
+        vault: *ZERO_ADDRESS
+
+    earnUSD_redeemQueueUSDC:
+      name: RedeemQueue
+      address: *earnUSD_redeemQueueUSDC
+      proxyName: TransparentUpgradeableProxy
+      implementation: *redeemQueueImplementation
+      proxyChecks: {}
+      storage:
+        - slot: *EIP1967_ADMIN_SLOT
+          expected: *earnUSD_redeemQueueUSDCProxyAdmin
+          label: admin
+        - slot: *EIP1967_IMPLEMENTATION_SLOT
+          expected: *redeemQueueImplementation
+          label: implementation
+      checks:
+        asset: *USDC
+        batchAt:
+        canBeRemoved: false
+        claimableOf:
+        # getState: [batchIterator, batchCount, totalDemandAssets, totalPendingShares]
+        getState:
+        requestsOf:
+        vault: *earnUSD_vault
+      implementationChecks:
+        asset: *ZERO_ADDRESS
+        batchAt:
+        canBeRemoved: true
+        claimableOf:
+        getState:
+        requestsOf:
+        vault: *ZERO_ADDRESS
+
+    earnUSD_depositQueueUSDT:
+      name: DepositQueue
+      address: *earnUSD_depositQueueUSDT
+      proxyName: TransparentUpgradeableProxy
+      implementation: *depositQueueImplementation
+      proxyChecks: {}
+      storage:
+        - slot: *EIP1967_ADMIN_SLOT
+          expected: *earnUSD_depositQueueUSDTProxyAdmin
+          label: admin
+        - slot: *EIP1967_IMPLEMENTATION_SLOT
+          expected: *depositQueueImplementation
+          label: implementation
+      checks:
+        asset: *USDT
+        canBeRemoved:
+        claimableOf:
+        requestOf:
+        unclaimedRequests:
+        vault: *earnUSD_vault
+      implementationChecks:
+        asset: *ZERO_ADDRESS
+        canBeRemoved: true
+        claimableOf:
+        requestOf:
+        unclaimedRequests: 0
+        vault: *ZERO_ADDRESS
+
+    earnUSD_syncDepositQueueUSDT:
+      name: SyncDepositQueue
+      address: *earnUSD_syncDepositQueueUSDT
+      proxyName: TransparentUpgradeableProxy
+      implementation: *syncDepositQueueImplementation
+      proxyChecks: {}
+      storage:
+        - slot: *EIP1967_ADMIN_SLOT
+          expected: *earnUSD_syncDepositQueueUSDTProxyAdmin
+          label: admin
+        - slot: *EIP1967_IMPLEMENTATION_SLOT
+          expected: *syncDepositQueueImplementation
+          label: implementation
+      checks:
+        SET_SYNC_DEPOSIT_PARAMS_ROLE: *SET_SYNC_DEPOSIT_PARAMS_ROLE
+        asset: *USDT
+        canBeRemoved: true
+        claim:
+        claimableOf:
+        name: "SyncDepositQueue"
+        syncDepositParams: [200, 86400] # [penaltyD6, maxAge(seconds)]
+        vault: *earnUSD_vault
+      implementationChecks:
+        SET_SYNC_DEPOSIT_PARAMS_ROLE: *SET_SYNC_DEPOSIT_PARAMS_ROLE
+        asset: *ZERO_ADDRESS
+        canBeRemoved: true
+        claim:
+        claimableOf:
+        name: "SyncDepositQueue"
+        syncDepositParams: [0, 0]
+        vault: *ZERO_ADDRESS
+
+    earnUSD_oracle:
+      name: Oracle
+      address: *earnUSD_oracle
+      proxyName: TransparentUpgradeableProxy
+      implementation: *oracleImplementation
+      proxyChecks: {}
+      storage:
+        - slot: *EIP1967_ADMIN_SLOT
+          expected: *earnUSD_oracleProxyAdmin
+          label: admin
+        - slot: *EIP1967_IMPLEMENTATION_SLOT
+          expected: *oracleImplementation
+          label: implementation
+      checks:
+        ACCEPT_REPORT_ROLE: *ACCEPT_REPORT_ROLE
+        ADD_SUPPORTED_ASSETS_ROLE: *ADD_SUPPORTED_ASSETS_ROLE
+        REMOVE_SUPPORTED_ASSETS_ROLE: *REMOVE_SUPPORTED_ASSETS_ROLE
+        SET_SECURITY_PARAMS_ROLE: *SET_SECURITY_PARAMS_ROLE
+        SUBMIT_REPORTS_ROLE: *SUBMIT_REPORTS_ROLE
+        getReport:
+        isSupportedAsset:
+          - args: [*USDC]
+            result: true
+          - args: [*USDT]
+            result: true
+        # securityParams: [maxAbsDeviation, suspAbsDeviation, maxRelDeviationD18, suspRelDeviationD18, timeout, depositInterval, redeemInterval]
+        securityParams:
+          [
+            5000000000000000000000000000,
+            1000000000000000000000000000,
+            5000000000000000,
+            1000000000000000,
+            72000,
+            3600,
+            172800,
+          ]
+        supportedAssetAt:
+          - args: [0]
+            result: *USDC
+          - args: [1]
+            result: *USDT
+          - args: [2]
+            mustRevert: true
+        supportedAssets: 2
+        validatePrice:
+        vault: *earnUSD_vault
+      implementationChecks:
+        ACCEPT_REPORT_ROLE: *ACCEPT_REPORT_ROLE
+        ADD_SUPPORTED_ASSETS_ROLE: *ADD_SUPPORTED_ASSETS_ROLE
+        REMOVE_SUPPORTED_ASSETS_ROLE: *REMOVE_SUPPORTED_ASSETS_ROLE
+        SET_SECURITY_PARAMS_ROLE: *SET_SECURITY_PARAMS_ROLE
+        SUBMIT_REPORTS_ROLE: *SUBMIT_REPORTS_ROLE
+        getReport:
+        isSupportedAsset:
+          - args: [*USDC]
+            result: false
+        securityParams:
+        supportedAssetAt:
+          - args: [0]
+            mustRevert: true
+        supportedAssets: 0
+        validatePrice:
+        vault: *ZERO_ADDRESS
+
+    earnUSD_oracleSubmitter:
+      name: OracleSubmitter
+      address: *earnUSD_oracleSubmitter
+      checks:
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        acceptedAt:
+        baseAsset: *USDC
+        decimals: 6
+        getRate:
+        getRoleAdmin:
+        getRoleMember:
+        getRoleMemberCount:
+        getRoleMembers:
+        hasRole:
+        latestAnswer:
+        latestRoundData:
+        oracle: *earnUSD_oracle
+        reportAt:
+        reports:
+        supportsInterface:
+        updatedAt:
+      ozAcl:
+        *DEFAULT_ADMIN_ROLE : [*lazyVaultAdmin]
+        *SUBMIT_REPORTS_ROLE : [*mellowOracleUpdater]
+        *ACCEPT_REPORT_ROLE : [*lazyVaultAdmin]
+
+    earnUSD_shareManager:
+      name: BurnableTokenizedShareManager
+      address: *earnUSD_shareManager
+      proxyName: TransparentUpgradeableProxy
+      implementation: *burnableShareManagerImplementation
+      proxyChecks: {}
+      storage:
+        - slot: *EIP1967_ADMIN_SLOT
+          expected: *earnUSD_shareManagerProxyAdmin
+          label: admin
+        - slot: *EIP1967_IMPLEMENTATION_SLOT
+          expected: *burnableShareManagerImplementation
+          label: implementation
+      checks:
+        SET_ACCOUNT_INFO_ROLE: *SET_ACCOUNT_INFO_ROLE
+        SET_FLAGS_ROLE: *SET_FLAGS_ROLE
+        SET_WHITELIST_MERKLE_ROOT_ROLE: *SET_WHITELIST_MERKLE_ROOT_ROLE
+        accounts:
+        activeShares:
+        activeSharesOf:
+        allocatedShares:
+        allowance:
+        balanceOf:
+        claimableSharesOf:
+        decimals: 18
+        # flags: [hasMintPause, hasBurnPause, hasTransferPause, hasWhitelist, hasTransferWhitelist, globalLockup]
+        flags: [false, false, false, false, false, 0]
+        isDepositorWhitelisted:
+        name: "Lido Earn USD"
+        sharesOf:
+        symbol: "earnUSD"
+        totalShares:
+        totalSupply:
+        updateChecks:
+        vault: *earnUSD_vault
+        whitelistMerkleRoot: *ZERO_BYTES32
+      implementationChecks:
+        SET_ACCOUNT_INFO_ROLE: *SET_ACCOUNT_INFO_ROLE
+        SET_FLAGS_ROLE: *SET_FLAGS_ROLE
+        SET_WHITELIST_MERKLE_ROOT_ROLE: *SET_WHITELIST_MERKLE_ROOT_ROLE
+        accounts:
+        activeShares: 0
+        activeSharesOf:
+        allocatedShares: 0
+        allowance:
+        balanceOf:
+        claimableSharesOf:
+        decimals: 18
+        flags:
+        isDepositorWhitelisted:
+        name: ""
+        sharesOf:
+        symbol: ""
+        totalShares: 0
+        totalSupply: 0
+        updateChecks:
+        vault: *ZERO_ADDRESS
+        whitelistMerkleRoot: *ZERO_BYTES32
+
+    earnUSD_feeManager:
+      name: FeeManager
+      address: *earnUSD_feeManager
+      proxyName: TransparentUpgradeableProxy
+      implementation: *feeManagerImplementation
+      proxyChecks: {}
+      storage:
+        - slot: *EIP1967_ADMIN_SLOT
+          expected: *earnUSD_feeManagerProxyAdmin
+          label: admin
+        - slot: *EIP1967_IMPLEMENTATION_SLOT
+          expected: *feeManagerImplementation
+          label: implementation
+      checks:
+        baseAsset:
+        calculateDepositFee:
+        calculateFee:
+        calculateRedeemFee:
+        depositFeeD6: 0
+        feeRecipient: *treasury
+        minPriceD18:
+        owner: *lazyVaultAdmin
+        performanceFeeD6: 0
+        protocolFeeD6: 0
+        redeemFeeD6: 0
+        timestamps:
+      implementationChecks:
+        baseAsset:
+        calculateDepositFee:
+        calculateFee:
+        calculateRedeemFee:
+        depositFeeD6: 0
+        feeRecipient: *ZERO_ADDRESS
+        minPriceD18:
+        owner: *ZERO_ADDRESS
+        performanceFeeD6: 0
+        protocolFeeD6: 0
+        redeemFeeD6: 0
+        timestamps:
+
+    earnUSD_riskManager:
+      name: RiskManager
+      address: *earnUSD_riskManager
+      proxyName: TransparentUpgradeableProxy
+      implementation: *riskManagerImplementation
+      proxyChecks: {}
+      storage:
+        - slot: *EIP1967_ADMIN_SLOT
+          expected: *earnUSD_riskManagerProxyAdmin
+          label: admin
+        - slot: *EIP1967_IMPLEMENTATION_SLOT
+          expected: *riskManagerImplementation
+          label: implementation
+      checks:
+        ALLOW_SUBVAULT_ASSETS_ROLE: *ALLOW_SUBVAULT_ASSETS_ROLE
+        DISALLOW_SUBVAULT_ASSETS_ROLE: *DISALLOW_SUBVAULT_ASSETS_ROLE
+        MODIFY_PENDING_ASSETS_ROLE: *MODIFY_PENDING_ASSETS_ROLE
+        MODIFY_SUBVAULT_BALANCE_ROLE: *MODIFY_SUBVAULT_BALANCE_ROLE
+        MODIFY_VAULT_BALANCE_ROLE: *MODIFY_VAULT_BALANCE_ROLE
+        SET_SUBVAULT_LIMIT_ROLE: *SET_SUBVAULT_LIMIT_ROLE
+        SET_VAULT_LIMIT_ROLE: *SET_VAULT_LIMIT_ROLE
+        allowedAssetAt:
+        allowedAssets:
+        convertToShares:
+        isAllowedAsset:
+        maxDeposit:
+        pendingAssets:
+        pendingBalance:
+        pendingShares:
+        requireValidSubvault:
+        subvaultState:
+        vault: *earnUSD_vault
+        vaultState:
+      implementationChecks:
+        ALLOW_SUBVAULT_ASSETS_ROLE: *ALLOW_SUBVAULT_ASSETS_ROLE
+        DISALLOW_SUBVAULT_ASSETS_ROLE: *DISALLOW_SUBVAULT_ASSETS_ROLE
+        MODIFY_PENDING_ASSETS_ROLE: *MODIFY_PENDING_ASSETS_ROLE
+        MODIFY_SUBVAULT_BALANCE_ROLE: *MODIFY_SUBVAULT_BALANCE_ROLE
+        MODIFY_VAULT_BALANCE_ROLE: *MODIFY_VAULT_BALANCE_ROLE
+        SET_SUBVAULT_LIMIT_ROLE: *SET_SUBVAULT_LIMIT_ROLE
+        SET_VAULT_LIMIT_ROLE: *SET_VAULT_LIMIT_ROLE
+        allowedAssetAt:
+        allowedAssets:
+        convertToShares:
+        isAllowedAsset:
+        maxDeposit:
+        pendingAssets:
+        pendingBalance:
+        pendingShares:
+        requireValidSubvault:
+        subvaultState:
+        vault: *ZERO_ADDRESS
+        vaultState:
+
+    earnUSD_timelockController:
+      name: TimelockController
+      address: *earnUSD_timelockController
+      checks:
+        CANCELLER_ROLE: *CANCELLER_ROLE
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        EXECUTOR_ROLE: *EXECUTOR_ROLE
+        PROPOSER_ROLE: *PROPOSER_ROLE
+        getMinDelay: 0
+        getOperationState:
+        getRoleAdmin:
+        getTimestamp:
+        hasRole:
+          # DEFAULT_ADMIN_ROLE holders
+          - args: [*DEFAULT_ADMIN_ROLE, *lazyVaultAdmin]
+            result: true
+          - args: [*DEFAULT_ADMIN_ROLE, *earnUSD_timelockController]
+            result: true
+          # CANCELLER_ROLE holders
+          - args: [*CANCELLER_ROLE, *lazyVaultAdmin]
+            result: true
+          # PROPOSER_ROLE holders
+          - args: [*PROPOSER_ROLE, *lazyVaultAdmin]
+            result: true
+          # EXECUTOR_ROLE holders
+          - args: [*EXECUTOR_ROLE, *pauser]
+            result: true
+          - args: [*EXECUTOR_ROLE, *mellowPauser]
+            result: true
+          # Verify deployer has no roles
+          - args: [*DEFAULT_ADMIN_ROLE, *deployer]
+            result: false
+          - args: [*CANCELLER_ROLE, *deployer]
+            result: false
+          - args: [*PROPOSER_ROLE, *deployer]
+            result: false
+          - args: [*EXECUTOR_ROLE, *deployer]
+            result: false
+          # Verify mellow_deployer has no roles
+          - args: [*DEFAULT_ADMIN_ROLE, *mellow_deployer]
+            result: false
+          - args: [*CANCELLER_ROLE, *mellow_deployer]
+            result: false
+          - args: [*PROPOSER_ROLE, *mellow_deployer]
+            result: false
+          - args: [*EXECUTOR_ROLE, *mellow_deployer]
+            result: false
+        hashOperation:
+        hashOperationBatch:
+        isOperation:
+        isOperationDone:
+        isOperationPending:
+        isOperationReady:
+        supportsInterface:
+
+    # --- earnUSDc (Conservative) ---
+
+    earnUSDc_vaultProxyAdmin:
+      name: ProxyAdmin
+      address: *earnUSDc_vaultProxyAdmin
+      checks:
+        UPGRADE_INTERFACE_VERSION: "5.0.0"
+        owner: *proxyAdmin
+
+    earnUSDc_syncDepositQueueUSDCProxyAdmin:
+      name: ProxyAdmin
+      address: *earnUSDc_syncDepositQueueUSDCProxyAdmin
+      checks:
+        UPGRADE_INTERFACE_VERSION: "5.0.0"
+        owner: *proxyAdmin
+
+    earnUSDc_redeemQueueUSDCProxyAdmin:
+      name: ProxyAdmin
+      address: *earnUSDc_redeemQueueUSDCProxyAdmin
+      checks:
+        UPGRADE_INTERFACE_VERSION: "5.0.0"
+        owner: *proxyAdmin
+
+    earnUSDc_syncDepositQueueUSDTProxyAdmin:
+      name: ProxyAdmin
+      address: *earnUSDc_syncDepositQueueUSDTProxyAdmin
+      checks:
+        UPGRADE_INTERFACE_VERSION: "5.0.0"
+        owner: *proxyAdmin
+
+    earnUSDc_oracleProxyAdmin:
+      name: ProxyAdmin
+      address: *earnUSDc_oracleProxyAdmin
+      checks:
+        UPGRADE_INTERFACE_VERSION: "5.0.0"
+        owner: *proxyAdmin
+
+    earnUSDc_shareManagerProxyAdmin:
+      name: ProxyAdmin
+      address: *earnUSDc_shareManagerProxyAdmin
+      checks:
+        UPGRADE_INTERFACE_VERSION: "5.0.0"
+        owner: *proxyAdmin
+
+    earnUSDc_feeManagerProxyAdmin:
+      name: ProxyAdmin
+      address: *earnUSDc_feeManagerProxyAdmin
+      checks:
+        UPGRADE_INTERFACE_VERSION: "5.0.0"
+        owner: *proxyAdmin
+
+    earnUSDc_riskManagerProxyAdmin:
+      name: ProxyAdmin
+      address: *earnUSDc_riskManagerProxyAdmin
+      checks:
+        UPGRADE_INTERFACE_VERSION: "5.0.0"
+        owner: *proxyAdmin
+
+    earnUSDc_swapModule0ProxyAdmin:
+      name: ProxyAdmin
+      address: *earnUSDc_swapModule0ProxyAdmin
+      checks:
+        UPGRADE_INTERFACE_VERSION: "5.0.0"
+        owner: *proxyAdmin
+
+    earnUSDc_subvault0ProxyAdmin:
+      name: ProxyAdmin
+      address: *earnUSDc_subvault0ProxyAdmin
+      checks:
+        UPGRADE_INTERFACE_VERSION: "5.0.0"
+        owner: *proxyAdmin
+
+    earnUSDc_verifier0ProxyAdmin:
+      name: ProxyAdmin
+      address: *earnUSDc_verifier0ProxyAdmin
+      checks:
+        UPGRADE_INTERFACE_VERSION: "5.0.0"
+        owner: *proxyAdmin
+
+    # --- earnUSDc Vault ---
+
+    earnUSDc_vault:
+      name: Vault
+      address: *earnUSDc_vault
+      proxyName: TransparentUpgradeableProxy
+      implementation: *vaultImplementation
+      proxyChecks: {}
+      storage:
+        - slot: *EIP1967_ADMIN_SLOT
+          expected: *earnUSDc_vaultProxyAdmin
+          label: admin
+        - slot: *EIP1967_IMPLEMENTATION_SLOT
+          expected: *vaultImplementation
+          label: implementation
+      checks:
+        CREATE_QUEUE_ROLE: *CREATE_QUEUE_ROLE
+        CREATE_SUBVAULT_ROLE: *CREATE_SUBVAULT_ROLE
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        DISCONNECT_SUBVAULT_ROLE: *DISCONNECT_SUBVAULT_ROLE
+        PULL_LIQUIDITY_ROLE: *PULL_LIQUIDITY_ROLE
+        PUSH_LIQUIDITY_ROLE: *PUSH_LIQUIDITY_ROLE
+        RECONNECT_SUBVAULT_ROLE: *RECONNECT_SUBVAULT_ROLE
+        REMOVE_QUEUE_ROLE: *REMOVE_QUEUE_ROLE
+        SET_HOOK_ROLE: *SET_HOOK_ROLE
+        SET_QUEUE_LIMIT_ROLE: *SET_QUEUE_LIMIT_ROLE
+        SET_QUEUE_STATUS_ROLE: *SET_QUEUE_STATUS_ROLE
+        assetAt:
+          - args: [0]
+            result: *USDC
+          - args: [1]
+            result: *USDT
+        claimableSharesOf:
+        defaultDepositHook: *redirectingDepositHook
+        defaultRedeemHook: *basicRedeemHook
+        depositQueueFactory: *depositQueueFactory
+        feeManager: *earnUSDc_feeManager
+        getAssetCount: 2
+        getHook:
+          - args: [*earnUSDc_syncDepositQueueUSDC]
+            result: *redirectingDepositHook
+          - args: [*earnUSDc_redeemQueueUSDC]
+            result: *basicRedeemHook
+          - args: [*earnUSDc_syncDepositQueueUSDT]
+            result: *redirectingDepositHook
+        getQueueCount: 3
+        getLiquidAssets:
+        getRoleAdmin:
+        getRoleMember:
+        getRoleMemberCount:
+        getRoleMembers:
+        getStorageAt:
+        hasAsset:
+          - args: [*USDC]
+            result: true
+          - args: [*USDT]
+            result: true
+        hasQueue:
+          - args: [*earnUSDc_syncDepositQueueUSDC]
+            result: true
+          - args: [*earnUSDc_redeemQueueUSDC]
+            result: true
+          - args: [*earnUSDc_syncDepositQueueUSDT]
+            result: true
+        hasRole:
+        hasSubvault:
+          - args: [*earnUSDc_subvault0]
+            result: true
+        hasSupportedRole:
+        isDepositQueue:
+          - args: [*earnUSDc_syncDepositQueueUSDC]
+            result: true
+          - args: [*earnUSDc_redeemQueueUSDC]
+            result: false
+          - args: [*earnUSDc_syncDepositQueueUSDT]
+            result: true
+        isPausedQueue:
+          - args: [*earnUSDc_syncDepositQueueUSDC]
+            result: false
+          - args: [*earnUSDc_redeemQueueUSDC]
+            result: false
+          - args: [*earnUSDc_syncDepositQueueUSDT]
+            result: false
+        onERC721Received:
+        oracle: *earnUSDc_oracle
+        queueAt:
+          # USDC - syncDepositQueue + redeemQueue
+          - args: [*USDC, 0]
+            result: *earnUSDc_syncDepositQueueUSDC
+          - args: [*USDC, 1]
+            result: *earnUSDc_redeemQueueUSDC
+          # USDT - syncDepositQueue
+          - args: [*USDT, 0]
+            result: *earnUSDc_syncDepositQueueUSDT
+        queueLimit: 3
+        redeemQueueFactory: *redeemQueueFactory
+        riskManager: *earnUSDc_riskManager
+        shareManager: *earnUSDc_shareManager
+        subvaultAt:
+        subvaultFactory: *subvaultFactory
+        subvaults: 1
+        supportedRoleAt:
+          - args: [13]
+            result: *ACCEPT_REPORT_ROLE
+          - args: [12]
+            result: *SUBMIT_REPORTS_ROLE
+          - args: [11]
+            result: *SET_QUEUE_STATUS_ROLE
+          - args: [10]
+            result: *SET_MERKLE_ROOT_ROLE
+          - args: [9]
+            result: *SET_FLAGS_ROLE
+          - args: [8]
+            result: *PUSH_LIQUIDITY_ROLE
+          - args: [7]
+            result: *PULL_LIQUIDITY_ROLE
+          - args: [6]
+            result: *CALLER_ROLE
+          - args: [5]
+            result: *MODIFY_SUBVAULT_BALANCE_ROLE
+          - args: [4]
+            result: *MODIFY_VAULT_BALANCE_ROLE
+          - args: [3]
+            result: *ALLOW_SUBVAULT_ASSETS_ROLE
+          - args: [2]
+            result: *SET_SUBVAULT_LIMIT_ROLE
+          - args: [1]
+            result: *SET_VAULT_LIMIT_ROLE
+          - args: [0]
+            result: *DEFAULT_ADMIN_ROLE
+          - args: [14]
+            result: *SET_SECURITY_PARAMS_ROLE
+          - args: [15]
+            mustRevert: true
+        supportedRoles: 15
+        supportsInterface:
+        verifierFactory: *verifierFactory
+      implementationChecks:
+        CREATE_QUEUE_ROLE: *CREATE_QUEUE_ROLE
+        CREATE_SUBVAULT_ROLE: *CREATE_SUBVAULT_ROLE
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        DISCONNECT_SUBVAULT_ROLE: *DISCONNECT_SUBVAULT_ROLE
+        PULL_LIQUIDITY_ROLE: *PULL_LIQUIDITY_ROLE
+        PUSH_LIQUIDITY_ROLE: *PUSH_LIQUIDITY_ROLE
+        RECONNECT_SUBVAULT_ROLE: *RECONNECT_SUBVAULT_ROLE
+        REMOVE_QUEUE_ROLE: *REMOVE_QUEUE_ROLE
+        SET_HOOK_ROLE: *SET_HOOK_ROLE
+        SET_QUEUE_LIMIT_ROLE: *SET_QUEUE_LIMIT_ROLE
+        SET_QUEUE_STATUS_ROLE: *SET_QUEUE_STATUS_ROLE
+        assetAt:
+        claimableSharesOf:
+        defaultDepositHook: *ZERO_ADDRESS
+        defaultRedeemHook: *ZERO_ADDRESS
+        depositQueueFactory: *depositQueueFactory
+        feeManager: *ZERO_ADDRESS
+        getAssetCount: 0
+        getHook:
+        getLiquidAssets:
+        getRoleAdmin:
+        getRoleMember:
+        getRoleMemberCount:
+        getRoleMembers:
+        getStorageAt:
+        hasAsset:
+        hasQueue:
+        hasRole:
+        hasSubvault:
+        hasSupportedRole:
+        isDepositQueue:
+        isPausedQueue:
+        onERC721Received:
+        oracle: *ZERO_ADDRESS
+        queueAt:
+        queueLimit: 0
+        redeemQueueFactory: *redeemQueueFactory
+        riskManager: *ZERO_ADDRESS
+        shareManager: *ZERO_ADDRESS
+        subvaultAt:
+        subvaultFactory: *subvaultFactory
+        subvaults: 0
+        supportedRoleAt:
+        supportedRoles: 0
+        supportsInterface:
+        verifierFactory: *verifierFactory
+      ozAcl:
+        *DEFAULT_ADMIN_ROLE : [*lazyVaultAdmin]
+        *SET_VAULT_LIMIT_ROLE : [*mellowActiveVaultAdmin]
+        *SET_SUBVAULT_LIMIT_ROLE : [*mellowActiveVaultAdmin]
+        *ALLOW_SUBVAULT_ASSETS_ROLE : [*mellowActiveVaultAdmin]
+        *MODIFY_VAULT_BALANCE_ROLE : [*mellowActiveVaultAdmin]
+        *MODIFY_SUBVAULT_BALANCE_ROLE : [*mellowActiveVaultAdmin]
+        *CALLER_ROLE : [*mellowCurator]
+        *PULL_LIQUIDITY_ROLE : [*mellowCurator]
+        *PUSH_LIQUIDITY_ROLE : [*mellowCurator]
+        *SET_FLAGS_ROLE : [*earnUSDc_timelockController]
+        *SET_MERKLE_ROOT_ROLE : [*earnUSDc_timelockController]
+        *SET_QUEUE_STATUS_ROLE : [*earnUSDc_timelockController]
+        *SUBMIT_REPORTS_ROLE : [*earnUSDc_oracleSubmitter]
+        *ACCEPT_REPORT_ROLE : [*earnUSDc_oracleSubmitter]
+        *SET_SECURITY_PARAMS_ROLE : [*lazyVaultAdmin]
+
+    earnUSDc_subvault0:
+      name: Subvault
+      address: *earnUSDc_subvault0
+      proxyName: TransparentUpgradeableProxy
+      implementation: *subvaultImplementation
+      proxyChecks: {}
+      storage:
+        - slot: *EIP1967_ADMIN_SLOT
+          expected: *earnUSDc_subvault0ProxyAdmin
+          label: admin
+        - slot: *EIP1967_IMPLEMENTATION_SLOT
+          expected: *subvaultImplementation
+          label: implementation
+      checks:
+        getStorageAt:
+        onERC721Received:
+        vault: *earnUSDc_vault
+        verifier: *earnUSDc_verifier0
+      implementationChecks:
+        getStorageAt:
+        onERC721Received:
+        vault: *ZERO_ADDRESS
+        verifier: *ZERO_ADDRESS
+
+    earnUSDc_verifier0:
+      name: Verifier
+      address: *earnUSDc_verifier0
+      proxyName: TransparentUpgradeableProxy
+      implementation: *verifierImplementation
+      proxyChecks: {}
+      storage:
+        - slot: *EIP1967_ADMIN_SLOT
+          expected: *earnUSDc_verifier0ProxyAdmin
+          label: admin
+        - slot: *EIP1967_IMPLEMENTATION_SLOT
+          expected: *verifierImplementation
+          label: implementation
+      checks:
+        ALLOW_CALL_ROLE: *ALLOW_CALL_ROLE
+        CALLER_ROLE: *CALLER_ROLE
+        DISALLOW_CALL_ROLE: *DISALLOW_CALL_ROLE
+        SET_MERKLE_ROOT_ROLE: *SET_MERKLE_ROOT_ROLE
+        allowedCallAt:
+        allowedCalls: 0
+        getVerificationResult:
+        hashCall:
+        isAllowedCall:
+        merkleRoot: "0x1c3a764fe318890d6c5d01ec860e6ba8212dc38951ddb1b1dd71dab1e8071fed"
+        vault: *earnUSDc_vault
+        verifyCall:
+      implementationChecks:
+        ALLOW_CALL_ROLE: *ALLOW_CALL_ROLE
+        CALLER_ROLE: *CALLER_ROLE
+        DISALLOW_CALL_ROLE: *DISALLOW_CALL_ROLE
+        SET_MERKLE_ROOT_ROLE: *SET_MERKLE_ROOT_ROLE
+        allowedCallAt:
+        allowedCalls:
+        getVerificationResult:
+        hashCall:
+        isAllowedCall:
+        merkleRoot: *ZERO_BYTES32
+        vault: *ZERO_ADDRESS
+        verifyCall:
+
+    earnUSDc_syncDepositQueueUSDC:
+      name: SyncDepositQueue
+      address: *earnUSDc_syncDepositQueueUSDC
+      proxyName: TransparentUpgradeableProxy
+      implementation: *syncDepositQueueImplementation
+      proxyChecks: {}
+      storage:
+        - slot: *EIP1967_ADMIN_SLOT
+          expected: *earnUSDc_syncDepositQueueUSDCProxyAdmin
+          label: admin
+        - slot: *EIP1967_IMPLEMENTATION_SLOT
+          expected: *syncDepositQueueImplementation
+          label: implementation
+      checks:
+        SET_SYNC_DEPOSIT_PARAMS_ROLE: *SET_SYNC_DEPOSIT_PARAMS_ROLE
+        asset: *USDC
+        canBeRemoved: true
+        claim:
+        claimableOf:
+        name: "SyncDepositQueue"
+        syncDepositParams: [0, 86400] # [penaltyD6, maxAge(seconds)]
+        vault: *earnUSDc_vault
+      implementationChecks:
+        SET_SYNC_DEPOSIT_PARAMS_ROLE: *SET_SYNC_DEPOSIT_PARAMS_ROLE
+        asset: *ZERO_ADDRESS
+        canBeRemoved: true
+        claim:
+        claimableOf:
+        name: "SyncDepositQueue"
+        syncDepositParams: [0, 0]
+        vault: *ZERO_ADDRESS
+
+    earnUSDc_redeemQueueUSDC:
+      name: RedeemQueue
+      address: *earnUSDc_redeemQueueUSDC
+      proxyName: TransparentUpgradeableProxy
+      implementation: *redeemQueueImplementation
+      proxyChecks: {}
+      storage:
+        - slot: *EIP1967_ADMIN_SLOT
+          expected: *earnUSDc_redeemQueueUSDCProxyAdmin
+          label: admin
+        - slot: *EIP1967_IMPLEMENTATION_SLOT
+          expected: *redeemQueueImplementation
+          label: implementation
+      checks:
+        asset: *USDC
+        batchAt:
+        canBeRemoved: true
+        claimableOf:
+        # getState: [batchIterator, batchCount, totalDemandAssets, totalPendingShares]
+        getState:
+        requestsOf:
+        vault: *earnUSDc_vault
+      implementationChecks:
+        asset: *ZERO_ADDRESS
+        batchAt:
+        canBeRemoved: true
+        claimableOf:
+        getState:
+        requestsOf:
+        vault: *ZERO_ADDRESS
+
+    earnUSDc_syncDepositQueueUSDT:
+      name: SyncDepositQueue
+      address: *earnUSDc_syncDepositQueueUSDT
+      proxyName: TransparentUpgradeableProxy
+      implementation: *syncDepositQueueImplementation
+      proxyChecks: {}
+      storage:
+        - slot: *EIP1967_ADMIN_SLOT
+          expected: *earnUSDc_syncDepositQueueUSDTProxyAdmin
+          label: admin
+        - slot: *EIP1967_IMPLEMENTATION_SLOT
+          expected: *syncDepositQueueImplementation
+          label: implementation
+      checks:
+        SET_SYNC_DEPOSIT_PARAMS_ROLE: *SET_SYNC_DEPOSIT_PARAMS_ROLE
+        asset: *USDT
+        canBeRemoved: true
+        claim:
+        claimableOf:
+        name: "SyncDepositQueue"
+        syncDepositParams: [0, 86400] # [penaltyD6, maxAge(seconds)]
+        vault: *earnUSDc_vault
+      implementationChecks:
+        SET_SYNC_DEPOSIT_PARAMS_ROLE: *SET_SYNC_DEPOSIT_PARAMS_ROLE
+        asset: *ZERO_ADDRESS
+        canBeRemoved: true
+        claim:
+        claimableOf:
+        name: "SyncDepositQueue"
+        syncDepositParams: [0, 0]
+        vault: *ZERO_ADDRESS
+
+    earnUSDc_oracle:
+      name: Oracle
+      address: *earnUSDc_oracle
+      proxyName: TransparentUpgradeableProxy
+      implementation: *oracleImplementation
+      proxyChecks: {}
+      storage:
+        - slot: *EIP1967_ADMIN_SLOT
+          expected: *earnUSDc_oracleProxyAdmin
+          label: admin
+        - slot: *EIP1967_IMPLEMENTATION_SLOT
+          expected: *oracleImplementation
+          label: implementation
+      checks:
+        ACCEPT_REPORT_ROLE: *ACCEPT_REPORT_ROLE
+        ADD_SUPPORTED_ASSETS_ROLE: *ADD_SUPPORTED_ASSETS_ROLE
+        REMOVE_SUPPORTED_ASSETS_ROLE: *REMOVE_SUPPORTED_ASSETS_ROLE
+        SET_SECURITY_PARAMS_ROLE: *SET_SECURITY_PARAMS_ROLE
+        SUBMIT_REPORTS_ROLE: *SUBMIT_REPORTS_ROLE
+        getReport:
+        isSupportedAsset:
+          - args: [*USDC]
+            result: true
+          - args: [*USDT]
+            result: true
+        # securityParams: [maxAbsDeviation, suspAbsDeviation, maxRelDeviationD18, suspRelDeviationD18, timeout, depositInterval, redeemInterval]
+        securityParams:
+          [
+            5000000000000000000000000000,
+            1000000000000000000000000000,
+            5000000000000000,
+            1000000000000000,
+            72000,
+            3600,
+            172800,
+          ]
+        supportedAssetAt:
+          - args: [0]
+            result: *USDC
+          - args: [1]
+            result: *USDT
+          - args: [2]
+            mustRevert: true
+        supportedAssets: 2
+        validatePrice:
+        vault: *earnUSDc_vault
+      implementationChecks:
+        ACCEPT_REPORT_ROLE: *ACCEPT_REPORT_ROLE
+        ADD_SUPPORTED_ASSETS_ROLE: *ADD_SUPPORTED_ASSETS_ROLE
+        REMOVE_SUPPORTED_ASSETS_ROLE: *REMOVE_SUPPORTED_ASSETS_ROLE
+        SET_SECURITY_PARAMS_ROLE: *SET_SECURITY_PARAMS_ROLE
+        SUBMIT_REPORTS_ROLE: *SUBMIT_REPORTS_ROLE
+        getReport:
+        isSupportedAsset:
+          - args: [*USDC]
+            result: false
+        securityParams:
+        supportedAssetAt:
+          - args: [0]
+            mustRevert: true
+        supportedAssets: 0
+        validatePrice:
+        vault: *ZERO_ADDRESS
+
+    earnUSDc_oracleSubmitter:
+      name: OracleSubmitter
+      address: *earnUSDc_oracleSubmitter
+      checks:
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        acceptedAt:
+        baseAsset: *USDC
+        decimals: 6
+        getRate:
+        getRoleAdmin:
+        getRoleMember:
+        getRoleMemberCount:
+        getRoleMembers:
+        hasRole:
+        latestAnswer:
+        latestRoundData:
+        oracle: *earnUSDc_oracle
+        reportAt:
+        reports:
+        supportsInterface:
+        updatedAt:
+      ozAcl:
+        *DEFAULT_ADMIN_ROLE : [*lazyVaultAdmin]
+        *SUBMIT_REPORTS_ROLE : [*mellowOracleUpdater]
+        *ACCEPT_REPORT_ROLE : [*lazyVaultAdmin]
+
+    earnUSDc_shareManager:
+      name: BurnableTokenizedShareManager
+      address: *earnUSDc_shareManager
+      proxyName: TransparentUpgradeableProxy
+      implementation: *burnableShareManagerImplementation
+      proxyChecks: {}
+      storage:
+        - slot: *EIP1967_ADMIN_SLOT
+          expected: *earnUSDc_shareManagerProxyAdmin
+          label: admin
+        - slot: *EIP1967_IMPLEMENTATION_SLOT
+          expected: *burnableShareManagerImplementation
+          label: implementation
+      checks:
+        SET_ACCOUNT_INFO_ROLE: *SET_ACCOUNT_INFO_ROLE
+        SET_FLAGS_ROLE: *SET_FLAGS_ROLE
+        SET_WHITELIST_MERKLE_ROOT_ROLE: *SET_WHITELIST_MERKLE_ROOT_ROLE
+        accounts:
+        activeShares:
+        activeSharesOf:
+        allocatedShares:
+        allowance:
+        balanceOf:
+        claimableSharesOf:
+        decimals: 18
+        # flags: [hasMintPause, hasBurnPause, hasTransferPause, hasWhitelist, hasTransferWhitelist, globalLockup]
+        flags: [false, false, false, true, false, 0]
+        isDepositorWhitelisted:
+        name: "Conservative earnUSD"
+        sharesOf:
+        symbol: "earnUSDc"
+        totalShares:
+        totalSupply:
+        updateChecks:
+        vault: *earnUSDc_vault
+        whitelistMerkleRoot: *ZERO_BYTES32
+      implementationChecks:
+        SET_ACCOUNT_INFO_ROLE: *SET_ACCOUNT_INFO_ROLE
+        SET_FLAGS_ROLE: *SET_FLAGS_ROLE
+        SET_WHITELIST_MERKLE_ROOT_ROLE: *SET_WHITELIST_MERKLE_ROOT_ROLE
+        accounts:
+        activeShares: 0
+        activeSharesOf:
+        allocatedShares: 0
+        allowance:
+        balanceOf:
+        claimableSharesOf:
+        decimals: 18
+        flags:
+        isDepositorWhitelisted:
+        name: ""
+        sharesOf:
+        symbol: ""
+        totalShares: 0
+        totalSupply: 0
+        updateChecks:
+        vault: *ZERO_ADDRESS
+        whitelistMerkleRoot: *ZERO_BYTES32
+
+    earnUSDc_feeManager:
+      name: FeeManager
+      address: *earnUSDc_feeManager
+      proxyName: TransparentUpgradeableProxy
+      implementation: *feeManagerImplementation
+      proxyChecks: {}
+      storage:
+        - slot: *EIP1967_ADMIN_SLOT
+          expected: *earnUSDc_feeManagerProxyAdmin
+          label: admin
+        - slot: *EIP1967_IMPLEMENTATION_SLOT
+          expected: *feeManagerImplementation
+          label: implementation
+      checks:
+        baseAsset:
+        calculateDepositFee:
+        calculateFee:
+        calculateRedeemFee:
+        depositFeeD6: 0
+        feeRecipient: *treasury
+        minPriceD18:
+        owner: *lazyVaultAdmin
+        performanceFeeD6: 0
+        protocolFeeD6: 0
+        redeemFeeD6: 0
+        timestamps:
+      implementationChecks:
+        baseAsset:
+        calculateDepositFee:
+        calculateFee:
+        calculateRedeemFee:
+        depositFeeD6: 0
+        feeRecipient: *ZERO_ADDRESS
+        minPriceD18:
+        owner: *ZERO_ADDRESS
+        performanceFeeD6: 0
+        protocolFeeD6: 0
+        redeemFeeD6: 0
+        timestamps:
+
+    earnUSDc_riskManager:
+      name: RiskManager
+      address: *earnUSDc_riskManager
+      proxyName: TransparentUpgradeableProxy
+      implementation: *riskManagerImplementation
+      proxyChecks: {}
+      storage:
+        - slot: *EIP1967_ADMIN_SLOT
+          expected: *earnUSDc_riskManagerProxyAdmin
+          label: admin
+        - slot: *EIP1967_IMPLEMENTATION_SLOT
+          expected: *riskManagerImplementation
+          label: implementation
+      checks:
+        ALLOW_SUBVAULT_ASSETS_ROLE: *ALLOW_SUBVAULT_ASSETS_ROLE
+        DISALLOW_SUBVAULT_ASSETS_ROLE: *DISALLOW_SUBVAULT_ASSETS_ROLE
+        MODIFY_PENDING_ASSETS_ROLE: *MODIFY_PENDING_ASSETS_ROLE
+        MODIFY_SUBVAULT_BALANCE_ROLE: *MODIFY_SUBVAULT_BALANCE_ROLE
+        MODIFY_VAULT_BALANCE_ROLE: *MODIFY_VAULT_BALANCE_ROLE
+        SET_SUBVAULT_LIMIT_ROLE: *SET_SUBVAULT_LIMIT_ROLE
+        SET_VAULT_LIMIT_ROLE: *SET_VAULT_LIMIT_ROLE
+        allowedAssetAt:
+        allowedAssets:
+        convertToShares:
+        isAllowedAsset:
+        maxDeposit:
+        pendingAssets:
+        pendingBalance:
+        pendingShares:
+        requireValidSubvault:
+        subvaultState:
+        vault: *earnUSDc_vault
+        vaultState:
+      implementationChecks:
+        ALLOW_SUBVAULT_ASSETS_ROLE: *ALLOW_SUBVAULT_ASSETS_ROLE
+        DISALLOW_SUBVAULT_ASSETS_ROLE: *DISALLOW_SUBVAULT_ASSETS_ROLE
+        MODIFY_PENDING_ASSETS_ROLE: *MODIFY_PENDING_ASSETS_ROLE
+        MODIFY_SUBVAULT_BALANCE_ROLE: *MODIFY_SUBVAULT_BALANCE_ROLE
+        MODIFY_VAULT_BALANCE_ROLE: *MODIFY_VAULT_BALANCE_ROLE
+        SET_SUBVAULT_LIMIT_ROLE: *SET_SUBVAULT_LIMIT_ROLE
+        SET_VAULT_LIMIT_ROLE: *SET_VAULT_LIMIT_ROLE
+        allowedAssetAt:
+        allowedAssets:
+        convertToShares:
+        isAllowedAsset:
+        maxDeposit:
+        pendingAssets:
+        pendingBalance:
+        pendingShares:
+        requireValidSubvault:
+        subvaultState:
+        vault: *ZERO_ADDRESS
+        vaultState:
+
+    earnUSDc_swapModule0:
+      name: SwapModule
+      address: *earnUSDc_swapModule0
+      proxyName: TransparentUpgradeableProxy
+      implementation: *swapModuleImplementation
+      proxyChecks: {}
+      storage:
+        - slot: *EIP1967_ADMIN_SLOT
+          expected: *earnUSDc_swapModule0ProxyAdmin
+          label: admin
+        - slot: *EIP1967_IMPLEMENTATION_SLOT
+          expected: *swapModuleImplementation
+          label: implementation
+      checks:
+        BASE_MULTIPLIER: 100000000 # 1e8 (100%)
+        CALLER_ROLE: *SM_CALLER_ROLE
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        MAX_MULTIPLIER: 110000000 # 1.1e8 (110%)
+        MIN_MULTIPLIER: 90000000 # 0.9e8 (90%)
+        ROUTER_ROLE: *ROUTER_ROLE
+        SET_SLIPPAGE_ROLE: *SET_SLIPPAGE_ROLE
+        TOKEN_IN_ROLE: *TOKEN_IN_ROLE
+        TOKEN_OUT_ROLE: *TOKEN_OUT_ROLE
+        checkCowswapOrder:
+        checkMultiplier:
+        checkParams:
+        cowswapSettlement: *cowswapSettlement
+        cowswapVaultRelayer: *cowswapVaultRelayer
+        customMultiplier:
+        defaultMultiplier: 99500000 # 0.995e8 (99.5% - 0.5% max slippage)
+        evaluate:
+        getRoleAdmin:
+        getRoleMember:
+        getRoleMemberCount:
+        getRoleMembers:
+        hasRole:
+        hasSupportedRole:
+        oracle: *swapModuleOracle
+        subvault: *earnUSDc_subvault0
+        supportedRoleAt:
+        supportedRoles: 5
+        supportsInterface:
+        weth: *WETH
+      implementationChecks:
+        BASE_MULTIPLIER: 100000000 # 1e8
+        CALLER_ROLE: *SM_CALLER_ROLE
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        MAX_MULTIPLIER: 110000000 # 1.1e8
+        MIN_MULTIPLIER: 90000000 # 0.9e8
+        ROUTER_ROLE: *ROUTER_ROLE
+        SET_SLIPPAGE_ROLE: *SET_SLIPPAGE_ROLE
+        TOKEN_IN_ROLE: *TOKEN_IN_ROLE
+        TOKEN_OUT_ROLE: *TOKEN_OUT_ROLE
+        cowswapSettlement: *cowswapSettlement
+        cowswapVaultRelayer: *cowswapVaultRelayer
+        defaultMultiplier: 0
+        oracle: *ZERO_ADDRESS
+        subvault: *ZERO_ADDRESS
+        supportedRoles: 0
+        weth: *WETH
+      ozAcl:
+        *DEFAULT_ADMIN_ROLE : [*lazyVaultAdmin]
+        *SM_CALLER_ROLE : [*mellowCurator]
+        *ROUTER_ROLE : [*swapModuleRouter]
+        *SET_SLIPPAGE_ROLE : []
+        *TOKEN_IN_ROLE : [*USDC, *USDT, *sUSDe, *PYUSD, *GHO, *syrupUSDC, *AURA, *BAL, *MORPHO]
+        *TOKEN_OUT_ROLE : [*USDC, *USDT, *sUSDe, *PYUSD, *GHO, *syrupUSDC, *AURA, *BAL, *MORPHO]
+
+    earnUSDc_timelockController:
+      name: TimelockController
+      address: *earnUSDc_timelockController
+      checks:
+        CANCELLER_ROLE: *CANCELLER_ROLE
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        EXECUTOR_ROLE: *EXECUTOR_ROLE
+        PROPOSER_ROLE: *PROPOSER_ROLE
+        getMinDelay: 0
+        getOperationState:
+        getRoleAdmin:
+        getTimestamp:
+        hasRole:
+          # DEFAULT_ADMIN_ROLE holders
+          - args: [*DEFAULT_ADMIN_ROLE, *lazyVaultAdmin]
+            result: true
+          - args: [*DEFAULT_ADMIN_ROLE, *earnUSDc_timelockController]
+            result: true
+          # CANCELLER_ROLE holders
+          - args: [*CANCELLER_ROLE, *lazyVaultAdmin]
+            result: true
+          # PROPOSER_ROLE holders
+          - args: [*PROPOSER_ROLE, *lazyVaultAdmin]
+            result: true
+          # EXECUTOR_ROLE holders
+          - args: [*EXECUTOR_ROLE, *pauser]
+            result: true
+          - args: [*EXECUTOR_ROLE, *mellowPauser]
+            result: true
+          # Verify deployer has no roles
+          - args: [*DEFAULT_ADMIN_ROLE, *deployer]
+            result: false
+          - args: [*CANCELLER_ROLE, *deployer]
+            result: false
+          - args: [*PROPOSER_ROLE, *deployer]
+            result: false
+          - args: [*EXECUTOR_ROLE, *deployer]
+            result: false
+          # Verify mellow_deployer has no roles
+          - args: [*DEFAULT_ADMIN_ROLE, *mellow_deployer]
+            result: false
+          - args: [*CANCELLER_ROLE, *mellow_deployer]
+            result: false
+          - args: [*PROPOSER_ROLE, *mellow_deployer]
+            result: false
+          - args: [*EXECUTOR_ROLE, *mellow_deployer]
+            result: false
+        hashOperation:
+        hashOperationBatch:
+        isOperation:
+        isOperationDone:
+        isOperationPending:
+        isOperationReady:
+        supportsInterface:
+
+    # --- Lido Multisig Contracts ---
+
+    proxyAdmin_multisig:
+      name: GnosisSafe
+      address: *proxyAdmin
+      proxyName: GnosisSafeProxy
+      implementation: *SAFE_IMPL_1_3_0
+      proxyChecks: {}
+      checks:
+        VERSION: 1.3.0
+        approvedHashes:
+        checkNSignatures:
+        checkSignatures:
+        domainSeparator:
+        encodeTransactionData:
+        getChainId: 1
+        getModulesPaginated:
+        getOwners:
+          - *LIDO_SIGNER_3
+          - *LIDO_SIGNER_2
+          - *LIDO_SIGNER_4
+          - *LIDO_SIGNER_1
+          - *MELLOW_SIGNER_2
+          - *MELLOW_SIGNER_3
+          - *MELLOW_SIGNER_1
+          - *MELLOW_SIGNER_4
+        getStorageAt:
+        getThreshold: *PROXY_ADMIN_THRESHOLD
+        getTransactionHash:
+        isModuleEnabled:
+        isOwner:
+        nonce:
+        signedMessages:
+      implementationChecks:
+        VERSION: 1.3.0
+        approvedHashes:
+        checkNSignatures:
+        checkSignatures:
+        domainSeparator:
+        encodeTransactionData:
+        getChainId:
+        getModulesPaginated:
+        getOwners:
+        getStorageAt:
+        getThreshold: 1
+        getTransactionHash:
+        isModuleEnabled:
+        isOwner:
+        nonce: 0
+        signedMessages:
+
+    lazyVaultAdmin_multisig:
+      name: Safe
+      address: *lazyVaultAdmin
+      proxyName: SafeProxy
+      implementation: *SAFE_IMPL_1_4_1
+      proxyChecks: {}
+      checks:
+        VERSION: 1.4.1
+        approvedHashes:
+        checkNSignatures:
+        checkSignatures:
+        domainSeparator:
+        encodeTransactionData:
+        getChainId: 1
+        getModulesPaginated:
+        getOwners:
+          - *LIDO_SIGNER_5
+          - *LIDO_SIGNER_10
+          - *LIDO_SIGNER_6
+          - *LIDO_SIGNER_4
+          - *LIDO_SIGNER_2
+          - *LIDO_SIGNER_1
+          - *LIDO_SIGNER_7
+          - *LIDO_SIGNER_9
+        getStorageAt:
+        getThreshold: *LAZY_VAULT_ADMIN_THRESHOLD
+        getTransactionHash:
+        isModuleEnabled:
+        isOwner:
+        nonce:
+        signedMessages:
+      implementationChecks:
+        VERSION: 1.4.1
+        approvedHashes:
+        checkNSignatures:
+        checkSignatures:
+        domainSeparator:
+        encodeTransactionData:
+        getChainId:
+        getModulesPaginated:
+        getOwners:
+        getStorageAt:
+        getThreshold: 1
+        getTransactionHash:
+        isModuleEnabled:
+        isOwner:
+        nonce: 0
+        signedMessages:
+
+    curator_multisig:
+      name: Safe
+      address: *curator
+      proxyName: SafeProxy
+      implementation: *SAFE_IMPL_1_4_1
+      proxyChecks: {}
+      checks:
+        VERSION: 1.4.1
+        approvedHashes:
+        checkNSignatures:
+        checkSignatures:
+        domainSeparator:
+        encodeTransactionData:
+        getChainId: 1
+        getModulesPaginated:
+        getOwners:
+          - *LIDO_SIGNER_6
+          - *LIDO_SIGNER_10
+          - *LIDO_SIGNER_14
+          - *LIDO_SIGNER_7
+          - *LIDO_SIGNER_9
+        getStorageAt:
+        getThreshold: *CURATOR_THRESHOLD
+        getTransactionHash:
+        isModuleEnabled:
+        isOwner:
+        nonce:
+        signedMessages:
+      implementationChecks:
+        VERSION: 1.4.1
+        approvedHashes:
+        checkNSignatures:
+        checkSignatures:
+        domainSeparator:
+        encodeTransactionData:
+        getChainId:
+        getModulesPaginated:
+        getOwners:
+        getStorageAt:
+        getThreshold: 1
+        getTransactionHash:
+        isModuleEnabled:
+        isOwner:
+        nonce: 0
+        signedMessages:
+
+    treasury_multisig:
+      name: Safe
+      address: *treasury
+      proxyName: SafeProxy
+      implementation: *SAFE_IMPL_1_4_1
+      proxyChecks: {}
+      checks:
+        VERSION: 1.4.1
+        approvedHashes:
+        checkNSignatures:
+        checkSignatures:
+        domainSeparator:
+        encodeTransactionData:
+        getChainId: 1
+        getModulesPaginated:
+        getOwners:
+          - *LIDO_SIGNER_11
+          - *LIDO_SIGNER_12
+          - *LIDO_SIGNER_6
+          - *LIDO_SIGNER_13
+          - *LIDO_SIGNER_10
+          - *LIDO_SIGNER_7
+          - *LIDO_SIGNER_9
+        getStorageAt:
+        getThreshold: *TREASURY_THRESHOLD
+        getTransactionHash:
+        isModuleEnabled:
+        isOwner:
+        nonce:
+        signedMessages:
+      implementationChecks:
+        VERSION: 1.4.1
+        approvedHashes:
+        checkNSignatures:
+        checkSignatures:
+        domainSeparator:
+        encodeTransactionData:
+        getChainId:
+        getModulesPaginated:
+        getOwners:
+        getStorageAt:
+        getThreshold: 1
+        getTransactionHash:
+        isModuleEnabled:
+        isOwner:
+        nonce: 0
+        signedMessages:
+
+    pauser_multisig:
+      name: Safe
+      address: *pauser
+      proxyName: SafeProxy
+      implementation: *SAFE_IMPL_1_4_1
+      proxyChecks: {}
+      checks:
+        VERSION: 1.4.1
+        approvedHashes:
+        checkNSignatures:
+        checkSignatures:
+        domainSeparator:
+        encodeTransactionData:
+        getChainId: 1
+        getModulesPaginated:
+        getOwners:
+          - *LIDO_SIGNER_7
+          - *LIDO_SIGNER_8
+          - *LIDO_SIGNER_9
+          - *LIDO_SIGNER_1
+          - *LIDO_SIGNER_10
+        getStorageAt:
+        getThreshold: *PAUSER_THRESHOLD
+        getTransactionHash:
+        isModuleEnabled:
+        isOwner:
+        nonce:
+        signedMessages:
+      implementationChecks:
+        VERSION: 1.4.1
+        approvedHashes:
+        checkNSignatures:
+        checkSignatures:
+        domainSeparator:
+        encodeTransactionData:
+        getChainId:
+        getModulesPaginated:
+        getOwners:
+        getStorageAt:
+        getThreshold: 1
+        getTransactionHash:
+        isModuleEnabled:
+        isOwner:
+        nonce: 0
+        signedMessages:
+
+    # --- Mellow Multisig Contracts ---
+
+    mellowActiveVaultAdmin_multisig:
+      name: Safe
+      address: *mellowActiveVaultAdmin
+      proxyName: SafeProxy
+      implementation: *SAFE_IMPL_1_4_1
+      proxyChecks: {}
+      checks:
+        VERSION: 1.4.1
+        approvedHashes:
+        checkNSignatures:
+        checkSignatures:
+        domainSeparator:
+        encodeTransactionData:
+        getChainId: 1
+        getModulesPaginated:
+        getOwners:
+          - *EXT_MELLOW_SIGNER_2
+          - *MELLOW_SIGNER_2
+          - *MELLOW_SIGNER_3
+          - *MELLOW_SIGNER_1
+          - *MELLOW_SIGNER_4
+          - *EXT_MELLOW_SIGNER_4
+        getStorageAt:
+        getThreshold: *MELLOW_ACTIVE_VAULT_ADMIN_THRESHOLD
+        getTransactionHash:
+        isModuleEnabled:
+        isOwner:
+        nonce:
+        signedMessages:
+      implementationChecks:
+        VERSION: 1.4.1
+        approvedHashes:
+        checkNSignatures:
+        checkSignatures:
+        domainSeparator:
+        encodeTransactionData:
+        getChainId:
+        getModulesPaginated:
+        getOwners:
+        getStorageAt:
+        getThreshold: 1
+        getTransactionHash:
+        isModuleEnabled:
+        isOwner:
+        nonce: 0
+        signedMessages:
+
+    mellowCurator_multisig:
+      name: Safe
+      address: *mellowCurator
+      proxyName: SafeProxy
+      implementation: *SAFE_IMPL_1_4_1
+      proxyChecks: {}
+      checks:
+        VERSION: 1.4.1
+        approvedHashes:
+        checkNSignatures:
+        checkSignatures:
+        domainSeparator:
+        encodeTransactionData:
+        getChainId: 1
+        getModulesPaginated:
+        getOwners:
+          - *EXT_MELLOW_SIGNER_5
+          - *EXT_MELLOW_SIGNER_2
+          - *MELLOW_SIGNER_2
+          - *MELLOW_SIGNER_3
+          - *MELLOW_SIGNER_1
+          - *MELLOW_SIGNER_4
+          - *EXT_MELLOW_SIGNER_4
+        getStorageAt:
+        getThreshold: *MELLOW_CURATOR_THRESHOLD
+        getTransactionHash:
+        isModuleEnabled:
+        isOwner:
+        nonce:
+        signedMessages:
+      implementationChecks:
+        VERSION: 1.4.1
+        approvedHashes:
+        checkNSignatures:
+        checkSignatures:
+        domainSeparator:
+        encodeTransactionData:
+        getChainId:
+        getModulesPaginated:
+        getOwners:
+        getStorageAt:
+        getThreshold: 1
+        getTransactionHash:
+        isModuleEnabled:
+        isOwner:
+        nonce: 0
+        signedMessages:
+
+    mellowOracleUpdater_multisig:
+      name: Safe
+      address: *mellowOracleUpdater
+      proxyName: SafeProxy
+      implementation: *SAFE_IMPL_1_4_1
+      proxyChecks: {}
+      checks:
+        VERSION: 1.4.1
+        approvedHashes:
+        checkNSignatures:
+        checkSignatures:
+        domainSeparator:
+        encodeTransactionData:
+        getChainId: 1
+        getModulesPaginated:
+        getOwners:
+          - *EXT_MELLOW_SIGNER_5
+          - *EXT_MELLOW_SIGNER_2
+          - *MELLOW_SIGNER_2
+          - *MELLOW_SIGNER_3
+          - *MELLOW_SIGNER_1
+          - *MELLOW_SIGNER_4
+          - *EXT_MELLOW_SIGNER_4
+        getStorageAt:
+        getThreshold: *MELLOW_ORACLE_UPDATER_THRESHOLD
+        getTransactionHash:
+        isModuleEnabled:
+        isOwner:
+        nonce:
+        signedMessages:
+      implementationChecks:
+        VERSION: 1.4.1
+        approvedHashes:
+        checkNSignatures:
+        checkSignatures:
+        domainSeparator:
+        encodeTransactionData:
+        getChainId:
+        getModulesPaginated:
+        getOwners:
+        getStorageAt:
+        getThreshold: 1
+        getTransactionHash:
+        isModuleEnabled:
+        isOwner:
+        nonce: 0
+        signedMessages:
+
+    mellowPauser_multisig:
+      name: Safe
+      address: *mellowPauser
+      proxyName: SafeProxy
+      implementation: *SAFE_IMPL_1_4_1
+      proxyChecks: {}
+      checks:
+        VERSION: 1.4.1
+        approvedHashes:
+        checkNSignatures:
+        checkSignatures:
+        domainSeparator:
+        encodeTransactionData:
+        getChainId: 1
+        getModulesPaginated:
+        getOwners:
+          - *EXT_MELLOW_SIGNER_1
+          - *EXT_MELLOW_SIGNER_2
+          - *EXT_MELLOW_SIGNER_3
+          - *EXT_MELLOW_SIGNER_4
+          - *MELLOW_SIGNER_2
+          - *MELLOW_SIGNER_3
+          - *MELLOW_SIGNER_1
+          - *MELLOW_SIGNER_4
+        getStorageAt:
+        getThreshold: *MELLOW_PAUSER_THRESHOLD
+        getTransactionHash:
+        isModuleEnabled:
+        isOwner:
+        nonce:
+        signedMessages:
+      implementationChecks:
+        VERSION: 1.4.1
+        approvedHashes:
+        checkNSignatures:
+        checkSignatures:
+        domainSeparator:
+        encodeTransactionData:
+        getChainId:
+        getModulesPaginated:
+        getOwners:
+        getStorageAt:
+        getThreshold: 1
+        getTransactionHash:
+        isModuleEnabled:
+        isOwner:
+        nonce: 0
+        signedMessages:
+
+    # --- Core Infrastructure Contracts ---
+
+    factoryFactoryProxyAdmin:
+      name: ProxyAdmin
+      address: *factoryFactoryProxyAdmin
+      checks:
+        UPGRADE_INTERFACE_VERSION: "5.0.0"
+        owner: *proxyAdmin
+
+    depositQueueFactoryProxyAdmin:
+      name: ProxyAdmin
+      address: *depositQueueFactoryProxyAdmin
+      checks:
+        UPGRADE_INTERFACE_VERSION: "5.0.0"
+        owner: *proxyAdmin
+
+    redeemQueueFactoryProxyAdmin:
+      name: ProxyAdmin
+      address: *redeemQueueFactoryProxyAdmin
+      checks:
+        UPGRADE_INTERFACE_VERSION: "5.0.0"
+        owner: *proxyAdmin
+
+    feeManagerFactoryProxyAdmin:
+      name: ProxyAdmin
+      address: *feeManagerFactoryProxyAdmin
+      checks:
+        UPGRADE_INTERFACE_VERSION: "5.0.0"
+        owner: *proxyAdmin
+
+    oracleFactoryProxyAdmin:
+      name: ProxyAdmin
+      address: *oracleFactoryProxyAdmin
+      checks:
+        UPGRADE_INTERFACE_VERSION: "5.0.0"
+        owner: *proxyAdmin
+
+    riskManagerFactoryProxyAdmin:
+      name: ProxyAdmin
+      address: *riskManagerFactoryProxyAdmin
+      checks:
+        UPGRADE_INTERFACE_VERSION: "5.0.0"
+        owner: *proxyAdmin
+
+    shareManagerFactoryProxyAdmin:
+      name: ProxyAdmin
+      address: *shareManagerFactoryProxyAdmin
+      checks:
+        UPGRADE_INTERFACE_VERSION: "5.0.0"
+        owner: *proxyAdmin
+
+    subvaultFactoryProxyAdmin:
+      name: ProxyAdmin
+      address: *subvaultFactoryProxyAdmin
+      checks:
+        UPGRADE_INTERFACE_VERSION: "5.0.0"
+        owner: *proxyAdmin
+
+    verifierFactoryProxyAdmin:
+      name: ProxyAdmin
+      address: *verifierFactoryProxyAdmin
+      checks:
+        UPGRADE_INTERFACE_VERSION: "5.0.0"
+        owner: *proxyAdmin
+
+    vaultFactoryProxyAdmin:
+      name: ProxyAdmin
+      address: *vaultFactoryProxyAdmin
+      checks:
+        UPGRADE_INTERFACE_VERSION: "5.0.0"
+        owner: *proxyAdmin
+
+    consensusFactoryProxyAdmin:
+      name: ProxyAdmin
+      address: *consensusFactoryProxyAdmin
+      checks:
+        UPGRADE_INTERFACE_VERSION: "5.0.0"
+        owner: *proxyAdmin
+
+    eigenLayerVerifierFactoryProxyAdmin:
+      name: ProxyAdmin
+      address: *eigenLayerVerifierFactoryProxyAdmin
+      checks:
+        UPGRADE_INTERFACE_VERSION: "5.0.0"
+        owner: *proxyAdmin
+
+    erc20VerifierFactoryProxyAdmin:
+      name: ProxyAdmin
+      address: *erc20VerifierFactoryProxyAdmin
+      checks:
+        UPGRADE_INTERFACE_VERSION: "5.0.0"
+        owner: *proxyAdmin
+
+    symbioticVerifierFactoryProxyAdmin:
+      name: ProxyAdmin
+      address: *symbioticVerifierFactoryProxyAdmin
+      checks:
+        UPGRADE_INTERFACE_VERSION: "5.0.0"
+        owner: *proxyAdmin
+
+    swapModuleFactoryProxyAdmin:
+      name: ProxyAdmin
+      address: *swapModuleFactoryProxyAdmin
+      checks:
+        UPGRADE_INTERFACE_VERSION: "5.0.0"
+        owner: *proxyAdmin
+
+    factoryFactory:
+      name: Factory
+      address: *factoryFactory
+      proxyName: TransparentUpgradeableProxy
+      implementation: *factoryImplementation
+      proxyChecks: {}
+      storage:
+        - slot: *EIP1967_ADMIN_SLOT
+          expected: *factoryFactoryProxyAdmin
+          label: admin
+        - slot: *EIP1967_IMPLEMENTATION_SLOT
+          expected: *factoryImplementation
+          label: implementation
+      checks:
+        owner: *proxyAdmin
+        entities:
+        entityAt:
+        implementations: 1
+        implementationAt:
+          - args: [0]
+            result: *factoryImplementation
+        isBlacklisted:
+        isEntity:
+        proposalAt:
+        proposals:
+      implementationChecks:
+        owner: *ZERO_ADDRESS
+        entities: 0
+        implementations: 0
+
+    depositQueueFactory:
+      name: Factory
+      address: *depositQueueFactory
+      proxyName: TransparentUpgradeableProxy
+      implementation: *factoryImplementation
+      proxyChecks: {}
+      storage:
+        - slot: *EIP1967_ADMIN_SLOT
+          expected: *depositQueueFactoryProxyAdmin
+          label: admin
+        - slot: *EIP1967_IMPLEMENTATION_SLOT
+          expected: *factoryImplementation
+          label: implementation
+      checks:
+        owner: *proxyAdmin
+        entities:
+        entityAt:
+        implementations: 4
+        implementationAt:
+          - args: [0]
+            result: *depositQueueImplementation
+          - args: [1]
+            result: "0x00000003887dfBCEbD1e4097Ad89B690de7eFbf9"
+          - args: [2]
+            result: "0x000000002E2aeaC5Fe65AaB6fE2E6AE0e44F1A3A"
+          - args: [3]
+            result: *syncDepositQueueImplementation
+        isBlacklisted:
+        isEntity:
+        proposalAt:
+        proposals:
+      implementationChecks:
+        owner: *ZERO_ADDRESS
+        entities: 0
+        implementations: 0
+
+    redeemQueueFactory:
+      name: Factory
+      address: *redeemQueueFactory
+      proxyName: TransparentUpgradeableProxy
+      implementation: *factoryImplementation
+      proxyChecks: {}
+      storage:
+        - slot: *EIP1967_ADMIN_SLOT
+          expected: *redeemQueueFactoryProxyAdmin
+          label: admin
+        - slot: *EIP1967_IMPLEMENTATION_SLOT
+          expected: *factoryImplementation
+          label: implementation
+      checks:
+        owner: *proxyAdmin
+        entities:
+        entityAt:
+        implementations: 3
+        implementationAt:
+          - args: [0]
+            result: "0x0000000285805eac535DADdb9648F1E10DfdC411"
+          - args: [1]
+            result: "0x0000000b2082667589A16c4cF18e9f923781c471"
+          - args: [2]
+            result: *redeemQueueImplementation
+        isBlacklisted:
+        isEntity:
+        proposalAt:
+        proposals:
+      implementationChecks:
+        owner: *ZERO_ADDRESS
+        entities: 0
+        implementations: 0
+
+    feeManagerFactory:
+      name: Factory
+      address: *feeManagerFactory
+      proxyName: TransparentUpgradeableProxy
+      implementation: *factoryImplementation
+      proxyChecks: {}
+      storage:
+        - slot: *EIP1967_ADMIN_SLOT
+          expected: *feeManagerFactoryProxyAdmin
+          label: admin
+        - slot: *EIP1967_IMPLEMENTATION_SLOT
+          expected: *factoryImplementation
+          label: implementation
+      checks:
+        owner: *proxyAdmin
+        entities:
+        entityAt:
+        implementations: 1
+        implementationAt:
+          - args: [0]
+            result: *feeManagerImplementation
+        isBlacklisted:
+        isEntity:
+        proposalAt:
+        proposals:
+      implementationChecks:
+        owner: *ZERO_ADDRESS
+        entities: 0
+        implementations: 0
+
+    oracleFactory:
+      name: Factory
+      address: *oracleFactory
+      proxyName: TransparentUpgradeableProxy
+      implementation: *factoryImplementation
+      proxyChecks: {}
+      storage:
+        - slot: *EIP1967_ADMIN_SLOT
+          expected: *oracleFactoryProxyAdmin
+          label: admin
+        - slot: *EIP1967_IMPLEMENTATION_SLOT
+          expected: *factoryImplementation
+          label: implementation
+      checks:
+        owner: *proxyAdmin
+        entities:
+        entityAt:
+        implementations: 1
+        implementationAt:
+          - args: [0]
+            result: *oracleImplementation
+        isBlacklisted:
+        isEntity:
+        proposalAt:
+        proposals:
+      implementationChecks:
+        owner: *ZERO_ADDRESS
+        entities: 0
+        implementations: 0
+
+    riskManagerFactory:
+      name: Factory
+      address: *riskManagerFactory
+      proxyName: TransparentUpgradeableProxy
+      implementation: *factoryImplementation
+      proxyChecks: {}
+      storage:
+        - slot: *EIP1967_ADMIN_SLOT
+          expected: *riskManagerFactoryProxyAdmin
+          label: admin
+        - slot: *EIP1967_IMPLEMENTATION_SLOT
+          expected: *factoryImplementation
+          label: implementation
+      checks:
+        owner: *proxyAdmin
+        entities:
+        entityAt:
+        implementations: 1
+        implementationAt:
+          - args: [0]
+            result: *riskManagerImplementation
+        isBlacklisted:
+        isEntity:
+        proposalAt:
+        proposals:
+      implementationChecks:
+        owner: *ZERO_ADDRESS
+        entities: 0
+        implementations: 0
+
+    shareManagerFactory:
+      name: Factory
+      address: *shareManagerFactory
+      proxyName: TransparentUpgradeableProxy
+      implementation: *factoryImplementation
+      proxyChecks: {}
+      storage:
+        - slot: *EIP1967_ADMIN_SLOT
+          expected: *shareManagerFactoryProxyAdmin
+          label: admin
+        - slot: *EIP1967_IMPLEMENTATION_SLOT
+          expected: *factoryImplementation
+          label: implementation
+      checks:
+        owner: *proxyAdmin
+        entities:
+        entityAt:
+        implementations: 3
+        implementationAt:
+          - args: [0]
+            result: *shareManagerImplementation
+          - args: [1]
+            result: "0x00000005564AAE40D88e2F08dA71CBe156767977"
+          - args: [2]
+            result: "0x000000000c79D2B5cD58AE545afc83030233D7B6"
+        isBlacklisted:
+        isEntity:
+        proposalAt:
+        proposals:
+      implementationChecks:
+        owner: *ZERO_ADDRESS
+        entities: 0
+        implementations: 0
+
+    subvaultFactory:
+      name: Factory
+      address: *subvaultFactory
+      proxyName: TransparentUpgradeableProxy
+      implementation: *factoryImplementation
+      proxyChecks: {}
+      storage:
+        - slot: *EIP1967_ADMIN_SLOT
+          expected: *subvaultFactoryProxyAdmin
+          label: admin
+        - slot: *EIP1967_IMPLEMENTATION_SLOT
+          expected: *factoryImplementation
+          label: implementation
+      checks:
+        owner: *proxyAdmin
+        entities:
+        entityAt:
+        implementations: 1
+        implementationAt:
+          - args: [0]
+            result: *subvaultImplementation
+        isBlacklisted:
+        isEntity:
+        proposalAt:
+        proposals:
+      implementationChecks:
+        owner: *ZERO_ADDRESS
+        entities: 0
+        implementations: 0
+
+    verifierFactory:
+      name: Factory
+      address: *verifierFactory
+      proxyName: TransparentUpgradeableProxy
+      implementation: *factoryImplementation
+      proxyChecks: {}
+      storage:
+        - slot: *EIP1967_ADMIN_SLOT
+          expected: *verifierFactoryProxyAdmin
+          label: admin
+        - slot: *EIP1967_IMPLEMENTATION_SLOT
+          expected: *factoryImplementation
+          label: implementation
+      checks:
+        owner: *proxyAdmin
+        entities:
+        entityAt:
+        implementations: 1
+        implementationAt:
+          - args: [0]
+            result: *verifierImplementation
+        isBlacklisted:
+        isEntity:
+        proposalAt:
+        proposals:
+      implementationChecks:
+        owner: *ZERO_ADDRESS
+        entities: 0
+        implementations: 0
+
+    vaultFactory:
+      name: Factory
+      address: *vaultFactory
+      proxyName: TransparentUpgradeableProxy
+      implementation: *factoryImplementation
+      proxyChecks: {}
+      storage:
+        - slot: *EIP1967_ADMIN_SLOT
+          expected: *vaultFactoryProxyAdmin
+          label: admin
+        - slot: *EIP1967_IMPLEMENTATION_SLOT
+          expected: *factoryImplementation
+          label: implementation
+      checks:
+        owner: *proxyAdmin
+        entities:
+        entityAt:
+        implementations: 1
+        implementationAt:
+          - args: [0]
+            result: *vaultImplementation
+        isBlacklisted:
+        isEntity:
+        proposalAt:
+        proposals:
+      implementationChecks:
+        owner: *ZERO_ADDRESS
+        entities: 0
+        implementations: 0
+
+    consensusFactory:
+      name: Factory
+      address: *consensusFactory
+      proxyName: TransparentUpgradeableProxy
+      implementation: *factoryImplementation
+      proxyChecks: {}
+      storage:
+        - slot: *EIP1967_ADMIN_SLOT
+          expected: *consensusFactoryProxyAdmin
+          label: admin
+        - slot: *EIP1967_IMPLEMENTATION_SLOT
+          expected: *factoryImplementation
+          label: implementation
+      checks:
+        owner: *proxyAdmin
+        entities:
+        entityAt:
+        implementations: 1
+        implementationAt:
+          - args: [0]
+            result: "0x0000000167598d2C78E2313fD5328E16bD9A0b13"
+        isBlacklisted:
+        isEntity:
+        proposalAt:
+        proposals:
+      implementationChecks:
+        owner: *ZERO_ADDRESS
+        entities: 0
+        implementations: 0
+
+    eigenLayerVerifierFactory:
+      name: Factory
+      address: *eigenLayerVerifierFactory
+      proxyName: TransparentUpgradeableProxy
+      implementation: *factoryImplementation
+      proxyChecks: {}
+      storage:
+        - slot: *EIP1967_ADMIN_SLOT
+          expected: *eigenLayerVerifierFactoryProxyAdmin
+          label: admin
+        - slot: *EIP1967_IMPLEMENTATION_SLOT
+          expected: *factoryImplementation
+          label: implementation
+      checks:
+        owner: *proxyAdmin
+        entities:
+        entityAt:
+        implementations: 1
+        implementationAt:
+          - args: [0]
+            result: *eigenLayerVerifier
+        isBlacklisted:
+        isEntity:
+        proposalAt:
+        proposals:
+      implementationChecks:
+        owner: *ZERO_ADDRESS
+        entities: 0
+        implementations: 0
+
+    erc20VerifierFactory:
+      name: Factory
+      address: *erc20VerifierFactory
+      proxyName: TransparentUpgradeableProxy
+      implementation: *factoryImplementation
+      proxyChecks: {}
+      storage:
+        - slot: *EIP1967_ADMIN_SLOT
+          expected: *erc20VerifierFactoryProxyAdmin
+          label: admin
+        - slot: *EIP1967_IMPLEMENTATION_SLOT
+          expected: *factoryImplementation
+          label: implementation
+      checks:
+        owner: *proxyAdmin
+        entities:
+        entityAt:
+        implementations: 1
+        implementationAt:
+          - args: [0]
+            result: *erc20Verifier
+        isBlacklisted:
+        isEntity:
+        proposalAt:
+        proposals:
+      implementationChecks:
+        owner: *ZERO_ADDRESS
+        entities: 0
+        implementations: 0
+
+    symbioticVerifierFactory:
+      name: Factory
+      address: *symbioticVerifierFactory
+      proxyName: TransparentUpgradeableProxy
+      implementation: *factoryImplementation
+      proxyChecks: {}
+      storage:
+        - slot: *EIP1967_ADMIN_SLOT
+          expected: *symbioticVerifierFactoryProxyAdmin
+          label: admin
+        - slot: *EIP1967_IMPLEMENTATION_SLOT
+          expected: *factoryImplementation
+          label: implementation
+      checks:
+        owner: *proxyAdmin
+        entities:
+        entityAt:
+        implementations: 1
+        implementationAt:
+          - args: [0]
+            result: *symbioticVerifier
+        isBlacklisted:
+        isEntity:
+        proposalAt:
+        proposals:
+      implementationChecks:
+        owner: *ZERO_ADDRESS
+        entities: 0
+        implementations: 0
+
+    swapModuleFactory:
+      name: Factory
+      address: *swapModuleFactory
+      proxyName: TransparentUpgradeableProxy
+      implementation: *factoryImplementation
+      proxyChecks: {}
+      storage:
+        - slot: *EIP1967_ADMIN_SLOT
+          expected: *swapModuleFactoryProxyAdmin
+          label: admin
+        - slot: *EIP1967_IMPLEMENTATION_SLOT
+          expected: *factoryImplementation
+          label: implementation
+      checks:
+        owner: *proxyAdmin
+        entities:
+        entityAt:
+        implementations: 1
+        implementationAt:
+          - args: [0]
+            result: *swapModuleImplementation
+        isBlacklisted:
+        isEntity:
+        proposalAt:
+        proposals:
+      implementationChecks:
+        owner: *ZERO_ADDRESS
+        entities: 0
+        implementations: 0
+
+    eigenLayerVerifierImpl:
+      name: EigenLayerVerifier
+      address: *eigenLayerVerifier
+      checks:
+        ASSET_ROLE: *ASSET_ROLE
+        CALLER_ROLE: *EL_CALLER_ROLE
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        MELLOW_VAULT_ROLE: *MELLOW_VAULT_ROLE
+        OPERATOR_ROLE: *OPERATOR_ROLE
+        RECEIVER_ROLE: *RECEIVER_ROLE
+        STRATEGY_ROLE: *STRATEGY_ROLE
+        delegationManager:
+        getRoleAdmin:
+        getRoleMember:
+        getRoleMembers:
+        hasSupportedRole:
+        rewardsCoordinator:
+        strategyManager:
+        supportedRoleAt:
+        supportedRoles:
+        supportsInterface:
+        verifyCall:
+        hasRole:
+        getRoleMemberCount:
+          - args: [*DEFAULT_ADMIN_ROLE]
+            result: 0
+
+    erc20VerifierImpl:
+      name: ERC20Verifier
+      address: *erc20Verifier
+      checks:
+        ASSET_ROLE: *ERC20_ASSET_ROLE
+        CALLER_ROLE: *ERC20_CALLER_ROLE
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        RECIPIENT_ROLE: *ERC20_RECIPIENT_ROLE
+        getRoleAdmin:
+        getRoleMember:
+        getRoleMembers:
+        hasSupportedRole:
+        supportedRoleAt:
+        supportedRoles:
+        supportsInterface:
+        verifyCall:
+        hasRole:
+        getRoleMemberCount:
+          - args: [*DEFAULT_ADMIN_ROLE]
+            result: 0
+
+    symbioticVerifierImpl:
+      name: SymbioticVerifier
+      address: *symbioticVerifier
+      checks:
+        CALLER_ROLE: *SYMBIOTIC_CALLER_ROLE
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        MELLOW_VAULT_ROLE: *SYMBIOTIC_MELLOW_VAULT_ROLE
+        SYMBIOTIC_FARM_ROLE: *SYMBIOTIC_FARM_ROLE
+        SYMBIOTIC_VAULT_ROLE: *SYMBIOTIC_VAULT_ROLE
+        farmFactory:
+        getRoleAdmin:
+        getRoleMember:
+        getRoleMembers:
+        hasSupportedRole:
+        supportedRoleAt:
+        supportedRoles:
+        supportsInterface:
+        vaultFactory:
+        verifyCall:
+        hasRole:
+        getRoleMemberCount:
+          - args: [*DEFAULT_ADMIN_ROLE]
+            result: 0
+
+    swapModuleImpl:
+      name: SwapModule
+      address: *swapModuleImplementation
+      checks:
+        BASE_MULTIPLIER:
+        CALLER_ROLE:
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        MAX_MULTIPLIER:
+        MIN_MULTIPLIER:
+        ROUTER_ROLE:
+        SET_SLIPPAGE_ROLE:
+        TOKEN_IN_ROLE:
+        TOKEN_OUT_ROLE:
+        checkCowswapOrder:
+        checkMultiplier:
+        checkParams:
+        cowswapSettlement:
+        cowswapVaultRelayer:
+        customMultiplier:
+        defaultMultiplier:
+        evaluate:
+        getRoleAdmin:
+        getRoleMember:
+        getRoleMembers:
+        hasSupportedRole:
+        oracle:
+        subvault:
+        supportedRoleAt:
+        supportedRoles:
+        supportsInterface:
+        weth:
+        hasRole:
+        getRoleMemberCount:
+          - args: [*DEFAULT_ADMIN_ROLE]
+            result: 0
+
+    basicRedeemHook:
+      name: BasicRedeemHook
+      address: *basicRedeemHook
+      checks:
+        getLiquidAssets:
+
+    redirectingDepositHook:
+      name: RedirectingDepositHook
+      address: *redirectingDepositHook
+      checks:
+        callHook:
+
+    vaultConfigurator:
+      name: VaultConfigurator
+      address: *vaultConfigurator
+      checks:
+        feeManagerFactory: *feeManagerFactory
+        oracleFactory: *oracleFactory
+        riskManagerFactory: *riskManagerFactory
+        shareManagerFactory: *shareManagerFactory
+        vaultFactory: *vaultFactory
+
+    oracleHelper:
+      name: OracleHelper
+      address: *oracleHelper
+      checks:
+        getPricesD18:
