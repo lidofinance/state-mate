@@ -93,7 +93,7 @@ parameters:
 
   # --- Lido signers ---
   - &LIDO_SIGNER_1 "0x59F8D74Fe49d5ebEAc069E3baf07eB4b614BD5A7"
-  - &LIDO_SIGNER_2 "0xa94e4ADceC38074967b17F6e8856AB12368686B5"
+  - &LIDO_SIGNER_2 "0x9777AF8c6727D57F74f7d381AD47eB4A65f042Ff"
   - &LIDO_SIGNER_3 "0xEA685f0AF4A0BF5E7D6729b2C63eDF574D3EE27f"
   - &LIDO_SIGNER_4 "0xFB864C1127ff77215d0A8e652bB632F526A4A89f"
 
@@ -129,7 +129,7 @@ deployed:
     - &consensusImplementation "0x0000000167598d2C78E2313fD5328E16bD9A0b13"
     - &depositQueueFactory "0xBB92A7B9695750e1234BaB18F83b73686dd09854"
     - &depositQueueImplementation "0x00000006dA9f179BFE250Dd1c51cD2d3581930c8"
-    - &syncDepositQueueImplementation "0x000000002E2aeaC5Fe65AaB6fE2E6AE0e44F1A3A"
+    - &syncDepositQueueImplementation "0x000000000b98f77a017b5d3468400c5C597a3Bde"
     - &signatureDepositQueueImplementation "0x00000003887dfBCEbD1e4097Ad89B690de7eFbf9"
     - &feeManagerFactory "0xF7223356819Ea48f25880b6c2ab3e907CC336D45"
     - &feeManagerImplementation "0x0000000dE74e5D51651326E0A3e1ACA94bEAF6E1"
@@ -144,6 +144,7 @@ deployed:
     - &shareManagerFactory "0x952f39AA62E94db3Ad0d1C7D1E43C1a8519E45D8"
     - &tokenizedShareManagerImplementation "0x0000000E8eb7173fA1a3ba60eCA325bcB6aaf378"
     - &basicShareManagerImplementation "0x00000005564AAE40D88e2F08dA71CBe156767977"
+    - &burnableTokenizedShareManagerImplementation "0x000000000c79D2B5cD58AE545afc83030233D7B6"
     - &subvaultFactory "0x75FE0d73d3C64cdC1C6449D9F977Be6857c4d011"
     - &subvaultImplementation "0x0000000E535B4E063f8372933A55470e67910a66"
     - &verifierFactory "0x04B30b1e98950e6A13550d84e991bE0d734C2c61"
@@ -220,12 +221,8 @@ l1:
       implementation: *factoryImplementation
       proxyChecks: {}
       checks:
-        entities: 15
+        entities:
         entityAt:
-          - args: [15]
-            mustRevert: true
-          - args: [14]
-            result: "0xCa027f59521E808EFdaF6f338D4269833451118A" # ???
           - args: [13]
             result: *swapModuleFactory
           - args: [12]
@@ -294,7 +291,7 @@ l1:
             mustRevert: true
         proposals: 0
       implementationChecks:
-        entities: 0
+        entities:
         entityAt:
         implementationAt:
         implementations: 0
@@ -310,10 +307,8 @@ l1:
       implementation: *consensusImplementation
       proxyChecks: {}
       checks:
-        entities: 0
+        entities:
         entityAt:
-          - args: [0]
-            mustRevert: true
         implementationAt:
           - args: [0]
             result: *consensusImplementation
@@ -344,42 +339,26 @@ l1:
       implementation: *depositQueueImplementation
       proxyChecks: {}
       checks:
-        entities: 122
+        entities:
         entityAt:
           - args: [89]
             result: *depositQueueDVV
-          - args: [10]
-            result: "0x7B7Fd64b5AD770f695a30EA7ecb6559D06CA94b8" # ???ы
-          - args: [9]
-            result: "0x34b46C8e622730C7115bB71c720F939274F73bEc" # ???
-          - args: [8]
-            result: "0x729f0fE9c1BE8e4a814695277d7B56AD2427487e" # ???
-          - args: [7]
-            result: "0xfA428FDBC73AD52C12724096e73e213FCd307141" # ???
           - args: [6]
             result: *depositQueueWSTETH
           - args: [5]
             result: *depositQueueWETH
           - args: [4]
             result: *depositQueueETH
-          - args: [3]
-            result: "0x37631803CDC5aD9729dd213EB84F09467f57239c" # ???
-          - args: [2]
-            result: "0x2aB3e457EA24CfA1fCD8b88502f825F2dBCc6D2c" # ???
-          - args: [1]
-            result: "0x94EE1F30a8191201c0BBc9E0C96c36c8561d885D" # ???
-          - args: [0]
-            result: "0x2915c6aF8Ab39A8E7d300Db078488212cd75cA22" # ???
         implementationAt:
           - args: [0]
             result: *depositQueueImplementation
           - args: [1]
             result: *signatureDepositQueueImplementation
           - args: [2]
-            result: *syncDepositQueueImplementation
+            result: "0x000000002E2aeaC5Fe65AaB6fE2E6AE0e44F1A3A"
           - args: [3]
-            mustRevert: true
-        implementations: 3
+            result: *syncDepositQueueImplementation
+        implementations: 4
         isBlacklisted:
           - args: [*depositQueueImplementation]
             result: false
@@ -450,22 +429,10 @@ l1:
       implementation: *feeManagerImplementation
       proxyChecks: {}
       checks:
-        entities: 49
+        entities:
         entityAt:
-          - args: [49]
-            mustRevert: true
-          - args: [48]
-            result: "0x363C6A0AF3917b4f08Cb1D0308eCaEF97b760d7d"
-          - args: [4]
-            result: "0xf5A06675b2CEd2e6f5B61B53fBb263c4529e4263"
-          - args: [3]
-            result: "0x3fEA00B3f535fCd2A77840563b48EDFee71B0E85" #???
           - args: [2]
             result: *feeManager
-          - args: [1]
-            result: "0x06b2424D39CdB0C4EBb2ad0F886e903afA0aDa06" #???
-          - args: [0]
-            result: "0x3A7F35760298017daD55c870dB515E12c4262ecB" #???
         implementationAt:
           - args: [0]
             result: *feeManagerImplementation
@@ -510,22 +477,10 @@ l1:
       implementation: *oracleImplementation
       proxyChecks: {}
       checks:
-        entities: 49
+        entities:
         entityAt:
-          - args: [49]
-            mustRevert: true
-          - args: [48]
-            result: "0x92616e18304a6A6D33A7edd89a9998C0df734AB9"
-          - args: [4]
-            result: "0x1DD023394C3Df4B5e5067a1E5D1fE6260eC8A60D"
-          - args: [3]
-            result: "0x7AD1D268Ab39612345CDACbC53bD7FFe806a3919" # ???Ы
           - args: [2]
             result: *oracle
-          - args: [1]
-            result: "0x9c369d0Ed346bB4DB3938E70304E5c18059af5e5" # ???
-          - args: [0]
-            result: "0xD800E8925471bBe846DeFcD805D4d56C658894Ac" # ???
         implementationAt:
           - args: [0]
             result: *oracleImplementation
@@ -570,26 +525,10 @@ l1:
       implementation: *redeemQueueImplementation
       proxyChecks: {}
       checks:
-        entities: 49
+        entities:
         entityAt:
-          - args: [49]
-            mustRevert: true
-          - args: [7]
-            result: "0x52135C49e6d734866AB37e127de03B479559A018" # ???
-          - args: [6]
-            result: "0x5490729bBB5821C56F8598b856ae353435b9E993" # ???
-          - args: [5]
-            result: "0xa1CE84069E5AC305075B0d54EBc12389BF674d18" # ???
           - args: [4]
             result: *redeemQueueWSTETH
-          - args: [3]
-            result: "0x89961b1a5906Dd5651EA0d17f67961Ce24702853" # ???
-          - args: [2]
-            result: "0x9cf0d1dc2812a54F8b4613148196Ca18706E3370" # ???
-          - args: [1]
-            result: "0x873422Aab77aA6A3FD9194F76d5b3ceB03fd466f" # ???
-          - args: [0]
-            result: "0x1956669435cFEE8d1E7703D6BaB4379476F0d0f4" # ???
         implementationAt:
           - args: [0]
             result: *redeemQueueImplementation
@@ -666,22 +605,10 @@ l1:
       implementation: *factoryImplementation
       proxyChecks: {}
       checks:
-        entities: 49
+        entities:
         entityAt:
-          - args: [49]
-            mustRevert: true
-          - args: [48]
-            result: "0x98cA76347cdB297d34cAE4F172259378F4627170"
-          - args: [4]
-            result: "0x6563372Ae244C1938c3CE606aF2903Db67b2fAFE"
-          - args: [3]
-            result: "0x22D047637D6aCD0B5525b5bD1449AE9f9575FEc5" # ???
           - args: [2]
             result: *riskManager
-          - args: [1]
-            result: "0x86909e76a0Faac4A3bf1134204125592CC40EBa2" # ???
-          - args: [0]
-            result: "0x6C85dC0E59BB81B5840411cf952eC8FaA7E39b91" # ???
         implementationAt:
           - args: [0]
             result: *riskManagerImplementation
@@ -726,30 +653,18 @@ l1:
       implementation: *tokenizedShareManagerImplementation
       proxyChecks: {}
       checks:
-        entities: 49
+        entities:
         entityAt:
-          - args: [49]
-            mustRevert: true
-          - args: [48]
-            result: "0x3341F548cC9D3De05E44b40967f54e19d8889081"
-          - args: [4]
-            result: "0x50B2de62e9De33620712abF8ee060163DbB972aF"
-          - args: [3]
-            result: "0x4076D217fAA2813165235b4f0D9C03B67bfF9355" # ???
           - args: [2]
             result: *shareManager
-          - args: [1]
-            result: "0x84C6321ea04b4D69425C1045dCd86Ee38033C012" # ???
-          - args: [0]
-            result: "0x5d1Bb09E87F3f52a252893522182a00Bd8649ac7" # ???
-        implementations: 2
+        implementations: 3
         implementationAt:
           - args: [0]
             result: *tokenizedShareManagerImplementation
           - args: [1]
             result: *basicShareManagerImplementation
           - args: [2]
-            mustRevert: true
+            result: *burnableTokenizedShareManagerImplementation
         isBlacklisted:
           - args: [*tokenizedShareManagerImplementation]
             result: false
@@ -834,10 +749,8 @@ l1:
       implementation: *subvaultImplementation
       proxyChecks: {}
       checks:
-        entities: 83
+        entities:
         entityAt:
-          - args: [83]
-            mustRevert: true
           - args: [82]
             result: *subvault7
           - args: [64]
@@ -846,8 +759,6 @@ l1:
             result: *subvault5
           - args: [15]
             result: *subvault4
-          - args: [5]
-            result: "0x2e2b73616e67c1C3660111baE981483a126e8F7a" # ???
           - args: [4]
             result: *subvault3
           - args: [3]
@@ -856,8 +767,6 @@ l1:
             result: *subvault1
           - args: [1]
             result: *subvault0
-          - args: [0]
-            result: "0xDF53d349a00Cb25C33cf2A5925EF21d8c2cFD3b1" # ???
         implementationAt:
           - args: [0]
             result: *subvaultImplementation
@@ -910,10 +819,8 @@ l1:
       implementation: *verifierImplementation
       proxyChecks: {}
       checks:
-        entities: 85
+        entities:
         entityAt:
-          - args: [85]
-            mustRevert: true
           - args: [84]
             result: *verifier7
           - args: [64]
@@ -922,8 +829,6 @@ l1:
             result: *verifier5
           - args: [15]
             result: *verifier4
-          - args: [5]
-            result: "0x6AF924f6450b2B5FdE62160bdD3eD076Ad92BCa1" # ???
           - args: [4]
             result: *verifier3
           - args: [3]
@@ -932,8 +837,6 @@ l1:
             result: *verifier1
           - args: [1]
             result: *verifier0
-          - args: [0]
-            result: "0x972C2c6b0f11dC748635b00dAD36Bf0BdE08Aa82" # ???
         implementationAt:
           - args: [0]
             result: *verifierImplementation
@@ -986,22 +889,10 @@ l1:
       implementation: *vaultImplementation
       proxyChecks: {}
       checks:
-        entities: 49
+        entities:
         entityAt:
-          - args: [49]
-            mustRevert: true
-          - args: [48]
-            result: "0x8F281A5fC4Fc588842923DE678ccC48Fc36AB631"
-          - args: [4]
-            result: "0xBbFff0044990271c2588ee6b9472E547A0111E4e"
-          - args: [3]
-            result: "0xDbC81B33A23375A90c8Ba4039d5738CB6f56fE8d" # ???
           - args: [2]
             result: *vault
-          - args: [1]
-            result: "0xf328463fb20d9265C612155F4d023f8cD79916C7" # ???
-          - args: [0]
-            result: "0x54b94cFD52f4eEd446bfbB2FeD1a6CD51ce995f6" # ???
         implementationAt:
           - args: [0]
             result: *vaultImplementation
@@ -1127,10 +1018,8 @@ l1:
       implementation: *factoryImplementation
       proxyChecks: {}
       checks:
-        entities: 0
+        entities:
         entityAt:
-          - args: [0]
-            mustRevert: true
         implementationAt:
           - args: [0]
             result: *eigenLayerVerifier
@@ -1187,12 +1076,8 @@ l1:
       implementation: *ERC20Verifier
       proxyChecks: {}
       checks:
-        entities: 4
+        entities:
         entityAt:
-          - args: [4]
-            mustRevert: true
-          - args: [0]
-            result: "0x839FaCCD970b1fdCBd011e87c7d9e7975eDa40ee" # ???
         implementationAt:
           - args: [0]
             result: *ERC20Verifier
@@ -1243,10 +1128,8 @@ l1:
       implementation: *symbioticVerifier
       proxyChecks: {}
       checks:
-        entities: 0
+        entities:
         entityAt:
-          - args: [0]
-            mustRevert: true
         implementationAt:
           - args: [0]
             result: *symbioticVerifier
@@ -1938,8 +1821,8 @@ l1:
         feeRecipient: *TREASURY
         minPriceD18:
         owner: *LAZY_VAULT_ADMIN
-        performanceFeeD6: 100000
-        protocolFeeD6: 10000
+        performanceFeeD6: 0
+        protocolFeeD6: 0
         redeemFeeD6: 0
         timestamps:
       implementationChecks:
@@ -2033,7 +1916,7 @@ l1:
         getVerificationResult:
         hashCall:
         isAllowedCall:
-        merkleRoot: "0x8c650325ede9960c0ba244922bae90c331c7a54fe0bb73b487e7cac2d33f2483"
+        merkleRoot: "0x71b504c7b3713da0a673dd749430208861b3b818fc52360b5779095f76e0dd48"
         vault: *vault
         verifyCall:
       implementationChecks:
@@ -2517,7 +2400,7 @@ l1:
         getTransactionHash:
         isModuleEnabled:
         isOwner:
-        nonce: 18
+        nonce: 22
         signedMessages:
       implementationChecks:
         VERSION: 1.3.0
@@ -2750,7 +2633,7 @@ l1:
         getTransactionHash:
         isModuleEnabled:
         isOwner:
-        nonce: 1
+        nonce: 2
         signedMessages:
       implementationChecks:
         VERSION:

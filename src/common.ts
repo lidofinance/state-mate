@@ -8,6 +8,7 @@ export enum EntryField {
   name = "name",
   address = "address",
   checks = "checks",
+  storage = "storage",
   proxyChecks = "proxyChecks",
   implementationChecks = "implementationChecks",
   ozNonEnumerableAcl = "ozNonEnumerableAcl",

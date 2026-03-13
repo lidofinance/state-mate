@@ -149,12 +149,26 @@ const ImplementationChecksTB = Type.Optional(RegularChecksTB);
 
 const OzAclChecksTB = Type.Readonly(Type.Record(Type.String(), EthereumStringArrayTB, { additionalProperties: false }));
 
+// Storage slot checks: array of {slot, expected, label?} entries
+const StorageCheckEntryTB = Type.Readonly(
+  Type.Object(
+    {
+      slot: EthereumStringTB,
+      expected: EthereumStringTB,
+      label: Type.Optional(Type.String()),
+    },
+    { additionalProperties: false },
+  ),
+);
+const StorageChecksTB = Type.Readonly(Type.Array(StorageCheckEntryTB));
+
 const RegularContractEntryTB = Type.Readonly(
   Type.Object(
     {
       address: EthereumStringTB,
       name: Type.String(),
       checks: RegularChecksTB,
+      storage: Type.Optional(StorageChecksTB),
       ozNonEnumerableAcl: Type.Optional(OzNonEnumerableAclTB),
       ozAcl: Type.Optional(OzAclChecksTB),
     },

@@ -10,12 +10,18 @@ import chalk from "chalk";
 import { JsonRpcProvider } from "ethers";
 import * as YAML from "yaml";
 
-import { checkAllAbi, flushAbiUpdates, renameAllAbiToLowerCase, resetAbiModeCache } from "./abi-provider";
+import {
+  abiExistsForAddress,
+  checkAllAbi,
+  flushAbiUpdates,
+  renameAllAbiToLowerCase,
+  resetAbiModeCache,
+} from "./abi-provider";
 import { doGenerateBoilerplate } from "./boilerplate-generator";
 import { parseCmdLineArguments } from "./cli-parser";
 import { printError, readUrlOrFromEnvironment } from "./common";
 import { loadContractInfoFromExplorer } from "./explorer-provider";
-import { FAILURE_MARK, log, logError, logErrorAndExit, logHeader1, WARNING_MARK } from "./logger";
+import { FAILURE_MARK, log, logError, logErrorAndExit, logHeader1, SUCCESS_MARK, WARNING_MARK } from "./logger";
 import { g_error_details, g_errors, g_total_checks } from "./section-validators/base";
 import { ContractSectionValidator } from "./section-validators/contract";
 import {
@@ -74,8 +80,7 @@ function validateJsonWithSchema<T extends TSchema>(
   schemaPrototype: T,
   { silent }: { silent: boolean } = { silent: false },
 ): jsonDocument is Static<T> {
-  if (!silent)
-    logHeader1(`The YAML file at ${chalk.yellow(g_Arguments.configPath)} will be validated against the JSON Schema`);
+  if (!silent) log(`Validating ${chalk.yellow(g_Arguments.configPath)} against schema...`);
 
   const ajv = new Ajv({ verbose: true, allErrors: true });
   addFormats(ajv);
@@ -102,10 +107,7 @@ function validateJsonWithSchema<T extends TSchema>(
         `Please correct them and try again\n\n${formatAjvErrors(validate.errors)} `,
     );
   }
-  if (!silent)
-    logHeader1(
-      `The YAML file at ${chalk.yellow(g_Arguments.configPath)} has successfully passed validation against the JSON Schema`,
-    );
+  if (!silent) log(`${SUCCESS_MARK} Schema validation passed\n`);
   return true;
 }
 
@@ -113,15 +115,19 @@ async function doChecks(jsonDocument: EntireDocument) {
   for (const [sectionTitle, section] of Object.entries(jsonDocument)) {
     if (isTypeOfTB(section, NetworkSectionTB)) await checkNetworkSection(sectionTitle, section);
   }
-  if (g_Arguments.checkOnly) {
-    log(
-      `\n${WARNING_MARK}${WARNING_MARK}${WARNING_MARK} Checks run only for "${chalk.bold(chalk.blue(g_Arguments.checkOnlyCmdArg))}"\n`,
-    );
-  }
-  log(chalk.bold(`\n${g_total_checks} checks performed.`));
-  if (g_errors) {
-    log(`\n${FAILURE_MARK} ${chalk.bold(`${g_errors} errors found!`)} `);
+  // Show final summary (outside the tree)
+  log(""); // Separator line
+  const statusMark = g_errors ? FAILURE_MARK : SUCCESS_MARK;
+  const statusMessage = g_errors
+    ? `${g_total_checks} checks, ${chalk.red(`${g_errors} errors`)}`
+    : `${g_total_checks} checks passed`;
+  log(`${statusMark} ${chalk.bold("Total:")} ${statusMessage}`);
 
+  if (g_Arguments.checkOnly) {
+    log(`${WARNING_MARK} filtered: ${chalk.yellow(`"${g_Arguments.checkOnlyCmdArg}"`)}`);
+  }
+
+  if (g_errors) {
     // Display detailed error summary
     if (g_error_details.length > 0) {
       logHeader1("Error Summary");
@@ -187,6 +193,11 @@ async function iterateLoadedContracts<T extends EntireDocument | SeedDocument>(
         log(`\n${WARNING_MARK} ${chalk.yellow(`The env var ${explorerTokenEnv} is not set`)}\n`);
       }
       for (const address of addresses) {
+        // Skip explorer call if ABI already exists and we only want to update missing
+        if (g_Arguments.updateAbiMissingOnly && abiExistsForAddress(address)) {
+          log(`ABI ${chalk.magenta(address)} ${chalk.green("Skipped (exists)")}`);
+          continue;
+        }
         const contractInfo = await loadContractInfoFromExplorer(
           address,
           explorerHostname,

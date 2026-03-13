@@ -14,8 +14,8 @@
     "consolidate-abi": "sh -c 'ts-node src/consolidate-abis.ts \"$1\" --compress' --",
     "lint": "eslint . --max-warnings=0",
     "lint:fix": "yarn lint --fix",
-    "format": "prettier . --ignore-path .gitignore --check",
-    "format:fix": "prettier . --ignore-path .gitignore --write",
+    "format": "prettier . --ignore-path .gitignore --ignore-path .prettierignore --check",
+    "format:fix": "prettier . --ignore-path .gitignore --ignore-path .prettierignore --write",
     "postinstall": "husky",
     "test": "ts-node src/test-util/app.ts",
     "schemas": "ts-node src/gen-schemas.ts"

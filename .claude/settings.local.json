@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(yarn start:*)",
+      "Bash(yarn format:*)",
+      "Bash(yarn lint:*)",
+      "Bash(yarn tsc:*)",
+      "Bash(cast call:*)",
+      "Bash(cast interface:*)",
+      "Bash(cast storage:*)",
+      "Bash(cast code:*)",
+      "Bash(cast chain-id:*)",
+      "Bash(gh api:*)",
+      "Bash(gh pr:*)",
+      "Bash(gh run:*)",
+      "WebFetch(domain:etherscan.io)"
+    ]
+  }
+}
