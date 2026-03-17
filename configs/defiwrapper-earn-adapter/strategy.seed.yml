@@ -2,8 +2,8 @@
 ---
 deployed:
   l1:
-    - &mellowStrategyFactory "0x600dbe07673e9c3445af10b8c7f6285370964333"
-    - &strategyCallForwarder "0x542d7Ae9ad8F4b1551d32e43455B4FCCD68CF93b"
+    - &mellowStrategyFactory "0x8Fac09FD82F031D390B94622E2E4baBf16Fd2236"
+    - &strategyCallForwarder "0x7305bB45aF91893B7BCaF0Ad8Eae37cb16820Bb8"
 
 l1:
   rpcUrl: MAINNET_REMOTE_RPC_URL # https://ethereum-rpc.publicnode.com
