@@ -1,0 +1,12 @@
+# yaml-language-server: $schema=./../../schemas/seed-schema.json
+---
+deployed:
+  l1:
+    - &mellowStrategyFactory "0x8Fac09FD82F031D390B94622E2E4baBf16Fd2236"
+    - &strategyCallForwarder "0x7305bB45aF91893B7BCaF0Ad8Eae37cb16820Bb8"
+
+l1:
+  rpcUrl: MAINNET_REMOTE_RPC_URL # https://ethereum-rpc.publicnode.com
+  explorerHostname: api.etherscan.io
+  chainId: 1
+  explorerTokenEnv: ETHERSCAN_TOKEN
