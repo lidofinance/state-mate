@@ -27,7 +27,7 @@ deployed:
     - &triggerableWithdrawalsGateway "0x6679090D92b08a2a686eF8614feECD8cDFE209db"
     - &validatorExitDelayVerifier "0xa5F5A9360275390fF9728262a29384399f38d2f0"
     - &vaultHub "0x4C9fFC325392090F789255b9948Ab1659b797964"
-    - &vaultHubImplAddress "0x932d97b59B8846796469C129AB1b83c2a855a3F7"
+    - &vaultHubImplAddress "0xAd2C869FE66Ff4c0E347A0824Af92D2B7C91288A"
     - &predepositGuarantee "0xa5F55f3402beA2B14AE15Dae1b6811457D43581d"
     - &predepositGuaranteeImplAddress "0xd1245b75d243a7e0b655479043f9c30b3e8717f5"
     - &operatorGrid "0x501e678182bB5dF3f733281521D3f3D1aDe69917"
@@ -52,7 +52,7 @@ deployed:
     - &postTokenRebaseReceiver "0x9c53d0075eA00ad77dDAd1b71E67bb97AaBC1e3D"
     - &oracleDaemonConfig "0x2a833402e3F46fFC1ecAb3598c599147a78731a9"
     - &lazyOracle "0xf41491C79C30e8f4862d3F4A5b790171adB8e04A"
-    - &lazyOracleImplAddress "0x4e3b9fd9F713e5dbA86255febD4c402794135095"
+    - &lazyOracleImplAddress "0xC372aBC601C4eE5aA82CA2bcb54Da5a1Ef492E82"
 
     # --- DAO & Aragon apps ---
     - &aragonRepoBase "0xD03e828844AA4eF31566F984Fe2A1693e7d5aF38"
