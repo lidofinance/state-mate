@@ -4,9 +4,13 @@
 # Checks state AFTER the vote executes.
 
 parameters:
-  # --- Oracle member being rotated ---
+  # --- Oracle member being rotated (first rotation) ---
   - &oldOracleAddress "0x285f8537e1daeedaf617e96c742f2cf36d63ccfb"
   - &newOracleAddress "0x8dB977C13CAA938BC58464bFD622DF0570564b78"
+
+  # --- Oracle member being rotated (stakefish) ---
+  - &oldStakefishOracle "0x946D3b081ed19173dC83Cd974fC69e1e760B7d78"
+  - &newStakefishOracle "0x042a9e5acCfa17e28300F1b5967f20891E973922"
 
   # --- EasyTrack non-contract addresses ---
   - &evmScriptExecutor "0xFE5986E06210aC1eCC1aDCafc0cc7f8D63B3F977"
@@ -70,6 +74,10 @@ l1:
             result: false
           - args: [*newOracleAddress]
             result: true
+          - args: [*oldStakefishOracle]
+            result: false
+          - args: [*newStakefishOracle]
+            result: true
         getMembers: null
         getQuorum: null
         getReportProcessor: null
@@ -103,6 +111,10 @@ l1:
             result: false
           - args: [*newOracleAddress]
             result: true
+          - args: [*oldStakefishOracle]
+            result: false
+          - args: [*newStakefishOracle]
+            result: true
         getMembers: null
         getQuorum: null
         getReportProcessor: null
@@ -135,6 +147,10 @@ l1:
           - args: [*oldOracleAddress]
             result: false
           - args: [*newOracleAddress]
+            result: true
+          - args: [*oldStakefishOracle]
+            result: false
+          - args: [*newStakefishOracle]
             result: true
         getMembers: null
         getQuorum: null
