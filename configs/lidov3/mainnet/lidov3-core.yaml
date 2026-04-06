@@ -1415,19 +1415,20 @@ l1:
         pendingRequests: null
         pendingRequestsCount: null
         supportsInterface: null
-        tier:
-          - args: [*DEFAULT_TIER_ID]
-            result:
-              [
-                *DEFAULT_TIER_OPERATOR,
-                *DEFAULT_TIER_SHARE_LIMIT,
-                0,
-                *DEFAULT_TIER_RR,
-                *DEFAULT_TIER_SHARE_FRT,
-                *DEFAULT_TIER_INFRA_FEE,
-                *DEFAULT_TIER_LIQUIDITY_FEE,
-                *DEFAULT_TIER_RESERVATION_FEE,
-              ]
+        tier: null
+        # TODO: handle case when one of the values is dynamic (third one in this case)
+        # - args: [*DEFAULT_TIER_ID]
+        #   result:
+        #     [
+        #       *DEFAULT_TIER_OPERATOR,
+        #       *DEFAULT_TIER_SHARE_LIMIT,
+        #       0,
+        #       *DEFAULT_TIER_RR,
+        #       *DEFAULT_TIER_SHARE_FRT,
+        #       *DEFAULT_TIER_INFRA_FEE,
+        #       *DEFAULT_TIER_LIQUIDITY_FEE,
+        #       *DEFAULT_TIER_RESERVATION_FEE,
+        #     ]
         vaultInfo: null
       ozAcl:
         *DEFAULT_ADMIN_ROLE : [*aragonAgent]
