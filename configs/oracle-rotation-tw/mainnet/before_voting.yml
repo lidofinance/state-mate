@@ -10,6 +10,7 @@ parameters:
   - &newChorusOneOracleAddress "0x8dB977C13CAA938BC58464bFD622DF0570564b78"
 
   # --- Oracle member being rotated (stakefish) ---
+  # https://research.lido.fi/t/expansion-of-lidos-ethereum-oracle-set/2836/81
   - &oldStakefishOracle "0x946D3b081ed19173dC83Cd974fC69e1e760B7d78"
   - &newStakefishOracle "0x042a9e5acCfa17e28300F1b5967f20891E973922"
 
