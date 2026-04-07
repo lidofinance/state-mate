@@ -793,7 +793,7 @@ l1:
           - *LIDO_SIGNER_2
           - *LIDO_SIGNER_1
           - *LIDO_SIGNER_7
-          - *LIDO_SIGNER_9
+          - *LIDO_SIGNER_13
         getStorageAt:
         getThreshold: *LAZY_VAULT_ADMIN_THRESHOLD
         getTransactionHash:
