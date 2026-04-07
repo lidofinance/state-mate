@@ -529,18 +529,8 @@ l1:
         *SM_CALLER_ROLE : [*curator]
         *ROUTER_ROLE : [*swapModuleRouter]
         *SET_SLIPPAGE_ROLE : []
-        *TOKEN_IN_ROLE :
-          [
-            *SWAP_MODULE_TOKEN_0,
-            *SWAP_MODULE_TOKEN_1,
-            *USDC,
-          ]
-        *TOKEN_OUT_ROLE :
-          [
-            *SWAP_MODULE_TOKEN_0,
-            *SWAP_MODULE_TOKEN_1,
-            *USDC,
-          ]
+        *TOKEN_IN_ROLE : [*SWAP_MODULE_TOKEN_0, *SWAP_MODULE_TOKEN_1, *USDC]
+        *TOKEN_OUT_ROLE : [*SWAP_MODULE_TOKEN_0, *SWAP_MODULE_TOKEN_1, *USDC]
 
     earnUSDe_oracle:
       name: Oracle
