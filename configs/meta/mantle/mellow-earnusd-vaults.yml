@@ -1,5 +1,5 @@
 # yaml-language-server: $schema=../../../schemas/main-schema.json
-# Source config for Experimental earnUSD (earnUSDe) on Plasma
+# Source config for Experimental earnUSD (earnUSDe) on Mantle
 # GitHub: https://github.com/mellow-finance/flexible-vaults
 #
 # Vaults included:
@@ -11,7 +11,7 @@ deployed:
     - &vaultImplementation "0x0000000070f44289ec5ea3E5972f058f75B29801"
     - &subvaultImplementation "0x00000000CA30010B8417f791250AE221FdaD5920"
     - &verifierImplementation "0x000000007e86a96e279662108cc19bA4c32EdE3C"
-    - &swapModuleImplementation "0x00000000015fa996bca8c842afedc334616f283a"
+    - &swapModuleImplementation "0x0000000042e248f84df6ba1e768f878b1f2bae9f"
     - &oracleImplementation "0x000000009adE4dAE1f868775A3f087945983f062"
     - &shareManagerImplementation "0x00000000861e8B90B81f35C18cA14858Cc91d1Df"
     - &feeManagerImplementation "0x00000000C18039E1F415fe07C33A316232238648"
@@ -27,14 +27,14 @@ deployed:
     - &SAFE_IMPL_1_4_1 "0x29fcB43b46531BcA003ddC8FCB67FFE91900C762"
 
     # --- earnUSDe Vault ---
-    - &earnUSDe_vault "0x3Ce1F83E9c95fc8b60e7ab36B3238A8257710862"
-    - &earnUSDe_vaultProxyAdmin "0x21ae4028cbb5d03ba1a8f290d9354f40f71be0f8"
-    - &earnUSDe_subvault0 "0xbd33C99D72BDfe71BE4eFD5b6B2A42d3Daf96e0f"
-    - &earnUSDe_subvault0ProxyAdmin "0x01f10385402f965cad335eb16f662feadae90d74"
-    - &earnUSDe_verifier0 "0x96383b3120B4437FE679c21aCb75ae19429b446D"
-    - &earnUSDe_verifier0ProxyAdmin "0x2fdb8536529adefd8acba32443728a214cbcf2b7"
-    - &earnUSDe_swapModule0 "0x1818D85D411938667AE13d34f32878F067793FeC"
-    - &earnUSDe_swapModule0ProxyAdmin "0x1b91d8f594becea0294d6092f52d9bd70dfbab81"
+    - &earnUSDe_vault "0x8e85760747F7280254575F4e911A7a2814Fc266E"
+    - &earnUSDe_vaultProxyAdmin "0x7f20db46b31bdd464cc647436791d20b51002c28"
+    - &earnUSDe_subvault0 "0xdF309792cb9feD4C453fA3B6aC0DDc5FBA8fa7f2"
+    - &earnUSDe_subvault0ProxyAdmin "0x58ea00b0591d2b78bc5f02e9b1251453e3763549"
+    - &earnUSDe_verifier0 "0xcd0Aa7d031d37C85AB3b77478e2FF8A260a865a3"
+    - &earnUSDe_verifier0ProxyAdmin "0x167d194f1c4106e2868bd930da5835955f8c9ef6"
+    - &earnUSDe_swapModule0 "0x8b3270b6bC2272126dD350944D17bcB23A32C624"
+    - &earnUSDe_swapModule0ProxyAdmin "0xec1522c98ad78159073b86e7fe1d9dcfbb9e8232"
     - &earnUSDe_oracle "0xE2aaefF18a0FA0389D6e5B64199727C21530b787"
     - &earnUSDe_oracleProxyAdmin "0x79318580ec9c1158eeda4ad4b0e4c969d0efcc63"
     - &earnUSDe_shareManager "0x134eA36E03b5e59dbddf2535084e342d84f2A043"
@@ -43,7 +43,10 @@ deployed:
     - &earnUSDe_feeManagerProxyAdmin "0xeab81b2aa95a92219446ebbdb36e4817188f4fad"
     - &earnUSDe_riskManager "0x9111E027ABB6269E7f1a10860b4DaA3f66054735"
     - &earnUSDe_riskManagerProxyAdmin "0x9f5437e484f01ead3cf0b97e2dfb5bbf8bf8a99b"
-    - &earnUSDe_timelockController "0x61fB5220a2bA26dF7a1635625e5b3305b333FD7f"
+    - &earnUSDe_timelockController "0xFb492a69ab7329a28180B55B0756b80d2f15c5b0"
+    # Ref: AaveV3Mantle.ORACLE (Aave V3 official oracle on Mantle)
+    # https://github.com/bgd-labs/aave-address-book/blob/main/src/ts/AaveV3Mantle.ts
+    - &earnUSDe_swapModuleOracle "0x47a063CfDa980532267970d478EC340C0F80E8df"
 
     # --- Actors ---
     - &proxyAdmin "0x81698f87C6482bF1ce9bFcfC0F103C4A0Adf0Af0"
@@ -51,6 +54,7 @@ deployed:
     - &activeVaultAdmin "0x982aB69785f5329BB59c36B19CBd4865353fEf10"
     - &curator "0x9745F161b0160a99924845BeFCE1d7b9Daee6899"
     - &treasury "0xcCf2daba8Bb04a232a2fDA0D01010D4EF6C69B85"
+    - &oracleUpdater "0x93a797643d74fC81e7A51F3f84a9D78F930435D1"
     - &lidoPauser "0xA916fD5252160A7E56A6405741De76dc0Da5A0Cd"
     - &mellowPauser "0x6E887aF318c6b29CEE42Ea28953Bd0BAdb3cE638"
 
@@ -66,27 +70,65 @@ misc:
 
   # --- Multisig thresholds ---
   - &PROXY_ADMIN_THRESHOLD 5
+  - &LAZY_VAULT_ADMIN_THRESHOLD 5
+  - &TREASURY_THRESHOLD 4
   - &LIDO_PAUSER_THRESHOLD 3
+  - &ACTIVE_VAULT_ADMIN_THRESHOLD 3
+  - &CURATOR_THRESHOLD 3
+  - &ORACLE_UPDATER_THRESHOLD 3
+  - &MELLOW_PAUSER_THRESHOLD 1
 
-  # --- Lido signers (ProxyAdmin Safe) ---
-  - &LIDO_SIGNER_1 "0xEA685f0AF4A0BF5E7D6729b2C63eDF574D3EE27f"
-  - &LIDO_SIGNER_4 "0x59F8D74Fe49d5ebEAc069E3baf07eB4b614BD5A7"
+  # --- Tokens ---
+  # Ref: Wrapped Mantle (WMNT)
+  # https://docs.mantle.xyz/governance/parameters/tokenomics
+  - &NATIVE_WRAPPED "0x78c1b0C915c4FAA5FffA6CAbf0219DA63d7f4cb8"
+  # Ref: USDT0 on Mantle
+  # https://docs.usdt0.to/technical-documentation/deployments
+  - &SWAP_MODULE_TOKEN_0 "0x779Ded0c9e1022225f8E0630b35a9b54bE713736"
+  # Ref: Ethena USDe (same address on all L2s except ZKSync/Zircuit)
+  # https://docs.ethena.fi/solution-design/key-addresses
+  - &SWAP_MODULE_TOKEN_1 "0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34"
+  # Ref: Ethena sUSDe (Staked USDe, same address on all L2s except ZKSync/Zircuit)
+  # https://docs.ethena.fi/solution-design/key-addresses
+  - &SWAP_MODULE_TOKEN_2 "0x211Cc4DD073734dA055fbF44a2b4667d5E5fE5d2"
 
-  # --- Mellow signers (ProxyAdmin Safe) ---
+  # --- CoW Protocol ---
+  # Ref: CoW Protocol core contracts (GPv2Settlement + GPv2VaultRelayer)
+  # https://docs.cow.fi/cow-protocol/reference/contracts/core
+  - &cowswapSettlement "0x9008D19f58AAbD9eD0D60971565AA8510560ab41"
+  - &cowswapVaultRelayer "0xC92E8bdf79f0507f65a392b0ab4667716BFE0110"
+
+  # --- SwapModule external ---
+  # Ref: LI.FI Diamond (aggregator router, same address on most networks)
+  # https://docs.li.fi/smart-contracts/deployments-contract-addresses
+  - &swapModuleRouter "0x1231DEB6f5749EF6cE6943a275A1D3E7486F4EaE"
+
+  # --- Lido signers ---
+  - &LIDO_SIGNER_1 "0x59F8D74Fe49d5ebEAc069E3baf07eB4b614BD5A7"
+  - &LIDO_SIGNER_2 "0x9777AF8c6727D57F74f7d381AD47eB4A65f042Ff"
+  - &LIDO_SIGNER_3 "0xEA685f0AF4A0BF5E7D6729b2C63eDF574D3EE27f"
+  - &LIDO_SIGNER_4 "0xFB864C1127ff77215d0A8e652bB632F526A4A89f"
+  - &LIDO_SIGNER_5 "0x912e21CdA3D7012146da4Df33309d860a9eb0bEb"
+  - &LIDO_SIGNER_6 "0x73B254db9cb71a129C4E73aF087D71Ac7d34a8d7"
+  - &LIDO_SIGNER_7 "0x59d07dc34B135B17b87840a86BFF7302039E7EDf"
+  - &LIDO_SIGNER_9 "0x8ecd93982FfbB2f937ADa6c6e50d1950974081C0"
+  - &LIDO_SIGNER_10 "0x75D95fF8D48E2Ca5c4235322A8AC8e52A76124cD"
+  - &LIDO_SIGNER_13 "0xf2374BCb265505002055942D070459a4d2011012"
+  - &LIDO_SIGNER_11 "0xE6CD29BF19769E44534099d241abAa07aa8c8E9a"
+  - &LIDO_SIGNER_12 "0x8aA493BcD7f989caD67dd3CB48A4c2E6b40FeDB0"
+
+  # --- Mellow signers ---
   - &MELLOW_SIGNER_1 "0x44A388BBD782AE1D7f4542aEb6C3569E2CfdF5a1"
   - &MELLOW_SIGNER_2 "0x185111c113d9B19Ea4C424D3cD8628A1ee09Be6A"
   - &MELLOW_SIGNER_3 "0x06C3992a6067bEA8FB3Af7F004EdEbC13656761F"
   - &MELLOW_SIGNER_4 "0x8888843c607F4Bbd6aD72128F478085256Bdd15D"
 
-  # --- Lido signers (ProxyAdmin Safe additional) ---
-  - &LIDO_SIGNER_3 "0xFB864C1127ff77215d0A8e652bB632F526A4A89f"
-  - &LIDO_SIGNER_2 "0xa94e4ADceC38074967b17F6e8856AB12368686B5"
-
-  # --- Lido signers (LidoPauser Safe) ---
-  - &LIDO_PAUSER_SIGNER_1 "0x59d07dc34B135B17b87840a86BFF7302039E7EDf"
-  - &LIDO_PAUSER_SIGNER_2 "0x04e7C0350241b818eE5c92cc260008C9898F41cf"
-  - &LIDO_PAUSER_SIGNER_3 "0xc7a8DE05264442A318189f2bd160d2830902C8CD"
-  - &LIDO_PAUSER_SIGNER_4 "0x75D95fF8D48E2Ca5c4235322A8AC8e52A76124cD"
+  # --- External Mellow signers ---
+  - &EXT_MELLOW_SIGNER_1 "0x78Eb634731bE1957D370BEcbbD254F427Af5D13b"
+  - &EXT_MELLOW_SIGNER_2 "0xe49384e6Aca6A26c82Eaa161A9211fA60fEee3Ef"
+  - &EXT_MELLOW_SIGNER_3 "0x112C1aAB1463A32eD8B1f5F2e8b5244D876Ef740"
+  - &EXT_MELLOW_SIGNER_4 "0x1f3E4c3dBF27056CD7881D8eb376B1D7815757a6"
+  - &EXT_MELLOW_SIGNER_5 "0x5fa3B054D91aF2e1dC76124D7E774044697b942e"
 
   # --- Deployer ---
   - &deployer "0x5C0F3DE4ba6AD53bb8E27f965170A52671e525Bf"
@@ -145,13 +187,13 @@ roles:
   - &TOKEN_OUT_ROLE "0x9d556436fc766d4a6d24fe48c90073bc03600d7556265a3217def4578d7c2531"
 
 l1:
-  rpcUrl: PLASMA_RPC_URL
-  explorerHostname: api.routescan.io/v2/network/mainnet/evm/9745/etherscan
-  explorerTokenEnv: PLASMA_API_KEY
-  chainId: 9745
+  rpcUrl: MANTLE_RPC_URL
+  explorerHostname: api.etherscan.io/v2/api
+  explorerTokenEnv: ETHERSCAN_TOKEN
+  chainId: 5000
   contracts:
     # =============================================
-    # === earnUSDe (Experimental) - Plasma ===
+    # === earnUSDe (Experimental) - Mantle ===
     # =============================================
 
     # --- ProxyAdmin Contracts ---
@@ -338,19 +380,20 @@ l1:
         verifierFactory: *verifierFactory
       ozAcl:
         *DEFAULT_ADMIN_ROLE : [*lazyVaultAdmin]
-        *SET_VAULT_LIMIT_ROLE : []
-        *SET_SUBVAULT_LIMIT_ROLE : []
-        *ALLOW_SUBVAULT_ASSETS_ROLE : []
-        *MODIFY_VAULT_BALANCE_ROLE : []
-        *MODIFY_SUBVAULT_BALANCE_ROLE : []
+        # WARN: roles below not yet granted on-chain — need grantRole txs
+        *SET_VAULT_LIMIT_ROLE : [*activeVaultAdmin]
+        *SET_SUBVAULT_LIMIT_ROLE : [*activeVaultAdmin]
+        *ALLOW_SUBVAULT_ASSETS_ROLE : [*activeVaultAdmin]
+        *MODIFY_VAULT_BALANCE_ROLE : [*activeVaultAdmin]
+        *MODIFY_SUBVAULT_BALANCE_ROLE : [*activeVaultAdmin]
         *CALLER_ROLE : [*curator]
-        *PULL_LIQUIDITY_ROLE : []
-        *PUSH_LIQUIDITY_ROLE : []
-        *SET_FLAGS_ROLE : []
-        *SET_MERKLE_ROOT_ROLE : [*earnUSDe_timelockController, *mellow_deployer]
-        *SET_QUEUE_STATUS_ROLE : []
-        *SUBMIT_REPORTS_ROLE : []
-        *ACCEPT_REPORT_ROLE : []
+        *PULL_LIQUIDITY_ROLE : [*curator]
+        *PUSH_LIQUIDITY_ROLE : [*curator]
+        *SET_FLAGS_ROLE : [*earnUSDe_timelockController]
+        *SET_MERKLE_ROOT_ROLE : [*earnUSDe_timelockController] # WARN: mellow_deployer must renounce this role on-chain
+        *SET_QUEUE_STATUS_ROLE : [*earnUSDe_timelockController]
+        *SUBMIT_REPORTS_ROLE : [*oracleUpdater]
+        *ACCEPT_REPORT_ROLE : [*lazyVaultAdmin]
         # Unused roles (verify 0 members)
         *CREATE_QUEUE_ROLE : []
         *CREATE_SUBVAULT_ROLE : []
@@ -450,8 +493,8 @@ l1:
         checkCowswapOrder:
         checkMultiplier:
         checkParams:
-        cowswapSettlement: "0x9008D19f58AAbD9eD0D60971565AA8510560ab41"
-        cowswapVaultRelayer: "0xC92E8bdf79f0507f65a392b0ab4667716BFE0110"
+        cowswapSettlement: *cowswapSettlement
+        cowswapVaultRelayer: *cowswapVaultRelayer
         customMultiplier:
         defaultMultiplier: 99500000
         evaluate:
@@ -461,12 +504,12 @@ l1:
         getRoleMembers:
         hasRole:
         hasSupportedRole:
-        oracle: "0x33E0b3fc976DC9C516926BA48CfC0A9E10a2aAA5"
+        oracle: *earnUSDe_swapModuleOracle
         subvault: *earnUSDe_subvault0
         supportedRoleAt:
         supportedRoles: 5
         supportsInterface:
-        weth: "0x6100E367285b01F48D07953803A2d8dCA5D19873"
+        weth: *NATIVE_WRAPPED
       implementationChecks:
         BASE_MULTIPLIER: 100000000 # 1e8
         CALLER_ROLE: *SM_CALLER_ROLE
@@ -477,20 +520,20 @@ l1:
         SET_SLIPPAGE_ROLE: *SET_SLIPPAGE_ROLE
         TOKEN_IN_ROLE: *TOKEN_IN_ROLE
         TOKEN_OUT_ROLE: *TOKEN_OUT_ROLE
-        cowswapSettlement: "0x9008D19f58AAbD9eD0D60971565AA8510560ab41"
-        cowswapVaultRelayer: "0xC92E8bdf79f0507f65a392b0ab4667716BFE0110"
+        cowswapSettlement: *cowswapSettlement
+        cowswapVaultRelayer: *cowswapVaultRelayer
         defaultMultiplier: 0
         oracle: *ZERO_ADDRESS
         subvault: *ZERO_ADDRESS
         supportedRoles: 0
-        weth: "0x6100E367285b01F48D07953803A2d8dCA5D19873"
+        weth: *NATIVE_WRAPPED
       ozAcl:
         *DEFAULT_ADMIN_ROLE : [*lazyVaultAdmin]
         *SM_CALLER_ROLE : [*curator]
-        *ROUTER_ROLE : ["0x6131B5fae19EA4f9D964eAc0408E4408b66337b5"]
+        *ROUTER_ROLE : [*swapModuleRouter]
         *SET_SLIPPAGE_ROLE : []
-        *TOKEN_IN_ROLE : ["0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb", "0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34", "0x211Cc4DD073734dA055fbF44a2b4667d5E5fE5d2"]
-        *TOKEN_OUT_ROLE : ["0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb", "0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34", "0x211Cc4DD073734dA055fbF44a2b4667d5E5fE5d2"]
+        *TOKEN_IN_ROLE : [*SWAP_MODULE_TOKEN_0, *SWAP_MODULE_TOKEN_1, *SWAP_MODULE_TOKEN_2, *NATIVE_WRAPPED]
+        *TOKEN_OUT_ROLE : [*SWAP_MODULE_TOKEN_0, *SWAP_MODULE_TOKEN_1, *SWAP_MODULE_TOKEN_2, *NATIVE_WRAPPED]
 
     earnUSDe_oracle:
       name: Oracle
@@ -762,19 +805,82 @@ l1:
         checkSignatures:
         domainSeparator:
         encodeTransactionData:
-        getChainId: 9745
+        getChainId: 5000
         getModulesPaginated:
         getOwners:
-          - *LIDO_SIGNER_1
-          - *LIDO_SIGNER_2
           - *LIDO_SIGNER_3
+          - *LIDO_SIGNER_2
           - *LIDO_SIGNER_4
+          - *LIDO_SIGNER_1
           - *MELLOW_SIGNER_2
           - *MELLOW_SIGNER_3
           - *MELLOW_SIGNER_1
           - *MELLOW_SIGNER_4
         getStorageAt:
         getThreshold: *PROXY_ADMIN_THRESHOLD
+        getTransactionHash:
+        isModuleEnabled:
+        isOwner:
+        nonce:
+        signedMessages:
+
+    lazyVaultAdmin_multisig:
+      name: SafeL2
+      address: *lazyVaultAdmin
+      proxyName: SafeProxy
+      implementation: *SAFE_IMPL_1_4_1
+      proxyChecks: {}
+      checks:
+        VERSION: 1.4.1
+        approvedHashes:
+        checkNSignatures:
+        checkSignatures:
+        domainSeparator:
+        encodeTransactionData:
+        getChainId: 5000
+        getModulesPaginated:
+        getOwners:
+          - *LIDO_SIGNER_4
+          - *LIDO_SIGNER_6
+          - *LIDO_SIGNER_10
+          - *LIDO_SIGNER_5
+          - *LIDO_SIGNER_2
+          - *LIDO_SIGNER_1
+          - *LIDO_SIGNER_7
+          - *LIDO_SIGNER_13
+        getStorageAt:
+        getThreshold: *LAZY_VAULT_ADMIN_THRESHOLD
+        getTransactionHash:
+        isModuleEnabled:
+        isOwner:
+        nonce:
+        signedMessages:
+
+    treasury_multisig:
+      name: SafeL2
+      address: *treasury
+      proxyName: SafeProxy
+      implementation: *SAFE_IMPL_1_4_1
+      proxyChecks: {}
+      checks:
+        VERSION: 1.4.1
+        approvedHashes:
+        checkNSignatures:
+        checkSignatures:
+        domainSeparator:
+        encodeTransactionData:
+        getChainId: 5000
+        getModulesPaginated:
+        getOwners:
+          - *LIDO_SIGNER_10
+          - *LIDO_SIGNER_13
+          - *LIDO_SIGNER_6
+          - *LIDO_SIGNER_11
+          - *LIDO_SIGNER_12
+          - *LIDO_SIGNER_7
+          - *LIDO_SIGNER_9
+        getStorageAt:
+        getThreshold: *TREASURY_THRESHOLD
         getTransactionHash:
         isModuleEnabled:
         isOwner:
@@ -794,16 +900,135 @@ l1:
         checkSignatures:
         domainSeparator:
         encodeTransactionData:
-        getChainId: 9745
+        getChainId: 5000
         getModulesPaginated:
-        getOwners:
-          - *LIDO_PAUSER_SIGNER_1
-          - *LIDO_PAUSER_SIGNER_2
-          - *LIDO_PAUSER_SIGNER_3
-          - *LIDO_SIGNER_4
-          - *LIDO_PAUSER_SIGNER_4
+        getOwners: [] # WARN: lidoPauser Safe not deployed on Mantle yet
         getStorageAt:
         getThreshold: *LIDO_PAUSER_THRESHOLD
+        getTransactionHash:
+        isModuleEnabled:
+        isOwner:
+        nonce:
+        signedMessages:
+
+    activeVaultAdmin_multisig:
+      name: SafeL2
+      address: *activeVaultAdmin
+      proxyName: SafeProxy
+      implementation: *SAFE_IMPL_1_4_1
+      proxyChecks: {}
+      checks:
+        VERSION: 1.4.1
+        approvedHashes:
+        checkNSignatures:
+        checkSignatures:
+        domainSeparator:
+        encodeTransactionData:
+        getChainId: 5000
+        getModulesPaginated:
+        getOwners:
+          - *EXT_MELLOW_SIGNER_2
+          - *MELLOW_SIGNER_2
+          - *MELLOW_SIGNER_3
+          - *MELLOW_SIGNER_1
+          - *MELLOW_SIGNER_4
+          - *EXT_MELLOW_SIGNER_4
+        getStorageAt:
+        getThreshold: *ACTIVE_VAULT_ADMIN_THRESHOLD
+        getTransactionHash:
+        isModuleEnabled:
+        isOwner:
+        nonce:
+        signedMessages:
+
+    curator_multisig:
+      name: SafeL2
+      address: *curator
+      proxyName: SafeProxy
+      implementation: *SAFE_IMPL_1_4_1
+      proxyChecks: {}
+      checks:
+        VERSION: 1.4.1
+        approvedHashes:
+        checkNSignatures:
+        checkSignatures:
+        domainSeparator:
+        encodeTransactionData:
+        getChainId: 5000
+        getModulesPaginated:
+        getOwners:
+          - *EXT_MELLOW_SIGNER_5
+          - *EXT_MELLOW_SIGNER_2
+          - *MELLOW_SIGNER_2
+          - *MELLOW_SIGNER_3
+          - *MELLOW_SIGNER_1
+          - *MELLOW_SIGNER_4
+          - *EXT_MELLOW_SIGNER_4
+        getStorageAt:
+        getThreshold: *CURATOR_THRESHOLD
+        getTransactionHash:
+        isModuleEnabled:
+        isOwner:
+        nonce:
+        signedMessages:
+
+    oracleUpdater_multisig:
+      name: SafeL2
+      address: *oracleUpdater
+      proxyName: SafeProxy
+      implementation: *SAFE_IMPL_1_4_1
+      proxyChecks: {}
+      checks:
+        VERSION: 1.4.1
+        approvedHashes:
+        checkNSignatures:
+        checkSignatures:
+        domainSeparator:
+        encodeTransactionData:
+        getChainId: 5000
+        getModulesPaginated:
+        getOwners:
+          - *EXT_MELLOW_SIGNER_5
+          - *EXT_MELLOW_SIGNER_2
+          - *MELLOW_SIGNER_2
+          - *MELLOW_SIGNER_3
+          - *MELLOW_SIGNER_1
+          - *MELLOW_SIGNER_4
+          - *EXT_MELLOW_SIGNER_4
+        getStorageAt:
+        getThreshold: *ORACLE_UPDATER_THRESHOLD
+        getTransactionHash:
+        isModuleEnabled:
+        isOwner:
+        nonce:
+        signedMessages:
+
+    mellowPauser_multisig:
+      name: SafeL2
+      address: *mellowPauser
+      proxyName: SafeProxy
+      implementation: *SAFE_IMPL_1_4_1
+      proxyChecks: {}
+      checks:
+        VERSION: 1.4.1
+        approvedHashes:
+        checkNSignatures:
+        checkSignatures:
+        domainSeparator:
+        encodeTransactionData:
+        getChainId: 5000
+        getModulesPaginated:
+        getOwners:
+          - *EXT_MELLOW_SIGNER_1
+          - *EXT_MELLOW_SIGNER_2
+          - *EXT_MELLOW_SIGNER_3
+          - *EXT_MELLOW_SIGNER_4
+          - *MELLOW_SIGNER_2
+          - *MELLOW_SIGNER_3
+          - *MELLOW_SIGNER_1
+          - *MELLOW_SIGNER_4
+        getStorageAt:
+        getThreshold: *MELLOW_PAUSER_THRESHOLD
         getTransactionHash:
         isModuleEnabled:
         isOwner:
