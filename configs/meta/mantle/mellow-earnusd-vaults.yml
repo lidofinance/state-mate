@@ -450,7 +450,7 @@ l1:
         getVerificationResult:
         hashCall:
         isAllowedCall:
-        merkleRoot: *ZERO_BYTES32
+        merkleRoot: *ZERO_BYTES32 # WARN: zero root blocks all subvault calls — verifier not yet configured
         vault: *earnUSDe_vault
         verifyCall:
       implementationChecks:

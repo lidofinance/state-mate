@@ -765,7 +765,7 @@ l1:
         getVerificationResult:
         hashCall:
         isAllowedCall:
-        merkleRoot: *ZERO_BYTES32
+        merkleRoot: *ZERO_BYTES32 # WARN: zero root blocks all subvault1 calls — verifier1 not yet configured
         vault: *earnUSD_vault
         verifyCall:
       implementationChecks:
@@ -1786,6 +1786,7 @@ l1:
         claimableSharesOf:
         decimals: 18
         # flags: [hasMintPause, hasBurnPause, hasTransferPause, hasWhitelist, hasTransferWhitelist, globalLockup]
+        # WARN: hasWhitelist=true with whitelistMerkleRoot=ZERO_BYTES32 — verify whether this allows all or blocks all
         flags: [false, false, false, true, false, 0]
         isDepositorWhitelisted:
         name: "Conservative earnUSD"
@@ -2362,7 +2363,7 @@ l1:
         getVerificationResult:
         hashCall:
         isAllowedCall:
-        merkleRoot: *ZERO_BYTES32
+        merkleRoot: *ZERO_BYTES32 # WARN: zero root blocks all subvault calls — verifier not yet configured
         vault: *earnUSDe_vault
         verifyCall:
       implementationChecks:
@@ -2581,6 +2582,7 @@ l1:
         claimableSharesOf:
         decimals: 18
         # flags: [hasMintPause, hasBurnPause, hasTransferPause, hasWhitelist, hasTransferWhitelist, globalLockup]
+        # WARN: hasWhitelist=true with whitelistMerkleRoot=ZERO_BYTES32 — verify whether this allows all or blocks all
         flags: [false, false, false, true, false, 0]
         isDepositorWhitelisted:
         name: "Experimental earnUSD"

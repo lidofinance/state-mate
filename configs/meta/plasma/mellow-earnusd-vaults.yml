@@ -451,7 +451,7 @@ l1:
         getVerificationResult:
         hashCall:
         isAllowedCall:
-        merkleRoot: *ZERO_BYTES32
+        merkleRoot: *ZERO_BYTES32 # WARN: zero root blocks all subvault calls — verifier not yet configured
         vault: *earnUSDe_vault
         verifyCall:
       implementationChecks:
@@ -808,6 +808,8 @@ l1:
         encodeTransactionData:
         getChainId: 9745
         getModulesPaginated:
+        # WARN: uses LIDO_SIGNER_14 where all other chains use LIDO_SIGNER_2. Additionally,
+        # LIDO_SIGNER_14 on Plasma maps to a different EOA than on Ethereum — verify this is intentional
         getOwners:
           - *LIDO_SIGNER_3
           - *LIDO_SIGNER_14
@@ -932,7 +934,13 @@ l1:
         encodeTransactionData:
         getChainId: 9745
         getModulesPaginated:
-        getOwners: [] # WARN: Safe not deployed on Plasma yet
+        getOwners:
+          - *EXT_MELLOW_SIGNER_2
+          - *MELLOW_SIGNER_2
+          - *MELLOW_SIGNER_3
+          - *MELLOW_SIGNER_1
+          - *MELLOW_SIGNER_4
+          - *EXT_MELLOW_SIGNER_4
         getStorageAt:
         getThreshold: *ACTIVE_VAULT_ADMIN_THRESHOLD
         getTransactionHash:
@@ -956,7 +964,14 @@ l1:
         encodeTransactionData:
         getChainId: 9745
         getModulesPaginated:
-        getOwners: [] # WARN: Safe not deployed on Plasma yet
+        getOwners:
+          - *EXT_MELLOW_SIGNER_5
+          - *EXT_MELLOW_SIGNER_2
+          - *MELLOW_SIGNER_2
+          - *MELLOW_SIGNER_3
+          - *MELLOW_SIGNER_1
+          - *MELLOW_SIGNER_4
+          - *EXT_MELLOW_SIGNER_4
         getStorageAt:
         getThreshold: *CURATOR_THRESHOLD
         getTransactionHash:
@@ -980,7 +995,14 @@ l1:
         encodeTransactionData:
         getChainId: 9745
         getModulesPaginated:
-        getOwners: [] # WARN: Safe not deployed on Plasma yet
+        getOwners:
+          - *EXT_MELLOW_SIGNER_5
+          - *EXT_MELLOW_SIGNER_2
+          - *MELLOW_SIGNER_2
+          - *MELLOW_SIGNER_3
+          - *MELLOW_SIGNER_1
+          - *MELLOW_SIGNER_4
+          - *EXT_MELLOW_SIGNER_4
         getStorageAt:
         getThreshold: *ORACLE_UPDATER_THRESHOLD
         getTransactionHash:
@@ -1004,7 +1026,15 @@ l1:
         encodeTransactionData:
         getChainId: 9745
         getModulesPaginated:
-        getOwners: [] # WARN: Safe not deployed on Plasma yet
+        getOwners:
+          - *EXT_MELLOW_SIGNER_1
+          - *EXT_MELLOW_SIGNER_2
+          - *EXT_MELLOW_SIGNER_3
+          - *EXT_MELLOW_SIGNER_4
+          - *MELLOW_SIGNER_2
+          - *MELLOW_SIGNER_3
+          - *MELLOW_SIGNER_1
+          - *MELLOW_SIGNER_4
         getStorageAt:
         getThreshold: *MELLOW_PAUSER_THRESHOLD
         getTransactionHash:
