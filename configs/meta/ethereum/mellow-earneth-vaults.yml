@@ -790,7 +790,7 @@ l1:
         claim:
         claimableOf:
         name: "SyncDepositQueue"
-        syncDepositParams: [200, 86400] # [penaltyD6, maxAge(seconds)] # WARN: stale — on-chain value is [0, 115200]
+        syncDepositParams:
         vault: *vault
       implementationChecks:
         SET_SYNC_DEPOSIT_PARAMS_ROLE: *SET_SYNC_DEPOSIT_PARAMS_ROLE
@@ -850,7 +850,7 @@ l1:
         claim:
         claimableOf:
         name: "SyncDepositQueue"
-        syncDepositParams: [200, 86400] # [penaltyD6, maxAge(seconds)] # WARN: stale — on-chain value is [0, 115200]
+        syncDepositParams:
         vault: *vault
       implementationChecks:
         SET_SYNC_DEPOSIT_PARAMS_ROLE: *SET_SYNC_DEPOSIT_PARAMS_ROLE
@@ -910,7 +910,7 @@ l1:
         claim:
         claimableOf:
         name: "SyncDepositQueue"
-        syncDepositParams: [200, 86400] # [penaltyD6, maxAge(seconds)] # WARN: stale — on-chain value is [0, 115200]
+        syncDepositParams:
         vault: *vault
       implementationChecks:
         SET_SYNC_DEPOSIT_PARAMS_ROLE: *SET_SYNC_DEPOSIT_PARAMS_ROLE
@@ -1001,7 +1001,7 @@ l1:
         claim:
         claimableOf:
         name: "SyncDepositQueue"
-        syncDepositParams: [200, 86400] # [penaltyD6, maxAge(seconds)] # WARN: stale — on-chain value is [0, 115200]
+        syncDepositParams:
         vault: *vault
       implementationChecks:
         SET_SYNC_DEPOSIT_PARAMS_ROLE: *SET_SYNC_DEPOSIT_PARAMS_ROLE
@@ -1061,7 +1061,7 @@ l1:
         claim:
         claimableOf:
         name: "SyncDepositQueue"
-        syncDepositParams: [200, 86400] # [penaltyD6, maxAge(seconds)] # WARN: stale — on-chain value is [0, 115200]
+        syncDepositParams:
         vault: *vault
       implementationChecks:
         SET_SYNC_DEPOSIT_PARAMS_ROLE: *SET_SYNC_DEPOSIT_PARAMS_ROLE
@@ -1121,7 +1121,7 @@ l1:
         claim:
         claimableOf:
         name: "SyncDepositQueue"
-        syncDepositParams: [200, 86400] # [penaltyD6, maxAge(seconds)] # WARN: stale — on-chain value is [0, 115200]
+        syncDepositParams:
         vault: *vault
       implementationChecks:
         SET_SYNC_DEPOSIT_PARAMS_ROLE: *SET_SYNC_DEPOSIT_PARAMS_ROLE
@@ -1636,7 +1636,6 @@ l1:
         encodeTransactionData:
         getChainId: 1
         getModulesPaginated:
-        # WARN: LIDO_SIGNER_9 was rotated out on-chain; actual last signer is LIDO_SIGNER_13 (0xf2374BCb...)
         getOwners:
           - *LIDO_SIGNER_5
           - *LIDO_SIGNER_10
@@ -1645,7 +1644,7 @@ l1:
           - *LIDO_SIGNER_2
           - *LIDO_SIGNER_1
           - *LIDO_SIGNER_7
-          - *LIDO_SIGNER_9
+          - *LIDO_SIGNER_13
         getStorageAt:
         getThreshold: *LAZY_VAULT_ADMIN_THRESHOLD
         getTransactionHash:
@@ -1686,8 +1685,8 @@ l1:
         encodeTransactionData:
         getChainId: 1
         getModulesPaginated:
-        # WARN: on-chain has 7 owners — EXT_MELLOW_SIGNER_5 (0x5fa3B054...) was added but not reflected here
         getOwners:
+          - *EXT_MELLOW_SIGNER_5
           - *EXT_MELLOW_SIGNER_2
           - *MELLOW_SIGNER_2
           - *MELLOW_SIGNER_3
@@ -1734,13 +1733,12 @@ l1:
         encodeTransactionData:
         getChainId: 1
         getModulesPaginated:
-        # WARN: LIDO_SIGNER_9 was rotated out on-chain; actual last signer is LIDO_SIGNER_13 (0xf2374BCb...)
         getOwners:
           - *LIDO_SIGNER_6
           - *LIDO_SIGNER_10
           - *LIDO_SIGNER_14
           - *LIDO_SIGNER_7
-          - *LIDO_SIGNER_9
+          - *LIDO_SIGNER_13
         getStorageAt:
         getThreshold: *CURATOR_THRESHOLD
         getTransactionHash:
@@ -1782,6 +1780,7 @@ l1:
         getChainId: 1
         getModulesPaginated:
         getOwners:
+          - *EXT_MELLOW_SIGNER_1
           - *EXT_MELLOW_SIGNER_5
           - *EXT_MELLOW_SIGNER_2
           - *MELLOW_SIGNER_2
