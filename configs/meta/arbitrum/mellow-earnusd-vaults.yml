@@ -378,21 +378,20 @@ l1:
         verifierFactory: *verifierFactory
       ozAcl:
         *DEFAULT_ADMIN_ROLE : [*lazyVaultAdmin]
-        # WARN: roles below not yet granted on-chain — maybe need grantRole txs
-        *SET_VAULT_LIMIT_ROLE : [*activeVaultAdmin]
-        *SET_SUBVAULT_LIMIT_ROLE : [*activeVaultAdmin]
-        *ALLOW_SUBVAULT_ASSETS_ROLE : [*activeVaultAdmin]
-        *MODIFY_VAULT_BALANCE_ROLE : [*activeVaultAdmin]
-        *MODIFY_SUBVAULT_BALANCE_ROLE : [*activeVaultAdmin]
-        *CALLER_ROLE : [*curator]
-        *PULL_LIQUIDITY_ROLE : [*curator]
-        *PUSH_LIQUIDITY_ROLE : [*curator]
-        *SET_FLAGS_ROLE : [*earnUSDe_timelockController]
         *SET_MERKLE_ROOT_ROLE : [*earnUSDe_timelockController] # WARN: mellow_deployer must renounce this role on-chain
-        *SET_QUEUE_STATUS_ROLE : [*earnUSDe_timelockController]
-        *SUBMIT_REPORTS_ROLE : [*oracleUpdater]
-        *ACCEPT_REPORT_ROLE : [*lazyVaultAdmin]
+        *CALLER_ROLE : [*curator]
         # Unused roles (verify 0 members)
+        *SET_VAULT_LIMIT_ROLE : []
+        *SET_SUBVAULT_LIMIT_ROLE : []
+        *ALLOW_SUBVAULT_ASSETS_ROLE : []
+        *MODIFY_VAULT_BALANCE_ROLE : []
+        *MODIFY_SUBVAULT_BALANCE_ROLE : []
+        *PULL_LIQUIDITY_ROLE : []
+        *PUSH_LIQUIDITY_ROLE : []
+        *SET_FLAGS_ROLE : []
+        *SET_QUEUE_STATUS_ROLE : []
+        *SUBMIT_REPORTS_ROLE : []
+        *ACCEPT_REPORT_ROLE : []
         *CREATE_QUEUE_ROLE : []
         *CREATE_SUBVAULT_ROLE : []
         *DISCONNECT_SUBVAULT_ROLE : []
@@ -553,15 +552,12 @@ l1:
         SET_SECURITY_PARAMS_ROLE: *SET_SECURITY_PARAMS_ROLE
         SUBMIT_REPORTS_ROLE: *SUBMIT_REPORTS_ROLE
         getReport:
-        # WARN: isSupportedAsset/securityParams/supportedAssets describe target state;
-        # on-chain oracle not yet initialized (actual: supportedAssets=0, securityParams=[1,1,1,1,MAX,1,1])
         isSupportedAsset:
-          - args: [*USDC]
-            result: true
         securityParams:
-          [5000000000000000, 1000000000000000, 5000000000000000, 1000000000000000, 72000, 31536000, 31536000]
         supportedAssetAt:
-        supportedAssets: 1
+          - args: [0]
+            mustRevert: true
+        supportedAssets: 0
         validatePrice:
         vault: *earnUSDe_vault
       implementationChecks:
