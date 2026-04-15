@@ -57,7 +57,7 @@
   "dependencies": {
     "@inquirer/prompts": "^5.1.2",
     "@types/chai": "^4.3.16",
-    "ajv": "^8.17.1",
+    "ajv": "^8.18.0",
     "ajv-formats": "^3.0.1",
     "chai": "^4.4.1",
     "chalk": "^4.1.2",
@@ -66,6 +66,6 @@
     "ethers": "^6.13.0",
     "json-diff": "^1.0.6",
     "tsconfig-paths": "^4.2.0",
-    "yaml": "^2.3.4"
+    "yaml": "^2.8.3"
   }
 }
