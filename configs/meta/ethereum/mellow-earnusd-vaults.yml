@@ -152,7 +152,7 @@ deployed:
     - &lazyVaultAdmin "0x0Dd73341d6158a72b4D224541f1094188f57076E"
     - &curator "0xe5abcc40196174Ae0d12153dE286F0D8E401769d"
     - &treasury "0xcCf2daba8Bb04a232a2fDA0D01010D4EF6C69B85"
-    - &pauser "0xA916fD5252160A7E56A6405741De76dc0Da5A0Cd"
+    - &lidoPauser "0xA916fD5252160A7E56A6405741De76dc0Da5A0Cd"
 
     # --- Mellow Actors (multisigs) ---
     - &mellowActiveVaultAdmin "0x982aB69785f5329BB59c36B19CBd4865353fEf10"
@@ -178,7 +178,7 @@ misc:
   - &MELLOW_CURATOR_THRESHOLD 3
   - &MELLOW_ORACLE_UPDATER_THRESHOLD 3
   - &TREASURY_THRESHOLD 4
-  - &PAUSER_THRESHOLD 3
+  - &LIDO_PAUSER_THRESHOLD 3
   - &MELLOW_PAUSER_THRESHOLD 1
 
   # --- Lido signers ---
@@ -1201,7 +1201,7 @@ l1:
           - args: [*PROPOSER_ROLE, *lazyVaultAdmin]
             result: true
           # EXECUTOR_ROLE holders
-          - args: [*EXECUTOR_ROLE, *pauser]
+          - args: [*EXECUTOR_ROLE, *lidoPauser]
             result: true
           - args: [*EXECUTOR_ROLE, *mellowPauser]
             result: true
@@ -2007,7 +2007,7 @@ l1:
           - args: [*PROPOSER_ROLE, *lazyVaultAdmin]
             result: true
           # EXECUTOR_ROLE holders
-          - args: [*EXECUTOR_ROLE, *pauser]
+          - args: [*EXECUTOR_ROLE, *lidoPauser]
             result: true
           - args: [*EXECUTOR_ROLE, *mellowPauser]
             result: true
@@ -2803,7 +2803,7 @@ l1:
           - args: [*PROPOSER_ROLE, *lazyVaultAdmin]
             result: true
           # EXECUTOR_ROLE holders
-          - args: [*EXECUTOR_ROLE, *pauser]
+          - args: [*EXECUTOR_ROLE, *lidoPauser]
             result: true
           - args: [*EXECUTOR_ROLE, *mellowPauser]
             result: true
@@ -2846,7 +2846,7 @@ l1:
         approvedHashes:
         checkNSignatures:
         checkSignatures:
-        domainSeparator:
+        domainSeparator: "0x90468bd6f3155511c3cb7b455a07664de4779c3a328ac577fdd4cc584ee815d0"
         encodeTransactionData:
         getChainId: 1
         getModulesPaginated:
@@ -3027,9 +3027,9 @@ l1:
         nonce: 0
         signedMessages:
 
-    pauser_multisig:
+    lidoPauser_multisig:
       name: Safe
-      address: *pauser
+      address: *lidoPauser
       proxyName: SafeProxy
       implementation: *SAFE_IMPL_1_4_1
       proxyChecks: {}
@@ -3049,7 +3049,7 @@ l1:
           - *LIDO_SIGNER_1
           - *LIDO_SIGNER_10
         getStorageAt:
-        getThreshold: *PAUSER_THRESHOLD
+        getThreshold: *LIDO_PAUSER_THRESHOLD
         getTransactionHash:
         isModuleEnabled:
         isOwner:
