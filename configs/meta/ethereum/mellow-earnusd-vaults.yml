@@ -2310,7 +2310,7 @@ l1:
         *PULL_LIQUIDITY_ROLE : [*mellowCurator]
         *PUSH_LIQUIDITY_ROLE : [*mellowCurator]
         *SET_FLAGS_ROLE : [*earnUSDe_timelockController]
-        *SET_MERKLE_ROOT_ROLE : [*earnUSDe_timelockController] # WARN: no-go for production — mellow_deployer must renounce SET_MERKLE_ROOT_ROLE
+        *SET_MERKLE_ROOT_ROLE : [*earnUSDe_timelockController] # WARN: mellow_deployer must renounce SET_MERKLE_ROOT_ROLE — on-chain count is 2
         *SET_QUEUE_STATUS_ROLE : [*earnUSDe_timelockController]
         *SUBMIT_REPORTS_ROLE : [*earnUSDe_oracleSubmitter]
         *ACCEPT_REPORT_ROLE : [*earnUSDe_oracleSubmitter]
@@ -3091,6 +3091,7 @@ l1:
         getChainId: 1
         getModulesPaginated:
         getOwners:
+          - *EXT_MELLOW_SIGNER_1
           - *EXT_MELLOW_SIGNER_5
           - *EXT_MELLOW_SIGNER_2
           - *MELLOW_SIGNER_2
@@ -3187,6 +3188,7 @@ l1:
         getChainId: 1
         getModulesPaginated:
         getOwners:
+          - *EXT_MELLOW_SIGNER_1
           - *EXT_MELLOW_SIGNER_5
           - *EXT_MELLOW_SIGNER_2
           - *MELLOW_SIGNER_2

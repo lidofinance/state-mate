@@ -1686,6 +1686,7 @@ l1:
         getChainId: 1
         getModulesPaginated:
         getOwners:
+          - *EXT_MELLOW_SIGNER_1
           - *EXT_MELLOW_SIGNER_5
           - *EXT_MELLOW_SIGNER_2
           - *MELLOW_SIGNER_2
