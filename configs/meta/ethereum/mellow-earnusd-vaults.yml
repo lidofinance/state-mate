@@ -3044,8 +3044,8 @@ l1:
         getModulesPaginated:
         getOwners:
           - *LIDO_SIGNER_7
-          - *LIDO_SIGNER_8
-          - *LIDO_SIGNER_9
+          - *LIDO_SIGNER_6
+          - *LIDO_SIGNER_13
           - *LIDO_SIGNER_1
           - *LIDO_SIGNER_10
         getStorageAt:
