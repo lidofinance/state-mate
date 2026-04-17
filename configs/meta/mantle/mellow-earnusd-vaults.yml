@@ -111,13 +111,11 @@ misc:
   - &LIDO_SIGNER_5 "0x912e21CdA3D7012146da4Df33309d860a9eb0bEb"
   - &LIDO_SIGNER_6 "0x73B254db9cb71a129C4E73aF087D71Ac7d34a8d7"
   - &LIDO_SIGNER_7 "0x59d07dc34B135B17b87840a86BFF7302039E7EDf"
-  - &LIDO_SIGNER_8 "0x04e7C0350241b818eE5c92cc260008C9898F41cf"
-  - &LIDO_SIGNER_9 "0x8ecd93982FfbB2f937ADa6c6e50d1950974081C0"
-  - &LIDO_SIGNER_10 "0x75D95fF8D48E2Ca5c4235322A8AC8e52A76124cD"
-  - &LIDO_SIGNER_11 "0xE6CD29BF19769E44534099d241abAa07aa8c8E9a"
-  - &LIDO_SIGNER_12 "0x8aA493BcD7f989caD67dd3CB48A4c2E6b40FeDB0"
-  - &LIDO_SIGNER_13 "0xf2374BCb265505002055942D070459a4d2011012"
-  - &LIDO_SIGNER_15 "0xc7a8DE05264442A318189f2bd160d2830902C8CD"
+  - &LIDO_SIGNER_8 "0x8ecd93982FfbB2f937ADa6c6e50d1950974081C0"
+  - &LIDO_SIGNER_9 "0x75D95fF8D48E2Ca5c4235322A8AC8e52A76124cD"
+  - &LIDO_SIGNER_10 "0xE6CD29BF19769E44534099d241abAa07aa8c8E9a"
+  - &LIDO_SIGNER_11 "0x8aA493BcD7f989caD67dd3CB48A4c2E6b40FeDB0"
+  - &LIDO_SIGNER_12 "0xf2374BCb265505002055942D070459a4d2011012"
 
   # --- Mellow signers ---
   - &MELLOW_SIGNER_1 "0x44A388BBD782AE1D7f4542aEb6C3569E2CfdF5a1"
@@ -451,7 +449,7 @@ l1:
         getVerificationResult:
         hashCall:
         isAllowedCall:
-        merkleRoot: *ZERO_BYTES32 # WARN: zero root blocks all subvault calls — verifier not yet configured
+        merkleRoot: "0xa43769625c710eebaa47d68ba979cd28179dd7fce8a2927694e2eaea95c3b8f2"
         vault: *earnUSDe_vault
         verifyCall:
       implementationChecks:
@@ -843,12 +841,12 @@ l1:
         getOwners:
           - *LIDO_SIGNER_4
           - *LIDO_SIGNER_6
-          - *LIDO_SIGNER_10
+          - *LIDO_SIGNER_9
           - *LIDO_SIGNER_5
           - *LIDO_SIGNER_2
           - *LIDO_SIGNER_1
           - *LIDO_SIGNER_7
-          - *LIDO_SIGNER_13
+          - *LIDO_SIGNER_12
         getStorageAt:
         getThreshold: *LAZY_VAULT_ADMIN_THRESHOLD
         getTransactionHash:
@@ -873,13 +871,13 @@ l1:
         getChainId: 5000
         getModulesPaginated:
         getOwners:
-          - *LIDO_SIGNER_10
-          - *LIDO_SIGNER_13
-          - *LIDO_SIGNER_6
-          - *LIDO_SIGNER_11
-          - *LIDO_SIGNER_12
-          - *LIDO_SIGNER_7
           - *LIDO_SIGNER_9
+          - *LIDO_SIGNER_12
+          - *LIDO_SIGNER_6
+          - *LIDO_SIGNER_10
+          - *LIDO_SIGNER_11
+          - *LIDO_SIGNER_7
+          - *LIDO_SIGNER_8
         getStorageAt:
         getThreshold: *TREASURY_THRESHOLD
         getTransactionHash:
@@ -905,10 +903,10 @@ l1:
         getModulesPaginated:
         getOwners:
           - *LIDO_SIGNER_7
-          - *LIDO_SIGNER_8
-          - *LIDO_SIGNER_15
+          - *LIDO_SIGNER_6
+          - *LIDO_SIGNER_12
           - *LIDO_SIGNER_1
-          - *LIDO_SIGNER_10
+          - *LIDO_SIGNER_9
         getStorageAt:
         getThreshold: *LIDO_PAUSER_THRESHOLD
         getTransactionHash:
