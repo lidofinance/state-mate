@@ -1,0 +1,251 @@
+[
+  {
+    "inputs": [
+      { "internalType": "address", "name": "_owner", "type": "address" },
+      { "internalType": "address", "name": "_vault", "type": "address" },
+      { "internalType": "address", "name": "_profitReceiver", "type": "address" },
+      { "internalType": "uint256", "name": "_premium", "type": "uint256" }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  { "inputs": [], "name": "ContractPaused", "type": "error" },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "aEthWETHBalance", "type": "uint256" },
+      { "internalType": "uint256", "name": "debtBalance", "type": "uint256" }
+    ],
+    "name": "DebtCeilingBreached",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "available", "type": "uint256" },
+      { "internalType": "uint256", "name": "required", "type": "uint256" }
+    ],
+    "name": "InsufficientLiquidity",
+    "type": "error"
+  },
+  { "inputs": [], "name": "OnlyOwner", "type": "error" },
+  { "inputs": [], "name": "PremiumTooHigh", "type": "error" },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "amountOut", "type": "uint256" },
+      { "internalType": "uint256", "name": "amountOutMin", "type": "uint256" }
+    ],
+    "name": "SlippageExceeded",
+    "type": "error"
+  },
+  { "inputs": [], "name": "TransferFailed", "type": "error" },
+  { "inputs": [], "name": "ZeroAddress", "type": "error" },
+  { "inputs": [], "name": "ZeroAmount", "type": "error" },
+  {
+    "anonymous": false,
+    "inputs": [{ "indexed": false, "internalType": "address", "name": "account", "type": "address" }],
+    "name": "Paused",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      { "indexed": false, "internalType": "uint256", "name": "oldPremium", "type": "uint256" },
+      { "indexed": false, "internalType": "uint256", "name": "newPremium", "type": "uint256" }
+    ],
+    "name": "PremiumUpdated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      { "indexed": true, "internalType": "address", "name": "user", "type": "address" },
+      { "indexed": true, "internalType": "address", "name": "referral", "type": "address" },
+      { "indexed": false, "internalType": "uint256", "name": "aEthWETHIn", "type": "uint256" },
+      { "indexed": false, "internalType": "uint256", "name": "aEthwstETHOut", "type": "uint256" }
+    ],
+    "name": "ReferralRecorded",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      { "indexed": true, "internalType": "address", "name": "user", "type": "address" },
+      { "indexed": false, "internalType": "uint256", "name": "aEthWETHIn", "type": "uint256" },
+      { "indexed": false, "internalType": "uint256", "name": "aEthwstETHOut", "type": "uint256" },
+      { "indexed": false, "internalType": "uint256", "name": "profit", "type": "uint256" }
+    ],
+    "name": "SwapWstETH",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [{ "indexed": false, "internalType": "address", "name": "account", "type": "address" }],
+    "name": "Unpaused",
+    "type": "event"
+  },
+  {
+    "inputs": [],
+    "name": "MAX_PREMIUM",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "PREMIUM_PRECISION",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "aEthWETH",
+    "outputs": [{ "internalType": "contract IERC20", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "aEthwstETH",
+    "outputs": [{ "internalType": "contract IERC20", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "availableWstETHLiquidity",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "uint256", "name": "amountIn", "type": "uint256" }],
+    "name": "getWstETHAmountOut",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "uint256", "name": "amountIn", "type": "uint256" }],
+    "name": "getWstETHProfit",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getWstETHRate",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getWstETHRateWithPremium",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "maxSwapFromDebtCeiling",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "maxSwapToWstETH",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "owner",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  { "inputs": [], "name": "pause", "outputs": [], "stateMutability": "nonpayable", "type": "function" },
+  {
+    "inputs": [],
+    "name": "paused",
+    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "premium",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "profitReceiver",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "uint256", "name": "_premium", "type": "uint256" }],
+    "name": "setPremium",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "target_", "type": "address" },
+      { "internalType": "bytes", "name": "data_", "type": "bytes" }
+    ],
+    "name": "spell",
+    "outputs": [{ "internalType": "bytes", "name": "response_", "type": "bytes" }],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "amountIn", "type": "uint256" },
+      { "internalType": "uint256", "name": "amountOutMin", "type": "uint256" }
+    ],
+    "name": "swapToWstETH",
+    "outputs": [{ "internalType": "uint256", "name": "amountOut", "type": "uint256" }],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "amountIn", "type": "uint256" },
+      { "internalType": "uint256", "name": "amountOutMin", "type": "uint256" },
+      { "internalType": "address", "name": "referral", "type": "address" }
+    ],
+    "name": "swapToWstETHWithReferral",
+    "outputs": [{ "internalType": "uint256", "name": "amountOut", "type": "uint256" }],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  { "inputs": [], "name": "unpause", "outputs": [], "stateMutability": "nonpayable", "type": "function" },
+  {
+    "inputs": [],
+    "name": "variableDebtEthWETH",
+    "outputs": [{ "internalType": "contract IERC20", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "vault",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "wstETH",
+    "outputs": [{ "internalType": "contract IWstETH", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  }
+]

@@ -1,0 +1,153 @@
+# yaml-language-server: $schema=../../schemas/main-schema.json
+deployed:
+  l1:
+    - &aTokenWstETHSwap "0x9D1F0f86E06f087E302E888aDBc9B07bfED0a25F"
+    - &ownerSafe "0x199cC9fDD6c9a7d1924A32EA03097D7475FDbaDf"
+    - &profitReceiverSafe "0xcCf2daba8Bb04a232a2fDA0D01010D4EF6C69B85"
+l1:
+  chainId: 1
+  rpcUrl: L1_MAINNET_RPC_URL
+  explorerHostname: api.etherscan.io
+  explorerTokenEnv: ETHERSCAN_TOKEN
+  contracts:
+    aTokenWstETHSwap:
+      name: ATokenWstETHSwap
+      address: *aTokenWstETHSwap
+      checks:
+        MAX_PREMIUM: 100000 # 10.0000 %
+        PREMIUM_PRECISION: 1000000 # 100.0000 %
+        aEthWETH: 0x4d5F47FA6A74757f35C14fD3a6Ef8E3C9BC514E8
+        aEthwstETH: 0x0B925eD163218f6662a35e0f0371Ac234f9E9371
+        availableWstETHLiquidity: 0
+        getWstETHAmountOut: null
+        getWstETHProfit: null
+        getWstETHRate: null
+        getWstETHRateWithPremium: null
+        maxSwapFromDebtCeiling: null
+        maxSwapToWstETH: 0 # null after allowance will be granted
+        owner: 0x199cC9fDD6c9a7d1924A32EA03097D7475FDbaDf
+        paused: false
+        premium: 5000 # 0.5000 %
+        profitReceiver: 0xcCf2daba8Bb04a232a2fDA0D01010D4EF6C69B85 # Earn Treasury
+        variableDebtEthWETH: 0xeA51d7853EEFb32b6ee06b1C12E6dcCA88Be0fFE
+        vault: 0x893aa69FBAA1ee81B536f0FbE3A3453e86290080
+        wstETH: 0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0
+    ownerSafe:
+      name: Safe
+      address: *ownerSafe
+      proxyName: SafeProxy
+      implementation: "0x41675c099f32341bf84bfc5382af534df5c7461a"
+      proxyChecks: {}
+      checks:
+        VERSION: "1.4.1"
+        approvedHashes: null # need to specify args
+        checkNSignatures: null # need to specify args
+        checkSignatures: null # need to specify args
+        domainSeparator: "0xcd59cb407791bf0ca63391cc93ea5e212c8983401fa446047c231d899ca3dc61"
+        encodeTransactionData: null # need to specify args
+        getChainId: 1
+        getModulesPaginated: null
+        getOwners:
+          - "0xa7615CD307F323172331865181DC8b80a2834324"
+          - "0x1d895E5CF6E5288C9A56fACE942E016696Fb0C90"
+          - "0x4604E3bFbaCcB317a6FfEde8Bf24105F476A7329"
+          - "0x8888843c607F4Bbd6aD72128F478085256Bdd15D"
+          - "0x59F8D74Fe49d5ebEAc069E3baf07eB4b614BD5A7"
+          - "0x912e21CdA3D7012146da4Df33309d860a9eb0bEb"
+        getStorageAt: null
+        getThreshold: 4
+        getTransactionHash: null
+        isModuleEnabled: null
+        isOwner:
+          - args: ["0xa7615CD307F323172331865181DC8b80a2834324"]
+            result: true
+          - args: ["0x1d895E5CF6E5288C9A56fACE942E016696Fb0C90"]
+            result: true
+          - args: ["0x4604E3bFbaCcB317a6FfEde8Bf24105F476A7329"]
+            result: true
+          - args: ["0x8888843c607F4Bbd6aD72128F478085256Bdd15D"]
+            result: true
+          - args: ["0x59F8D74Fe49d5ebEAc069E3baf07eB4b614BD5A7"]
+            result: true
+          - args: ["0x912e21CdA3D7012146da4Df33309d860a9eb0bEb"]
+            result: true
+        nonce: 0
+        signedMessages: null
+      implementationChecks:
+        VERSION: "1.4.1"
+        approvedHashes: null
+        checkNSignatures: null
+        checkSignatures: null
+        domainSeparator: "0xc4864056e21022913a49884ba9fb4035364d5c2ab8b40f0305583ae419c72f86"
+        encodeTransactionData: null
+        getChainId: 1
+        getModulesPaginated: null
+        getOwners: null
+        getStorageAt: null
+        getThreshold: null
+        getTransactionHash: null
+        isModuleEnabled: null
+        isOwner: null
+        nonce: 0
+        signedMessages: null
+    profitReceiverSafe:
+      name: Safe
+      address: *profitReceiverSafe
+      proxyName: SafeProxy
+      implementation: "0x41675c099f32341bf84bfc5382af534df5c7461a"
+      proxyChecks: {}
+      checks:
+        VERSION: "1.4.1"
+        approvedHashes: null
+        checkNSignatures: null
+        checkSignatures: null
+        domainSeparator: "0xf463eafe8cd1b761a1e0fd9e1f08d016237252b4af417c43077fc33f3c831d03"
+        encodeTransactionData: null
+        getChainId: 1
+        getModulesPaginated: null
+        getOwners:
+          - "0xE6CD29BF19769E44534099d241abAa07aa8c8E9a"
+          - "0x8aA493BcD7f989caD67dd3CB48A4c2E6b40FeDB0"
+          - "0x73B254db9cb71a129C4E73aF087D71Ac7d34a8d7"
+          - "0xf2374BCb265505002055942D070459a4d2011012"
+          - "0x75D95fF8D48E2Ca5c4235322A8AC8e52A76124cD"
+          - "0x59d07dc34B135B17b87840a86BFF7302039E7EDf"
+          - "0x8ecd93982FfbB2f937ADa6c6e50d1950974081C0"
+        getStorageAt: null
+        getThreshold: 4
+        getTransactionHash: null
+        isModuleEnabled: null
+        isOwner:
+          - args: ["0xE6CD29BF19769E44534099d241abAa07aa8c8E9a"]
+            result: true
+          - args: ["0x8aA493BcD7f989caD67dd3CB48A4c2E6b40FeDB0"]
+            result: true
+          - args: ["0x73B254db9cb71a129C4E73aF087D71Ac7d34a8d7"]
+            result: true
+          - args: ["0xf2374BCb265505002055942D070459a4d2011012"]
+            result: true
+          - args: ["0x75D95fF8D48E2Ca5c4235322A8AC8e52A76124cD"]
+            result: true
+          - args: ["0x59d07dc34B135B17b87840a86BFF7302039E7EDf"]
+            result: true
+          - args: ["0x8ecd93982FfbB2f937ADa6c6e50d1950974081C0"]
+            result: true
+        nonce: null
+        signedMessages: null
+      implementationChecks:
+        VERSION: "1.4.1"
+        approvedHashes: null
+        checkNSignatures: null
+        checkSignatures: null
+        domainSeparator: "0xc4864056e21022913a49884ba9fb4035364d5c2ab8b40f0305583ae419c72f86"
+        encodeTransactionData: null
+        getChainId: 1
+        getModulesPaginated: null
+        getOwners: null
+        getStorageAt: null
+        getThreshold: null
+        getTransactionHash: null
+        isModuleEnabled: null
+        isOwner: null
+        nonce: 0
+        signedMessages: null
