@@ -28,7 +28,7 @@ jobs:
           # Lido V3 configs - Hoodi
           - config: configs/lido/hoodi/lido-testnet.yaml
             network: hoodi-testnet
-          - config: configs/lido/hoodi/lido-et-testnet.yaml
+          - config: configs/lido/hoodi/lido-et-testnet.yml
             network: hoodi-testnet
           # SafeHarbor configs
           - config: configs/safeharbor/mainnet.yml
