@@ -2,38 +2,12 @@
   "name": "state-mate",
   "build": {
     "dockerfile": "Dockerfile",
-    "context": "..",
-    "args": {
-      "DEVCONTAINER_BASE_IMAGE": "mcr.microsoft.com/devcontainers/typescript-node:1-20-bookworm",
-      "YARN_VERSION": "4.3.1"
-    }
+    "context": ".."
   },
   "workspaceFolder": "/workspaces/state-mate",
   "postCreateCommand": "bash .devcontainer/post-create.sh",
   "customizations": {
     "vscode": {
-      "settings": {
-        "editor.formatOnSave": true,
-        "editor.defaultFormatter": "esbenp.prettier-vscode",
-        "editor.codeActionsOnSave": {
-          "source.fixAll.eslint": "always"
-        },
-        "files.trimTrailingWhitespace": true,
-        "cSpell.words": [
-          "apikey",
-          "bscscan",
-          "Depositable",
-          "esbenp",
-          "IERC165",
-          "minato",
-          "Mutables",
-          "Ossifiable",
-          "REBASABLE",
-          "REPLACEME",
-          "SONEIUM",
-          "typebox"
-        ]
-      },
       "extensions": ["esbenp.prettier-vscode", "dbaeumer.vscode-eslint", "redhat.vscode-yaml"]
     }
   }
