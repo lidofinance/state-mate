@@ -1,24 +1,4 @@
 # yaml-language-server: $schema=../../schemas/main-schema.json
-
-#
-# Lido V3 Phase 2 - Post-Vote Configuration
-#
-# This configuration represents the state AFTER the Phase 2 vote is enacted.
-# Phase 2 enables the Predeposit Guarantee on mainnet and increases the global
-# stVaults minting limit to ~3M ETH via a 30% max external ratio.
-#
-# Key changes from Phase 1:
-# - Max external ratio: 3000 BP (30%) - enabling ~3M ETH global minting capacity
-# - New PDG implementation: 0xE78717192C45736DF0E4be55c0219Ee7f9aDdd0D (unpaused)
-# - New VaultsAdapter: 0x28F9Ac198C4E0FA6A9Ad2c2f97CB38F1A3120f27
-# - New Easy Track factories for vaults operations
-#
-# Voting: January 20, 2026
-# Expected enactment: ~January 29, 2026
-#
-# Source of truth: https://research.lido.fi/t/lido-v3-design-implementation-proposal/10665/15
-#
-
 ---
 parameters:
   - &contract4788 "0x000F3df6D732807Ef1319fB7B8bB8522d0Beac02"
@@ -53,10 +33,9 @@ deployed:
     # --- stVaults system contracts ---
 
     - &vaultHub "0x1d201BE093d847f6446530Efb0E8Fb426d176709"
-    - &vaultHubImplAddress "0x7c7d957D0752AB732E73400624C4a1eb1cb6CF50"
+    - &vaultHubImplAddress "0x6330fE7756FBE8649adfb9A541d61C5edB8B4D70"
     - &predepositGuarantee "0xF4bF42c6D6A0E38825785048124DBAD6c9eaaac3"
-    - &predepositGuaranteeOldImplAddress "0xCC08C36BD5bb78FDcB10F35B404ada6Ffc71a023"
-    - &predepositGuaranteeNewImplAddress "0xE78717192C45736DF0E4be55c0219Ee7f9aDdd0D"
+    - &predepositGuaranteeImplAddress "0xE78717192C45736DF0E4be55c0219Ee7f9aDdd0D"
     - &operatorGrid "0xC69685E89Cefc327b43B7234AC646451B27c544d"
     - &operatorGridImplAddress "0xA612E30D71d7D54aEaf4e5A21023F3F270932C2C"
 
@@ -78,9 +57,8 @@ deployed:
     - &oracleReportSanityChecker "0xf1647c86E6D7959f638DD9CE1d90e2F3C9503129"
     - &oracleDaemonConfig "0xbf05A929c3D7885a6aeAd833a992dA6E5ac23b09"
     - &lazyOracle "0x5DB427080200c235F2Ae8Cd17A7be87921f7AD6c"
-    - &lazyOracleImplAddress "0x47f3a6b1E70F7Ec7dBC3CB510B1fdB948C863a5B"
+    - &lazyOracleImplAddress "0x96c9a897D116ef660086d3aA67b3af653324aB37"
     - &tokenRateNotifier "0x25e35855783bec3E49355a29e110f02Ed8b05ba9"
-    - &legacyOracle "0x442af784A788A5bd6F42A01Ebe9F287a871243fb"
 
     # --- DAO & Aragon apps ---
     - &aragonRepoBase "0xa8A358E9bbB9fF60D4B89CBE5b2FE88f98b51B9D"
@@ -99,10 +77,6 @@ deployed:
     - &aragonAclImplAddress "0x9f3b9198911054B122fDb865f8A5Ac516201c339"
     - &aragonEvmScriptRegistry "0x853cc0D5917f49B57B8e9F89e491F5E18919093A"
     - &aragonEvmScriptRegistryImplAddress "0xBF1Ce0Bc4EdaAD8e576b3b55e19c4C15Cf6999eb"
-    - &aragonAppLidoRepo "0xF5Dc67E54FC96F993CD06073f71ca732C1E654B1"
-    - &dualGovernance "0xC1db28B3301331277e307FDCfF8DE28242A4486E"
-    - &elRewardsVault "0x388C818CA8B9251b393131C08a736A67ccB19297"
-    - &timeConstraints "0x2a30F5aC03187674553024296bed35Aa49749DDa"
 
     # --- GateSeal ---
     - &gateSealBlueprint "0xEe06EA501f7d9DC6F4200385A8D910182D155d3e"
@@ -129,8 +103,7 @@ deployed:
     - &easyTrack "0xF0211b7660680B49De1A7E9f25C65660F0a13Fea"
     - &evmScriptExecutor "0xFE5986E06210aC1eCC1aDCafc0cc7f8D63B3F977"
     - &callsScript "0x5cEb19e1890f677c3676d5ecDF7c501eBA01A054"
-    - &vaultsAdapterOld "0xe2DE6d2DefF15588a71849c0429101F8ca9FB14D"
-    - &vaultsAdapterNew "0x28F9Ac198C4E0FA6A9Ad2c2f97CB38F1A3120f27"
+    - &vaultsAdapter "0x28F9Ac198C4E0FA6A9Ad2c2f97CB38F1A3120f27"
 
     # --- Committees (Safe msigs) ---
     - &resealManager "0x7914b5a1539b97Bd0bbd155757F25FD79A522d24"
@@ -176,7 +149,7 @@ misc:
   - &LIDO_SYMBOL "stETH"
   - &WSTETH_NAME "Wrapped liquid staked Ether 2.0"
   - &WSTETH_SYMBOL "wstETH"
-  - &LIDO_MAX_EXTERNAL_RATIO_BP 3000 # WARN: 30% cap as of Phase 2, !!! important !!!
+  - &LIDO_MAX_EXTERNAL_RATIO_BP 3000 # WARN: 30% cap, !!! important !!!
   - &TOTAL_BASIS_POINTS 10000
   - &FEE_PRECISION_POINTS 100000000000000000000
   - &MAX_BATCHES_LENGTH 36
@@ -190,7 +163,7 @@ misc:
   - &DEFAULT_TIER_ID 0
   - &DEFAULT_TIER_OPERATOR "0xFFfFfFffFFfffFFfFFfFFFFFffFFFffffFfFFFfF"
   - &DEFAULT_TIER_RR 5000
-  - &DEFAULT_TIER_SHARE_LIMIT 4071000000000000000000
+  - &DEFAULT_TIER_SHARE_LIMIT 0
   - &DEFAULT_TIER_SHARE_FRT 4975
   - &DEFAULT_TIER_INFRA_FEE 100
   - &DEFAULT_TIER_LIQUIDITY_FEE 650
@@ -213,8 +186,6 @@ misc:
   - &DURATION_28_DAYS 2419200
   - &DURATION_30_DAYS 2592000
   - &DURATION_1_YEAR 31536000
-  - &UTC_14 50400
-  - &UTC_23 82800
 
   # --- Percentage bases & voting parameters ---
   - &VOTING_SUPPORT_REQUIRED_PCT 500000000000000000
@@ -276,13 +247,8 @@ misc:
   - &MAX_REWARD_RATIO 65535
   - &REWARD_RATIO_BP 350
   - &QUARANTINE_PERIOD 259200
-
-  # --- V3 Template ---
-  - &UPGRADE_NOT_STARTED 0
-  - &UPGRADE_STARTED_SLOT "0x058d69f67a3d86c424c516d23a070ff8bed34431617274caa2049bd702675e3f"
-  - &EXPIRE_SINCE_INCLUSIVE 1768435200
-  - &INFINITE_ALLOWANCE "115792089237316195423570985008687907853269984665640564039457584007913129639935"
-  - &INITIAL_MAX_EXTERNAL_RATIO_BP "300" # 3%
+eoa:
+  - &deployer "0xAD2F7e30AeA89f6D45D942D0f52aFB8B395965f2"
 
 roles:
   # Lido
@@ -375,9 +341,7 @@ roles:
   - &AGENT_APP_ID "0x701a4fd1f5174d12a0f1d9ad2c88d0ad11ab6aad0ac72b7d9ce621815f8016a9"
   - &NODE_OPERATORS_REGISTRY_APP_ID "0x7071f283424072341f856ac9e947e7ec0eb68719f757a7e785979b6b8717579d"
   - &SIMPLE_DVT_APP_ID "0xe1635b63b5f7b5e545f2a637558a4029dea7905361a2f0fc28c66e9136cf86a4"
-  - &APM_REGISTRY_APP_ID "0x9089af016eb74d66811e1c39c1eef86fdcdb84b5665a4884ebf62339c2613991"
   - &LIDO_APP_ID "0x3ca7c3e38968823ccb4c78ea688df41356f182ae1d159e4ee608d30d68cef320"
-  - &LIDO_APM_APP_ID "0xc95d34302dc847b668b330533aa705a57718eab1060b8549df38040633554bcd"
 
   # NodeOperatorsRegistry
   - &STAKING_ROUTER_ROLE "0xbb75b874360e0bfd87f964eadd8276d8efb7c942134fc329b513032d0803e0c6"
@@ -985,7 +949,7 @@ l1:
         getRoleAdmin: null
         getRoleMember: null
         getRoleMemberCount: null
-        getSharesRequestedToBurn: null
+        getSharesRequestedToBurn: [0, 0]
         hasRole: null
         supportsInterface: null
       ozAcl:
@@ -1246,9 +1210,9 @@ l1:
         *OZ_PAUSE_ROLE : [*gateSealVaulthubAndPredepositGuarantee, *resealManager]
         *OZ_RESUME_ROLE : [*resealManager]
         *VAULT_MASTER_ROLE : []
-        *BAD_DEBT_MASTER_ROLE : [*vaultsAdapterNew]
+        *BAD_DEBT_MASTER_ROLE : [*vaultsAdapter]
         *REDEMPTION_MASTER_ROLE : []
-        *VALIDATOR_EXIT_ROLE : [*vaultsAdapterNew]
+        *VALIDATOR_EXIT_ROLE : [*vaultsAdapter]
       implementationChecks:
         CONNECT_DEPOSIT: *ONE_ETH_WEI
         CONSENSUS_CONTRACT: *hashConsensusForAccountingOracle
@@ -1302,10 +1266,10 @@ l1:
       name: PredepositGuarantee
       address: *predepositGuarantee
       proxyName: OssifiableProxy
-      implementation: *predepositGuaranteeNewImplAddress
+      implementation: *predepositGuaranteeImplAddress
       proxyChecks:
         proxy__getAdmin: *aragonAgent
-        proxy__getImplementation: *predepositGuaranteeNewImplAddress
+        proxy__getImplementation: *predepositGuaranteeImplAddress
         proxy__getIsOssified: false
       checks:
         PREDEPOSIT_AMOUNT: *ONE_ETH_WEI
@@ -1324,8 +1288,8 @@ l1:
         PAUSE_INFINITELY: *MAX_UINT256
         PAUSE_ROLE: *OZ_PAUSE_ROLE
         RESUME_ROLE: *OZ_RESUME_ROLE
-        getResumeSinceTimestamp: null
-        isPaused: false # Phase 2: Unpaused
+        getResumeSinceTimestamp: 1769692907 # resumed by Phase 3 vote
+        isPaused: false
         claimableRefund: null
         getRoleAdmin: null
         getRoleMember: null
@@ -1415,23 +1379,24 @@ l1:
         pendingRequests: null
         pendingRequestsCount: null
         supportsInterface: null
-        tier:
-          - args: [*DEFAULT_TIER_ID]
-            result:
-              [
-                *DEFAULT_TIER_OPERATOR,
-                *DEFAULT_TIER_SHARE_LIMIT,
-                0,
-                *DEFAULT_TIER_RR,
-                *DEFAULT_TIER_SHARE_FRT,
-                *DEFAULT_TIER_INFRA_FEE,
-                *DEFAULT_TIER_LIQUIDITY_FEE,
-                *DEFAULT_TIER_RESERVATION_FEE,
-              ]
+        tier: null
+        # TODO: handle case when one of the values is dynamic (third one in this case)
+        # - args: [*DEFAULT_TIER_ID]
+        #   result:
+        #     [
+        #       *DEFAULT_TIER_OPERATOR,
+        #       *DEFAULT_TIER_SHARE_LIMIT,
+        #       0,
+        #       *DEFAULT_TIER_RR,
+        #       *DEFAULT_TIER_SHARE_FRT,
+        #       *DEFAULT_TIER_INFRA_FEE,
+        #       *DEFAULT_TIER_LIQUIDITY_FEE,
+        #       *DEFAULT_TIER_RESERVATION_FEE,
+        #     ]
         vaultInfo: null
       ozAcl:
         *DEFAULT_ADMIN_ROLE : [*aragonAgent]
-        *REGISTRY_ROLE : [*evmScriptExecutor, *vaultsAdapterNew]
+        *REGISTRY_ROLE : [*evmScriptExecutor, *vaultsAdapter]
       implementationChecks:
         DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
         DEFAULT_TIER_ID: *DEFAULT_TIER_ID

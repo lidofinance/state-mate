@@ -1,0 +1,15 @@
+.buildx-cache
+.claude
+.git
+.github
+.idea
+.skills
+.vscode
+.yarn/install-state.gz
+.DS_Store
+.env
+artifacts
+cache
+dist
+node_modules
+reports

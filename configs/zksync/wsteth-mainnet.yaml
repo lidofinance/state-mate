@@ -1,0 +1,76 @@
+# ZKsync Mainnet wstETH Bridge
+# L1 deployment & configuration
+
+# yaml-language-server: $schema=./../../schemas/main-schema.json
+
+parameters:
+  - &wstETH "0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0"
+  - &agent "0x3e40D73EB977Dc6a537aF587D48316feE66E9C8c"
+  - &zkSyncDiamondProxy "0x32400084C286CF3E17e7B677ea9583e60a000324" # https://docs.zksync.io/zksync-network/environment/l1-contracts#l1-mainnet-contract-addresses
+
+deployed:
+  l1:
+    - &l1ERC20Bridge "0x41527B2d03844dB6b0945f25702cB958b6d55989"
+    - &l1ERC20BridgeImpl "0x9a810469F4a451Ebb7ef53672142053b4971587c"
+  l2:
+    - &l2ERC20Bridge "0xE1D6A50E7101c8f8db77352897Ee3f1AC53f782B"
+    - &l2WstETH "0x703b52F2b28fEbcB60E1372858AF5b18849FE867"
+
+roles:
+  - &DEFAULT_ADMIN_ROLE "0x0000000000000000000000000000000000000000000000000000000000000000"
+  - &DEPOSITS_DISABLER_ROLE "0x63f736f21cb2943826cd50b191eb054ebbea670e4e962d0527611f830cd399d6"
+  - &DEPOSITS_ENABLER_ROLE "0x4b43b36766bde12c5e9cbbc37d15f8d1f769f08f54720ab370faeb4ce893753a"
+  - &WITHDRAWALS_DISABLER_ROLE "0x94a954c0bc99227eddbc0715a62a7e1056ed8784cd719c2303b685683908857c"
+  - &WITHDRAWALS_ENABLER_ROLE "0x9ab8816a3dc0b3849ec1ac00483f6ec815b07eee2fd766a353311c823ad59d0d"
+
+l1:
+  rpcUrl: L1_MAINNET_RPC_URL
+  explorerHostname: api.etherscan.io/v2/api
+  explorerTokenEnv: ETHERSCAN_TOKEN
+  chainId: 1
+  contracts:
+    l1ERC20Bridge:
+      name: L1ERC20Bridge
+      address: *l1ERC20Bridge
+      proxyName: OssifiableProxy
+      implementation: *l1ERC20BridgeImpl
+      proxyChecks:
+        proxy__getImplementation: *l1ERC20BridgeImpl
+        proxy__getAdmin: *agent
+        proxy__getIsOssified: false
+      checks:
+        isInitialized: true
+        isDepositsEnabled: false
+        isWithdrawalsEnabled: true
+        l1Token: *wstETH
+        l2Token: *l2WstETH
+        l2Bridge: *l2ERC20Bridge
+        zkSync: *zkSyncDiamondProxy
+        l2TokenAddress:
+          - args: [*wstETH]
+            result: *l2WstETH
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        DEPOSITS_DISABLER_ROLE: *DEPOSITS_DISABLER_ROLE
+        DEPOSITS_ENABLER_ROLE: *DEPOSITS_ENABLER_ROLE
+        WITHDRAWALS_DISABLER_ROLE: *WITHDRAWALS_DISABLER_ROLE
+        WITHDRAWALS_ENABLER_ROLE: *WITHDRAWALS_ENABLER_ROLE
+        getRoleAdmin: null
+        hasRole: null
+        supportsInterface: null
+        depositAmount: null
+        isWithdrawalFinalized: null
+      implementationChecks:
+        isInitialized: false
+        isDepositsEnabled: false
+        isWithdrawalsEnabled: false
+        l1Token: "0x0000000000000000000000000000000000000000"
+        l2Token: "0x0000000000000000000000000000000000000000"
+        l2Bridge: "0x0000000000000000000000000000000000000000"
+        zkSync: "0x0000000000000000000000000000000000000000"
+        hasRole: null
+      ozNonEnumerableAcl:
+        *DEFAULT_ADMIN_ROLE : [*agent]
+        *DEPOSITS_ENABLER_ROLE : [*agent]
+        *DEPOSITS_DISABLER_ROLE : [*agent]
+        *WITHDRAWALS_ENABLER_ROLE : [*agent]
+        *WITHDRAWALS_DISABLER_ROLE : [*agent]

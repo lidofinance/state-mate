@@ -106,8 +106,8 @@ parameters:
 
   # --- Ext Lido signers ---
   - &EXT_LIDO_SIGNER_1 "0x59d07dc34B135B17b87840a86BFF7302039E7EDf"
-  - &EXT_LIDO_SIGNER_2 "0x04e7C0350241b818eE5c92cc260008C9898F41cf"
-  - &EXT_LIDO_SIGNER_3 "0x8ecd93982FfbB2f937ADa6c6e50d1950974081C0"
+  - &EXT_LIDO_SIGNER_2 "0x73B254db9cb71a129C4E73aF087D71Ac7d34a8d7"
+  - &EXT_LIDO_SIGNER_3 "0xf2374BCb265505002055942D070459a4d2011012"
   - &EXT_LIDO_SIGNER_4 "0x75D95fF8D48E2Ca5c4235322A8AC8e52A76124cD"
 
   # --- Thresholds for msigs ---
@@ -1274,12 +1274,14 @@ l1:
           - args: [*SET_SUBVAULT_LIMIT_ROLE]
             result: 1
           - args: [*ALLOW_SUBVAULT_ASSETS_ROLE]
-            result: 1
+            result: 2
           - args: [*MODIFY_VAULT_BALANCE_ROLE]
             result: 1
           - args: [*MODIFY_SUBVAULT_BALANCE_ROLE]
             result: 1
           - args: [*SET_FLAGS_ROLE]
+            result: 2
+          - args: [*SET_ACCOUNT_INFO_ROLE]
             result: 1
           - args: [*SET_QUEUE_STATUS_ROLE]
             result: 1
@@ -1319,13 +1321,15 @@ l1:
           - args: [*SET_SUBVAULT_LIMIT_ROLE]
             result: [*ACTIVE_VAULT_ADMIN]
           - args: [*ALLOW_SUBVAULT_ASSETS_ROLE]
-            result: [*ACTIVE_VAULT_ADMIN]
+            result: [*ACTIVE_VAULT_ADMIN, *LAZY_VAULT_ADMIN]
           - args: [*MODIFY_VAULT_BALANCE_ROLE]
             result: [*ACTIVE_VAULT_ADMIN]
           - args: [*MODIFY_SUBVAULT_BALANCE_ROLE]
             result: [*ACTIVE_VAULT_ADMIN]
           - args: [*SET_FLAGS_ROLE]
-            result: [*timelockController]
+            result: [*timelockController, *LAZY_VAULT_ADMIN]
+          - args: [*SET_ACCOUNT_INFO_ROLE]
+            result: [*LAZY_VAULT_ADMIN]
           - args: [*SET_QUEUE_STATUS_ROLE]
             result: [*timelockController]
           - args: [*SUBMIT_REPORTS_ROLE]
@@ -1432,6 +1436,8 @@ l1:
             result: true
           - args: [*SET_QUEUE_LIMIT_ROLE]
             result: true
+          - args: [*SET_ACCOUNT_INFO_ROLE]
+            result: true
         isDepositQueue:
           - args: [*depositQueueETH]
             result: true
@@ -1536,8 +1542,10 @@ l1:
           - args: [21]
             result: *SET_QUEUE_LIMIT_ROLE
           - args: [22]
+            result: *SET_ACCOUNT_INFO_ROLE
+          - args: [23]
             mustRevert: true
-        supportedRoles: 22
+        supportedRoles: 23
         supportsInterface:
         verifierFactory: *verifierFactory
       implementationChecks:
@@ -1596,7 +1604,7 @@ l1:
       proxyChecks: {}
       checks:
         asset: *ETH
-        canBeRemoved: false
+        canBeRemoved:
         claimableOf:
         requestOf:
         unclaimedRequests:
@@ -1616,7 +1624,7 @@ l1:
       proxyChecks: {}
       checks:
         asset: *WETH
-        canBeRemoved: false
+        canBeRemoved:
         claimableOf:
         requestOf:
         unclaimedRequests:
@@ -1636,7 +1644,7 @@ l1:
       proxyChecks: {}
       checks:
         asset: *LIDO_WSTETH
-        canBeRemoved: false
+        canBeRemoved:
         claimableOf:
         requestOf:
         unclaimedRequests:
@@ -1656,7 +1664,7 @@ l1:
       proxyChecks: {}
       checks:
         asset: *DVV_TOKEN
-        canBeRemoved: true
+        canBeRemoved:
         claimableOf:
         requestOf:
         unclaimedRequests:
@@ -1677,7 +1685,7 @@ l1:
       checks:
         asset: *LIDO_WSTETH
         batchAt:
-        canBeRemoved: false
+        canBeRemoved:
         getState:
         requestsOf:
         vault: *vault
@@ -1720,7 +1728,7 @@ l1:
             result: true
           - args: [*LIDO_STETH]
             result: false
-        securityParams: [10000000000000000, 1000000000000000, 10000000000000000, 1000000000000000, 72000, 3600, 172800]
+        securityParams: [5000000000000000, 1000000000000000, 5000000000000000, 1000000000000000, 72000, 3600, 86400]
         supportedAssetAt:
           - args: [0]
             result: *ETH
@@ -1774,7 +1782,7 @@ l1:
         balanceOf:
         claimableSharesOf:
         decimals: 18
-        flags: [false, false, false, false, false, 0]
+        flags: [false, false, false, true, false, 0]
         isDepositorWhitelisted:
         name: "Mellow stRATEGY"
         sharesOf:
@@ -1916,7 +1924,7 @@ l1:
         getVerificationResult:
         hashCall:
         isAllowedCall:
-        merkleRoot: "0x71b504c7b3713da0a673dd749430208861b3b818fc52360b5779095f76e0dd48"
+        merkleRoot: "0xcd715d551e0b3173d7dd466c34d8bd1f4df89e12dc4b14a5d6e3276e50d5fcd3"
         vault: *vault
         verifyCall:
       implementationChecks:
@@ -1964,7 +1972,7 @@ l1:
         getVerificationResult:
         hashCall:
         isAllowedCall:
-        merkleRoot: "0xde6489cb864dea92096c8730f15a358db4513ec2ffada5930890f1c8f795a90f"
+        merkleRoot: "0x5dcde2b5ebae9e24afe2adbb45136c4347e7d63d3715608035aebccb6491166b"
         vault: *vault
         verifyCall:
       implementationChecks:
@@ -2012,7 +2020,7 @@ l1:
         getVerificationResult:
         hashCall:
         isAllowedCall:
-        merkleRoot: "0x00bbc26b9558e314d4511e14fdf56afe2d06085cc7ad960f52f1b07ed053f46c"
+        merkleRoot: "0xa676bdddff6894164a43f900342e8a4d2b89872d1c93a339ea5a58fae2388779"
         vault: *vault
         verifyCall:
       implementationChecks:
@@ -2156,7 +2164,7 @@ l1:
         getVerificationResult:
         hashCall:
         isAllowedCall:
-        merkleRoot: "0x9ffa6937871e1b8a443f452a89ebaa25172a848e15142324505f3ff6ebc4ba8c"
+        merkleRoot: "0x1ef6dc1dc63981685c24700f5a5c712dc64be74754befcce8b449e8368270466"
         vault: *vault
         verifyCall:
       implementationChecks:
@@ -2204,7 +2212,7 @@ l1:
         getVerificationResult:
         hashCall:
         isAllowedCall:
-        merkleRoot: "0xc268fd284eaab90c6036600556505aaaef5d5c7c4209123507904e59bfbed5ea"
+        merkleRoot: "0x0af2e0c9cb4af529fac7f8b0b43ad359ca34c60d9bac4f46958ca826c8d35e7c"
         vault: *vault
         verifyCall:
       implementationChecks:
@@ -2252,7 +2260,7 @@ l1:
         getVerificationResult:
         hashCall:
         isAllowedCall:
-        merkleRoot: "0x8f3073576c02ddfbb89db283fefbeee19676b6eff2c7d7015592aa6c2f041b69"
+        merkleRoot: "0x0170f52cc06f6d9b9ecc008db9387f06c19efbe3abcb4afc9d08e50d3c86ea4f"
         vault: *vault
         verifyCall:
       implementationChecks:
@@ -2483,6 +2491,7 @@ l1:
         getChainId: 1
         getModulesPaginated:
         getOwners:
+          - *EXT_MELLOW_SIGNER_1
           - *EXT_MELLOW_SIGNER_5
           - *EXT_MELLOW_SIGNER_2
           - *MELLOW_SIGNER_2
@@ -2577,6 +2586,7 @@ l1:
         getChainId: 1
         getModulesPaginated:
         getOwners:
+          - *EXT_MELLOW_SIGNER_1
           - *EXT_MELLOW_SIGNER_5
           - *EXT_MELLOW_SIGNER_2
           - *MELLOW_SIGNER_2
@@ -2633,7 +2643,7 @@ l1:
         getTransactionHash:
         isModuleEnabled:
         isOwner:
-        nonce: 2
+        nonce:
         signedMessages:
       implementationChecks:
         VERSION:
@@ -2678,7 +2688,7 @@ l1:
         getTransactionHash:
         isModuleEnabled:
         isOwner:
-        nonce: 1
+        nonce:
         signedMessages:
       implementationChecks:
         VERSION:
