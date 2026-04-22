@@ -57,7 +57,6 @@ deployed:
     # --- DAO & Aragon apps ---
     - &aragonRepoBase "0xD03e828844AA4eF31566F984Fe2A1693e7d5aF38"
     - &aragonID "0xAa3dFDDA2670A3d2A5B9cd6669ce1E4cF99258D9"
-    - &lidoAPMKernelProxy "0xe4fAd5232489Fe4E403918cbF45aA71EEB7e93D4"
     - &aragonKernel "0xA48DF029Fd2e5FCECB3886c5c2F60e3625A1E87d"
     - &aragonKernelImplAddress "0xEEf274E065964Ec22Bd44ddEbE7557c6638b368C"
     - &ldo "0xEf2573966D009CcEA0Fc74451dee2193564198dc"
@@ -188,7 +187,6 @@ misc:
   - &DURATION_1_MINUTE 60
   - &DURATION_1_HOUR 3600
   - &DURATION_1_DAY 86400
-  - &DURATION_2_WEEKS 1209600
   - &DURATION_30_DAYS 2592000
   - &DURATION_1_YEAR 31536000
   - &DURATION_3_YEARS 94608000
@@ -203,7 +201,11 @@ misc:
   - &VEB_CONSENSUS_VERSION 4
   - &VEB_DATA_FORMAT_LIST 1
   - &HASH_CONSENSUS_FAST_LANE 75
-  - &HC_AO_START 39833
+  # AccountingOracle HashConsensus frame, set in tx
+  # https://hoodi.etherscan.io/tx/0x04d4f8f6960050743bde64a363734d47b66f61f01f6f81341d0b9724fc9e79c7
+  - &HC_AO_START 85208
+  - &HC_AO_EPOCHS_PER_FRAME 225
+  - &HC_AO_FAST_LANE_LENGTH 100
   - &HC_VEB_START 39843
   - &HASH_CONSENSUS_QUORUM_AO 6
   - &HASH_CONSENSUS_QUORUM_VEBO 7
@@ -1050,7 +1052,7 @@ l1:
         totalBondShares: null
       ozAcl:
         *DEFAULT_ADMIN_ROLE : [*aragonAgent, *csmManager]
-        *CS_MANAGE_BOND_CURVES_ROLE : [*csmManager]
+        *CS_MANAGE_BOND_CURVES_ROLE : []
         *CS_SET_BOND_CURVE_ROLE : [*CSVettedGate, *csmManager]
         *CS_RECOVERER_ROLE : []
         *CS_RESUME_ROLE : [*resealManager]
@@ -1655,10 +1657,11 @@ l1:
           - *SLOTS_PER_EPOCH
           - *SECONDS_PER_SLOT
           - *GENESIS_TIME
+        # [initialEpoch, epochsPerFrame, fastLaneLengthSlots]
         getFrameConfig:
           - *HC_AO_START
-          - *HASH_CONSENSUS_FAST_LANE
-          - *SLOTS_PER_EPOCH
+          - *HC_AO_EPOCHS_PER_FRAME
+          - *HC_AO_FAST_LANE_LENGTH
         getQuorum: *HASH_CONSENSUS_QUORUM_AO
         getReportProcessor: *accountingOracle
         getConsensusState: null
