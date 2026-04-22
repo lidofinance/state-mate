@@ -25,7 +25,7 @@ jobs:
             network: ethereum-mainnet
           - config: configs/lido/mainnet/lido-et.yaml
             network: ethereum-mainnet
-          # Lido V3 configs - Hoodi
+          # Lido configs - Hoodi
           - config: configs/lido/hoodi/lido-testnet.yaml
             network: hoodi-testnet
           - config: configs/lido/hoodi/lido-et-testnet.yaml
