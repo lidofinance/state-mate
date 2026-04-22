@@ -83,13 +83,8 @@ deployed:
     - &aragonApmRegistry "0x948ffB5fDA2961C60ED3Eb84c7a31aae42EbEdCC"
     - &aragonApmRegistryImplAddress "0x13f43DCe264695D4118Cbc8Adb8691ABaEa0562d"
 
-    # --- GateSeal ---
-    - &gateSealBlueprint "0x8685Ca0311E4aBd846ee1b5b8B09299E990523F7"
-    - &gateSealFactory "0xA402349F560D45310D301E92B1AA4DeCABe147B3"
-    - &gateSealVEBAndTWG "0x368f2fcb593170823cc844F1B29e75E3d26879A1"
-    - &gateSealWithdrawalQueue "0x73d76Bd3D589B2b2185c402da82cdAfbc18b958D"
-    - &gateSealVaulthubAndPredepositGuarantee "0x2291496c76CC2e9368DbE9d4977ED2623cbDfb32"
-    - &gateSealCSAccounting "0x725166f143DdcD9EC1b96dfb70f16E3f44968A65"
+    # --- CircuitBreaker ---
+    - &circuitBreaker "0x44a5789dFeDa59cD176Ab5709ec2F4829dE4d555"
 
     # --- Staking modules ---
     - &nodeOperatorsRegistry "0x5cDbE1590c083b5A2A64427fAA63A7cfDB91FbB5"
@@ -101,6 +96,8 @@ deployed:
     - &CSAccounting "0xA54b90BA34C5f326BC1485054080994e38FB4C60"
     - &CSAccountingImplAddress "0xD32b59d6054b94516f8EEE2A84C3c33DaF1d06B8"
     - &CSFeeDistributor "0xaCd9820b0A2229a82dc1A0770307ce5522FF3582"
+    - &CSFeeOracle "0xe7314f561B2e72f9543F1004e741bab6Fc51028B"
+    - &CSPermissionlessGate "0x1773b2Ff99A030F6000554Cb8A5Ec93145650cbA"
     - &CSVettedGate "0x10a254E724fe2b7f305F76f3F116a3969c53845f"
     - &CSEjector "0x777bd76326E4aDcD353b03AD45b33BAF41048476"
 
@@ -188,11 +185,13 @@ misc:
   - &EIP712_VERSION 2
 
   # --- Time durations (in seconds) ---
+  - &DURATION_1_MINUTE 60
   - &DURATION_1_HOUR 3600
   - &DURATION_1_DAY 86400
   - &DURATION_2_WEEKS 1209600
   - &DURATION_30_DAYS 2592000
   - &DURATION_1_YEAR 31536000
+  - &DURATION_3_YEARS 94608000
 
   # --- Percentage bases & voting parameters ---
   - &VOTING_SUPPORT_REQUIRED_PCT 500000000000000000
@@ -258,7 +257,7 @@ eoa:
   - &oracleManager "0x4022E0754d0cB6905B54306105D3346d1547988b"
   - &nomManager "0xF865A1d43D36c713B4DA085f32b7d1e9739B9275"
   - &csmManager "0x4AF43Ee34a6fcD1fEcA1e1F832124C763561dA53"
-  - &resealCommittee "0x83BCE68B4e8b7071b2a664a26e6D3Bc17eEe3102" # WARNING: same as deployer!
+  - &circuitBreakerCommittee "0x83BCE68B4e8b7071b2a664a26e6D3Bc17eEe3102"
 
 roles:
   # Lido
@@ -850,7 +849,7 @@ l1:
         *MANAGE_TOKEN_URI_ROLE : []
         *ORACLE_ROLE : [*accountingOracle]
         *WQ_RESUME_ROLE : [*aragonAgent, *resealManager]
-        *WQ_PAUSE_ROLE : [*resealManager, *gateSealWithdrawalQueue]
+        *WQ_PAUSE_ROLE : [*resealManager, *circuitBreaker]
       implementationChecks:
         BUNKER_MODE_DISABLED_TIMESTAMP: *MAX_UINT256
         DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
@@ -1055,7 +1054,7 @@ l1:
         *CS_SET_BOND_CURVE_ROLE : [*CSVettedGate, *csmManager]
         *CS_RECOVERER_ROLE : []
         *CS_RESUME_ROLE : [*resealManager]
-        *CS_PAUSE_ROLE : [*resealManager, *gateSealCSAccounting]
+        *CS_PAUSE_ROLE : [*resealManager, *circuitBreaker]
       implementationChecks:
         DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
         DEFAULT_BOND_CURVE_ID: 0
@@ -1127,7 +1126,7 @@ l1:
         TW_EXIT_LIMIT_MANAGER_ROLE: *TW_EXIT_LIMIT_MANAGER_ROLE
         VERSION: *VERSION_1
         getExitRequestLimitFullInfo: null
-        getResumeSinceTimestamp: 0
+        getResumeSinceTimestamp: 1776181680
         getRoleAdmin: null
         getRoleMember: null
         getRoleMemberCount: null
@@ -1216,7 +1215,7 @@ l1:
         vaultsCount: null
       ozAcl:
         *DEFAULT_ADMIN_ROLE : [*aragonAgent]
-        *OZ_PAUSE_ROLE : [*gateSealVaulthubAndPredepositGuarantee, *resealManager]
+        *OZ_PAUSE_ROLE : [*circuitBreaker, *resealManager]
         *OZ_RESUME_ROLE : [*resealManager]
         *VAULT_MASTER_ROLE : []
         *BAD_DEBT_MASTER_ROLE : [*vaultsAdapter]
@@ -1317,7 +1316,7 @@ l1:
         validatorStatus: null
       ozAcl:
         *DEFAULT_ADMIN_ROLE : [*aragonAgent]
-        *OZ_PAUSE_ROLE : [*gateSealVaulthubAndPredepositGuarantee, *resealManager]
+        *OZ_PAUSE_ROLE : [*circuitBreaker, *resealManager]
         *OZ_RESUME_ROLE : [*resealManager]
       implementationChecks:
         PREDEPOSIT_AMOUNT: *ONE_ETH_WEI
@@ -1730,7 +1729,7 @@ l1:
         *DEFAULT_ADMIN_ROLE : [*aragonAgent]
         *ORACLE_MANAGE_CONSENSUS_CONTRACT_ROLE : []
         *ORACLE_MANAGE_CONSENSUS_VERSION_ROLE : []
-        *ORACLE_PAUSE_ROLE : [*resealManager, *gateSealVEBAndTWG]
+        *ORACLE_PAUSE_ROLE : [*resealManager, *circuitBreaker]
         *ORACLE_RESUME_ROLE : [*aragonAgent, *resealManager]
         *ORACLE_SUBMIT_DATA_ROLE : []
       implementationChecks:
@@ -2533,56 +2532,63 @@ l1:
         regFactory: *evmScriptRegistryFactory
         baseKernel: "0x14dDb33F1D85997Bc35546e7E8CC306F5A7B9DD1"
 
-    gateSealBlueprint:
-      name: GateSeal
-      address: *gateSealBlueprint
+    circuitBreaker:
+      name: CircuitBreaker
+      address: *circuitBreaker
       checks:
-        get_sealing_committee:
-          - mustRevert: true
-        get_seal_duration_seconds:
-          - mustRevert: true
-        get_sealables:
-          - mustRevert: true
-        get_expiry_timestamp:
-          - mustRevert: true
-        is_expired:
-          - mustRevert: true
-
-    gateSealFactory:
-      name: GateSealFactory
-      address: *gateSealFactory
-      checks:
-        get_blueprint: *gateSealBlueprint
-
-    gateSealWithdrawalQueue:
-      name: GateSeal
-      address: *gateSealWithdrawalQueue
-      checks:
-        get_sealing_committee: *resealCommittee
-        get_seal_duration_seconds: *DURATION_2_WEEKS
-        get_sealables: [*withdrawalQueueERC721]
-        get_expiry_timestamp: 1784217696
-        is_expired: false
-
-    gateSealVaulthubAndPredepositGuarantee:
-      name: GateSeal
-      address: *gateSealVaulthubAndPredepositGuarantee
-      checks:
-        get_sealing_committee: *resealCommittee
-        get_seal_duration_seconds: *DURATION_2_WEEKS
-        get_sealables: [*vaultHub, *predepositGuarantee]
-        get_expiry_timestamp: 1791454296
-        is_expired: false
-
-    gateSealVEBAndTWG:
-      name: GateSeal
-      address: *gateSealVEBAndTWG
-      checks:
-        get_sealing_committee: *resealCommittee
-        get_seal_duration_seconds: *DURATION_2_WEEKS
-        get_sealables: [*triggerableWithdrawalsGateway, *validatorsExitBusOracle]
-        get_expiry_timestamp: 1784217696
-        is_expired: false
+        ADMIN: *aragonAgent
+        MIN_PAUSE_DURATION: *DURATION_1_MINUTE
+        MAX_PAUSE_DURATION: *DURATION_30_DAYS
+        MIN_HEARTBEAT_INTERVAL: *DURATION_1_MINUTE
+        MAX_HEARTBEAT_INTERVAL: *DURATION_3_YEARS
+        pauseDuration: *DURATION_1_HOUR
+        heartbeatInterval: *DURATION_1_YEAR
+        getPausables:
+          - *withdrawalQueueERC721
+          - *CSEjector
+          - *validatorsExitBusOracle
+          - *vaultHub
+          - *predepositGuarantee
+          - *CSModule
+          - *CSAccounting
+          - *CSFeeOracle
+          - *CSPermissionlessGate
+          - *CSVettedGate
+          - *triggerableWithdrawalsGateway
+        getPauser:
+          - args: [*withdrawalQueueERC721]
+            result: *circuitBreakerCommittee
+          - args: [*triggerableWithdrawalsGateway]
+            result: *circuitBreakerCommittee
+          - args: [*validatorsExitBusOracle]
+            result: *circuitBreakerCommittee
+          - args: [*vaultHub]
+            result: *circuitBreakerCommittee
+          - args: [*predepositGuarantee]
+            result: *circuitBreakerCommittee
+          - args: [*CSModule]
+            result: *csmManager
+          - args: [*CSAccounting]
+            result: *csmManager
+          - args: [*CSFeeOracle]
+            result: *csmManager
+          - args: [*CSPermissionlessGate]
+            result: *csmManager
+          - args: [*CSVettedGate]
+            result: *csmManager
+          - args: [*CSEjector]
+            result: *csmManager
+        getPausableCount:
+          - args: [*circuitBreakerCommittee]
+            result: 5
+          - args: [*csmManager]
+            result: 6
+        isPauserLive:
+          - args: [*circuitBreakerCommittee]
+            result: true
+          - args: [*csmManager]
+            result: true
+        heartbeatExpiry: null
 
     node-operators-registry:
       name: NodeOperatorsRegistry
