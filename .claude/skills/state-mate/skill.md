@@ -344,13 +344,13 @@ cast call $CONTRACT "hasRole(bytes32,address)(bool)" $ROLE $ADDRESS --rpc-url $R
 
 ## Seed configs
 
-A seed config is a thin starter file named `*.seed.yml`. It lists `deployed:` + a per-chain `contracts:` stub (addresses only), and `yarn start <seed> --generate` walks each contract, downloads ABIs, and writes a sibling `*.seed.generated.yml` populated with `checks:` entries (functions set to `null` to skip until reviewed).
+A seed config is a thin starter file named `*.seed.yml`. It contains only address-book and chain-explorer sections (`deployed:`, `l1:` / `l2:` with `rpcUrl` / `explorerHostname`, optional `eoa:` / `roles:` / `misc:`) — **no `contracts:` block**. `yarn start <seed> --generate` walks every anchor under `deployed:`, resolves the ABI for each address, and writes a sibling `*.seed.generated.yml` with a populated `contracts:` block where each function value is `REPLACEME` (and, for proxies, a commented-out `implementationChecks` stub).
 
-Iterate:
+`--generate` on its own does not fetch ABIs — it only uses ABIs already on disk. Combine with `--update-abi-missing` on first run.
 
 ```bash
-yarn start configs/proto/mainnet.seed.yml --generate  # or --update-abi-missing
-# Review/edit *.seed.generated.yml into the final config, then:
+yarn start configs/proto/mainnet.seed.yml --generate --update-abi-missing
+# Review *.seed.generated.yml, replace REPLACEME with real expectations, then:
 yarn start configs/proto/mainnet.seed.generated.yml
 ```
 
@@ -361,7 +361,7 @@ Adding a new contract to an existing config:
 1. **Resolve addresses** — `cast admin` / `cast implementation` for proxies; EIP-1967 slots for anything non-standard.
 2. **Define anchors** in `deployed:` (and `implementation:` addresses in the same section with a matching name).
 3. **Write the contract stanza** — pick the proxy pattern, seed `checks:` with function names, leave unknowns as `REPLACEME`.
-4. **Download ABIs** — `yarn start config.yml --update-abi-missing`. ABI resolution order: `Name-{proxyAddr}.json` → `Name.json` → `Name-{implAddr}.json`.
+4. **Download ABIs** — `yarn start config.yml --update-abi-missing`. Resolution depends on mode: consolidated (`abis.json.gz`) tries the `Name-{address}` key first, then `Name`; individual-file mode (`abi/*.json`) tries `Name.json`, then `Name.sol/Name.json`, then `Name-{address}.json`.
 5. **Run, read actuals, replace** — iterate `yarn start config.yml -o l1/contractName` until green.
 6. **Access control** — probe with `cast call getRoleMemberCount`; choose `ozAcl` / `ozNonEnumerableAcl` / `hasRole`. List every role constant, including empty ones (`[]`).
 
@@ -405,7 +405,7 @@ yarn start config.seed.yml --generate                     # expand seed → *.se
 
 - Run `yarn start <config> --update-abi-missing`.
 - Verify `name:` matches the ABI filename (the `{proxyAddr}` / `{implAddr}` suffix is optional).
-- Resolution order: `Name-{proxyAddr}.json` → `Name.json` → `Name-{implAddr}.json`.
+- Individual-file resolution order: `Name.json` → `Name.sol/Name.json` → `Name-{address}.json`. Consolidated (`abis.json.gz`) tries `Name-{address}` key first, then `Name`.
 
 ### `getRoleMemberCount` reverted / `no matching function`
 
