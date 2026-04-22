@@ -1,9 +1,13 @@
 name: Setup state-mate
-description: Enable Corepack, install Node 20 with yarn cache, and run yarn install --immutable.
+description: Enable Corepack, install Node 20 (yarn cache), run yarn install --immutable.
 
 runs:
   using: composite
   steps:
+    # Corepack must come before actions/setup-node: when `cache: yarn` is
+    # set, setup-node invokes yarn to locate the cache folder. Without the
+    # shim, it falls back to the runner's system yarn (v1), which refuses
+    # to run a project with `packageManager: yarn@4.3.1` in package.json.
     - name: Enable Corepack
       run: corepack enable
       shell: bash
@@ -15,5 +19,7 @@ runs:
         cache: "yarn"
 
     - name: Install dependencies
+      env:
+        HUSKY: "0"
       run: yarn install --immutable
       shell: bash
