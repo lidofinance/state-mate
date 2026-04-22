@@ -55,7 +55,6 @@
     "typescript": "^5.4.5"
   },
   "dependencies": {
-    "@inquirer/prompts": "^5.1.2",
     "@types/chai": "^4.3.16",
     "ajv": "^8.18.0",
     "ajv-formats": "^3.0.1",
