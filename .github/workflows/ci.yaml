@@ -20,17 +20,19 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # Lido V3 configs - Mainnet
-          - config: configs/lidov3/mainnet/lidov3-core.yaml
+          # Lido configs - Mainnet
+          - config: configs/lido/mainnet/lido.yaml
             network: ethereum-mainnet
-          - config: configs/lidov3/mainnet/lidov3-et.yml
+          - config: configs/lido/mainnet/lido-et.yml
             network: ethereum-mainnet
+          # Lido V3 configs - Hoodi
+          - config: configs/lido/hoodi/lido-testnet.yaml
+            network: hoodi-testnet
+          - config: configs/lido/hoodi/lido-et-testnet.yaml
+            network: hoodi-testnet
           # SafeHarbor configs
           - config: configs/safeharbor/mainnet.yml
             network: ethereum-mainnet
-          # Lido V3 configs - Hoodi
-          - config: configs/lidov3/hoodi/lidov3-testnet.yaml
-            network: hoodi-testnet
           # Mellow stRATEGY configs - Mainnet
           - config: configs/mellow_strategy/mellow-strategy.yml
             network: ethereum-mainnet
