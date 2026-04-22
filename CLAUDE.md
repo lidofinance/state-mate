@@ -5,9 +5,9 @@ state-mate validates smart contract states against YAML-based descriptions. It c
 ## Key Commands
 
 ```bash
-yarn start configs/path/to/config.yml                    # Full verification
-yarn start configs/path/to/config.yml -o l1/contractName  # Single contract
-yarn start configs/path/to/config.yml --update-abi-missing # Download missing ABIs
+yarn start configs/path/to/config.yaml                    # Full verification
+yarn start configs/path/to/config.yaml -o l1/contractName  # Single contract
+yarn start configs/path/to/config.yaml --update-abi-missing # Download missing ABIs
 yarn start configs/path/to/config.seed.yml --generate      # Generate from seed
 ```
 
@@ -16,7 +16,7 @@ yarn start configs/path/to/config.seed.yml --generate      # Generate from seed
 ```
 configs/meta/ethereum/   # Ethereum mainnet configs
 configs/meta/base/       # Base L2 configs
-configs/lidov3/          # Lido v3 configs
+configs/lido/            # Lido configs
 src/                     # TypeScript source
 .claude/skills/          # Skills and references
 ```
