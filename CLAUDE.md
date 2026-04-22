@@ -8,7 +8,7 @@ state-mate validates smart contract states against YAML-based descriptions. It c
 yarn start configs/path/to/config.yaml                    # Full verification
 yarn start configs/path/to/config.yaml -o l1/contractName  # Single contract
 yarn start configs/path/to/config.yaml --update-abi-missing # Download missing ABIs
-yarn start configs/path/to/config.seed.yml --generate      # Generate from seed
+yarn start configs/path/to/config.seed.yaml --generate     # Generate from seed
 ```
 
 ## Project Structure
