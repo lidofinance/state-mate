@@ -47,15 +47,14 @@
     "eslint-plugin-import": "^2.31.0",
     "eslint-plugin-prettier": "^5.2.1",
     "eslint-plugin-unicorn": "^56.0.1",
-    "globals": "^15.6.0",
+    "globals": "^17.5.0",
     "husky": "^9.0.11",
     "lint-staged": "^15.2.7",
     "prettier": "^3.3.2",
     "ts-node": ">=8.0.0",
-    "typescript": "^5.4.5"
+    "typescript": "^5.9.3"
   },
   "dependencies": {
-    "@inquirer/prompts": "^5.1.2",
     "@types/chai": "^4.3.16",
     "ajv": "^8.18.0",
     "ajv-formats": "^3.0.1",
@@ -63,7 +62,7 @@
     "chalk": "^4.1.2",
     "commander": "^12.1.0",
     "dotenv": "^16.4.5",
-    "ethers": "^6.13.0",
+    "ethers": "^6.16.0",
     "json-diff": "^1.0.6",
     "tsconfig-paths": "^4.2.0",
     "yaml": "^2.8.3"
