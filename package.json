@@ -52,7 +52,7 @@
     "lint-staged": "^15.2.7",
     "prettier": "^3.3.2",
     "ts-node": ">=8.0.0",
-    "typescript": "^5.4.5"
+    "typescript": "^6.0.3"
   },
   "dependencies": {
     "@types/chai": "^4.3.16",
