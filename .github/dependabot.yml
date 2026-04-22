@@ -1,0 +1,47 @@
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    groups:
+      github-actions:
+        patterns: ["*"]
+    labels: ["dependencies", "github-actions"]
+    commit-message:
+      prefix: "ci"
+
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    groups:
+      eslint:
+        patterns:
+          - "eslint"
+          - "@eslint/*"
+          - "@typescript-eslint/*"
+          - "eslint-*"
+      prettier:
+        patterns:
+          - "prettier"
+          - "prettier-*"
+          - "eslint-config-prettier"
+          - "eslint-plugin-prettier"
+      typescript:
+        patterns:
+          - "typescript"
+          - "ts-node"
+          - "tsconfig-paths"
+          - "@tsconfig/*"
+      types:
+        patterns:
+          - "@types/*"
+      commitlint:
+        patterns:
+          - "@commitlint/*"
+          - "husky"
+          - "lint-staged"
+    labels: ["dependencies", "npm"]
+    commit-message:
+      prefix: "chore(deps)"
