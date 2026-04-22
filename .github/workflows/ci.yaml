@@ -38,22 +38,20 @@ jobs:
           # DeFiWrapper configs
           - config: configs/defiwrapper/mainnet.seed.generated.yaml
             network: ethereum-mainnet
-          # Earn configs - Mainnet
+          # Earn configs
           - config: configs/earn/atoken-wsteth-swap.yaml
             network: ethereum-mainnet
-          # Meta configs - Ethereum
-          - config: configs/meta/ethereum/mellow-earneth-vaults.yaml
+          - config: configs/earn/ethereum/earneth-vaults.yaml
             network: ethereum-mainnet
-          - config: configs/meta/ethereum/mellow-earnusd-vaults.yaml
+          - config: configs/earn/ethereum/earnusd-vaults.yaml
             network: ethereum-mainnet
-          # Meta configs - L2s
-          - config: configs/meta/base/mellow-earnusd-vaults.yaml
+          - config: configs/earn/base/earnusd-vaults.yaml
             network: base-mainnet
-          - config: configs/meta/arbitrum/mellow-earnusd-vaults.yaml
+          - config: configs/earn/arbitrum/earnusd-vaults.yaml
             network: arbitrum-mainnet
-          - config: configs/meta/mantle/mellow-earnusd-vaults.yaml
+          - config: configs/earn/mantle/earnusd-vaults.yaml
             network: mantle-mainnet
-          - config: configs/meta/plasma/mellow-earnusd-vaults.yaml
+          - config: configs/earn/plasma/earnusd-vaults.yaml
             network: plasma-mainnet
 
     env:
