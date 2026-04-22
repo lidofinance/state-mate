@@ -956,7 +956,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ajv@npm:^8.0.0, ajv@npm:^8.11.0":
+"ajv@npm:^8.0.0, ajv@npm:^8.11.0, ajv@npm:^8.18.0":
   version: 8.18.0
   resolution: "ajv@npm:8.18.0"
   dependencies:
@@ -4142,6 +4142,7 @@ __metadata:
     "@types/node": "npm:^20.14.2"
     "@typescript-eslint/eslint-plugin": "npm:^7.13.1"
     "@typescript-eslint/parser": "npm:^7.13.1"
+    ajv: "npm:^8.18.0"
     ajv-formats: "npm:^3.0.1"
     chai: "npm:^4.4.1"
     chalk: "npm:^4.1.2"

@@ -20,29 +20,29 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # Lido V3 configs - Mainnet
-          - config: configs/lidov3/mainnet/lidov3-core.yaml
+          # Lido configs - Mainnet
+          - config: configs/lido/mainnet/lido.yaml
             network: ethereum-mainnet
-          - config: configs/lidov3/mainnet/lidov3-et.yml
+          - config: configs/lido/mainnet/lido-et.yaml
             network: ethereum-mainnet
+          # Lido configs - Hoodi
+          - config: configs/lido/hoodi/lido-testnet.yaml
+            network: hoodi-testnet
+          - config: configs/lido/hoodi/lido-et-testnet.yaml
+            network: hoodi-testnet
           # SafeHarbor configs
-          - config: configs/safeharbor/mainnet.yml
+          - config: configs/safeharbor/mainnet.yaml
             network: ethereum-mainnet
-          # Lido V3 configs - Hoodi
-          - config: configs/lidov3/hoodi/lidov3-testnet.yaml
-            network: hoodi-testnet
-          - config: configs/lidov3/hoodi/lidov3-et-testnet.yml
-            network: hoodi-testnet
           # Mellow stRATEGY configs - Mainnet
-          - config: configs/mellow_strategy/mellow-strategy.yml
+          - config: configs/mellow_strategy/mellow-strategy.yaml
             network: ethereum-mainnet
           # DeFiWrapper configs
-          - config: configs/defiwrapper/mainnet.seed.generated.yml
+          - config: configs/defiwrapper/mainnet.seed.generated.yaml
             network: ethereum-mainnet
           # Meta configs - Ethereum
-          - config: configs/meta/ethereum/mellow-earneth-vaults.yml
+          - config: configs/meta/ethereum/mellow-earneth-vaults.yaml
             network: ethereum-mainnet
-          - config: configs/meta/ethereum/mellow-earnusd-vaults.yml
+          - config: configs/meta/ethereum/mellow-earnusd-vaults.yaml
             network: ethereum-mainnet
 
     env:
