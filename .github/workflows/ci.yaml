@@ -37,6 +37,9 @@ jobs:
           # DeFiWrapper configs
           - config: configs/defiwrapper/mainnet.seed.generated.yml
             network: ethereum-mainnet
+          # Earn configs - Mainnet
+          - config: configs/earn/atoken-wsteth-swap.yaml
+            network: ethereum-mainnet
           # Meta configs - Ethereum
           - config: configs/meta/ethereum/mellow-earneth-vaults.yml
             network: ethereum-mainnet
