@@ -113,8 +113,10 @@ contractName:
     proxy__getAdmin: *aragonAgent
     proxy__getImplementation: *implAddress
     proxy__getIsOssified: false
-  checks: { ... }
-  implementationChecks: { ... }
+  checks:
+    someFunction: expectedValue
+  implementationChecks:
+    someFunction: *ZERO_ADDRESS
 ```
 
 **AppProxyUpgradeable** (Aragon apps) has its own shape:
