@@ -31,6 +31,8 @@ jobs:
           # Lido V3 configs - Hoodi
           - config: configs/lidov3/hoodi/lidov3-testnet.yaml
             network: hoodi-testnet
+          - config: configs/lidov3/hoodi/lidov3-et-testnet.yml
+            network: hoodi-testnet
           # Mellow stRATEGY configs - Mainnet
           - config: configs/mellow_strategy/mellow-strategy.yml
             network: ethereum-mainnet
