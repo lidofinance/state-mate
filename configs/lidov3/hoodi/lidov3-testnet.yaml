@@ -201,7 +201,8 @@ misc:
   - &VEB_CONSENSUS_VERSION 4
   - &VEB_DATA_FORMAT_LIST 1
   - &HASH_CONSENSUS_FAST_LANE 75
-  # AccountingOracle HashConsensus frame (Hoodi-tuned: 24h frames, 100-slot fast lane)
+  # AccountingOracle HashConsensus frame, set in tx
+  # https://hoodi.etherscan.io/tx/0x04d4f8f6960050743bde64a363734d47b66f61f01f6f81341d0b9724fc9e79c7
   - &HC_AO_START 85208
   - &HC_AO_EPOCHS_PER_FRAME 225
   - &HC_AO_FAST_LANE_LENGTH 100
