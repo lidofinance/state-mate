@@ -12,10 +12,6 @@ permissions:
   contents: read
   pull-requests: write
 
-env:
-  DEVCONTAINER_BUILD_CACHE_DIR: .buildx-cache
-  DEVCONTAINER_IMAGE: state-mate:${{ github.sha }}
-
 jobs:
   test:
     name: Test ${{ matrix.config }}
@@ -60,55 +56,21 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Restore devcontainer build cache
-        uses: actions/cache@v4
-        with:
-          path: ${{ env.DEVCONTAINER_BUILD_CACHE_DIR }}
-          key: devcontainer-buildx-${{ runner.os }}-${{ hashFiles('.devcontainer/Dockerfile', '.dockerignore') }}
-          restore-keys: |
-            devcontainer-buildx-${{ runner.os }}-
+      - name: Enable Corepack
+        run: corepack enable
 
-      - name: Build devcontainer image
-        run: |
-          mkdir -p "${DEVCONTAINER_BUILD_CACHE_DIR}"
-          docker buildx create --use --name state-mate-builder
-          docker buildx inspect --bootstrap
-          docker buildx build \
-            --cache-from "type=local,src=${DEVCONTAINER_BUILD_CACHE_DIR}" \
-            --cache-to "type=local,dest=${DEVCONTAINER_BUILD_CACHE_DIR}-new,mode=max" \
-            --file .devcontainer/Dockerfile \
-            --load \
-            --tag "${DEVCONTAINER_IMAGE}" \
-            .
-          rm -rf "${DEVCONTAINER_BUILD_CACHE_DIR}"
-          mv "${DEVCONTAINER_BUILD_CACHE_DIR}-new" "${DEVCONTAINER_BUILD_CACHE_DIR}"
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "yarn"
+
+      - name: Install dependencies
+        run: yarn install --immutable
 
       - name: Run state-mate
-        env:
-          STATE_MATE_CONFIG: ${{ matrix.config }}
         run: |
-          docker run --rm \
-            --user "$(id -u):$(id -g)" \
-            --volume "${GITHUB_WORKSPACE}:/workspaces/state-mate" \
-            --workdir /workspaces/state-mate \
-            --env CI=true \
-            --env HUSKY=0 \
-            --env HOME=/tmp/state-mate-home \
-            --env XDG_CACHE_HOME=/tmp/state-mate-home/.cache \
-            --env COREPACK_HOME=/tmp/state-mate-home/.cache/corepack \
-            --env YARN_CACHE_FOLDER=/tmp/state-mate-home/.cache/yarn \
-            --env ETHERSCAN_TOKEN \
-            --env MAINNET_REMOTE_RPC_URL \
-            --env HOODI_REMOTE_RPC_URL \
-            --env L1_MAINNET_RPC_URL \
-            --env STATE_MATE_CONFIG \
-            "${DEVCONTAINER_IMAGE}" \
-            bash -lc '
-              set -euo pipefail
-              mkdir -p "$HOME" "$XDG_CACHE_HOME" "$COREPACK_HOME" "$YARN_CACHE_FOLDER"
-              yarn install --immutable
-              yarn start "$STATE_MATE_CONFIG"
-            '
+          yarn start ${{ matrix.config }}
 
   lint:
     name: Lint and Format Check
@@ -117,49 +79,23 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Restore devcontainer build cache
-        uses: actions/cache@v4
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          path: ${{ env.DEVCONTAINER_BUILD_CACHE_DIR }}
-          key: devcontainer-buildx-${{ runner.os }}-${{ hashFiles('.devcontainer/Dockerfile', '.dockerignore') }}
-          restore-keys: |
-            devcontainer-buildx-${{ runner.os }}-
+          node-version: "20"
+          cache: "yarn"
 
-      - name: Build devcontainer image
-        run: |
-          mkdir -p "${DEVCONTAINER_BUILD_CACHE_DIR}"
-          docker buildx create --use --name state-mate-builder
-          docker buildx inspect --bootstrap
-          docker buildx build \
-            --cache-from "type=local,src=${DEVCONTAINER_BUILD_CACHE_DIR}" \
-            --cache-to "type=local,dest=${DEVCONTAINER_BUILD_CACHE_DIR}-new,mode=max" \
-            --file .devcontainer/Dockerfile \
-            --load \
-            --tag "${DEVCONTAINER_IMAGE}" \
-            .
-          rm -rf "${DEVCONTAINER_BUILD_CACHE_DIR}"
-          mv "${DEVCONTAINER_BUILD_CACHE_DIR}-new" "${DEVCONTAINER_BUILD_CACHE_DIR}"
+      - name: Install dependencies
+        run: yarn install --immutable
 
-      - name: Run lint and format checks
-        run: |
-          docker run --rm \
-            --user "$(id -u):$(id -g)" \
-            --volume "${GITHUB_WORKSPACE}:/workspaces/state-mate" \
-            --workdir /workspaces/state-mate \
-            --env CI=true \
-            --env HUSKY=0 \
-            --env HOME=/tmp/state-mate-home \
-            --env XDG_CACHE_HOME=/tmp/state-mate-home/.cache \
-            --env COREPACK_HOME=/tmp/state-mate-home/.cache/corepack \
-            --env YARN_CACHE_FOLDER=/tmp/state-mate-home/.cache/yarn \
-            "${DEVCONTAINER_IMAGE}" \
-            bash -lc '
-              set -euo pipefail
-              mkdir -p "$HOME" "$XDG_CACHE_HOME" "$COREPACK_HOME" "$YARN_CACHE_FOLDER"
-              yarn install --immutable
-              yarn lint
-              yarn format
-            '
+      - name: Run linter
+        run: yarn lint
+
+      - name: Check formatting
+        run: yarn format
 
   schemas:
     name: Validate Schemas
@@ -168,49 +104,24 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Restore devcontainer build cache
-        uses: actions/cache@v4
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          path: ${{ env.DEVCONTAINER_BUILD_CACHE_DIR }}
-          key: devcontainer-buildx-${{ runner.os }}-${{ hashFiles('.devcontainer/Dockerfile', '.dockerignore') }}
-          restore-keys: |
-            devcontainer-buildx-${{ runner.os }}-
+          node-version: "20"
+          cache: "yarn"
 
-      - name: Build devcontainer image
-        run: |
-          mkdir -p "${DEVCONTAINER_BUILD_CACHE_DIR}"
-          docker buildx create --use --name state-mate-builder
-          docker buildx inspect --bootstrap
-          docker buildx build \
-            --cache-from "type=local,src=${DEVCONTAINER_BUILD_CACHE_DIR}" \
-            --cache-to "type=local,dest=${DEVCONTAINER_BUILD_CACHE_DIR}-new,mode=max" \
-            --file .devcontainer/Dockerfile \
-            --load \
-            --tag "${DEVCONTAINER_IMAGE}" \
-            .
-          rm -rf "${DEVCONTAINER_BUILD_CACHE_DIR}"
-          mv "${DEVCONTAINER_BUILD_CACHE_DIR}-new" "${DEVCONTAINER_BUILD_CACHE_DIR}"
+      - name: Install dependencies
+        run: yarn install --immutable
 
-      - name: Validate schemas
+      - name: Generate schemas
+        run: yarn schemas
+
+      - name: Check if schemas are up to date
         run: |
-          docker run --rm \
-            --user "$(id -u):$(id -g)" \
-            --volume "${GITHUB_WORKSPACE}:/workspaces/state-mate" \
-            --workdir /workspaces/state-mate \
-            --env CI=true \
-            --env HUSKY=0 \
-            --env HOME=/tmp/state-mate-home \
-            --env XDG_CACHE_HOME=/tmp/state-mate-home/.cache \
-            --env COREPACK_HOME=/tmp/state-mate-home/.cache/corepack \
-            --env YARN_CACHE_FOLDER=/tmp/state-mate-home/.cache/yarn \
-            "${DEVCONTAINER_IMAGE}" \
-            bash -lc '
-              set -euo pipefail
-              mkdir -p "$HOME" "$XDG_CACHE_HOME" "$COREPACK_HOME" "$YARN_CACHE_FOLDER"
-              yarn install --immutable
-              yarn schemas
-              if ! git diff --exit-code schemas/; then
-                echo "Error: Schema files are not up to date. Please run '\''yarn schemas'\'' and commit the changes."
-                exit 1
-              fi
-            '
+          if ! git diff --exit-code schemas/; then
+            echo "Error: Schema files are not up to date. Please run 'yarn schemas' and commit the changes."
+            exit 1
+          fi
