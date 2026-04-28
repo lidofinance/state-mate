@@ -38,23 +38,34 @@ jobs:
           # DeFiWrapper configs
           - config: configs/defiwrapper/mainnet.seed.generated.yaml
             network: ethereum-mainnet
-          # Earn configs - Mainnet
+          # Earn configs
           - config: configs/earn/atoken-wsteth-swap.yaml
             network: ethereum-mainnet
-          # Meta configs - Ethereum
-          - config: configs/meta/ethereum/mellow-earneth-vaults.yaml
+          - config: configs/earn/ethereum/earneth-vaults.yaml
             network: ethereum-mainnet
-          - config: configs/meta/ethereum/mellow-earnusd-vaults.yaml
+          - config: configs/earn/ethereum/earnusd-vaults.yaml
             network: ethereum-mainnet
+          - config: configs/earn/base/earnusd-vaults.yaml
+            network: base-mainnet
+          - config: configs/earn/arbitrum/earnusd-vaults.yaml
+            network: arbitrum-mainnet
+          - config: configs/earn/mantle/earnusd-vaults.yaml
+            network: mantle-mainnet
+          - config: configs/earn/plasma/earnusd-vaults.yaml
+            network: plasma-mainnet
 
     env:
       # Explorer API tokens
       ETHERSCAN_TOKEN: ${{ secrets.ETHERSCAN_TOKEN }}
 
-      # Ethereum RPC URLs
+      # Ethereum + L2 RPC URLs
       MAINNET_REMOTE_RPC_URL: ${{ secrets.MAINNET_REMOTE_RPC_URL }}
       HOODI_REMOTE_RPC_URL: ${{ secrets.HOODI_REMOTE_RPC_URL }}
       L1_MAINNET_RPC_URL: ${{ secrets.MAINNET_REMOTE_RPC_URL }}
+      BASE_RPC_URL: ${{ secrets.BASE_RPC_URL }}
+      ARBITRUM_RPC_URL: ${{ secrets.ARBITRUM_RPC_URL }}
+      MANTLE_RPC_URL: ${{ secrets.MANTLE_RPC_URL }}
+      PLASMA_RPC_URL: ${{ secrets.PLASMA_RPC_URL }}
 
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
