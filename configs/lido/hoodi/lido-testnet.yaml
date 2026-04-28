@@ -203,10 +203,10 @@ misc:
   - &HASH_CONSENSUS_FAST_LANE 75
   # AccountingOracle HashConsensus frame, set in tx
   # https://hoodi.etherscan.io/tx/0x04d4f8f6960050743bde64a363734d47b66f61f01f6f81341d0b9724fc9e79c7
-  - &HC_AO_START 85208
+  - &HC_AO_START 91574
   - &HC_AO_EPOCHS_PER_FRAME 225
   - &HC_AO_FAST_LANE_LENGTH 100
-  - &HC_VEB_START 39843
+  - &HC_VEB_START 91574
   - &HASH_CONSENSUS_QUORUM_AO 6
   - &HASH_CONSENSUS_QUORUM_VEBO 7
 
@@ -1779,7 +1779,7 @@ l1:
         getFrameConfig:
           - *HC_VEB_START
           - *HASH_CONSENSUS_FAST_LANE
-          - *SLOTS_PER_EPOCH
+          - *HC_AO_FAST_LANE_LENGTH
         getQuorum: *HASH_CONSENSUS_QUORUM_VEBO
         getReportProcessor: *validatorsExitBusOracle
         getConsensusState: null
