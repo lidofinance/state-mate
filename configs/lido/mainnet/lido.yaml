@@ -857,7 +857,7 @@ l1:
         getContractVersion: *MAX_UINT256
         getLastCheckpointIndex: 0
         getLastFinalizedRequestId: 0
-        getLastRequestId: 0
+        getLastRequestId: null
         getLockedEtherAmount: 0
         getNFTDescriptorAddress: *ZERO_ADDRESS
         getResumeSinceTimestamp: 0
@@ -865,8 +865,8 @@ l1:
         isPaused: false
         name: "Lido: stETH Withdrawal NFT"
         symbol: "unstETH"
-        unfinalizedRequestNumber: 0
-        unfinalizedStETH: 0
+        unfinalizedRequestNumber: null
+        unfinalizedStETH: null
         balanceOf: null
         calculateFinalizationBatches: null
         findCheckpointHints: null
