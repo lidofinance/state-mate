@@ -12,9 +12,13 @@ misc:
   - &CURATED_STAKING_MODULE_FEE 400
   - &CURATED_TREASURY_FEE 600
   - &CURATED_STAKE_SHARE_LIMIT 10000
+  - &CURATED_MODULE_STATUS 0
+  - &CURATED_EXITED_VALIDATORS_COUNT 0
   - &CURATED_PRIORITY_EXIT_SHARE_THRESHOLD 10000
   - &CURATED_MAX_DEPOSITS_PER_BLOCK 150
   - &CURATED_MIN_DEPOSIT_BLOCK_DISTANCE 25
+  - &CURATED_WITHDRAWAL_CREDENTIALS_TYPE 2
+  - &CURATED_VALIDATORS_BALANCE_GWEI 0
   - &TW_MAX_EXIT_REQUESTS_LIMIT 250
   - &TW_EXITS_PER_FRAME 1
   - &TW_FRAME_DURATION_IN_SEC 240
@@ -28,6 +32,16 @@ misc:
   - &IDVT_EXIT_DELAY_FEE "50000000000000000"
   - &CURATED_INITIAL_EPOCH 47480
   - &CURATED_EPOCHS_PER_FRAME 1575
+  - &CURATED_FAST_LANE_LENGTH_SLOTS 128
+  - &UPDATE_STAKING_MODULE_SHARE_LIMITS_PERMISSIONS "0xd63cf25df1ba6144db27a81a98120dfc53de45405adcee90cc820558b39ee15c7c45b59390b503b83fb499a813976a06"
+  - &ALLOW_CONSOLIDATION_PAIR_PERMISSIONS "0x747d357f5b6410b80eb63406fac5e2a91131b4f8b4ecbe1a"
+  - &SET_MERKLE_GATE_TREE_CSM_PERMISSIONS "0x10a254e724fe2b7f305f76f3f116a3969c53845fed4b1869887f8512f9998045f4b5993e6eaa6bcfe5f02a94ed4b1869"
+  - &REPORT_SLASHED_WITHDRAWN_VALIDATORS_CSM_PERMISSIONS "0x79cef36d84743222f37765204bec41e92a93e59d4412f7aa"
+  - &SETTLE_GENERAL_DELAYED_PENALTY_CSM_PERMISSIONS "0x79cef36d84743222f37765204bec41e92a93e59d187d9f92"
+  - &SET_MERKLE_GATE_TREE_CM_PERMISSIONS "0xf1862d120831ebe31f7202378ff3ae63a5658ae3ed4b1869410a309df81b782190188cdb3d215729cc6bc1f3ed4b1869a5a604b172787e017b1b118f02fe54fc1d696519ed4b1869e966874cdb6a4282ed75cd10439e3799e5531a2ded4b18695c063da03e3f21443716d75a2205ee16706e1153ed4b18691cd655ac53cfe8269de0dbfc0140b074623c4a6bed4b186928518be9894c20135f280a9539617783b08a04c7ed4b1869"
+  - &REPORT_SLASHED_WITHDRAWN_VALIDATORS_CM_PERMISSIONS "0x87eb69ae51317405fd285efd2326a4a11f6173b94412f7aa"
+  - &SETTLE_GENERAL_DELAYED_PENALTY_CM_PERMISSIONS "0x87eb69ae51317405fd285efd2326a4a11f6173b9187d9f92"
+  - &CREATE_OR_UPDATE_OPERATOR_GROUP_CM_PERMISSIONS "0x857289ccbfbc4c134cc312022a104cd9b38d8aae63fe89d7"
 
 roles:
   - &DEFAULT_ADMIN_ROLE "0x0000000000000000000000000000000000000000000000000000000000000000"
@@ -119,6 +133,7 @@ deployed:
     - &curatedVerifier "0x209190Ebc2Be80367a15d05e626784Eb94d6A880"
     - &curatedEjector "0xfDbde2B3554B69C84e0f8d7daB68D390Ff0f4394"
     - &curatedHashConsensus "0x920883908A78c1554f682006a8aB32E62Be09F33"
+    - &metaRegistry "0x857289cCBFBc4C134Cc312022a104CD9b38d8AAE"
 
     # Easy Track factories.
     - &oldCsmSettleElStealingPenaltyFactory "0x5c0af5b9f96921d3F61503e1006CF0ab9867279E"
@@ -137,6 +152,8 @@ deployed:
 
 l1:
   rpcUrl: HOODI_REMOTE_RPC_URL
+  explorerHostname: api-hoodi.etherscan.io
+  explorerTokenEnv: ETHERSCAN_TOKEN
   chainId: *CHAIN_ID
   contracts:
     lidoLocatorProxy:
@@ -169,16 +186,16 @@ l1:
               stakingModuleFee: *CURATED_STAKING_MODULE_FEE
               treasuryFee: *CURATED_TREASURY_FEE
               stakeShareLimit: *CURATED_STAKE_SHARE_LIMIT
-              status: null
+              status: *CURATED_MODULE_STATUS
               name: *CURATED_MODULE_NAME
               lastDepositAt: null
               lastDepositBlock: null
-              exitedValidatorsCount: null
+              exitedValidatorsCount: *CURATED_EXITED_VALIDATORS_COUNT
               priorityExitShareThreshold: *CURATED_PRIORITY_EXIT_SHARE_THRESHOLD
               maxDepositsPerBlock: *CURATED_MAX_DEPOSITS_PER_BLOCK
               minDepositBlockDistance: *CURATED_MIN_DEPOSIT_BLOCK_DISTANCE
-              withdrawalCredentialsType: null
-              validatorsBalanceGwei: null
+              withdrawalCredentialsType: *CURATED_WITHDRAWAL_CREDENTIALS_TYPE
+              validatorsBalanceGwei: *CURATED_VALIDATORS_BALANCE_GWEI
         hasRole:
           - args: [*DEFAULT_ADMIN_ROLE, *agent]
             result: true
@@ -261,8 +278,8 @@ l1:
           maxExitRequestsLimit: *TW_MAX_EXIT_REQUESTS_LIMIT
           exitsPerFrame: *TW_EXITS_PER_FRAME
           frameDurationInSec: *TW_FRAME_DURATION_IN_SEC
-          prevExitRequestsLimit: null
-          currentExitRequestsLimit: null
+          prevExitRequestsLimit: *TW_MAX_EXIT_REQUESTS_LIMIT
+          currentExitRequestsLimit: *TW_MAX_EXIT_REQUESTS_LIMIT
         hasRole:
           - args: [*TW_EXIT_LIMIT_MANAGER_ROLE, *agent]
             result: true
@@ -466,7 +483,7 @@ l1:
         getFrameConfig:
           initialEpoch: *CURATED_INITIAL_EPOCH
           epochsPerFrame: *CURATED_EPOCHS_PER_FRAME
-          fastLaneLengthSlots: null
+          fastLaneLengthSlots: *CURATED_FAST_LANE_LENGTH_SLOTS
 
     circuitBreaker:
       name: CircuitBreakerState
@@ -500,9 +517,44 @@ l1:
             result: 5
 
     easyTrack:
-      name: EasyTrackState
+      name: EasyTrack
       address: *easyTrack
       checks:
+        CANCEL_ROLE: null
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        MAX_MOTIONS_LIMIT: null
+        MAX_OBJECTIONS_THRESHOLD: null
+        MIN_MOTION_DURATION: null
+        PAUSE_ROLE: null
+        UNPAUSE_ROLE: null
+        canObjectToMotion: null
+        evmScriptExecutor: *easyTrackEvmScriptExecutor
+        evmScriptFactories: null
+        evmScriptFactoryPermissions:
+          - args: [*updateStakingModuleShareLimitsFactory]
+            result: *UPDATE_STAKING_MODULE_SHARE_LIMITS_PERMISSIONS
+          - args: [*allowConsolidationPairFactory]
+            result: *ALLOW_CONSOLIDATION_PAIR_PERMISSIONS
+          - args: [*setMerkleGateTreeForCsmFactory]
+            result: *SET_MERKLE_GATE_TREE_CSM_PERMISSIONS
+          - args: [*reportWithdrawalsForSlashedValidatorsForCsmFactory]
+            result: *REPORT_SLASHED_WITHDRAWN_VALIDATORS_CSM_PERMISSIONS
+          - args: [*settleGeneralDelayedPenaltyForCsmFactory]
+            result: *SETTLE_GENERAL_DELAYED_PENALTY_CSM_PERMISSIONS
+          - args: [*setMerkleGateTreeForCmFactory]
+            result: *SET_MERKLE_GATE_TREE_CM_PERMISSIONS
+          - args: [*reportWithdrawalsForSlashedValidatorsForCmFactory]
+            result: *REPORT_SLASHED_WITHDRAWN_VALIDATORS_CM_PERMISSIONS
+          - args: [*settleGeneralDelayedPenaltyForCmFactory]
+            result: *SETTLE_GENERAL_DELAYED_PENALTY_CM_PERMISSIONS
+          - args: [*createOrUpdateOperatorGroupFactory]
+            result: *CREATE_OR_UPDATE_OPERATOR_GROUP_CM_PERMISSIONS
+        getEVMScriptFactories: null
+        getMotion: null
+        getMotions: null
+        getRoleAdmin: null
+        governanceToken: null
+        hasRole: null
         isEVMScriptFactory:
           - args: [*oldCsmSettleElStealingPenaltyFactory]
             result: false
@@ -526,3 +578,10 @@ l1:
             result: true
           - args: [*createOrUpdateOperatorGroupFactory]
             result: true
+        motionDuration: null
+        motions: null
+        motionsCountLimit: null
+        objections: null
+        objectionsThreshold: null
+        paused: null
+        supportsInterface: null
