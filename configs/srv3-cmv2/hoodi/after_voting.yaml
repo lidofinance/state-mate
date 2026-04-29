@@ -19,11 +19,17 @@ misc:
   - &CURATED_MIN_DEPOSIT_BLOCK_DISTANCE 25
   - &CURATED_WITHDRAWAL_CREDENTIALS_TYPE 2
   - &CURATED_VALIDATORS_BALANCE_GWEI 0
+  - &VEBO_MAX_EXIT_BALANCE_ETH 416000
+  - &VEBO_BALANCE_PER_FRAME_ETH 32
+  - &VEBO_FRAME_DURATION_IN_SEC 48
   - &TW_MAX_EXIT_REQUESTS_LIMIT 250
   - &TW_EXITS_PER_FRAME 1
   - &TW_FRAME_DURATION_IN_SEC 240
   - &VEBO_MAX_VALIDATORS_PER_REPORT 600
   - &IDVT_BOND_CURVE_ID 4
+  - &IDVT_BOND_CURVE_INFO
+    - - [1, "1500000000000000000", "1500000000000000000"]
+      - [2, "2000000000000000000", "500000000000000000"]
   - &IDVT_KEY_REMOVAL_CHARGE "10000000000000000"
   - &IDVT_GENERAL_DELAYED_PENALTY_FINE "50000000000000000"
   - &IDVT_QUEUE_PRIORITY 1
@@ -42,13 +48,20 @@ misc:
   - &REPORT_SLASHED_WITHDRAWN_VALIDATORS_CM_PERMISSIONS "0x87eb69ae51317405fd285efd2326a4a11f6173b94412f7aa"
   - &SETTLE_GENERAL_DELAYED_PENALTY_CM_PERMISSIONS "0x87eb69ae51317405fd285efd2326a4a11f6173b9187d9f92"
   - &CREATE_OR_UPDATE_OPERATOR_GROUP_CM_PERMISSIONS "0x857289ccbfbc4c134cc312022a104cd9b38d8aae63fe89d7"
+  - &LIDO_APP_ID "0x3ca7c3e38968823ccb4c78ea688df41356f182ae1d159e4ee608d30d68cef320"
+  - &KERNEL_APP_BASES_NAMESPACE "0xf1f3eb40f5bc1ad1344716ced8b8a0431d840b5783aea1fd01786bc26f35ac0f"
 
 roles:
   - &DEFAULT_ADMIN_ROLE "0x0000000000000000000000000000000000000000000000000000000000000000"
+  - &APP_MANAGER_ROLE "0xb6d92708f3d4817afc106147d969e229ced5c46e65e0a5002a0d391287762bd0"
+  - &BUFFER_RESERVE_MANAGER_ROLE "0x33969636f1fbf3d7d062d4de4a08e7bd3c46606ec28b3a4398d2665be559b921"
+  - &STAKING_MODULE_MANAGE_ROLE "0x3105bcbf19d4417b73ae0e58d508a65ecf75665e46c2622d8521732de6080c48"
   - &STAKING_MODULE_SHARE_MANAGE_ROLE "0x43bf0e13900cfaa1b03ed5681dc143266597e29a1d6f9cbd84114f0ac21cd208"
   - &STAKING_MODULE_UNVETTING_ROLE "0x240525496a9dc32284b17ce03b43e539e4bd81414634ee54395030d793463b57"
+  - &REPORT_EXITED_VALIDATORS_ROLE "0xc23292b191d95d2a7dd94fc6436eb44338fda9e1307d9394fd27c28157c1b33c"
   - &REPORT_VALIDATOR_EXITING_STATUS_ROLE "0xbe1bd143a0dde8a867d58aab054bfdb25250951665c4570e39abc3b3de3c2d6c"
   - &REPORT_VALIDATOR_EXIT_TRIGGERED_ROLE "0x0766e72e5c008b3df8129fb356d9176eef8544f6241e078b7d61aff604f8812b"
+  - &REPORT_REWARDS_MINTED_ROLE "0x779e5c23cb7a5bcb9bfe1e9a5165a00057f12bcdfd13e374540fdf1a1cd91137"
   - &TW_EXIT_LIMIT_MANAGER_ROLE "0x03c30da9b9e4d4789ac88a294d39a63058ca4a498804c2aa823e381df59d0cf4"
   - &REPORT_GENERAL_DELAYED_PENALTY_ROLE "0xa2c92d51d5647473735e9dfd5e2edf65bcf2fc2c139c95cbed53c19dc227c0b5"
   - &SETTLE_GENERAL_DELAYED_PENALTY_ROLE "0xe4c6f42648e5067520394b287613558d8b8a48bc7a320523da96c04d46253bda"
@@ -76,6 +89,9 @@ deployed:
     - &csmCommittee "0x4AF43Ee34a6fcD1fEcA1e1F832124C763561dA53"
     - &curatedCircuitBreakerPauser "0x84DffcfB232594975C608DE92544Ff239a24c9E9"
     - &consolidationGatewayPauser "0x83BCE68B4e8b7071b2a664a26e6D3Bc17eEe3102"
+    - &hoodiLegacyStakingModuleManager "0xE28f573b732632fdE03BD5507A7d475383e8512E"
+    - &aragonKernel "0xA48DF029Fd2e5FCECB3886c5c2F60e3625A1E87d"
+    - &acl "0x78780e70Eae33e2935814a327f7dB6c01136cc62"
 
     # Core upgrade targets.
     - &lidoLocator "0xe2EF9536DAAAEBFf5b1c130957AB3E80056b06D8"
@@ -199,15 +215,23 @@ l1:
         hasRole:
           - args: [*DEFAULT_ADMIN_ROLE, *agent]
             result: true
+          - args: [*STAKING_MODULE_MANAGE_ROLE, *agent]
+            result: true
+          - args: [*STAKING_MODULE_MANAGE_ROLE, *hoodiLegacyStakingModuleManager]
+            result: true
           - args: [*STAKING_MODULE_SHARE_MANAGE_ROLE, *easyTrackEvmScriptExecutor]
             result: true
           - args: [*STAKING_MODULE_UNVETTING_ROLE, *oldDepositSecurityModule]
             result: false
           - args: [*STAKING_MODULE_UNVETTING_ROLE, *newDepositSecurityModule]
             result: true
+          - args: [*REPORT_EXITED_VALIDATORS_ROLE, *accountingOracle]
+            result: true
           - args: [*REPORT_VALIDATOR_EXITING_STATUS_ROLE, *validatorExitDelayVerifier]
             result: true
           - args: [*REPORT_VALIDATOR_EXIT_TRIGGERED_ROLE, *triggerableWithdrawalsGateway]
+            result: true
+          - args: [*REPORT_REWARDS_MINTED_ROLE, *accounting]
             result: true
 
     accountingOracleProxy:
@@ -239,6 +263,14 @@ l1:
       checks:
         getContractVersion: 3
         getConsensusVersion: 5
+        getExitRequestLimitFullInfo:
+          [
+            *VEBO_MAX_EXIT_BALANCE_ETH,
+            *VEBO_BALANCE_PER_FRAME_ETH,
+            *VEBO_FRAME_DURATION_IN_SEC,
+            *VEBO_MAX_EXIT_BALANCE_ETH,
+            *VEBO_MAX_EXIT_BALANCE_ETH,
+          ]
         getMaxValidatorsPerReport: *VEBO_MAX_VALIDATORS_PER_REPORT
 
     accountingProxy:
@@ -269,6 +301,27 @@ l1:
       checks:
         implementation: *lidoImpl
         getContractVersion: 4
+
+    aragonKernel:
+      name: KernelState
+      address: *aragonKernel
+      checks:
+        getApp:
+          - args: [*KERNEL_APP_BASES_NAMESPACE, *LIDO_APP_ID]
+            result: *lidoImpl
+
+    aragonAcl:
+      name: ACLState
+      address: *acl
+      checks:
+        hasPermission:
+          - args: [*agent, *aragonKernel, *APP_MANAGER_ROLE]
+            result: false
+          - args: [*agent, *lido, *BUFFER_RESERVE_MANAGER_ROLE]
+            result: true
+        getPermissionManager:
+          - args: [*lido, *BUFFER_RESERVE_MANAGER_ROLE]
+            result: *agent
 
     triggerableWithdrawalsGateway:
       name: TriggerableWithdrawalsGatewayState
@@ -412,6 +465,9 @@ l1:
       address: *csAccounting
       checks:
         getInitializedVersion: 3
+        getCurveInfo:
+          - args: [*IDVT_BOND_CURVE_ID]
+            result: *IDVT_BOND_CURVE_INFO
         getCurvesCount: 5
         hasRole:
           - args: [*SET_BOND_CURVE_ROLE, *identifiedDvtClusterGate]
@@ -454,6 +510,19 @@ l1:
       address: *csValidatorStrikes
       checks:
         ejector: *csmEjector
+
+    identifiedDvtClusterGate:
+      name: VettedGateState
+      address: *identifiedDvtClusterGate
+      checks:
+        curveId: *IDVT_BOND_CURVE_ID
+
+    identifiedDvtClusterCurveSetup:
+      name: OneShotCurveSetup
+      address: *identifiedDvtClusterCurveSetup
+      checks:
+        executed: true
+        deployedCurveId: *IDVT_BOND_CURVE_ID
 
     burner:
       name: AccessControlState
@@ -517,19 +586,9 @@ l1:
             result: 5
 
     easyTrack:
-      name: EasyTrack
+      name: EasyTrackState
       address: *easyTrack
       checks:
-        CANCEL_ROLE: null
-        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
-        MAX_MOTIONS_LIMIT: null
-        MAX_OBJECTIONS_THRESHOLD: null
-        MIN_MOTION_DURATION: null
-        PAUSE_ROLE: null
-        UNPAUSE_ROLE: null
-        canObjectToMotion: null
-        evmScriptExecutor: *easyTrackEvmScriptExecutor
-        evmScriptFactories: null
         evmScriptFactoryPermissions:
           - args: [*updateStakingModuleShareLimitsFactory]
             result: *UPDATE_STAKING_MODULE_SHARE_LIMITS_PERMISSIONS
@@ -549,12 +608,6 @@ l1:
             result: *SETTLE_GENERAL_DELAYED_PENALTY_CM_PERMISSIONS
           - args: [*createOrUpdateOperatorGroupFactory]
             result: *CREATE_OR_UPDATE_OPERATOR_GROUP_CM_PERMISSIONS
-        getEVMScriptFactories: null
-        getMotion: null
-        getMotions: null
-        getRoleAdmin: null
-        governanceToken: null
-        hasRole: null
         isEVMScriptFactory:
           - args: [*oldCsmSettleElStealingPenaltyFactory]
             result: false
@@ -578,10 +631,3 @@ l1:
             result: true
           - args: [*createOrUpdateOperatorGroupFactory]
             result: true
-        motionDuration: null
-        motions: null
-        motionsCountLimit: null
-        objections: null
-        objectionsThreshold: null
-        paused: null
-        supportsInterface: null
