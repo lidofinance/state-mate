@@ -1,0 +1,413 @@
+{
+  "AccessControlState": [
+    {
+      "type": "function",
+      "name": "hasRole",
+      "stateMutability": "view",
+      "inputs": [
+        { "name": "role", "type": "bytes32" },
+        { "name": "account", "type": "address" }
+      ],
+      "outputs": [{ "name": "", "type": "bool" }]
+    }
+  ],
+  "AccountingOracleState": [
+    {
+      "type": "function",
+      "name": "getContractVersion",
+      "stateMutability": "view",
+      "inputs": [],
+      "outputs": [{ "name": "", "type": "uint256" }]
+    },
+    {
+      "type": "function",
+      "name": "getConsensusVersion",
+      "stateMutability": "view",
+      "inputs": [],
+      "outputs": [{ "name": "", "type": "uint256" }]
+    }
+  ],
+  "CSAccountingState": [
+    {
+      "type": "function",
+      "name": "getInitializedVersion",
+      "stateMutability": "view",
+      "inputs": [],
+      "outputs": [{ "name": "", "type": "uint64" }]
+    },
+    {
+      "type": "function",
+      "name": "getCurvesCount",
+      "stateMutability": "view",
+      "inputs": [],
+      "outputs": [{ "name": "", "type": "uint256" }]
+    },
+    {
+      "type": "function",
+      "name": "hasRole",
+      "stateMutability": "view",
+      "inputs": [
+        { "name": "role", "type": "bytes32" },
+        { "name": "account", "type": "address" }
+      ],
+      "outputs": [{ "name": "", "type": "bool" }]
+    }
+  ],
+  "CSFeeOracleState": [
+    {
+      "type": "function",
+      "name": "getContractVersion",
+      "stateMutability": "view",
+      "inputs": [],
+      "outputs": [{ "name": "", "type": "uint256" }]
+    },
+    {
+      "type": "function",
+      "name": "getConsensusVersion",
+      "stateMutability": "view",
+      "inputs": [],
+      "outputs": [{ "name": "", "type": "uint256" }]
+    }
+  ],
+  "CSModuleState": [
+    {
+      "type": "function",
+      "name": "getInitializedVersion",
+      "stateMutability": "view",
+      "inputs": [],
+      "outputs": [{ "name": "", "type": "uint64" }]
+    },
+    {
+      "type": "function",
+      "name": "hasRole",
+      "stateMutability": "view",
+      "inputs": [
+        { "name": "role", "type": "bytes32" },
+        { "name": "account", "type": "address" }
+      ],
+      "outputs": [{ "name": "", "type": "bool" }]
+    }
+  ],
+  "CSParametersRegistryState": [
+    {
+      "type": "function",
+      "name": "getInitializedVersion",
+      "stateMutability": "view",
+      "inputs": [],
+      "outputs": [{ "name": "", "type": "uint64" }]
+    },
+    {
+      "type": "function",
+      "name": "getKeyRemovalCharge",
+      "stateMutability": "view",
+      "inputs": [{ "name": "curveId", "type": "uint256" }],
+      "outputs": [{ "name": "keyRemovalCharge", "type": "uint256" }]
+    },
+    {
+      "type": "function",
+      "name": "getGeneralDelayedPenaltyAdditionalFine",
+      "stateMutability": "view",
+      "inputs": [{ "name": "curveId", "type": "uint256" }],
+      "outputs": [{ "name": "fine", "type": "uint256" }]
+    },
+    {
+      "type": "function",
+      "name": "getQueueConfig",
+      "stateMutability": "view",
+      "inputs": [{ "name": "curveId", "type": "uint256" }],
+      "outputs": [
+        { "name": "queuePriority", "type": "uint32" },
+        { "name": "maxDeposits", "type": "uint32" }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "getRewardShareData",
+      "stateMutability": "view",
+      "inputs": [{ "name": "curveId", "type": "uint256" }],
+      "outputs": [
+        {
+          "name": "data",
+          "type": "tuple[]",
+          "components": [
+            { "name": "minKeyNumber", "type": "uint256" },
+            { "name": "value", "type": "uint256" }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "getAllowedExitDelay",
+      "stateMutability": "view",
+      "inputs": [{ "name": "curveId", "type": "uint256" }],
+      "outputs": [{ "name": "delay", "type": "uint256" }]
+    },
+    {
+      "type": "function",
+      "name": "getExitDelayFee",
+      "stateMutability": "view",
+      "inputs": [{ "name": "curveId", "type": "uint256" }],
+      "outputs": [{ "name": "penalty", "type": "uint256" }]
+    },
+    {
+      "type": "function",
+      "name": "hasRole",
+      "stateMutability": "view",
+      "inputs": [
+        { "name": "role", "type": "bytes32" },
+        { "name": "account", "type": "address" }
+      ],
+      "outputs": [{ "name": "", "type": "bool" }]
+    }
+  ],
+  "CSValidatorStrikesState": [
+    {
+      "type": "function",
+      "name": "ejector",
+      "stateMutability": "view",
+      "inputs": [],
+      "outputs": [{ "name": "", "type": "address" }]
+    }
+  ],
+  "CircuitBreakerState": [
+    {
+      "type": "function",
+      "name": "getPauser",
+      "stateMutability": "view",
+      "inputs": [{ "name": "pausable", "type": "address" }],
+      "outputs": [{ "name": "", "type": "address" }]
+    },
+    {
+      "type": "function",
+      "name": "getPausableCount",
+      "stateMutability": "view",
+      "inputs": [{ "name": "pauser", "type": "address" }],
+      "outputs": [{ "name": "", "type": "uint256" }]
+    }
+  ],
+  "CuratedModuleState": [
+    {
+      "type": "function",
+      "name": "isPaused",
+      "stateMutability": "view",
+      "inputs": [],
+      "outputs": [{ "name": "", "type": "bool" }]
+    },
+    {
+      "type": "function",
+      "name": "hasRole",
+      "stateMutability": "view",
+      "inputs": [
+        { "name": "role", "type": "bytes32" },
+        { "name": "account", "type": "address" }
+      ],
+      "outputs": [{ "name": "", "type": "bool" }]
+    }
+  ],
+  "EasyTrackState": [
+    {
+      "type": "function",
+      "name": "isEVMScriptFactory",
+      "stateMutability": "view",
+      "inputs": [{ "name": "factory", "type": "address" }],
+      "outputs": [{ "name": "", "type": "bool" }]
+    }
+  ],
+  "HashConsensusState": [
+    {
+      "type": "function",
+      "name": "getFrameConfig",
+      "stateMutability": "view",
+      "inputs": [],
+      "outputs": [
+        { "name": "initialEpoch", "type": "uint256" },
+        { "name": "epochsPerFrame", "type": "uint256" },
+        { "name": "fastLaneLengthSlots", "type": "uint256" }
+      ]
+    }
+  ],
+  "InitializedState": [
+    {
+      "type": "function",
+      "name": "getInitializedVersion",
+      "stateMutability": "view",
+      "inputs": [],
+      "outputs": [{ "name": "", "type": "uint64" }]
+    }
+  ],
+  "LidoAppState": [
+    {
+      "type": "function",
+      "name": "implementation",
+      "stateMutability": "view",
+      "inputs": [],
+      "outputs": [{ "name": "", "type": "address" }]
+    },
+    {
+      "type": "function",
+      "name": "getContractVersion",
+      "stateMutability": "view",
+      "inputs": [],
+      "outputs": [{ "name": "", "type": "uint256" }]
+    }
+  ],
+  "OssifiableProxyState": [
+    {
+      "type": "function",
+      "name": "proxy__getImplementation",
+      "stateMutability": "view",
+      "inputs": [],
+      "outputs": [{ "name": "", "type": "address" }]
+    },
+    {
+      "type": "function",
+      "name": "proxy__getAdmin",
+      "stateMutability": "view",
+      "inputs": [],
+      "outputs": [{ "name": "", "type": "address" }]
+    },
+    {
+      "type": "function",
+      "name": "proxy__getIsOssified",
+      "stateMutability": "view",
+      "inputs": [],
+      "outputs": [{ "name": "", "type": "bool" }]
+    }
+  ],
+  "StakingRouterState": [
+    {
+      "type": "function",
+      "name": "getContractVersion",
+      "stateMutability": "view",
+      "inputs": [],
+      "outputs": [{ "name": "", "type": "uint256" }]
+    },
+    {
+      "type": "function",
+      "name": "getStakingModulesCount",
+      "stateMutability": "view",
+      "inputs": [],
+      "outputs": [{ "name": "", "type": "uint256" }]
+    },
+    {
+      "type": "function",
+      "name": "getStakingModule",
+      "stateMutability": "view",
+      "inputs": [{ "name": "_stakingModuleId", "type": "uint256" }],
+      "outputs": [
+        {
+          "name": "",
+          "type": "tuple",
+          "components": [
+            { "name": "id", "type": "uint24" },
+            { "name": "stakingModuleAddress", "type": "address" },
+            { "name": "stakingModuleFee", "type": "uint16" },
+            { "name": "treasuryFee", "type": "uint16" },
+            { "name": "stakeShareLimit", "type": "uint16" },
+            { "name": "status", "type": "uint8" },
+            { "name": "name", "type": "string" },
+            { "name": "lastDepositAt", "type": "uint64" },
+            { "name": "lastDepositBlock", "type": "uint256" },
+            { "name": "exitedValidatorsCount", "type": "uint256" },
+            { "name": "priorityExitShareThreshold", "type": "uint16" },
+            { "name": "maxDepositsPerBlock", "type": "uint64" },
+            { "name": "minDepositBlockDistance", "type": "uint64" },
+            { "name": "withdrawalCredentialsType", "type": "uint8" },
+            { "name": "validatorsBalanceGwei", "type": "uint64" }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "hasRole",
+      "stateMutability": "view",
+      "inputs": [
+        { "name": "role", "type": "bytes32" },
+        { "name": "account", "type": "address" }
+      ],
+      "outputs": [{ "name": "", "type": "bool" }]
+    }
+  ],
+  "TriggerableWithdrawalsGatewayState": [
+    {
+      "type": "function",
+      "name": "getExitRequestLimitFullInfo",
+      "stateMutability": "view",
+      "inputs": [],
+      "outputs": [
+        { "name": "maxExitRequestsLimit", "type": "uint256" },
+        { "name": "exitsPerFrame", "type": "uint256" },
+        { "name": "frameDurationInSec", "type": "uint256" },
+        { "name": "prevExitRequestsLimit", "type": "uint256" },
+        { "name": "currentExitRequestsLimit", "type": "uint256" }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "hasRole",
+      "stateMutability": "view",
+      "inputs": [
+        { "name": "role", "type": "bytes32" },
+        { "name": "account", "type": "address" }
+      ],
+      "outputs": [{ "name": "", "type": "bool" }]
+    }
+  ],
+  "ValidatorsExitBusOracleState": [
+    {
+      "type": "function",
+      "name": "getContractVersion",
+      "stateMutability": "view",
+      "inputs": [],
+      "outputs": [{ "name": "", "type": "uint256" }]
+    },
+    {
+      "type": "function",
+      "name": "getConsensusVersion",
+      "stateMutability": "view",
+      "inputs": [],
+      "outputs": [{ "name": "", "type": "uint256" }]
+    },
+    {
+      "type": "function",
+      "name": "getMaxValidatorsPerReport",
+      "stateMutability": "view",
+      "inputs": [],
+      "outputs": [{ "name": "", "type": "uint256" }]
+    }
+  ],
+  "WithdrawalVaultProxyState": [
+    {
+      "type": "function",
+      "name": "implementation",
+      "stateMutability": "view",
+      "inputs": [],
+      "outputs": [{ "name": "", "type": "address" }]
+    },
+    {
+      "type": "function",
+      "name": "proxy_getAdmin",
+      "stateMutability": "view",
+      "inputs": [],
+      "outputs": [{ "name": "", "type": "address" }]
+    },
+    {
+      "type": "function",
+      "name": "proxy_getIsOssified",
+      "stateMutability": "view",
+      "inputs": [],
+      "outputs": [{ "name": "", "type": "bool" }]
+    }
+  ],
+  "WithdrawalVaultState": [
+    {
+      "type": "function",
+      "name": "getContractVersion",
+      "stateMutability": "view",
+      "inputs": [],
+      "outputs": [{ "name": "", "type": "uint256" }]
+    }
+  ]
+}
