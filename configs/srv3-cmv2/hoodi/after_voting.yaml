@@ -114,10 +114,10 @@ deployed:
 
     # Curated module v2.
     - &curatedModule "0x87EB69Ae51317405FD285efD2326a4a11f6173b9"
-    - &curatedAccounting "0x7f7356d29ACd915f1934220956C3305808cEb235"
-    - &curatedFeeOracle "0x5D2F27000C80f6f7A03015FD49dB7fEba3fbFa83"
+    - &curatedAccounting "0x7f7356D29aCd915F1934220956c3305808ceB235"
+    - &curatedFeeOracle "0x5D2F27000C80f6f7A03015Fd49dB7FEba3fBfa83"
     - &curatedVerifier "0x209190Ebc2Be80367a15d05e626784Eb94d6A880"
-    - &curatedEjector "0xfDBDe2B3554B69c84e0f8D7DAB68D390Ff0f4394"
+    - &curatedEjector "0xfDbde2B3554B69C84e0f8d7daB68D390Ff0f4394"
     - &curatedHashConsensus "0x920883908A78c1554f682006a8aB32E62Be09F33"
 
     # Easy Track factories.
