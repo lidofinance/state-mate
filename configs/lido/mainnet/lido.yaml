@@ -85,6 +85,7 @@ deployed:
     - &gateSealWithdrawalQueue "0x8A854C4E750CDf24f138f34A9061b2f556066912"
     - &gateSealVaulthubAndPredepositGuarantee "0x881dAd714679A6FeaA636446A0499101375A365c"
     - &gateSealCSAccounting "0xE1686C2E90eb41a48356c1cC7FaA17629af3ADB3"
+    - &circuitBreaker "0x6019CB557978296BA3C08a7B73225C0975DFB2F7"
 
     # --- Staking modules ---
     - &nodeOperatorsRegistry "0x55032650b14df07b85bF18A3a3eC8E0Af2e028d5"
@@ -98,6 +99,8 @@ deployed:
     - &CSFeeDistributor "0xD99CC66fEC647E68294C6477B40fC7E0F6F618D0"
     - &CSVettedGate "0xB314D4A76C457c93150d308787939063F4Cc67E0"
     - &CSEjector "0xc72b58aa02E0e98cF8A4a0E9Dce75e763800802C"
+    - &CSFeeOracle "0x4D4074628678Bd302921c20573EEa1ed38DdF7FB"
+    - &CSVerifier "0xdC5FE1782B6943f318E05230d688713a560063DC"
 
     # --- Easy Track ---
     - &easyTrack "0xF0211b7660680B49De1A7E9f25C65660F0a13Fea"
@@ -182,10 +185,14 @@ misc:
   # --- Time durations (in seconds) ---
   - &DURATION_1_HOUR 3600
   - &DURATION_1_DAY 86400
+  - &DURATION_5_DAYS 432000
   - &DURATION_2_WEEKS 1209600
+  - &DURATION_21_DAYS 1814400
   - &DURATION_28_DAYS 2419200
   - &DURATION_30_DAYS 2592000
+  - &DURATION_60_DAYS 5184000
   - &DURATION_1_YEAR 31536000
+  - &DURATION_3_YEARS 94608000
 
   # --- Percentage bases & voting parameters ---
   - &VOTING_SUPPORT_REQUIRED_PCT 500000000000000000
@@ -838,6 +845,7 @@ l1:
         *ORACLE_ROLE : [*accountingOracle]
         *WQ_RESUME_ROLE : [*resealManager]
         *WQ_PAUSE_ROLE : [*resealManager, *gateSealWithdrawalQueue]
+        # *WQ_PAUSE_ROLE : [*resealManager, *circuitBreaker]
       implementationChecks:
         BUNKER_MODE_DISABLED_TIMESTAMP: *MAX_UINT256
         DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
@@ -1041,6 +1049,7 @@ l1:
         *CS_RECOVERER_ROLE : []
         *CS_RESUME_ROLE : [*resealManager]
         *CS_PAUSE_ROLE : [*resealManager, *gateSealCSAccounting]
+        # *CS_PAUSE_ROLE : [*resealManager, *circuitBreaker]
       implementationChecks:
         DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
         DEFAULT_BOND_CURVE_ID: 0
@@ -1123,6 +1132,7 @@ l1:
         *DEFAULT_ADMIN_ROLE : [*aragonAgent]
         *ADD_FULL_WITHDRAWAL_REQUEST_ROLE : [*CSEjector, *validatorsExitBusOracle]
         *TWG_PAUSE_ROLE : [*gateSealVEBAndTWG, *resealManager]
+        # *TWG_PAUSE_ROLE : [*circuitBreaker, *resealManager]
         *TWG_RESUME_ROLE : [*resealManager]
         *TW_EXIT_LIMIT_MANAGER_ROLE : []
 
@@ -1208,6 +1218,7 @@ l1:
       ozAcl:
         *DEFAULT_ADMIN_ROLE : [*aragonAgent]
         *OZ_PAUSE_ROLE : [*gateSealVaulthubAndPredepositGuarantee, *resealManager]
+        # *OZ_PAUSE_ROLE : [*circuitBreaker, *resealManager]
         *OZ_RESUME_ROLE : [*resealManager]
         *VAULT_MASTER_ROLE : []
         *BAD_DEBT_MASTER_ROLE : [*vaultsAdapter]
@@ -1308,6 +1319,7 @@ l1:
       ozAcl:
         *DEFAULT_ADMIN_ROLE : [*aragonAgent]
         *OZ_PAUSE_ROLE : [*gateSealVaulthubAndPredepositGuarantee, *resealManager]
+        # *OZ_PAUSE_ROLE : [*circuitBreaker, *resealManager]
         *OZ_RESUME_ROLE : [*resealManager]
       implementationChecks:
         PREDEPOSIT_AMOUNT: *ONE_ETH_WEI
@@ -1695,6 +1707,7 @@ l1:
         *ORACLE_MANAGE_CONSENSUS_CONTRACT_ROLE : []
         *ORACLE_MANAGE_CONSENSUS_VERSION_ROLE : []
         *ORACLE_PAUSE_ROLE : [*resealManager, *gateSealVEBAndTWG]
+        # *ORACLE_PAUSE_ROLE : [*resealManager, *circuitBreaker]
         *ORACLE_RESUME_ROLE : [*resealManager]
         *ORACLE_SUBMIT_DATA_ROLE : []
       implementationChecks:
@@ -2444,6 +2457,68 @@ l1:
         get_sealables: [*triggerableWithdrawalsGateway, *validatorsExitBusOracle]
         get_expiry_timestamp: 1789207187
         is_expired: false
+
+    circuitBreaker:
+      name: CircuitBreaker
+      address: *circuitBreaker
+      checks:
+        ADMIN: *aragonAgent
+        MIN_PAUSE_DURATION: *DURATION_5_DAYS
+        MAX_PAUSE_DURATION: *DURATION_60_DAYS
+        MIN_HEARTBEAT_INTERVAL: *DURATION_30_DAYS
+        MAX_HEARTBEAT_INTERVAL: *DURATION_3_YEARS
+        pauseDuration: *DURATION_21_DAYS
+        heartbeatInterval: *DURATION_1_YEAR
+        heartbeatExpiry: null
+        getPausables: []
+        getPauser: null
+        getPausableCount: null
+        isPauserLive: null
+        # getPausables:
+        #   - *withdrawalQueueERC721
+        #   - *validatorsExitBusOracle
+        #   - *triggerableWithdrawalsGateway
+        #   - *vaultHub
+        #   - *predepositGuarantee
+        #   - *CSModule
+        #   - *CSAccounting
+        #   - *CSFeeOracle
+        #   - *CSVerifier
+        #   - *CSVettedGate
+        #   - *CSEjector
+        # getPauser:
+        #   - args: [*withdrawalQueueERC721]
+        #     result: *sealCommittee
+        #   - args: [*validatorsExitBusOracle]
+        #     result: *sealCommittee
+        #   - args: [*triggerableWithdrawalsGateway]
+        #     result: *sealCommittee
+        #   - args: [*vaultHub]
+        #     result: *sealCommittee
+        #   - args: [*predepositGuarantee]
+        #     result: *sealCommittee
+        #   - args: [*CSModule]
+        #     result: *csmCommittee
+        #   - args: [*CSAccounting]
+        #     result: *csmCommittee
+        #   - args: [*CSFeeOracle]
+        #     result: *csmCommittee
+        #   - args: [*CSVerifier]
+        #     result: *csmCommittee
+        #   - args: [*CSVettedGate]
+        #     result: *csmCommittee
+        #   - args: [*CSEjector]
+        #     result: *csmCommittee
+        # getPausableCount:
+        #   - args: [*sealCommittee]
+        #     result: 5
+        #   - args: [*csmCommittee]
+        #     result: 6
+        # isPauserLive:
+        #   - args: [*sealCommittee]
+        #     result: true
+        #   - args: [*csmCommittee]
+        #     result: true
 
     node-operators-registry:
       name: NodeOperatorsRegistry
