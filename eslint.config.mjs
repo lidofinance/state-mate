@@ -5,6 +5,7 @@ import { includeIgnoreFile } from "@eslint/compat";
 import { FlatCompat } from "@eslint/eslintrc";
 import js from "@eslint/js";
 import tsParser from "@typescript-eslint/parser";
+import eslintPluginUnicorn from "eslint-plugin-unicorn";
 import globals from "globals";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -22,8 +23,8 @@ export default [
     "plugin:prettier/recommended",
     "plugin:import/recommended",
     "plugin:import/typescript",
-    "plugin:unicorn/recommended",
   ),
+  eslintPluginUnicorn.configs.recommended,
 
   includeIgnoreFile(gitignorePath),
   {
