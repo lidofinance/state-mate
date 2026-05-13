@@ -10,17 +10,17 @@
   "packageManager": "yarn@4.3.1",
   "scripts": {
     "build": "tsc",
-    "start": "node --import tsx src/state-mate.ts",
-    "consolidate-abi": "sh -c 'node --import tsx src/consolidate-abis.ts \"$1\" --compress' --",
+    "start": "tsx src/state-mate.ts",
+    "consolidate-abi": "sh -c 'tsx src/consolidate-abis.ts \"$1\" --compress' --",
     "lint": "eslint . --max-warnings=0",
     "lint:fix": "yarn lint --fix",
     "format": "prettier . --ignore-path .gitignore --ignore-path .prettierignore --check",
     "format:fix": "prettier . --ignore-path .gitignore --ignore-path .prettierignore --write",
     "postinstall": "husky",
-    "test": "node --import tsx --test tests/unit.test.ts",
-    "coverage": "c8 --all --src src --include \"src/**/*.ts\" --reporter=text node --import tsx --test tests/**/*.test.ts",
-    "test:compare": "node --import tsx src/compare/app.ts",
-    "schemas": "node --import tsx src/gen-schemas.ts"
+    "test": "tsx --test",
+    "coverage": "c8 --all --src src --include \"src/**/*.ts\" --reporter=text tsx --test",
+    "test:compare": "tsx src/compare/app.ts",
+    "schemas": "tsx src/gen-schemas.ts"
   },
   "lint-staged": {
     "./**.{ts,md,json}": [
