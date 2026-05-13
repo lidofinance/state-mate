@@ -146,6 +146,20 @@ function formatConsolidatedKeys(keys: string[]): string {
   return `${preview}, ... (+${keys.length - CONSOLIDATED_KEYS_PREVIEW_LIMIT} more)`;
 }
 
+function formatGenericAbiConflictMessage(
+  key: string,
+  contractName: string,
+  address: string,
+  addressMatches: string[],
+): string {
+  return (
+    `ABI lookup for ${chalk.yellow(key)} would use generic ABI ${chalk.yellow(contractName)}, ` +
+    `but address-specific ABI key(s) exist for ${chalk.yellow(address)}:\n` +
+    `${addressMatches.join(", ")}\n\n` +
+    `Use the address-specific contract name in YAML so coverage is checked against the real contract ABI.`
+  );
+}
+
 type LoadAbiOptions = {
   allowAddressFallback?: boolean;
   failSilently?: boolean;
@@ -172,7 +186,16 @@ export function loadAbiFromFile(
     // Try with address first, then without
     let abi = abis[key];
     if (!abi && address) {
-      abi = abis[contractName];
+      const genericAbi = abis[contractName];
+      if (genericAbi) {
+        const addressMatches = findAbiKeysByAddress(allKeys, address);
+        if (addressMatches.length > 0) {
+          const message = formatGenericAbiConflictMessage(key, contractName, address, addressMatches);
+          if (failSilently) return null;
+          logErrorAndExit(message);
+        }
+        abi = genericAbi;
+      }
     }
     if (!abi && address && allowAddressFallback) {
       const addressMatches = findAbiKeysByAddress(allKeys, address);
@@ -204,6 +227,17 @@ export function loadAbiFromFile(
     let abiPath;
     try {
       abiPath = _findAbiPath(contractName, address, { shouldThrow: true, allowAddressFallback });
+      const addressMatches = findAddressSpecificAbiFiles(address);
+      if (isGenericAbiPath(contractName, abiPath) && addressMatches.length > 0) {
+        const message = formatGenericAbiConflictMessage(
+          getAbiKey(contractName, address),
+          contractName,
+          address,
+          addressMatches,
+        );
+        if (failSilently) return null;
+        logErrorAndExit(message);
+      }
     } catch (error) {
       const message =
         `Error finding ABI file for contract
@@ -491,6 +525,27 @@ function toLowerCaseAddress(fileName: string): string {
 
   const address = match[0];
   return fileName.replace(address, address.toLowerCase());
+}
+
+function findAddressSpecificAbiFiles(address: string): string[] {
+  if (!fs.existsSync(g_Arguments.abiDirPath)) return [];
+
+  try {
+    return findAbiKeysByAddress(fs.readdirSync(g_Arguments.abiDirPath), address).filter((fileName) =>
+      fileName.endsWith(".json"),
+    );
+  } catch (error) {
+    logErrorAndExit(`Failed to read ${chalk.yellow(g_Arguments.abiDirPath)}:\n ${printError(error)}`);
+  }
+}
+
+function isGenericAbiPath(contractName: string, abiPath: string): boolean {
+  const relativeAbiPath = path.relative(g_Arguments.abiDirPath, abiPath);
+
+  return (
+    relativeAbiPath === `${contractName}.json` ||
+    relativeAbiPath === path.join(`${contractName}.sol`, `${contractName}.json`)
+  );
 }
 
 function normalizeConsolidatedAbiKeys(
