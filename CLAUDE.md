@@ -5,7 +5,7 @@ Validates EVM smart-contract state against YAML configs. Calls view functions on
 ## Conventions (non-obvious)
 
 - RPC URLs in configs are typically given as **env-var names**, not URLs (e.g. `rpcUrl: HOODI_REMOTE_RPC_URL`). A few configs inline URLs directly — both forms are accepted. Copy `.env.sample` → `.env` and fill values in locally; `.env` is gitignored.
-- Seed configs use a `.seed.yaml` suffix and are consumed by `--generate`, which writes a sibling `*.seed.generated.yaml`. `--generate` only downloads ABIs when combined with `--update-abi-missing` / `--update-abi`.
+- Seed configs use a `.seed.yaml` suffix and are consumed by `--generate`, which prints the generated sibling path. Checked-in generated examples use `*.seed.generated.yaml`; `--generate` only downloads ABIs when combined with `--update-abi-missing` / `--update-abi`.
 - ABI lookup differs by mode. Consolidated (`abis.json.gz`): tries `Name-{addr}` key first, then `Name`. Individual (`abi/*.json`): tries `Name.json`, then `Name.sol/Name.json`, then `Name-{addr}.json`. Prefer `--update-abi-missing` over `--update-abi` (the latter overwrites existing ABIs).
 - `-o` drills in: `-o l1`, `-o l1/contractName`, `-o l1/contractName/checks/funcName`.
 

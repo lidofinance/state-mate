@@ -47,6 +47,9 @@ roles: # bytes32 role hashes, often many (one per domain)
 eoa: # named EOAs (deployer, signer addresses); useful for "deployer renounced" checks
   - &deployer "0x..."
 
+# Other repo-specific anchor/value sections may appear in main configs:
+# deployed-aux, tvl, delays, signers, selectors, validators
+
 l1: # per-chain section — key matches deployed.* key
   rpcUrl: L1_MAINNET_RPC_URL # env-var name, or inline URL
   explorerHostname: api.etherscan.io/v2/api
@@ -61,7 +64,7 @@ l2: # present when deployed.l2 exists
   # ...
 ```
 
-`parameters`, `deployed`, `misc`, `roles`, `eoa` are anchor-only sections — they define YAML anchors (`&name`) that later sections reference via `*name`. Only `<chain-key>` sections with `contracts:` produce on-chain calls.
+`parameters`, `deployed`, `misc`, `roles`, `eoa`, and repo-specific sections such as `deployed-aux`, `tvl`, `delays`, `signers`, `selectors`, and `validators` are anchor/value sections — they define YAML anchors (`&name`) or reusable values that later sections reference via `*name`. Only `<chain-key>` sections with `contracts:` produce on-chain checks.
 
 ## Contract patterns
 
@@ -320,7 +323,7 @@ checks:
   unknownValue: "REPLACEME"
 ```
 
-Run `yarn start config.yml` — the error surfaces the actual on-chain value:
+Run `yarn start config.yaml` — the error surfaces the actual on-chain value:
 
 ```
 ✗ .unknownValue: expected REPLACEME, got 0xb13b0c93...
@@ -347,14 +350,14 @@ cast call $CONTRACT "hasRole(bytes32,address)(bool)" $ROLE $ADDRESS --rpc-url $R
 
 ## Seed configs
 
-A seed config is a thin starter file named `*.seed.yaml`. It contains only address-book and chain-explorer sections (`deployed:`, `l1:` / `l2:` with `rpcUrl` / `explorerHostname`, optional `eoa:` / `roles:` / `misc:`) — **no `contracts:` block**. `yarn start <seed> --generate` walks every anchor under `deployed:`, uses ABIs already on disk to infer contract stanzas, and writes a sibling `*.seed.generated.yaml` with a populated `contracts:` block where each function value is `REPLACEME` (and, for proxies, a commented-out `implementationChecks` stub).
+A seed config is a thin starter file named `*.seed.yaml`. It contains only address-book and chain-explorer sections (`deployed:`, `l1:` / `l2:` with `rpcUrl` / `explorerHostname`, optional `eoa:` / `roles:` / `misc:`) — **no `contracts:` block**. `yarn start <seed> --generate` walks every anchor under `deployed:`, uses ABIs already on disk to infer contract stanzas, and writes a sibling generated YAML file with a populated `contracts:` block where each function value is `REPLACEME` (and, for proxies, a commented-out `implementationChecks` stub). Use the generated file path printed by state-mate; checked-in generated examples use `*.seed.generated.yaml`.
 
 `--generate` on its own does not fetch ABIs — it only uses ABIs already on disk. Combine with `--update-abi-missing` on first run.
 
 ```bash
 yarn start configs/<protocol>/<name>.seed.yaml --generate --update-abi-missing
-# Review *.seed.generated.yaml, replace REPLACEME with real expectations, then:
-yarn start configs/<protocol>/<name>.seed.generated.yaml
+# Review the generated file, replace REPLACEME with real expectations, then:
+yarn start <generated-config-path>
 ```
 
 ## Workflow
@@ -364,8 +367,8 @@ Adding a new contract to an existing config:
 1. **Resolve addresses** — `cast admin` / `cast implementation` for proxies; EIP-1967 slots for anything non-standard.
 2. **Define anchors** in `deployed:` (and `implementation:` addresses in the same section with a matching name).
 3. **Write the contract stanza** — pick the proxy pattern, seed `checks:` with function names, leave unknowns as `REPLACEME`.
-4. **Download ABIs** — `yarn start config.yml --update-abi-missing`. Resolution depends on mode: consolidated (`abis.json.gz`) tries the `Name-{address}` key first, then `Name`; individual-file mode (`abi/*.json`) tries `Name.json`, then `Name.sol/Name.json`, then `Name-{address}.json`.
-5. **Run, read actuals, replace** — iterate `yarn start config.yml -o l1/contractName` until green.
+4. **Download ABIs** — `yarn start config.yaml --update-abi-missing`. Resolution depends on mode: consolidated (`abis.json.gz`) tries the `Name-{address}` key first, then `Name`; individual-file mode (`abi/*.json`) tries `Name.json`, then `Name.sol/Name.json`, then `Name-{address}.json`.
+5. **Run, read actuals, replace** — iterate `yarn start config.yaml -o l1/contractName` until green.
 6. **Access control** — probe with `cast call getRoleMemberCount`; choose `ozAcl` / `ozNonEnumerableAcl` / `hasRole`. List every role constant, including empty ones (`[]`).
 
 ## Implementation checks
@@ -384,13 +387,13 @@ For `implementationChecks`, use uninitialized defaults — implementations store
 ## Running checks
 
 ```bash
-yarn start config.yml                                     # full config
-yarn start config.yml -o l1                               # specific section
-yarn start config.yml -o l1/contractName                  # specific contract (great for rate-limited RPC)
-yarn start config.yml -o l1/contractName/checks/funcName  # single function
-yarn start config.yml --update-abi-missing                # download only missing ABIs (preferred)
-yarn start config.yml --update-abi                        # overwrite all ABIs (rarely needed)
-yarn start config.seed.yaml --generate                    # expand seed -> *.seed.generated.yaml
+yarn start config.yaml                                    # full config
+yarn start config.yaml -o l1                              # specific section
+yarn start config.yaml -o l1/contractName                 # specific contract (great for rate-limited RPC)
+yarn start config.yaml -o l1/contractName/checks/funcName # single function
+yarn start config.yaml --update-abi-missing               # download only missing ABIs (preferred)
+yarn start config.yaml --update-abi                       # overwrite all ABIs (rarely needed)
+yarn start config.seed.yaml --generate                    # expand seed and print generated file path
 ```
 
 ## Best practices
