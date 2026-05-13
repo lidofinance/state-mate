@@ -13,12 +13,10 @@ misc:
   - &CURATED_TREASURY_FEE 600
   - &CURATED_STAKE_SHARE_LIMIT 10000
   - &CURATED_MODULE_STATUS 0
-  - &CURATED_EXITED_VALIDATORS_COUNT 0
   - &CURATED_PRIORITY_EXIT_SHARE_THRESHOLD 10000
   - &CURATED_MAX_DEPOSITS_PER_BLOCK 150
   - &CURATED_MIN_DEPOSIT_BLOCK_DISTANCE 25
   - &CURATED_WITHDRAWAL_CREDENTIALS_TYPE 2
-  - &CURATED_VALIDATORS_BALANCE_GWEI 0
   - &VEBO_MAX_EXIT_BALANCE_ETH 358400
   - &VEBO_BALANCE_PER_FRAME_ETH 32
   - &VEBO_FRAME_DURATION_IN_SEC 48
@@ -107,7 +105,7 @@ deployed:
     - &accounting "0x9b5b78D1C9A3238bF24662067e34c57c83E8c354"
     - &accountingImpl "0xDB47544d5813f15116bf95c1cF2ff4dEdb2226fD"
     - &withdrawalVault "0x4473dCDDbf77679A643BdB654dbd86D67F8d32f2"
-    - &withdrawalVaultImpl "0xB97e67CC20bd2970E30341c0ECc7497d8A5b7342"
+    - &withdrawalVaultImpl "0x6724DaD16f7b05157dF72783F99cA6B813742330"
     - &burner "0xb2c99cd38a2636a6281a849C8de938B3eF4A7C3D"
     - &triggerableWithdrawalsGateway "0x6679090D92b08a2a686eF8614feECD8cDFE209db"
     - &validatorExitDelayVerifier "0xa5F5A9360275390fF9728262a29384399f38d2f0"
@@ -206,12 +204,12 @@ l1:
               name: *CURATED_MODULE_NAME
               lastDepositAt: null
               lastDepositBlock: null
-              exitedValidatorsCount: *CURATED_EXITED_VALIDATORS_COUNT
+              exitedValidatorsCount: null
               priorityExitShareThreshold: *CURATED_PRIORITY_EXIT_SHARE_THRESHOLD
               maxDepositsPerBlock: *CURATED_MAX_DEPOSITS_PER_BLOCK
               minDepositBlockDistance: *CURATED_MIN_DEPOSIT_BLOCK_DISTANCE
               withdrawalCredentialsType: *CURATED_WITHDRAWAL_CREDENTIALS_TYPE
-              validatorsBalanceGwei: *CURATED_VALIDATORS_BALANCE_GWEI
+              validatorsBalanceGwei: null
         hasRole:
           - args: [*DEFAULT_ADMIN_ROLE, *agent]
             result: true
@@ -268,8 +266,8 @@ l1:
             *VEBO_MAX_EXIT_BALANCE_ETH,
             *VEBO_BALANCE_PER_FRAME_ETH,
             *VEBO_FRAME_DURATION_IN_SEC,
-            *VEBO_MAX_EXIT_BALANCE_ETH,
-            *VEBO_MAX_EXIT_BALANCE_ETH,
+            null,
+            null,
           ]
         getMaxValidatorsPerReport: *VEBO_MAX_VALIDATORS_PER_REPORT
 
@@ -294,6 +292,7 @@ l1:
       address: *withdrawalVault
       checks:
         getContractVersion: 3
+        CONSOLIDATION_GATEWAY: *consolidationGateway
 
     lido:
       name: LidoAppState
@@ -331,8 +330,8 @@ l1:
           maxExitRequestsLimit: *TW_MAX_EXIT_REQUESTS_LIMIT
           exitsPerFrame: *TW_EXITS_PER_FRAME
           frameDurationInSec: *TW_FRAME_DURATION_IN_SEC
-          prevExitRequestsLimit: *TW_MAX_EXIT_REQUESTS_LIMIT
-          currentExitRequestsLimit: *TW_MAX_EXIT_REQUESTS_LIMIT
+          prevExitRequestsLimit: null
+          currentExitRequestsLimit: null
         hasRole:
           - args: [*TW_EXIT_LIMIT_MANAGER_ROLE, *agent]
             result: true
