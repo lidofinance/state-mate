@@ -2,13 +2,15 @@ import chalk from "chalk";
 import { JsonRpcProvider } from "ethers";
 
 import { EntryField } from "src/common";
-import { logFinalStatus, logHeader1, logHeader2 } from "src/logger";
-import { ContractEntry } from "src/typebox";
+import { logError, logFinalStatus, logHeader1, logHeader2 } from "src/logger";
+import { ContractEntry, isTypeOfTB, ProxyContractEntryTB } from "src/typebox";
 
 import {
   CheckLevel,
   clearErrorContext,
   getContractStats,
+  incChecks,
+  incErrors,
   needCheck,
   resetContractCounters,
   SectionValidatorBase,
@@ -21,10 +23,16 @@ import { OzNonEnumerableAclSectionValidator } from "./oz-non-enumerable-acl";
 import { ProxyCheckSectionValidator } from "./proxy-check";
 import { StorageSectionValidator } from "./storage";
 
+// bytes32(uint256(keccak256("eip1967.proxy.implementation")) - 1)
+const EIP1967_IMPL_SLOT = "0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc";
+const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
+
 export class ContractSectionValidator {
   private map: Map<EntryField, SectionValidatorBase> = new Map();
+  private provider: JsonRpcProvider;
 
   constructor(provider: JsonRpcProvider) {
+    this.provider = provider;
     const sections = [
       EntryField.checks,
       EntryField.storage,
@@ -85,6 +93,8 @@ export class ContractSectionValidator {
 
     const basePath = `${sectionTitle}/${contractAlias}`;
 
+    await this._checkEip1967Topology(contractEntry);
+
     if (needCheck(CheckLevel.checksType, EntryField.checks)) {
       logHeader2(`${basePath}/${EntryField.checks}`);
       setErrorContext({ checksType: EntryField.checks });
@@ -125,5 +135,39 @@ export class ContractSectionValidator {
       ? `${checks} checks, ${chalk.red(`${errors} ${errors === 1 ? "error" : "errors"}`)}`
       : `${checks} checks passed`;
     logFinalStatus(statusMessage, errors === 0, true);
+  }
+
+  private async _checkEip1967Topology(contractEntry: ContractEntry): Promise<void> {
+    if (contractEntry.skipImplementationChecks) return;
+
+    let raw: string;
+    try {
+      raw = await this.provider.getStorage(contractEntry.address, EIP1967_IMPL_SLOT);
+    } catch {
+      return; // best-effort: ignore storage read failures
+    }
+    if (!raw || raw === "0x" || /^0x0+$/.test(raw)) return;
+
+    const implFromSlot = `0x${raw.slice(-40).toLowerCase()}`;
+    if (implFromSlot === ZERO_ADDRESS) return;
+
+    setErrorContext({ checksType: "eip1967ProxyDetection", method: "getStorage" });
+
+    if (isTypeOfTB(contractEntry, ProxyContractEntryTB)) {
+      if (contractEntry.implementation && contractEntry.implementation.toLowerCase() !== implFromSlot) {
+        const message = `EIP-1967 implementation slot reports ${implFromSlot}, but config declares ${contractEntry.implementation.toLowerCase()}`;
+        logError(message);
+        incErrors(message);
+      } else {
+        incChecks();
+      }
+      return;
+    }
+
+    const message =
+      `Address ${contractEntry.address} is an EIP-1967 proxy (impl=${implFromSlot}) but is described as a plain contract. ` +
+      `Use the proxy form (proxyName/implementation/proxyChecks/implementationChecks), or set 'skipImplementationChecks: true' to acknowledge.`;
+    logError(message);
+    incErrors(message);
   }
 }
