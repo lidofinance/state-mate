@@ -29,7 +29,8 @@ parameters: # optional — arbitrary constants used across the file
 deployed: # address book, grouped by chain
   l1:
     - &contractAddress "0x..."
-    - &implAddress "0x..."
+    - &implementationAddress "0x..."
+    - &proxyAdminAddress "0x..."
   l2: # for multi-chain configs (e.g. L1↔L2 bridges)
     - &l2ContractAddress "0x..."
 
@@ -108,10 +109,10 @@ contractName:
   name: ContractName
   address: *contractAddress
   proxyName: OssifiableProxy
-  implementation: *implAddress
+  implementation: *implementationAddress
   proxyChecks:
     proxy__getAdmin: *aragonAgent
-    proxy__getImplementation: *implAddress
+    proxy__getImplementation: *implementationAddress
     proxy__getIsOssified: false
   checks:
     someFunction: expectedValue
@@ -346,14 +347,14 @@ cast call $CONTRACT "hasRole(bytes32,address)(bool)" $ROLE $ADDRESS --rpc-url $R
 
 ## Seed configs
 
-A seed config is a thin starter file named `*.seed.yml`. It contains only address-book and chain-explorer sections (`deployed:`, `l1:` / `l2:` with `rpcUrl` / `explorerHostname`, optional `eoa:` / `roles:` / `misc:`) — **no `contracts:` block**. `yarn start <seed> --generate` walks every anchor under `deployed:`, resolves the ABI for each address, and writes a sibling `*.seed.generated.yml` with a populated `contracts:` block where each function value is `REPLACEME` (and, for proxies, a commented-out `implementationChecks` stub).
+A seed config is a thin starter file named `*.seed.yaml`. It contains only address-book and chain-explorer sections (`deployed:`, `l1:` / `l2:` with `rpcUrl` / `explorerHostname`, optional `eoa:` / `roles:` / `misc:`) — **no `contracts:` block**. `yarn start <seed> --generate` walks every anchor under `deployed:`, uses ABIs already on disk to infer contract stanzas, and writes a sibling `*.seed.generated.yaml` with a populated `contracts:` block where each function value is `REPLACEME` (and, for proxies, a commented-out `implementationChecks` stub).
 
 `--generate` on its own does not fetch ABIs — it only uses ABIs already on disk. Combine with `--update-abi-missing` on first run.
 
 ```bash
-yarn start configs/proto/mainnet.seed.yml --generate --update-abi-missing
-# Review *.seed.generated.yml, replace REPLACEME with real expectations, then:
-yarn start configs/proto/mainnet.seed.generated.yml
+yarn start configs/<protocol>/<name>.seed.yaml --generate --update-abi-missing
+# Review *.seed.generated.yaml, replace REPLACEME with real expectations, then:
+yarn start configs/<protocol>/<name>.seed.generated.yaml
 ```
 
 ## Workflow
@@ -389,7 +390,7 @@ yarn start config.yml -o l1/contractName                  # specific contract (g
 yarn start config.yml -o l1/contractName/checks/funcName  # single function
 yarn start config.yml --update-abi-missing                # download only missing ABIs (preferred)
 yarn start config.yml --update-abi                        # overwrite all ABIs (rarely needed)
-yarn start config.seed.yml --generate                     # expand seed → *.seed.generated.yml
+yarn start config.seed.yaml --generate                    # expand seed -> *.seed.generated.yaml
 ```
 
 ## Best practices
