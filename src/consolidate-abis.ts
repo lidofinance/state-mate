@@ -14,7 +14,7 @@ function parseArguments(): { abiDirectoryPath: string; shouldCompress: boolean }
   const shouldCompress = arguments_.includes("--compress");
 
   if (!abiDirectoryPath) {
-    console.error("Usage: ts-node src/consolidate-abis.ts <abi-directory-path> [--compress]");
+    console.error("Usage: yarn consolidate-abi <abi-directory-path>");
     process.exit(1);
   }
 
