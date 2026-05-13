@@ -23,4 +23,4 @@ Validates EVM smart-contract state against YAML configs. Calls view functions on
 
 ## Deeper guidance
 
-Config patterns (proxies, Safe detection, access control, indexed collections, REPLACEME discovery, troubleshooting): `.claude/skills/state-mate/skill.md`.
+Config patterns (proxies, Safe detection, access control, indexed collections, REPLACEME discovery, troubleshooting): `.skills/state-mate/SKILL.md`.
