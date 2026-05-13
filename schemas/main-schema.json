@@ -821,6 +821,9 @@
                           }
                         }
                       }
+                    },
+                    "skipImplementationChecks": {
+                      "type": "boolean"
                     }
                   },
                   "required": [
@@ -1472,6 +1475,9 @@
                           }
                         }
                       }
+                    },
+                    "skipImplementationChecks": {
+                      "type": "boolean"
                     },
                     "proxyName": {
                       "type": "string"
@@ -3000,6 +3006,9 @@
                           }
                         }
                       }
+                    },
+                    "skipImplementationChecks": {
+                      "type": "boolean"
                     }
                   },
                   "required": [
@@ -3651,6 +3660,9 @@
                           }
                         }
                       }
+                    },
+                    "skipImplementationChecks": {
+                      "type": "boolean"
                     },
                     "proxyName": {
                       "type": "string"

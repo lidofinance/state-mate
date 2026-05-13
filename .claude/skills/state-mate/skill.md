@@ -77,6 +77,8 @@ contractName:
 
 ### Proxy patterns
 
+> **EIP-1967 pre-flight (enforced)**: before validating each contract, state-mate reads the EIP-1967 implementation slot (`0x360894…382bbc`). If non-zero, the entry **must** use the generic proxy form (`proxyName/implementation/proxyChecks/implementationChecks`). Otherwise validation fails with `eip1967ProxyDetection` and a hint to either switch to proxy form or set `skipImplementationChecks: true`. If a `ProxyContractEntry` declares `implementation:` and it doesn't match the slot, that's also an error. Aragon `AppProxyUpgradeable`/`KernelProxy` don't use EIP-1967 — they pass through and need explicit proxy-form description on their own.
+
 **Transparent Upgradeable Proxy** (OpenZeppelin classic). `proxyChecks: {}` because the admin/impl live in EIP-1967 slots, which you verify via `storage:`:
 
 ```yaml
@@ -408,6 +410,12 @@ yarn start config.seed.yml --generate                     # expand seed → *.se
 - Run `yarn start <config> --update-abi-missing`.
 - Verify `name:` matches the ABI filename (the `{proxyAddr}` / `{implAddr}` suffix is optional).
 - Individual-file resolution order: `Name.json` → `Name.sol/Name.json` → `Name-{address}.json`. Consolidated (`abis.json.gz`) tries `Name-{address}` key first, then `Name`.
+
+### `eip1967ProxyDetection` errors
+
+- `Address … is an EIP-1967 proxy (impl=…) but is described as a plain contract`: the entry has no `proxyName:` but the EIP-1967 impl slot is non-zero. Either convert to the full proxy form (`proxyName`/`implementation`/`proxyChecks`/`implementationChecks` — see [Proxy patterns](#proxy-patterns)), or, when you really only want to validate proxy-slot state and not the impl, add `skipImplementationChecks: true` on the entry.
+- `EIP-1967 implementation slot reports … but config declares …`: the on-chain slot disagrees with the `implementation:` you wrote in YAML. Update the declared address — the chain is authoritative.
+- The check only fires for true EIP-1967 proxies. Aragon `AppProxyUpgradeable`/`KernelProxy` don't write to that slot and pass through silently — describe them in the proxy form on your own.
 
 ### `getRoleMemberCount` reverted / `no matching function`
 

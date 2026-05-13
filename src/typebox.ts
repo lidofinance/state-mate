@@ -171,6 +171,7 @@ const RegularContractEntryTB = Type.Readonly(
       storage: Type.Optional(StorageChecksTB),
       ozNonEnumerableAcl: Type.Optional(OzNonEnumerableAclTB),
       ozAcl: Type.Optional(OzAclChecksTB),
+      skipImplementationChecks: Type.Optional(Type.Boolean()),
     },
     { additionalProperties: false },
   ),
