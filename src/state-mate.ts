@@ -162,7 +162,7 @@ async function downloadAndCheckAllAbi<T extends EntireDocument | SeedDocument>(j
 
   log(
     `\n💡 To consolidate individual ABI files into a single compressed file, run:\n` +
-      `   ${chalk.cyan(`yarn consolidate-abi ${path.relative(process.cwd(), abiDirectoryPath)}`)}\n`,
+      `   ${chalk.cyan(`yarn consolidate-abi ${path.relative(process.cwd(), abiDirectoryPath)} --compress`)}\n`,
   );
 }
 

@@ -17,7 +17,7 @@ Validates EVM smart-contract state against YAML configs. Calls view functions on
 
 - `yarn start <config>` — run a config (add `-o …` for scope, `--update-abi-missing` for ABIs, `--generate` for seed).
 - `yarn schemas` — regenerate JSON schemas after touching `src/typebox.ts`.
-- `yarn consolidate-abi <abi-dir>` — pack a `<dir>/abi/*.json` tree into `<dir>/abis.json.gz`.
+- `yarn consolidate-abi <abi-dir> [--compress]` — pack a `<dir>/abi/*.json` tree into sibling `abis.json` or `abis.json.gz`.
 - `yarn lint` / `yarn format` — CI-gated; lint is `--max-warnings=0`.
 - `yarn test` — unit tests.
 - `yarn coverage` — unit tests with all `src/**/*.ts` files included in coverage.
