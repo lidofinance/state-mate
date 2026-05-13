@@ -350,14 +350,14 @@ cast call $CONTRACT "hasRole(bytes32,address)(bool)" $ROLE $ADDRESS --rpc-url $R
 
 ## Seed configs
 
-A seed config is a thin starter file named `*.seed.yaml`. It contains only address-book and chain-explorer sections (`deployed:`, `l1:` / `l2:` with `rpcUrl` / `explorerHostname`, optional `eoa:` / `roles:` / `misc:`) — **no `contracts:` block**. `yarn start <seed> --generate` walks every anchor under `deployed:`, uses ABIs already on disk to infer contract stanzas, and writes a sibling generated YAML file with a populated `contracts:` block where each function value is `REPLACEME` (and, for proxies, a commented-out `implementationChecks` stub). Use the generated file path printed by state-mate; checked-in generated examples use `*.seed.generated.yaml`.
+A seed config is a thin starter file named `*.seed.yaml`. It contains only address-book and chain-explorer sections (`deployed:`, `l1:` / `l2:` with `rpcUrl` / `explorerHostname`, optional `eoa:` / `roles:` / `misc:`) — **no `contracts:` block**. `yarn start <seed> --generate` walks every anchor under `deployed:`, uses ABIs already on disk to infer contract stanzas, and writes a sibling `*.seed.generated.yaml` with a populated `contracts:` block where each function value is `REPLACEME` (and, for proxies, a commented-out `implementationChecks` stub).
 
 `--generate` on its own does not fetch ABIs — it only uses ABIs already on disk. Combine with `--update-abi-missing` on first run.
 
 ```bash
 yarn start configs/<protocol>/<name>.seed.yaml --generate --update-abi-missing
-# Review the generated file, replace REPLACEME with real expectations, then:
-yarn start <generated-config-path>
+# Review *.seed.generated.yaml, replace REPLACEME with real expectations, then:
+yarn start configs/<protocol>/<name>.seed.generated.yaml
 ```
 
 ## Workflow
@@ -393,7 +393,7 @@ yarn start config.yaml -o l1/contractName                 # specific contract (g
 yarn start config.yaml -o l1/contractName/checks/funcName # single function
 yarn start config.yaml --update-abi-missing               # download only missing ABIs (preferred)
 yarn start config.yaml --update-abi                       # overwrite all ABIs (rarely needed)
-yarn start config.seed.yaml --generate                    # expand seed and print generated file path
+yarn start config.seed.yaml --generate                    # expand seed -> *.seed.generated.yaml
 ```
 
 ## Best practices
