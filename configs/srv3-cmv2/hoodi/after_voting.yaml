@@ -1,0 +1,632 @@
+# yaml-language-server: $schema=../../../schemas/main-schema.json
+
+# Hoodi SRv3 / CMv2 protocol upgrade post-vote state assertions.
+# Run this against a fork after the Python voting test has enacted the DG proposal.
+
+misc:
+  - &ZERO_ADDRESS "0x0000000000000000000000000000000000000000"
+  - &CHAIN_ID 560048
+  - &CURATED_MODULE_ID 5
+  - &CURATED_MODULES_COUNT 5
+  - &CURATED_MODULE_NAME "curated-onchain-v2"
+  - &CURATED_STAKING_MODULE_FEE 400
+  - &CURATED_TREASURY_FEE 600
+  - &CURATED_STAKE_SHARE_LIMIT 10000
+  - &CURATED_MODULE_STATUS 0
+  - &CURATED_PRIORITY_EXIT_SHARE_THRESHOLD 10000
+  - &CURATED_MAX_DEPOSITS_PER_BLOCK 150
+  - &CURATED_MIN_DEPOSIT_BLOCK_DISTANCE 25
+  - &CURATED_WITHDRAWAL_CREDENTIALS_TYPE 2
+  - &VEBO_MAX_EXIT_BALANCE_ETH 358400
+  - &VEBO_BALANCE_PER_FRAME_ETH 32
+  - &VEBO_FRAME_DURATION_IN_SEC 48
+  - &TW_MAX_EXIT_REQUESTS_LIMIT 250
+  - &TW_EXITS_PER_FRAME 1
+  - &TW_FRAME_DURATION_IN_SEC 240
+  - &VEBO_MAX_VALIDATORS_PER_REPORT 600
+  - &IDVT_BOND_CURVE_ID 4
+  - &IDVT_BOND_CURVE_INFO
+    - - [1, "1500000000000000000", "1500000000000000000"]
+      - [2, "2000000000000000000", "500000000000000000"]
+  - &IDVT_KEY_REMOVAL_CHARGE "10000000000000000"
+  - &IDVT_GENERAL_DELAYED_PENALTY_FINE "50000000000000000"
+  - &IDVT_QUEUE_PRIORITY 1
+  - &IDVT_QUEUE_MAX_DEPOSITS 40
+  - &IDVT_ALLOWED_EXIT_DELAY 432000
+  - &IDVT_EXIT_DELAY_FEE "50000000000000000"
+  - &CURATED_INITIAL_EPOCH 93833
+  - &CURATED_EPOCHS_PER_FRAME 1575
+  - &CURATED_FAST_LANE_LENGTH_SLOTS 128
+  - &UPDATE_STAKING_MODULE_SHARE_LIMITS_PERMISSIONS "0xd63cf25df1ba6144db27a81a98120dfc53de45405adcee90cc820558b39ee15c7c45b59390b503b83fb499a813976a06"
+  - &ALLOW_CONSOLIDATION_PAIR_PERMISSIONS "0x747d357f5b6410b80eb63406fac5e2a91131b4f8b4ecbe1a"
+  - &SET_MERKLE_GATE_TREE_CSM_PERMISSIONS "0x10a254e724fe2b7f305f76f3f116a3969c53845fed4b1869887f8512f9998045f4b5993e6eaa6bcfe5f02a94ed4b1869"
+  - &REPORT_SLASHED_WITHDRAWN_VALIDATORS_CSM_PERMISSIONS "0x79cef36d84743222f37765204bec41e92a93e59d4412f7aa"
+  - &SETTLE_GENERAL_DELAYED_PENALTY_CSM_PERMISSIONS "0x79cef36d84743222f37765204bec41e92a93e59d187d9f92"
+  - &SET_MERKLE_GATE_TREE_CM_PERMISSIONS "0xf1862d120831ebe31f7202378ff3ae63a5658ae3ed4b1869410a309df81b782190188cdb3d215729cc6bc1f3ed4b1869a5a604b172787e017b1b118f02fe54fc1d696519ed4b1869e966874cdb6a4282ed75cd10439e3799e5531a2ded4b18695c063da03e3f21443716d75a2205ee16706e1153ed4b18691cd655ac53cfe8269de0dbfc0140b074623c4a6bed4b186928518be9894c20135f280a9539617783b08a04c7ed4b1869"
+  - &REPORT_SLASHED_WITHDRAWN_VALIDATORS_CM_PERMISSIONS "0x87eb69ae51317405fd285efd2326a4a11f6173b94412f7aa"
+  - &SETTLE_GENERAL_DELAYED_PENALTY_CM_PERMISSIONS "0x87eb69ae51317405fd285efd2326a4a11f6173b9187d9f92"
+  - &CREATE_OR_UPDATE_OPERATOR_GROUP_CM_PERMISSIONS "0x857289ccbfbc4c134cc312022a104cd9b38d8aae63fe89d7"
+  - &LIDO_APP_ID "0x3ca7c3e38968823ccb4c78ea688df41356f182ae1d159e4ee608d30d68cef320"
+  - &KERNEL_APP_BASES_NAMESPACE "0xf1f3eb40f5bc1ad1344716ced8b8a0431d840b5783aea1fd01786bc26f35ac0f"
+
+roles:
+  - &DEFAULT_ADMIN_ROLE "0x0000000000000000000000000000000000000000000000000000000000000000"
+  - &APP_MANAGER_ROLE "0xb6d92708f3d4817afc106147d969e229ced5c46e65e0a5002a0d391287762bd0"
+  - &BUFFER_RESERVE_MANAGER_ROLE "0x33969636f1fbf3d7d062d4de4a08e7bd3c46606ec28b3a4398d2665be559b921"
+  - &STAKING_MODULE_MANAGE_ROLE "0x3105bcbf19d4417b73ae0e58d508a65ecf75665e46c2622d8521732de6080c48"
+  - &STAKING_MODULE_SHARE_MANAGE_ROLE "0x43bf0e13900cfaa1b03ed5681dc143266597e29a1d6f9cbd84114f0ac21cd208"
+  - &STAKING_MODULE_UNVETTING_ROLE "0x240525496a9dc32284b17ce03b43e539e4bd81414634ee54395030d793463b57"
+  - &REPORT_EXITED_VALIDATORS_ROLE "0xc23292b191d95d2a7dd94fc6436eb44338fda9e1307d9394fd27c28157c1b33c"
+  - &REPORT_VALIDATOR_EXITING_STATUS_ROLE "0xbe1bd143a0dde8a867d58aab054bfdb25250951665c4570e39abc3b3de3c2d6c"
+  - &REPORT_VALIDATOR_EXIT_TRIGGERED_ROLE "0x0766e72e5c008b3df8129fb356d9176eef8544f6241e078b7d61aff604f8812b"
+  - &REPORT_REWARDS_MINTED_ROLE "0x779e5c23cb7a5bcb9bfe1e9a5165a00057f12bcdfd13e374540fdf1a1cd91137"
+  - &TW_EXIT_LIMIT_MANAGER_ROLE "0x03c30da9b9e4d4789ac88a294d39a63058ca4a498804c2aa823e381df59d0cf4"
+  - &REPORT_GENERAL_DELAYED_PENALTY_ROLE "0xa2c92d51d5647473735e9dfd5e2edf65bcf2fc2c139c95cbed53c19dc227c0b5"
+  - &SETTLE_GENERAL_DELAYED_PENALTY_ROLE "0xe4c6f42648e5067520394b287613558d8b8a48bc7a320523da96c04d46253bda"
+  - &REPORT_EL_REWARDS_STEALING_PENALTY_ROLE "0x59911a6aa08a72fe3824aec4500dc42335c6d0702b6d5c5c72ceb265a0de9302"
+  - &SETTLE_EL_REWARDS_STEALING_PENALTY_ROLE "0xe85fdec10fe0f93d0792364051df7c3d73e37c17b3a954bffe593960e3cd3012"
+  - &VERIFIER_ROLE "0x0ce23c3e399818cfee81a7ab0880f714e53d7672b08df0fa62f2843416e1ea09"
+  - &REPORT_REGULAR_WITHDRAWN_VALIDATORS_ROLE "0xb169cb0459e6d91326174ff566a2fcc3c7bb31ef3d4d83bec1d5679c611ab094"
+  - &REPORT_SLASHED_WITHDRAWN_VALIDATORS_ROLE "0x2dba60a7b2c6bc437f1868d48dc8e53a95d71e78cef88de0aff6d952ecff8daa"
+  - &CREATE_NODE_OPERATOR_ROLE "0xc72a21b38830f4d6418a239e17db78b945cc7cfee674bac97fd596eaf0438478"
+  - &START_REFERRAL_SEASON_ROLE "0xc0bd4bb446c4ce6fd2289aa78c8ea233de3ad2b870bc787b2ba154e19c271f12"
+  - &END_REFERRAL_SEASON_ROLE "0x4a1304957825c6a76938ccf907b92b9b872c8348083e23dae57e7e6111105d0c"
+  - &SET_BOND_CURVE_ROLE "0x645c9e6d2a86805cb5a28b1e4751c0dab493df7cf935070ce405489ba1a7bf72"
+  - &MANAGE_BOND_CURVES_ROLE "0xd35e4a788498271198ec69c34f1dc762a1eee8200c111f598da1b3dde946783d"
+  - &MANAGE_CURVE_PARAMETERS_ROLE "0x2ea86fa86b8394b93915254c102ea62e584d45bf5fd06dbc4e2efaddacd2d925"
+  - &MANAGE_GENERAL_PENALTIES_AND_CHARGES_ROLE "0x00b6097bf7ad894f88f786cd383df3190b971af96510047737d0cb2e9bd25558"
+  - &REQUEST_BURN_SHARES_ROLE "0x4be29e0e4eb91f98f709d98803cba271592782e293b84a625e025cbb40197ba8"
+  - &REQUEST_BURN_MY_STETH_ROLE "0x28186f938b759084eea36948ef1cd8b40ec8790a98d5f1a09b70879fe054e5cc"
+  - &ADD_FULL_WITHDRAWAL_REQUEST_ROLE "0x15fac8ba7fe8dd5344b88c1915452ce66976f270d1cd793c3b0ab579cecd33c0"
+  - &RESUME_ROLE "0x2fc10cc8ae19568712f7a176fb4978616a610650813c9d05326c34abb62749c7"
+
+deployed:
+  l1:
+    - &agent "0x0534aA41907c9631fae990960bCC72d75fA7cfeD"
+    - &easyTrackEvmScriptExecutor "0x79a20FD0FA36453B2F45eAbab19bfef43575Ba9E"
+    - &csmCommittee "0x4AF43Ee34a6fcD1fEcA1e1F832124C763561dA53"
+    - &curatedCircuitBreakerPauser "0x84DffcfB232594975C608DE92544Ff239a24c9E9"
+    - &consolidationGatewayPauser "0x83BCE68B4e8b7071b2a664a26e6D3Bc17eEe3102"
+    - &hoodiLegacyStakingModuleManager "0xE28f573b732632fdE03BD5507A7d475383e8512E"
+    - &aragonKernel "0xA48DF029Fd2e5FCECB3886c5c2F60e3625A1E87d"
+    - &acl "0x78780e70Eae33e2935814a327f7dB6c01136cc62"
+
+    # Core upgrade targets.
+    - &lidoLocator "0xe2EF9536DAAAEBFf5b1c130957AB3E80056b06D8"
+    - &lidoLocatorImpl "0x2C33BE7c09bfBC8e41E7648d611d857fD4831b68"
+    - &lido "0x3508A952176b3c15387C97BE809eaffB1982176a"
+    - &lidoImpl "0x6147270470A9Ee5b55c33EA71e32000E5d6D8E6B"
+    - &stakingRouter "0xCc820558B39ee15C7C45B59390B503b83fb499A8"
+    - &stakingRouterImpl "0x44d0b2B95d2C2bDF73FE4f5cD7E3A930494E5B1f"
+    - &accountingOracle "0xcb883B1bD0a41512b42D2dB267F2A2cd919FB216"
+    - &accountingOracleImpl "0x41bF10F28A1312f2241f86A2537A04b08e343C0a"
+    - &validatorsExitBusOracle "0x8664d394C2B3278F26A1B44B967aEf99707eeAB2"
+    - &validatorsExitBusOracleImpl "0x86aeA211B30174b3ee5d294ECeaDbD7f1C575eF3"
+    - &accounting "0x9b5b78D1C9A3238bF24662067e34c57c83E8c354"
+    - &accountingImpl "0xDB47544d5813f15116bf95c1cF2ff4dEdb2226fD"
+    - &withdrawalVault "0x4473dCDDbf77679A643BdB654dbd86D67F8d32f2"
+    - &withdrawalVaultImpl "0x6724DaD16f7b05157dF72783F99cA6B813742330"
+    - &burner "0xb2c99cd38a2636a6281a849C8de938B3eF4A7C3D"
+    - &triggerableWithdrawalsGateway "0x6679090D92b08a2a686eF8614feECD8cDFE209db"
+    - &validatorExitDelayVerifier "0xa5F5A9360275390fF9728262a29384399f38d2f0"
+    - &oldDepositSecurityModule "0x2F0303F20E0795E6CCd17BD5efE791A586f28E03"
+    - &newDepositSecurityModule "0x1a629bB7C0563650e46406Eb6764A2ba207a0eFE"
+    - &consolidationGateway "0xC9991Bb865d025364BCbBd99f36e85889Fb68e69"
+    - &consolidationMigrator "0x747d357F5b6410B80Eb63406FaC5E2A91131B4f8"
+
+    # CSM upgrade targets.
+    - &csm "0x79CEf36D84743222f37765204Bec41E92a93E59d"
+    - &csmImpl "0x161b1DAa658fD0D78a4603860edd8Ed06f98F4cA"
+    - &csParametersRegistry "0xA4aD5236963f9Fe4229864712269D8d79B65C5Ad"
+    - &csParametersRegistryImpl "0x58376D8B192813E85532b25685D948EB49c2A8B5"
+    - &csFeeOracle "0xe7314f561B2e72f9543F1004e741bab6Fc51028B"
+    - &csFeeOracleImpl "0x27d1Ff0353AF6b7480CBc902169d0F89b49334B5"
+    - &csVettedGate "0x10a254E724fe2b7f305F76f3F116a3969c53845f"
+    - &csVettedGateImpl "0x3b834c6d043F4CE5C61d84723bA737D405B2e276"
+    - &csAccounting "0xA54b90BA34C5f326BC1485054080994e38FB4C60"
+    - &csAccountingImpl "0x3a18675fFB2C37A4296dD794A7Ed94644225F881"
+    - &csFeeDistributor "0xaCd9820b0A2229a82dc1A0770307ce5522FF3582"
+    - &csFeeDistributorImpl "0x74c5be19CcD1a264899FbCf8dB1a64C1e3fb73Ac"
+    - &csExitPenalties "0xD259b31083Be841E5C85b2D481Cfc17C14276800"
+    - &csExitPenaltiesImpl "0xf38A3DA25B417D83182EEDD30d00557d78c35C96"
+    - &csValidatorStrikes "0x8fBA385C3c334D251eE413e79d4D3890db98693c"
+    - &csValidatorStrikesImpl "0x47F96DCD5cf3e94492CD050c00C9F6e33b3ca677"
+    - &oldPermissionlessGate "0x5553077102322689876A6AdFd48D75014c28acfb"
+    - &newPermissionlessGate "0xd7bD8D2A9888D1414c770B35ACF55890B15de26a"
+    - &oldVerifier "0x1773b2Ff99A030F6000554Cb8A5Ec93145650cbA"
+    - &verifierV3 "0xC96406b0eADdAC5708aFCa04DcCA67BAdC9642Fd"
+    - &oldCsmEjector "0x777bd76326E4aDcD353b03AD45b33BAF41048476"
+    - &csmEjector "0xCAe028378d69D54dc8bF809e6C44CF751F997b80"
+    - &identifiedDvtClusterGate "0x887F8512F9998045f4b5993e6eaa6BCfE5F02A94"
+    - &identifiedDvtClusterCurveSetup "0x75CC99052fB05eEb4D9f80Ba94A5D077e3a721C1"
+
+    # Curated module v2.
+    - &curatedModule "0x87EB69Ae51317405FD285efD2326a4a11f6173b9"
+    - &curatedAccounting "0x7f7356D29aCd915F1934220956c3305808ceB235"
+    - &curatedFeeOracle "0x5D2F27000C80f6f7A03015Fd49dB7FEba3fBfa83"
+    - &curatedVerifier "0x209190Ebc2Be80367a15d05e626784Eb94d6A880"
+    - &curatedEjector "0xfDbde2B3554B69C84e0f8d7daB68D390Ff0f4394"
+    - &curatedHashConsensus "0x920883908A78c1554f682006a8aB32E62Be09F33"
+    - &metaRegistry "0x857289cCBFBc4C134Cc312022a104CD9b38d8AAE"
+
+    # Easy Track factories.
+    - &oldCsmSettleElStealingPenaltyFactory "0x5c0af5b9f96921d3F61503e1006CF0ab9867279E"
+    - &oldCsmSetVettedGateTreeFactory "0xa890fc73e1b771Ee6073e2402E631c312FF92Cd9"
+    - &updateStakingModuleShareLimitsFactory "0xD63cf25df1bA6144db27A81A98120Dfc53dE4540"
+    - &allowConsolidationPairFactory "0x22D36e7616F541A527989C5652fDA4d527bB461C"
+    - &setMerkleGateTreeForCsmFactory "0xf71fcB20B9FB8468653Bcb24E31F39bc069D5995"
+    - &reportWithdrawalsForSlashedValidatorsForCsmFactory "0x4EaB04775837A6F0218750A10454119f349258FE"
+    - &settleGeneralDelayedPenaltyForCsmFactory "0xd0c38B2F0C1F760976dA010C1c35D828331Ff9E2"
+    - &setMerkleGateTreeForCmFactory "0x5194cC02B6F477B4a23DFA422fFC238c8B5b1736"
+    - &reportWithdrawalsForSlashedValidatorsForCmFactory "0x6E40FED7c28bAA93a798cA10f8A93965a19eC52e"
+    - &settleGeneralDelayedPenaltyForCmFactory "0x3486B872768D361309e405A046C4BF995c21CC6c"
+    - &createOrUpdateOperatorGroupFactory "0x44D9b39bBdc2182Aa1af6f16f8F55E0eA038294d"
+    - &easyTrack "0x284D91a7D47850d21A6DEaaC6E538AC7E5E6fc2a"
+    - &circuitBreaker "0x44a5789dFeDa59cD176Ab5709ec2F4829dE4d555"
+
+l1:
+  rpcUrl: HOODI_REMOTE_RPC_URL
+  explorerHostname: api-hoodi.etherscan.io
+  explorerTokenEnv: ETHERSCAN_TOKEN
+  chainId: *CHAIN_ID
+  contracts:
+    lidoLocatorProxy:
+      name: OssifiableProxyState
+      address: *lidoLocator
+      checks:
+        proxy__getAdmin: *agent
+        proxy__getImplementation: *lidoLocatorImpl
+        proxy__getIsOssified: false
+
+    stakingRouterProxy:
+      name: OssifiableProxyState
+      address: *stakingRouter
+      checks:
+        proxy__getAdmin: *agent
+        proxy__getImplementation: *stakingRouterImpl
+        proxy__getIsOssified: false
+
+    stakingRouter:
+      name: StakingRouterState
+      address: *stakingRouter
+      checks:
+        getContractVersion: 4
+        getStakingModulesCount: *CURATED_MODULES_COUNT
+        getStakingModule:
+          - args: [*CURATED_MODULE_ID]
+            result:
+              id: *CURATED_MODULE_ID
+              stakingModuleAddress: *curatedModule
+              stakingModuleFee: *CURATED_STAKING_MODULE_FEE
+              treasuryFee: *CURATED_TREASURY_FEE
+              stakeShareLimit: *CURATED_STAKE_SHARE_LIMIT
+              status: *CURATED_MODULE_STATUS
+              name: *CURATED_MODULE_NAME
+              lastDepositAt: null
+              lastDepositBlock: null
+              exitedValidatorsCount: null
+              priorityExitShareThreshold: *CURATED_PRIORITY_EXIT_SHARE_THRESHOLD
+              maxDepositsPerBlock: *CURATED_MAX_DEPOSITS_PER_BLOCK
+              minDepositBlockDistance: *CURATED_MIN_DEPOSIT_BLOCK_DISTANCE
+              withdrawalCredentialsType: *CURATED_WITHDRAWAL_CREDENTIALS_TYPE
+              validatorsBalanceGwei: null
+        hasRole:
+          - args: [*DEFAULT_ADMIN_ROLE, *agent]
+            result: true
+          - args: [*STAKING_MODULE_MANAGE_ROLE, *agent]
+            result: true
+          - args: [*STAKING_MODULE_MANAGE_ROLE, *hoodiLegacyStakingModuleManager]
+            result: true
+          - args: [*STAKING_MODULE_SHARE_MANAGE_ROLE, *easyTrackEvmScriptExecutor]
+            result: true
+          - args: [*STAKING_MODULE_UNVETTING_ROLE, *oldDepositSecurityModule]
+            result: false
+          - args: [*STAKING_MODULE_UNVETTING_ROLE, *newDepositSecurityModule]
+            result: true
+          - args: [*REPORT_EXITED_VALIDATORS_ROLE, *accountingOracle]
+            result: true
+          - args: [*REPORT_VALIDATOR_EXITING_STATUS_ROLE, *validatorExitDelayVerifier]
+            result: true
+          - args: [*REPORT_VALIDATOR_EXIT_TRIGGERED_ROLE, *triggerableWithdrawalsGateway]
+            result: true
+          - args: [*REPORT_REWARDS_MINTED_ROLE, *accounting]
+            result: true
+
+    accountingOracleProxy:
+      name: OssifiableProxyState
+      address: *accountingOracle
+      checks:
+        proxy__getAdmin: *agent
+        proxy__getImplementation: *accountingOracleImpl
+        proxy__getIsOssified: false
+
+    accountingOracle:
+      name: AccountingOracleState
+      address: *accountingOracle
+      checks:
+        getContractVersion: 5
+        getConsensusVersion: 6
+
+    validatorsExitBusOracleProxy:
+      name: OssifiableProxyState
+      address: *validatorsExitBusOracle
+      checks:
+        proxy__getAdmin: *agent
+        proxy__getImplementation: *validatorsExitBusOracleImpl
+        proxy__getIsOssified: false
+
+    validatorsExitBusOracle:
+      name: ValidatorsExitBusOracleState
+      address: *validatorsExitBusOracle
+      checks:
+        getContractVersion: 3
+        getConsensusVersion: 5
+        getExitRequestLimitFullInfo:
+          [
+            *VEBO_MAX_EXIT_BALANCE_ETH,
+            *VEBO_BALANCE_PER_FRAME_ETH,
+            *VEBO_FRAME_DURATION_IN_SEC,
+            null,
+            null,
+          ]
+        getMaxValidatorsPerReport: *VEBO_MAX_VALIDATORS_PER_REPORT
+
+    accountingProxy:
+      name: OssifiableProxyState
+      address: *accounting
+      checks:
+        proxy__getAdmin: *agent
+        proxy__getImplementation: *accountingImpl
+        proxy__getIsOssified: false
+
+    withdrawalVaultProxy:
+      name: WithdrawalVaultProxyState
+      address: *withdrawalVault
+      checks:
+        implementation: *withdrawalVaultImpl
+        proxy_getAdmin: *agent
+        proxy_getIsOssified: false
+
+    withdrawalVault:
+      name: WithdrawalVaultState
+      address: *withdrawalVault
+      checks:
+        getContractVersion: 3
+        CONSOLIDATION_GATEWAY: *consolidationGateway
+
+    lido:
+      name: LidoAppState
+      address: *lido
+      checks:
+        implementation: *lidoImpl
+        getContractVersion: 4
+
+    aragonKernel:
+      name: KernelState
+      address: *aragonKernel
+      checks:
+        getApp:
+          - args: [*KERNEL_APP_BASES_NAMESPACE, *LIDO_APP_ID]
+            result: *lidoImpl
+
+    aragonAcl:
+      name: ACLState
+      address: *acl
+      checks:
+        hasPermission:
+          - args: [*agent, *aragonKernel, *APP_MANAGER_ROLE]
+            result: false
+          - args: [*agent, *lido, *BUFFER_RESERVE_MANAGER_ROLE]
+            result: true
+        getPermissionManager:
+          - args: [*lido, *BUFFER_RESERVE_MANAGER_ROLE]
+            result: *agent
+
+    triggerableWithdrawalsGateway:
+      name: TriggerableWithdrawalsGatewayState
+      address: *triggerableWithdrawalsGateway
+      checks:
+        getExitRequestLimitFullInfo:
+          maxExitRequestsLimit: *TW_MAX_EXIT_REQUESTS_LIMIT
+          exitsPerFrame: *TW_EXITS_PER_FRAME
+          frameDurationInSec: *TW_FRAME_DURATION_IN_SEC
+          prevExitRequestsLimit: null
+          currentExitRequestsLimit: null
+        hasRole:
+          - args: [*TW_EXIT_LIMIT_MANAGER_ROLE, *agent]
+            result: true
+          - args: [*ADD_FULL_WITHDRAWAL_REQUEST_ROLE, *oldCsmEjector]
+            result: false
+          - args: [*ADD_FULL_WITHDRAWAL_REQUEST_ROLE, *csmEjector]
+            result: true
+          - args: [*ADD_FULL_WITHDRAWAL_REQUEST_ROLE, *curatedEjector]
+            result: true
+
+    csmProxy:
+      name: OssifiableProxyState
+      address: *csm
+      checks:
+        proxy__getAdmin: *agent
+        proxy__getImplementation: *csmImpl
+        proxy__getIsOssified: false
+
+    csm:
+      name: CSModuleState
+      address: *csm
+      checks:
+        getInitializedVersion: 3
+        hasRole:
+          - args: [*REPORT_EL_REWARDS_STEALING_PENALTY_ROLE, *csmCommittee]
+            result: false
+          - args: [*REPORT_GENERAL_DELAYED_PENALTY_ROLE, *csmCommittee]
+            result: true
+          - args: [*SETTLE_EL_REWARDS_STEALING_PENALTY_ROLE, *easyTrackEvmScriptExecutor]
+            result: false
+          - args: [*SETTLE_GENERAL_DELAYED_PENALTY_ROLE, *easyTrackEvmScriptExecutor]
+            result: true
+          - args: [*VERIFIER_ROLE, *oldVerifier]
+            result: false
+          - args: [*VERIFIER_ROLE, *verifierV3]
+            result: true
+          - args: [*REPORT_REGULAR_WITHDRAWN_VALIDATORS_ROLE, *verifierV3]
+            result: true
+          - args: [*REPORT_SLASHED_WITHDRAWN_VALIDATORS_ROLE, *easyTrackEvmScriptExecutor]
+            result: true
+          - args: [*CREATE_NODE_OPERATOR_ROLE, *oldPermissionlessGate]
+            result: false
+          - args: [*CREATE_NODE_OPERATOR_ROLE, *newPermissionlessGate]
+            result: true
+          - args: [*CREATE_NODE_OPERATOR_ROLE, *identifiedDvtClusterGate]
+            result: true
+
+    csParametersRegistryProxy:
+      name: OssifiableProxyState
+      address: *csParametersRegistry
+      checks:
+        proxy__getAdmin: *agent
+        proxy__getImplementation: *csParametersRegistryImpl
+        proxy__getIsOssified: false
+
+    csParametersRegistry:
+      name: CSParametersRegistryState
+      address: *csParametersRegistry
+      checks:
+        getInitializedVersion: 3
+        getKeyRemovalCharge:
+          - args: [*IDVT_BOND_CURVE_ID]
+            result: *IDVT_KEY_REMOVAL_CHARGE
+        getGeneralDelayedPenaltyAdditionalFine:
+          - args: [*IDVT_BOND_CURVE_ID]
+            result: *IDVT_GENERAL_DELAYED_PENALTY_FINE
+        getQueueConfig:
+          - args: [*IDVT_BOND_CURVE_ID]
+            result: [*IDVT_QUEUE_PRIORITY, *IDVT_QUEUE_MAX_DEPOSITS]
+        getRewardShareData:
+          - args: [*IDVT_BOND_CURVE_ID]
+            result:
+              - [1, 5834]
+              - [65, 3334]
+        getAllowedExitDelay:
+          - args: [*IDVT_BOND_CURVE_ID]
+            result: *IDVT_ALLOWED_EXIT_DELAY
+        getExitDelayFee:
+          - args: [*IDVT_BOND_CURVE_ID]
+            result: *IDVT_EXIT_DELAY_FEE
+        hasRole:
+          - args: [*MANAGE_CURVE_PARAMETERS_ROLE, *identifiedDvtClusterCurveSetup]
+            result: false
+          - args: [*MANAGE_GENERAL_PENALTIES_AND_CHARGES_ROLE, *csmCommittee]
+            result: true
+
+    csFeeOracleProxy:
+      name: OssifiableProxyState
+      address: *csFeeOracle
+      checks:
+        proxy__getAdmin: *agent
+        proxy__getImplementation: *csFeeOracleImpl
+        proxy__getIsOssified: false
+
+    csFeeOracle:
+      name: CSFeeOracleState
+      address: *csFeeOracle
+      checks:
+        getContractVersion: 3
+        getConsensusVersion: 4
+
+    csVettedGateProxy:
+      name: OssifiableProxyState
+      address: *csVettedGate
+      checks:
+        proxy__getAdmin: *agent
+        proxy__getImplementation: *csVettedGateImpl
+        proxy__getIsOssified: false
+
+    csVettedGate:
+      name: AccessControlState
+      address: *csVettedGate
+      checks:
+        hasRole:
+          - args: [*START_REFERRAL_SEASON_ROLE, *agent]
+            result: false
+          - args: [*END_REFERRAL_SEASON_ROLE, *csmCommittee]
+            result: false
+
+    csAccountingProxy:
+      name: OssifiableProxyState
+      address: *csAccounting
+      checks:
+        proxy__getAdmin: *agent
+        proxy__getImplementation: *csAccountingImpl
+        proxy__getIsOssified: false
+
+    csAccounting:
+      name: CSAccountingState
+      address: *csAccounting
+      checks:
+        getInitializedVersion: 3
+        getCurveInfo:
+          - args: [*IDVT_BOND_CURVE_ID]
+            result: *IDVT_BOND_CURVE_INFO
+        getCurvesCount: 5
+        hasRole:
+          - args: [*SET_BOND_CURVE_ROLE, *identifiedDvtClusterGate]
+            result: true
+          - args: [*MANAGE_BOND_CURVES_ROLE, *identifiedDvtClusterCurveSetup]
+            result: false
+
+    csFeeDistributorProxy:
+      name: OssifiableProxyState
+      address: *csFeeDistributor
+      checks:
+        proxy__getAdmin: *agent
+        proxy__getImplementation: *csFeeDistributorImpl
+        proxy__getIsOssified: false
+
+    csFeeDistributor:
+      name: InitializedState
+      address: *csFeeDistributor
+      checks:
+        getInitializedVersion: 3
+
+    csExitPenaltiesProxy:
+      name: OssifiableProxyState
+      address: *csExitPenalties
+      checks:
+        proxy__getAdmin: *agent
+        proxy__getImplementation: *csExitPenaltiesImpl
+        proxy__getIsOssified: false
+
+    csValidatorStrikesProxy:
+      name: OssifiableProxyState
+      address: *csValidatorStrikes
+      checks:
+        proxy__getAdmin: *agent
+        proxy__getImplementation: *csValidatorStrikesImpl
+        proxy__getIsOssified: false
+
+    csValidatorStrikes:
+      name: CSValidatorStrikesState
+      address: *csValidatorStrikes
+      checks:
+        ejector: *csmEjector
+
+    identifiedDvtClusterGate:
+      name: VettedGateState
+      address: *identifiedDvtClusterGate
+      checks:
+        curveId: *IDVT_BOND_CURVE_ID
+
+    identifiedDvtClusterCurveSetup:
+      name: OneShotCurveSetup
+      address: *identifiedDvtClusterCurveSetup
+      checks:
+        executed: true
+        deployedCurveId: *IDVT_BOND_CURVE_ID
+
+    burner:
+      name: AccessControlState
+      address: *burner
+      checks:
+        hasRole:
+          - args: [*REQUEST_BURN_SHARES_ROLE, *csAccounting]
+            result: false
+          - args: [*REQUEST_BURN_MY_STETH_ROLE, *csAccounting]
+            result: true
+          - args: [*REQUEST_BURN_MY_STETH_ROLE, *curatedAccounting]
+            result: true
+
+    curatedModule:
+      name: CuratedModuleState
+      address: *curatedModule
+      checks:
+        isPaused: false
+        hasRole:
+          - args: [*RESUME_ROLE, *agent]
+            result: false
+
+    curatedHashConsensus:
+      name: HashConsensusState
+      address: *curatedHashConsensus
+      checks:
+        getFrameConfig:
+          initialEpoch: *CURATED_INITIAL_EPOCH
+          epochsPerFrame: *CURATED_EPOCHS_PER_FRAME
+          fastLaneLengthSlots: *CURATED_FAST_LANE_LENGTH_SLOTS
+
+    circuitBreaker:
+      name: CircuitBreakerState
+      address: *circuitBreaker
+      checks:
+        getPauser:
+          - args: [*consolidationGateway]
+            result: *consolidationGatewayPauser
+          - args: [*verifierV3]
+            result: *csmCommittee
+          - args: [*csmEjector]
+            result: *csmCommittee
+          - args: [*identifiedDvtClusterGate]
+            result: *csmCommittee
+          - args: [*curatedModule]
+            result: *curatedCircuitBreakerPauser
+          - args: [*curatedAccounting]
+            result: *curatedCircuitBreakerPauser
+          - args: [*curatedFeeOracle]
+            result: *curatedCircuitBreakerPauser
+          - args: [*curatedVerifier]
+            result: *curatedCircuitBreakerPauser
+          - args: [*curatedEjector]
+            result: *curatedCircuitBreakerPauser
+        getPausableCount:
+          - args: [*consolidationGatewayPauser]
+            result: 6
+          - args: [*csmCommittee]
+            result: 9
+          - args: [*curatedCircuitBreakerPauser]
+            result: 5
+
+    easyTrack:
+      name: EasyTrackState
+      address: *easyTrack
+      checks:
+        evmScriptFactoryPermissions:
+          - args: [*updateStakingModuleShareLimitsFactory]
+            result: *UPDATE_STAKING_MODULE_SHARE_LIMITS_PERMISSIONS
+          - args: [*allowConsolidationPairFactory]
+            result: *ALLOW_CONSOLIDATION_PAIR_PERMISSIONS
+          - args: [*setMerkleGateTreeForCsmFactory]
+            result: *SET_MERKLE_GATE_TREE_CSM_PERMISSIONS
+          - args: [*reportWithdrawalsForSlashedValidatorsForCsmFactory]
+            result: *REPORT_SLASHED_WITHDRAWN_VALIDATORS_CSM_PERMISSIONS
+          - args: [*settleGeneralDelayedPenaltyForCsmFactory]
+            result: *SETTLE_GENERAL_DELAYED_PENALTY_CSM_PERMISSIONS
+          - args: [*setMerkleGateTreeForCmFactory]
+            result: *SET_MERKLE_GATE_TREE_CM_PERMISSIONS
+          - args: [*reportWithdrawalsForSlashedValidatorsForCmFactory]
+            result: *REPORT_SLASHED_WITHDRAWN_VALIDATORS_CM_PERMISSIONS
+          - args: [*settleGeneralDelayedPenaltyForCmFactory]
+            result: *SETTLE_GENERAL_DELAYED_PENALTY_CM_PERMISSIONS
+          - args: [*createOrUpdateOperatorGroupFactory]
+            result: *CREATE_OR_UPDATE_OPERATOR_GROUP_CM_PERMISSIONS
+        isEVMScriptFactory:
+          - args: [*oldCsmSettleElStealingPenaltyFactory]
+            result: false
+          - args: [*oldCsmSetVettedGateTreeFactory]
+            result: false
+          - args: [*updateStakingModuleShareLimitsFactory]
+            result: true
+          - args: [*allowConsolidationPairFactory]
+            result: true
+          - args: [*setMerkleGateTreeForCsmFactory]
+            result: true
+          - args: [*reportWithdrawalsForSlashedValidatorsForCsmFactory]
+            result: true
+          - args: [*settleGeneralDelayedPenaltyForCsmFactory]
+            result: true
+          - args: [*setMerkleGateTreeForCmFactory]
+            result: true
+          - args: [*reportWithdrawalsForSlashedValidatorsForCmFactory]
+            result: true
+          - args: [*settleGeneralDelayedPenaltyForCmFactory]
+            result: true
+          - args: [*createOrUpdateOperatorGroupFactory]
+            result: true
