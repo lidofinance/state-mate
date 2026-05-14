@@ -45,7 +45,7 @@ corepack enable
 yarn install
 ```
 
-3. Specify RPC endpoints for your target networks in `.env` or export them in your shell:
+3. Specify RPC endpoints for your target networks in `.env`, or export the same names in your shell. Example `.env` contents:
 
 ```sh
 L1_MAINNET_RPC_URL=%YOUR_RPC_URL%

@@ -106,6 +106,7 @@ test("typebox schemas validate static calls and reject extra properties", () => 
   assert.equal(isTypeOfTB({ result: ["0x1234", [1, null], [["nested"]]] }, StaticCallCheckTB), true);
   assert.equal(isTypeOfTB({ mustRevert: true, args: [ADDRESS] }, StaticCallCheckTB), true);
   assert.equal(isTypeOfTB({ mustRevert: true, result: null }, StaticCallCheckTB), false);
+  assert.equal(isTypeOfTB({ result: [], unexpected: true }, StaticCallCheckTB), false);
 });
 
 test("typebox schemas validate seed and network sections", () => {
