@@ -18,6 +18,7 @@ artifacts
 #
 .env
 reports
+coverage
 
 # pycharm
 .idea

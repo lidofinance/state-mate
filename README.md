@@ -45,13 +45,11 @@ corepack enable
 yarn install
 ```
 
-3. Specify RPC endpoints for your target networks, e.g.
+3. Specify RPC endpoints for your target networks in `.env`, or export the same names in your shell. Example `.env` contents:
 
 ```sh
-# config.seed.yaml
-
-export L1_MAINNET_RPC_URL=%YOUR_RPC_URL%
-export L2_MAINNET_RPC_URL=%YOUR_RPC_URL%
+L1_MAINNET_RPC_URL=%YOUR_RPC_URL%
+L2_MAINNET_RPC_URL=%YOUR_RPC_URL%
 ```
 
 4. Prepare a seed config
@@ -77,13 +75,25 @@ l2:
   # explorerTokenEnv: ETHERSCAN_MODE_TOKEN
 ```
 
-4. Start the program to generate a populated config from the seed one
+5. Start the program to generate a populated config from the seed one. Use `--update-abi-missing` when ABI files are not present yet.
 
 ```sh
-yarn start path/to/config.seed.yaml --generate
+yarn start path/to/config.seed.yaml --generate --update-abi-missing
 ```
 
-5. Edit the generated config manually
+6. Edit the generated config manually
+
+7. Run checks against a populated config
+
+```sh
+yarn start path/to/config.yaml
+```
+
+Use `-o, --only` to run a subset of checks:
+
+```sh
+yarn start path/to/config.yaml -o l1/myContract/checks/getFoo
+```
 
 ### Configuration
 
@@ -102,8 +112,9 @@ misc:
 
 deployed:
   # Contract addresses
-  - &myContract "0x0000000000000000000000000000000000000001"
-  - &adminMultisig "0x0000000000000000000000000000000000000002"
+  l1:
+    - &myContract "0x0000000000000000000000000000000000000001"
+    - &adminMultisig "0x0000000000000000000000000000000000000002"
 
 roles:
   # ACL checks
@@ -115,6 +126,7 @@ l1:
     myContract:
       name: "myContract"
       address: *myContract
+      proxyName: "TransparentUpgradeableProxy"
       implementation: "%implementation address%"
       proxyChecks:
         proxy__getAdmin: *adminMultisig
@@ -123,12 +135,12 @@ l1:
         getMyParameter: *MY_PARAMETER
         getFoo: *FOO
       ozAcl:
-        *DEFAULT_ADMIN_ROLE : [*adminMultisig]
+        *DEFAULT_ADMIN_ROLE: [*adminMultisig]
 ```
 
 ### ABIs
 
-All required ABIs are located in the same directory as the config and placed under `abi` folder being downloaded upon the first launch. See [configs](/configs/).
+All required ABIs are located next to the config, either in an `abi/` folder or in a consolidated `abis.json` / `abis.json.gz` file. Use `--update-abi` or `--update-abi-missing` to download ABI files from the configured explorer. See [configs](/configs/).
 
 state-mate supports two ABI storage formats:
 

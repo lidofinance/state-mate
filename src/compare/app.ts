@@ -209,7 +209,7 @@ async function main() {
   const [_, __, otherRepoPath, ...requiredFolders] = process.argv;
 
   if (!otherRepoPath) {
-    console.error("Usage: yarn test <path/to/other/repo> [folder1 folder2 ...]");
+    console.error("Usage: yarn test:compare <path/to/other/repo> [folder1 folder2 ...]");
     process.exit(1);
   }
   ORIGIN_REPO_PATH = otherRepoPath;
