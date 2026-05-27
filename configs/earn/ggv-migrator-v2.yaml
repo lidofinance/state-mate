@@ -15,7 +15,7 @@ misc:
   - &SAFE_GUARD_SLOT "0x4a204f620c8c5ccdca3fd54d003badd85ba500436a431f0cbda4f558c93c34c8"
   - &SAFE_SENTINEL "0x0000000000000000000000000000000000000001"
   - &SAFE_DOMAIN_SEPARATOR "0x90468bd6f3155511c3cb7b455a07664de4779c3a328ac577fdd4cc584ee815d0"
-  - &SAFE_TRESHOLD 5
+  - &SAFE_THRESHOLD 5
 
   # --- Admin Safe ---
   - &SAFE_OWNER_1 "0xEA685f0AF4A0BF5E7D6729b2C63eDF574D3EE27f"
@@ -99,7 +99,7 @@ l1:
       checks:
         VERSION: "1.3.0"
         getChainId: 1
-        getThreshold: *SAFE_TRESHOLD
+        getThreshold: *SAFE_THRESHOLD
         domainSeparator: *SAFE_DOMAIN_SEPARATOR
         getOwners:
           - *SAFE_OWNER_1
