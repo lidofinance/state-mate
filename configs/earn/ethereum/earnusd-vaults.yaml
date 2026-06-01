@@ -140,8 +140,8 @@ deployed:
     - &earnUSDe_riskManagerProxyAdmin "0x80438ddc27036213a220b669935aebebbee51c7c"
     - &earnUSDe_timelockController "0xFf06E4D42Bc59Dc47DbE2CEBE4E05A0ddA27378A"
     - &earnUSDe_oracleSubmitter "0xd114BCC2a5b683CF6568789d9B0B8702eD56948d"
-    - &earnUSDe_swapModule0 "0x1ABBef01954e2F58AFa0153A50e78674D5f12F4b"
-    - &earnUSDe_swapModule0ProxyAdmin "0xf19b8ef421d6d8611825b945fd3e9337dfb99ed7"
+    - &earnUSDe_swapModule0 "0xD8E9300d1a838791cC76393fD78B1fD3C73DBEeb"
+    - &earnUSDe_swapModule0ProxyAdmin "0x33F6e9256CA5BCdF34786c732325CfC46D122FBB"
     - &earnUSDe_subvault0 "0x6082A97Bbb2e51d5aa429DE7DAa5a7Cb04c1B17A"
     - &earnUSDe_subvault0ProxyAdmin "0xda62ab223dcecb74234eb9247ad640f0504e55ab"
     - &earnUSDe_verifier0 "0x6445DC7C182386997D894A8dA2872E0e0a002F8b"
@@ -213,6 +213,7 @@ misc:
   - &USDC "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
   - &USDT "0xdAC17F958D2ee523a2206206994597C13D831ec7"
   - &syrupUSDC "0x80ac24aA929eaF5013f6436cdA2a7ba190f5Cc0b"
+  - &syrupUSDT "0x356B8d89c1e1239Cbbb9dE4815c39A1474d5BA7D"
   - &MORPHO "0x58D97B57BB95320F9a05dC918Aef65434969c2B2"
   - &sUSDe "0x9D39A5DE30e57443BfF2A8307A4256c8797A3497"
   - &WETH "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
@@ -221,10 +222,6 @@ misc:
   - &AURA "0xC0c293ce456fF0ED870ADd98a0828Dd4d2903DBF"
   - &BAL "0xba100000625a3754423978a60c9317c58a424e3D"
   - &USDe "0x4c9EDD5852cd905f086C759E8383e09bff1E68B3"
-  - &CRV "0xD533a949740bb3306d119CC777fa900bA034cd52"
-  - &frxUSD "0xCAcd6fd266aF91b8AeD52aCCc382b4e165586E29"
-  - &WFRAX "0x04ACaF8D2865c0714F79da09645C13FD2888977f"
-  - &msUSD "0xab5eB14c09D416F0aC63661E57EDB7AEcDb9BEfA"
 
   # --- CoW Protocol ---
   - &cowswapSettlement "0x9008D19f58AAbD9eD0D60971565AA8510560ab41"
@@ -233,7 +230,7 @@ misc:
   # --- SwapModule external ---
   - &swapModuleRouter "0x6131B5fae19EA4f9D964eAc0408E4408b66337b5"
   - &swapModuleOracle "0x58f80f4e6367bC1CF548B819F6F0DE5F77BDF797"
-  - &earnUSDe_swapModuleOracle "0xBB95c046Ce6a7C45a1172a514eE8623a1afE782d"
+  - &earnUSDe_swapModuleOracle "0x54586bE62E3c3580375aE3723C145253060Ca0C2"
 
   # --- EIP-1967 Storage Slots ---
   - &EIP1967_ADMIN_SLOT "0xb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d6103"
@@ -1703,7 +1700,7 @@ l1:
             1000000000000000,
             72000,
             3600,
-            172800,
+            86400,
           ]
         supportedAssetAt:
           - args: [0]
@@ -2362,6 +2359,8 @@ l1:
         getVerificationResult:
         hashCall:
         isAllowedCall:
+        # WARN: pending earnUSDe permission update (PR #25) not yet executed on-chain.
+        # After timelock executes setMerkleRoot, update to: 0x60837b03c59fcf8b150ff2da2d0ba67007ff1743f434667aa39abd5a4cd134d7
         merkleRoot: "0x3bb0503c44d08bdf061b5fb9d53faf3d3103fe6afee87132b8ec21d2e236e328"
         vault: *earnUSDe_vault
         verifyCall:
@@ -2500,7 +2499,9 @@ l1:
           - args: [*USDT]
             result: true
         # securityParams: [maxAbsDeviation, suspAbsDeviation, maxRelDeviationD18, suspRelDeviationD18, timeout, depositInterval, redeemInterval]
-        securityParams: [5000000000000000, 1000000000000000, 5000000000000000, 1000000000000000, 72000, 3600, 172800]
+        # WARN: on-chain currently has maxAbsDeviation=5e15, suspAbsDeviation=1e15 (inherited from earnETH template — anomalous for a USD-base vault).
+        # Expected values match earnUSD/earnUSDc (5e27 / 1e27); requires oracle redeploy/upgrade on-chain.
+        securityParams: [5000000000000000000000000000, 1000000000000000000000000000, 5000000000000000, 1000000000000000, 72000, 3600, 172800]
         supportedAssetAt:
           - args: [0]
             result: *USDC
@@ -2774,8 +2775,8 @@ l1:
         *SM_CALLER_ROLE : [*mellowCurator]
         *ROUTER_ROLE : [*swapModuleRouter]
         *SET_SLIPPAGE_ROLE : []
-        *TOKEN_IN_ROLE : [*USDC, *USDT, *sUSDe, *USDe, *CRV, *frxUSD, *WFRAX, *msUSD]
-        *TOKEN_OUT_ROLE : [*USDC, *USDT, *sUSDe, *USDe, *CRV, *frxUSD, *WFRAX, *msUSD]
+        *TOKEN_IN_ROLE : [*USDC, *USDT, *sUSDe, *USDe, *syrupUSDT]
+        *TOKEN_OUT_ROLE : [*USDC, *USDT, *sUSDe, *USDe, *syrupUSDT]
 
     earnUSDe_timelockController:
       name: TimelockController
@@ -3139,6 +3140,7 @@ l1:
         getChainId: 1
         getModulesPaginated:
         getOwners:
+          - *EXT_MELLOW_SIGNER_1
           - *EXT_MELLOW_SIGNER_5
           - *EXT_MELLOW_SIGNER_2
           - *MELLOW_SIGNER_2

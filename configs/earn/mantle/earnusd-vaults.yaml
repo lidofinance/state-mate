@@ -901,6 +901,9 @@ l1:
         encodeTransactionData:
         getChainId: 5000
         getModulesPaginated:
+        # WARN: on-chain currently has unexpected signers 0x04e7C0350241b818eE5c92cc260008C9898F41cf
+        # and 0xc7a8DE05264442A318189f2bd160d2830902C8CD in place of LIDO_SIGNER_6 / LIDO_SIGNER_12.
+        # Config keeps the correct expected set; check stays red until Safe membership is corrected on-chain.
         getOwners:
           - *LIDO_SIGNER_7
           - *LIDO_SIGNER_6

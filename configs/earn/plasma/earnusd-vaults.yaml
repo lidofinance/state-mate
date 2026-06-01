@@ -33,8 +33,8 @@ deployed:
     - &earnUSDe_subvault0ProxyAdmin "0x01f10385402f965cad335eb16f662feadae90d74"
     - &earnUSDe_verifier0 "0x96383b3120B4437FE679c21aCb75ae19429b446D"
     - &earnUSDe_verifier0ProxyAdmin "0x2fdb8536529adefd8acba32443728a214cbcf2b7"
-    - &earnUSDe_swapModule0 "0x1818D85D411938667AE13d34f32878F067793FeC"
-    - &earnUSDe_swapModule0ProxyAdmin "0x1b91d8f594becea0294d6092f52d9bd70dfbab81"
+    - &earnUSDe_swapModule0 "0xf9C8b4D0fBAcCfc341feBC852b750997b4a72fc8"
+    - &earnUSDe_swapModule0ProxyAdmin "0xe00c1C1cD84305763c58b898028fE14bCA7A6E5a"
     - &earnUSDe_oracle "0xE2aaefF18a0FA0389D6e5B64199727C21530b787"
     - &earnUSDe_oracleProxyAdmin "0x79318580ec9c1158eeda4ad4b0e4c969d0efcc63"
     - &earnUSDe_shareManager "0x134eA36E03b5e59dbddf2535084e342d84f2A043"
@@ -73,12 +73,8 @@ misc:
   # Ref: USDT0 on Plasma
   # https://docs.usdt0.to/technical-documentation/deployments
   - &SWAP_MODULE_TOKEN_0 "0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb"
-  # Ref: Ethena USDe (same address on all L2s except ZKSync/Zircuit)
-  # https://docs.ethena.fi/solution-design/key-addresses
-  - &SWAP_MODULE_TOKEN_1 "0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34"
-  # Ref: Ethena sUSDe (Staked USDe, same address on all L2s except ZKSync/Zircuit)
-  # https://docs.ethena.fi/solution-design/key-addresses
-  - &SWAP_MODULE_TOKEN_2 "0x211Cc4DD073734dA055fbF44a2b4667d5E5fE5d2"
+  # Ref: Maple syrupUSDT on Plasma
+  - &SWAP_MODULE_TOKEN_1 "0xC4374775489CB9C56003BF2C9b12495fC64F0771"
 
   # --- CoW Protocol ---
   # Ref: CoW Protocol core contracts (GPv2Settlement + GPv2VaultRelayer)
@@ -448,6 +444,8 @@ l1:
         getVerificationResult:
         hashCall:
         isAllowedCall:
+        # WARN: pending earnUSDe permission update (PR #25) not yet executed on-chain.
+        # After timelock executes setMerkleRoot, update to: 0x3b8a760ff1aaf34c7ce7cd617d769286b19d80ca9bdcd7a971b5bfa55cb2ef54
         merkleRoot: "0xcd6c339209d78b9eaf91f077fa87f009feb80eac167e3e202f5d9c0f72dab3da"
         vault: *earnUSDe_vault
         verifyCall:
@@ -530,8 +528,8 @@ l1:
         *SM_CALLER_ROLE : [*curator]
         *ROUTER_ROLE : [*swapModuleRouter]
         *SET_SLIPPAGE_ROLE : []
-        *TOKEN_IN_ROLE : [*SWAP_MODULE_TOKEN_0, *SWAP_MODULE_TOKEN_1, *SWAP_MODULE_TOKEN_2]
-        *TOKEN_OUT_ROLE : [*SWAP_MODULE_TOKEN_0, *SWAP_MODULE_TOKEN_1, *SWAP_MODULE_TOKEN_2]
+        *TOKEN_IN_ROLE : [*SWAP_MODULE_TOKEN_0, *SWAP_MODULE_TOKEN_1]
+        *TOKEN_OUT_ROLE : [*SWAP_MODULE_TOKEN_0, *SWAP_MODULE_TOKEN_1]
 
     earnUSDe_oracle:
       name: Oracle
@@ -839,6 +837,9 @@ l1:
         encodeTransactionData:
         getChainId: 9745
         getModulesPaginated:
+        # WARN: on-chain currently has unexpected signers 0x04e7C0350241b818eE5c92cc260008C9898F41cf
+        # and 0xc7a8DE05264442A318189f2bd160d2830902C8CD in place of LIDO_SIGNER_6 / LIDO_SIGNER_12.
+        # Config keeps the correct expected set; check stays red until Safe membership is corrected on-chain.
         getOwners:
           - *LIDO_SIGNER_7
           - *LIDO_SIGNER_6

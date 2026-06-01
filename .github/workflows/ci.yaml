@@ -47,8 +47,6 @@ jobs:
             network: ethereum-mainnet
           - config: configs/earn/base/earnusd-vaults.yaml
             network: base-mainnet
-          - config: configs/earn/arbitrum/earnusd-vaults.yaml
-            network: arbitrum-mainnet
           - config: configs/earn/mantle/earnusd-vaults.yaml
             network: mantle-mainnet
           - config: configs/earn/plasma/earnusd-vaults.yaml
@@ -63,7 +61,6 @@ jobs:
       HOODI_REMOTE_RPC_URL: ${{ secrets.HOODI_REMOTE_RPC_URL }}
       L1_MAINNET_RPC_URL: ${{ secrets.MAINNET_REMOTE_RPC_URL }}
       BASE_RPC_URL: ${{ secrets.BASE_RPC_URL }}
-      ARBITRUM_RPC_URL: ${{ secrets.ARBITRUM_RPC_URL }}
       MANTLE_RPC_URL: ${{ secrets.MANTLE_RPC_URL }}
       PLASMA_RPC_URL: ${{ secrets.PLASMA_RPC_URL }}
 
