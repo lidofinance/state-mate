@@ -2020,7 +2020,7 @@ l1:
         getVerificationResult:
         hashCall:
         isAllowedCall:
-        merkleRoot: "0xa676bdddff6894164a43f900342e8a4d2b89872d1c93a339ea5a58fae2388779"
+        merkleRoot: "0x0defb6ee7a9988e2247999be4b92bbcfff0ef4bcaf98a4e1f7e665e805c129a5"
         vault: *vault
         verifyCall:
       implementationChecks:
@@ -2068,7 +2068,7 @@ l1:
         getVerificationResult:
         hashCall:
         isAllowedCall:
-        merkleRoot: "0xc87be1d795d3fd7b33cacefa6bc5a0b71f5b4ffe7764f8f02c7137e37e6c1c48"
+        merkleRoot: "0x72f7eb192cdbb602a41a2fa676fc5a7885f92bfcafdb7b9c8ed2b84cb83861ca"
         vault: *vault
         verifyCall:
       implementationChecks:
@@ -2116,7 +2116,7 @@ l1:
         getVerificationResult:
         hashCall:
         isAllowedCall:
-        merkleRoot: "0x024f7e69ecf4c1d49c751885deab80b955cad770ae9c9cfd9bef09917d3b65f7"
+        merkleRoot: "0x539f54782bab568bc60271227f4807a394bda17fd8622e78c2b34dc342fe0ade"
         vault: *vault
         verifyCall:
       implementationChecks:
@@ -2260,7 +2260,7 @@ l1:
         getVerificationResult:
         hashCall:
         isAllowedCall:
-        merkleRoot: "0x0170f52cc06f6d9b9ecc008db9387f06c19efbe3abcb4afc9d08e50d3c86ea4f"
+        merkleRoot: "0xbbf7c96b84484997f65758984d04874d1e7f814487536ca566bba51313c2dfac"
         vault: *vault
         verifyCall:
       implementationChecks:
