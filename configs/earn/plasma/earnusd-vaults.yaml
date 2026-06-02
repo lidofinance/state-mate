@@ -27,24 +27,31 @@ deployed:
     - &SAFE_IMPL_1_4_1 "0x29fcB43b46531BcA003ddC8FCB67FFE91900C762"
 
     # --- earnUSDe Vault ---
-    - &earnUSDe_vault "0x3Ce1F83E9c95fc8b60e7ab36B3238A8257710862"
-    - &earnUSDe_vaultProxyAdmin "0x21ae4028cbb5d03ba1a8f290d9354f40f71be0f8"
-    - &earnUSDe_subvault0 "0xbd33C99D72BDfe71BE4eFD5b6B2A42d3Daf96e0f"
-    - &earnUSDe_subvault0ProxyAdmin "0x01f10385402f965cad335eb16f662feadae90d74"
-    - &earnUSDe_verifier0 "0x96383b3120B4437FE679c21aCb75ae19429b446D"
-    - &earnUSDe_verifier0ProxyAdmin "0x2fdb8536529adefd8acba32443728a214cbcf2b7"
-    - &earnUSDe_swapModule0 "0xf9C8b4D0fBAcCfc341feBC852b750997b4a72fc8"
-    - &earnUSDe_swapModule0ProxyAdmin "0xe00c1C1cD84305763c58b898028fE14bCA7A6E5a"
-    - &earnUSDe_oracle "0xE2aaefF18a0FA0389D6e5B64199727C21530b787"
-    - &earnUSDe_oracleProxyAdmin "0x79318580ec9c1158eeda4ad4b0e4c969d0efcc63"
-    - &earnUSDe_shareManager "0x134eA36E03b5e59dbddf2535084e342d84f2A043"
-    - &earnUSDe_shareManagerProxyAdmin "0x12d7fa0ccb68d78ac268a4f6c9bc31df4dc00fcc"
-    - &earnUSDe_feeManager "0x038E3cc0FaE5092C92E87C6371d0Dc55357cd2E5"
-    - &earnUSDe_feeManagerProxyAdmin "0xeab81b2aa95a92219446ebbdb36e4817188f4fad"
-    - &earnUSDe_riskManager "0x9111E027ABB6269E7f1a10860b4DaA3f66054735"
-    - &earnUSDe_riskManagerProxyAdmin "0x9f5437e484f01ead3cf0b97e2dfb5bbf8bf8a99b"
-    - &earnUSDe_timelockController "0x61fB5220a2bA26dF7a1635625e5b3305b333FD7f"
-    # TODO: include earnUSDe_swapModuleOracle in diffyscan — not a known audited protocol address
+    - &earnUSDe_vault "0x49DAb986A4288bE616f44733d56397d3410fD331"
+    - &earnUSDe_vaultProxyAdmin "0xc9F42CFcFdF17479114e8dbF3607954080d38653"
+    - &earnUSDe_subvault0 "0xa11BE438F1961dB47F6660BDAF59b05C0200ADC5"
+    - &earnUSDe_subvault0ProxyAdmin "0xFF5124787C2aDB77c064497dc20de0d022229930"
+    - &earnUSDe_verifier0 "0xeF886da65AA032ce51517a555540339d08effd83"
+    - &earnUSDe_verifier0ProxyAdmin "0x252F43BF2863830a33D8865046183EAf795767C7"
+    - &earnUSDe_subvault1 "0xbaaE2F02d3a4f33eC164902e5A9E980Cb4c71afB"
+    - &earnUSDe_subvault1ProxyAdmin "0xC7F37769657D4ef023bd180376F4C37b786a445E"
+    - &earnUSDe_verifier1 "0xDCa60DBDa06418dB843779486D61cc89208634DE"
+    - &earnUSDe_verifier1ProxyAdmin "0xeDDC9e0Cca1A039688d2Ac008657841F7D173c5d"
+    - &earnUSDe_swapModule0 "0x351C5644D4d8502385b28Fe3Ef36B44C4b4cEb1c"
+    - &earnUSDe_swapModule0ProxyAdmin "0x4ce3095A7BEfd4bbEC27025D39E7eF680d86Da20"
+    - &earnUSDe_oracle "0xdB8837c1946f28d9766d9CA7470160B663198DD9"
+    - &earnUSDe_oracleProxyAdmin "0x145e195b5d3072c5a5dA923c70e84Fc7E63de2ca"
+    - &earnUSDe_shareManager "0x906703a4e566D04828845b6C2918B1767E24752A"
+    - &earnUSDe_shareManagerProxyAdmin "0xe91F985fA14ca024c5880BA7910A97b134E1D47f"
+    # earnUSDe's TokenizedShareManager points at a deployment-specific implementation
+    # (not the shared &shareManagerImplementation used elsewhere).
+    - &earnUSDe_shareManagerImplementation "0x00000000C534B8680e3aa7165DeDc3Ab8781f602"
+    - &earnUSDe_feeManager "0x4FD8e72bEA84dc3B947672E49734e457a196bbdb"
+    - &earnUSDe_feeManagerProxyAdmin "0x6A21Beb45CB3d3a7265C97Ebaa0AdC9f39fA4724"
+    - &earnUSDe_riskManager "0x6B2EaDFD25947b6eD2657f9DCb5bf4413113cc9E"
+    - &earnUSDe_riskManagerProxyAdmin "0x6bc2b37cBd611bC27223E4DBd01F245f6F46d4C1"
+    - &earnUSDe_timelockController "0xFC950F8C0064071a5D762783Cf726Fa0CC2722Fe"
+    - &earnUSDe_oracleSubmitter "0x9d84510ED5dA4adc6Be2726F6C27B3AD68fDAd92"
     - &earnUSDe_swapModuleOracle "0x33E0b3fc976DC9C516926BA48CfC0A9E10a2aAA5"
 
     # --- Actors ---
@@ -68,23 +75,17 @@ misc:
   - &EIP1967_IMPLEMENTATION_SLOT "0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc"
 
   # --- Tokens ---
-  # Ref: Wrapped XPL (WXPL) on Plasma — no official docs page found
   - &NATIVE_WRAPPED "0x6100E367285b01F48D07953803A2d8dCA5D19873"
-  # Ref: USDT0 on Plasma
-  # https://docs.usdt0.to/technical-documentation/deployments
   - &SWAP_MODULE_TOKEN_0 "0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb"
-  # Ref: Maple syrupUSDT on Plasma
   - &SWAP_MODULE_TOKEN_1 "0xC4374775489CB9C56003BF2C9b12495fC64F0771"
+  - &USDe "0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34"
+  - &sUSDe "0x211Cc4DD073734dA055fbF44a2b4667d5E5fE5d2"
 
   # --- CoW Protocol ---
-  # Ref: CoW Protocol core contracts (GPv2Settlement + GPv2VaultRelayer)
-  # https://docs.cow.fi/cow-protocol/reference/contracts/core
   - &cowswapSettlement "0x9008D19f58AAbD9eD0D60971565AA8510560ab41"
   - &cowswapVaultRelayer "0xC92E8bdf79f0507f65a392b0ab4667716BFE0110"
 
   # --- SwapModule external ---
-  # Ref: LI.FI Diamond (aggregator router, same address on most networks)
-  # https://docs.li.fi/smart-contracts/deployments-contract-addresses
   - &swapModuleRouter "0x6131B5fae19EA4f9D964eAc0408E4408b66337b5"
 
   # --- Multisig thresholds ---
@@ -214,6 +215,20 @@ l1:
         UPGRADE_INTERFACE_VERSION: "5.0.0"
         owner: *proxyAdmin
 
+    earnUSDe_subvault1ProxyAdmin:
+      name: ProxyAdmin
+      address: *earnUSDe_subvault1ProxyAdmin
+      checks:
+        UPGRADE_INTERFACE_VERSION: "5.0.0"
+        owner: *proxyAdmin
+
+    earnUSDe_verifier1ProxyAdmin:
+      name: ProxyAdmin
+      address: *earnUSDe_verifier1ProxyAdmin
+      checks:
+        UPGRADE_INTERFACE_VERSION: "5.0.0"
+        owner: *proxyAdmin
+
     earnUSDe_swapModule0ProxyAdmin:
       name: ProxyAdmin
       address: *earnUSDe_swapModule0ProxyAdmin
@@ -297,6 +312,8 @@ l1:
         hasSubvault:
           - args: [*earnUSDe_subvault0]
             result: true
+          - args: [*earnUSDe_subvault1]
+            result: true
         hasSupportedRole:
         isDepositQueue:
         isPausedQueue:
@@ -311,19 +328,41 @@ l1:
           - args: [0]
             result: *earnUSDe_subvault0
           - args: [1]
+            result: *earnUSDe_subvault1
+          - args: [2]
             mustRevert: true
         subvaultFactory: *subvaultFactory
-        subvaults: 1
+        subvaults: 2
         supportedRoleAt:
-          - args: [2]
-            result: *SET_MERKLE_ROOT_ROLE
-          - args: [1]
-            result: *CALLER_ROLE
           - args: [0]
             result: *DEFAULT_ADMIN_ROLE
+          - args: [1]
+            result: *SET_VAULT_LIMIT_ROLE
+          - args: [2]
+            result: *SET_SUBVAULT_LIMIT_ROLE
           - args: [3]
+            result: *ALLOW_SUBVAULT_ASSETS_ROLE
+          - args: [4]
+            result: *MODIFY_VAULT_BALANCE_ROLE
+          - args: [5]
+            result: *MODIFY_SUBVAULT_BALANCE_ROLE
+          - args: [6]
+            result: *CALLER_ROLE
+          - args: [7]
+            result: *PULL_LIQUIDITY_ROLE
+          - args: [8]
+            result: *PUSH_LIQUIDITY_ROLE
+          - args: [9]
+            result: *SET_FLAGS_ROLE
+          - args: [10]
+            result: *SET_MERKLE_ROOT_ROLE
+          - args: [11]
+            result: *SUBMIT_REPORTS_ROLE
+          - args: [12]
+            result: *ACCEPT_REPORT_ROLE
+          - args: [13]
             mustRevert: true
-        supportedRoles: 3
+        supportedRoles: 13
         supportsInterface:
         verifierFactory: *verifierFactory
       implementationChecks:
@@ -375,20 +414,21 @@ l1:
         verifierFactory: *verifierFactory
       ozAcl:
         *DEFAULT_ADMIN_ROLE : [*lazyVaultAdmin]
-        *SET_MERKLE_ROOT_ROLE : [*earnUSDe_timelockController] # WARN: mellow_deployer must renounce this role on-chain
+        *SET_VAULT_LIMIT_ROLE : [*activeVaultAdmin]
+        *SET_SUBVAULT_LIMIT_ROLE : [*activeVaultAdmin]
+        *ALLOW_SUBVAULT_ASSETS_ROLE : [*activeVaultAdmin]
+        *MODIFY_VAULT_BALANCE_ROLE : [*activeVaultAdmin]
+        *MODIFY_SUBVAULT_BALANCE_ROLE : [*activeVaultAdmin]
         *CALLER_ROLE : [*curator]
+        *PULL_LIQUIDITY_ROLE : [*curator]
+        *PUSH_LIQUIDITY_ROLE : [*curator]
+        *SET_FLAGS_ROLE : [*earnUSDe_timelockController]
+        # WARN: mellow_deployer must renounce SET_MERKLE_ROOT_ROLE on-chain (count 2 vs 1)
+        *SET_MERKLE_ROOT_ROLE : [*earnUSDe_timelockController]
+        *SUBMIT_REPORTS_ROLE : [*earnUSDe_oracleSubmitter]
+        *ACCEPT_REPORT_ROLE : [*earnUSDe_oracleSubmitter]
         # Unused roles (verify 0 members)
-        *SET_VAULT_LIMIT_ROLE : []
-        *SET_SUBVAULT_LIMIT_ROLE : []
-        *ALLOW_SUBVAULT_ASSETS_ROLE : []
-        *MODIFY_VAULT_BALANCE_ROLE : []
-        *MODIFY_SUBVAULT_BALANCE_ROLE : []
-        *PULL_LIQUIDITY_ROLE : []
-        *PUSH_LIQUIDITY_ROLE : []
-        *SET_FLAGS_ROLE : []
         *SET_QUEUE_STATUS_ROLE : []
-        *SUBMIT_REPORTS_ROLE : []
-        *ACCEPT_REPORT_ROLE : []
         *CREATE_QUEUE_ROLE : []
         *CREATE_SUBVAULT_ROLE : []
         *DISCONNECT_SUBVAULT_ROLE : []
@@ -444,9 +484,71 @@ l1:
         getVerificationResult:
         hashCall:
         isAllowedCall:
-        # WARN: pending earnUSDe permission update (PR #25) not yet executed on-chain.
-        # After timelock executes setMerkleRoot, update to: 0x3b8a760ff1aaf34c7ce7cd617d769286b19d80ca9bdcd7a971b5bfa55cb2ef54
-        merkleRoot: "0xcd6c339209d78b9eaf91f077fa87f009feb80eac167e3e202f5d9c0f72dab3da"
+        merkleRoot: *ZERO_BYTES32 # WARN: zero root blocks all curator calls — verifier permissions not yet set on-chain (expected non-zero)
+        vault: *earnUSDe_vault
+        verifyCall:
+      implementationChecks:
+        ALLOW_CALL_ROLE: *ALLOW_CALL_ROLE
+        CALLER_ROLE: *CALLER_ROLE
+        DISALLOW_CALL_ROLE: *DISALLOW_CALL_ROLE
+        SET_MERKLE_ROOT_ROLE: *SET_MERKLE_ROOT_ROLE
+        allowedCallAt:
+        allowedCalls: 0
+        getVerificationResult:
+        hashCall:
+        isAllowedCall:
+        merkleRoot: *ZERO_BYTES32
+        vault: *ZERO_ADDRESS
+        verifyCall:
+
+    earnUSDe_subvault1:
+      name: Subvault
+      address: *earnUSDe_subvault1
+      proxyName: TransparentUpgradeableProxy
+      implementation: *subvaultImplementation
+      proxyChecks: {}
+      storage:
+        - slot: *EIP1967_ADMIN_SLOT
+          expected: *earnUSDe_subvault1ProxyAdmin
+          label: admin
+        - slot: *EIP1967_IMPLEMENTATION_SLOT
+          expected: *subvaultImplementation
+          label: implementation
+      checks:
+        getStorageAt:
+        onERC721Received:
+        vault: *earnUSDe_vault
+        verifier: *earnUSDe_verifier1
+      implementationChecks:
+        getStorageAt:
+        onERC721Received:
+        vault: *ZERO_ADDRESS
+        verifier: *ZERO_ADDRESS
+
+    earnUSDe_verifier1:
+      name: Verifier
+      address: *earnUSDe_verifier1
+      proxyName: TransparentUpgradeableProxy
+      implementation: *verifierImplementation
+      proxyChecks: {}
+      storage:
+        - slot: *EIP1967_ADMIN_SLOT
+          expected: *earnUSDe_verifier1ProxyAdmin
+          label: admin
+        - slot: *EIP1967_IMPLEMENTATION_SLOT
+          expected: *verifierImplementation
+          label: implementation
+      checks:
+        ALLOW_CALL_ROLE: *ALLOW_CALL_ROLE
+        CALLER_ROLE: *CALLER_ROLE
+        DISALLOW_CALL_ROLE: *DISALLOW_CALL_ROLE
+        SET_MERKLE_ROOT_ROLE: *SET_MERKLE_ROOT_ROLE
+        allowedCallAt:
+        allowedCalls: 0
+        getVerificationResult:
+        hashCall:
+        isAllowedCall:
+        merkleRoot: *ZERO_BYTES32 # WARN: zero root blocks all curator calls — verifier permissions not yet set on-chain (expected non-zero)
         vault: *earnUSDe_vault
         verifyCall:
       implementationChecks:
@@ -528,8 +630,8 @@ l1:
         *SM_CALLER_ROLE : [*curator]
         *ROUTER_ROLE : [*swapModuleRouter]
         *SET_SLIPPAGE_ROLE : []
-        *TOKEN_IN_ROLE : [*SWAP_MODULE_TOKEN_0, *SWAP_MODULE_TOKEN_1]
-        *TOKEN_OUT_ROLE : [*SWAP_MODULE_TOKEN_0, *SWAP_MODULE_TOKEN_1]
+        *TOKEN_IN_ROLE : [*SWAP_MODULE_TOKEN_0, *sUSDe, *USDe, *SWAP_MODULE_TOKEN_1]
+        *TOKEN_OUT_ROLE : [*SWAP_MODULE_TOKEN_0, *sUSDe, *USDe, *SWAP_MODULE_TOKEN_1]
 
     earnUSDe_oracle:
       name: Oracle
@@ -552,12 +654,29 @@ l1:
         SUBMIT_REPORTS_ROLE: *SUBMIT_REPORTS_ROLE
         getReport:
         isSupportedAsset:
+          - args: [*SWAP_MODULE_TOKEN_0]
+            result: true
+          - args: [*USDe]
+            result: true
+          - args: [*sUSDe]
+            result: true
+          - args: [*SWAP_MODULE_TOKEN_1]
+            result: true
         # securityParams: [maxAbsDeviation, suspAbsDeviation, maxRelDeviationD18, suspRelDeviationD18, timeout, depositInterval, redeemInterval]
         securityParams:
+          [5000000000000000000000000000, 1000000000000000000000000000, 5000000000000000, 1000000000000000, 72000, 3600, 172800]
         supportedAssetAt:
           - args: [0]
+            result: *SWAP_MODULE_TOKEN_0
+          - args: [1]
+            result: *USDe
+          - args: [2]
+            result: *sUSDe
+          - args: [3]
+            result: *SWAP_MODULE_TOKEN_1
+          - args: [4]
             mustRevert: true
-        supportedAssets: 0
+        supportedAssets: 4
         validatePrice:
         vault: *earnUSDe_vault
       implementationChecks:
@@ -577,17 +696,17 @@ l1:
         vault: *ZERO_ADDRESS
 
     earnUSDe_shareManager:
-      name: TokenizedShareManager
+      name: BurnableTokenizedShareManager
       address: *earnUSDe_shareManager
       proxyName: TransparentUpgradeableProxy
-      implementation: *shareManagerImplementation
+      implementation: *earnUSDe_shareManagerImplementation
       proxyChecks: {}
       storage:
         - slot: *EIP1967_ADMIN_SLOT
           expected: *earnUSDe_shareManagerProxyAdmin
           label: admin
         - slot: *EIP1967_IMPLEMENTATION_SLOT
-          expected: *shareManagerImplementation
+          expected: *earnUSDe_shareManagerImplementation
           label: implementation
       checks:
         SET_ACCOUNT_INFO_ROLE: *SET_ACCOUNT_INFO_ROLE
@@ -837,9 +956,6 @@ l1:
         encodeTransactionData:
         getChainId: 9745
         getModulesPaginated:
-        # WARN: on-chain currently has unexpected signers 0x04e7C0350241b818eE5c92cc260008C9898F41cf
-        # and 0xc7a8DE05264442A318189f2bd160d2830902C8CD in place of LIDO_SIGNER_6 / LIDO_SIGNER_12.
-        # Config keeps the correct expected set; check stays red until Safe membership is corrected on-chain.
         getOwners:
           - *LIDO_SIGNER_7
           - *LIDO_SIGNER_6

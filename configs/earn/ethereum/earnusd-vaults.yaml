@@ -121,31 +121,33 @@ deployed:
     - &earnUSDc_verifier0 "0x1e87c6fba77966A5Ff6BF83FAc4Ea76D978A733f"
     - &earnUSDc_verifier0ProxyAdmin "0x47ff4a8ec8b8e815bef7a745197e06001aa75d57"
 
-    # --- earnUSDe Vault ---
-    - &earnUSDe_vault "0x0E27abEF8C0390DB326be61Da660cEAb5D7A01c0"
-    - &earnUSDe_vaultProxyAdmin "0x9da1430332ca8aa31f38078cc39e98f582b21c6a"
-    - &earnUSDe_syncDepositQueueUSDC "0x0c48c1eA0Bb779F2B747d9a89EDEb4199000Fa90"
-    - &earnUSDe_syncDepositQueueUSDCProxyAdmin "0x78c97614388a937dd179c7c99635c100310954f7"
-    - &earnUSDe_redeemQueueUSDC "0xAeF472489Ae2405c4B9ece09642e1ce7A9233446"
-    - &earnUSDe_redeemQueueUSDCProxyAdmin "0x1fa49331e3117594cda8e5ad7681909fddc7ce31"
-    - &earnUSDe_syncDepositQueueUSDT "0xdbd555288BA3C789156718D7C94c568a0E4e0023"
-    - &earnUSDe_syncDepositQueueUSDTProxyAdmin "0xb24e8f3e1cf858c65a88a456dc93e6ff329ed9ed"
-    - &earnUSDe_oracle "0x248cA260BfecD194e9596aa7bf50f0E49a5fa43a"
-    - &earnUSDe_oracleProxyAdmin "0x63a833736407b02884fd75650dcf0c240cba2624"
-    - &earnUSDe_shareManager "0x18bf9c3004da28bA2Ad4Dc676aF2091E38CcB414"
-    - &earnUSDe_shareManagerProxyAdmin "0x82442996d0a226a8e1a00bc70659f8fc74e638c1"
-    - &earnUSDe_feeManager "0xeffE4750254e520b39E5bf872b821Aa5973B69eC"
-    - &earnUSDe_feeManagerProxyAdmin "0x548f8f9910d2dda7ac4e255b18f7bb4cc1da4091"
-    - &earnUSDe_riskManager "0xb48c3b3ed0D12fbFA0f2bD9c9E11AB44B8317BA3"
-    - &earnUSDe_riskManagerProxyAdmin "0x80438ddc27036213a220b669935aebebbee51c7c"
-    - &earnUSDe_timelockController "0xFf06E4D42Bc59Dc47DbE2CEBE4E05A0ddA27378A"
-    - &earnUSDe_oracleSubmitter "0xd114BCC2a5b683CF6568789d9B0B8702eD56948d"
-    - &earnUSDe_swapModule0 "0xD8E9300d1a838791cC76393fD78B1fD3C73DBEeb"
-    - &earnUSDe_swapModule0ProxyAdmin "0x33F6e9256CA5BCdF34786c732325CfC46D122FBB"
-    - &earnUSDe_subvault0 "0x6082A97Bbb2e51d5aa429DE7DAa5a7Cb04c1B17A"
-    - &earnUSDe_subvault0ProxyAdmin "0xda62ab223dcecb74234eb9247ad640f0504e55ab"
-    - &earnUSDe_verifier0 "0x6445DC7C182386997D894A8dA2872E0e0a002F8b"
-    - &earnUSDe_verifier0ProxyAdmin "0xfec0c28f02b652d2468c89a84028b7650a54adc2"
+    # --- earnUSDe Vault (redeployed) ---
+    - &earnUSDe_vault "0x0cC65147BF7F615A8dD9E78e2c53158F8E01754d"
+    - &earnUSDe_vaultProxyAdmin "0x95Ad8A8597D55fe2082190cD504Cc162C97266Ca"
+    - &earnUSDe_syncDepositQueueUSDC "0xBb647898e0CF0aE81Ac480d04A8a9973763eBD2D"
+    - &earnUSDe_syncDepositQueueUSDCProxyAdmin "0xCc53dB7AD5f8BE190806846e6eF70e029A62Ec48"
+    - &earnUSDe_redeemQueueUSDC "0x8B857170F2a6C10Ce64ec8b920428ca977fb7710"
+    - &earnUSDe_redeemQueueUSDCProxyAdmin "0x1c56bBB70B4b22AbF4f91f8aB4F5D268fd9674D7"
+    - &earnUSDe_syncDepositQueueUSDT "0xa01aEfeC7A3384C8440e99084458030BDbdD7404"
+    - &earnUSDe_syncDepositQueueUSDTProxyAdmin "0x3b131eE930328B4b8fC9ea4586Bae83106CEC4AD"
+    - &earnUSDe_syncDepositQueueUSDe "0xAcb2E510e8FcdaB3808cC5B9d206374cAB527947"
+    - &earnUSDe_syncDepositQueueUSDeProxyAdmin "0xc44681612aFd98C599949dfEB64679cDfa2fE2d7"
+    - &earnUSDe_oracle "0xBcdFaf92783B2C391A1c80682e75Bb6EF47B9c3C"
+    - &earnUSDe_oracleProxyAdmin "0x45d5eE9dbF6F493772A44C6e6B46CDE53789712E"
+    - &earnUSDe_shareManager "0x3D561e1E0204d47b45C23B65356a4536c36d1AF6"
+    - &earnUSDe_shareManagerProxyAdmin "0x85673C92008C17294499819f678AA3220d927d51"
+    - &earnUSDe_feeManager "0xE90b8D7DfFB816b2895DE67307b4A8f9061CEF52"
+    - &earnUSDe_feeManagerProxyAdmin "0xCe6eAf94DC5196727218034d60bF7FAd58507dBe"
+    - &earnUSDe_riskManager "0x5D7e237BD77d3671fFb33FC9bC8c37d49aAE6153"
+    - &earnUSDe_riskManagerProxyAdmin "0x00b1b75CAd50Ea30a26083B60D44Ac4457D654a6"
+    - &earnUSDe_timelockController "0x7589b8645F61F151D6c28Eaf8cE2fD9F23E09AbF"
+    - &earnUSDe_oracleSubmitter "0xDa5508789B5f93fb49b644c87Ef9D8CddB699d59"
+    - &earnUSDe_swapModule0 "0xC99DaA2dC366cFd115130a0b7D21Df01CB5FcF7b"
+    - &earnUSDe_swapModule0ProxyAdmin "0xc7135Ff08856BDAB0ecA5dD12C3Fe15f352A94e1"
+    - &earnUSDe_subvault0 "0x31B7d5A2B1CE1871Dd642F6aeCC0Ef68d126B95A"
+    - &earnUSDe_subvault0ProxyAdmin "0x25a44474fE072d6A3aa8910d8E7727D35d500C87"
+    - &earnUSDe_verifier0 "0x87631dbf0224234107B593c874f63f577e1336Da"
+    - &earnUSDe_verifier0ProxyAdmin "0xb90eC48b4DE74806ddf455B1eFC334b3e76c0fA3"
 
     # --- Lido Actors (multisigs) ---
     - &proxyAdmin "0x81698f87C6482bF1ce9bFcfC0F103C4A0Adf0Af0"
@@ -2064,6 +2066,13 @@ l1:
         UPGRADE_INTERFACE_VERSION: "5.0.0"
         owner: *proxyAdmin
 
+    earnUSDe_syncDepositQueueUSDeProxyAdmin:
+      name: ProxyAdmin
+      address: *earnUSDe_syncDepositQueueUSDeProxyAdmin
+      checks:
+        UPGRADE_INTERFACE_VERSION: "5.0.0"
+        owner: *proxyAdmin
+
     earnUSDe_oracleProxyAdmin:
       name: ProxyAdmin
       address: *earnUSDe_oracleProxyAdmin
@@ -2145,12 +2154,14 @@ l1:
             result: *USDC
           - args: [1]
             result: *USDT
+          - args: [2]
+            result: *USDe
         claimableSharesOf:
         defaultDepositHook: *redirectingDepositHook
         defaultRedeemHook: *basicRedeemHook
         depositQueueFactory: *depositQueueFactory
         feeManager: *earnUSDe_feeManager
-        getAssetCount: 2
+        getAssetCount: 3
         getHook:
           - args: [*earnUSDe_syncDepositQueueUSDC]
             result: *redirectingDepositHook
@@ -2158,7 +2169,9 @@ l1:
             result: *basicRedeemHook
           - args: [*earnUSDe_syncDepositQueueUSDT]
             result: *redirectingDepositHook
-        getQueueCount: 3
+          - args: [*earnUSDe_syncDepositQueueUSDe]
+            result: *redirectingDepositHook
+        getQueueCount: 4
         getLiquidAssets:
         getRoleAdmin:
         getRoleMember:
@@ -2170,12 +2183,16 @@ l1:
             result: true
           - args: [*USDT]
             result: true
+          - args: [*USDe]
+            result: true
         hasQueue:
           - args: [*earnUSDe_syncDepositQueueUSDC]
             result: true
           - args: [*earnUSDe_redeemQueueUSDC]
             result: true
           - args: [*earnUSDe_syncDepositQueueUSDT]
+            result: true
+          - args: [*earnUSDe_syncDepositQueueUSDe]
             result: true
         hasRole:
         hasSubvault:
@@ -2189,12 +2206,16 @@ l1:
             result: false
           - args: [*earnUSDe_syncDepositQueueUSDT]
             result: true
+          - args: [*earnUSDe_syncDepositQueueUSDe]
+            result: true
         isPausedQueue:
           - args: [*earnUSDe_syncDepositQueueUSDC]
             result: false
           - args: [*earnUSDe_redeemQueueUSDC]
             result: false
           - args: [*earnUSDe_syncDepositQueueUSDT]
+            result: false
+          - args: [*earnUSDe_syncDepositQueueUSDe]
             result: false
         onERC721Received:
         oracle: *earnUSDe_oracle
@@ -2207,7 +2228,10 @@ l1:
           # USDT - syncDepositQueue
           - args: [*USDT, 0]
             result: *earnUSDe_syncDepositQueueUSDT
-        queueLimit: 3
+          # USDe - syncDepositQueue
+          - args: [*USDe, 0]
+            result: *earnUSDe_syncDepositQueueUSDe
+        queueLimit: 4
         redeemQueueFactory: *redeemQueueFactory
         riskManager: *earnUSDe_riskManager
         shareManager: *earnUSDe_shareManager
@@ -2306,7 +2330,7 @@ l1:
         *PULL_LIQUIDITY_ROLE : [*mellowCurator]
         *PUSH_LIQUIDITY_ROLE : [*mellowCurator]
         *SET_FLAGS_ROLE : [*earnUSDe_timelockController]
-        *SET_MERKLE_ROOT_ROLE : [*earnUSDe_timelockController] # WARN: mellow_deployer must renounce SET_MERKLE_ROOT_ROLE — on-chain count is 2
+        *SET_MERKLE_ROOT_ROLE : [*earnUSDe_timelockController] # WARN: mellow_deployer must renounce this role on-chain
         *SET_QUEUE_STATUS_ROLE : [*earnUSDe_timelockController]
         *SUBMIT_REPORTS_ROLE : [*earnUSDe_oracleSubmitter]
         *ACCEPT_REPORT_ROLE : [*earnUSDe_oracleSubmitter]
@@ -2359,9 +2383,7 @@ l1:
         getVerificationResult:
         hashCall:
         isAllowedCall:
-        # WARN: pending earnUSDe permission update (PR #25) not yet executed on-chain.
-        # After timelock executes setMerkleRoot, update to: 0x60837b03c59fcf8b150ff2da2d0ba67007ff1743f434667aa39abd5a4cd134d7
-        merkleRoot: "0x3bb0503c44d08bdf061b5fb9d53faf3d3103fe6afee87132b8ec21d2e236e328"
+        merkleRoot: *ZERO_BYTES32 # WARN: zero root blocks all curator calls — verifier permissions not yet set on-chain (expected non-zero)
         vault: *earnUSDe_vault
         verifyCall:
       implementationChecks:
@@ -2473,6 +2495,38 @@ l1:
         syncDepositParams:
         vault: *ZERO_ADDRESS
 
+    earnUSDe_syncDepositQueueUSDe:
+      name: SyncDepositQueue
+      address: *earnUSDe_syncDepositQueueUSDe
+      proxyName: TransparentUpgradeableProxy
+      implementation: *syncDepositQueueImplementation
+      proxyChecks: {}
+      storage:
+        - slot: *EIP1967_ADMIN_SLOT
+          expected: *earnUSDe_syncDepositQueueUSDeProxyAdmin
+          label: admin
+        - slot: *EIP1967_IMPLEMENTATION_SLOT
+          expected: *syncDepositQueueImplementation
+          label: implementation
+      checks:
+        SET_SYNC_DEPOSIT_PARAMS_ROLE: *SET_SYNC_DEPOSIT_PARAMS_ROLE
+        asset: *USDe
+        canBeRemoved:
+        claim:
+        claimableOf:
+        name: "SyncDepositQueue"
+        syncDepositParams:
+        vault: *earnUSDe_vault
+      implementationChecks:
+        SET_SYNC_DEPOSIT_PARAMS_ROLE: *SET_SYNC_DEPOSIT_PARAMS_ROLE
+        asset: *ZERO_ADDRESS
+        canBeRemoved:
+        claim:
+        claimableOf:
+        name: "SyncDepositQueue"
+        syncDepositParams:
+        vault: *ZERO_ADDRESS
+
     earnUSDe_oracle:
       name: Oracle
       address: *earnUSDe_oracle
@@ -2498,9 +2552,9 @@ l1:
             result: true
           - args: [*USDT]
             result: true
+          - args: [*USDe]
+            result: true
         # securityParams: [maxAbsDeviation, suspAbsDeviation, maxRelDeviationD18, suspRelDeviationD18, timeout, depositInterval, redeemInterval]
-        # WARN: on-chain currently has maxAbsDeviation=5e15, suspAbsDeviation=1e15 (inherited from earnETH template — anomalous for a USD-base vault).
-        # Expected values match earnUSD/earnUSDc (5e27 / 1e27); requires oracle redeploy/upgrade on-chain.
         securityParams: [5000000000000000000000000000, 1000000000000000000000000000, 5000000000000000, 1000000000000000, 72000, 3600, 172800]
         supportedAssetAt:
           - args: [0]
@@ -2508,8 +2562,10 @@ l1:
           - args: [1]
             result: *USDT
           - args: [2]
+            result: *USDe
+          - args: [3]
             mustRevert: true
-        supportedAssets: 2
+        supportedAssets: 3
         validatePrice:
         vault: *earnUSDe_vault
       implementationChecks:
@@ -3145,7 +3201,6 @@ l1:
           - *EXT_MELLOW_SIGNER_2
           - *MELLOW_SIGNER_2
           - *MELLOW_SIGNER_3
-          - *MELLOW_SIGNER_1
           - *MELLOW_SIGNER_4
           - *EXT_MELLOW_SIGNER_4
         getStorageAt:
