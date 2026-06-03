@@ -1784,7 +1784,6 @@ l1:
         claimableSharesOf:
         decimals: 18
         # flags: [hasMintPause, hasBurnPause, hasTransferPause, hasWhitelist, hasTransferWhitelist, globalLockup]
-        # WARN: hasWhitelist=true with whitelistMerkleRoot=ZERO_BYTES32 — verify whether this allows all or blocks all
         flags: [false, false, false, true, false, 0]
         isDepositorWhitelisted:
         name: "Conservative earnUSD"
@@ -2647,7 +2646,6 @@ l1:
         claimableSharesOf:
         decimals: 18
         # flags: [hasMintPause, hasBurnPause, hasTransferPause, hasWhitelist, hasTransferWhitelist, globalLockup]
-        # WARN: hasWhitelist=true with whitelistMerkleRoot=ZERO_BYTES32 — verify whether this allows all or blocks all
         flags: [false, false, false, true, false, 0]
         isDepositorWhitelisted:
         name: "Experimental earnUSD"
@@ -2812,7 +2810,7 @@ l1:
         getRoleMembers:
         hasRole:
         hasSupportedRole:
-        oracle: *earnUSDe_swapModuleOracle
+        oracle: *earnUSDe_swapModuleOracle # Aave V3 AaveOracle (immutable, no owner/proxy, Aave-governed; base unit 1e8 USD)
         subvault: *earnUSDe_subvault0
         supportedRoleAt:
         supportedRoles: 5
