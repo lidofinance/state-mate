@@ -763,7 +763,7 @@ l1:
         getVerificationResult:
         hashCall:
         isAllowedCall:
-        merkleRoot: *ZERO_BYTES32 # WARN: zero root blocks all subvault1 calls — verifier1 not yet configured
+        merkleRoot: *ZERO_BYTES32
         vault: *earnUSD_vault
         verifyCall:
       implementationChecks:
@@ -2329,7 +2329,7 @@ l1:
         *PULL_LIQUIDITY_ROLE : [*mellowCurator]
         *PUSH_LIQUIDITY_ROLE : [*mellowCurator]
         *SET_FLAGS_ROLE : [*earnUSDe_timelockController]
-        *SET_MERKLE_ROOT_ROLE : [*earnUSDe_timelockController] # WARN: mellow_deployer must renounce this role on-chain
+        *SET_MERKLE_ROOT_ROLE : [*earnUSDe_timelockController] # WARN: mellow_deployer must renounce this role on-chain (on-chain count is 2)
         *SET_QUEUE_STATUS_ROLE : [*earnUSDe_timelockController]
         *SUBMIT_REPORTS_ROLE : [*earnUSDe_oracleSubmitter]
         *ACCEPT_REPORT_ROLE : [*earnUSDe_oracleSubmitter]
