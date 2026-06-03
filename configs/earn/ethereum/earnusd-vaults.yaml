@@ -2383,7 +2383,7 @@ l1:
         getVerificationResult:
         hashCall:
         isAllowedCall:
-        merkleRoot: *ZERO_BYTES32 # WARN: zero root blocks all curator calls — verifier permissions not yet set on-chain (expected non-zero)
+        merkleRoot: "0x6684dd40de98004314146ec0e664da87cee9a0b83993df2e13cfac91f003559e"
         vault: *earnUSDe_vault
         verifyCall:
       implementationChecks:

@@ -111,7 +111,6 @@ misc:
   - &LIDO_SIGNER_10 "0xE6CD29BF19769E44534099d241abAa07aa8c8E9a"
   - &LIDO_SIGNER_11 "0x8aA493BcD7f989caD67dd3CB48A4c2E6b40FeDB0"
   - &LIDO_SIGNER_12 "0xf2374BCb265505002055942D070459a4d2011012"
-  - &LIDO_SIGNER_13 "0xa94e4ADceC38074967b17F6e8856AB12368686B5"
 
   # --- Mellow signers ---
   - &MELLOW_SIGNER_1 "0x44A388BBD782AE1D7f4542aEb6C3569E2CfdF5a1"
@@ -484,7 +483,7 @@ l1:
         getVerificationResult:
         hashCall:
         isAllowedCall:
-        merkleRoot: *ZERO_BYTES32 # WARN: zero root blocks all curator calls — verifier permissions not yet set on-chain (expected non-zero)
+        merkleRoot: "0x3290cff12dc523502faa7784661dc051c8e8d9c8c06446e8c038d37f06996ebd"
         vault: *earnUSDe_vault
         verifyCall:
       implementationChecks:
@@ -548,7 +547,7 @@ l1:
         getVerificationResult:
         hashCall:
         isAllowedCall:
-        merkleRoot: *ZERO_BYTES32 # WARN: zero root blocks all curator calls — verifier permissions not yet set on-chain (expected non-zero)
+        merkleRoot: "0x9e7f6d52a5c1802ca0e0a73d9a28aebcd6a34d591703a283a6bedd1b1c7cff43"
         vault: *earnUSDe_vault
         verifyCall:
       implementationChecks:
@@ -930,11 +929,9 @@ l1:
         encodeTransactionData:
         getChainId: 9745
         getModulesPaginated:
-        # WARN: uses LIDO_SIGNER_13 where all other chains use LIDO_SIGNER_2. Additionally,
-        # LIDO_SIGNER_13 on Plasma maps to a different EOA than on Ethereum — verify this is intentional
         getOwners:
           - *LIDO_SIGNER_3
-          - *LIDO_SIGNER_13
+          - *LIDO_SIGNER_2
           - *LIDO_SIGNER_4
           - *LIDO_SIGNER_1
           - *MELLOW_SIGNER_2
