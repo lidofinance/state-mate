@@ -7,7 +7,6 @@ import tsParser from "@typescript-eslint/parser";
 import importPlugin from "eslint-plugin-import";
 import prettierRecommended from "eslint-plugin-prettier/recommended";
 import eslintPluginUnicorn from "eslint-plugin-unicorn";
-import globals from "globals";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -57,14 +56,6 @@ export default [
           },
         },
       ],
-    },
-  },
-  {
-    files: ["./scripts/{**/,}*.js", "./test/{**/,}*.js"],
-    languageOptions: {
-      globals: {
-        ...globals.mocha,
-      },
     },
   },
 ];
