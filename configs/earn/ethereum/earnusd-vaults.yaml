@@ -76,6 +76,8 @@ deployed:
     - &earnUSD_depositQueueUSDTProxyAdmin "0x21bb6fd0d713e99bd0eba9a1df19387d17d4a672"
     - &earnUSD_syncDepositQueueUSDT "0x534d0bEb82C47cf703BFb9E959297658b65Ec8E9"
     - &earnUSD_syncDepositQueueUSDTProxyAdmin "0x37e7176616a1ab7ab016d637553f4fcacc5f059b"
+    - &earnUSD_depositQueueUSDe "REPLACEME"
+    - &earnUSD_depositQueueUSDeProxyAdmin "REPLACEME"
     - &earnUSD_oracle "0x827044735c9708a2cf850e7Ea37EBa43bc786028"
     - &earnUSD_oracleProxyAdmin "0x197ff65b13c9cad57fbe693e398f093a99812653"
     - &earnUSD_shareManager "0x4Ce1ac8F43E0E5BD7A346A98aF777bF8fbeA1981"
@@ -367,6 +369,13 @@ l1:
         UPGRADE_INTERFACE_VERSION: "5.0.0"
         owner: *proxyAdmin
 
+    earnUSD_depositQueueUSDeProxyAdmin:
+      name: ProxyAdmin
+      address: *earnUSD_depositQueueUSDeProxyAdmin
+      checks:
+        UPGRADE_INTERFACE_VERSION: "5.0.0"
+        owner: *proxyAdmin
+
     earnUSD_oracleProxyAdmin:
       name: ProxyAdmin
       address: *earnUSD_oracleProxyAdmin
@@ -455,12 +464,14 @@ l1:
             result: *USDC
           - args: [1]
             result: *USDT
+          - args: [2]
+            result: *USDe
         claimableSharesOf:
         defaultDepositHook: *redirectingDepositHook
         defaultRedeemHook: *basicRedeemHook
         depositQueueFactory: *depositQueueFactory
         feeManager: *earnUSD_feeManager
-        getAssetCount: 2
+        getAssetCount: 3
         getHook:
           - args: [*earnUSD_depositQueueUSDC]
             result: *redirectingDepositHook
@@ -472,7 +483,9 @@ l1:
             result: *redirectingDepositHook
           - args: [*earnUSD_syncDepositQueueUSDT]
             result: *redirectingDepositHook
-        getQueueCount: 5
+          - args: [*earnUSD_depositQueueUSDe]
+            result: *redirectingDepositHook
+        getQueueCount: 6
         getLiquidAssets:
         getRoleAdmin:
         getRoleMember:
@@ -484,6 +497,8 @@ l1:
             result: true
           - args: [*USDT]
             result: true
+          - args: [*USDe]
+            result: true
         hasQueue:
           - args: [*earnUSD_depositQueueUSDC]
             result: true
@@ -494,6 +509,8 @@ l1:
           - args: [*earnUSD_depositQueueUSDT]
             result: true
           - args: [*earnUSD_syncDepositQueueUSDT]
+            result: true
+          - args: [*earnUSD_depositQueueUSDe]
             result: true
         hasRole:
         hasSubvault:
@@ -513,6 +530,8 @@ l1:
             result: true
           - args: [*earnUSD_syncDepositQueueUSDT]
             result: true
+          - args: [*earnUSD_depositQueueUSDe]
+            result: true
         isPausedQueue:
           - args: [*earnUSD_depositQueueUSDC]
             result: false
@@ -523,6 +542,8 @@ l1:
           - args: [*earnUSD_depositQueueUSDT]
             result: false
           - args: [*earnUSD_syncDepositQueueUSDT]
+            result: false
+          - args: [*earnUSD_depositQueueUSDe]
             result: false
         onERC721Received:
         oracle: *earnUSD_oracle
@@ -539,7 +560,10 @@ l1:
             result: *earnUSD_depositQueueUSDT
           - args: [*USDT, 1]
             result: *earnUSD_syncDepositQueueUSDT
-        queueLimit: 5
+          # USDe - depositQueue
+          - args: [*USDe, 0]
+            result: *earnUSD_depositQueueUSDe
+        queueLimit: 6
         redeemQueueFactory: *redeemQueueFactory
         riskManager: *earnUSD_riskManager
         shareManager: *earnUSD_shareManager
@@ -763,7 +787,7 @@ l1:
         getVerificationResult:
         hashCall:
         isAllowedCall:
-        merkleRoot: *ZERO_BYTES32
+        merkleRoot: "0x3b7a7dc82cb5a678f0a369510d9dab0cab2b30660a4cf56ef6171accf2ea0afa"
         vault: *earnUSD_vault
         verifyCall:
       implementationChecks:
@@ -931,6 +955,34 @@ l1:
         syncDepositParams:
         vault: *ZERO_ADDRESS
 
+    earnUSD_depositQueueUSDe:
+      name: DepositQueue
+      address: *earnUSD_depositQueueUSDe
+      proxyName: TransparentUpgradeableProxy
+      implementation: *depositQueueImplementation
+      proxyChecks: {}
+      storage:
+        - slot: *EIP1967_ADMIN_SLOT
+          expected: *earnUSD_depositQueueUSDeProxyAdmin
+          label: admin
+        - slot: *EIP1967_IMPLEMENTATION_SLOT
+          expected: *depositQueueImplementation
+          label: implementation
+      checks:
+        asset: *USDe
+        canBeRemoved:
+        claimableOf:
+        requestOf:
+        unclaimedRequests:
+        vault: *earnUSD_vault
+      implementationChecks:
+        asset: *ZERO_ADDRESS
+        canBeRemoved:
+        claimableOf:
+        requestOf:
+        unclaimedRequests: 0
+        vault: *ZERO_ADDRESS
+
     earnUSD_oracle:
       name: Oracle
       address: *earnUSD_oracle
@@ -956,6 +1008,8 @@ l1:
             result: true
           - args: [*USDT]
             result: true
+          - args: [*USDe]
+            result: true
         # securityParams: [maxAbsDeviation, suspAbsDeviation, maxRelDeviationD18, suspRelDeviationD18, timeout, depositInterval, redeemInterval]
         securityParams:
           [
@@ -973,8 +1027,10 @@ l1:
           - args: [1]
             result: *USDT
           - args: [2]
+            result: *USDe
+          - args: [3]
             mustRevert: true
-        supportedAssets: 2
+        supportedAssets: 3
         validatePrice:
         vault: *earnUSD_vault
       implementationChecks:
@@ -1556,7 +1612,7 @@ l1:
         getVerificationResult:
         hashCall:
         isAllowedCall:
-        merkleRoot: "0x1c3a764fe318890d6c5d01ec860e6ba8212dc38951ddb1b1dd71dab1e8071fed"
+        merkleRoot: "0x44fe43cb38d25b6e86316daa05f2cca9cf77c8878172c58bb89404635478ce63"
         vault: *earnUSDc_vault
         verifyCall:
       implementationChecks:
