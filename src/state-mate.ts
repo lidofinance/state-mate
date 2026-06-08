@@ -20,11 +20,13 @@ import {
 import { doGenerateBoilerplate } from "./boilerplate-generator";
 import { parseCmdLineArguments } from "./cli-parser";
 import { printError, readUrlOrFromEnvironment, YAML_PARSE_OPTIONS, yamlBigintReviver } from "./common";
-import { loadStateWithDeployedAddresses, resolveDeployedFilePath } from "./deployed-addresses";
+import { DEPLOYED_SPEC, resolveDeployedFilePath } from "./deployed-addresses";
 import { loadContractInfoFromExplorer } from "./explorer-provider";
+import { INPUTS_SPEC, resolveInputsFilePath } from "./inputs";
 import { FAILURE_MARK, log, logError, logErrorAndExit, logHeader1, SUCCESS_MARK, WARNING_MARK } from "./logger";
 import { g_error_details, g_errors, g_total_checks } from "./section-validators/base";
 import { ContractSectionValidator } from "./section-validators/contract";
+import { loadStateWithSiblings, SiblingSpec } from "./sibling-delegation";
 import {
   EntireDocument,
   EntireDocumentTB,
@@ -73,29 +75,45 @@ function loadStateFromYaml(configPath: string): unknown {
   }
 }
 
-// Load the main config, composing it with a separate `.deployed` addresses file when one is
-// selected (an explicit `--deployed` path or, by convention, the `<name>.deployed.<ext>` sibling).
-// A `.deployed` file is incompatible with `--generate`, which operates on a seed document.
-function loadStateWithOptionalDeployed(): unknown {
-  let deployedPath: string | null = null;
+// Load the main config, composing it with separate `.deployed` and/or `.inputs` sibling files when
+// selected (an explicit `--deployed`/`--inputs` path or, by convention, the `<name>.<infix>.<ext>`
+// sibling). Both may be in play at once. Sibling files are incompatible with `--generate`, which
+// operates on a seed document.
+type SelectedSibling = { path: string; spec: SiblingSpec; describe: (count: number) => string };
+
+function loadStateWithOptionalSiblings(): unknown {
+  const siblings: SelectedSibling[] = [];
   try {
-    deployedPath = resolveDeployedFilePath(g_Arguments.configPath, g_Arguments.deployed);
+    const deployedPath = resolveDeployedFilePath(g_Arguments.configPath, g_Arguments.deployed);
+    if (deployedPath) {
+      siblings.push({ path: deployedPath, spec: DEPLOYED_SPEC, describe: (count) => `${count} deployed address(es)` });
+    }
+    const inputsPath = resolveInputsFilePath(g_Arguments.configPath, g_Arguments.inputs);
+    if (inputsPath) {
+      siblings.push({ path: inputsPath, spec: INPUTS_SPEC, describe: (count) => `${count} input anchor(s)` });
+    }
   } catch (error) {
     logErrorAndExit(printError(error));
   }
 
-  if (!deployedPath) {
+  if (siblings.length === 0) {
     return loadStateFromYaml(g_Arguments.configPath);
   }
 
-  const relativeDeployedPath = path.relative(process.cwd(), deployedPath);
   if (g_Arguments.generate) {
-    log(`${WARNING_MARK} Ignoring deployed-addresses file (${chalk.yellow(relativeDeployedPath)}) with --generate`);
+    for (const { path: siblingPath } of siblings) {
+      log(`${WARNING_MARK} Ignoring ${chalk.yellow(path.relative(process.cwd(), siblingPath))} with --generate`);
+    }
     return loadStateFromYaml(g_Arguments.configPath);
   }
 
-  const { document, labels } = loadStateWithDeployedAddresses(g_Arguments.configPath, deployedPath);
-  log(`Loaded ${labels.length} deployed address(es) from ${chalk.yellow(relativeDeployedPath)}`);
+  const { document, labels } = loadStateWithSiblings(
+    g_Arguments.configPath,
+    siblings.map(({ path: siblingPath, spec }) => ({ path: siblingPath, spec })),
+  );
+  for (const [index, { path: siblingPath, describe }] of siblings.entries()) {
+    log(`Loaded ${describe(labels[index].length)} from ${chalk.yellow(path.relative(process.cwd(), siblingPath))}`);
+  }
   return document;
 }
 
@@ -259,7 +277,7 @@ async function main() {
     renameAllAbiToLowerCase();
   }
 
-  const jsonDocument = loadStateWithOptionalDeployed();
+  const jsonDocument = loadStateWithOptionalSiblings();
 
   if (g_Arguments.generate) {
     if (validateJsonWithSchema(jsonDocument, EntireDocumentTB, { silent: true })) {
