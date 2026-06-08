@@ -644,8 +644,6 @@ l1:
         subvaultFactory: *subvaultFactory
         subvaults: 2
         supportedRoleAt:
-          - args: [14]
-            result: *SET_SECURITY_PARAMS_ROLE
           - args: [13]
             result: *ACCEPT_REPORT_ROLE
           - args: [12]
@@ -674,7 +672,7 @@ l1:
             result: *SET_VAULT_LIMIT_ROLE
           - args: [0]
             result: *DEFAULT_ADMIN_ROLE
-        supportedRoles: 15
+        supportedRoles: 14
         supportsInterface:
         verifierFactory: *verifierFactory
       implementationChecks:
@@ -736,10 +734,10 @@ l1:
         *PUSH_LIQUIDITY_ROLE : [*curator]
         *SET_FLAGS_ROLE : [*timelockController]
         *SET_MERKLE_ROOT_ROLE : [*timelockController, *lazyVaultAdmin]
-        *SET_QUEUE_STATUS_ROLE : [*timelockController]
+        *SET_QUEUE_STATUS_ROLE : [*timelockController, *lazyVaultAdmin]
         *SUBMIT_REPORTS_ROLE : [*oracleSubmitter]
         *ACCEPT_REPORT_ROLE : [*oracleSubmitter]
-        *SET_SECURITY_PARAMS_ROLE : [*lazyVaultAdmin]
+        *SET_SECURITY_PARAMS_ROLE : []
 
     depositQueueETH:
       name: DepositQueue
