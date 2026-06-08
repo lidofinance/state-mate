@@ -1,7 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
 
-import chalk from "chalk";
 import * as YAML from "yaml";
 
 import { printError, YAML_PARSE_OPTIONS, yamlBigintReviver } from "./common";
@@ -49,11 +48,12 @@ function isExistingFile(filePath: string): boolean {
 export function resolveDeployedFilePath(configPath: string, deployedArgument?: string): string | null {
   if (deployedArgument) {
     const resolved = path.resolve(deployedArgument);
-    if (!fs.existsSync(resolved)) {
-      throw new Error(`The --deployed file was not found: ${deployedArgument}`);
-    }
     if (!isExistingFile(resolved)) {
-      throw new Error(`The --deployed path is not a file: ${deployedArgument}`);
+      throw new Error(
+        fs.existsSync(resolved)
+          ? `The --deployed path is not a file: ${deployedArgument}`
+          : `The --deployed file was not found: ${deployedArgument}`,
+      );
     }
     return resolved;
   }
@@ -110,7 +110,7 @@ function stripDocumentMarkers(text: string): string {
   const isInsignificant = (line: string) => line.trim() === "" || line.trim().startsWith("#");
 
   const firstSignificant = lines.findIndex((line) => !isInsignificant(line));
-  if (firstSignificant !== -1 && lines[firstSignificant].trim() === "---") {
+  if (firstSignificant !== -1 && /^---(\s|$)/.test(lines[firstSignificant].trim())) {
     lines.splice(firstSignificant, 1);
   }
 
@@ -121,7 +121,7 @@ function stripDocumentMarkers(text: string): string {
       break;
     }
   }
-  if (lastSignificant !== -1 && lines[lastSignificant].trim() === "...") {
+  if (lastSignificant !== -1 && /^\.\.\.(\s|$)/.test(lines[lastSignificant].trim())) {
     lines.splice(lastSignificant, 1);
   }
 
@@ -192,8 +192,7 @@ function inspectMainDocument(mainDocument: YAML.Document): {
   };
   YAML.visit(mainDocument, {
     Scalar: collectAnchor,
-    Map: collectAnchor,
-    Seq: collectAnchor,
+    Collection: collectAnchor,
     Alias: (_key, node) => {
       aliases.add(node.source);
     },
@@ -257,11 +256,17 @@ export function composeWithDeployedAddresses(mainText: string, deployedText: str
 
 /** Read both files and compose them, converting any failure into a fatal, formatted exit. */
 export function loadStateWithDeployedAddresses(configPath: string, deployedPath: string): DeployedComposeResult {
+  let mainText: string;
+  let deployedText: string;
   try {
-    const mainText = fs.readFileSync(path.resolve(configPath), "utf8");
-    const deployedText = fs.readFileSync(path.resolve(deployedPath), "utf8");
+    mainText = fs.readFileSync(path.resolve(configPath), "utf8");
+    deployedText = fs.readFileSync(path.resolve(deployedPath), "utf8");
+  } catch (error) {
+    return logErrorAndExit(`Failed to read config files:\n${printError(error)}`);
+  }
+  try {
     return composeWithDeployedAddresses(mainText, deployedText);
   } catch (error) {
-    logErrorAndExit(`Failed to load deployed addresses from ${chalk.magenta(deployedPath)}:\n${printError(error)}`);
+    return logErrorAndExit(printError(error));
   }
 }

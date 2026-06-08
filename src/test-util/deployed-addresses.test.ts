@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
+import { test } from "node:test";
 
 import {
   composeWithDeployedAddresses,
@@ -9,13 +10,6 @@ import {
   isDeployedFileName,
   resolveDeployedFilePath,
 } from "../deployed-addresses";
-
-type TestCase = { name: string; run: () => void };
-
-const tests: TestCase[] = [];
-function test(name: string, run: () => void) {
-  tests.push({ name, run });
-}
 
 // Full-delegation model: the main config holds ONLY wiring (`*label` aliases) plus its own constant
 // anchors (e.g. `&ZERO` in `misc:`). It has no `deployed:` section. The .deployed file is the sole
@@ -158,6 +152,13 @@ test("a leading --- document marker in the main config is handled (still compose
   assert.equal(document_.l1.contracts.fooContract.address, "0x1111111111111111111111111111111111111111");
 });
 
+test("a leading '--- # comment' document marker in the main config is handled (still composes)", () => {
+  const main = `--- # lido mainnet\n${MAIN_CONFIG}`;
+  const { document } = composeWithDeployedAddresses(main, DEPLOYED);
+  const document_ = document as { l1: { contracts: { fooContract: { address: string } } } };
+  assert.equal(document_.l1.contracts.fooContract.address, "0x1111111111111111111111111111111111111111");
+});
+
 test("H3: a mid-file document marker in .deployed is rejected with a file-targeted error", () => {
   const deployed = `${DEPLOYED}---\nmore: stuff\n`;
   assert.throws(
@@ -168,6 +169,12 @@ test("H3: a mid-file document marker in .deployed is rejected with a file-target
 
 test("H3: a trailing ... document-end marker in .deployed still composes", () => {
   const { document } = composeWithDeployedAddresses(MAIN_CONFIG, `${DEPLOYED}...\n`);
+  const document_ = document as { l1: { contracts: { fooContract: { address: string } } } };
+  assert.equal(document_.l1.contracts.fooContract.address, "0x1111111111111111111111111111111111111111");
+});
+
+test("H3: a trailing '... # comment' document-end marker in .deployed still composes", () => {
+  const { document } = composeWithDeployedAddresses(MAIN_CONFIG, `${DEPLOYED}... # end\n`);
   const document_ = document as { l1: { contracts: { fooContract: { address: string } } } };
   assert.equal(document_.l1.contracts.fooContract.address, "0x1111111111111111111111111111111111111111");
 });
@@ -241,19 +248,3 @@ test("resolveDeployedFilePath: flag wins, convention discovers, missing flag thr
     fs.rmSync(directory, { recursive: true, force: true });
   }
 });
-
-let failures = 0;
-for (const { name, run } of tests) {
-  try {
-    run();
-    console.log(`  ok  ${name}`);
-  } catch (error) {
-    failures += 1;
-    console.error(`FAIL  ${name}`);
-    console.error(error);
-  }
-}
-console.log(`\n${tests.length - failures}/${tests.length} passed`);
-if (failures > 0) {
-  process.exit(1);
-}
