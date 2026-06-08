@@ -2032,8 +2032,8 @@ l1:
         *SM_CALLER_ROLE : [*mellowCurator]
         *ROUTER_ROLE : [*swapModuleRouter]
         *SET_SLIPPAGE_ROLE : []
-        *TOKEN_IN_ROLE : [*USDC, *USDT, *sUSDe, *PYUSD, *GHO, *syrupUSDC, *AURA, *BAL, *MORPHO]
-        *TOKEN_OUT_ROLE : [*USDC, *USDT, *sUSDe, *PYUSD, *GHO, *syrupUSDC, *AURA, *BAL, *MORPHO]
+        *TOKEN_IN_ROLE : [*USDC, *USDT, *sUSDe, *PYUSD, *GHO, *syrupUSDC, *AURA, *BAL, *MORPHO, *syrupUSDT]
+        *TOKEN_OUT_ROLE : [*USDC, *USDT, *sUSDe, *PYUSD, *GHO, *syrupUSDC, *AURA, *BAL, *MORPHO, *syrupUSDT]
 
     earnUSDc_timelockController:
       name: TimelockController
