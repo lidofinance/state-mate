@@ -18,6 +18,7 @@ Validate EVM smart-contract state against YAML configs. state-mate calls view fu
 | Unknown return values                                  | [REPLACEME discovery](#replaceme-discovery)                        |
 | Overloaded function (two ABI fragments with same name) | [Function overloads](#function-overloads)                          |
 | Seed config (`--generate`)                             | [Seed configs](#seed-configs)                                      |
+| Swap addresses without touching wiring                 | [Separate deployed addresses](#separate-deployed-addresses)        |
 | ABI not found / rate-limit / revert reading            | [Troubleshooting](#troubleshooting)                                |
 
 ## Top-level structure
@@ -355,6 +356,57 @@ yarn start configs/proto/mainnet.seed.yml --generate --update-abi-missing
 # Review *.seed.generated.yml, replace REPLACEME with real expectations, then:
 yarn start configs/proto/mainnet.seed.generated.yml
 ```
+
+## Separate deployed addresses
+
+Keep the **wiring** in the main config and point it at a fresh redeployment (test fork, another
+network) by moving the **addresses** into a separate `<name>.deployed.<ext>` file. This is _full
+delegation_: when a `.deployed` file is used, the main config holds **only the wiring** (`*label`
+aliases) and **no `deployed:` section**; the `.deployed` file holds only `deployed:` and is the
+sole source of the address anchors.
+
+```yaml
+# lido.yaml — wiring only, no deployed: section
+l1:
+  contracts:
+    lido:
+      address: *lido # anchor defined in the .deployed file
+      checks:
+        wstETH: *wstETH
+```
+
+```yaml
+# lido.hoodi.deployed.yaml — only the deployed: address book, one &label per address
+deployed:
+  l1:
+    - &lido "0x3F1c547b21f65e10480dE3 ..."
+    - &wstETH "0x47B594e9a3F87f6D60f33 ..."
+```
+
+```bash
+yarn start configs/lido/lido.yaml                                  # auto-loads lido.deployed.yaml if present
+yarn start configs/lido/lido.yaml --deployed configs/lido/lido.hoodi.deployed.yaml
+```
+
+The two files are concatenated (addresses first) and parsed as one YAML document, so `*label`
+aliases resolve to the `&label` anchors natively. Four invariants are enforced — each a hard error:
+
+- **every address has an `&label`** — a bare address in `.deployed` is rejected;
+- **every label is referenced** by a `*alias` in the main config — unused labels are rejected;
+- **the main config has no `deployed:` section** — move all addresses to the `.deployed` file;
+- **no duplicate labels** within `.deployed`, and none colliding with a main-config anchor.
+
+Notes:
+
+- The sibling `<name>.deployed.<ext>` is auto-loaded when it exists; `--deployed <path>` selects a
+  specific variant and overrides the convention.
+- The `.deployed` file may contain **only** a `deployed:` section, must be a **single YAML document**
+  (no mid-file `---`/`...`), and every value must be a valid `0x` address/hash. RPC/explorer settings
+  stay in the main config (they are not deployment addresses).
+- Ignored together with `--generate` (which operates on a seed document). Existing single-file
+  configs (inline `deployed:`, no sibling) are unaffected.
+- Complementary to [seed configs](#seed-configs): a seed **bootstraps** a full config from an
+  address book; a `.deployed` file **swaps** the addresses of an existing wiring-only config.
 
 ## Workflow
 

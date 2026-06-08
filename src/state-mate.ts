@@ -19,7 +19,8 @@ import {
 } from "./abi-provider";
 import { doGenerateBoilerplate } from "./boilerplate-generator";
 import { parseCmdLineArguments } from "./cli-parser";
-import { printError, readUrlOrFromEnvironment } from "./common";
+import { printError, readUrlOrFromEnvironment, YAML_PARSE_OPTIONS, yamlBigintReviver } from "./common";
+import { loadStateWithDeployedAddresses, resolveDeployedFilePath } from "./deployed-addresses";
 import { loadContractInfoFromExplorer } from "./explorer-provider";
 import { FAILURE_MARK, log, logError, logErrorAndExit, logHeader1, SUCCESS_MARK, WARNING_MARK } from "./logger";
 import { g_error_details, g_errors, g_total_checks } from "./section-validators/base";
@@ -62,17 +63,40 @@ function formatAjvErrors(errors: ValidateFunction["errors"]) {
 }
 
 function loadStateFromYaml(configPath: string): unknown {
-  const reviver = (_: unknown, v: unknown) => {
-    return typeof v === "bigint" ? String(v) : v;
-  };
   const file = path.resolve(configPath);
   try {
     const configContent = fs.readFileSync(file, "utf8");
 
-    return YAML.parse(configContent, reviver, { schema: "core", intAsBigInt: true });
+    return YAML.parse(configContent, yamlBigintReviver, YAML_PARSE_OPTIONS);
   } catch (error) {
     logErrorAndExit(`Failed to convert the YAML file ${chalk.magenta(configPath)} to JSON:\n${printError(error)}`);
   }
+}
+
+// Load the main config, composing it with a separate `.deployed` addresses file when one is
+// selected (an explicit `--deployed` path or, by convention, the `<name>.deployed.<ext>` sibling).
+// A `.deployed` file is incompatible with `--generate`, which operates on a seed document.
+function loadStateWithOptionalDeployed(): unknown {
+  let deployedPath: string | null = null;
+  try {
+    deployedPath = resolveDeployedFilePath(g_Arguments.configPath, g_Arguments.deployed);
+  } catch (error) {
+    logErrorAndExit(printError(error));
+  }
+
+  if (!deployedPath) {
+    return loadStateFromYaml(g_Arguments.configPath);
+  }
+
+  const relativeDeployedPath = path.relative(process.cwd(), deployedPath);
+  if (g_Arguments.generate) {
+    log(`${WARNING_MARK} Ignoring deployed-addresses file (${chalk.yellow(relativeDeployedPath)}) with --generate`);
+    return loadStateFromYaml(g_Arguments.configPath);
+  }
+
+  const { document, labels } = loadStateWithDeployedAddresses(g_Arguments.configPath, deployedPath);
+  log(`Loaded ${labels.length} deployed address(es) from ${chalk.yellow(relativeDeployedPath)}`);
+  return document;
 }
 
 function validateJsonWithSchema<T extends TSchema>(
@@ -235,7 +259,7 @@ async function main() {
     renameAllAbiToLowerCase();
   }
 
-  const jsonDocument = loadStateFromYaml(g_Arguments.configPath);
+  const jsonDocument = loadStateWithOptionalDeployed();
 
   if (g_Arguments.generate) {
     if (validateJsonWithSchema(jsonDocument, EntireDocumentTB, { silent: true })) {
