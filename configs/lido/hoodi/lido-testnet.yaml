@@ -2306,7 +2306,7 @@ l1:
         PIVOT_SLOT: 0
         SLOTS_PER_EPOCH: *SLOTS_PER_EPOCH
         TOP_UP_ROLE: *TUG_TOP_UP_ROLE
-        getLastTopUpTimestamp: 0
+        getLastTopUpTimestamp:
         getMaxRootAge: 600
         getMaxValidatorsPerTopUp: 32
         getMinBlockDistance: 1
