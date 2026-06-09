@@ -57,13 +57,8 @@
     "ajv-formats": "^3.0.1",
     "chai": "^4.4.1",
     "chalk": "^4.1.2",
-<<<<<<< HEAD
     "commander": "^15.0.0",
-    "dotenv": "^16.4.5",
-=======
-    "commander": "^12.1.0",
     "dotenv": "^17.4.2",
->>>>>>> 859c2b7 (chore(deps): bump dotenv from 16.4.7 to 17.4.2)
     "ethers": "^6.16.0",
     "json-diff": "^1.0.6",
     "tsconfig-paths": "^4.2.0",
