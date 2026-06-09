@@ -490,10 +490,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sinclair/typebox@npm:^0.34.13":
-  version: 0.34.13
-  resolution: "@sinclair/typebox@npm:0.34.13"
-  checksum: 10c0/3095d62d697f332d2b2f6b75ea05ee7e0b3e97666c82aea6ea95798b79087509ddcece3bb39126d560fa3eb978c418275df8c01a086ba6cc20b0a31cfd5a49b8
+"@sinclair/typebox@npm:^0.34.49":
+  version: 0.34.49
+  resolution: "@sinclair/typebox@npm:0.34.49"
+  checksum: 10c0/16b7d87f039a49b68c10bb4cdcae2ce5242b2472228851fd6483731616aba4ef977690aa517b230a8d20da8185bb416eb34e326f30568b3963c1cf26b05d1ad8
   languageName: node
   linkType: hard
 
@@ -3961,7 +3961,7 @@ __metadata:
     "@eslint/compat": "npm:^1.1.0"
     "@eslint/eslintrc": "npm:^3.1.0"
     "@eslint/js": "npm:^9.5.0"
-    "@sinclair/typebox": "npm:^0.34.13"
+    "@sinclair/typebox": "npm:^0.34.49"
     "@tsconfig/node20": "npm:^20.1.9"
     "@types/chai": "npm:^4.3.16"
     "@types/json-diff": "npm:^1.0.3"

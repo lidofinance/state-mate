@@ -1,6 +1,10 @@
 {
   "additionalProperties": false,
   "type": "object",
+  "required": [
+    "deployed",
+    "l1"
+  ],
   "properties": {
     "parameters": {
       "type": "array",
@@ -120,6 +124,9 @@
     "deployed": {
       "additionalProperties": false,
       "type": "object",
+      "required": [
+        "l1"
+      ],
       "properties": {
         "l1": {
           "type": "array",
@@ -137,10 +144,7 @@
             "type": "string"
           }
         }
-      },
-      "required": [
-        "l1"
-      ]
+      }
     },
     "deployed-aux": {
       "type": "array",
@@ -153,6 +157,10 @@
     "l1": {
       "additionalProperties": false,
       "type": "object",
+      "required": [
+        "rpcUrl",
+        "contracts"
+      ],
       "properties": {
         "rpcUrl": {
           "type": "string"
@@ -181,6 +189,11 @@
                 {
                   "additionalProperties": false,
                   "type": "object",
+                  "required": [
+                    "address",
+                    "name",
+                    "checks"
+                  ],
                   "properties": {
                     "address": {
                       "format": "ethereum-string",
@@ -200,6 +213,9 @@
                                 {
                                   "additionalProperties": false,
                                   "type": "object",
+                                  "required": [
+                                    "result"
+                                  ],
                                   "properties": {
                                     "args": {
                                       "type": "array",
@@ -340,14 +356,14 @@
                                         }
                                       ]
                                     }
-                                  },
-                                  "required": [
-                                    "result"
-                                  ]
+                                  }
                                 },
                                 {
                                   "additionalProperties": false,
                                   "type": "object",
+                                  "required": [
+                                    "mustRevert"
+                                  ],
                                   "properties": {
                                     "args": {
                                       "type": "array",
@@ -405,10 +421,7 @@
                                       "const": true,
                                       "type": "boolean"
                                     }
-                                  },
-                                  "required": [
-                                    "mustRevert"
-                                  ]
+                                  }
                                 }
                               ]
                             },
@@ -552,6 +565,9 @@
                                   {
                                     "additionalProperties": false,
                                     "type": "object",
+                                    "required": [
+                                      "result"
+                                    ],
                                     "properties": {
                                       "args": {
                                         "type": "array",
@@ -692,14 +708,14 @@
                                           }
                                         ]
                                       }
-                                    },
-                                    "required": [
-                                      "result"
-                                    ]
+                                    }
                                   },
                                   {
                                     "additionalProperties": false,
                                     "type": "object",
+                                    "required": [
+                                      "mustRevert"
+                                    ],
                                     "properties": {
                                       "args": {
                                         "type": "array",
@@ -757,10 +773,7 @@
                                         "const": true,
                                         "type": "boolean"
                                       }
-                                    },
-                                    "required": [
-                                      "mustRevert"
-                                    ]
+                                    }
                                   }
                                 ]
                               }
@@ -774,6 +787,10 @@
                       "items": {
                         "additionalProperties": false,
                         "type": "object",
+                        "required": [
+                          "slot",
+                          "expected"
+                        ],
                         "properties": {
                           "slot": {
                             "format": "ethereum-string",
@@ -788,11 +805,7 @@
                           "label": {
                             "type": "string"
                           }
-                        },
-                        "required": [
-                          "slot",
-                          "expected"
-                        ]
+                        }
                       }
                     },
                     "ozNonEnumerableAcl": {
@@ -822,16 +835,17 @@
                         }
                       }
                     }
-                  },
-                  "required": [
-                    "address",
-                    "name",
-                    "checks"
-                  ]
+                  }
                 },
                 {
                   "additionalProperties": false,
                   "type": "object",
+                  "required": [
+                    "address",
+                    "name",
+                    "checks",
+                    "proxyName"
+                  ],
                   "properties": {
                     "address": {
                       "format": "ethereum-string",
@@ -851,6 +865,9 @@
                                 {
                                   "additionalProperties": false,
                                   "type": "object",
+                                  "required": [
+                                    "result"
+                                  ],
                                   "properties": {
                                     "args": {
                                       "type": "array",
@@ -991,14 +1008,14 @@
                                         }
                                       ]
                                     }
-                                  },
-                                  "required": [
-                                    "result"
-                                  ]
+                                  }
                                 },
                                 {
                                   "additionalProperties": false,
                                   "type": "object",
+                                  "required": [
+                                    "mustRevert"
+                                  ],
                                   "properties": {
                                     "args": {
                                       "type": "array",
@@ -1056,10 +1073,7 @@
                                       "const": true,
                                       "type": "boolean"
                                     }
-                                  },
-                                  "required": [
-                                    "mustRevert"
-                                  ]
+                                  }
                                 }
                               ]
                             },
@@ -1203,6 +1217,9 @@
                                   {
                                     "additionalProperties": false,
                                     "type": "object",
+                                    "required": [
+                                      "result"
+                                    ],
                                     "properties": {
                                       "args": {
                                         "type": "array",
@@ -1343,14 +1360,14 @@
                                           }
                                         ]
                                       }
-                                    },
-                                    "required": [
-                                      "result"
-                                    ]
+                                    }
                                   },
                                   {
                                     "additionalProperties": false,
                                     "type": "object",
+                                    "required": [
+                                      "mustRevert"
+                                    ],
                                     "properties": {
                                       "args": {
                                         "type": "array",
@@ -1408,10 +1425,7 @@
                                         "const": true,
                                         "type": "boolean"
                                       }
-                                    },
-                                    "required": [
-                                      "mustRevert"
-                                    ]
+                                    }
                                   }
                                 ]
                               }
@@ -1425,6 +1439,10 @@
                       "items": {
                         "additionalProperties": false,
                         "type": "object",
+                        "required": [
+                          "slot",
+                          "expected"
+                        ],
                         "properties": {
                           "slot": {
                             "format": "ethereum-string",
@@ -1439,11 +1457,7 @@
                           "label": {
                             "type": "string"
                           }
-                        },
-                        "required": [
-                          "slot",
-                          "expected"
-                        ]
+                        }
                       }
                     },
                     "ozNonEnumerableAcl": {
@@ -1580,6 +1594,13 @@
                         {
                           "additionalProperties": false,
                           "type": "object",
+                          "required": [
+                            "proxyType",
+                            "isDepositable",
+                            "implementation",
+                            "appId",
+                            "kernel"
+                          ],
                           "properties": {
                             "proxyType": {
                               "anyOf": [
@@ -1650,18 +1671,18 @@
                                 }
                               ]
                             }
-                          },
-                          "required": [
-                            "proxyType",
-                            "isDepositable",
-                            "implementation",
-                            "appId",
-                            "kernel"
-                          ]
+                          }
                         },
                         {
                           "additionalProperties": false,
                           "type": "object",
+                          "required": [
+                            "proxyType",
+                            "apps",
+                            "isDepositable",
+                            "implementation",
+                            "recoveryVaultAppId"
+                          ],
                           "properties": {
                             "proxyType": {
                               "anyOf": [
@@ -1721,14 +1742,7 @@
                               "pattern": "^(0x[a-fA-F0-9]{40}|0x[a-fA-F0-9]{64}|.+)$",
                               "type": "string"
                             }
-                          },
-                          "required": [
-                            "proxyType",
-                            "apps",
-                            "isDepositable",
-                            "implementation",
-                            "recoveryVaultAppId"
-                          ]
+                          }
                         }
                       ]
                     },
@@ -1742,6 +1756,9 @@
                                 {
                                   "additionalProperties": false,
                                   "type": "object",
+                                  "required": [
+                                    "result"
+                                  ],
                                   "properties": {
                                     "args": {
                                       "type": "array",
@@ -1882,14 +1899,14 @@
                                         }
                                       ]
                                     }
-                                  },
-                                  "required": [
-                                    "result"
-                                  ]
+                                  }
                                 },
                                 {
                                   "additionalProperties": false,
                                   "type": "object",
+                                  "required": [
+                                    "mustRevert"
+                                  ],
                                   "properties": {
                                     "args": {
                                       "type": "array",
@@ -1947,10 +1964,7 @@
                                       "const": true,
                                       "type": "boolean"
                                     }
-                                  },
-                                  "required": [
-                                    "mustRevert"
-                                  ]
+                                  }
                                 }
                               ]
                             },
@@ -2094,6 +2108,9 @@
                                   {
                                     "additionalProperties": false,
                                     "type": "object",
+                                    "required": [
+                                      "result"
+                                    ],
                                     "properties": {
                                       "args": {
                                         "type": "array",
@@ -2234,14 +2251,14 @@
                                           }
                                         ]
                                       }
-                                    },
-                                    "required": [
-                                      "result"
-                                    ]
+                                    }
                                   },
                                   {
                                     "additionalProperties": false,
                                     "type": "object",
+                                    "required": [
+                                      "mustRevert"
+                                    ],
                                     "properties": {
                                       "args": {
                                         "type": "array",
@@ -2299,10 +2316,7 @@
                                         "const": true,
                                         "type": "boolean"
                                       }
-                                    },
-                                    "required": [
-                                      "mustRevert"
-                                    ]
+                                    }
                                   }
                                 ]
                               }
@@ -2311,27 +2325,21 @@
                         }
                       }
                     }
-                  },
-                  "required": [
-                    "address",
-                    "name",
-                    "checks",
-                    "proxyName"
-                  ]
+                  }
                 }
               ]
             }
           }
         }
-      },
-      "required": [
-        "rpcUrl",
-        "contracts"
-      ]
+      }
     },
     "l2": {
       "additionalProperties": false,
       "type": "object",
+      "required": [
+        "rpcUrl",
+        "contracts"
+      ],
       "properties": {
         "rpcUrl": {
           "type": "string"
@@ -2360,6 +2368,11 @@
                 {
                   "additionalProperties": false,
                   "type": "object",
+                  "required": [
+                    "address",
+                    "name",
+                    "checks"
+                  ],
                   "properties": {
                     "address": {
                       "format": "ethereum-string",
@@ -2379,6 +2392,9 @@
                                 {
                                   "additionalProperties": false,
                                   "type": "object",
+                                  "required": [
+                                    "result"
+                                  ],
                                   "properties": {
                                     "args": {
                                       "type": "array",
@@ -2519,14 +2535,14 @@
                                         }
                                       ]
                                     }
-                                  },
-                                  "required": [
-                                    "result"
-                                  ]
+                                  }
                                 },
                                 {
                                   "additionalProperties": false,
                                   "type": "object",
+                                  "required": [
+                                    "mustRevert"
+                                  ],
                                   "properties": {
                                     "args": {
                                       "type": "array",
@@ -2584,10 +2600,7 @@
                                       "const": true,
                                       "type": "boolean"
                                     }
-                                  },
-                                  "required": [
-                                    "mustRevert"
-                                  ]
+                                  }
                                 }
                               ]
                             },
@@ -2731,6 +2744,9 @@
                                   {
                                     "additionalProperties": false,
                                     "type": "object",
+                                    "required": [
+                                      "result"
+                                    ],
                                     "properties": {
                                       "args": {
                                         "type": "array",
@@ -2871,14 +2887,14 @@
                                           }
                                         ]
                                       }
-                                    },
-                                    "required": [
-                                      "result"
-                                    ]
+                                    }
                                   },
                                   {
                                     "additionalProperties": false,
                                     "type": "object",
+                                    "required": [
+                                      "mustRevert"
+                                    ],
                                     "properties": {
                                       "args": {
                                         "type": "array",
@@ -2936,10 +2952,7 @@
                                         "const": true,
                                         "type": "boolean"
                                       }
-                                    },
-                                    "required": [
-                                      "mustRevert"
-                                    ]
+                                    }
                                   }
                                 ]
                               }
@@ -2953,6 +2966,10 @@
                       "items": {
                         "additionalProperties": false,
                         "type": "object",
+                        "required": [
+                          "slot",
+                          "expected"
+                        ],
                         "properties": {
                           "slot": {
                             "format": "ethereum-string",
@@ -2967,11 +2984,7 @@
                           "label": {
                             "type": "string"
                           }
-                        },
-                        "required": [
-                          "slot",
-                          "expected"
-                        ]
+                        }
                       }
                     },
                     "ozNonEnumerableAcl": {
@@ -3001,16 +3014,17 @@
                         }
                       }
                     }
-                  },
-                  "required": [
-                    "address",
-                    "name",
-                    "checks"
-                  ]
+                  }
                 },
                 {
                   "additionalProperties": false,
                   "type": "object",
+                  "required": [
+                    "address",
+                    "name",
+                    "checks",
+                    "proxyName"
+                  ],
                   "properties": {
                     "address": {
                       "format": "ethereum-string",
@@ -3030,6 +3044,9 @@
                                 {
                                   "additionalProperties": false,
                                   "type": "object",
+                                  "required": [
+                                    "result"
+                                  ],
                                   "properties": {
                                     "args": {
                                       "type": "array",
@@ -3170,14 +3187,14 @@
                                         }
                                       ]
                                     }
-                                  },
-                                  "required": [
-                                    "result"
-                                  ]
+                                  }
                                 },
                                 {
                                   "additionalProperties": false,
                                   "type": "object",
+                                  "required": [
+                                    "mustRevert"
+                                  ],
                                   "properties": {
                                     "args": {
                                       "type": "array",
@@ -3235,10 +3252,7 @@
                                       "const": true,
                                       "type": "boolean"
                                     }
-                                  },
-                                  "required": [
-                                    "mustRevert"
-                                  ]
+                                  }
                                 }
                               ]
                             },
@@ -3382,6 +3396,9 @@
                                   {
                                     "additionalProperties": false,
                                     "type": "object",
+                                    "required": [
+                                      "result"
+                                    ],
                                     "properties": {
                                       "args": {
                                         "type": "array",
@@ -3522,14 +3539,14 @@
                                           }
                                         ]
                                       }
-                                    },
-                                    "required": [
-                                      "result"
-                                    ]
+                                    }
                                   },
                                   {
                                     "additionalProperties": false,
                                     "type": "object",
+                                    "required": [
+                                      "mustRevert"
+                                    ],
                                     "properties": {
                                       "args": {
                                         "type": "array",
@@ -3587,10 +3604,7 @@
                                         "const": true,
                                         "type": "boolean"
                                       }
-                                    },
-                                    "required": [
-                                      "mustRevert"
-                                    ]
+                                    }
                                   }
                                 ]
                               }
@@ -3604,6 +3618,10 @@
                       "items": {
                         "additionalProperties": false,
                         "type": "object",
+                        "required": [
+                          "slot",
+                          "expected"
+                        ],
                         "properties": {
                           "slot": {
                             "format": "ethereum-string",
@@ -3618,11 +3636,7 @@
                           "label": {
                             "type": "string"
                           }
-                        },
-                        "required": [
-                          "slot",
-                          "expected"
-                        ]
+                        }
                       }
                     },
                     "ozNonEnumerableAcl": {
@@ -3759,6 +3773,13 @@
                         {
                           "additionalProperties": false,
                           "type": "object",
+                          "required": [
+                            "proxyType",
+                            "isDepositable",
+                            "implementation",
+                            "appId",
+                            "kernel"
+                          ],
                           "properties": {
                             "proxyType": {
                               "anyOf": [
@@ -3829,18 +3850,18 @@
                                 }
                               ]
                             }
-                          },
-                          "required": [
-                            "proxyType",
-                            "isDepositable",
-                            "implementation",
-                            "appId",
-                            "kernel"
-                          ]
+                          }
                         },
                         {
                           "additionalProperties": false,
                           "type": "object",
+                          "required": [
+                            "proxyType",
+                            "apps",
+                            "isDepositable",
+                            "implementation",
+                            "recoveryVaultAppId"
+                          ],
                           "properties": {
                             "proxyType": {
                               "anyOf": [
@@ -3900,14 +3921,7 @@
                               "pattern": "^(0x[a-fA-F0-9]{40}|0x[a-fA-F0-9]{64}|.+)$",
                               "type": "string"
                             }
-                          },
-                          "required": [
-                            "proxyType",
-                            "apps",
-                            "isDepositable",
-                            "implementation",
-                            "recoveryVaultAppId"
-                          ]
+                          }
                         }
                       ]
                     },
@@ -3921,6 +3935,9 @@
                                 {
                                   "additionalProperties": false,
                                   "type": "object",
+                                  "required": [
+                                    "result"
+                                  ],
                                   "properties": {
                                     "args": {
                                       "type": "array",
@@ -4061,14 +4078,14 @@
                                         }
                                       ]
                                     }
-                                  },
-                                  "required": [
-                                    "result"
-                                  ]
+                                  }
                                 },
                                 {
                                   "additionalProperties": false,
                                   "type": "object",
+                                  "required": [
+                                    "mustRevert"
+                                  ],
                                   "properties": {
                                     "args": {
                                       "type": "array",
@@ -4126,10 +4143,7 @@
                                       "const": true,
                                       "type": "boolean"
                                     }
-                                  },
-                                  "required": [
-                                    "mustRevert"
-                                  ]
+                                  }
                                 }
                               ]
                             },
@@ -4273,6 +4287,9 @@
                                   {
                                     "additionalProperties": false,
                                     "type": "object",
+                                    "required": [
+                                      "result"
+                                    ],
                                     "properties": {
                                       "args": {
                                         "type": "array",
@@ -4413,14 +4430,14 @@
                                           }
                                         ]
                                       }
-                                    },
-                                    "required": [
-                                      "result"
-                                    ]
+                                    }
                                   },
                                   {
                                     "additionalProperties": false,
                                     "type": "object",
+                                    "required": [
+                                      "mustRevert"
+                                    ],
                                     "properties": {
                                       "args": {
                                         "type": "array",
@@ -4478,10 +4495,7 @@
                                         "const": true,
                                         "type": "boolean"
                                       }
-                                    },
-                                    "required": [
-                                      "mustRevert"
-                                    ]
+                                    }
                                   }
                                 ]
                               }
@@ -4490,23 +4504,13 @@
                         }
                       }
                     }
-                  },
-                  "required": [
-                    "address",
-                    "name",
-                    "checks",
-                    "proxyName"
-                  ]
+                  }
                 }
               ]
             }
           }
         }
-      },
-      "required": [
-        "rpcUrl",
-        "contracts"
-      ]
+      }
     },
     "tvl": {
       "type": "array",
@@ -4738,9 +4742,5 @@
         ]
       }
     }
-  },
-  "required": [
-    "deployed",
-    "l1"
-  ]
+  }
 }
