@@ -2,28 +2,22 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { includeIgnoreFile } from "@eslint/compat";
-import { FlatCompat } from "@eslint/eslintrc";
-import js from "@eslint/js";
+import tseslint from "@typescript-eslint/eslint-plugin";
 import tsParser from "@typescript-eslint/parser";
-import globals from "globals";
+import importPlugin from "eslint-plugin-import";
+import prettierRecommended from "eslint-plugin-prettier/recommended";
+import eslintPluginUnicorn from "eslint-plugin-unicorn";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const gitignorePath = path.resolve(__dirname, ".gitignore");
-const compat = new FlatCompat({
-  baseDirectory: __dirname,
-  recommendedConfig: js.configs.recommended,
-  allConfig: js.configs.all,
-});
 
 export default [
-  ...compat.extends(
-    "plugin:@typescript-eslint/recommended",
-    "plugin:prettier/recommended",
-    "plugin:import/recommended",
-    "plugin:import/typescript",
-    "plugin:unicorn/recommended",
-  ),
+  ...tseslint.configs["flat/recommended"],
+  prettierRecommended,
+  importPlugin.flatConfigs.recommended,
+  importPlugin.flatConfigs.typescript,
+  eslintPluginUnicorn.configs.recommended,
 
   includeIgnoreFile(gitignorePath),
   {
@@ -62,14 +56,6 @@ export default [
           },
         },
       ],
-    },
-  },
-  {
-    files: ["./scripts/{**/,}*.js", "./test/{**/,}*.js"],
-    languageOptions: {
-      globals: {
-        ...globals.mocha,
-      },
     },
   },
 ];
