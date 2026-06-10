@@ -6,7 +6,7 @@ import { test } from "node:test";
 
 import { composeWithDeployedAddresses, DEPLOYED_SPEC } from "../deployed-addresses";
 import { composeWithInputs, INPUTS_SPEC, resolveInputsFilePath } from "../inputs";
-import { composeWithSiblings } from "../sibling-delegation";
+import { composeWithSiblings, deriveSiblingPath, isSiblingFileName } from "../sibling-delegation";
 
 // Full-delegation model: the main config holds ONLY wiring (`*label` aliases) plus its own constant
 // anchors (e.g. `&ZERO` in `misc:`). It has no `config:`/`externals:` sections. The .inputs file is
@@ -103,6 +103,20 @@ test("externals: a null/empty value is rejected", () => {
   assert.throws(() => composeWithInputs(MAIN_CONFIG, inputs), /&depositContract is not a valid address/);
 });
 
+test("externals: a non-scalar (nested) entry is rejected", () => {
+  // Mirrors the `.deployed` non-scalar guard: an external must be a single labeled scalar, not a map.
+  const inputs = `
+config:
+  - &lidoName "Liquid staked Ether 2.0"
+  - &oracleReportLimits [3600, 1800, 1000, 50]
+externals:
+  - &depositContract
+      nested: "0x00000000219ab540356cBB839Cbe05303d7705Fa"
+  - &chainId 560048
+`;
+  assert.throws(() => composeWithInputs(MAIN_CONFIG, inputs), /must be a scalar address/);
+});
+
 test("invariant: an entry without an &label is rejected", () => {
   const inputs = `
 config:
@@ -169,6 +183,26 @@ roles:
   assert.throws(() => composeWithInputs(MAIN_CONFIG, inputs), /may only contain/);
 });
 
+test("the .inputs file must contain at least one of config:/externals:", () => {
+  // Parity with `.deployed` requiring its `deployed:` section: a section-less file is a mistake.
+  assert.throws(() => composeWithInputs(MAIN_CONFIG, "{}\n"), /must contain a `config:` and\/or `externals:`/);
+});
+
+test("a main alias defined neither in main nor .inputs is reported clearly", () => {
+  const main = `
+l1:
+  chainId: *chainId
+  contracts:
+    fooContract:
+      checks:
+        name: *lidoName
+        limits: *oracleReportLimits
+        deposit: *depositContract
+        missing: *nowhere
+`;
+  assert.throws(() => composeWithInputs(main, INPUTS), /neither in it nor in the .inputs file/);
+});
+
 test("a leading --- document marker in the .inputs file is handled (still composes)", () => {
   const { document } = composeWithInputs(MAIN_CONFIG, `---\n${INPUTS}`);
   const document_ = document as { l1: { contracts: { fooContract: { checks: { name: string } } } } };
@@ -220,6 +254,30 @@ test("resolveInputsFilePath: flag wins, convention discovers, missing flag throw
   } finally {
     fs.rmSync(directory, { recursive: true, force: true });
   }
+});
+
+test("H2: a directory passed as --inputs is rejected as not a file", () => {
+  const directory = fs.mkdtempSync(path.join(os.tmpdir(), "state-mate-inputs-"));
+  try {
+    const mainPath = path.join(directory, "lido.yaml");
+    const subdir = path.join(directory, "subdir");
+    fs.writeFileSync(mainPath, MAIN_CONFIG);
+    fs.mkdirSync(subdir);
+    assert.throws(() => resolveInputsFilePath(mainPath, subdir), /is not a file/);
+  } finally {
+    fs.rmSync(directory, { recursive: true, force: true });
+  }
+});
+
+test("deriveSiblingPath inserts the .inputs infix before the extension", () => {
+  assert.equal(deriveSiblingPath("/a/b/lido.yaml", INPUTS_SPEC.infix), path.join("/a/b", "lido.inputs.yaml"));
+  assert.equal(deriveSiblingPath("lido.yml", INPUTS_SPEC.infix), "lido.inputs.yml");
+});
+
+test("isSiblingFileName recognises .inputs files only", () => {
+  assert.equal(isSiblingFileName("lido.inputs.yaml", INPUTS_SPEC.infix), true);
+  assert.equal(isSiblingFileName("lido.yaml", INPUTS_SPEC.infix), false);
+  assert.equal(isSiblingFileName("lido.deployed.yaml", INPUTS_SPEC.infix), false);
 });
 
 test("multi-sibling: a .deployed and a .inputs file compose together", () => {

@@ -3,8 +3,6 @@ import * as YAML from "yaml";
 import {
   ADDRESS_OR_HASH_RE,
   composeWithSiblings,
-  deriveSiblingPath,
-  isSiblingFileName,
   pairKeyToString,
   resolveSiblingFilePath,
   SiblingSpec,
@@ -84,16 +82,6 @@ export const DEPLOYED_SPEC: SiblingSpec = {
     }
   },
 };
-
-/** Derive the conventional sibling path: `lido.yaml` -> `lido.deployed.yaml`. */
-export function deriveDeployedSiblingPath(configPath: string): string {
-  return deriveSiblingPath(configPath, DEPLOYED_INFIX);
-}
-
-/** True when the file is itself a `*.deployed.<ext>` file (so it must not be given its own sibling). */
-export function isDeployedFileName(filePath: string): boolean {
-  return isSiblingFileName(filePath, DEPLOYED_INFIX);
-}
 
 /**
  * Decide which deployed-addresses file to apply, or `null` for a standalone run.

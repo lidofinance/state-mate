@@ -36,13 +36,18 @@ function collectInputsLabels(document: YAML.Document): Set<string> {
     // eslint-disable-next-line unicorn/prefer-type-error -- user-facing config-validation error, not a programmer TypeError
     throw new Error("the .inputs file must be a mapping with `config:` and/or `externals:` section(s)");
   }
-  const extraKeys = document.contents.items
-    .map((pair) => pairKeyToString(pair.key))
-    .filter((key) => key && !isInputsSection(key));
+  const topLevelKeys = document.contents.items.map((pair) => pairKeyToString(pair.key)).filter(Boolean);
+  const extraKeys = topLevelKeys.filter((key) => !isInputsSection(key));
   if (extraKeys.length > 0) {
     throw new Error(
       `the .inputs file may only contain \`config:\` and/or \`externals:\` section(s), but also has: ${extraKeys.join(", ")}`,
     );
+  }
+  // Parity with `.deployed`, which requires its `deployed:` section to be present: a `.inputs` file
+  // is auto-loaded only when it exists, so a section-less one (e.g. an empty `{}` map) is a mistake,
+  // not a no-op — reject it instead of silently contributing zero anchors.
+  if (!topLevelKeys.some((key) => isInputsSection(key))) {
+    throw new Error("the .inputs file must contain a `config:` and/or `externals:` section");
   }
 
   const labels = new Set<string>();
@@ -57,7 +62,7 @@ function collectInputsLabels(document: YAML.Document): Set<string> {
     const requireAddress = sectionKey === "externals";
     for (const item of pair.value.items) {
       const scalar = YAML.isScalar(item) ? item : null;
-      const node = scalar ?? (YAML.isMap(item) || YAML.isSeq(item) ? item : null);
+      const node = scalar ?? (YAML.isCollection(item) ? item : null);
       if (requireAddress && !scalar) {
         throw new Error(`every entry under \`${sectionKey}\` must be a scalar address with an &label`);
       }

@@ -4,12 +4,8 @@ import os from "node:os";
 import path from "node:path";
 import { test } from "node:test";
 
-import {
-  composeWithDeployedAddresses,
-  deriveDeployedSiblingPath,
-  isDeployedFileName,
-  resolveDeployedFilePath,
-} from "../deployed-addresses";
+import { composeWithDeployedAddresses, DEPLOYED_SPEC, resolveDeployedFilePath } from "../deployed-addresses";
+import { deriveSiblingPath, isSiblingFileName } from "../sibling-delegation";
 
 // Full-delegation model: the main config holds ONLY wiring (`*label` aliases) plus its own constant
 // anchors (e.g. `&ZERO` in `misc:`). It has no `deployed:` section. The .deployed file is the sole
@@ -209,15 +205,15 @@ test("H2: a directory passed as --deployed is rejected as not a file", () => {
   }
 });
 
-test("deriveDeployedSiblingPath inserts the .deployed infix before the extension", () => {
-  assert.equal(deriveDeployedSiblingPath("/a/b/lido.yaml"), path.join("/a/b", "lido.deployed.yaml"));
-  assert.equal(deriveDeployedSiblingPath("lido.yml"), "lido.deployed.yml");
+test("deriveSiblingPath inserts the .deployed infix before the extension", () => {
+  assert.equal(deriveSiblingPath("/a/b/lido.yaml", DEPLOYED_SPEC.infix), path.join("/a/b", "lido.deployed.yaml"));
+  assert.equal(deriveSiblingPath("lido.yml", DEPLOYED_SPEC.infix), "lido.deployed.yml");
 });
 
-test("isDeployedFileName recognises .deployed files only", () => {
-  assert.equal(isDeployedFileName("lido.deployed.yaml"), true);
-  assert.equal(isDeployedFileName("lido.yaml"), false);
-  assert.equal(isDeployedFileName("lido.seed.yaml"), false);
+test("isSiblingFileName recognises .deployed files only", () => {
+  assert.equal(isSiblingFileName("lido.deployed.yaml", DEPLOYED_SPEC.infix), true);
+  assert.equal(isSiblingFileName("lido.yaml", DEPLOYED_SPEC.infix), false);
+  assert.equal(isSiblingFileName("lido.seed.yaml", DEPLOYED_SPEC.infix), false);
 });
 
 test("resolveDeployedFilePath: flag wins, convention discovers, missing flag throws", () => {
