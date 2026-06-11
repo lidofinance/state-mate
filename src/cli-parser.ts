@@ -21,6 +21,16 @@ export function parseCmdLineArguments() {
       `only checks to do, e.g. 'l2/proxyAdmin/${EntryField.checks}/owner', 'l1', 'l1/controller'`,
     )
     .option("--generate", "generate a populated config from the seed one")
+    .option(
+      "--deployed <path>",
+      "path to a '.deployed' YAML file that provides the address anchors for a wiring-only main config " +
+        "(defaults to the sibling '<name>.deployed.<ext>' if it exists)",
+    )
+    .option(
+      "--inputs <path>",
+      "path to a '.inputs' YAML file that provides the config/externals anchors for a wiring-only main " +
+        "config (defaults to the sibling '<name>.inputs.<ext>' if it exists)",
+    )
     .option("--update-abi", "download all ABIs replacing existing files")
     .option("--update-abi-missing", "download only missing ABIs (skip existing)")
     .parse();
@@ -49,6 +59,8 @@ export function parseCmdLineArguments() {
     checkOnly,
     checkOnlyCmdArg: options.only,
     generate: options.generate,
+    deployed: options.deployed as string | undefined,
+    inputs: options.inputs as string | undefined,
     updateAbi: options.updateAbi || options.updateAbiMissing,
     updateAbiMissingOnly: options.updateAbiMissing,
   };
