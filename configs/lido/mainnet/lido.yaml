@@ -101,14 +101,14 @@ deployed:
     - &CSEjector "0xc72b58aa02E0e98cF8A4a0E9Dce75e763800802C"
     - &CSFeeOracle "0x4D4074628678Bd302921c20573EEa1ed38DdF7FB"
     - &CSVerifier "0xdC5FE1782B6943f318E05230d688713a560063DC"
-    - &CSPermissionlessGate "0xcF33a38111d0B1246A3F38a838fb41D626B454f0" # CSM permissionless gate
+    - &CSPermissionlessGate "0xcF33a38111d0B1246A3F38a838fb41D626B454f0"
 
     # --- Easy Track ---
     - &easyTrack "0xF0211b7660680B49De1A7E9f25C65660F0a13Fea"
     - &evmScriptExecutor "0xFE5986E06210aC1eCC1aDCafc0cc7f8D63B3F977"
     - &callsScript "0x5cEb19e1890f677c3676d5ecDF7c501eBA01A054"
     - &vaultsAdapter "0x28F9Ac198C4E0FA6A9Ad2c2f97CB38F1A3120f27"
-    - &lolAllowedRecipientsRegistry "0x48c4929630099b217136b64089E8543dB0E5163a" # LOL (Liquidity Observation Lab) stETH
+    - &lolAllowedRecipientsRegistry "0x48c4929630099b217136b64089E8543dB0E5163a"
 
     # --- Committees (Safe msigs) ---
     - &resealManager "0x7914b5a1539b97Bd0bbd155757F25FD79A522d24"
