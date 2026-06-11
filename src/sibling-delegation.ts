@@ -15,10 +15,10 @@ export const ADDRESS_OR_HASH_RE = /^0x[a-fA-F0-9]{40}$|^0x[a-fA-F0-9]{64}$/;
 /**
  * Describes one kind of sibling "delegation" file (e.g. `.deployed`, `.inputs`). The generic engine
  * handles path resolution, document-marker stripping, the concat-then-parse composition, and the
- * cross-file invariants; each spec supplies the bits that differ: the filename infix, the human and
- * CLI labels, which top-level sections it owns (and which the main config must therefore NOT hold),
- * how to validate its own structure/values and collect its `&label` anchors, and how to report a
- * main config that still carries an owned section.
+ * cross-file invariants — including that the sibling holds only its owned sections and the main
+ * config none of them; each spec supplies the bits that differ: the filename infix, the human and
+ * CLI labels, which top-level sections it owns, and how to validate its own per-entry structure/
+ * values and collect its `&label` anchors.
  */
 export type SiblingSpec = {
   /** Filename infix inserted before the extension, e.g. `.deployed` -> `lido.deployed.yaml`. */
@@ -27,12 +27,10 @@ export type SiblingSpec = {
   optionName: string;
   /** Human-facing label for this file, e.g. `the .deployed file` (used in error messages). */
   fileLabel: string;
-  /** Top-level section keys this sibling owns; the main config must contain none of them. */
+  /** Top-level section keys this sibling owns; it holds only these, the main config none of them. */
   ownedSectionKeys: string[];
-  /** Validate the sibling document and return its `&label` anchors. Throws on any violation. */
+  /** Validate the sibling's sections/values and return its entry `&label` anchors. Throws on any violation. */
   collectLabels: (document: YAML.Document) => Set<string>;
-  /** Throw if the main config still contains any of this sibling's owned sections. */
-  assertMainClean: (presentTopLevelKeys: Set<string>) => void;
 };
 
 export type ComposeResult = {
@@ -99,8 +97,9 @@ function assertNoParseErrors(document: YAML.Document, label: string) {
 
 /**
  * Parse `text` as a single YAML document, with a file-targeted error if it is empty or multi-document.
- * Does NOT assert the absence of parse errors — the main config legitimately has unresolved aliases
- * (its anchors live in the sibling file); callers assert where appropriate.
+ * Does NOT assert the absence of parse errors itself; callers do. (Note that an unresolved alias is
+ * NOT a parse error — the yaml library only resolves aliases at `toJS` time — so the wiring-only main
+ * config parses cleanly on its own and any error found IS a genuine syntax error.)
  */
 function parseSingleDocument(text: string, label: string): YAML.Document {
   const documents = YAML.parseAllDocuments(text, YAML_PARSE_OPTIONS);
@@ -137,8 +136,18 @@ function stripDocumentMarkers(text: string): string {
   const isInsignificant = (line: string) => line.trim() === "" || line.trim().startsWith("#");
 
   const firstSignificant = lines.findIndex((line) => !isInsignificant(line));
-  if (firstSignificant !== -1 && /^---(\s|$)/.test(lines[firstSignificant].trim())) {
-    lines.splice(firstSignificant, 1);
+  if (firstSignificant !== -1) {
+    const trimmed = lines[firstSignificant].trim();
+    if (/^---(\s|$)/.test(trimmed)) {
+      // `--- {flow: doc}` carries document content on the marker line — keep it; drop marker-only
+      // (or marker-plus-comment) lines entirely.
+      const rest = trimmed.slice("---".length).trim();
+      if (rest === "" || rest.startsWith("#")) {
+        lines.splice(firstSignificant, 1);
+      } else {
+        lines[firstSignificant] = rest;
+      }
+    }
   }
 
   let lastSignificant = -1;
@@ -153,6 +162,46 @@ function stripDocumentMarkers(text: string): string {
   }
 
   return lines.join("\n");
+}
+
+/** Reject a sibling document that is not a mapping of exactly the spec's owned sections. */
+function assertOnlyOwnedSections(document: YAML.Document, spec: SiblingSpec) {
+  const sections = spec.ownedSectionKeys.map((key) => `\`${key}:\``).join(" and/or ");
+  if (!YAML.isMap(document.contents)) {
+    // eslint-disable-next-line unicorn/prefer-type-error -- user-facing config-validation error, not a programmer TypeError
+    throw new Error(`${spec.fileLabel} must be a mapping with ${sections} section(s)`);
+  }
+  const keys = document.contents.items.map((pair) => pairKeyToString(pair.key, "<non-scalar key>"));
+  const extraKeys = keys.filter((key) => !spec.ownedSectionKeys.includes(key));
+  if (extraKeys.length > 0) {
+    throw new Error(`${spec.fileLabel} may only contain ${sections} section(s), but also has: ${extraKeys.join(", ")}`);
+  }
+  // A sibling is auto-loaded only when it exists, so a section-less one (e.g. an empty `{}` map) is a
+  // mistake, not a no-op — reject it instead of silently contributing zero anchors.
+  if (keys.length === 0) {
+    throw new Error(`${spec.fileLabel} must contain ${sections} section(s)`);
+  }
+}
+
+/**
+ * Reject anchors a sibling file defines beyond its entry `&label`s. A nested anchor inside an entry's
+ * collection value (e.g. `- &limits [3600, &lido 99]`) is invisible to the per-entry label collection,
+ * so it would bypass the duplicate/collision invariants and silently shadow a same-named label from
+ * another file once the texts are concatenated.
+ */
+function assertNoStrayAnchors(document: YAML.Document, labels: Set<string>, fileLabel: string) {
+  const anchors: string[] = [];
+  const collectAnchor = (_key: unknown, node: YAML.Scalar | YAML.YAMLMap | YAML.YAMLSeq) => {
+    if (node.anchor) anchors.push(node.anchor);
+  };
+  YAML.visit(document, { Scalar: collectAnchor, Collection: collectAnchor });
+  const stray = anchors.filter((anchor, index) => !labels.has(anchor) || anchors.indexOf(anchor) !== index);
+  if (stray.length > 0) {
+    throw new Error(
+      `anchor(s) in ${fileLabel} defined outside the labeled entries: ` +
+        `${[...new Set(stray)].map((anchor) => `&${anchor}`).join(", ")}`,
+    );
+  }
 }
 
 /** Collect the anchors a document defines, the aliases it references, and its top-level section keys. */
@@ -191,25 +240,38 @@ function inspectMainDocument(mainDocument: YAML.Document): {
  * Each sibling file holds only its own section(s), with one `&label` per delegated value. Because
  * YAML anchors can't be resolved across files, the texts are concatenated (sibling anchors first) and
  * parsed as a single document so every alias resolves natively. Before composing, the invariants are
- * enforced per sibling (every value labeled and valid; every label referenced by the main config; no
- * duplicate label) and across files (the main config has none of the delegated sections; no label
- * collides with a main anchor or with another sibling's label; every main alias resolves).
+ * enforced per sibling (only owned sections; every value labeled and valid; no anchors beyond the
+ * entry labels; every label referenced by the main config; no duplicate label) and across files (the
+ * main config has none of the delegated sections; no label collides with a main anchor or with
+ * another sibling's label; every main alias resolves).
  */
 export function composeWithSiblings(mainText: string, siblings: { text: string; spec: SiblingSpec }[]): ComposeResult {
   const collected = siblings.map(({ text, spec }) => {
     const document = parseSingleDocument(text, spec.fileLabel);
     assertNoParseErrors(document, spec.fileLabel);
-    return { spec, labels: spec.collectLabels(document) };
+    assertOnlyOwnedSections(document, spec);
+    const labels = spec.collectLabels(document);
+    assertNoStrayAnchors(document, labels, spec.fileLabel);
+    return { spec, labels };
   });
 
-  // The main config is parsed only for inspection here; on its own it has unresolved aliases (its
-  // anchors live in the sibling file(s)). Real syntax errors are surfaced by the combined parse below.
+  // Unresolved aliases are not parse errors (they only surface at `toJS`), so the wiring-only main
+  // config can — and must — be syntax-checked standalone: here the error positions refer to the real
+  // file, while the combined parse below would offset them by the prepended sibling text and, worse,
+  // a syntax error that swallows the aliases would masquerade as a bogus invariant violation.
   const mainDocument = parseSingleDocument(mainText, "the main config");
+  assertNoParseErrors(mainDocument, "the main config");
   const { anchors: mainAnchors, aliases: mainAliases, presentKeys } = inspectMainDocument(mainDocument);
 
   // Full delegation: the main config must hold none of the delegated sections.
   for (const { spec } of siblings) {
-    spec.assertMainClean(presentKeys);
+    const ownedPresent = spec.ownedSectionKeys.filter((key) => presentKeys.has(key));
+    if (ownedPresent.length > 0) {
+      throw new Error(
+        `the main config still has ${ownedPresent.map((key) => `\`${key}:\``).join(" / ")} section(s); ` +
+          `move every value to ${spec.fileLabel} so the main config holds only the wiring`,
+      );
+    }
   }
 
   // Per-sibling: no label collides with a main anchor or with another sibling's label; every label is
@@ -238,10 +300,11 @@ export function composeWithSiblings(mainText: string, siblings: { text: string; 
     `the main config references label(s) defined neither in it nor in ${fileLabels}`,
   );
 
-  const combinedText = [
-    ...siblings.map(({ text }) => stripDocumentMarkers(text).replace(/\s*$/, "")),
-    stripDocumentMarkers(mainText),
-  ].join("\n");
+  // No trimming beyond a guaranteed line break between files: stripping trailing whitespace would
+  // corrupt a keep-chomped block scalar (`|+`) whose trailing newlines are significant.
+  const combinedText = [...siblings.map(({ text }) => stripDocumentMarkers(text)), stripDocumentMarkers(mainText)]
+    .map((text) => (text.endsWith("\n") ? text : `${text}\n`))
+    .join("");
   const combinedDocument = YAML.parseDocument(combinedText, YAML_PARSE_OPTIONS);
   assertNoParseErrors(combinedDocument, "the combined config");
 
@@ -249,6 +312,26 @@ export function composeWithSiblings(mainText: string, siblings: { text: string; 
     document: combinedDocument.toJS({ reviver: yamlBigintReviver }),
     labels: collected.map(({ labels }) => [...labels]),
   };
+}
+
+/**
+ * True when the file references aliases whose anchors it does not define itself — i.e. a wiring-only
+ * main config that delegates to sibling file(s) and cannot be parsed standalone. Read/parse failures
+ * yield `false`: the regular loading path reports those properly.
+ */
+export function configDelegatesAnchors(configPath: string): boolean {
+  let text: string;
+  try {
+    text = fs.readFileSync(path.resolve(configPath), "utf8");
+  } catch {
+    return false;
+  }
+  const documents = YAML.parseAllDocuments(text, YAML_PARSE_OPTIONS);
+  if (documents.length !== 1) {
+    return false;
+  }
+  const { anchors, aliases } = inspectMainDocument(documents[0]);
+  return [...aliases].some((alias) => !anchors.has(alias));
 }
 
 /** Read the main config and each sibling, then compose them, converting any failure into a fatal exit. */

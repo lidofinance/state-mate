@@ -5,7 +5,7 @@ import { logErrorAndExit } from "./logger";
 import { Abi, AbiArgumentsLength as AbiArgumentsLength } from "./types";
 
 // Shared YAML parsing semantics. Every loader (the flat parse in state-mate.ts and the
-// deployed-addresses composition) MUST use these so a deployed-composed config is indistinguishable
+// sibling-delegation composition) MUST use these so a sibling-composed config is indistinguishable
 // from a standalone one. Keep the two in sync by importing rather than re-declaring.
 export const YAML_PARSE_OPTIONS: YAML.ParseOptions & YAML.DocumentOptions & YAML.SchemaOptions = {
   schema: "core",
@@ -15,8 +15,8 @@ export const yamlBigintReviver = (_: unknown, value: unknown) => (typeof value =
 
 /**
  * The scalar items under `deployed.<sectionKey>` (in document order), or `[]` when that section is
- * absent or is not a list of scalars. Shared by the seed generator and the deployed-addresses
- * composer, which both walk the `deployed:` anchor book.
+ * absent or is not a list of scalars. Used by the seed/boilerplate generator when walking the
+ * `deployed:` anchor book.
  */
 export function getDeployedSectionScalars(document: YAML.Document, sectionKey: string): YAML.Scalar[] {
   const section = document.getIn(["deployed", sectionKey]);

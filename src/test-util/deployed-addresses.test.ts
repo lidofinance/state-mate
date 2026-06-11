@@ -4,8 +4,21 @@ import os from "node:os";
 import path from "node:path";
 import { test } from "node:test";
 
-import { composeWithDeployedAddresses, DEPLOYED_SPEC, resolveDeployedFilePath } from "../deployed-addresses";
-import { deriveSiblingPath, isSiblingFileName } from "../sibling-delegation";
+import { DEPLOYED_SPEC } from "../deployed-addresses";
+import {
+  composeWithSiblings,
+  deriveSiblingPath,
+  isSiblingFileName,
+  resolveSiblingFilePath,
+} from "../sibling-delegation";
+
+// Local conveniences over the generic engine (production goes through the engine directly).
+const composeWithDeployedAddresses = (mainText: string, deployedText: string) => {
+  const { document, labels } = composeWithSiblings(mainText, [{ text: deployedText, spec: DEPLOYED_SPEC }]);
+  return { document, labels: labels[0] };
+};
+const resolveDeployedFilePath = (configPath: string, deployedArgument?: string) =>
+  resolveSiblingFilePath(configPath, DEPLOYED_SPEC, deployedArgument);
 
 // Full-delegation model: the main config holds ONLY wiring (`*label` aliases) plus its own constant
 // anchors (e.g. `&ZERO` in `misc:`). It has no `deployed:` section. The .deployed file is the sole
@@ -88,7 +101,7 @@ l1:
       address: *foo
       checks: {}
 `;
-  assert.throws(() => composeWithDeployedAddresses(main, DEPLOYED), /move every address to the .deployed file/);
+  assert.throws(() => composeWithDeployedAddresses(main, DEPLOYED), /move every value to the .deployed file/);
 });
 
 test("invariant #4: a duplicate label within the .deployed file is rejected", () => {
@@ -138,7 +151,22 @@ deployed:
 roles:
   - &ADMIN "0x0000000000000000000000000000000000000000000000000000000000000000"
 `;
-  assert.throws(() => composeWithDeployedAddresses(MAIN_CONFIG, deployed), /may only contain a/);
+  assert.throws(() => composeWithDeployedAddresses(MAIN_CONFIG, deployed), /may only contain/);
+});
+
+test("a syntax error in the main config is reported as a parse error, not an invariant violation", () => {
+  // An unclosed quote swallows the rest of the file, so no aliases are visible; before the standalone
+  // syntax check this surfaced as a bogus "label(s) never referenced in the main config" error.
+  const main = `name: "unclosed\n${MAIN_CONFIG}`;
+  assert.throws(() => composeWithDeployedAddresses(main, DEPLOYED), /Failed to parse the main config/);
+});
+
+test("a one-line flow main config after the --- marker is not silently dropped", () => {
+  // A flow-style document cannot merge with the sibling's block mapping by concatenation, so it must
+  // fail loudly at the combined parse — previously the marker stripper deleted the whole line and the
+  // run could 'succeed' with the main config's content silently gone.
+  const main = `--- {l1: {contracts: {fooContract: {address: *foo, checks: {bar: *bar}}}}}`;
+  assert.throws(() => composeWithDeployedAddresses(main, DEPLOYED), /Failed to parse the combined config/);
 });
 
 test("a leading --- document marker in the main config is handled (still composes)", () => {

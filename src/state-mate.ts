@@ -20,13 +20,18 @@ import {
 import { doGenerateBoilerplate } from "./boilerplate-generator";
 import { parseCmdLineArguments } from "./cli-parser";
 import { printError, readUrlOrFromEnvironment, YAML_PARSE_OPTIONS, yamlBigintReviver } from "./common";
-import { DEPLOYED_SPEC, resolveDeployedFilePath } from "./deployed-addresses";
+import { DEPLOYED_SPEC } from "./deployed-addresses";
 import { loadContractInfoFromExplorer } from "./explorer-provider";
-import { INPUTS_SPEC, resolveInputsFilePath } from "./inputs";
+import { INPUTS_SPEC } from "./inputs";
 import { FAILURE_MARK, log, logError, logErrorAndExit, logHeader1, SUCCESS_MARK, WARNING_MARK } from "./logger";
 import { g_error_details, g_errors, g_total_checks } from "./section-validators/base";
 import { ContractSectionValidator } from "./section-validators/contract";
-import { loadStateWithSiblings, SiblingSpec } from "./sibling-delegation";
+import {
+  configDelegatesAnchors,
+  loadStateWithSiblings,
+  resolveSiblingFilePath,
+  SiblingSpec,
+} from "./sibling-delegation";
 import {
   EntireDocument,
   EntireDocumentTB,
@@ -79,42 +84,91 @@ function loadStateFromYaml(configPath: string): unknown {
 // selected (an explicit `--deployed`/`--inputs` path or, by convention, the `<name>.<infix>.<ext>`
 // sibling). Both may be in play at once. Sibling files are incompatible with `--generate`, which
 // operates on a seed document.
-type SelectedSibling = { path: string; spec: SiblingSpec; describe: (count: number) => string };
+type SelectedSibling = { path: string; spec: SiblingSpec; noun: string; explicit: boolean };
+
+// Inline `config:`/`externals:` sections would bypass every `.inputs` invariant (`&label` anchors,
+// the address check on externals). The schema must list those keys for composed documents, so the
+// rejection lives here: they are legal only when delegated from a `.inputs` file.
+function rejectInlineInputsSections(document: unknown): unknown {
+  if (typeof document === "object" && document !== null) {
+    const inline = INPUTS_SPEC.ownedSectionKeys.filter((key) => key in document);
+    if (inline.length > 0) {
+      logErrorAndExit(
+        `${chalk.magenta(g_Arguments.configPath)} holds top-level ${inline.map((key) => `\`${key}:\``).join(" / ")} ` +
+          `section(s) inline; they are only allowed in a \`${INPUTS_SPEC.infix}\` sibling file ` +
+          `(auto-loaded when present, or selected with ${INPUTS_SPEC.optionName})`,
+      );
+    }
+  }
+  return document;
+}
 
 function loadStateWithOptionalSiblings(): unknown {
   const siblings: SelectedSibling[] = [];
   try {
-    const deployedPath = resolveDeployedFilePath(g_Arguments.configPath, g_Arguments.deployed);
+    const deployedPath = resolveSiblingFilePath(g_Arguments.configPath, DEPLOYED_SPEC, g_Arguments.deployed);
     if (deployedPath) {
-      siblings.push({ path: deployedPath, spec: DEPLOYED_SPEC, describe: (count) => `${count} deployed address(es)` });
+      siblings.push({
+        path: deployedPath,
+        spec: DEPLOYED_SPEC,
+        noun: "deployed address(es)",
+        explicit: Boolean(g_Arguments.deployed),
+      });
     }
-    const inputsPath = resolveInputsFilePath(g_Arguments.configPath, g_Arguments.inputs);
+    const inputsPath = resolveSiblingFilePath(g_Arguments.configPath, INPUTS_SPEC, g_Arguments.inputs);
     if (inputsPath) {
-      siblings.push({ path: inputsPath, spec: INPUTS_SPEC, describe: (count) => `${count} input anchor(s)` });
+      siblings.push({
+        path: inputsPath,
+        spec: INPUTS_SPEC,
+        noun: "input anchor(s)",
+        explicit: Boolean(g_Arguments.inputs),
+      });
     }
   } catch (error) {
     logErrorAndExit(printError(error));
   }
 
   if (siblings.length === 0) {
-    return loadStateFromYaml(g_Arguments.configPath);
+    return rejectInlineInputsSections(loadStateFromYaml(g_Arguments.configPath));
   }
 
   if (g_Arguments.generate) {
     for (const { path: siblingPath } of siblings) {
       log(`${WARNING_MARK} Ignoring ${chalk.yellow(path.relative(process.cwd(), siblingPath))} with --generate`);
     }
+    // A wiring-only main config cannot be parsed without the sibling anchors it delegates to — fail
+    // with a clear message instead of the raw "Unresolved alias" parse error below.
+    if (configDelegatesAnchors(g_Arguments.configPath)) {
+      logErrorAndExit(
+        `${chalk.magenta(g_Arguments.configPath)} delegates anchors to the sibling file(s) ignored above, ` +
+          `so it cannot be parsed standalone — --generate works on self-contained (seed) configs only`,
+      );
+    }
     return loadStateFromYaml(g_Arguments.configPath);
+  }
+
+  // Mixing an explicit variant of one sibling with the auto-discovered convention file of the other
+  // (e.g. `--deployed lido.hoodi.deployed.yaml` next to a mainnet `lido.inputs.yaml`) is easy to do
+  // by accident — surface the combination.
+  if (siblings.some((sibling) => sibling.explicit)) {
+    for (const { path: siblingPath, spec, explicit } of siblings) {
+      if (!explicit) {
+        log(
+          `${WARNING_MARK} ${chalk.yellow(path.relative(process.cwd(), siblingPath))} is auto-loaded by ` +
+            `convention alongside an explicit sibling path — pass ${spec.optionName} if another variant is intended`,
+        );
+      }
+    }
   }
 
   const { document, labels } = loadStateWithSiblings(
     g_Arguments.configPath,
     siblings.map(({ path: siblingPath, spec }) => ({ path: siblingPath, spec })),
   );
-  for (const [index, { path: siblingPath, describe }] of siblings.entries()) {
-    log(`Loaded ${describe(labels[index].length)} from ${chalk.yellow(path.relative(process.cwd(), siblingPath))}`);
+  for (const [index, { path: siblingPath, noun }] of siblings.entries()) {
+    log(`Loaded ${labels[index].length} ${noun} from ${chalk.yellow(path.relative(process.cwd(), siblingPath))}`);
   }
-  return document;
+  return siblings.some(({ spec }) => spec === INPUTS_SPEC) ? document : rejectInlineInputsSections(document);
 }
 
 function validateJsonWithSchema<T extends TSchema>(

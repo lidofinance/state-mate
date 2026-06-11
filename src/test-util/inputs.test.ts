@@ -4,9 +4,26 @@ import os from "node:os";
 import path from "node:path";
 import { test } from "node:test";
 
-import { composeWithDeployedAddresses, DEPLOYED_SPEC } from "../deployed-addresses";
-import { composeWithInputs, INPUTS_SPEC, resolveInputsFilePath } from "../inputs";
-import { composeWithSiblings, deriveSiblingPath, isSiblingFileName } from "../sibling-delegation";
+import { DEPLOYED_SPEC } from "../deployed-addresses";
+import { INPUTS_SPEC } from "../inputs";
+import {
+  composeWithSiblings,
+  deriveSiblingPath,
+  isSiblingFileName,
+  resolveSiblingFilePath,
+} from "../sibling-delegation";
+
+// Local conveniences over the generic engine (production goes through the engine directly).
+const composeWithInputs = (mainText: string, inputsText: string) => {
+  const { document, labels } = composeWithSiblings(mainText, [{ text: inputsText, spec: INPUTS_SPEC }]);
+  return { document, labels: labels[0] };
+};
+const composeWithDeployedAddresses = (mainText: string, deployedText: string) => {
+  const { document, labels } = composeWithSiblings(mainText, [{ text: deployedText, spec: DEPLOYED_SPEC }]);
+  return { document, labels: labels[0] };
+};
+const resolveInputsFilePath = (configPath: string, inputsArgument?: string) =>
+  resolveSiblingFilePath(configPath, INPUTS_SPEC, inputsArgument);
 
 // Full-delegation model: the main config holds ONLY wiring (`*label` aliases) plus its own constant
 // anchors (e.g. `&ZERO` in `misc:`). It has no `config:`/`externals:` sections. The .inputs file is
@@ -185,7 +202,36 @@ roles:
 
 test("the .inputs file must contain at least one of config:/externals:", () => {
   // Parity with `.deployed` requiring its `deployed:` section: a section-less file is a mistake.
-  assert.throws(() => composeWithInputs(MAIN_CONFIG, "{}\n"), /must contain a `config:` and\/or `externals:`/);
+  assert.throws(() => composeWithInputs(MAIN_CONFIG, "{}\n"), /must contain `config:` and\/or `externals:`/);
+});
+
+test("externals: a digit-only QUOTED string is still accepted (long CCIP-style chain selectors)", () => {
+  const inputs = INPUTS.replace("&chainId 560048", '&chainId "16015286601757825753"');
+  const { document } = composeWithInputs(MAIN_CONFIG, inputs);
+  const document_ = document as { l1: { chainId: string } };
+  assert.equal(document_.l1.chainId, "16015286601757825753");
+});
+
+test("externals: a float value is rejected (the numeric exemption covers integers only)", () => {
+  const inputs = INPUTS.replace("&chainId 560048", "&chainId 1.5");
+  assert.throws(() => composeWithInputs(MAIN_CONFIG, inputs), /&chainId is not a valid address/);
+});
+
+test("externals: a negative integer is rejected (the numeric exemption covers non-negatives only)", () => {
+  const inputs = INPUTS.replace("&chainId 560048", "&chainId -5");
+  assert.throws(() => composeWithInputs(MAIN_CONFIG, inputs), /&chainId is not a valid address/);
+});
+
+test("config: an anchored map entry is rejected early (the schema has no object branch for config)", () => {
+  const inputs = INPUTS.replace('&lidoName "Liquid staked Ether 2.0"', "&lidoName {name: 'Liquid staked Ether 2.0'}");
+  assert.throws(() => composeWithInputs(MAIN_CONFIG, inputs), /must be a labeled scalar or array/);
+});
+
+test("a nested anchor inside a config array entry is rejected (it would shadow other labels)", () => {
+  // Without this invariant, `&shadow` inside the array would silently override a same-named label
+  // from a .deployed file (or main anchor) when the texts are concatenated.
+  const inputs = INPUTS.replace("[3600, 1800, 1000, 50]", "[3600, &shadow 1800, 1000, 50]");
+  assert.throws(() => composeWithInputs(MAIN_CONFIG, inputs), /anchor\(s\) in the .inputs file defined outside/);
 });
 
 test("a main alias defined neither in main nor .inputs is reported clearly", () => {
