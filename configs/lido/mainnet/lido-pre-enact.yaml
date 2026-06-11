@@ -1,4 +1,8 @@
 # yaml-language-server: $schema=../../schemas/main-schema.json
+#
+# THROWAWAY pre-enact snapshot for vote_2026_06_17.
+# The post-enact source of truth is lido.yaml. `diff lido-pre-enact.yaml lido.yaml` == the vote's intended state delta.
+#
 ---
 parameters:
   - &contract4788 "0x000F3df6D732807Ef1319fB7B8bB8522d0Beac02"
@@ -101,14 +105,14 @@ deployed:
     - &CSEjector "0xc72b58aa02E0e98cF8A4a0E9Dce75e763800802C"
     - &CSFeeOracle "0x4D4074628678Bd302921c20573EEa1ed38DdF7FB"
     - &CSVerifier "0xdC5FE1782B6943f318E05230d688713a560063DC"
-    - &CSPermissionlessGate "0xcF33a38111d0B1246A3F38a838fb41D626B454f0"
+    - &CSPermissionlessGate "0xcF33a38111d0B1246A3F38a838fb41D626B454f0" # CSM permissionless gate
 
     # --- Easy Track ---
     - &easyTrack "0xF0211b7660680B49De1A7E9f25C65660F0a13Fea"
     - &evmScriptExecutor "0xFE5986E06210aC1eCC1aDCafc0cc7f8D63B3F977"
     - &callsScript "0x5cEb19e1890f677c3676d5ecDF7c501eBA01A054"
     - &vaultsAdapter "0x28F9Ac198C4E0FA6A9Ad2c2f97CB38F1A3120f27"
-    - &lolAllowedRecipientsRegistry "0x48c4929630099b217136b64089E8543dB0E5163a"
+    - &lolAllowedRecipientsRegistry "0x48c4929630099b217136b64089E8543dB0E5163a" # LOL (Liquidity Observation Lab) stETH
 
     # --- Committees (Safe msigs) ---
     - &resealManager "0x7914b5a1539b97Bd0bbd155757F25FD79A522d24"
@@ -857,7 +861,7 @@ l1:
         *MANAGE_TOKEN_URI_ROLE : []
         *ORACLE_ROLE : [*accountingOracle]
         *WQ_RESUME_ROLE : [*resealManager]
-        *WQ_PAUSE_ROLE : [*resealManager, *circuitBreaker]
+        *WQ_PAUSE_ROLE : [*resealManager, *gateSealWithdrawalQueue]
       implementationChecks:
         BUNKER_MODE_DISABLED_TIMESTAMP: *MAX_UINT256
         DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
@@ -1060,7 +1064,7 @@ l1:
         *CS_SET_BOND_CURVE_ROLE : [*csmCommittee, *CSVettedGate]
         *CS_RECOVERER_ROLE : []
         *CS_RESUME_ROLE : [*resealManager]
-        *CS_PAUSE_ROLE : [*resealManager, *circuitBreaker]
+        *CS_PAUSE_ROLE : [*resealManager, *gateSealCSAccounting]
       implementationChecks:
         DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
         DEFAULT_BOND_CURVE_ID: 0
@@ -1167,7 +1171,7 @@ l1:
         supportsInterface: null
       ozAcl:
         *DEFAULT_ADMIN_ROLE : [*aragonAgent]
-        *CS_PAUSE_ROLE : [*resealManager, *circuitBreaker]
+        *CS_PAUSE_ROLE : [*resealManager, *gateSealCSAccounting]
         *CS_RESUME_ROLE : [*resealManager]
         *CS_RECOVERER_ROLE : []
         *STAKING_ROUTER_ROLE : [*stakingRouter]
@@ -1206,7 +1210,7 @@ l1:
         supportsInterface: null
       ozAcl:
         *DEFAULT_ADMIN_ROLE : [*aragonAgent]
-        *CS_PAUSE_ROLE : [*resealManager, *circuitBreaker]
+        *CS_PAUSE_ROLE : [*resealManager, *gateSealCSAccounting]
         *CS_RESUME_ROLE : [*resealManager]
         *CS_RECOVERER_ROLE : []
         *ORACLE_MANAGE_CONSENSUS_CONTRACT_ROLE : []
@@ -1246,7 +1250,7 @@ l1:
         supportsInterface: null
       ozAcl:
         *DEFAULT_ADMIN_ROLE : [*aragonAgent]
-        *CS_PAUSE_ROLE : [*resealManager, *circuitBreaker]
+        *CS_PAUSE_ROLE : [*resealManager, *gateSealCSAccounting]
         *CS_RESUME_ROLE : [*resealManager]
 
     CSVettedGate:
@@ -1285,7 +1289,7 @@ l1:
         verifyProof: null
       ozAcl:
         *DEFAULT_ADMIN_ROLE : [*aragonAgent]
-        *CS_PAUSE_ROLE : [*resealManager, *circuitBreaker]
+        *CS_PAUSE_ROLE : [*resealManager, *gateSealCSAccounting]
         *CS_RESUME_ROLE : [*resealManager]
         *CS_RECOVERER_ROLE : []
         *CS_SET_TREE_ROLE : [*evmScriptExecutor]
@@ -1316,7 +1320,7 @@ l1:
         triggerableWithdrawalsGateway: null
       ozAcl:
         *DEFAULT_ADMIN_ROLE : [*aragonAgent]
-        *CS_PAUSE_ROLE : [*resealManager, *circuitBreaker]
+        *CS_PAUSE_ROLE : [*resealManager, *gateSealCSAccounting]
         *CS_RESUME_ROLE : [*resealManager]
         *CS_RECOVERER_ROLE : []
 
@@ -1349,7 +1353,7 @@ l1:
       ozAcl:
         *DEFAULT_ADMIN_ROLE : [*aragonAgent]
         *ADD_FULL_WITHDRAWAL_REQUEST_ROLE : [*CSEjector, *validatorsExitBusOracle]
-        *TWG_PAUSE_ROLE : [*circuitBreaker, *resealManager]
+        *TWG_PAUSE_ROLE : [*gateSealVEBAndTWG, *resealManager]
         *TWG_RESUME_ROLE : [*resealManager]
         *TW_EXIT_LIMIT_MANAGER_ROLE : []
 
@@ -1434,7 +1438,7 @@ l1:
         vaultsCount: null
       ozAcl:
         *DEFAULT_ADMIN_ROLE : [*aragonAgent]
-        *OZ_PAUSE_ROLE : [*circuitBreaker, *resealManager]
+        *OZ_PAUSE_ROLE : [*gateSealVaulthubAndPredepositGuarantee, *resealManager]
         *OZ_RESUME_ROLE : [*resealManager]
         *VAULT_MASTER_ROLE : []
         *BAD_DEBT_MASTER_ROLE : [*vaultsAdapter]
@@ -1534,7 +1538,7 @@ l1:
         validatorStatus: null
       ozAcl:
         *DEFAULT_ADMIN_ROLE : [*aragonAgent]
-        *OZ_PAUSE_ROLE : [*circuitBreaker, *resealManager]
+        *OZ_PAUSE_ROLE : [*gateSealVaulthubAndPredepositGuarantee, *resealManager]
         *OZ_RESUME_ROLE : [*resealManager]
       implementationChecks:
         PREDEPOSIT_AMOUNT: *ONE_ETH_WEI
@@ -1921,7 +1925,7 @@ l1:
         *DEFAULT_ADMIN_ROLE : [*aragonAgent]
         *ORACLE_MANAGE_CONSENSUS_CONTRACT_ROLE : []
         *ORACLE_MANAGE_CONSENSUS_VERSION_ROLE : []
-        *ORACLE_PAUSE_ROLE : [*resealManager, *circuitBreaker]
+        *ORACLE_PAUSE_ROLE : [*resealManager, *gateSealVEBAndTWG]
         *ORACLE_RESUME_ROLE : [*resealManager]
         *ORACLE_SUBMIT_DATA_ROLE : []
       implementationChecks:
@@ -2684,51 +2688,10 @@ l1:
         pauseDuration: *DURATION_21_DAYS
         heartbeatInterval: *DURATION_1_YEAR
         heartbeatExpiry: null
-        getPausables:
-          - *withdrawalQueueERC721
-          - *validatorsExitBusOracle
-          - *triggerableWithdrawalsGateway
-          - *vaultHub
-          - *predepositGuarantee
-          - *CSModule
-          - *CSAccounting
-          - *CSFeeOracle
-          - *CSVerifier
-          - *CSVettedGate
-          - *CSEjector
-        getPauser:
-          - args: [*withdrawalQueueERC721]
-            result: *sealCommittee
-          - args: [*validatorsExitBusOracle]
-            result: *sealCommittee
-          - args: [*triggerableWithdrawalsGateway]
-            result: *sealCommittee
-          - args: [*vaultHub]
-            result: *sealCommittee
-          - args: [*predepositGuarantee]
-            result: *sealCommittee
-          - args: [*CSModule]
-            result: *csmCommittee
-          - args: [*CSAccounting]
-            result: *csmCommittee
-          - args: [*CSFeeOracle]
-            result: *csmCommittee
-          - args: [*CSVerifier]
-            result: *csmCommittee
-          - args: [*CSVettedGate]
-            result: *csmCommittee
-          - args: [*CSEjector]
-            result: *csmCommittee
-        getPausableCount:
-          - args: [*sealCommittee]
-            result: 5
-          - args: [*csmCommittee]
-            result: 6
-        isPauserLive:
-          - args: [*sealCommittee]
-            result: true
-          - args: [*csmCommittee]
-            result: true
+        getPausables: []
+        getPauser: null
+        getPausableCount: null
+        isPauserLive: null
 
     node-operators-registry:
       name: NodeOperatorsRegistry
@@ -2952,7 +2915,7 @@ l1:
       name: AllowedRecipientsRegistry
       address: *lolAllowedRecipientsRegistry
       checks:
-        getLimitParameters: [8000000000000000000000, 6]
+        getLimitParameters: [6000000000000000000000, 6]
         ADD_RECIPIENT_TO_ALLOWED_LIST_ROLE: null
         DEFAULT_ADMIN_ROLE: null
         REMOVE_RECIPIENT_FROM_ALLOWED_LIST_ROLE: null
