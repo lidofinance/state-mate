@@ -5,30 +5,30 @@ deployed:
   l1:
     # --- Core protocol ---
     - &lidoLocator "0xe2EF9536DAAAEBFf5b1c130957AB3E80056b06D8"
-    - &lidoLocatorImplAddress "0x2C33BE7c09bfBC8e41E7648d611d857fD4831b68"
+    - &lidoLocatorImplAddress "0x1dB06d15976954D48765f40d4bDd840C257CD4B9"
     - &lido "0x3508A952176b3c15387C97BE809eaffB1982176a"
-    - &lidoImplAddress "0x6147270470A9Ee5b55c33EA71e32000E5d6D8E6B"
+    - &lidoImplAddress "0xB9A2Fb8336f3775d790b3FdD6151e3F193AA7352"
     - &wstETH "0x7E99eE3C66636DE415D2d7C880938F2f40f94De4"
     - &wstETHReferralStaker "0xf886BcC68b240316103fE8A12453Ce7831c2e835"
     - &eip712StETH "0x2A1d51BF3aAA7A7D027C8f561e5f579876a17B0a"
     - &stakingRouter "0xCc820558B39ee15C7C45B59390B503b83fb499A8"
-    - &stakingRouterImplAddress "0x44d0b2B95d2C2bDF73FE4f5cD7E3A930494E5B1f"
+    - &stakingRouterImplAddress "0x2107dffDf8C2934A5197C8C6c5eC646099C51204"
     - &executionLayerRewardsVault "0x9b108015fe433F173696Af3Aa0CF7CDb3E104258"
     - &withdrawalQueueERC721 "0xfe56573178f1bcdf53F01A6E9977670dcBBD9186"
     - &withdrawalQueueERC721ImplAddress "0xD0a60e52837e045F4567193Cf8921191C486eCD5"
     - &withdrawalVault "0x4473dCDDbf77679A643BdB654dbd86D67F8d32f2"
     - &withdrawalVaultImplAddress "0x6724DaD16f7b05157dF72783F99cA6B813742330"
     - &accounting "0x9b5b78D1C9A3238bF24662067e34c57c83E8c354"
-    - &accountingImplAddress "0xDB47544d5813f15116bf95c1cF2ff4dEdb2226fD"
+    - &accountingImplAddress "0xA39fe063A6d1420E59d218d318d52D84Fbd9202F"
     - &burner "0xb2c99cd38a2636a6281a849C8de938B3eF4A7C3D"
     - &burnerImplAddress "0xBb77f95A29D1ccE1A54F6ED9144D48be38D43dbC"
     - &minFirstAllocationStrategy "0x6d1a9bBFF97f7565e9532FEB7b499982848E5e07"
     - &mevBoostRelayAllowedList "0x279d3A456212a1294DaEd0faEE98675a52E8A4Bf" # TODO: add checks ?
     - &triggerableWithdrawalsGateway "0x6679090D92b08a2a686eF8614feECD8cDFE209db"
     - &consolidationGateway "0xC9991Bb865d025364BCbBd99f36e85889Fb68e69"
-    - &consolidationGatewayRequester "0xe09fBcE63826468867eE66Eda491E444829E022A"
+    - &consolidationBus "0xe09fBcE63826468867eE66Eda491E444829E022A"
     - &topUpGateway "0x10DBEb3367876826d00D21718D1d893e0fbD2956"
-    - &topUpGatewayImplAddress "0xFd1b63657dda65C4E6fDEF9d1f37064D078e9B49"
+    - &topUpGatewayImplAddress "0x8621D8a402fdf2a131E38e16ac50f4C97660Fc2b"
     - &validatorExitDelayVerifier "0xa5F5A9360275390fF9728262a29384399f38d2f0"
     - &vaultHub "0x4C9fFC325392090F789255b9948Ab1659b797964"
     - &vaultHubImplAddress "0xAd2C869FE66Ff4c0E347A0824Af92D2B7C91288A"
@@ -47,12 +47,12 @@ deployed:
 
     # --- Oracle contracts ---
     - &accountingOracle "0xcb883B1bD0a41512b42D2dB267F2A2cd919FB216"
-    - &accountingOracleImplAddress "0x41bF10F28A1312f2241f86A2537A04b08e343C0a"
+    - &accountingOracleImplAddress "0xfdF72d92B55555B02e89D61177D5138B144815dE"
     - &hashConsensusForAccountingOracle "0x32EC59a78abaca3f91527aeB2008925D5AaC1eFC"
     - &validatorsExitBusOracle "0x8664d394C2B3278F26A1B44B967aEf99707eeAB2"
-    - &validatorsExitBusOracleImplAddress "0x86aeA211B30174b3ee5d294ECeaDbD7f1C575eF3"
+    - &validatorsExitBusOracleImplAddress "0xA881F320E17Aa97d6Ce0bE76B0e2620bd2FC555A"
     - &hashConsensusForValidatorsExitBusOracle "0x30308CD8844fb2DB3ec4D056F1d475a802DCA07c"
-    - &oracleReportSanityChecker "0x049A972e9cBEfFFc1c2543dFD0Fa892C2E9Ed6C5"
+    - &oracleReportSanityChecker "0xD0261b0032A00a7449ee7fbE14d3f98702996441"
     - &postTokenRebaseReceiver "0x9c53d0075eA00ad77dDAd1b71E67bb97AaBC1e3D"
     - &oracleDaemonConfig "0x2a833402e3F46fFC1ecAb3598c599147a78731a9"
     - &lazyOracle "0xf41491C79C30e8f4862d3F4A5b790171adB8e04A"
@@ -97,9 +97,9 @@ deployed:
 
     # --- CSM ---
     - &CSModule "0x79CEf36D84743222f37765204Bec41E92a93E59d"
-    - &CSModuleImplAddress "0x161b1DAa658fD0D78a4603860edd8Ed06f98F4cA"
+    - &CSModuleImplAddress "0xB48d144A1c7aB43FDb0ac7582C65728E94e1Df0c"
     - &CSAccounting "0xA54b90BA34C5f326BC1485054080994e38FB4C60"
-    - &CSAccountingImplAddress "0x3a18675fFB2C37A4296dD794A7Ed94644225F881"
+    - &CSAccountingImplAddress "0x690c68287c6e759059d48519274B6920356647F0"
     - &CSParametersRegistry "0xA4aD5236963f9Fe4229864712269D8d79B65C5Ad"
     - &CSParametersRegistryImplAddress "0x58376D8B192813E85532b25685D948EB49c2A8B5"
     - &CSFeeDistributor "0xaCd9820b0A2229a82dc1A0770307ce5522FF3582"
@@ -109,7 +109,7 @@ deployed:
     - &CSExitPenalties "0xD259b31083Be841E5C85b2D481Cfc17C14276800"
     - &CSExitPenaltiesImplAddress "0xf38A3DA25B417D83182EEDD30d00557d78c35C96"
     - &CSStrikes "0x8fBA385C3c334D251eE413e79d4D3890db98693c"
-    - &CSStrikesImplAddress "0x47F96DCD5cf3e94492CD050c00C9F6e33b3ca677"
+    - &CSStrikesImplAddress "0x55D2206a4f7e81c170D3f5b7aFbD46B9f75Bc54d"
     - &CSPermissionlessGate "0x1773b2Ff99A030F6000554Cb8A5Ec93145650cbA"
     - &permissionlessGate "0xd7bD8D2A9888D1414c770B35ACF55890B15de26a"
     - &CSVettedGate "0x10a254E724fe2b7f305F76f3F116a3969c53845f"
@@ -122,8 +122,8 @@ deployed:
 
     # --- Curated Module v2 ---
     - &curatedModule "0x87EB69Ae51317405FD285efD2326a4a11f6173b9"
-    - &curatedModuleImplAddress "0x22C16D0511D919d5Ed756b8F8d1a35c32A7370C5"
-    - &curatedAccountingImplAddress "0x687D3C4E8fcc8aDF83e4C33337c00A5b71F53f2c"
+    - &curatedModuleImplAddress "0xf01b6b3E27fD3A4c063E391A0714c770d9422CE8"
+    - &curatedAccountingImplAddress "0x665eA8EFf296f67C59eda4F4130ba12De49c1cc3"
     - &curatedFeeOracle "0x5D2F27000C80f6f7A03015Fd49dB7FEba3fBfa83"
     - &curatedFeeOracleImplAddress "0x5AE7D76050f57D3c42931B3c845ec09b42c3370d"
     - &curatedVerifier "0x209190Ebc2Be80367a15d05e626784Eb94d6A880"
@@ -301,7 +301,7 @@ misc:
   - &MAX_REWARD_RATIO 65535
 
 eoa:
-  - &depositSecurityModule "0x1a629bB7C0563650e46406Eb6764A2ba207a0eFE"
+  - &depositSecurityModule "0xf738F86009Ec704880c9Aa175fc5869F020FEe4e"
   - &deployer "0x83BCE68B4e8b7071b2a664a26e6D3Bc17eEe3102"
   - &superManager "0xE28f573b732632fdE03BD5507A7d475383e8512E"
   - &oracleManager "0x4022E0754d0cB6905B54306105D3346d1547988b"
@@ -807,6 +807,7 @@ l1:
         MAX_EFFECTIVE_BALANCE_WC_TYPE_01: 32000000000000000000
         MAX_EFFECTIVE_BALANCE_WC_TYPE_02: 2048000000000000000000
         canDeposit: null
+        getMaxTopUpPerBlockGwei: null
         getAllNodeOperatorDigests: null
         getAllStakingModuleDigests: null
         getDepositAllocations: null
@@ -1147,7 +1148,6 @@ l1:
         proxy__getImplementation: *CSAccountingImplAddress
         proxy__getIsOssified: false
       checks:
-        BURNER: *burner
         DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
         DEFAULT_BOND_CURVE_ID: 0
         FEE_DISTRIBUTOR: *CSFeeDistributor
@@ -1155,7 +1155,6 @@ l1:
         LIDO_LOCATOR: *lidoLocator
         MANAGE_BOND_CURVES_ROLE: *CS_MANAGE_BOND_CURVES_ROLE
         MAX_BOND_LOCK_PERIOD: *DURATION_1_YEAR
-        MAX_FEE_SPLITS: 10
         MIN_BOND_LOCK_PERIOD: *DURATION_1_DAY
         MODULE: *CSModule
         PAUSE_INFINITELY: *MAX_UINT256
@@ -1165,6 +1164,10 @@ l1:
         SET_BOND_CURVE_ROLE: *CS_SET_BOND_CURVE_ROLE
         WITHDRAWAL_QUEUE: *withdrawalQueueERC721
         WSTETH: *wstETH
+        MAX_CURVE_LENGTH: null
+        MIN_CURVE_LENGTH: null
+        feeDistributor: null
+        getActualLockedBond: null
         chargePenaltyRecipient: null
         getBond: null
         getBondAmountByKeysCount: null
@@ -1304,6 +1307,7 @@ l1:
         getResumeSinceTimestamp: 1742289204
         getType: "0x636f6d6d756e6974792d6f6e636861696e2d7631000000000000000000000000"
         isPaused: false
+        OPERATOR_ADDRESSES_ADMIN_ROLE: null
         depositQueueItem: null
         depositQueuePointers: null
         exitDeadlineThreshold: null
@@ -1665,6 +1669,7 @@ l1:
         getInitializedVersion: 1
         getResumeSinceTimestamp: 0
         isPaused: false
+        name: null
         getRoleAdmin: null
         getRoleMember: null
         getRoleMemberCount: null
@@ -1719,6 +1724,7 @@ l1:
         getInitializedVersion: 1
         getResumeSinceTimestamp: 0
         isPaused: false
+        name: null
         getRoleAdmin: null
         getRoleMember: null
         getRoleMemberCount: null
@@ -1805,7 +1811,7 @@ l1:
         VOLUNTARY_EXIT_TYPE_ID: 0
         stakingModuleId: 4
         triggerableWithdrawalsGateway: *triggerableWithdrawalsGateway
-        getResumeSinceTimestamp: 0
+        getResumeSinceTimestamp: null
         isPaused: false
         getRoleAdmin: null
         getRoleMember: null
@@ -1850,7 +1856,7 @@ l1:
         STETH: *lido
         VERIFIER_ROLE: *CS_VERIFIER_ROLE
         getInitializedVersion: 1
-        getResumeSinceTimestamp: 1777561932
+        getResumeSinceTimestamp: null
         getType: "0x637572617465642d6f6e636861696e2d76320000000000000000000000000000"
         isPaused: false
         exitDeadlineThreshold: null
@@ -1964,7 +1970,7 @@ l1:
         getBondLockPeriod: 5184000
         getCurvesCount: 7
         getInitializedVersion: 3
-        getResumeSinceTimestamp: 0
+        getResumeSinceTimestamp: null
         isPaused: false
         getBond: null
         getBondAmountByKeysCount: null
@@ -2119,7 +2125,7 @@ l1:
         SLOTS_PER_EPOCH: *SLOTS_PER_EPOCH
         SLOTS_PER_HISTORICAL_ROOT: *SLOTS_PER_HISTORICAL_ROOT
         WITHDRAWAL_ADDRESS: *withdrawalVault
-        getResumeSinceTimestamp: 0
+        getResumeSinceTimestamp: null
         isPaused: false
         getRoleAdmin: null
         getRoleMember: null
@@ -2147,7 +2153,7 @@ l1:
         VOLUNTARY_EXIT_TYPE_ID: 0
         stakingModuleId: 5
         triggerableWithdrawalsGateway: *triggerableWithdrawalsGateway
-        getResumeSinceTimestamp: 0
+        getResumeSinceTimestamp: null
         isPaused: false
         getRoleAdmin: null
         getRoleMember: null
@@ -2180,7 +2186,7 @@ l1:
           - 93833
           - 1575
           - 128
-        getQuorum: 7
+        getQuorum: 6
         getReportProcessor: *curatedFeeOracle
         getConsensusState: null
         getConsensusStateForMember: null
@@ -2282,7 +2288,7 @@ l1:
         supportsInterface: null
       ozAcl:
         *DEFAULT_ADMIN_ROLE : [*aragonAgent]
-        *ADD_CONSOLIDATION_REQUEST_ROLE : [*consolidationGatewayRequester]
+        *ADD_CONSOLIDATION_REQUEST_ROLE : [*consolidationBus]
         *CG_EXIT_LIMIT_MANAGER_ROLE : []
         *CG_PAUSE_ROLE : [*circuitBreaker, *resealManager]
         *CG_RESUME_ROLE : [*resealManager]
@@ -2306,12 +2312,19 @@ l1:
         PIVOT_SLOT: 0
         SLOTS_PER_EPOCH: *SLOTS_PER_EPOCH
         TOP_UP_ROLE: *TUG_TOP_UP_ROLE
-        getLastTopUpTimestamp:
+        PAUSE_INFINITELY: *MAX_UINT256
+        PAUSE_ROLE: *LIDO_PAUSE_ROLE
+        RESUME_ROLE: *LIDO_RESUME_ROLE
+
         getMaxRootAge: 600
         getMaxValidatorsPerTopUp: 32
-        getMinBlockDistance: 1
+        getMinBlockDistance: 75
         getMinTopUpGwei: 2000000000
         getTargetBalanceGwei: 2046750000000
+        getResumeSinceTimestamp: null
+        getLastTopUpTimestamp: null
+        isBlockDistancePassed: null
+        isPaused: false
         canTopUp: null
         getRoleAdmin: null
         getRoleMember: null
@@ -3038,6 +3051,10 @@ l1:
         getMaxPositiveTokenRebase: *MAX_POSITIVE_TOKEN_REBASE
         getOracleReportLimits: *ORACLE_REPORT_LIMITS
         secondOpinionOracle: *ZERO_ADDRESS
+        checkExitedValidatorsCount: null
+        isPostMigrationFirstReportDone: null
+        lastReportTimestamp: null
+        lastVaultBalanceAfterTransfer: null
         checkAppearedEthAmountPerDay: null
         checkCLBalancesConsistency: null
         checkCLPendingBalanceIncrease: null
