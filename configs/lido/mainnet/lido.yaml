@@ -969,7 +969,7 @@ l1:
         getRoleAdmin: null
         getRoleMember: null
         getRoleMemberCount: null
-        getSharesRequestedToBurn: [0, 0]
+        getSharesRequestedToBurn: null
         hasRole: null
         supportsInterface: null
       ozAcl:
