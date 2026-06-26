@@ -47,7 +47,7 @@ deployed:
 
     # --- Oracle contracts ---
     - &accountingOracle "0xcb883B1bD0a41512b42D2dB267F2A2cd919FB216"
-    - &accountingOracleImplAddress "0xfdF72d92B55555B02e89D61177D5138B144815dE"
+    - &accountingOracleImplAddress "0xD00dD90651f031ED3158Cf75AC6e4361B4CCcBD8"
     - &hashConsensusForAccountingOracle "0x32EC59a78abaca3f91527aeB2008925D5AaC1eFC"
     - &validatorsExitBusOracle "0x8664d394C2B3278F26A1B44B967aEf99707eeAB2"
     - &validatorsExitBusOracleImplAddress "0xA881F320E17Aa97d6Ce0bE76B0e2620bd2FC555A"
