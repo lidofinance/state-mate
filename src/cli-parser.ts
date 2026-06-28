@@ -31,6 +31,12 @@ export function parseCmdLineArguments() {
       "path to a '.inputs' YAML file that provides the config/externals anchors for a wiring-only main " +
         "config (defaults to the sibling '<name>.inputs.<ext>' if it exists)",
     )
+    .option(
+      "--overrides <path>",
+      "path to a YAML file shaped like a '.inputs' file that OVERRIDES values of labels already defined " +
+        "in the .inputs file (every label must already exist there and every value must differ); " +
+        "explicit path only, never auto-loaded",
+    )
     .option("--update-abi", "download all ABIs replacing existing files")
     .option("--update-abi-missing", "download only missing ABIs (skip existing)")
     .parse();
@@ -61,6 +67,7 @@ export function parseCmdLineArguments() {
     generate: options.generate,
     deployed: options.deployed as string | undefined,
     inputs: options.inputs as string | undefined,
+    overrides: options.overrides as string | undefined,
     updateAbi: options.updateAbi || options.updateAbiMissing,
     updateAbiMissingOnly: options.updateAbiMissing,
   };

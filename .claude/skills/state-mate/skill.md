@@ -19,6 +19,7 @@ Validate EVM smart-contract state against YAML configs. state-mate calls view fu
 | Overloaded function (two ABI fragments with same name) | [Function overloads](#function-overloads)                          |
 | Seed config (`--generate`)                             | [Seed configs](#seed-configs)                                      |
 | Swap addresses without touching wiring                 | [Separate deployed addresses](#separate-deployed-addresses)        |
+| Externalize / override input values                    | [Separate inputs & overrides](#separate-inputs--overrides)         |
 | ABI not found / rate-limit / revert reading            | [Troubleshooting](#troubleshooting)                                |
 
 ## Top-level structure
@@ -407,6 +408,46 @@ Notes:
   configs (inline `deployed:`, no sibling) are unaffected.
 - Complementary to [seed configs](#seed-configs): a seed **bootstraps** a full config from an
   address book; a `.deployed` file **swaps** the addresses of an existing wiring-only config.
+
+## Separate inputs & overrides
+
+The dual of `.deployed`: where `.deployed` externalizes a deployment's _outputs_ (addresses), a
+sibling `<name>.inputs.<ext>` externalizes its _inputs_, in two sections (one `&label` per entry):
+
+```yaml
+# lido.inputs.yaml — project-chosen knobs + fixed external facts, the sole source of these anchors
+config: # any anchored scalar OR array; NO address check
+  - &lidoName "Liquid staked Ether 2.0"
+  - &oracleReportLimits [3600, 1800, 1000, 50]
+externals: # 3rd-party addresses (validated 0x) plus chainId (numeric, exempt)
+  - &depositContract "0x00000000219ab540356cBB839Cbe05303d7705Fa"
+  - &chainId 560048
+```
+
+The main config holds only the wiring (`*lidoName`, `l1.chainId: *chainId`, …) and **no
+`config:`/`externals:` section**; same full-delegation invariants as `.deployed`. Auto-loaded when
+present; `--inputs <path>` selects a variant; ignored with `--generate`.
+
+**Override input values** (`--overrides <path>`) — an _overlay_ on the `.inputs` file: a file shaped
+exactly like `.inputs` that **redefines the values of labels already defined in `.inputs`** (e.g. a
+what-if run, or a per-scenario tweak on a shared base):
+
+```yaml
+# overrides.yaml — redefine a subset of .inputs values; same sections, same &labels
+config:
+  - &lidoName "stETH" # must already exist in .inputs, and must differ from its value there
+```
+
+```bash
+yarn start configs/lido/lido.yaml --overrides path/to/overrides.yaml   # .inputs auto-loaded alongside
+```
+
+Two rules, both hard errors: **(1) no new labels** — every override label must already exist in
+`.inputs`; **(2) no no-ops** — every override value must _differ_ from the `.inputs` value (compared
+on the parsed value, so `560048` ≡ `"560048"` and arrays are order-sensitive). A label must also keep
+the **same section** it has in `.inputs`. Unlike the siblings, `--overrides` is **explicit-only**
+(never auto-discovered — it changes effective values, so it must be deliberate), requires a `.inputs`
+file in play, and is ignored with `--generate`.
 
 ## Workflow
 

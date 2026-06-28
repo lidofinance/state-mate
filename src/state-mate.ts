@@ -22,13 +22,15 @@ import { parseCmdLineArguments } from "./cli-parser";
 import { printError, readUrlOrFromEnvironment, YAML_PARSE_OPTIONS, yamlBigintReviver } from "./common";
 import { DEPLOYED_SPEC } from "./deployed-addresses";
 import { loadContractInfoFromExplorer } from "./explorer-provider";
-import { INPUTS_SPEC } from "./inputs";
+import { INPUTS_OVERRIDES_SPEC, INPUTS_SPEC } from "./inputs";
 import { FAILURE_MARK, log, logError, logErrorAndExit, logHeader1, SUCCESS_MARK, WARNING_MARK } from "./logger";
 import { g_error_details, g_errors, g_total_checks } from "./section-validators/base";
 import { ContractSectionValidator } from "./section-validators/contract";
 import {
   configDelegatesAnchors,
   loadStateWithSiblings,
+  OverlaySpec,
+  resolveExplicitFilePath,
   resolveSiblingFilePath,
   SiblingSpec,
 } from "./sibling-delegation";
@@ -105,6 +107,7 @@ function rejectInlineInputsSections(document: unknown): unknown {
 
 function loadStateWithOptionalSiblings(): unknown {
   const siblings: SelectedSibling[] = [];
+  const overlays: { path: string; spec: OverlaySpec }[] = [];
   try {
     const deployedPath = resolveSiblingFilePath(g_Arguments.configPath, DEPLOYED_SPEC, g_Arguments.deployed);
     if (deployedPath) {
@@ -124,17 +127,25 @@ function loadStateWithOptionalSiblings(): unknown {
         explicit: Boolean(g_Arguments.inputs),
       });
     }
+    // The overrides file is explicit-only — never auto-discovered — so applying it (which changes
+    // the effective input values) is always a deliberate choice.
+    if (g_Arguments.overrides) {
+      overlays.push({
+        path: resolveExplicitFilePath(INPUTS_OVERRIDES_SPEC.optionName, g_Arguments.overrides),
+        spec: INPUTS_OVERRIDES_SPEC,
+      });
+    }
   } catch (error) {
     logErrorAndExit(printError(error));
   }
 
-  if (siblings.length === 0) {
+  if (siblings.length === 0 && overlays.length === 0) {
     return rejectInlineInputsSections(loadStateFromYaml(g_Arguments.configPath));
   }
 
   if (g_Arguments.generate) {
-    for (const { path: siblingPath } of siblings) {
-      log(`${WARNING_MARK} Ignoring ${chalk.yellow(path.relative(process.cwd(), siblingPath))} with --generate`);
+    for (const { path: ignoredPath } of [...siblings, ...overlays]) {
+      log(`${WARNING_MARK} Ignoring ${chalk.yellow(path.relative(process.cwd(), ignoredPath))} with --generate`);
     }
     // A wiring-only main config cannot be parsed without the sibling anchors it delegates to — fail
     // with a clear message instead of the raw "Unresolved alias" parse error below.
@@ -145,6 +156,14 @@ function loadStateWithOptionalSiblings(): unknown {
       );
     }
     return loadStateFromYaml(g_Arguments.configPath);
+  }
+
+  // An overrides file redefines `.inputs` values, so a `.inputs` file must be in play to override.
+  if (overlays.length > 0 && !siblings.some(({ spec }) => spec === INPUTS_SPEC)) {
+    logErrorAndExit(
+      `${INPUTS_OVERRIDES_SPEC.optionName} requires ${INPUTS_SPEC.fileLabel} (pass ${INPUTS_SPEC.optionName} or ` +
+        `add the convention <name>${INPUTS_SPEC.infix}.<ext> sibling)`,
+    );
   }
 
   // Mixing an explicit variant of one sibling with the auto-discovered convention file of the other
@@ -161,12 +180,18 @@ function loadStateWithOptionalSiblings(): unknown {
     }
   }
 
-  const { document, labels } = loadStateWithSiblings(
+  const { document, labels, overlayLabels } = loadStateWithSiblings(
     g_Arguments.configPath,
     siblings.map(({ path: siblingPath, spec }) => ({ path: siblingPath, spec })),
+    overlays,
   );
   for (const [index, { path: siblingPath, noun }] of siblings.entries()) {
     log(`Loaded ${labels[index].length} ${noun} from ${chalk.yellow(path.relative(process.cwd(), siblingPath))}`);
+  }
+  for (const [index, { path: overlayPath }] of overlays.entries()) {
+    log(
+      `Applied ${overlayLabels[index].length} override(s) from ${chalk.yellow(path.relative(process.cwd(), overlayPath))}`,
+    );
   }
   return siblings.some(({ spec }) => spec === INPUTS_SPEC) ? document : rejectInlineInputsSections(document);
 }

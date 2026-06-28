@@ -1,6 +1,7 @@
 import * as YAML from "yaml";
 
-import { ADDRESS_OR_HASH_RE, pairKeyToString, SiblingSpec } from "./sibling-delegation";
+import { yamlBigintReviver } from "./common";
+import { ADDRESS_OR_HASH_RE, OverlaySpec, pairKeyToString, SiblingSpec } from "./sibling-delegation";
 
 const INPUTS_INFIX = ".inputs";
 // The two groups of a `.inputs` file, split by AUTHORSHIP:
@@ -9,16 +10,24 @@ const INPUTS_INFIX = ".inputs";
 const INPUTS_SECTIONS = ["config", "externals"] as const;
 
 /**
- * Validate the `.inputs` entries and collect their labels. The engine has already checked that the
- * file holds only `config:`/`externals:` sections; this enforces that every entry carries an `&label`
- * anchor and that no label is duplicated. `config` entries may be any anchored scalar or array (no
- * value check); `externals` entries must be anchored scalars whose string values are valid
- * addresses/hashes — a chainId-style non-negative integer (e.g. `&chainId 560048`) is exempt.
+ * Validate the `.inputs`-shaped entries of `document` and, in one pass, return per `&label`: the
+ * label set, the (reviver-normalized) value, and the owning section. Used both for the `.inputs` file
+ * itself and for an `--overrides` file over it, so `fileLabel` targets the duplicate-label error at
+ * the right file. The engine has already checked that the file holds only `config:`/`externals:`
+ * sections; this enforces that every entry carries an `&label` anchor and that no label is
+ * duplicated. `config` entries may be any anchored scalar or array (no value check); `externals`
+ * entries must be anchored scalars whose string values are valid addresses/hashes — a chainId-style
+ * non-negative integer (e.g. `&chainId 560048`) is exempt.
  */
-function collectInputsLabels(document: YAML.Document): Set<string> {
+function collectInputsEntries(
+  document: YAML.Document,
+  fileLabel: string,
+): { labels: Set<string>; values: Map<string, unknown>; sections: Map<string, string> } {
   const labels = new Set<string>();
+  const values = new Map<string, unknown>();
+  const sections = new Map<string, string>();
   if (!YAML.isMap(document.contents)) {
-    return labels; // unreachable: the engine has already rejected non-mapping files
+    return { labels, values, sections }; // unreachable: the engine has already rejected non-mapping files
   }
   for (const pair of document.contents.items) {
     const sectionKey = pairKeyToString(pair.key);
@@ -57,12 +66,21 @@ function collectInputsLabels(document: YAML.Document): Set<string> {
         }
       }
       if (labels.has(node.anchor)) {
-        throw new Error(`duplicate label &${node.anchor} in the .inputs file`);
+        throw new Error(`duplicate label &${node.anchor} in ${fileLabel}`);
       }
       labels.add(node.anchor);
+      // Normalize through the same reviver the composed document uses, so an overrides no-op check
+      // compares like-for-like (bigints -> strings, arrays of ints -> arrays of strings).
+      values.set(node.anchor, node.toJS(document, { reviver: yamlBigintReviver }));
+      sections.set(node.anchor, sectionKey);
     }
   }
-  return labels;
+  return { labels, values, sections };
+}
+
+/** Validate the `.inputs` entries and collect their labels (the `SiblingSpec` contract). */
+function collectInputsLabels(document: YAML.Document): Set<string> {
+  return collectInputsEntries(document, "the .inputs file").labels;
 }
 
 /** The `.inputs` delegation: project-chosen `config:` values and fixed external `externals:` facts. */
@@ -72,4 +90,17 @@ export const INPUTS_SPEC: SiblingSpec = {
   fileLabel: "the .inputs file",
   ownedSectionKeys: [...INPUTS_SECTIONS],
   collectLabels: collectInputsLabels,
+};
+
+/**
+ * The `--overrides` overlay over `.inputs`: an inputs-shaped file that redefines the values of labels
+ * already defined in `.inputs`. It reuses the same per-entry validation; the engine additionally
+ * enforces that it introduces no new label, keeps each label's section, and changes every value.
+ */
+export const INPUTS_OVERRIDES_SPEC: OverlaySpec = {
+  optionName: "--overrides",
+  fileLabel: "the overrides file",
+  ownedSectionKeys: [...INPUTS_SECTIONS],
+  baseSpec: INPUTS_SPEC,
+  collect: collectInputsEntries,
 };
