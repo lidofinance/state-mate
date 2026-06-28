@@ -4,6 +4,8 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+    cooldown:
+      default-days: 7
     groups:
       github-actions:
         patterns: ["*"]
@@ -15,6 +17,8 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+    cooldown:
+      default-days: 7
     groups:
       eslint:
         patterns:
@@ -22,6 +26,13 @@ updates:
           - "@eslint/*"
           - "@typescript-eslint/*"
           - "eslint-*"
+    ignore:
+      # ESM-only since the next major, the project is CommonJS;
+      # chalk and chai (section-validators/base.ts) are runtime imports
+      - dependency-name: "chalk"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "chai"
+        update-types: ["version-update:semver-major"]
     labels: ["dependencies", "npm"]
     commit-message:
       prefix: "chore(deps)"

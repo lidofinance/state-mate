@@ -56,8 +56,8 @@ function isEtherResponseOkResult(object: unknown): object is EtherResponseOkResu
   if (result.IsProxy === "true") {
     return Boolean(
       result.Implementation ||
-        result.ImplementationAddress ||
-        (result.ImplementationAddresses && result.ImplementationAddresses.length > 0),
+      result.ImplementationAddress ||
+      (result.ImplementationAddresses && result.ImplementationAddresses.length > 0),
     );
   }
 
