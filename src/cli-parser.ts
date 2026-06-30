@@ -43,13 +43,16 @@ export function parseCmdLineArguments() {
     };
   }
 
+  // On --generate, download missing ABIs by default (skip existing), unless --update-abi overwrites all.
+  const updateAbiMissingOnly = options.updateAbiMissing || (options.generate && !options.updateAbi);
+
   return {
     configPath,
     abiDirPath: path.join(path.dirname(configPath), "abi"),
     checkOnly,
     checkOnlyCmdArg: options.only,
     generate: options.generate,
-    updateAbi: options.updateAbi || options.updateAbiMissing,
-    updateAbiMissingOnly: options.updateAbiMissing,
+    updateAbi: options.updateAbi || updateAbiMissingOnly,
+    updateAbiMissingOnly,
   };
 }

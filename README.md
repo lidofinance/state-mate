@@ -45,14 +45,23 @@ corepack enable
 yarn install
 ```
 
-3. Specify RPC endpoints for your target networks, e.g.
+3. Configure RPC endpoints and explorer tokens
+
+Copy the sample env file and fill in the values:
 
 ```sh
-# config.seed.yaml
-
-export L1_MAINNET_RPC_URL=%YOUR_RPC_URL%
-export L2_MAINNET_RPC_URL=%YOUR_RPC_URL%
+cp .env.sample .env
 ```
+
+```sh
+# .env
+
+L1_MAINNET_RPC_URL=%YOUR_RPC_URL%
+L2_MAINNET_RPC_URL=%YOUR_RPC_URL%
+ETHERSCAN_TOKEN=%YOUR_TOKEN%
+```
+
+Configs reference these by their **env-var name** (e.g. `rpcUrl: L1_MAINNET_RPC_URL`). `.env` is gitignored.
 
 4. Prepare a seed config
 
@@ -70,6 +79,7 @@ l1:
   rpcUrl: L1_MAINNET_RPC_URL
   explorerHostname: api.etherscan.io
   explorerTokenEnv: ETHERSCAN_TOKEN
+  chainId: 1 # required for etherscan.io explorers (v2 API)
 
 l2:
   rpcUrl: L2_MAINNET_RPC_URL
@@ -77,13 +87,15 @@ l2:
   # explorerTokenEnv: ETHERSCAN_MODE_TOKEN
 ```
 
-4. Start the program to generate a populated config from the seed one
+5. Start the program to generate a populated config from the seed one
 
 ```sh
 yarn start path/to/config.seed.yaml --generate
 ```
 
-5. Edit the generated config manually
+`--generate` downloads missing ABIs and skips ones already present. Add `--update-abi` to re-download and overwrite existing ABIs.
+
+6. Edit the generated config manually
 
 ### Configuration
 
@@ -111,6 +123,9 @@ roles:
 
 l1:
   rpcUrl: L1_MAINNET_RPC_URL # env variable
+  explorerHostname: api.etherscan.io
+  explorerTokenEnv: ETHERSCAN_TOKEN
+  chainId: 1 # required for etherscan.io explorers (v2 API)
   contracts:
     myContract:
       name: "myContract"
@@ -128,7 +143,7 @@ l1:
 
 ### ABIs
 
-All required ABIs are located in the same directory as the config and placed under `abi` folder being downloaded upon the first launch. See [configs](/configs/).
+ABIs live in an `abi/` folder next to the config, or in a consolidated file (see below). `--generate` fetches missing ABIs for you. A plain check run does not; pass `--update-abi-missing` (or `--update-abi`) to fetch them. See [configs](/configs/).
 
 state-mate supports two ABI storage formats:
 
@@ -140,16 +155,21 @@ state-mate supports two ABI storage formats:
 For large projects with many contracts, you can consolidate all individual ABI files into a single compressed file to reduce repository size and improve performance:
 
 ```sh
-yarn consolidate-abi path/to/config/abi --compress
+yarn consolidate-abi path/to/config/abi
 ```
 
 This command:
 
 - Reads all `.json` files from the specified ABI directory
 - Validates each ABI format
-- Consolidates them into a single `abis.json.gz` file (or `abis.json` without `--compress`)
-- Places the output file alongside your config file
+- Consolidates them into a single compressed `abis.json.gz` file alongside your config
 - Provides compression statistics
+
+Compression is the default. For an uncompressed `abis.json`, pass `--no-compress`:
+
+```sh
+yarn consolidate-abi path/to/config/abi --no-compress
+```
 
 **Note**: You cannot use both consolidated and individual ABI files simultaneously. state-mate will automatically detect which format you're using.
 
@@ -165,6 +185,16 @@ To download only missing ABIs (without updating existing ones):
 
 ```sh
 yarn start path/to/config.yaml --update-abi-missing
+```
+
+### Scoping checks
+
+Use `-o` to run only part of a config. The path drills in from network section to contract to a single function:
+
+```sh
+yarn start path/to/config.yaml -o l1                          # one network section
+yarn start path/to/config.yaml -o l1/myContract               # one contract
+yarn start path/to/config.yaml -o l1/myContract/checks/getFoo # one check
 ```
 
 ## 🔧 Contributing

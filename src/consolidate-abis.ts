@@ -11,10 +11,10 @@ interface ConsolidatedAbis {
 function parseArguments(): { abiDirectoryPath: string; shouldCompress: boolean } {
   const arguments_ = process.argv.slice(2);
   const abiDirectoryPath = arguments_[0];
-  const shouldCompress = arguments_.includes("--compress");
+  const shouldCompress = !arguments_.includes("--no-compress");
 
   if (!abiDirectoryPath) {
-    console.error("Usage: ts-node src/consolidate-abis.ts <abi-directory-path> [--compress]");
+    console.error("Usage: ts-node src/consolidate-abis.ts <abi-directory-path> [--no-compress]");
     process.exit(1);
   }
 
