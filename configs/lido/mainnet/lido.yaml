@@ -85,6 +85,7 @@ deployed:
     - &gateSealWithdrawalQueue "0x8A854C4E750CDf24f138f34A9061b2f556066912"
     - &gateSealVaulthubAndPredepositGuarantee "0x881dAd714679A6FeaA636446A0499101375A365c"
     - &gateSealCSAccounting "0xE1686C2E90eb41a48356c1cC7FaA17629af3ADB3"
+    - &circuitBreaker "0x6019CB557978296BA3C08a7B73225C0975DFB2F7"
 
     # --- Staking modules ---
     - &nodeOperatorsRegistry "0x55032650b14df07b85bF18A3a3eC8E0Af2e028d5"
@@ -98,12 +99,16 @@ deployed:
     - &CSFeeDistributor "0xD99CC66fEC647E68294C6477B40fC7E0F6F618D0"
     - &CSVettedGate "0xB314D4A76C457c93150d308787939063F4Cc67E0"
     - &CSEjector "0xc72b58aa02E0e98cF8A4a0E9Dce75e763800802C"
+    - &CSFeeOracle "0x4D4074628678Bd302921c20573EEa1ed38DdF7FB"
+    - &CSVerifier "0xdC5FE1782B6943f318E05230d688713a560063DC"
+    - &CSPermissionlessGate "0xcF33a38111d0B1246A3F38a838fb41D626B454f0"
 
     # --- Easy Track ---
     - &easyTrack "0xF0211b7660680B49De1A7E9f25C65660F0a13Fea"
     - &evmScriptExecutor "0xFE5986E06210aC1eCC1aDCafc0cc7f8D63B3F977"
     - &callsScript "0x5cEb19e1890f677c3676d5ecDF7c501eBA01A054"
     - &vaultsAdapter "0x28F9Ac198C4E0FA6A9Ad2c2f97CB38F1A3120f27"
+    - &lolAllowedRecipientsRegistry "0x48c4929630099b217136b64089E8543dB0E5163a"
 
     # --- Committees (Safe msigs) ---
     - &resealManager "0x7914b5a1539b97Bd0bbd155757F25FD79A522d24"
@@ -182,10 +187,14 @@ misc:
   # --- Time durations (in seconds) ---
   - &DURATION_1_HOUR 3600
   - &DURATION_1_DAY 86400
+  - &DURATION_5_DAYS 432000
   - &DURATION_2_WEEKS 1209600
+  - &DURATION_21_DAYS 1814400
   - &DURATION_28_DAYS 2419200
   - &DURATION_30_DAYS 2592000
+  - &DURATION_60_DAYS 5184000
   - &DURATION_1_YEAR 31536000
+  - &DURATION_3_YEARS 94608000
 
   # --- Percentage bases & voting parameters ---
   - &VOTING_SUPPORT_REQUIRED_PCT 500000000000000000
@@ -379,6 +388,17 @@ roles:
   - &CS_RECOVERER_ROLE "0xb3e25b5404b87e5a838579cb5d7481d61ad96ee284d38ec1e97c07ba64e7f6fc"
   - &CS_RESUME_ROLE "0x2fc10cc8ae19568712f7a176fb4978616a610650813c9d05326c34abb62749c7"
   - &CS_PAUSE_ROLE "0x139c2898040ef16910dc9f44dc697df79363da767d8bc92f2e310312b816e46d"
+
+  # CSModule
+  - &CS_CREATE_NODE_OPERATOR_ROLE "0xc72a21b38830f4d6418a239e17db78b945cc7cfee674bac97fd596eaf0438478"
+  - &CS_REPORT_EL_REWARDS_STEALING_PENALTY_ROLE "0x59911a6aa08a72fe3824aec4500dc42335c6d0702b6d5c5c72ceb265a0de9302"
+  - &CS_SETTLE_EL_REWARDS_STEALING_PENALTY_ROLE "0xe85fdec10fe0f93d0792364051df7c3d73e37c17b3a954bffe593960e3cd3012"
+  - &CS_VERIFIER_ROLE "0x0ce23c3e399818cfee81a7ab0880f714e53d7672b08df0fa62f2843416e1ea09"
+
+  # CSVettedGate
+  - &CS_SET_TREE_ROLE "0x932ff8b4c99f097090996a04c43547e4ab5096f3d09b9d577303a7f3c1c1de56"
+  - &CS_START_REFERRAL_SEASON_ROLE "0xc0bd4bb446c4ce6fd2289aa78c8ea233de3ad2b870bc787b2ba154e19c271f12"
+  - &CS_END_REFERRAL_SEASON_ROLE "0x4a1304957825c6a76938ccf907b92b9b872c8348083e23dae57e7e6111105d0c"
 
 l1:
   rpcUrl: MAINNET_REMOTE_RPC_URL # https://ethereum-rpc.publicnode.com
@@ -837,7 +857,7 @@ l1:
         *MANAGE_TOKEN_URI_ROLE : []
         *ORACLE_ROLE : [*accountingOracle]
         *WQ_RESUME_ROLE : [*resealManager]
-        *WQ_PAUSE_ROLE : [*resealManager, *gateSealWithdrawalQueue]
+        *WQ_PAUSE_ROLE : [*resealManager, *circuitBreaker]
       implementationChecks:
         BUNKER_MODE_DISABLED_TIMESTAMP: *MAX_UINT256
         DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
@@ -949,7 +969,7 @@ l1:
         getRoleAdmin: null
         getRoleMember: null
         getRoleMemberCount: null
-        getSharesRequestedToBurn: [0, 0]
+        getSharesRequestedToBurn: null
         hasRole: null
         supportsInterface: null
       ozAcl:
@@ -1040,7 +1060,7 @@ l1:
         *CS_SET_BOND_CURVE_ROLE : [*csmCommittee, *CSVettedGate]
         *CS_RECOVERER_ROLE : []
         *CS_RESUME_ROLE : [*resealManager]
-        *CS_PAUSE_ROLE : [*resealManager, *gateSealCSAccounting]
+        *CS_PAUSE_ROLE : [*resealManager, *circuitBreaker]
       implementationChecks:
         DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
         DEFAULT_BOND_CURVE_ID: 0
@@ -1093,6 +1113,213 @@ l1:
         supportsInterface: null
         totalBondShares: 0
 
+    CSModule:
+      name: CSModule
+      address: *CSModule
+      checks:
+        DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
+        PAUSE_ROLE: *CS_PAUSE_ROLE
+        RESUME_ROLE: *CS_RESUME_ROLE
+        RECOVERER_ROLE: *CS_RECOVERER_ROLE
+        STAKING_ROUTER_ROLE: *STAKING_ROUTER_ROLE
+        CREATE_NODE_OPERATOR_ROLE: *CS_CREATE_NODE_OPERATOR_ROLE
+        REPORT_EL_REWARDS_STEALING_PENALTY_ROLE: *CS_REPORT_EL_REWARDS_STEALING_PENALTY_ROLE
+        SETTLE_EL_REWARDS_STEALING_PENALTY_ROLE: *CS_SETTLE_EL_REWARDS_STEALING_PENALTY_ROLE
+        VERIFIER_ROLE: *CS_VERIFIER_ROLE
+        PAUSE_INFINITELY: *MAX_UINT256
+        isPaused: null
+        ACCOUNTING: null
+        DEPOSIT_SIZE: null
+        EXIT_PENALTIES: null
+        FEE_DISTRIBUTOR: null
+        LIDO_LOCATOR: null
+        PARAMETERS_REGISTRY: null
+        QUEUE_LEGACY_PRIORITY: null
+        QUEUE_LOWEST_PRIORITY: null
+        STETH: null
+        accounting: null
+        depositQueueItem: null
+        depositQueuePointers: null
+        exitDeadlineThreshold: null
+        getActiveNodeOperatorsCount: null
+        getInitializedVersion: null
+        getNodeOperator: null
+        getNodeOperatorIds: null
+        getNodeOperatorIsActive: null
+        getNodeOperatorManagementProperties: null
+        getNodeOperatorNonWithdrawnKeys: null
+        getNodeOperatorOwner: null
+        getNodeOperatorSummary: null
+        getNodeOperatorTotalDepositedKeys: null
+        getNodeOperatorsCount: null
+        getNonce: null
+        getResumeSinceTimestamp: null
+        getRoleAdmin: null
+        getRoleMember: null
+        getRoleMemberCount: null
+        getSigningKeys: null
+        getSigningKeysWithSignatures: null
+        getStakingModuleSummary: null
+        getType: null
+        hasRole: null
+        isValidatorExitDelayPenaltyApplicable: null
+        isValidatorWithdrawn: null
+        supportsInterface: null
+      ozAcl:
+        *DEFAULT_ADMIN_ROLE : [*aragonAgent]
+        *CS_PAUSE_ROLE : [*resealManager, *circuitBreaker]
+        *CS_RESUME_ROLE : [*resealManager]
+        *CS_RECOVERER_ROLE : []
+        *STAKING_ROUTER_ROLE : [*stakingRouter]
+        *CS_CREATE_NODE_OPERATOR_ROLE : [*CSPermissionlessGate, *CSVettedGate]
+        *CS_REPORT_EL_REWARDS_STEALING_PENALTY_ROLE : [*csmCommittee]
+        *CS_SETTLE_EL_REWARDS_STEALING_PENALTY_ROLE : [*evmScriptExecutor]
+        *CS_VERIFIER_ROLE : [*CSVerifier]
+
+    CSFeeOracle:
+      name: CSFeeOracle
+      address: *CSFeeOracle
+      checks:
+        DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
+        PAUSE_ROLE: *CS_PAUSE_ROLE
+        RESUME_ROLE: *CS_RESUME_ROLE
+        RECOVERER_ROLE: *CS_RECOVERER_ROLE
+        MANAGE_CONSENSUS_CONTRACT_ROLE: *ORACLE_MANAGE_CONSENSUS_CONTRACT_ROLE
+        MANAGE_CONSENSUS_VERSION_ROLE: *ORACLE_MANAGE_CONSENSUS_VERSION_ROLE
+        SUBMIT_DATA_ROLE: *ORACLE_SUBMIT_DATA_ROLE
+        PAUSE_INFINITELY: *MAX_UINT256
+        isPaused: null
+        FEE_DISTRIBUTOR: null
+        GENESIS_TIME: null
+        SECONDS_PER_SLOT: null
+        STRIKES: null
+        getConsensusContract: null
+        getConsensusReport: null
+        getConsensusVersion: null
+        getContractVersion: null
+        getLastProcessingRefSlot: null
+        getResumeSinceTimestamp: null
+        getRoleAdmin: null
+        getRoleMember: null
+        getRoleMemberCount: null
+        hasRole: null
+        supportsInterface: null
+      ozAcl:
+        *DEFAULT_ADMIN_ROLE : [*aragonAgent]
+        *CS_PAUSE_ROLE : [*resealManager, *circuitBreaker]
+        *CS_RESUME_ROLE : [*resealManager]
+        *CS_RECOVERER_ROLE : []
+        *ORACLE_MANAGE_CONSENSUS_CONTRACT_ROLE : []
+        *ORACLE_MANAGE_CONSENSUS_VERSION_ROLE : []
+        *ORACLE_SUBMIT_DATA_ROLE : []
+
+    CSVerifier:
+      name: CSVerifier
+      address: *CSVerifier
+      checks:
+        DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
+        PAUSE_ROLE: *CS_PAUSE_ROLE
+        RESUME_ROLE: *CS_RESUME_ROLE
+        PAUSE_INFINITELY: *MAX_UINT256
+        isPaused: null
+        BEACON_ROOTS: null
+        CAPELLA_SLOT: null
+        FIRST_SUPPORTED_SLOT: null
+        GI_FIRST_BLOCK_ROOT_IN_SUMMARY_CURR: null
+        GI_FIRST_BLOCK_ROOT_IN_SUMMARY_PREV: null
+        GI_FIRST_HISTORICAL_SUMMARY_CURR: null
+        GI_FIRST_HISTORICAL_SUMMARY_PREV: null
+        GI_FIRST_VALIDATOR_CURR: null
+        GI_FIRST_VALIDATOR_PREV: null
+        GI_FIRST_WITHDRAWAL_CURR: null
+        GI_FIRST_WITHDRAWAL_PREV: null
+        MODULE: null
+        PIVOT_SLOT: null
+        SLOTS_PER_EPOCH: null
+        SLOTS_PER_HISTORICAL_ROOT: null
+        WITHDRAWAL_ADDRESS: null
+        getResumeSinceTimestamp: null
+        getRoleAdmin: null
+        getRoleMember: null
+        getRoleMemberCount: null
+        hasRole: null
+        supportsInterface: null
+      ozAcl:
+        *DEFAULT_ADMIN_ROLE : [*aragonAgent]
+        *CS_PAUSE_ROLE : [*resealManager, *circuitBreaker]
+        *CS_RESUME_ROLE : [*resealManager]
+
+    CSVettedGate:
+      name: VettedGate
+      address: *CSVettedGate
+      checks:
+        DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
+        PAUSE_ROLE: *CS_PAUSE_ROLE
+        RESUME_ROLE: *CS_RESUME_ROLE
+        RECOVERER_ROLE: *CS_RECOVERER_ROLE
+        SET_TREE_ROLE: *CS_SET_TREE_ROLE
+        START_REFERRAL_SEASON_ROLE: *CS_START_REFERRAL_SEASON_ROLE
+        END_REFERRAL_SEASON_ROLE: *CS_END_REFERRAL_SEASON_ROLE
+        PAUSE_INFINITELY: *MAX_UINT256
+        isPaused: null
+        ACCOUNTING: null
+        MODULE: null
+        curveId: null
+        getInitializedVersion: null
+        getReferralsCount: null
+        getResumeSinceTimestamp: null
+        getRoleAdmin: null
+        getRoleMember: null
+        getRoleMemberCount: null
+        hasRole: null
+        hashLeaf: null
+        isConsumed: null
+        isReferralProgramSeasonActive: null
+        isReferrerConsumed: null
+        referralCurveId: null
+        referralProgramSeasonNumber: null
+        referralsThreshold: null
+        supportsInterface: null
+        treeCid: null
+        treeRoot: null
+        verifyProof: null
+      ozAcl:
+        *DEFAULT_ADMIN_ROLE : [*aragonAgent]
+        *CS_PAUSE_ROLE : [*resealManager, *circuitBreaker]
+        *CS_RESUME_ROLE : [*resealManager]
+        *CS_RECOVERER_ROLE : []
+        *CS_SET_TREE_ROLE : [*evmScriptExecutor]
+        *CS_START_REFERRAL_SEASON_ROLE : [*aragonAgent]
+        *CS_END_REFERRAL_SEASON_ROLE : [*csmCommittee]
+
+    CSEjector:
+      name: CSEjector
+      address: *CSEjector
+      checks:
+        DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
+        PAUSE_ROLE: *CS_PAUSE_ROLE
+        RESUME_ROLE: *CS_RESUME_ROLE
+        RECOVERER_ROLE: *CS_RECOVERER_ROLE
+        PAUSE_INFINITELY: *MAX_UINT256
+        isPaused: null
+        MODULE: null
+        STAKING_MODULE_ID: null
+        STRIKES: null
+        STRIKES_EXIT_TYPE_ID: null
+        VOLUNTARY_EXIT_TYPE_ID: null
+        getResumeSinceTimestamp: null
+        getRoleAdmin: null
+        getRoleMember: null
+        getRoleMemberCount: null
+        hasRole: null
+        supportsInterface: null
+        triggerableWithdrawalsGateway: null
+      ozAcl:
+        *DEFAULT_ADMIN_ROLE : [*aragonAgent]
+        *CS_PAUSE_ROLE : [*resealManager, *circuitBreaker]
+        *CS_RESUME_ROLE : [*resealManager]
+        *CS_RECOVERER_ROLE : []
+
     minFirstAllocationStrategy:
       name: MinFirstAllocationStrategy
       address: *minFirstAllocationStrategy
@@ -1122,7 +1349,7 @@ l1:
       ozAcl:
         *DEFAULT_ADMIN_ROLE : [*aragonAgent]
         *ADD_FULL_WITHDRAWAL_REQUEST_ROLE : [*CSEjector, *validatorsExitBusOracle]
-        *TWG_PAUSE_ROLE : [*gateSealVEBAndTWG, *resealManager]
+        *TWG_PAUSE_ROLE : [*circuitBreaker, *resealManager]
         *TWG_RESUME_ROLE : [*resealManager]
         *TW_EXIT_LIMIT_MANAGER_ROLE : []
 
@@ -1207,7 +1434,7 @@ l1:
         vaultsCount: null
       ozAcl:
         *DEFAULT_ADMIN_ROLE : [*aragonAgent]
-        *OZ_PAUSE_ROLE : [*gateSealVaulthubAndPredepositGuarantee, *resealManager]
+        *OZ_PAUSE_ROLE : [*circuitBreaker, *resealManager]
         *OZ_RESUME_ROLE : [*resealManager]
         *VAULT_MASTER_ROLE : []
         *BAD_DEBT_MASTER_ROLE : [*vaultsAdapter]
@@ -1307,7 +1534,7 @@ l1:
         validatorStatus: null
       ozAcl:
         *DEFAULT_ADMIN_ROLE : [*aragonAgent]
-        *OZ_PAUSE_ROLE : [*gateSealVaulthubAndPredepositGuarantee, *resealManager]
+        *OZ_PAUSE_ROLE : [*circuitBreaker, *resealManager]
         *OZ_RESUME_ROLE : [*resealManager]
       implementationChecks:
         PREDEPOSIT_AMOUNT: *ONE_ETH_WEI
@@ -1694,7 +1921,7 @@ l1:
         *DEFAULT_ADMIN_ROLE : [*aragonAgent]
         *ORACLE_MANAGE_CONSENSUS_CONTRACT_ROLE : []
         *ORACLE_MANAGE_CONSENSUS_VERSION_ROLE : []
-        *ORACLE_PAUSE_ROLE : [*resealManager, *gateSealVEBAndTWG]
+        *ORACLE_PAUSE_ROLE : [*resealManager, *circuitBreaker]
         *ORACLE_RESUME_ROLE : [*resealManager]
         *ORACLE_SUBMIT_DATA_ROLE : []
       implementationChecks:
@@ -2445,6 +2672,64 @@ l1:
         get_expiry_timestamp: 1789207187
         is_expired: false
 
+    circuitBreaker:
+      name: CircuitBreaker
+      address: *circuitBreaker
+      checks:
+        ADMIN: *aragonAgent
+        MIN_PAUSE_DURATION: *DURATION_5_DAYS
+        MAX_PAUSE_DURATION: *DURATION_60_DAYS
+        MIN_HEARTBEAT_INTERVAL: *DURATION_30_DAYS
+        MAX_HEARTBEAT_INTERVAL: *DURATION_3_YEARS
+        pauseDuration: *DURATION_21_DAYS
+        heartbeatInterval: *DURATION_1_YEAR
+        heartbeatExpiry: null
+        getPausables:
+          - *withdrawalQueueERC721
+          - *validatorsExitBusOracle
+          - *triggerableWithdrawalsGateway
+          - *vaultHub
+          - *predepositGuarantee
+          - *CSModule
+          - *CSAccounting
+          - *CSFeeOracle
+          - *CSVerifier
+          - *CSVettedGate
+          - *CSEjector
+        getPauser:
+          - args: [*withdrawalQueueERC721]
+            result: *sealCommittee
+          - args: [*validatorsExitBusOracle]
+            result: *sealCommittee
+          - args: [*triggerableWithdrawalsGateway]
+            result: *sealCommittee
+          - args: [*vaultHub]
+            result: *sealCommittee
+          - args: [*predepositGuarantee]
+            result: *sealCommittee
+          - args: [*CSModule]
+            result: *csmCommittee
+          - args: [*CSAccounting]
+            result: *csmCommittee
+          - args: [*CSFeeOracle]
+            result: *csmCommittee
+          - args: [*CSVerifier]
+            result: *csmCommittee
+          - args: [*CSVettedGate]
+            result: *csmCommittee
+          - args: [*CSEjector]
+            result: *csmCommittee
+        getPausableCount:
+          - args: [*sealCommittee]
+            result: 5
+          - args: [*csmCommittee]
+            result: 6
+        isPauserLive:
+          - args: [*sealCommittee]
+            result: true
+          - args: [*csmCommittee]
+            result: true
+
     node-operators-registry:
       name: NodeOperatorsRegistry
       address: *nodeOperatorsRegistry
@@ -2661,6 +2946,27 @@ l1:
         isEVMScriptFactory: null
         motions: null
         objections: null
+        supportsInterface: null
+
+    lolAllowedRecipientsRegistry:
+      name: AllowedRecipientsRegistry
+      address: *lolAllowedRecipientsRegistry
+      checks:
+        getLimitParameters: [8000000000000000000000, 6]
+        ADD_RECIPIENT_TO_ALLOWED_LIST_ROLE: null
+        DEFAULT_ADMIN_ROLE: null
+        REMOVE_RECIPIENT_FROM_ALLOWED_LIST_ROLE: null
+        SET_PARAMETERS_ROLE: null
+        UPDATE_SPENT_AMOUNT_ROLE: null
+        allowedRecipients: null
+        bokkyPooBahsDateTimeContract: null
+        getAllowedRecipients: null
+        getPeriodState: null
+        getRoleAdmin: null
+        hasRole: null
+        isRecipientAllowed: null
+        isUnderSpendableBalance: null
+        spendableBalance: null
         supportsInterface: null
 
     evmScriptExecutor:
