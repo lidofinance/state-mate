@@ -1158,8 +1158,8 @@ l1:
         feeRecipient: *treasury
         minPriceD18:
         owner: *lazyVaultAdmin
-        performanceFeeD6: 0
-        protocolFeeD6: 0
+        performanceFeeD6: 100000
+        protocolFeeD6: 10000
         redeemFeeD6: 0
         timestamps:
       implementationChecks:
@@ -2438,7 +2438,7 @@ l1:
         getVerificationResult:
         hashCall:
         isAllowedCall:
-        merkleRoot: "0x6684dd40de98004314146ec0e664da87cee9a0b83993df2e13cfac91f003559e"
+        merkleRoot: "0x92cf8cbe6034ade3bb247df86672b570f9bee9e74e10f011fc2af8fc2fd44785"
         vault: *earnUSDe_vault
         verifyCall:
       implementationChecks:
