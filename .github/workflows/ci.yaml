@@ -24,6 +24,9 @@ jobs:
             network: ethereum-mainnet
           - config: configs/lido/mainnet/lido-et.yaml
             network: ethereum-mainnet
+          # srv3 (V3 upgrade) - Mainnet, pre-enact state
+          - config: configs/srv3/mainnet/before_voting.yaml
+            network: ethereum-mainnet
           # Lido configs - Hoodi
           - config: configs/lido/hoodi/lido-testnet.yaml
             network: hoodi-testnet
