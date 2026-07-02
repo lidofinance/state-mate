@@ -282,7 +282,9 @@ misc:
   - &QUEUE_LEGACY_PRIORITY 4
   - &QUEUE_LOWEST_PRIORITY 5
 
-  - &defaultBondingCurve [[[1,2400000000000000000,2400000000000000000],[2,3700000000000000000,1300000000000000000]]]
+  - &defaultBondingCurve [
+      [[1, 2400000000000000000, 2400000000000000000], [2, 3700000000000000000, 1300000000000000000]],
+    ]
   - &defaultAllowedExitDelay 345600
   - &defaultBadPerformancePenalty 258000000000000000
   - &defaultElRewardsStealingAdditionalFine 100000000000000000
@@ -297,18 +299,17 @@ misc:
   - &defaultRewardShareData [[1, 5834]]
   - &defaultStrikesParams [6, 3]
 
-  - &icsBondingCurve [[[1,1500000000000000000,1500000000000000000],[2,2800000000000000000,1300000000000000000]]]
+  - &icsBondingCurve [[[1, 1500000000000000000, 1500000000000000000], [2, 2800000000000000000, 1300000000000000000]]]
   - &icsAllowedExitDelay 432000
   - &icsBadPerformancePenalty 172000000000000000
   - &icsElRewardsStealingAdditionalFine 50000000000000000
   - &icsExitDelayPenalty 50000000000000000
   - &icsKeyRemovalCharge 10000000000000000
   - &icsPerformanceCoefficients [54, 4, 2]
-  - &icsPerformanceLeewayData [[1, 500],[151, 300]]
+  - &icsPerformanceLeewayData [[1, 500], [151, 300]]
   - &icsQueueConfig [0, 10]
-  - &icsRewardShareData [[1, 10000],[17, 5834]]
+  - &icsRewardShareData [[1, 10000], [17, 5834]]
   - &icsStrikesParams [6, 4]
-
 
 eoa:
   - &deployer "0xAD2F7e30AeA89f6D45D942D0f52aFB8B395965f2"
@@ -1049,7 +1050,7 @@ l1:
         supportsInterface: null
 
     # --- CSM ---
-    
+
     CSAccounting:
       name: CSAccounting
       address: *CSAccounting
@@ -1390,7 +1391,7 @@ l1:
         getRoleMember: null
         getRoleMemberCount: null
         hasRole: null
-        isPaused: false 
+        isPaused: false
         supportsInterface: null
       ozAcl:
         *DEFAULT_ADMIN_ROLE : [*aragonAgent]
@@ -1476,13 +1477,13 @@ l1:
         treeCid: null
         treeRoot: null
         verifyProof: null
- 
+
     CSPermissionlessGate:
       name: PermissionlessGate
       address: *CSPermissionlessGate
       checks:
         CURVE_ID: 0
-        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE 
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
         MODULE: *CSModule
         RECOVERER_ROLE: *CS_RECOVERER_ROLE
         getRoleAdmin: null
@@ -1649,7 +1650,7 @@ l1:
             args: [1]
           - result: *icsElRewardsStealingAdditionalFine
             args: [2]
-        getExitDelayPenalty: 
+        getExitDelayPenalty:
           - result: *defaultExitDelayPenalty
             args: [1]
           - result: *icsExitDelayPenalty
@@ -1713,16 +1714,16 @@ l1:
         defaultKeyRemovalCharge: 0
         defaultKeysLimit: 0
         defaultMaxWithdrawalRequestFee: 0
-        defaultPerformanceCoefficients: 
+        defaultPerformanceCoefficients:
           - 0
           - 0
           - 0
         defaultPerformanceLeeway: 0
-        defaultQueueConfig: 
+        defaultQueueConfig:
           - 0
           - 0
         defaultRewardShare: 0
-        defaultStrikesParams: 
+        defaultStrikesParams:
           - 0
           - 0
         getAllowedExitDelay: null
