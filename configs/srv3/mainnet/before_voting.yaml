@@ -46,6 +46,12 @@ parameters:
   - &exitedValidatorEthAmountLimit 32
   - &externalPendingBalanceCapEth 300
 
+  # ConsolidationGateway limit
+  # https://hackmd.io/RLqefrGYQlaaPXnXEF8-ew#Deploy-params-ConsolidationGateway
+  - &maxConsolidationRequestsLimit 2900
+  - &consolidationsPerFrame 1
+  - &frameDurationInSec 30
+
 deployed:
   l1:
     # Live locator proxy (still delegates to the old impl), replaced by the vote
@@ -541,7 +547,14 @@ l1:
         PAUSE_ROLE: *PAUSE_ROLE
         PIVOT_SLOT: 0
         RESUME_ROLE: *RESUME_ROLE
-        getConsolidationRequestLimitFullInfo: [2900, 1, 30, 2900, 2900]
+        getConsolidationRequestLimitFullInfo:
+          [
+            *maxConsolidationRequestsLimit,
+            *consolidationsPerFrame,
+            *frameDurationInSec,
+            *maxConsolidationRequestsLimit,
+            *maxConsolidationRequestsLimit,
+          ]
         getResumeSinceTimestamp: 0
         getRoleAdmin:
         getRoleMember:
