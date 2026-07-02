@@ -59,7 +59,7 @@
     "chalk": "^4.1.2",
     "commander": "^15.0.0",
     "dotenv": "^17.4.2",
-    "ethers": "^6.16.0",
+    "ethers": "^6.17.0",
     "json-diff": "^1.0.6",
     "tsconfig-paths": "^4.2.0",
     "yaml": "^2.9.0"
