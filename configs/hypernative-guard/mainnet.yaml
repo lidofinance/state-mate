@@ -1,0 +1,291 @@
+# yaml-language-server: $schema=../../schemas/main-schema.json
+---
+# Hypernative Safe transaction guards (HypernativeGuard) protecting Lido multisigs.
+# Source: https://github.com/Hypernative-Labs/hypernative-guard/tree/5e7cbe19ebd5ea0139bed5f003c253d634a8b85c
+#
+# HypernativeGuard is AccessControlEnumerable + BaseTransactionGuard.
+# On deploy it: grants KEEPER_ROLE to the keeper, starts in pass-through mode,
+# and pre-approves the two nonce-free timelock transactions
+# (activateRevokeTimelock / disableRevokeTimelock).
+# DEFAULT_ADMIN_ROLE is granted to nobody (0 members).
+# Both timelocks (revoke guard / enable pass-through) use a hardcoded 10-day delay.
+#
+# NOTE: this config describes the TARGET state.
+#   - isPassThroughMode is expected to be `false` (enforcement enabled), but the
+#     guards deploy with pass-through mode ON (isPassThroughMode == true) and it is
+#     turned off via disablePassThroughMode() after setup — so this check is RED
+#     until that happens and turns GREEN afterwards.
+#   - The guards are also not yet wired into the Safes (Safe slot
+#     keccak256("guard_manager.guard.address") is still 0). Safe-side verification
+#     (setGuard wiring, owners, threshold) is intentionally out of scope here —
+#     this config only checks the guard contracts themselves.
+
+deployed:
+  l1:
+    # Hypernative keeper (Hypernative System Asset), shared by all guards
+    - &hypernativeKeeper "0xc664b5be2f72bbeb23d1eed6bbd884a2f2d736b0"
+
+    # Protected Safes (referenced only as expected safeAddress() values)
+    - &lidoLabsSafe "0x95B521B4F55a447DB89f6a27f951713fC2035f3F"
+    - &lidoEcosystemSafe "0x55897893c19e4B0c52731a3b7C689eC417005Ad6"
+    - &lidoAllianceSafe "0x606f77BF3dd6Ed9790D9771C7003f269a385D942"
+    - &lolMainSafe "0x87D93d9B2C672bf9c9642d853a8682546a5012B5"
+
+    # HypernativeGuard contracts (redeployed after review)
+    - &lidoLabsGuard "0x05Af8e10964Ad5536a643Ce7b9C831F45DC9D43e"
+    - &lidoEcosystemGuard "0x95D3BD1547738fe6B5e43F7A2939e0c1c2Ac2661"
+    - &lidoAllianceGuard "0xFf4Adf0fAfc7475ba9BdfFdB90Fe7e07931CeBd6"
+    - &lolMainGuard "0xD43a70D54E907b339BF77A31dA25d30Af4b4C73c"
+
+roles:
+  - &DEFAULT_ADMIN_ROLE "0x0000000000000000000000000000000000000000000000000000000000000000"
+  # keccak256("KEEPER_ROLE")
+  - &KEEPER_ROLE "0xfc8737ab85eb45125971625a9ebdb75cc78e01d5c1fa80c4c6e5203f47bc4fab"
+
+l1:
+  rpcUrl: MAINNET_REMOTE_RPC_URL # https://ethereum-rpc.publicnode.com
+  explorerHostname: api.etherscan.io/v2/api
+  explorerTokenEnv: ETHERSCAN_TOKEN
+  chainId: 1
+  contracts:
+    # ---------------------------------------------------------------------------
+    # Lido Labs MS guard
+    # ---------------------------------------------------------------------------
+    lidoLabsGuard:
+      name: HypernativeGuard
+      address: *lidoLabsGuard
+      checks:
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        KEEPER_ROLE: *KEEPER_ROLE
+        safeAddress: *lidoLabsSafe
+        isPassThroughMode: false # target state (guards deploy in pass-through mode; disabled after wiring)
+        isRevokeTimelockTriggered: false
+        isPassThroughTimelockTriggered: false
+        getRevokeTimelockBlock: 0
+        getPassThroughTimelockBlock: 0
+        getPolicyExtensions: []
+        # immutables derived from the Safe domain separator (unique per guard)
+        DOMAIN_SEPARATOR: "0x52bc042a04305ea6e73eb9fd596d942fcf720c2cb8c2ab9617fc5f707203a22a"
+        revokingHash: "0x429ffe1f82269334e16347a7eda5948cb399ee90cefe848d1a0fc3cfa7407d7b"
+        enablePassThroughModeHash: "0x4cd879a333a4135b2b3f206eafdff7ca311a349811c9028deddbfece39760689"
+        activateRevokeTimelockHash: &labsActivateRevokeTimelockHash "0x0c64af59a0757b888a485d07e676961ccb8f32748c98e012866d4487857b94c0"
+        disableRevokeTimelockHash: &labsDisableRevokeTimelockHash "0xa623e16b3410209eaeb57df5b0b41c8da4177206c5c8278100cd4b74d67df72d"
+        # the two timelock transactions are pre-approved as nonce-free on deploy
+        approvedNonceFreeTxHashes:
+          - args: [*labsActivateRevokeTimelockHash]
+            result: true
+          - args: [*labsDisableRevokeTimelockHash]
+            result: true
+        approvedTxHashes: null # mapping(bytes32=>bool), needs a specific hash
+        approvedFunctionCallHashes: null # mapping(bytes32=>bool), needs a specific hash
+        getRoleAdmin:
+          - args: [*DEFAULT_ADMIN_ROLE]
+            result: *DEFAULT_ADMIN_ROLE
+          - args: [*KEEPER_ROLE]
+            result: *DEFAULT_ADMIN_ROLE
+        getRoleMembers:
+          - args: [*DEFAULT_ADMIN_ROLE]
+            result: []
+          - args: [*KEEPER_ROLE]
+            result: [*hypernativeKeeper]
+        getRoleMember: null # covered via ozAcl
+        getRoleMemberCount: null # covered via ozAcl
+        hasRole: null # covered via ozAcl
+        supportsInterface:
+          - args: ["0x01ffc9a7"] # ERC-165 (IERC165)
+            result: true
+          - args: ["0x7965db0b"] # IAccessControl
+            result: true
+          - args: ["0x5a05180f"] # IAccessControlEnumerable
+            result: true
+          - args: ["0xe6d7a83a"] # ITransactionGuard (Safe transaction guard)
+            result: true
+          - args: ["0xffffffff"] # must be false per ERC-165
+            result: false
+        checkTransaction: null # guard hook, requires a full tx + signatures
+        getFunctionCallHash: null # pure helper, needs tx arguments
+        getNonceFreeTransactionHash: null # pure helper, needs tx arguments
+        getPrivilegedOperationHash: null # pure helper, needs tx arguments
+      ozAcl:
+        *DEFAULT_ADMIN_ROLE : []
+        *KEEPER_ROLE : [*hypernativeKeeper]
+
+    # ---------------------------------------------------------------------------
+    # Lido Ecosystem MS guard
+    # ---------------------------------------------------------------------------
+    lidoEcosystemGuard:
+      name: HypernativeGuard
+      address: *lidoEcosystemGuard
+      checks:
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        KEEPER_ROLE: *KEEPER_ROLE
+        safeAddress: *lidoEcosystemSafe
+        isPassThroughMode: false # target state (guards deploy in pass-through mode; disabled after wiring)
+        isRevokeTimelockTriggered: false
+        isPassThroughTimelockTriggered: false
+        getRevokeTimelockBlock: 0
+        getPassThroughTimelockBlock: 0
+        getPolicyExtensions: []
+        DOMAIN_SEPARATOR: "0x81324a6349931a21396d6a2b649d772d33957058a0bfa78ff1b40543eb26e89c"
+        revokingHash: "0xa6372e6b81cf2dcd8adc2a6a48277e28477d333a7d23380b745c740bd8c5cbd5"
+        enablePassThroughModeHash: "0xf0dcbecf84bcc1853cd2c26d39f2a77c795fcbd10a94a67dd478f31ae3acfe4b"
+        activateRevokeTimelockHash: &ecoActivateRevokeTimelockHash "0x149e69286e5d32772cce1c6f5555e38654f79135598bd9c62b5581118c4604db"
+        disableRevokeTimelockHash: &ecoDisableRevokeTimelockHash "0x0be6c7918fa88468bf277334cff0190a549b7401bc49e42ba82474b73598f268"
+        approvedNonceFreeTxHashes:
+          - args: [*ecoActivateRevokeTimelockHash]
+            result: true
+          - args: [*ecoDisableRevokeTimelockHash]
+            result: true
+        approvedTxHashes: null
+        approvedFunctionCallHashes: null
+        getRoleAdmin:
+          - args: [*DEFAULT_ADMIN_ROLE]
+            result: *DEFAULT_ADMIN_ROLE
+          - args: [*KEEPER_ROLE]
+            result: *DEFAULT_ADMIN_ROLE
+        getRoleMembers:
+          - args: [*DEFAULT_ADMIN_ROLE]
+            result: []
+          - args: [*KEEPER_ROLE]
+            result: [*hypernativeKeeper]
+        getRoleMember: null
+        getRoleMemberCount: null
+        hasRole: null
+        supportsInterface:
+          - args: ["0x01ffc9a7"] # ERC-165 (IERC165)
+            result: true
+          - args: ["0x7965db0b"] # IAccessControl
+            result: true
+          - args: ["0x5a05180f"] # IAccessControlEnumerable
+            result: true
+          - args: ["0xe6d7a83a"] # ITransactionGuard (Safe transaction guard)
+            result: true
+          - args: ["0xffffffff"] # must be false per ERC-165
+            result: false
+        checkTransaction: null
+        getFunctionCallHash: null
+        getNonceFreeTransactionHash: null
+        getPrivilegedOperationHash: null
+      ozAcl:
+        *DEFAULT_ADMIN_ROLE : []
+        *KEEPER_ROLE : [*hypernativeKeeper]
+
+    # ---------------------------------------------------------------------------
+    # Lido Alliance MS guard
+    # ---------------------------------------------------------------------------
+    lidoAllianceGuard:
+      name: HypernativeGuard
+      address: *lidoAllianceGuard
+      checks:
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        KEEPER_ROLE: *KEEPER_ROLE
+        safeAddress: *lidoAllianceSafe
+        isPassThroughMode: false # target state (guards deploy in pass-through mode; disabled after wiring)
+        isRevokeTimelockTriggered: false
+        isPassThroughTimelockTriggered: false
+        getRevokeTimelockBlock: 0
+        getPassThroughTimelockBlock: 0
+        getPolicyExtensions: []
+        DOMAIN_SEPARATOR: "0x9d104fb5e22968c1078635bdfc91ca20a9c3ebdb762ee4f4eff428b6e92f36a5"
+        revokingHash: "0x99f2e5fb11d244218872e48cbf4714d9c7776961457947a6366c8a62f63ab82d"
+        enablePassThroughModeHash: "0x641fafee863cdd9c722e4066553e7684ffe235165d303e5cf9c1d135fc36822b"
+        activateRevokeTimelockHash: &allianceActivateRevokeTimelockHash "0xb58278ac4de6c7c2558f7d30f4743e805ba8aa263e5c826b920645e6038348cb"
+        disableRevokeTimelockHash: &allianceDisableRevokeTimelockHash "0x9d83daa38068b2300ff34afb07f22461f9875f24afae0ca9beaf537be19752e5"
+        approvedNonceFreeTxHashes:
+          - args: [*allianceActivateRevokeTimelockHash]
+            result: true
+          - args: [*allianceDisableRevokeTimelockHash]
+            result: true
+        approvedTxHashes: null
+        approvedFunctionCallHashes: null
+        getRoleAdmin:
+          - args: [*DEFAULT_ADMIN_ROLE]
+            result: *DEFAULT_ADMIN_ROLE
+          - args: [*KEEPER_ROLE]
+            result: *DEFAULT_ADMIN_ROLE
+        getRoleMembers:
+          - args: [*DEFAULT_ADMIN_ROLE]
+            result: []
+          - args: [*KEEPER_ROLE]
+            result: [*hypernativeKeeper]
+        getRoleMember: null
+        getRoleMemberCount: null
+        hasRole: null
+        supportsInterface:
+          - args: ["0x01ffc9a7"] # ERC-165 (IERC165)
+            result: true
+          - args: ["0x7965db0b"] # IAccessControl
+            result: true
+          - args: ["0x5a05180f"] # IAccessControlEnumerable
+            result: true
+          - args: ["0xe6d7a83a"] # ITransactionGuard (Safe transaction guard)
+            result: true
+          - args: ["0xffffffff"] # must be false per ERC-165
+            result: false
+        checkTransaction: null
+        getFunctionCallHash: null
+        getNonceFreeTransactionHash: null
+        getPrivilegedOperationHash: null
+      ozAcl:
+        *DEFAULT_ADMIN_ROLE : []
+        *KEEPER_ROLE : [*hypernativeKeeper]
+
+    # ---------------------------------------------------------------------------
+    # LOL main MS guard
+    # ---------------------------------------------------------------------------
+    lolMainGuard:
+      name: HypernativeGuard
+      address: *lolMainGuard
+      checks:
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        KEEPER_ROLE: *KEEPER_ROLE
+        safeAddress: *lolMainSafe
+        isPassThroughMode: false # target state (guards deploy in pass-through mode; disabled after wiring)
+        isRevokeTimelockTriggered: false
+        isPassThroughTimelockTriggered: false
+        getRevokeTimelockBlock: 0
+        getPassThroughTimelockBlock: 0
+        getPolicyExtensions: []
+        DOMAIN_SEPARATOR: "0xd321138f2bf9cc808e81c9d2c087d27eb4233d30218d0c158b0fabd18127597f"
+        revokingHash: "0xba58570ed36e97c0e8a8b1124999ab4eac5c4b7409a3d83b7d35cce9882fd2c1"
+        enablePassThroughModeHash: "0x1555ca669b5b591f4dce0919f2dbb6b171fb94269ad20c021fdf8407be71feee"
+        activateRevokeTimelockHash: &lolActivateRevokeTimelockHash "0x8deaa9343e6d38aa4eaeaf07a0119da6876c3ea68524053ddc171c156bbc62f7"
+        disableRevokeTimelockHash: &lolDisableRevokeTimelockHash "0x6fb5538bce1bd7f6a0adc2c8aa9e8e0ee1b1722801b0677a19509de144fa3441"
+        approvedNonceFreeTxHashes:
+          - args: [*lolActivateRevokeTimelockHash]
+            result: true
+          - args: [*lolDisableRevokeTimelockHash]
+            result: true
+        approvedTxHashes: null
+        approvedFunctionCallHashes: null
+        getRoleAdmin:
+          - args: [*DEFAULT_ADMIN_ROLE]
+            result: *DEFAULT_ADMIN_ROLE
+          - args: [*KEEPER_ROLE]
+            result: *DEFAULT_ADMIN_ROLE
+        getRoleMembers:
+          - args: [*DEFAULT_ADMIN_ROLE]
+            result: []
+          - args: [*KEEPER_ROLE]
+            result: [*hypernativeKeeper]
+        getRoleMember: null
+        getRoleMemberCount: null
+        hasRole: null
+        supportsInterface:
+          - args: ["0x01ffc9a7"] # ERC-165 (IERC165)
+            result: true
+          - args: ["0x7965db0b"] # IAccessControl
+            result: true
+          - args: ["0x5a05180f"] # IAccessControlEnumerable
+            result: true
+          - args: ["0xe6d7a83a"] # ITransactionGuard (Safe transaction guard)
+            result: true
+          - args: ["0xffffffff"] # must be false per ERC-165
+            result: false
+        checkTransaction: null
+        getFunctionCallHash: null
+        getNonceFreeTransactionHash: null
+        getPrivilegedOperationHash: null
+      ozAcl:
+        *DEFAULT_ADMIN_ROLE : []
+        *KEEPER_ROLE : [*hypernativeKeeper]
