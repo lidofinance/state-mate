@@ -1,0 +1,103 @@
+parameters:
+  # Token addresses
+  - &ldoToken "0x5A98FcBEA516Cf06857215779Fd812CA3beF1B32"
+  - &wstethToken "0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0"
+  # Curve related addresses
+  - &curveAdmin "0x97aA696e37659Fb4f0B53824246d802Df40E980A"
+  - &curveFeeCollector "0xa2Bcd1a4Efbd04B63cd03f5aFf2561106ebCCE00"
+  - &curveMathImplementation "0x1Fd8Af16DC4BEBd950521308D55d0543b6cDF4A1"
+
+deployed:
+  l1:
+    - &curvePoolLdoWsteth "0xD7f1dA0a28E39dd0dB70E6Acdc2B49846AD22760"
+    - &curveTwocryptoFactory "0x98EE851a00abeE0d95D08cF4CA2BdCE32aeaAF7F"
+
+l1:
+  chainId: 1
+  rpcUrl: L1_MAINNET_RPC_URL
+  explorerHostname: api.etherscan.io
+  explorerTokenEnv: ETHERSCAN_TOKEN
+  contracts:
+    curvePoolLdoWsteth:
+      name: CurveTwocryptoOptimized
+      address: *curvePoolLdoWsteth
+      checks:
+        # Metadata
+        name: "Curve.fi LDO/wstETH"
+        symbol: "LDOwstETH-f"
+        decimals: 18
+        version: "v2.1.0"
+        DOMAIN_SEPARATOR: "0xd3d4e91189ec7a7d1aa87f43d39e5aeab7803dd600dbdc1727cfb9dbd8849bcd"
+        salt: "0x9cff4f6a46077356b5f51d8045bd5597f08443ebee48320faa82544eb276665d"
+        # Composition
+        coins:
+          - args: [0]
+            result: *ldoToken
+          - args: [1]
+            result: *wstethToken
+        precisions: [1, 1]
+        factory: *curveTwocryptoFactory
+        MATH: *curveMathImplementation
+        admin: *curveAdmin
+        fee_receiver: *curveFeeCollector
+        ADMIN_FEE: 5000000000
+        # Pool parameters
+        A: 400000
+        gamma: 145000000000000
+        mid_fee: 500000
+        out_fee: 5000000
+        fee_gamma: 230000000000000
+        allowed_extra_profit: 2000000000000
+        adjustment_step: 146000000000000
+        ma_time: 601
+        packed_fee_params: "170141183460469231823921024084661863808000000"
+        packed_rebalancing_params: "680564733841876929619973849625130958848000000000866"
+        initial_A_gamma: "136112946768375385385349842972852284582400000"
+        initial_A_gamma_time: 0
+        future_A_gamma: "136112946768375385385349842972852284582400000"
+        future_A_gamma_time: 0
+        fee:
+        lp_price:
+        get_virtual_price:
+        virtual_price:
+        price_oracle:
+        price_scale:
+        last_prices:
+        last_timestamp:
+        balances:
+        D:
+        totalSupply:
+        xcp_profit:
+        xcp_profit_a:
+        balanceOf:
+        allowance:
+        nonces:
+        calc_token_amount:
+        calc_withdraw_one_coin:
+        calc_token_fee:
+        fee_calc:
+        get_dy:
+        get_dx:
+
+    # Governance over the pool: pool.admin()/fee_receiver() delegate to the factory
+    # future_admin gives early warning of a pending admin handover
+    curveTwocryptoFactory:
+      name: CurveTwocryptoFactory
+      address: *curveTwocryptoFactory
+      checks:
+        admin: *curveAdmin
+        future_admin: *curveAdmin
+        fee_receiver:
+        pool_implementations:
+        gauge_implementation:
+        views_implementation:
+        math_implementation:
+        find_pool_for_coins:
+        get_coins:
+        get_decimals:
+        get_balances:
+        get_coin_indices:
+        get_gauge:
+        get_market_counts:
+        pool_count:
+        pool_list:
