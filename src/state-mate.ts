@@ -19,11 +19,21 @@ import {
 } from "./abi-provider";
 import { doGenerateBoilerplate } from "./boilerplate-generator";
 import { parseCmdLineArguments } from "./cli-parser";
-import { printError, readUrlOrFromEnvironment } from "./common";
+import { printError, readUrlOrFromEnvironment, YAML_PARSE_OPTIONS, yamlBigintReviver } from "./common";
+import { DEPLOYED_SPEC } from "./deployed-addresses";
 import { loadContractInfoFromExplorer } from "./explorer-provider";
+import { INPUTS_OVERRIDES_SPEC, INPUTS_SPEC } from "./inputs";
 import { FAILURE_MARK, log, logError, logErrorAndExit, logHeader1, SUCCESS_MARK, WARNING_MARK } from "./logger";
 import { g_error_details, g_errors, g_total_checks } from "./section-validators/base";
 import { ContractSectionValidator } from "./section-validators/contract";
+import {
+  configDelegatesAnchors,
+  loadStateWithSiblings,
+  OverlaySpec,
+  resolveExplicitFilePath,
+  resolveSiblingFilePath,
+  SiblingSpec,
+} from "./sibling-delegation";
 import {
   EntireDocument,
   EntireDocumentTB,
@@ -62,17 +72,128 @@ function formatAjvErrors(errors: ValidateFunction["errors"]) {
 }
 
 function loadStateFromYaml(configPath: string): unknown {
-  const reviver = (_: unknown, v: unknown) => {
-    return typeof v === "bigint" ? String(v) : v;
-  };
   const file = path.resolve(configPath);
   try {
     const configContent = fs.readFileSync(file, "utf8");
 
-    return YAML.parse(configContent, reviver, { schema: "core", intAsBigInt: true });
+    return YAML.parse(configContent, yamlBigintReviver, YAML_PARSE_OPTIONS);
   } catch (error) {
     logErrorAndExit(`Failed to convert the YAML file ${chalk.magenta(configPath)} to JSON:\n${printError(error)}`);
   }
+}
+
+// Load the main config, composing it with separate `.deployed` and/or `.inputs` sibling files when
+// selected (an explicit `--deployed`/`--inputs` path or, by convention, the `<name>.<infix>.<ext>`
+// sibling). Both may be in play at once. Sibling files are incompatible with `--generate`, which
+// operates on a seed document.
+type SelectedSibling = { path: string; spec: SiblingSpec; noun: string; explicit: boolean };
+
+// Inline `config:`/`externals:` sections would bypass every `.inputs` invariant (`&label` anchors,
+// the address check on externals). The schema must list those keys for composed documents, so the
+// rejection lives here: they are legal only when delegated from a `.inputs` file.
+function rejectInlineInputsSections(document: unknown): unknown {
+  if (typeof document === "object" && document !== null) {
+    const inline = INPUTS_SPEC.ownedSectionKeys.filter((key) => key in document);
+    if (inline.length > 0) {
+      logErrorAndExit(
+        `${chalk.magenta(g_Arguments.configPath)} holds top-level ${inline.map((key) => `\`${key}:\``).join(" / ")} ` +
+          `section(s) inline; they are only allowed in a \`${INPUTS_SPEC.infix}\` sibling file ` +
+          `(auto-loaded when present, or selected with ${INPUTS_SPEC.optionName})`,
+      );
+    }
+  }
+  return document;
+}
+
+function loadStateWithOptionalSiblings(): unknown {
+  const siblings: SelectedSibling[] = [];
+  const overlays: { path: string; spec: OverlaySpec }[] = [];
+  try {
+    const deployedPath = resolveSiblingFilePath(g_Arguments.configPath, DEPLOYED_SPEC, g_Arguments.deployed);
+    if (deployedPath) {
+      siblings.push({
+        path: deployedPath,
+        spec: DEPLOYED_SPEC,
+        noun: "deployed address(es)",
+        explicit: Boolean(g_Arguments.deployed),
+      });
+    }
+    const inputsPath = resolveSiblingFilePath(g_Arguments.configPath, INPUTS_SPEC, g_Arguments.inputs);
+    if (inputsPath) {
+      siblings.push({
+        path: inputsPath,
+        spec: INPUTS_SPEC,
+        noun: "input anchor(s)",
+        explicit: Boolean(g_Arguments.inputs),
+      });
+    }
+    // The overrides file is explicit-only — never auto-discovered — so applying it (which changes
+    // the effective input values) is always a deliberate choice.
+    if (g_Arguments.overrides) {
+      overlays.push({
+        path: resolveExplicitFilePath(INPUTS_OVERRIDES_SPEC.optionName, g_Arguments.overrides),
+        spec: INPUTS_OVERRIDES_SPEC,
+      });
+    }
+  } catch (error) {
+    logErrorAndExit(printError(error));
+  }
+
+  if (siblings.length === 0 && overlays.length === 0) {
+    return rejectInlineInputsSections(loadStateFromYaml(g_Arguments.configPath));
+  }
+
+  if (g_Arguments.generate) {
+    for (const { path: ignoredPath } of [...siblings, ...overlays]) {
+      log(`${WARNING_MARK} Ignoring ${chalk.yellow(path.relative(process.cwd(), ignoredPath))} with --generate`);
+    }
+    // A wiring-only main config cannot be parsed without the sibling anchors it delegates to — fail
+    // with a clear message instead of the raw "Unresolved alias" parse error below.
+    if (configDelegatesAnchors(g_Arguments.configPath)) {
+      logErrorAndExit(
+        `${chalk.magenta(g_Arguments.configPath)} delegates anchors to the sibling file(s) ignored above, ` +
+          `so it cannot be parsed standalone — --generate works on self-contained (seed) configs only`,
+      );
+    }
+    return loadStateFromYaml(g_Arguments.configPath);
+  }
+
+  // An overrides file redefines `.inputs` values, so a `.inputs` file must be in play to override.
+  if (overlays.length > 0 && !siblings.some(({ spec }) => spec === INPUTS_SPEC)) {
+    logErrorAndExit(
+      `${INPUTS_OVERRIDES_SPEC.optionName} requires ${INPUTS_SPEC.fileLabel} (pass ${INPUTS_SPEC.optionName} or ` +
+        `add the convention <name>${INPUTS_SPEC.infix}.<ext> sibling)`,
+    );
+  }
+
+  // Mixing an explicit variant of one sibling with the auto-discovered convention file of the other
+  // (e.g. `--deployed lido.hoodi.deployed.yaml` next to a mainnet `lido.inputs.yaml`) is easy to do
+  // by accident — surface the combination.
+  if (siblings.some((sibling) => sibling.explicit)) {
+    for (const { path: siblingPath, spec, explicit } of siblings) {
+      if (!explicit) {
+        log(
+          `${WARNING_MARK} ${chalk.yellow(path.relative(process.cwd(), siblingPath))} is auto-loaded by ` +
+            `convention alongside an explicit sibling path — pass ${spec.optionName} if another variant is intended`,
+        );
+      }
+    }
+  }
+
+  const { document, labels, overlayLabels } = loadStateWithSiblings(
+    g_Arguments.configPath,
+    siblings.map(({ path: siblingPath, spec }) => ({ path: siblingPath, spec })),
+    overlays,
+  );
+  for (const [index, { path: siblingPath, noun }] of siblings.entries()) {
+    log(`Loaded ${labels[index].length} ${noun} from ${chalk.yellow(path.relative(process.cwd(), siblingPath))}`);
+  }
+  for (const [index, { path: overlayPath }] of overlays.entries()) {
+    log(
+      `Applied ${overlayLabels[index].length} override(s) from ${chalk.yellow(path.relative(process.cwd(), overlayPath))}`,
+    );
+  }
+  return siblings.some(({ spec }) => spec === INPUTS_SPEC) ? document : rejectInlineInputsSections(document);
 }
 
 function validateJsonWithSchema<T extends TSchema>(
@@ -235,7 +356,7 @@ async function main() {
     renameAllAbiToLowerCase();
   }
 
-  const jsonDocument = loadStateFromYaml(g_Arguments.configPath);
+  const jsonDocument = loadStateWithOptionalSiblings();
 
   if (g_Arguments.generate) {
     if (validateJsonWithSchema(jsonDocument, EntireDocumentTB, { silent: true })) {

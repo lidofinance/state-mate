@@ -229,6 +229,10 @@ export const EntireDocumentTB = Type.Readonly(
   Type.Object(
     {
       parameters: Type.Optional(PlainValueOrArray),
+      // Project-chosen configurable values (knobs), delegated from a `.inputs` sibling file.
+      config: Type.Optional(PlainValueOrArray),
+      // Fixed third-party / external facts (addresses + chainId), delegated from a `.inputs` sibling.
+      externals: Type.Optional(PlainValueOrArray),
       roles: Type.Optional(Type.Union([EthereumStringArrayTB, Type.Null()])),
       misc: Type.Optional(PlainValueOrArray),
       eoa: Type.Optional(EthereumStringArrayTB),

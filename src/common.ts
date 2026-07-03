@@ -1,7 +1,30 @@
 import chalk from "chalk";
+import * as YAML from "yaml";
 
 import { logErrorAndExit } from "./logger";
 import { Abi, AbiArgumentsLength as AbiArgumentsLength } from "./types";
+
+// Shared YAML parsing semantics. Every loader (the flat parse in state-mate.ts and the
+// sibling-delegation composition) MUST use these so a sibling-composed config is indistinguishable
+// from a standalone one. Keep the two in sync by importing rather than re-declaring.
+export const YAML_PARSE_OPTIONS: YAML.ParseOptions & YAML.DocumentOptions & YAML.SchemaOptions = {
+  schema: "core",
+  intAsBigInt: true,
+};
+export const yamlBigintReviver = (_: unknown, value: unknown) => (typeof value === "bigint" ? String(value) : value);
+
+/**
+ * The scalar items under `deployed.<sectionKey>` (in document order), or `[]` when that section is
+ * absent or is not a list of scalars. Used by the seed/boilerplate generator when walking the
+ * `deployed:` anchor book.
+ */
+export function getDeployedSectionScalars(document: YAML.Document, sectionKey: string): YAML.Scalar[] {
+  const section = document.getIn(["deployed", sectionKey]);
+  if (YAML.isSeq(section) && section.items.every((element) => YAML.isScalar(element))) {
+    return section.items as YAML.Scalar[];
+  }
+  return [];
+}
 
 // Contract entry fields
 export enum EntryField {
