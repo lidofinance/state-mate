@@ -11,7 +11,7 @@
   "scripts": {
     "build": "tsc",
     "start": "ts-node -r tsconfig-paths/register src/state-mate.ts",
-    "consolidate-abi": "sh -c 'ts-node src/consolidate-abis.ts \"$1\" --compress' --",
+    "consolidate-abi": "ts-node src/consolidate-abis.ts",
     "lint": "eslint . --max-warnings=0",
     "lint:fix": "yarn lint --fix",
     "format": "prettier . --ignore-path .gitignore --ignore-path .prettierignore --check",

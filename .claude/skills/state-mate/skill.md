@@ -1,6 +1,6 @@
 ---
 name: state-mate
-description: Configure and verify state-mate YAML for EVM smart-contract state checks — contracts, proxies (Transparent, Ossifiable, AppProxyUpgradeable), Safe multisigs, ozAcl and ozNonEnumerableAcl access control, ABI resolution and updates, EIP-1967 storage slots, seed configs and --generate, REPLACEME discovery, and common error triage.
+description: Configure and verify state-mate YAML for EVM smart-contract state checks: contracts, proxies (Transparent, Ossifiable, AppProxyUpgradeable), Safe multisigs, ozAcl and ozNonEnumerableAcl access control, ABI resolution and updates, EIP-1967 storage slots, seed configs and --generate, REPLACEME discovery, and common error triage.
 ---
 
 # State-Mate Skill
@@ -23,7 +23,7 @@ Validate EVM smart-contract state against YAML configs. state-mate calls view fu
 ## Top-level structure
 
 ```yaml
-parameters: # optional — arbitrary constants used across the file
+parameters: # optional, arbitrary constants used across the file
   - &someConstant "0x..."
 
 deployed: # address book, grouped by chain
@@ -46,7 +46,7 @@ roles: # bytes32 role hashes, often many (one per domain)
 eoa: # named EOAs (deployer, signer addresses); useful for "deployer renounced" checks
   - &deployer "0x..."
 
-l1: # per-chain section — key matches deployed.* key
+l1: # per-chain section, key matches deployed.* key
   rpcUrl: L1_MAINNET_RPC_URL # env-var name, or inline URL
   explorerHostname: api.etherscan.io/v2/api
   explorerTokenEnv: ETHERSCAN_TOKEN
@@ -60,7 +60,7 @@ l2: # present when deployed.l2 exists
   # ...
 ```
 
-`parameters`, `deployed`, `misc`, `roles`, `eoa` are anchor-only sections — they define YAML anchors (`&name`) that later sections reference via `*name`. Only `<chain-key>` sections with `contracts:` produce on-chain calls.
+`parameters`, `deployed`, `misc`, `roles`, `eoa` are anchor-only sections that define YAML anchors (`&name`) for later sections to reference via `*name`. Only `<chain-key>` sections with `contracts:` produce on-chain calls.
 
 ## Contract patterns
 
@@ -97,7 +97,7 @@ contractName:
     # against the proxy (implementation logic, proxy state)
     someFunction: expectedValue
   implementationChecks:
-    # against the impl directly (uninitialized state — zeros/empties)
+    # against the impl directly (uninitialized state, zeros/empties)
     someFunction: *ZERO_ADDRESS
 ```
 
@@ -170,7 +170,7 @@ multisigName:
         result: true
 ```
 
-Transient values (Safe `nonce`, queue `canBeRemoved`, `getResumeSinceTimestamp` after a transient pause) drift over time — either leave the key `null` to skip, or accept that each state change needs a config update.
+Transient values (Safe `nonce`, queue `canBeRemoved`, `getResumeSinceTimestamp` after a transient pause) drift over time. Either leave the key `null` to skip, or accept that each state change needs a config update.
 
 ### Contract with indexed collections
 
@@ -241,7 +241,7 @@ checks:
 
 ### Tuple / array returns
 
-Document field names with comments — tuple positions aren't obvious from YAML alone:
+Document field names with comments. Tuple positions aren't obvious from YAML alone:
 
 ```yaml
 checks:
@@ -319,13 +319,13 @@ checks:
   unknownValue: "REPLACEME"
 ```
 
-Run `yarn start config.yml` — the error surfaces the actual on-chain value:
+Run `yarn start config.yml`. The error surfaces the actual on-chain value:
 
 ```
 ✗ .unknownValue: expected REPLACEME, got 0xb13b0c93...
 ```
 
-**Do not** use `REPLACEME` in `deployed:` — invalid-address errors block the whole file from loading. For unknown addresses, read EIP-1967 slots first:
+**Do not** use `REPLACEME` in `deployed:`. Invalid-address errors block the whole file from loading. For unknown addresses, read EIP-1967 slots first:
 
 ```bash
 cast admin $PROXY --rpc-url $RPC           # EIP-1967 admin
@@ -346,9 +346,9 @@ cast call $CONTRACT "hasRole(bytes32,address)(bool)" $ROLE $ADDRESS --rpc-url $R
 
 ## Seed configs
 
-A seed config is a thin starter file named `*.seed.yml`. It contains only address-book and chain-explorer sections (`deployed:`, `l1:` / `l2:` with `rpcUrl` / `explorerHostname`, optional `eoa:` / `roles:` / `misc:`) — **no `contracts:` block**. `yarn start <seed> --generate` walks every anchor under `deployed:`, resolves the ABI for each address, and writes a sibling `*.seed.generated.yml` with a populated `contracts:` block where each function value is `REPLACEME` (and, for proxies, a commented-out `implementationChecks` stub).
+A seed config is a thin starter file named `*.seed.yml`. It contains only address-book and chain-explorer sections (`deployed:`, `l1:` / `l2:` with `rpcUrl` / `explorerHostname`, optional `eoa:` / `roles:` / `misc:`), with **no `contracts:` block**. `yarn start <seed> --generate` walks every anchor under `deployed:`, resolves the ABI for each address, and writes a sibling `*.seed.generated.yml` with a populated `contracts:` block where each function value is `REPLACEME` (and, for proxies, a commented-out `implementationChecks` stub).
 
-`--generate` on its own does not fetch ABIs — it only uses ABIs already on disk. Combine with `--update-abi-missing` on first run.
+`--generate` on its own does not fetch ABIs. It uses only ABIs already on disk. Combine with `--update-abi-missing` on first run.
 
 ```bash
 yarn start configs/proto/mainnet.seed.yml --generate --update-abi-missing
@@ -360,16 +360,16 @@ yarn start configs/proto/mainnet.seed.generated.yml
 
 Adding a new contract to an existing config:
 
-1. **Resolve addresses** — `cast admin` / `cast implementation` for proxies; EIP-1967 slots for anything non-standard.
+1. **Resolve addresses:** `cast admin` / `cast implementation` for proxies; EIP-1967 slots for anything non-standard.
 2. **Define anchors** in `deployed:` (and `implementation:` addresses in the same section with a matching name).
-3. **Write the contract stanza** — pick the proxy pattern, seed `checks:` with function names, leave unknowns as `REPLACEME`.
-4. **Download ABIs** — `yarn start config.yml --update-abi-missing`. Resolution depends on mode: consolidated (`abis.json.gz`) tries the `Name-{address}` key first, then `Name`; individual-file mode (`abi/*.json`) tries `Name.json`, then `Name.sol/Name.json`, then `Name-{address}.json`.
-5. **Run, read actuals, replace** — iterate `yarn start config.yml -o l1/contractName` until green.
-6. **Access control** — probe with `cast call getRoleMemberCount`; choose `ozAcl` / `ozNonEnumerableAcl` / `hasRole`. List every role constant, including empty ones (`[]`).
+3. **Write the contract stanza:** pick the proxy pattern, seed `checks:` with function names, leave unknowns as `REPLACEME`.
+4. **Download ABIs:** `yarn start config.yml --update-abi-missing`. Resolution depends on mode: consolidated (`abis.json.gz`) tries the `Name-{address}` key first, then `Name`; individual-file mode (`abi/*.json`) tries `Name.json`, then `Name.sol/Name.json`, then `Name-{address}.json`.
+5. **Run, read actuals, replace:** iterate `yarn start config.yml -o l1/contractName` until green.
+6. **Access control:** probe with `cast call getRoleMemberCount`; choose `ozAcl` / `ozNonEnumerableAcl` / `hasRole`. List every role constant, including empty ones (`[]`).
 
 ## Implementation checks
 
-For `implementationChecks`, use uninitialized defaults — implementations store no state:
+For `implementationChecks`, use uninitialized defaults. Implementations store no state:
 
 | Type    | Default                                        |
 | ------- | ---------------------------------------------- |
@@ -394,12 +394,12 @@ yarn start config.seed.yml --generate                     # expand seed → *.se
 
 ## Best practices
 
-- **Named anchors for addresses** — define every address in `deployed:` / `eoa:`; don't hardcode `0x…` inside `checks:` values. Inline hex is fine for **data** (bytes32 constants, selectors).
-- **Deployer renounced** — confirm `deployer` is not a role holder (not in any `ozAcl` list; `hasRole(…, deployer) = false`).
-- **Empty roles are explicit** — list unused roles with `[]` so a future grant is caught.
-- **Comment tuples** — field names aren't derivable from YAML; look up the ABI.
-- **Rate-limited RPC?** — scope with `-o l1/contractName` to reduce concurrency.
-- **Transient values** — Safe `nonce`, `getResumeSinceTimestamp`, queue operational flags etc. belong as `null` unless you intentionally want the check to fire on every state change.
+- **Named anchors for addresses:** define every address in `deployed:` / `eoa:`; don't hardcode `0x…` inside `checks:` values. Inline hex is fine for **data** (bytes32 constants, selectors).
+- **Deployer renounced:** confirm `deployer` is not a role holder (not in any `ozAcl` list; `hasRole(…, deployer) = false`).
+- **Empty roles are explicit:** list unused roles with `[]` so a future grant is caught.
+- **Comment tuples:** field names aren't derivable from YAML; look up the ABI.
+- **Rate-limited RPC?** Scope with `-o l1/contractName` to reduce concurrency.
+- **Transient values:** Safe `nonce`, `getResumeSinceTimestamp`, queue operational flags etc. belong as `null` unless you want the check to fire on every state change.
 
 ## Troubleshooting
 
@@ -411,8 +411,8 @@ yarn start config.seed.yml --generate                     # expand seed → *.se
 
 ### `getRoleMemberCount` reverted / `no matching function`
 
-- The contract is standard AccessControl, not Enumerable — switch to `ozNonEnumerableAcl:` or raw `hasRole` checks.
-- Or the contract doesn't expose role management at all — skip the role block.
+- The contract is standard AccessControl, not Enumerable. Switch to `ozNonEnumerableAcl:` or raw `hasRole` checks.
+- Or the contract doesn't expose role management at all. Skip the role block.
 
 ### `missing revert data` with `data=null`
 
@@ -422,7 +422,7 @@ yarn start config.seed.yml --generate                     # expand seed → *.se
 
 ### `Invalid address` in `deployed:`
 
-- `REPLACEME` is invalid in `deployed:` — resolve the address via `cast storage` / `cast admin` first, then add a real anchor.
+- `REPLACEME` is invalid in `deployed:`. Resolve the address via `cast storage` / `cast admin` first, then add a real anchor.
 
 ### Ambiguous function overload
 
@@ -434,4 +434,4 @@ cast call $CONTRACT "itemAt(bool,uint256)(address)" true 0 --rpc-url $RPC
 
 ### Unexpected tuple length / field order
 
-The YAML array must match the on-chain struct's field order exactly. Look up the canonical layout in the contract's Solidity source or the ABI's `components` field — don't rely on field names in the contract UI.
+The YAML array must match the on-chain struct's field order exactly. Look up the canonical layout in the contract's Solidity source or the ABI's `components` field. Don't rely on field names in the contract UI.
