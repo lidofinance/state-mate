@@ -71,7 +71,7 @@ l2: # present when deployed.l2 exists
 
 ```yaml
 contractName:
-  name: ContractName                 # must match ABI filename
+  name: ContractName # must match ABI filename
   address: *contractAddress
   checks:
     functionName: expectedValue
@@ -198,7 +198,7 @@ checks:
     - args: [1]
       result: *item2
     - args: [2]
-      mustRevert: true        # out of bounds
+      mustRevert: true # out of bounds
 ```
 
 Multi-arg indexed getter:
@@ -286,8 +286,8 @@ Use when `getRoleMemberCount(bytes32)` succeeds:
 ```yaml
 ozAcl:
   *DEFAULT_ADMIN_ROLE : [*adminAddress]
-  *SOME_ROLE          : [*holder1, *holder2]
-  *UNUSED_ROLE        : []             # explicit: 0 members
+  *SOME_ROLE : [*holder1, *holder2]
+  *UNUSED_ROLE : [] # explicit: 0 members
 ```
 
 ### Non-enumerable AccessControl → `ozNonEnumerableAcl:`
@@ -296,8 +296,8 @@ Same shape as `ozAcl`, but state-mate verifies via per-address `hasRole` instead
 
 ```yaml
 ozNonEnumerableAcl:
-  *DEFAULT_ADMIN_ROLE      : [*agent]
-  *DEPOSITS_ENABLER_ROLE   : [*agent]
+  *DEFAULT_ADMIN_ROLE : [*agent]
+  *DEPOSITS_ENABLER_ROLE : [*agent]
   *WITHDRAWALS_DISABLER_ROLE : [*agent, *emergencyMultisig]
 ```
 
