@@ -16,7 +16,7 @@ import { ContractEntry, EntireDocument, ExplorerSectionTB, isTypeOfTB, NetworkSe
 import { MethodCallResults, Abi } from "./types";
 
 const REPLACE_ME_PLACEHOLDER = "REPLACEME";
-const YML = "yml";
+const YAML_EXT = "yaml";
 const MAIN_SCHEMA_NAME = "main-schema.json";
 
 export async function doGenerateBoilerplate(seedConfigPath: string, jsonDocument: SeedDocument) {
@@ -100,7 +100,7 @@ export async function doGenerateBoilerplate(seedConfigPath: string, jsonDocument
 
   const generatedFilePath = path.join(
     path.dirname(seedConfigPath),
-    `${path.basename(seedConfigPath, "." + YML)}.generated.${YML}`,
+    `${path.basename(seedConfigPath, "." + YAML_EXT)}.generated.${YAML_EXT}`,
   );
   writeGeneratedYaml(generatedFilePath, document.toString());
 }
