@@ -3700,6 +3700,9 @@ __metadata:
     tsconfig-paths: "npm:^4.2.0"
     typescript: "npm:^6.0.3"
     yaml: "npm:^2.9.0"
+  dependenciesMeta:
+    unrs-resolver:
+      built: true
   languageName: unknown
   linkType: soft
 

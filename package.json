@@ -8,6 +8,11 @@
     "node": ">=22"
   },
   "packageManager": "yarn@4.17.0",
+  "dependenciesMeta": {
+    "unrs-resolver": {
+      "built": true
+    }
+  },
   "scripts": {
     "build": "tsc",
     "start": "ts-node -r tsconfig-paths/register src/state-mate.ts",
