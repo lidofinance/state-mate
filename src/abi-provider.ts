@@ -417,25 +417,26 @@ export function resetAbiModeCache(): void {
   g_abiMode = null;
 }
 
+type FindAbiOptions = { shouldThrow?: boolean; allowAddressFallback?: boolean };
+
 function _findAbiPath(
   contractName: string,
   contractAddress: string,
-  shouldThrow: { shouldThrow: true; allowAddressFallback?: boolean },
+  options: FindAbiOptions & { shouldThrow: true },
 ): string;
 
 function _findAbiPath(
   contractName: string,
   contractAddress: string,
-  shouldThrow?: { shouldThrow: false; allowAddressFallback?: boolean },
+  options?: FindAbiOptions & { shouldThrow?: false },
 ): string | null;
 
-function _findAbiPath(
-  contractName: string,
-  contractAddress: string,
-  { shouldThrow, allowAddressFallback = true }: { shouldThrow?: boolean; allowAddressFallback?: boolean } = {
-    shouldThrow: false,
-  },
-): string | null {
+function _findAbiPath(contractName: string, contractAddress: string, options: FindAbiOptions = {}): string | null {
+  // allowAddressFallback defaults to false: matching by address alone can return a file named
+  // after another contract (e.g. the proxy's own ABI), which must never be picked implicitly,
+  // and never overwritten when saving. Readers opt in explicitly.
+  const { shouldThrow = false, allowAddressFallback = false } = options;
+
   if (!contractName || !g_Arguments.abiDirPath) return null;
 
   // prettier-ignore
