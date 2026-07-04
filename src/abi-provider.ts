@@ -210,7 +210,7 @@ export function loadAbiFromFile(
       logErrorAndExit(
         `Error finding ABI file for contract
         ${contractName} in ${g_Arguments.abiDirPath}: ${printError(error)}\n\n` +
-          chalk.yellow.bold(`Try running with the '--update-abi' option to download the unnecessary ABI`),
+          chalk.yellow.bold(`Try running with the '--update-abi' option to download the missing ABI`),
       );
     }
     return loadAbiFromAbiPath(abiPath);
