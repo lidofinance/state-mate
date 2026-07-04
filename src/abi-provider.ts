@@ -50,24 +50,24 @@ function determineAbiMode(): AbiMode {
   }
 
   const consolidatedFile = getConsolidatedAbiPathToUse();
-  const isConsolidatedExists = consolidatedFile !== null;
+  const consolidatedExists = consolidatedFile !== null;
 
-  let isIndividualFilesExist = false;
+  let individualFilesExist = false;
   if (fs.existsSync(g_Arguments.abiDirPath)) {
     const files = fs.readdirSync(g_Arguments.abiDirPath);
-    isIndividualFilesExist = files.some((file) => file.endsWith(".json") && file !== CONSOLIDATED_ABI_FILENAME);
+    individualFilesExist = files.some((file) => file.endsWith(".json") && file !== CONSOLIDATED_ABI_FILENAME);
   }
 
-  if (isConsolidatedExists && isIndividualFilesExist) {
+  if (consolidatedExists && individualFilesExist) {
     logErrorAndExit(
       `Cannot use both consolidated ${chalk.yellow(CONSOLIDATED_ABI_FILENAME)} and individual ABI files.\n` +
         `Please remove one format from ${chalk.magenta(g_Arguments.abiDirPath)}`,
     );
   }
 
-  if (isConsolidatedExists) {
+  if (consolidatedExists) {
     g_abiMode = "consolidated";
-  } else if (isIndividualFilesExist) {
+  } else if (individualFilesExist) {
     g_abiMode = "individual";
   } else {
     g_abiMode = "none";
