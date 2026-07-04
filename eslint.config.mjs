@@ -21,6 +21,14 @@ export default [
 
   includeIgnoreFile(gitignorePath),
   {
+    // CommonJS entrypoints: no top-level await, main().catch() is the pattern
+    files: ["src/state-mate.ts", "src/gen-schemas.ts", "src/consolidate-abis.ts", "src/test-util/app.ts"],
+    rules: {
+      "unicorn/prefer-top-level-await": "off",
+      "unicorn/prefer-await": "off",
+    },
+  },
+  {
     languageOptions: {
       parser: tsParser,
       ecmaVersion: 2022,
@@ -38,6 +46,12 @@ export default [
       "unicorn/prefer-module": "off",
       "unicorn/no-process-exit": "off",
       "unicorn/no-object-as-default-parameter": "off",
+      // unicorn v69 migration: opinionated new rules that conflict with the codebase style
+      "unicorn/max-nested-calls": "off", // chalk calls inside template literals
+      "unicorn/no-top-level-assignment-in-function": "off", // g_* module-level state is deliberate
+      "unicorn/no-break-in-nested-loop": "off", // flags mandatory breaks of a switch inside a loop
+      "unicorn/no-top-level-side-effects": "off", // CLI entrypoints
+      "unicorn/consistent-boolean-name": "off", // its is*-prefix autofix produces worse names (reverted in review)
       "unicorn/consistent-function-scoping": "off",
       "@typescript-eslint/no-explicit-any": ["warn"],
       "@typescript-eslint/no-unused-vars": ["warn"],

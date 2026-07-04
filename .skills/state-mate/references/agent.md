@@ -106,7 +106,7 @@ contractName:
 ```yaml
 ozAcl:
   *ROLE_WITH_MEMBERS : [*holder1, *holder2]
-  *ROLE_WITHOUT_MEMBERS : []  # Verify 0 members
+  *ROLE_WITHOUT_MEMBERS : [] # Verify 0 members
 ```
 
 ### hasRole (Standard AccessControl)
