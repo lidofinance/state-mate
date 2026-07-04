@@ -14,7 +14,7 @@ deployed:
     # Live locator proxy (still delegates to the old impl), replaced by the vote
     - &lidoLocator "0xC1d0b3DE6792Bf6b4b37EccdcC24e45978Cfd2Eb"
 
-    # --- Live protocol, referenced as expected values ---
+    # --- Live protocol ---
     - &lido "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84"
     - &agent "0x3e40D73EB977Dc6a537aF587D48316feE66E9C8c"
     - &accounting "0x23ED611be0e1a820978875C0122F92260804cdDf"
@@ -66,7 +66,7 @@ deployed:
     - &beaconChainDepositor "0xf98AC162eAB766bDB9507c3584c00C535B8F6216"
     - &srLib "0xc0be9942Fd8f54aB126A5F0Ba649A90049ccad14"
 
-    # Deploy tooling; used to verify that no roles left on it after the setup
+    # Deploy tooling; must hold no roles after setup
     - &upgradeTemporaryAdmin "0x57Cc953D3d27E7E8bAd04566bfd4Cd416c3B0855"
 
 misc:
@@ -118,9 +118,12 @@ misc:
   - &consolidationsPerFrame 1
   - &frameDurationInSec 30
 
+  # Safe singleton
+  - &safeSingleton "0x41675C099F32341bf84BFc5382aF534df5C7461a"
+
 roles:
   # Common
-  # bytes32(0) — OZ default admin, not a keccak
+  # bytes32(0): OZ default admin, not a keccak
   - &DEFAULT_ADMIN_ROLE "0x0000000000000000000000000000000000000000000000000000000000000000"
 
   # Lido
@@ -237,7 +240,6 @@ l1:
   explorerTokenEnv: ETHERSCAN_TOKEN
   chainId: "1"
   contracts:
-    # Live locator proxy (still delegates to the old impl), replaced by the vote
     lidoLocator:
       name: LidoLocator
       address: *lidoLocator
@@ -290,7 +292,6 @@ l1:
         withdrawalVault: *withdrawalVault
         wstETH: *wstETH
 
-    # New implementations deployed by SRv3, not yet wired in
     lidoLocatorImpl:
       name: LidoLocator
       address: *lidoLocatorImpl
@@ -332,7 +333,6 @@ l1:
         withdrawalVault: *withdrawalVault
         wstETH: *wstETH
 
-    # New implementations deployed by SRv3, not yet wired in
     lidoImpl:
       name: Lido
       address: *lidoImpl
@@ -394,7 +394,6 @@ l1:
         sharesOf:
         getTotalELRewardsCollected: 0
 
-    # New implementations deployed by SRv3, not yet wired in
     stakingRouterImpl:
       name: StakingRouter
       address: *stakingRouterImpl
@@ -470,7 +469,6 @@ l1:
         supportsInterface:
         validateReportValidatorBalancesByStakingModule:
 
-    # New implementations deployed by SRv3, not yet wired in
     accountingImpl:
       name: Accounting
       address: *accountingImpl
@@ -479,7 +477,6 @@ l1:
         LIDO_LOCATOR: *lidoLocator
         simulateOracleReport:
 
-    # New implementations deployed by SRv3, not yet wired in
     accountingOracleImpl:
       name: AccountingOracle
       address: *accountingOracleImpl
@@ -512,7 +509,6 @@ l1:
             result: false
         supportsInterface:
 
-    # New implementations deployed by SRv3, not yet wired in
     validatorsExitBusOracleImpl:
       name: ValidatorsExitBusOracle
       address: *validatorsExitBusOracleImpl
@@ -556,7 +552,6 @@ l1:
         supportsInterface:
         unpackExitRequest:
 
-    # New implementations deployed by SRv3, not yet wired in
     withdrawalVaultImpl:
       name: WithdrawalVault
       address: *withdrawalVaultImpl
@@ -571,7 +566,6 @@ l1:
         getContractVersion: *MAX_UINT256
         getWithdrawalRequestFee: 1
 
-    # New contract deployed by SRv3, not yet wired in
     oracleReportSanityChecker:
       name: OracleReportSanityChecker
       address: *oracleReportSanityChecker
@@ -691,13 +685,12 @@ l1:
         *SECOND_OPINION_MANAGER_ROLE : []
         *SHARE_RATE_DEVIATION_LIMIT_MANAGER_ROLE : []
 
-    # New contract deployed by SRv3, not yet wired in
     depositSecurityModule:
       name: DepositSecurityModule
       address: *depositSecurityModule
       checks:
         # Prefixes = keccak256(keccak256("lido.DepositSecurityModule.<TAG>") ++ uint256(chainId) ++ dsmAddress),
-        # recomputed and matched for chainId 1 and this DSM address
+        # verified for chainId 1 and this DSM address
         ATTEST_MESSAGE_PREFIX: "0x683df20ff74dc438e214ff44087d5e4b6ccf03b21e7f1ba074459a5212abd912"
         DEPOSIT_CONTRACT: *DEPOSIT_CONTRACT
         PAUSE_MESSAGE_PREFIX: "0xe3fb87228adf6fbdd12dc1496751f0251453f29ac84ebbd3a699461b51f1de7b"
@@ -724,7 +717,6 @@ l1:
         isGuardian:
         isMinDepositDistancePassed:
 
-    # New contract deployed by SRv3, not yet wired in
     consolidationGateway:
       name: ConsolidationGateway
       address: *consolidationGateway
@@ -778,7 +770,6 @@ l1:
         *PAUSE_ROLE : [*circuitBreaker, *resealManager]
         *RESUME_ROLE : [*resealManager]
 
-    # New contract deployed by SRv3, not yet wired in
     topUpGateway:
       name: TopUpGateway
       address: *topUpGateway
@@ -883,7 +874,6 @@ l1:
           - args: [*DEFAULT_ADMIN_ROLE, *upgradeTemporaryAdmin]
             result: false
 
-    # New contract deployed by SRv3, not yet wired in
     consolidationBus:
       name: ConsolidationBus
       address: *consolidationBus
@@ -958,7 +948,6 @@ l1:
           - args: [*DEFAULT_ADMIN_ROLE, *upgradeTemporaryAdmin]
             result: false
 
-    # New contract deployed by SRv3, not yet wired in
     consolidationMigrator:
       name: ConsolidationMigrator
       address: *consolidationMigrator
@@ -1068,12 +1057,17 @@ l1:
 
     # --- Safe instances ---
     curatedModuleCommittee:
-      name: GnosisSafe
+      name: Safe
       address: *curatedModuleCommittee
+      proxyName: SafeProxy
+      implementation: *safeSingleton
+      # SafeProxy has no view functions (masterCopy() is a fallback trick, absent from the ABI);
+      # slot 0 below pins the singleton without trusting the proxy code
+      proxyChecks: {}
       storage:
         # Safe stores the singleton in slot 0 (not EIP-1967); canonical Safe 1.4.1
         - slot: "0x0000000000000000000000000000000000000000000000000000000000000000"
-          expected: "0x41675C099F32341bf84BFc5382aF534df5C7461a"
+          expected: *safeSingleton
           label: singleton
         # cast keccak "fallback_manager.handler.address" — canonical CompatibilityFallbackHandler 1.4.1
         - slot: "0x6c9a6c4a39284e37ed1cf53d337577d14212a4870fb976a4366c693b939918d5"
