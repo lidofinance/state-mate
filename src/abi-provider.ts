@@ -437,7 +437,12 @@ function _findAbiPath(contractName: string, contractAddress: string, options: Fi
   // and never overwritten when saving. Readers opt in explicitly.
   const { shouldThrow = false, allowAddressFallback = false } = options;
 
-  if (!contractName || !g_Arguments.abiDirPath) return null;
+  if (!contractName || !g_Arguments.abiDirPath) {
+    if (shouldThrow) {
+      throw new Error(`ABI lookup failed: ${contractName ? "ABI directory path is not set" : "empty contract name"}`);
+    }
+    return null;
+  }
 
   // prettier-ignore
   const abiVariantsName = [
