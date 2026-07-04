@@ -40,8 +40,12 @@ import { ContractInfo } from "./types";
 
 export let g_Arguments: ReturnType<typeof parseCommandLineArguments>;
 
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore: Unreachable code error
+declare global {
+  interface BigInt {
+    toJSON(): string;
+  }
+}
+
 // eslint-disable-next-line unicorn/no-nonstandard-builtin-properties -- deliberate polyfill for JSON.stringify of bigints
 BigInt.prototype.toJSON = function (): string {
   // eslint-disable-next-line unicorn/no-this-outside-of-class -- prototype method
@@ -270,7 +274,6 @@ async function main() {
   }
 }
 
-// eslint-disable-next-line unicorn/prefer-top-level-await, unicorn/prefer-await -- CommonJS entrypoint
 main().catch((error) => {
   logError(error);
   process.exitCode = 1;
