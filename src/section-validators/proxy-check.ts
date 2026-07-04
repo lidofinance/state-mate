@@ -13,22 +13,24 @@ export class ProxyCheckSectionValidator extends SectionValidatorBase {
     super(provider, EntryField.proxyChecks);
   }
   override async validateSection(contractEntry: ContractEntry, contractAlias: string, basePath?: string) {
-    if (isTypeOfTB(contractEntry, ProxyContractEntryTB) && contractEntry.proxyChecks) {
-      const { address, proxyName, proxyChecks } = contractEntry;
+    if (!(isTypeOfTB(contractEntry, ProxyContractEntryTB) && contractEntry.proxyChecks)) {
+      return;
+    }
 
-      // Skip if no checks defined
-      if (Object.keys(proxyChecks).length === 0) return;
+    const { address, proxyName, proxyChecks } = contractEntry;
 
-      logHeader2(basePath ? `${basePath}/${this.sectionName}` : this.sectionName);
+    // Skip if no checks defined
+    if (Object.keys(proxyChecks).length === 0) return;
 
-      const abi = loadAbiFromFile(proxyName, address);
-      this._reportNonCoveredNonMutableChecks(contractAlias, abi, Object.keys(proxyChecks));
+    logHeader2(basePath ? `${basePath}/${this.sectionName}` : this.sectionName);
 
-      const contract = loadContract(address, abi, this.provider);
-      for (const [method, checkEntryValue] of Object.entries(proxyChecks)) {
-        if (!needCheck(CheckLevel.method, method)) continue;
-        await this._validateSubsection(contract, method, checkEntryValue);
-      }
+    const abi = loadAbiFromFile(proxyName, address);
+    this._reportNonCoveredNonMutableChecks(contractAlias, abi, Object.keys(proxyChecks));
+
+    const contract = loadContract(address, abi, this.provider);
+    for (const [method, checkEntryValue] of Object.entries(proxyChecks)) {
+      if (!needCheck(CheckLevel.method, method)) continue;
+      await this._validateSubsection(contract, method, checkEntryValue);
     }
   }
 

@@ -106,7 +106,7 @@ export async function doGenerateBoilerplate(seedConfigPath: string, jsonDocument
 }
 
 function writeGeneratedYaml(filePath: string, fileContent: string) {
-  const generatedDocument = addSchemaIntoYaml(filePath, fileContent.toString());
+  const generatedDocument = addSchemaIntoYaml(filePath, fileContent);
   try {
     fs.writeFileSync(filePath, generatedDocument);
     log(`Generated state config: ${chalk.bold(filePath)}`);
@@ -120,7 +120,7 @@ function addSchemaIntoYaml(filePath: string, fileContent: string): string {
   const relativePathToMainSchema = path.join(path.relative(path.dirname(filePath), schemaPath), MAIN_SCHEMA_NAME);
   const regex = /\$schema=.*/;
   fileContent = regex.test(fileContent)
-    ? fileContent.replace(regex, `$schema=${relativePathToMainSchema}`)
+    ? fileContent.replace(regex, () => `$schema=${relativePathToMainSchema}`)
     : `# yaml-language-server: $schema=${relativePathToMainSchema}\n` + fileContent;
 
   return fileContent;

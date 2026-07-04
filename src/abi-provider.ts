@@ -50,24 +50,24 @@ function determineAbiMode(): AbiMode {
   }
 
   const consolidatedFile = getConsolidatedAbiPathToUse();
-  const consolidatedExists = consolidatedFile !== null;
+  const isConsolidatedExists = consolidatedFile !== null;
 
-  let individualFilesExist = false;
+  let isIndividualFilesExist = false;
   if (fs.existsSync(g_Arguments.abiDirPath)) {
     const files = fs.readdirSync(g_Arguments.abiDirPath);
-    individualFilesExist = files.some((file) => file.endsWith(".json") && file !== CONSOLIDATED_ABI_FILENAME);
+    isIndividualFilesExist = files.some((file) => file.endsWith(".json") && file !== CONSOLIDATED_ABI_FILENAME);
   }
 
-  if (consolidatedExists && individualFilesExist) {
+  if (isConsolidatedExists && isIndividualFilesExist) {
     logErrorAndExit(
       `Cannot use both consolidated ${chalk.yellow(CONSOLIDATED_ABI_FILENAME)} and individual ABI files.\n` +
         `Please remove one format from ${chalk.magenta(g_Arguments.abiDirPath)}`,
     );
   }
 
-  if (consolidatedExists) {
+  if (isConsolidatedExists) {
     g_abiMode = "consolidated";
-  } else if (individualFilesExist) {
+  } else if (isIndividualFilesExist) {
     g_abiMode = "individual";
   } else {
     g_abiMode = "none";
@@ -200,7 +200,8 @@ export function loadAbiFromFile(
     }
 
     return abi;
-  } else if (mode === "individual") {
+  }
+  if (mode === "individual") {
     let abiPath;
     try {
       abiPath = _findAbiPath(contractName, address, { shouldThrow: true, allowAddressFallback });
@@ -213,10 +214,9 @@ export function loadAbiFromFile(
       logErrorAndExit(message);
     }
     return loadAbiFromAbiPath(abiPath);
-  } else {
-    if (failSilently) return null;
-    logErrorAndExit(`No ABI files found in ${chalk.magenta(g_Arguments.abiDirPath)}`);
   }
+  if (failSilently) return null;
+  logErrorAndExit(`No ABI files found in ${chalk.magenta(g_Arguments.abiDirPath)}`);
 }
 
 export function abiExistsForAddress(address: string): boolean {
@@ -226,7 +226,8 @@ export function abiExistsForAddress(address: string): boolean {
   if (mode === "consolidated") {
     const abis = loadConsolidatedAbis();
     return findAbiKeysByAddress(Object.keys(abis), address).length > 0;
-  } else if (mode === "individual") {
+  }
+  if (mode === "individual") {
     if (!fs.existsSync(g_Arguments.abiDirPath)) return false;
     try {
       const files = fs.readdirSync(g_Arguments.abiDirPath);
@@ -314,22 +315,22 @@ async function _checkAbi(contractName: string, address: string, abiFromExplorer:
   const mode = determineAbiMode();
 
   let savedAbi: Abi | null = null;
-  let abiExists = false;
+  let isAbiExists = false;
 
   if (mode === "consolidated") {
     const abis = loadConsolidatedAbis();
     const key = getAbiKey(contractName, address);
     savedAbi = abis[key] || abis[contractName] || null;
-    abiExists = savedAbi !== null;
+    isAbiExists = savedAbi !== null;
   } else if (mode === "individual") {
     const abiExistedPath = _findAbiPath(contractName, address, { shouldThrow: false });
     if (abiExistedPath) {
       savedAbi = loadAbiFromAbiPath(abiExistedPath);
-      abiExists = true;
+      isAbiExists = true;
     }
   }
 
-  if (abiExists && savedAbi) {
+  if (isAbiExists && savedAbi) {
     if (g_Arguments.updateAbiMissingOnly) {
       logHandler.success("Skipped (exists)");
       return;
@@ -346,7 +347,7 @@ async function _checkAbi(contractName: string, address: string, abiFromExplorer:
       : _findAbiPath(contractName, address, { shouldThrow: false }) || _defaultAbiFilePath(contractName, address);
 
   _saveAbi(abiFileNameToSave, abiFromExplorer);
-  logHandler.success(abiExists ? "Overwritten" : "Saved");
+  logHandler.success(isAbiExists ? "Overwritten" : "Saved");
 }
 
 function _saveAbi(abiFileName: string, abiFromExplorer: Abi) {
@@ -496,7 +497,7 @@ function toLowerCaseAddress(fileName: string): string {
   if (!match) return fileName;
 
   const address = match[0];
-  return fileName.replace(address, address.toLowerCase());
+  return fileName.replace(address, () => address.toLowerCase());
 }
 
 function normalizeConsolidatedAbiKeys(
@@ -504,20 +505,20 @@ function normalizeConsolidatedAbiKeys(
   options: { onRename?: (from: string, to: string) => void } = {},
 ): { normalized: Record<string, Abi>; renamed: boolean } {
   const normalized: Record<string, Abi> = {};
-  let renamed = false;
+  let isRenamed = false;
 
   for (const [key, abi] of Object.entries(abis)) {
     const normalizedKey = toLowerCaseAddress(key);
 
     if (normalizedKey !== key) {
-      renamed = true;
+      isRenamed = true;
       options.onRename?.(key, normalizedKey);
     }
 
     normalized[normalizedKey] = abi;
   }
 
-  return { normalized: normalized, renamed };
+  return { normalized: normalized, renamed: isRenamed };
 }
 
 function _renameAbiIfNeed(fileName: string): void {

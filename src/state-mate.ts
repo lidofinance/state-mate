@@ -18,7 +18,7 @@ import {
   resetAbiModeCache,
 } from "./abi-provider";
 import { doGenerateBoilerplate } from "./boilerplate-generator";
-import { parseCmdLineArguments } from "./cli-parser";
+import { parseCommandLineArguments } from "./cli-parser";
 import { printError, readUrlOrFromEnvironment } from "./common";
 import { loadContractInfoFromExplorer } from "./explorer-provider";
 import { FAILURE_MARK, log, logError, logErrorAndExit, logHeader1, SUCCESS_MARK, WARNING_MARK } from "./logger";
@@ -38,11 +38,13 @@ import {
 } from "./typebox";
 import { ContractInfo } from "./types";
 
-export let g_Arguments: ReturnType<typeof parseCmdLineArguments>;
+export let g_Arguments: ReturnType<typeof parseCommandLineArguments>;
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore: Unreachable code error
+// eslint-disable-next-line unicorn/no-nonstandard-builtin-properties -- deliberate polyfill for JSON.stringify of bigints
 BigInt.prototype.toJSON = function (): number {
+  // eslint-disable-next-line unicorn/no-this-outside-of-class -- prototype method
   return Number(this);
 };
 
@@ -137,7 +139,7 @@ async function doChecks(jsonDocument: EntireDocument) {
           `\n${chalk.red(`[${index + 1}/${g_error_details.length}]`)} ` +
             `${chalk.cyan("Section:")} ${chalk.yellow(error.section)} | ` +
             `${chalk.cyan("Contract:")} ${chalk.yellow(error.contract)} ` +
-            `${chalk.gray(`(${error.contractAddress})`)}` +
+            chalk.gray(`(${error.contractAddress})`) +
             `\n    ${chalk.cyan("Check Type:")} ${chalk.yellow(error.checksType)} | ` +
             `${chalk.cyan("Method:")} ${chalk.yellow(error.method)}` +
             `\n    ${chalk.cyan("Error:")} ${chalk.red(error.message)}`,
@@ -229,7 +231,7 @@ async function checkNetworkSection(sectionTitle: string, section: NetworkSection
 }
 
 async function main() {
-  g_Arguments = parseCmdLineArguments();
+  g_Arguments = parseCommandLineArguments();
 
   if (g_Arguments.updateAbi) {
     renameAllAbiToLowerCase();

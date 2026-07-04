@@ -38,6 +38,16 @@ export default [
       "unicorn/prefer-module": "off",
       "unicorn/no-process-exit": "off",
       "unicorn/no-object-as-default-parameter": "off",
+      // unicorn v69 migration: opinionated new rules that conflict with the codebase style
+      "unicorn/max-nested-calls": "off", // chalk calls inside template literals
+      "unicorn/no-top-level-assignment-in-function": "off", // g_* module-level state is deliberate
+      "unicorn/no-break-in-nested-loop": "off",
+      "unicorn/no-declarations-before-early-exit": "off",
+      "unicorn/no-top-level-side-effects": "off", // CLI entrypoints
+      "unicorn/consistent-class-member-order": "off",
+      "unicorn/consistent-boolean-name": "off",
+      "unicorn/prefer-await": "off", // CommonJS entrypoints cannot top-level await; main().catch() is the pattern
+      "unicorn/prefer-number-coercion": "off", // Number("") === 0 vs parseInt("") === NaN: keep strict parsing
       "unicorn/consistent-function-scoping": "off",
       "@typescript-eslint/no-explicit-any": ["warn"],
       "@typescript-eslint/no-unused-vars": ["warn"],
