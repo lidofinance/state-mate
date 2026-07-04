@@ -223,8 +223,9 @@ roles:
   - &DISALLOW_PAIR_ROLE "0x4638c3377b40c5fdb49ab3032cbb02972024761b03e6a0d7dcf113f5673c03a8"
 
 eoa:
-  # Holds TOP_UP_ROLE on topUpGateway
-  - &topUpRoleHolder "0xF82aC5937A20dC862F9bc0668779031E06000f17"
+  # Lido depositor bot; holds TOP_UP_ROLE on topUpGateway
+  # https://research.lido.fi/t/proposal-to-refund-money-spent-on-deposits-on-ethereum-to-the-dev-team/1882
+  - &depositorBot "0xF82aC5937A20dC862F9bc0668779031E06000f17"
 
 l1:
   rpcUrl: MAINNET_REMOTE_RPC_URL
@@ -697,12 +698,12 @@ l1:
         getGuardians:
           # https://docs.lido.fi/holders/lido-council-daemon#mainnet-members
           [
-            "0x5fd0dDbC3351d009eb3f88DE7Cd081a614C519F1",
-            "0x7912Fa976BcDe9c2cf728e213e892AD7588E6AaF",
-            "0x6d22aE126eB2c37F67a1391B37FF4f2863e61389",
-            "0xf82D88217C249297C6037BA77CE34b3d8a90ab43",
-            "0xa56b128Ea2Ea237052b0fA2a96a387C0E43157d8",
-            "0x4B87F16B8d32cb5a859a4C48a88edB5adBe3498E",
+            "0x5fd0dDbC3351d009eb3f88DE7Cd081a614C519F1", # Lido dev team
+            "0x7912Fa976BcDe9c2cf728e213e892AD7588E6AaF", # Blockscape
+            "0x6d22aE126eB2c37F67a1391B37FF4f2863e61389", # Kiln
+            "0xf82D88217C249297C6037BA77CE34b3d8a90ab43", # Staking Facilities
+            "0xa56b128Ea2Ea237052b0fA2a96a387C0E43157d8", # P2P
+            "0x4B87F16B8d32cb5a859a4C48a88edB5adBe3498E", # Stakefish
           ]
         getLastDepositBlock: null
         getMaxOperatorsPerUnvetting: 200
@@ -821,7 +822,7 @@ l1:
         *MANAGE_LIMITS_ROLE : []
         *PAUSE_ROLE : [*circuitBreaker, *resealManager]
         *RESUME_ROLE : [*resealManager]
-        *TOP_UP_ROLE : [*topUpRoleHolder]
+        *TOP_UP_ROLE : [*depositorBot]
       implementationChecks:
         BEACON_ROOTS: *BEACON_ROOTS_CONTRACT
         DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
@@ -1053,17 +1054,17 @@ l1:
       checks:
         VERSION: "1.4.1"
         getThreshold: 5
-        getOwners:
-          [
-            "0xe8E5503242896efeBE3AAC55e4Ce614b0f3aF259",
-            "0xfAd931F268dc5f8E5cdc3000baAaC0cbdb4E0a9C",
-            "0x3F3C4146F597d2b1d9bC51Ad56E084cfd77Ebd9a",
-            "0x6B70C69A2b6c54C3525dA5e5b241aC7437D672CB",
-            "0x19aC7c69e5F1AC95b8d49b30Cbb79e81f1ab0dba",
-            "0x7FfFE46F9aB8288c5D7aC3e63722f3DE8e3743E3",
-            "0xFd660518dC1b52d9F67FAcd42bbBA962B06b8E54",
-            "0x75b2219E1D68788f0C6f0FdA07D1d3Ab550CfE18",
-            "0x08F21e00D9eE3D082cC2a7CcC9C2a5770666e7c2",
+        # https://research.lido.fi/t/proposal-transition-the-lnosg-into-the-cmc/11341
+        getOwners: [
+            "0xe8E5503242896efeBE3AAC55e4Ce614b0f3aF259", # @dgusakov
+            "0xfAd931F268dc5f8E5cdc3000baAaC0cbdb4E0a9C", # @KimonSh
+            "0x3F3C4146F597d2b1d9bC51Ad56E084cfd77Ebd9a", # @sabrychiaa
+            "0x6B70C69A2b6c54C3525dA5e5b241aC7437D672CB", # @Aleksandra_G
+            "0x19aC7c69e5F1AC95b8d49b30Cbb79e81f1ab0dba", # @syncnode
+            "0x7FfFE46F9aB8288c5D7aC3e63722f3DE8e3743E3", # @AlexMov
+            "0xFd660518dC1b52d9F67FAcd42bbBA962B06b8E54", # @iicc
+            "0x75b2219E1D68788f0C6f0FdA07D1d3Ab550CfE18", # @Sven
+            "0x08F21e00D9eE3D082cC2a7CcC9C2a5770666e7c2", # @Edouard_Stakin
           ]
         approvedHashes:
         checkNSignatures:
