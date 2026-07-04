@@ -27,6 +27,11 @@ export class LogCommand {
     this.initialPrint();
   }
 
+  private initialPrint(): void {
+    const prefix = getItemPrefix();
+    process.stdout.write(`${prefix}  ${this.description}: ...`);
+  }
+
   public printResult(statusSymbol: string, result: string): void {
     readline.cursorTo(process.stdout, 0);
     readline.clearLine(process.stdout, 0);
@@ -44,11 +49,6 @@ export class LogCommand {
 
   public warning(result: string): void {
     this.printResult(WARNING_MARK, result);
-  }
-
-  private initialPrint(): void {
-    const prefix = getItemPrefix();
-    process.stdout.write(`${prefix}  ${this.description}: ...`);
   }
 }
 

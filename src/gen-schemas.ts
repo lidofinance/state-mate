@@ -32,5 +32,5 @@ async function main() {
   generateBothSchemas();
 }
 
-// eslint-disable-next-line unicorn/prefer-top-level-await
+// eslint-disable-next-line unicorn/prefer-top-level-await, unicorn/prefer-await -- CommonJS entrypoint
 main().catch((error) => console.error(error));

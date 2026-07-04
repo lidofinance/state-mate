@@ -14,6 +14,7 @@ export class OzNonEnumerableAclSectionValidator extends SectionValidatorBase {
   constructor(provider: JsonRpcProvider) {
     super(provider, EntryField.ozNonEnumerableAcl);
   }
+
   override async validateSection(contractEntry: ContractEntry, contractAlias: string, basePath?: string) {
     void contractAlias; // Used for interface compatibility
     if (contractEntry.ozNonEnumerableAcl) {

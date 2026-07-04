@@ -32,12 +32,13 @@ function getConsolidatedAbiPathGz(): string {
 
 function getConsolidatedAbiPathToUse(): { path: string; isCompressed: boolean } | null {
   const gzPath = getConsolidatedAbiPathGz();
-  const jsonPath = getConsolidatedAbiPath();
 
   // Prefer compressed version if it exists
   if (fs.existsSync(gzPath)) {
     return { path: gzPath, isCompressed: true };
   }
+
+  const jsonPath = getConsolidatedAbiPath();
   if (fs.existsSync(jsonPath)) {
     return { path: jsonPath, isCompressed: false };
   }
@@ -179,24 +180,23 @@ export function loadAbiFromFile(
       if (addressMatches.length === 1) {
         abi = abis[addressMatches[0]];
       } else if (addressMatches.length > 1) {
-        const message =
-          `ABI lookup for ${chalk.yellow(key)} is ambiguous.\n` +
-          `The following consolidated ABI keys match address ${chalk.yellow(address)}:\n` +
-          `${addressMatches.join(", ")}\n\n` +
-          `Please align the contract ${chalk.yellow("name")} in YAML or keep a unique ABI key per address.`;
-
         if (failSilently) return null;
-        logErrorAndExit(message);
+        logErrorAndExit(
+          `ABI lookup for ${chalk.yellow(key)} is ambiguous.\n` +
+            `The following consolidated ABI keys match address ${chalk.yellow(address)}:\n` +
+            `${addressMatches.join(", ")}\n\n` +
+            `Please align the contract ${chalk.yellow("name")} in YAML or keep a unique ABI key per address.`,
+        );
       }
     }
 
     if (!abi) {
-      const message =
-        `ABI not found in consolidated file for ${chalk.yellow(key)}\n` +
-        `Available keys: ${formatConsolidatedKeys(allKeys)}\n\n` +
-        chalk.yellow.bold(`Try running with the '--update-abi' option to download the ABI`);
       if (failSilently) return null;
-      logErrorAndExit(message);
+      logErrorAndExit(
+        `ABI not found in consolidated file for ${chalk.yellow(key)}\n` +
+          `Available keys: ${formatConsolidatedKeys(allKeys)}\n\n` +
+          chalk.yellow.bold(`Try running with the '--update-abi' option to download the ABI`),
+      );
     }
 
     return abi;
@@ -206,12 +206,12 @@ export function loadAbiFromFile(
     try {
       abiPath = _findAbiPath(contractName, address, { shouldThrow: true, allowAddressFallback });
     } catch (error) {
-      const message =
+      if (failSilently) return null;
+      logErrorAndExit(
         `Error finding ABI file for contract
         ${contractName} in ${g_Arguments.abiDirPath}: ${printError(error)}\n\n` +
-        chalk.yellow.bold(`Try running with the '--update-abi' option to download the unnecessary ABI`);
-      if (failSilently) return null;
-      logErrorAndExit(message);
+          chalk.yellow.bold(`Try running with the '--update-abi' option to download the unnecessary ABI`),
+      );
     }
     return loadAbiFromAbiPath(abiPath);
   }

@@ -270,7 +270,7 @@ async function main() {
   }
 }
 
-// eslint-disable-next-line unicorn/prefer-top-level-await
+// eslint-disable-next-line unicorn/prefer-top-level-await, unicorn/prefer-await -- CommonJS entrypoint
 main().catch((error) => {
   logError(error);
   process.exitCode = 1;

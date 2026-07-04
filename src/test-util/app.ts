@@ -29,8 +29,8 @@ class Result {
     const checksMatch = response.match(/(\d+) checks performed/);
     const errorsMatch = response.match(/(\d+) errors found/);
 
-    this.checks = checksMatch ? Number.parseInt(checksMatch[1], 10) : undefined;
-    this.errors = errorsMatch ? Number.parseInt(errorsMatch[1], 10) : 0;
+    this.checks = checksMatch ? Number(checksMatch[1]) : undefined;
+    this.errors = errorsMatch ? Number(errorsMatch[1]) : 0;
   }
   isValid(): boolean {
     return !!this?.checks;
@@ -232,5 +232,5 @@ async function main() {
   processAllYamlFolders(yamlFolderAbsolutePath, requiredFolders, environmentVariables);
 }
 
-// eslint-disable-next-line unicorn/prefer-top-level-await
+// eslint-disable-next-line unicorn/prefer-top-level-await, unicorn/prefer-await -- CommonJS entrypoint
 main().catch((error) => console.error(error));

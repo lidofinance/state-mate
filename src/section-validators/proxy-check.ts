@@ -12,6 +12,15 @@ export class ProxyCheckSectionValidator extends SectionValidatorBase {
   constructor(provider: JsonRpcProvider) {
     super(provider, EntryField.proxyChecks);
   }
+
+  private async _validateSubsection(contract: Contract, method: string, checkEntryValue: ChecksEntryValue) {
+    if (isTypeOfTB(checkEntryValue, ViewResultTB)) {
+      await this._checkViewFunction(contract, method, { result: checkEntryValue });
+    } else {
+      logErrorAndExit(`Unknown check type: ${JSON.stringify(checkEntryValue)}`);
+    }
+  }
+
   override async validateSection(contractEntry: ContractEntry, contractAlias: string, basePath?: string) {
     if (!(isTypeOfTB(contractEntry, ProxyContractEntryTB) && contractEntry.proxyChecks)) {
       return;
@@ -31,14 +40,6 @@ export class ProxyCheckSectionValidator extends SectionValidatorBase {
     for (const [method, checkEntryValue] of Object.entries(proxyChecks)) {
       if (!needCheck(CheckLevel.method, method)) continue;
       await this._validateSubsection(contract, method, checkEntryValue);
-    }
-  }
-
-  private async _validateSubsection(contract: Contract, method: string, checkEntryValue: ChecksEntryValue) {
-    if (isTypeOfTB(checkEntryValue, ViewResultTB)) {
-      await this._checkViewFunction(contract, method, { result: checkEntryValue });
-    } else {
-      logErrorAndExit(`Unknown check type: ${JSON.stringify(checkEntryValue)}`);
     }
   }
 }
