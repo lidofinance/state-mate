@@ -29,8 +29,8 @@ class Result {
     const checksMatch = response.match(/(\d+) checks performed/);
     const errorsMatch = response.match(/(\d+) errors found/);
 
-    this.checks = checksMatch ? Number.parseInt(checksMatch[1], 10) : undefined;
-    this.errors = errorsMatch ? Number.parseInt(errorsMatch[1], 10) : 0;
+    this.checks = checksMatch ? Number(checksMatch[1]) : undefined;
+    this.errors = errorsMatch ? Number(errorsMatch[1]) : 0;
   }
   isValid(): boolean {
     return !!this?.checks;
@@ -61,7 +61,7 @@ class ResultsMatcher {
     if (!this.forkResult || !this.originResult) return "";
     const print = (forkCounter?: number, originCounter?: number): string => {
       const report = `${forkCounter ?? 0} vs ${originCounter ?? 0}`;
-      return `${forkCounter === originCounter ? chalk.green(report) : chalk.red(report)}`;
+      return forkCounter === originCounter ? chalk.green(report) : chalk.red(report);
     };
 
     const formattedReport =
@@ -79,12 +79,14 @@ const FORK_REPO_PATH: string = process.cwd();
 let ORIGIN_REPO_PATH: string;
 
 function setEnvironmentsFromFolder(folder: string, environmentVariables?: EnvironmentVariables) {
-  if (environmentVariables && environmentVariables[folder]) {
-    Object.assign(process.env, environmentVariables[folder]);
-    log(
-      `The following environment variables are additionally set:\n ${JSON.stringify(environmentVariables[folder], null, 2)}`,
-    );
+  if (!(environmentVariables && Object.hasOwn(environmentVariables, folder))) {
+    return;
   }
+
+  Object.assign(process.env, environmentVariables[folder]);
+  log(
+    `The following environment variables are additionally set:\n ${JSON.stringify(environmentVariables[folder], null, 2)}`,
+  );
 }
 
 function processAllYamlFolders(
@@ -178,10 +180,9 @@ function runStateMate(yamlFileAbsolutePath: string, options?: string): Response 
       logHandler.failure("Failed with report");
     }
     return { result, output };
-  } else {
-    logHandler.failure("Failed without report");
-    return {};
   }
+  logHandler.failure("Failed without report");
+  return {};
 }
 
 function run(command: string): string | null {
@@ -231,5 +232,4 @@ async function main() {
   processAllYamlFolders(yamlFolderAbsolutePath, requiredFolders, environmentVariables);
 }
 
-// eslint-disable-next-line unicorn/prefer-top-level-await
 main().catch((error) => console.error(error));

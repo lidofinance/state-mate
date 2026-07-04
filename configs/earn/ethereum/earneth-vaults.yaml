@@ -1312,8 +1312,8 @@ l1:
         feeRecipient: *treasury
         minPriceD18:
         owner: *lazyVaultAdmin
-        performanceFeeD6: 0
-        protocolFeeD6: 0
+        performanceFeeD6: 100000
+        protocolFeeD6: 10000
         redeemFeeD6: 0
         timestamps:
       implementationChecks:

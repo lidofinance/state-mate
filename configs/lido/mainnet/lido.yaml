@@ -1,9 +1,5 @@
 # yaml-language-server: $schema=../../schemas/main-schema.json
 ---
-parameters:
-  - &contract4788 "0x000F3df6D732807Ef1319fB7B8bB8522d0Beac02"
-  - &contractDeposit "0x00000000219ab540356cBB839Cbe05303d7705Fa"
-
 deployed:
   l1:
     # --- Core protocol ---
@@ -94,14 +90,25 @@ deployed:
 
     # --- CSM ---
     - &CSModule "0xdA7dE2ECdDfccC6c3AF10108Db212ACBBf9EA83F"
+    - &CSModuleImpl "0x1eB6d4da13ca9566c17F526aE0715325d7a07665"
     - &CSAccounting "0x4d72BFF1BeaC69925F8Bd12526a39BAAb069e5Da"
-    - &CSAccountingImplAddress "0x6f09d2426c7405C5546413e6059F884D2D03f449"
+    - &CSAccountingImpl "0x6f09d2426c7405C5546413e6059F884D2D03f449"
     - &CSFeeDistributor "0xD99CC66fEC647E68294C6477B40fC7E0F6F618D0"
+    - &CSFeeDistributorImpl "0x5DCF7cF7c6645E9E822a379dF046a8b0390251A1"
     - &CSVettedGate "0xB314D4A76C457c93150d308787939063F4Cc67E0"
+    - &CSVettedGateImpl "0x65D4D92Cd0EabAa05cD5A46269C24b71C21cfdc4"
     - &CSEjector "0xc72b58aa02E0e98cF8A4a0E9Dce75e763800802C"
     - &CSFeeOracle "0x4D4074628678Bd302921c20573EEa1ed38DdF7FB"
+    - &CSFeeOracleImpl "0xe0B234f99E413E27D9Bc31aBba9A49A3e570Da97"
     - &CSVerifier "0xdC5FE1782B6943f318E05230d688713a560063DC"
     - &CSPermissionlessGate "0xcF33a38111d0B1246A3F38a838fb41D626B454f0"
+    - &CSExitPenalties "0x06cd61045f958A209a0f8D746e103eCc625f4193"
+    - &CSExitPenaltiesImpl "0xDa22fA1CEa40d05Fe4CD536967afdD839586D546"
+    - &CSParametersRegistry "0x9D28ad303C90DF524BA960d7a2DAC56DcC31e428"
+    - &CSParametersRegistryImpl "0x25fdC3BE9977CD4da679dF72A64C8B6Bd5216A78"
+    - &CSStrikes "0xaa328816027F2D32B9F56d190BC9Fa4A5C07637f"
+    - &CSStrikesImpl "0x3E5021424c9e13FC853e523Cd68ebBec848956a0"
+    - &CSHashConsensus "0x71093efF8D8599b5fA340D665Ad60fA7C80688e4"
 
     # --- Easy Track ---
     - &easyTrack "0xF0211b7660680B49De1A7E9f25C65660F0a13Fea"
@@ -130,10 +137,12 @@ misc:
   - &AO_CONTRACT_VERSION 4
 
   # --- Beacon/Genesis roots and validator info ---
-  - &GI_FIRST_VALIDATOR_PREV "0x0000000000000000000000000000000000000000000000000096000000000028"
-  - &GI_FIRST_VALIDATOR_CURR "0x0000000000000000000000000000000000000000000000000096000000000028"
-  - &GI_PUBKEY_WC_PARENT "0x0000000000000000000000000000000000000000000000000000000000000402"
-  - &GI_STATE_ROOT "0x0000000000000000000000000000000000000000000000000000000000000b03"
+  - &GI_FIRST_BLOCK_ROOT_IN_SUMMARY_ELECTRA "0x000000000000000000000000000000000000000000000000000000000040000d"
+  - &GI_FIRST_VALIDATOR_ELECTRA "0x0000000000000000000000000000000000000000000000000096000000000028"
+  - &GI_FIRST_WITHDRAWAL_ELECTRA "0x000000000000000000000000000000000000000000000000000000000161c004"
+  - &GI_PUBKEY_WC_PARENT_ELECTRA "0x0000000000000000000000000000000000000000000000000000000000000402"
+  - &GI_FIRST_HISTORICAL_SUMMARY_ELECTRA "0x000000000000000000000000000000000000000000000000000000b600000018"
+  - &GI_STATE_ROOT_ELECTRA "0x0000000000000000000000000000000000000000000000000000000000000b03"
 
   # --- Addresses / Zero values ---
   - &ZERO_ADDRESS "0x0000000000000000000000000000000000000000"
@@ -142,7 +151,9 @@ misc:
 
   # --- General numeric constants ---
   - &MAX_UINT256 "115792089237316195423570985008687907853269984665640564039457584007913129639935"
+  - &MAX_UINT248 "452312848583266388373324160190187140051835877600158453279131187530910662655"
   - &MAX_UINT64 "18446744073709551615"
+  - &MAX_UINT32 "4294967295"
   - &DECIMALS_18 18
 
   # --- EIP-712 domain separators ---
@@ -183,6 +194,11 @@ misc:
   - &SLOTS_PER_HISTORICAL_ROOT 8192
   - &SHARD_COMMITTEE_PERIOD_IN_SECONDS 98304
   - &EIP712_VERSION 2
+  - &EIP4788_BEACON_ROOTS_CONTRACT "0x000F3df6D732807Ef1319fB7B8bB8522d0Beac02"
+  - &CAPELLA_SLOT 6209536 # https://github.com/eth-clients/mainnet/blob/main/metadata/config.yaml#L50
+  - &ELECTRA_SLOT 11649024 # https://github.com/ethereum/EIPs/blob/master/EIPS/eip-7600.md#activation
+  - &MIN_ACTIVATION_BALANCE 32000000000000000000
+  - &DEPOSIT_CONTRACT "0x00000000219ab540356cBB839Cbe05303d7705Fa"
 
   # --- Time durations (in seconds) ---
   - &DURATION_1_HOUR 3600
@@ -193,6 +209,7 @@ misc:
   - &DURATION_28_DAYS 2419200
   - &DURATION_30_DAYS 2592000
   - &DURATION_60_DAYS 5184000
+  - &DURATION_8_WEEKS 4838400
   - &DURATION_1_YEAR 31536000
   - &DURATION_3_YEARS 94608000
 
@@ -211,7 +228,21 @@ misc:
   - &HC_VEB_START 449550
   - &HC_VEB_FAST_LANE 100
   - &HC_VEB_FRAME_EPOCHS 45
+  - &HC_CSM_START 434490
+  - &HC_CSM_FAST_LANE 300 # https://github.com/lidofinance/staking-modules/blob/3b0c016c77590c208f2b71ca51410cb55ea2dcc2/script/csm/DeployMainnet.s.sol#L22
+  - &HC_CSM_FRAME_EPOCHS 6300 # https://github.com/lidofinance/staking-modules/blob/3b0c016c77590c208f2b71ca51410cb55ea2dcc2/script/csm/DeployMainnet.s.sol#L21
   - &HASH_CONSENSUS_QUORUM 5
+  - &HASH_CONSENSUS_MEMBERS [
+      "0x73181107c8D9ED4ce0bbeF7A0b4ccf3320C41d12", # Instadapp
+      "0x4118DAD7f348A4063bD15786c299De2f3B1333F3", # Caliber
+      "0x404335BcE530400a5814375E7Ec1FB55fAff3eA2", # Staking Facilities
+      "0x8dB977C13CAA938BC58464bFD622DF0570564b78", # Chorus One
+      "0x007DE4a5F7bc37E2F26c0cb2E8A95006EE9B89b5", # P2P
+      "0xc79F702202E3A6B0B6310B537E786B9ACAA19BAf", # Chainlayer
+      "0x61c91ECd902EB56e314bB2D5c5C07785444Ea1c8", # bloXroute
+      "0xe57B3792aDCc5da47EF4fF588883F0ee0c9835C9", # MatrixedLink
+      "0x042a9e5acCfa17e28300F1b5967f20891E973922", # Stakefish
+    ]
 
   # --- Node/operator limits ---
   - &MAX_NODE_OPERATORS_COUNT 200
@@ -256,6 +287,42 @@ misc:
   - &MAX_REWARD_RATIO 65535
   - &REWARD_RATIO_BP 350
   - &QUARANTINE_PERIOD 259200
+
+  # --- CSM constants ---
+  # https://github.com/lidofinance/staking-modules/blob/main/script/DeployMainnet.s.sol
+  - &CSM_TYPE "0x636f6d6d756e6974792d6f6e636861696e2d7631000000000000000000000000" # bytes32("community-onchain-v1")
+  - &QUEUE_LEGACY_PRIORITY 4
+  - &QUEUE_LOWEST_PRIORITY 5
+
+  - &defaultBondingCurve [
+      [[1, 2400000000000000000, 2400000000000000000], [2, 3700000000000000000, 1300000000000000000]],
+    ]
+  - &defaultAllowedExitDelay 345600
+  - &defaultBadPerformancePenalty 258000000000000000
+  - &defaultElRewardsStealingAdditionalFine 100000000000000000
+  - &defaultExitDelayPenalty 100000000000000000
+  - &defaultKeyRemovalCharge 20000000000000000
+  - &defaultMaxWithdrawalRequestFee 100000000000000000
+  - &defaultPerformanceCoefficients [54, 8, 2]
+  - &defaultPerformanceLeeway 300
+  - &defaultPerformanceLeewayData [[1, 300]]
+  - &defaultQueueConfig [5, *MAX_UINT32]
+  - &defaultRewardShare 5834
+  - &defaultRewardShareData [[1, 5834]]
+  - &defaultStrikesParams [6, 3]
+
+  - &icsBondingCurve [[[1, 1500000000000000000, 1500000000000000000], [2, 2800000000000000000, 1300000000000000000]]]
+  - &icsAllowedExitDelay 432000
+  - &icsBadPerformancePenalty 172000000000000000
+  - &icsElRewardsStealingAdditionalFine 50000000000000000
+  - &icsExitDelayPenalty 50000000000000000
+  - &icsKeyRemovalCharge 10000000000000000
+  - &icsPerformanceCoefficients [54, 4, 2]
+  - &icsPerformanceLeewayData [[1, 500], [151, 300]]
+  - &icsQueueConfig [0, 10]
+  - &icsRewardShareData [[1, 10000], [17, 5834]]
+  - &icsStrikesParams [6, 4]
+
 eoa:
   - &deployer "0xAD2F7e30AeA89f6D45D942D0f52aFB8B395965f2"
 
@@ -691,7 +758,7 @@ l1:
         REPORT_VALIDATOR_EXITING_STATUS_ROLE: *REPORT_VALIDATOR_EXITING_STATUS_ROLE
         REPORT_VALIDATOR_EXIT_TRIGGERED_ROLE: *REPORT_VALIDATOR_EXIT_TRIGGERED_ROLE
         MANAGE_WITHDRAWAL_CREDENTIALS_ROLE: *MANAGE_WITHDRAWAL_CREDENTIALS_ROLE
-        DEPOSIT_CONTRACT: *contractDeposit
+        DEPOSIT_CONTRACT: *DEPOSIT_CONTRACT
         FEE_PRECISION_POINTS: *FEE_PRECISION_POINTS
         TOTAL_BASIS_POINTS: *TOTAL_BASIS_POINTS
         MAX_STAKING_MODULES_COUNT: *MAX_STAKING_MODULES_COUNT
@@ -745,7 +812,7 @@ l1:
         UNSAFE_SET_EXITED_VALIDATORS_ROLE: *UNSAFE_SET_EXITED_VALIDATORS_ROLE
         REPORT_VALIDATOR_EXITING_STATUS_ROLE: *REPORT_VALIDATOR_EXITING_STATUS_ROLE
         REPORT_VALIDATOR_EXIT_TRIGGERED_ROLE: *REPORT_VALIDATOR_EXIT_TRIGGERED_ROLE
-        DEPOSIT_CONTRACT: *contractDeposit
+        DEPOSIT_CONTRACT: *DEPOSIT_CONTRACT
         FEE_PRECISION_POINTS: *FEE_PRECISION_POINTS
         MAX_STAKING_MODULES_COUNT: *MAX_STAKING_MODULES_COUNT
         MAX_STAKING_MODULE_NAME_LENGTH: *MAX_STAKING_MODULE_NAME_LENGTH
@@ -994,17 +1061,19 @@ l1:
         hasRole: null
         supportsInterface: null
 
+    # --- CSM ---
+
     CSAccounting:
       name: CSAccounting
       address: *CSAccounting
       proxyName: OssifiableProxy
-      implementation: *CSAccountingImplAddress
+      implementation: *CSAccountingImpl
       proxyChecks:
         proxy__getAdmin: *aragonAgent
-        proxy__getImplementation: *CSAccountingImplAddress
+        proxy__getImplementation: *CSAccountingImpl
         proxy__getIsOssified: false
       checks:
-        DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
         DEFAULT_BOND_CURVE_ID: 0
         FEE_DISTRIBUTOR: *CSFeeDistributor
         LIDO: *lido
@@ -1022,7 +1091,7 @@ l1:
         SET_BOND_CURVE_ROLE: *CS_SET_BOND_CURVE_ROLE
         WITHDRAWAL_QUEUE: *withdrawalQueueERC721
         WSTETH: *wstETH
-        chargePenaltyRecipient: null
+        chargePenaltyRecipient: *aragonAgent
         feeDistributor: *CSFeeDistributor
         getActualLockedBond: null
         getBond: null
@@ -1030,15 +1099,21 @@ l1:
         getBondAmountByKeysCountWstETH: null
         getBondCurve: null
         getBondCurveId: null
-        getBondLockPeriod: null
+        getBondLockPeriod: *DURATION_8_WEEKS
         getBondShares: null
         getBondSummary: null
         getBondSummaryShares: null
         getClaimableBondShares: null
         getClaimableRewardsAndBondShares: null
-        getCurveInfo: null
-        getCurvesCount: null
-        getInitializedVersion: null
+        getCurveInfo:
+          - result: *defaultBondingCurve
+            args: [0]
+          - result: *icsBondingCurve # Legacy EA and ICS curves are identical
+            args: [1]
+          - result: *icsBondingCurve
+            args: [2]
+        getCurvesCount: 3
+        getInitializedVersion: 2
         getKeysCountByBondAmount: null
         getLockedBondInfo: null
         getRequiredBondForNextKeys: null
@@ -1080,7 +1155,7 @@ l1:
         SET_BOND_CURVE_ROLE: *CS_SET_BOND_CURVE_ROLE
         WITHDRAWAL_QUEUE: *withdrawalQueueERC721
         WSTETH: *wstETH
-        chargePenaltyRecipient: null
+        chargePenaltyRecipient: *ZERO_ADDRESS
         feeDistributor: *CSFeeDistributor
         getActualLockedBond: null
         getBond: null
@@ -1088,15 +1163,15 @@ l1:
         getBondAmountByKeysCountWstETH: null
         getBondCurve: null
         getBondCurveId: null
-        getBondLockPeriod: null
+        getBondLockPeriod: 0
         getBondShares: null
         getBondSummary: null
         getBondSummaryShares: null
         getClaimableBondShares: null
         getClaimableRewardsAndBondShares: null
         getCurveInfo: null
-        getCurvesCount: null
-        getInitializedVersion: null
+        getCurvesCount: 0
+        getInitializedVersion: *MAX_UINT64 # Initialization disabled for implementation contract
         getKeysCountByBondAmount: null
         getLockedBondInfo: null
         getRequiredBondForNextKeys: null
@@ -1109,13 +1184,19 @@ l1:
         getRoleMembers: null
         getRoleMemberCount: null
         hasRole: null
-        isPaused: false # WARNING: must be true for mainnet
+        isPaused: false
         supportsInterface: null
         totalBondShares: 0
 
     CSModule:
       name: CSModule
       address: *CSModule
+      proxyName: OssifiableProxy
+      implementation: *CSModuleImpl
+      proxyChecks:
+        proxy__getAdmin: *aragonAgent
+        proxy__getImplementation: *CSModuleImpl
+        proxy__getIsOssified: false
       checks:
         DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
         PAUSE_ROLE: *CS_PAUSE_ROLE
@@ -1127,22 +1208,22 @@ l1:
         SETTLE_EL_REWARDS_STEALING_PENALTY_ROLE: *CS_SETTLE_EL_REWARDS_STEALING_PENALTY_ROLE
         VERIFIER_ROLE: *CS_VERIFIER_ROLE
         PAUSE_INFINITELY: *MAX_UINT256
-        isPaused: null
-        ACCOUNTING: null
-        DEPOSIT_SIZE: null
-        EXIT_PENALTIES: null
-        FEE_DISTRIBUTOR: null
-        LIDO_LOCATOR: null
-        PARAMETERS_REGISTRY: null
-        QUEUE_LEGACY_PRIORITY: null
-        QUEUE_LOWEST_PRIORITY: null
-        STETH: null
-        accounting: null
+        isPaused: false
+        ACCOUNTING: *CSAccounting
+        DEPOSIT_SIZE: *MIN_ACTIVATION_BALANCE
+        EXIT_PENALTIES: *CSExitPenalties
+        FEE_DISTRIBUTOR: *CSFeeDistributor
+        LIDO_LOCATOR: *lidoLocator
+        PARAMETERS_REGISTRY: *CSParametersRegistry
+        QUEUE_LEGACY_PRIORITY: *QUEUE_LEGACY_PRIORITY
+        QUEUE_LOWEST_PRIORITY: *QUEUE_LOWEST_PRIORITY
+        STETH: *lido
+        accounting: *CSAccounting
         depositQueueItem: null
         depositQueuePointers: null
         exitDeadlineThreshold: null
         getActiveNodeOperatorsCount: null
-        getInitializedVersion: null
+        getInitializedVersion: 2
         getNodeOperator: null
         getNodeOperatorIds: null
         getNodeOperatorIsActive: null
@@ -1160,7 +1241,7 @@ l1:
         getSigningKeys: null
         getSigningKeysWithSignatures: null
         getStakingModuleSummary: null
-        getType: null
+        getType: *CSM_TYPE
         hasRole: null
         isValidatorExitDelayPenaltyApplicable: null
         isValidatorWithdrawn: null
@@ -1175,10 +1256,65 @@ l1:
         *CS_REPORT_EL_REWARDS_STEALING_PENALTY_ROLE : [*csmCommittee]
         *CS_SETTLE_EL_REWARDS_STEALING_PENALTY_ROLE : [*evmScriptExecutor]
         *CS_VERIFIER_ROLE : [*CSVerifier]
+      implementationChecks:
+        DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
+        PAUSE_ROLE: *CS_PAUSE_ROLE
+        RESUME_ROLE: *CS_RESUME_ROLE
+        RECOVERER_ROLE: *CS_RECOVERER_ROLE
+        STAKING_ROUTER_ROLE: *STAKING_ROUTER_ROLE
+        CREATE_NODE_OPERATOR_ROLE: *CS_CREATE_NODE_OPERATOR_ROLE
+        REPORT_EL_REWARDS_STEALING_PENALTY_ROLE: *CS_REPORT_EL_REWARDS_STEALING_PENALTY_ROLE
+        SETTLE_EL_REWARDS_STEALING_PENALTY_ROLE: *CS_SETTLE_EL_REWARDS_STEALING_PENALTY_ROLE
+        VERIFIER_ROLE: *CS_VERIFIER_ROLE
+        PAUSE_INFINITELY: *MAX_UINT256
+        isPaused: false
+        ACCOUNTING: *CSAccounting
+        DEPOSIT_SIZE: *MIN_ACTIVATION_BALANCE
+        EXIT_PENALTIES: *CSExitPenalties
+        FEE_DISTRIBUTOR: *CSFeeDistributor
+        LIDO_LOCATOR: *lidoLocator
+        PARAMETERS_REGISTRY: *CSParametersRegistry
+        QUEUE_LEGACY_PRIORITY: *QUEUE_LEGACY_PRIORITY
+        QUEUE_LOWEST_PRIORITY: *QUEUE_LOWEST_PRIORITY
+        STETH: *lido
+        accounting: *CSAccounting
+        depositQueueItem: null
+        depositQueuePointers: null
+        exitDeadlineThreshold: null
+        getActiveNodeOperatorsCount: null
+        getInitializedVersion: *MAX_UINT64 # Initialization disabled for implementation contract
+        getNodeOperator: null
+        getNodeOperatorIds: null
+        getNodeOperatorIsActive: null
+        getNodeOperatorManagementProperties: null
+        getNodeOperatorNonWithdrawnKeys: null
+        getNodeOperatorOwner: null
+        getNodeOperatorSummary: null
+        getNodeOperatorTotalDepositedKeys: null
+        getNodeOperatorsCount: 0
+        getNonce: 0
+        getResumeSinceTimestamp: null
+        getRoleAdmin: null
+        getRoleMember: null
+        getRoleMemberCount: null
+        getSigningKeys: null
+        getSigningKeysWithSignatures: null
+        getStakingModuleSummary: null
+        getType: *CSM_TYPE
+        hasRole: null
+        isValidatorExitDelayPenaltyApplicable: null
+        isValidatorWithdrawn: null
+        supportsInterface: null
 
     CSFeeOracle:
       name: CSFeeOracle
       address: *CSFeeOracle
+      proxyName: OssifiableProxy
+      implementation: *CSFeeOracleImpl
+      proxyChecks:
+        proxy__getAdmin: *aragonAgent
+        proxy__getImplementation: *CSFeeOracleImpl
+        proxy__getIsOssified: false
       checks:
         DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
         PAUSE_ROLE: *CS_PAUSE_ROLE
@@ -1188,15 +1324,15 @@ l1:
         MANAGE_CONSENSUS_VERSION_ROLE: *ORACLE_MANAGE_CONSENSUS_VERSION_ROLE
         SUBMIT_DATA_ROLE: *ORACLE_SUBMIT_DATA_ROLE
         PAUSE_INFINITELY: *MAX_UINT256
-        isPaused: null
-        FEE_DISTRIBUTOR: null
-        GENESIS_TIME: null
-        SECONDS_PER_SLOT: null
-        STRIKES: null
-        getConsensusContract: null
+        isPaused: false
+        FEE_DISTRIBUTOR: *CSFeeDistributor
+        GENESIS_TIME: *GENESIS_TIME
+        SECONDS_PER_SLOT: *SECONDS_PER_SLOT
+        STRIKES: *CSStrikes
+        getConsensusContract: *CSHashConsensus
         getConsensusReport: null
-        getConsensusVersion: null
-        getContractVersion: null
+        getConsensusVersion: 3
+        getContractVersion: 2
         getLastProcessingRefSlot: null
         getResumeSinceTimestamp: null
         getRoleAdmin: null
@@ -1212,37 +1348,62 @@ l1:
         *ORACLE_MANAGE_CONSENSUS_CONTRACT_ROLE : []
         *ORACLE_MANAGE_CONSENSUS_VERSION_ROLE : []
         *ORACLE_SUBMIT_DATA_ROLE : []
-
-    CSVerifier:
-      name: CSVerifier
-      address: *CSVerifier
-      checks:
+      implementationChecks:
         DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
         PAUSE_ROLE: *CS_PAUSE_ROLE
         RESUME_ROLE: *CS_RESUME_ROLE
+        RECOVERER_ROLE: *CS_RECOVERER_ROLE
+        MANAGE_CONSENSUS_CONTRACT_ROLE: *ORACLE_MANAGE_CONSENSUS_CONTRACT_ROLE
+        MANAGE_CONSENSUS_VERSION_ROLE: *ORACLE_MANAGE_CONSENSUS_VERSION_ROLE
+        SUBMIT_DATA_ROLE: *ORACLE_SUBMIT_DATA_ROLE
         PAUSE_INFINITELY: *MAX_UINT256
-        isPaused: null
-        BEACON_ROOTS: null
-        CAPELLA_SLOT: null
-        FIRST_SUPPORTED_SLOT: null
-        GI_FIRST_BLOCK_ROOT_IN_SUMMARY_CURR: null
-        GI_FIRST_BLOCK_ROOT_IN_SUMMARY_PREV: null
-        GI_FIRST_HISTORICAL_SUMMARY_CURR: null
-        GI_FIRST_HISTORICAL_SUMMARY_PREV: null
-        GI_FIRST_VALIDATOR_CURR: null
-        GI_FIRST_VALIDATOR_PREV: null
-        GI_FIRST_WITHDRAWAL_CURR: null
-        GI_FIRST_WITHDRAWAL_PREV: null
-        MODULE: null
-        PIVOT_SLOT: null
-        SLOTS_PER_EPOCH: null
-        SLOTS_PER_HISTORICAL_ROOT: null
-        WITHDRAWAL_ADDRESS: null
+        isPaused: false
+        FEE_DISTRIBUTOR: *CSFeeDistributor
+        GENESIS_TIME: *GENESIS_TIME
+        SECONDS_PER_SLOT: *SECONDS_PER_SLOT
+        STRIKES: *CSStrikes
+        getConsensusContract: *ZERO_ADDRESS
+        getConsensusReport: null
+        getConsensusVersion: 0
+        getContractVersion: *MAX_UINT256
+        getLastProcessingRefSlot: null
         getResumeSinceTimestamp: null
         getRoleAdmin: null
         getRoleMember: null
         getRoleMemberCount: null
         hasRole: null
+        supportsInterface: null
+
+    CSVerifier:
+      name: CSVerifier
+      address: *CSVerifier
+      checks:
+        BEACON_ROOTS: *EIP4788_BEACON_ROOTS_CONTRACT
+        CAPELLA_SLOT: *CAPELLA_SLOT
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        FIRST_SUPPORTED_SLOT: *ELECTRA_SLOT
+        GI_FIRST_BLOCK_ROOT_IN_SUMMARY_CURR: *GI_FIRST_BLOCK_ROOT_IN_SUMMARY_ELECTRA
+        GI_FIRST_BLOCK_ROOT_IN_SUMMARY_PREV: *GI_FIRST_BLOCK_ROOT_IN_SUMMARY_ELECTRA
+        GI_FIRST_HISTORICAL_SUMMARY_CURR: *GI_FIRST_HISTORICAL_SUMMARY_ELECTRA
+        GI_FIRST_HISTORICAL_SUMMARY_PREV: *GI_FIRST_HISTORICAL_SUMMARY_ELECTRA
+        GI_FIRST_VALIDATOR_CURR: *GI_FIRST_VALIDATOR_ELECTRA
+        GI_FIRST_VALIDATOR_PREV: *GI_FIRST_VALIDATOR_ELECTRA
+        GI_FIRST_WITHDRAWAL_CURR: *GI_FIRST_WITHDRAWAL_ELECTRA
+        GI_FIRST_WITHDRAWAL_PREV: *GI_FIRST_WITHDRAWAL_ELECTRA
+        MODULE: *CSModule
+        PAUSE_INFINITELY: *MAX_UINT256
+        PAUSE_ROLE: *CS_PAUSE_ROLE
+        PIVOT_SLOT: *ELECTRA_SLOT
+        RESUME_ROLE: *CS_RESUME_ROLE
+        SLOTS_PER_EPOCH: *SLOTS_PER_EPOCH
+        SLOTS_PER_HISTORICAL_ROOT: *SLOTS_PER_HISTORICAL_ROOT
+        WITHDRAWAL_ADDRESS: *withdrawalVault
+        getResumeSinceTimestamp: null
+        getRoleAdmin: null
+        getRoleMember: null
+        getRoleMemberCount: null
+        hasRole: null
+        isPaused: false
         supportsInterface: null
       ozAcl:
         *DEFAULT_ADMIN_ROLE : [*aragonAgent]
@@ -1252,6 +1413,12 @@ l1:
     CSVettedGate:
       name: VettedGate
       address: *CSVettedGate
+      proxyName: OssifiableProxy
+      implementation: *CSVettedGateImpl
+      proxyChecks:
+        proxy__getAdmin: *aragonAgent
+        proxy__getImplementation: *CSVettedGateImpl
+        proxy__getIsOssified: false
       checks:
         DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
         PAUSE_ROLE: *CS_PAUSE_ROLE
@@ -1261,11 +1428,11 @@ l1:
         START_REFERRAL_SEASON_ROLE: *CS_START_REFERRAL_SEASON_ROLE
         END_REFERRAL_SEASON_ROLE: *CS_END_REFERRAL_SEASON_ROLE
         PAUSE_INFINITELY: *MAX_UINT256
-        isPaused: null
-        ACCOUNTING: null
-        MODULE: null
-        curveId: null
-        getInitializedVersion: null
+        isPaused: false
+        ACCOUNTING: *CSAccounting
+        MODULE: *CSModule
+        curveId: 2
+        getInitializedVersion: 1
         getReferralsCount: null
         getResumeSinceTimestamp: null
         getRoleAdmin: null
@@ -1274,11 +1441,11 @@ l1:
         hasRole: null
         hashLeaf: null
         isConsumed: null
-        isReferralProgramSeasonActive: null
+        isReferralProgramSeasonActive: false
         isReferrerConsumed: null
-        referralCurveId: null
-        referralProgramSeasonNumber: null
-        referralsThreshold: null
+        referralCurveId: 0
+        referralProgramSeasonNumber: 0
+        referralsThreshold: 0
         supportsInterface: null
         treeCid: null
         treeRoot: null
@@ -1291,6 +1458,54 @@ l1:
         *CS_SET_TREE_ROLE : [*evmScriptExecutor]
         *CS_START_REFERRAL_SEASON_ROLE : [*aragonAgent]
         *CS_END_REFERRAL_SEASON_ROLE : [*csmCommittee]
+      implementationChecks:
+        DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
+        PAUSE_ROLE: *CS_PAUSE_ROLE
+        RESUME_ROLE: *CS_RESUME_ROLE
+        RECOVERER_ROLE: *CS_RECOVERER_ROLE
+        SET_TREE_ROLE: *CS_SET_TREE_ROLE
+        START_REFERRAL_SEASON_ROLE: *CS_START_REFERRAL_SEASON_ROLE
+        END_REFERRAL_SEASON_ROLE: *CS_END_REFERRAL_SEASON_ROLE
+        PAUSE_INFINITELY: *MAX_UINT256
+        isPaused: false
+        ACCOUNTING: *CSAccounting
+        MODULE: *CSModule
+        curveId: 0
+        getInitializedVersion: *MAX_UINT64 # Initialization disabled for implementation contract
+        getReferralsCount: null
+        getResumeSinceTimestamp: null
+        getRoleAdmin: null
+        getRoleMember: null
+        getRoleMemberCount: null
+        hasRole: null
+        hashLeaf: null
+        isConsumed: null
+        isReferralProgramSeasonActive: false
+        isReferrerConsumed: null
+        referralCurveId: 0
+        referralProgramSeasonNumber: 0
+        referralsThreshold: 0
+        supportsInterface: null
+        treeCid: null
+        treeRoot: null
+        verifyProof: null
+
+    CSPermissionlessGate:
+      name: PermissionlessGate
+      address: *CSPermissionlessGate
+      checks:
+        CURVE_ID: 0
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        MODULE: *CSModule
+        RECOVERER_ROLE: *CS_RECOVERER_ROLE
+        getRoleAdmin: null
+        getRoleMember: null
+        getRoleMemberCount: null
+        hasRole: null
+        supportsInterface: null
+      ozAcl:
+        *DEFAULT_ADMIN_ROLE : [*aragonAgent]
+        *CS_RECOVERER_ROLE : []
 
     CSEjector:
       name: CSEjector
@@ -1301,24 +1516,338 @@ l1:
         RESUME_ROLE: *CS_RESUME_ROLE
         RECOVERER_ROLE: *CS_RECOVERER_ROLE
         PAUSE_INFINITELY: *MAX_UINT256
-        isPaused: null
-        MODULE: null
-        STAKING_MODULE_ID: null
-        STRIKES: null
-        STRIKES_EXIT_TYPE_ID: null
-        VOLUNTARY_EXIT_TYPE_ID: null
+        isPaused: false
+        MODULE: *CSModule
+        STAKING_MODULE_ID: 3
+        STRIKES: *CSStrikes
+        STRIKES_EXIT_TYPE_ID: 1
+        VOLUNTARY_EXIT_TYPE_ID: 0
         getResumeSinceTimestamp: null
         getRoleAdmin: null
         getRoleMember: null
         getRoleMemberCount: null
         hasRole: null
         supportsInterface: null
-        triggerableWithdrawalsGateway: null
+        triggerableWithdrawalsGateway: *triggerableWithdrawalsGateway
       ozAcl:
         *DEFAULT_ADMIN_ROLE : [*aragonAgent]
         *CS_PAUSE_ROLE : [*resealManager, *circuitBreaker]
         *CS_RESUME_ROLE : [*resealManager]
         *CS_RECOVERER_ROLE : []
+
+    CSFeeDistributor:
+      name: CSFeeDistributor
+      address: *CSFeeDistributor
+      proxyName: OssifiableProxy
+      implementation: *CSFeeDistributorImpl
+      proxyChecks:
+        proxy__getAdmin: *aragonAgent
+        proxy__getImplementation: *CSFeeDistributorImpl
+        proxy__getIsOssified: false
+      checks:
+        ACCOUNTING: *CSAccounting
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        ORACLE: *CSFeeOracle
+        RECOVERER_ROLE: *CS_RECOVERER_ROLE
+        STETH: *lido
+        distributedShares: null
+        distributionDataHistoryCount: null
+        getFeesToDistribute: null
+        getHistoricalDistributionData: null
+        getInitializedVersion: 2
+        getRoleAdmin: null
+        getRoleMember: null
+        getRoleMemberCount: null
+        hasRole: null
+        hashLeaf: null
+        logCid: null
+        pendingSharesToDistribute: null
+        rebateRecipient: *aragonAgent
+        supportsInterface: null
+        totalClaimableShares: null
+        treeCid: null
+        treeRoot: null
+      ozAcl:
+        *DEFAULT_ADMIN_ROLE : [*aragonAgent]
+        *CS_RECOVERER_ROLE : []
+      implementationChecks:
+        ACCOUNTING: *CSAccounting
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        ORACLE: *CSFeeOracle
+        RECOVERER_ROLE: *CS_RECOVERER_ROLE
+        STETH: *lido
+        distributedShares: null
+        distributionDataHistoryCount: null
+        getFeesToDistribute: null
+        getHistoricalDistributionData: null
+        getInitializedVersion: *MAX_UINT64 # Initialization disabled for implementation contract
+        getRoleAdmin: null
+        getRoleMember: null
+        getRoleMemberCount: null
+        hasRole: null
+        hashLeaf: null
+        logCid: null
+        pendingSharesToDistribute: null
+        rebateRecipient: *ZERO_ADDRESS
+        supportsInterface: null
+        totalClaimableShares: null
+        treeCid: null
+        treeRoot: null
+
+    CSExitPenalties:
+      name: CSExitPenalties
+      address: *CSExitPenalties
+      proxyName: OssifiableProxy
+      implementation: *CSExitPenaltiesImpl
+      proxyChecks:
+        proxy__getAdmin: *aragonAgent
+        proxy__getImplementation: *CSExitPenaltiesImpl
+        proxy__getIsOssified: false
+      checks:
+        ACCOUNTING: *CSAccounting
+        MODULE: *CSModule
+        PARAMETERS_REGISTRY: *CSParametersRegistry
+        STRIKES: *CSStrikes
+        STRIKES_EXIT_TYPE_ID: 1
+        VOLUNTARY_EXIT_TYPE_ID: 0
+        getExitPenaltyInfo: null
+        isValidatorExitDelayPenaltyApplicable: null
+      implementationChecks:
+        ACCOUNTING: *CSAccounting
+        MODULE: *CSModule
+        PARAMETERS_REGISTRY: *CSParametersRegistry
+        STRIKES: *CSStrikes
+        STRIKES_EXIT_TYPE_ID: 1
+        VOLUNTARY_EXIT_TYPE_ID: 0
+        getExitPenaltyInfo: null
+        isValidatorExitDelayPenaltyApplicable: null
+
+    CSParametersRegistry:
+      name: CSParametersRegistry
+      address: *CSParametersRegistry
+      proxyName: OssifiableProxy
+      implementation: *CSParametersRegistryImpl
+      proxyChecks:
+        proxy__getAdmin: *aragonAgent
+        proxy__getImplementation: *CSParametersRegistryImpl
+        proxy__getIsOssified: false
+      checks:
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        QUEUE_LEGACY_PRIORITY: *QUEUE_LEGACY_PRIORITY
+        QUEUE_LOWEST_PRIORITY: *QUEUE_LOWEST_PRIORITY
+        defaultAllowedExitDelay: *defaultAllowedExitDelay
+        defaultBadPerformancePenalty: *defaultBadPerformancePenalty
+        defaultElRewardsStealingAdditionalFine: *defaultElRewardsStealingAdditionalFine
+        defaultExitDelayPenalty: *defaultExitDelayPenalty
+        defaultKeyRemovalCharge: *defaultKeyRemovalCharge
+        defaultKeysLimit: *MAX_UINT256
+        defaultMaxWithdrawalRequestFee: *defaultMaxWithdrawalRequestFee
+        defaultPerformanceCoefficients: *defaultPerformanceCoefficients
+        defaultPerformanceLeeway: *defaultPerformanceLeeway
+        defaultQueueConfig: *defaultQueueConfig
+        defaultRewardShare: *defaultRewardShare
+        defaultStrikesParams: *defaultStrikesParams
+        getAllowedExitDelay:
+          - result: *defaultAllowedExitDelay
+            args: [1]
+          - result: *icsAllowedExitDelay
+            args: [2]
+        getBadPerformancePenalty:
+          - result: *defaultBadPerformancePenalty
+            args: [1]
+          - result: *icsBadPerformancePenalty
+            args: [2]
+        getElRewardsStealingAdditionalFine:
+          - result: *defaultElRewardsStealingAdditionalFine
+            args: [1]
+          - result: *icsElRewardsStealingAdditionalFine
+            args: [2]
+        getExitDelayPenalty:
+          - result: *defaultExitDelayPenalty
+            args: [1]
+          - result: *icsExitDelayPenalty
+            args: [2]
+        getInitializedVersion: 1
+        getKeyRemovalCharge:
+          - result: *defaultKeyRemovalCharge
+            args: [1]
+          - result: *icsKeyRemovalCharge
+            args: [2]
+        getKeysLimit:
+          - result: *MAX_UINT256
+            args: [1]
+          - result: *MAX_UINT248
+            args: [2]
+        getMaxWithdrawalRequestFee:
+          - result: *defaultMaxWithdrawalRequestFee
+            args: [1]
+          - result: *defaultMaxWithdrawalRequestFee
+            args: [2]
+        getPerformanceCoefficients:
+          - result: *defaultPerformanceCoefficients
+            args: [1]
+          - result: *icsPerformanceCoefficients
+            args: [2]
+        getPerformanceLeewayData:
+          - result: *defaultPerformanceLeewayData
+            args: [1]
+          - result: *icsPerformanceLeewayData
+            args: [2]
+        getQueueConfig:
+          - result: *defaultQueueConfig
+            args: [1]
+          - result: *icsQueueConfig
+            args: [2]
+        getRewardShareData:
+          - result: *defaultRewardShareData
+            args: [1]
+          - result: *icsRewardShareData
+            args: [2]
+        getRoleAdmin: null
+        getRoleMember: null
+        getRoleMemberCount: null
+        getStrikesParams:
+          - result: *defaultStrikesParams
+            args: [1]
+          - result: *icsStrikesParams
+            args: [2]
+        hasRole: null
+        supportsInterface: null
+      ozAcl:
+        *DEFAULT_ADMIN_ROLE : [*aragonAgent]
+      implementationChecks:
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        QUEUE_LEGACY_PRIORITY: *QUEUE_LEGACY_PRIORITY
+        QUEUE_LOWEST_PRIORITY: *QUEUE_LOWEST_PRIORITY
+        defaultAllowedExitDelay: 0
+        defaultBadPerformancePenalty: 0
+        defaultElRewardsStealingAdditionalFine: 0
+        defaultExitDelayPenalty: 0
+        defaultKeyRemovalCharge: 0
+        defaultKeysLimit: 0
+        defaultMaxWithdrawalRequestFee: 0
+        defaultPerformanceCoefficients:
+          - 0
+          - 0
+          - 0
+        defaultPerformanceLeeway: 0
+        defaultQueueConfig:
+          - 0
+          - 0
+        defaultRewardShare: 0
+        defaultStrikesParams:
+          - 0
+          - 0
+        getAllowedExitDelay: null
+        getBadPerformancePenalty: null
+        getElRewardsStealingAdditionalFine: null
+        getExitDelayPenalty: null
+        getInitializedVersion: *MAX_UINT64 # Initialization disabled for implementation contract
+        getKeyRemovalCharge: null
+        getKeysLimit: null
+        getMaxWithdrawalRequestFee: null
+        getPerformanceCoefficients: null
+        getPerformanceLeewayData: null
+        getQueueConfig: null
+        getRewardShareData: null
+        getRoleAdmin: null
+        getRoleMember: null
+        getRoleMemberCount: null
+        getStrikesParams: null
+        hasRole: null
+        supportsInterface: null
+
+    CSStrikes:
+      name: CSStrikes
+      address: *CSStrikes
+      proxyName: OssifiableProxy
+      implementation: *CSStrikesImpl
+      proxyChecks:
+        proxy__getAdmin: *aragonAgent
+        proxy__getImplementation: *CSStrikesImpl
+        proxy__getIsOssified: false
+      checks:
+        ACCOUNTING: *CSAccounting
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        EXIT_PENALTIES: *CSExitPenalties
+        MODULE: *CSModule
+        ORACLE: *CSFeeOracle
+        PARAMETERS_REGISTRY: *CSParametersRegistry
+        ejector: *CSEjector
+        getInitializedVersion: 1
+        getRoleAdmin: null
+        getRoleMember: null
+        getRoleMemberCount: null
+        hasRole: null
+        hashLeaf: null
+        supportsInterface: null
+        treeCid: null
+        treeRoot: null
+        verifyProof: null
+      ozAcl:
+        *DEFAULT_ADMIN_ROLE : [*aragonAgent]
+      implementationChecks:
+        ACCOUNTING: *CSAccounting
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        EXIT_PENALTIES: *CSExitPenalties
+        MODULE: *CSModule
+        ORACLE: *CSFeeOracle
+        PARAMETERS_REGISTRY: *CSParametersRegistry
+        ejector: *ZERO_ADDRESS
+        getInitializedVersion: *MAX_UINT64 # Initialization disabled for implementation contract
+        getRoleAdmin: null
+        getRoleMember: null
+        getRoleMemberCount: null
+        hasRole: null
+        hashLeaf: null
+        supportsInterface: null
+        treeCid: null
+        treeRoot: null
+        verifyProof: null
+
+    CSHashConsensus:
+      name: HashConsensus
+      address: *CSHashConsensus
+      checks:
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        DISABLE_CONSENSUS_ROLE: *DISABLE_CONSENSUS_ROLE
+        MANAGE_FAST_LANE_CONFIG_ROLE: *MANAGE_FAST_LANE_CONFIG_ROLE
+        MANAGE_FRAME_CONFIG_ROLE: *MANAGE_FRAME_CONFIG_ROLE
+        MANAGE_MEMBERS_AND_QUORUM_ROLE: *MANAGE_MEMBERS_AND_QUORUM_ROLE
+        MANAGE_REPORT_PROCESSOR_ROLE: *MANAGE_REPORT_PROCESSOR_ROLE
+        getChainConfig:
+          - *SLOTS_PER_EPOCH
+          - *SECONDS_PER_SLOT
+          - *GENESIS_TIME
+        getFrameConfig:
+          - *HC_CSM_START
+          - *HC_CSM_FRAME_EPOCHS
+          - *HC_CSM_FAST_LANE
+        getConsensusState: null
+        getConsensusStateForMember: null
+        getCurrentFrame: null
+        getFastLaneMembers: null
+        getInitialRefSlot: null
+        getIsFastLaneMember: null
+        getIsMember: null
+        getMembers: [*HASH_CONSENSUS_MEMBERS, null]
+        getQuorum: *HASH_CONSENSUS_QUORUM
+        getReportProcessor: *CSFeeOracle
+        getReportVariants: null
+        getRoleAdmin: null
+        getRoleMember: null
+        getRoleMemberCount: null
+        hasRole: null
+        supportsInterface: null
+      ozAcl:
+        *DEFAULT_ADMIN_ROLE : [*aragonAgent]
+        *DISABLE_CONSENSUS_ROLE : []
+        *MANAGE_FAST_LANE_CONFIG_ROLE : []
+        *MANAGE_FRAME_CONFIG_ROLE : []
+        *MANAGE_MEMBERS_AND_QUORUM_ROLE : [*aragonAgent]
+        *MANAGE_REPORT_PROCESSOR_ROLE : []
+
+    # ------
 
     minFirstAllocationStrategy:
       name: MinFirstAllocationStrategy
@@ -1357,18 +1886,18 @@ l1:
       name: ValidatorExitDelayVerifier
       address: *validatorExitDelayVerifier
       checks:
-        BEACON_ROOTS: *contract4788
-        CAPELLA_SLOT: 6209536
-        FIRST_SUPPORTED_SLOT: 11649024
+        BEACON_ROOTS: *EIP4788_BEACON_ROOTS_CONTRACT
+        CAPELLA_SLOT: *CAPELLA_SLOT
+        FIRST_SUPPORTED_SLOT: *ELECTRA_SLOT
         GENESIS_TIME: *GENESIS_TIME
-        GI_FIRST_BLOCK_ROOT_IN_SUMMARY_CURR: "0x000000000000000000000000000000000000000000000000000000000040000d"
-        GI_FIRST_BLOCK_ROOT_IN_SUMMARY_PREV: "0x000000000000000000000000000000000000000000000000000000000040000d"
-        GI_FIRST_HISTORICAL_SUMMARY_CURR: "0x000000000000000000000000000000000000000000000000000000b600000018"
-        GI_FIRST_HISTORICAL_SUMMARY_PREV: "0x000000000000000000000000000000000000000000000000000000b600000018"
-        GI_FIRST_VALIDATOR_CURR: *GI_FIRST_VALIDATOR_CURR
-        GI_FIRST_VALIDATOR_PREV: *GI_FIRST_VALIDATOR_PREV
+        GI_FIRST_BLOCK_ROOT_IN_SUMMARY_CURR: *GI_FIRST_BLOCK_ROOT_IN_SUMMARY_ELECTRA
+        GI_FIRST_BLOCK_ROOT_IN_SUMMARY_PREV: *GI_FIRST_BLOCK_ROOT_IN_SUMMARY_ELECTRA
+        GI_FIRST_HISTORICAL_SUMMARY_CURR: *GI_FIRST_HISTORICAL_SUMMARY_ELECTRA
+        GI_FIRST_HISTORICAL_SUMMARY_PREV: *GI_FIRST_HISTORICAL_SUMMARY_ELECTRA
+        GI_FIRST_VALIDATOR_CURR: *GI_FIRST_VALIDATOR_ELECTRA
+        GI_FIRST_VALIDATOR_PREV: *GI_FIRST_VALIDATOR_ELECTRA
         LOCATOR: *lidoLocator
-        PIVOT_SLOT: 11649024
+        PIVOT_SLOT: *ELECTRA_SLOT
         SECONDS_PER_SLOT: *SECONDS_PER_SLOT
         SHARD_COMMITTEE_PERIOD_IN_SECONDS: *SHARD_COMMITTEE_PERIOD_IN_SECONDS
         SLOTS_PER_EPOCH: *SLOTS_PER_EPOCH
@@ -1502,13 +2031,13 @@ l1:
         PREDEPOSIT_AMOUNT: *ONE_ETH_WEI
         ACTIVATION_DEPOSIT_AMOUNT: *ACTIVATION_DEPOSIT_AMOUNT
         MAX_TOPUP_AMOUNT: *MAX_TOPUP_AMOUNT
-        BEACON_ROOTS: *contract4788
+        BEACON_ROOTS: *EIP4788_BEACON_ROOTS_CONTRACT
         DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
         DEPOSIT_DOMAIN: *DEPOSIT_DOMAIN
-        GI_FIRST_VALIDATOR_CURR: *GI_FIRST_VALIDATOR_CURR
-        GI_FIRST_VALIDATOR_PREV: *GI_FIRST_VALIDATOR_CURR
-        GI_PUBKEY_WC_PARENT: *GI_PUBKEY_WC_PARENT
-        GI_STATE_ROOT: *GI_STATE_ROOT
+        GI_FIRST_VALIDATOR_CURR: *GI_FIRST_VALIDATOR_ELECTRA
+        GI_FIRST_VALIDATOR_PREV: *GI_FIRST_VALIDATOR_ELECTRA
+        GI_PUBKEY_WC_PARENT: *GI_PUBKEY_WC_PARENT_ELECTRA
+        GI_STATE_ROOT: *GI_STATE_ROOT_ELECTRA
         MIN_SUPPORTED_WC_VERSION: 1
         MAX_SUPPORTED_WC_VERSION: 2
         PIVOT_SLOT: 0
@@ -1540,13 +2069,13 @@ l1:
         PREDEPOSIT_AMOUNT: *ONE_ETH_WEI
         ACTIVATION_DEPOSIT_AMOUNT: *ACTIVATION_DEPOSIT_AMOUNT
         MAX_TOPUP_AMOUNT: *MAX_TOPUP_AMOUNT
-        BEACON_ROOTS: *contract4788
+        BEACON_ROOTS: *EIP4788_BEACON_ROOTS_CONTRACT
         DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
         DEPOSIT_DOMAIN: *DEPOSIT_DOMAIN
-        GI_FIRST_VALIDATOR_CURR: *GI_FIRST_VALIDATOR_CURR
-        GI_FIRST_VALIDATOR_PREV: *GI_FIRST_VALIDATOR_CURR
-        GI_PUBKEY_WC_PARENT: *GI_PUBKEY_WC_PARENT
-        GI_STATE_ROOT: *GI_STATE_ROOT
+        GI_FIRST_VALIDATOR_CURR: *GI_FIRST_VALIDATOR_ELECTRA
+        GI_FIRST_VALIDATOR_PREV: *GI_FIRST_VALIDATOR_ELECTRA
+        GI_PUBKEY_WC_PARENT: *GI_PUBKEY_WC_PARENT_ELECTRA
+        GI_STATE_ROOT: *GI_STATE_ROOT_ELECTRA
         MIN_SUPPORTED_WC_VERSION: 1
         MAX_SUPPORTED_WC_VERSION: 2
         PIVOT_SLOT: 0
@@ -1668,7 +2197,7 @@ l1:
       name: StakingVault
       address: *stakingVaultImplAddress
       checks:
-        DEPOSIT_CONTRACT: *contractDeposit
+        DEPOSIT_CONTRACT: *DEPOSIT_CONTRACT
         beaconChainDepositsPaused: false
         depositor: *ZERO_ADDRESS
         getInitializedVersion: *MAX_UINT64
@@ -1860,7 +2389,7 @@ l1:
         getInitialRefSlot: null
         getIsFastLaneMember: null
         getIsMember: null
-        getMembers: null
+        getMembers: [*HASH_CONSENSUS_MEMBERS, null]
         getReportVariants: null
         getRoleAdmin: null
         getRoleMember: null
@@ -1978,7 +2507,7 @@ l1:
         getInitialRefSlot: null
         getIsFastLaneMember: null
         getIsMember: null
-        getMembers: null
+        getMembers: [*HASH_CONSENSUS_MEMBERS, null]
         getReportVariants:
         getRoleAdmin: null
         getRoleMember: null

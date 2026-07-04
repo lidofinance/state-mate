@@ -57,7 +57,7 @@ function readAbiFiles(abiDirectoryPath: string): ConsolidatedAbis {
       }
 
       // Warn about duplicate keys
-      if (consolidatedAbis[key]) {
+      if (Object.hasOwn(consolidatedAbis, key)) {
         console.warn(`⚠ Duplicate key detected: ${key} (overwriting previous entry)`);
       }
 

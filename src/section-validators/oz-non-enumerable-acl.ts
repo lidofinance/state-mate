@@ -14,6 +14,7 @@ export class OzNonEnumerableAclSectionValidator extends SectionValidatorBase {
   constructor(provider: JsonRpcProvider) {
     super(provider, EntryField.ozNonEnumerableAcl);
   }
+
   override async validateSection(contractEntry: ContractEntry, contractAlias: string, basePath?: string) {
     void contractAlias; // Used for interface compatibility
     if (contractEntry.ozNonEnumerableAcl) {
@@ -60,7 +61,8 @@ export class OzNonEnumerableAclSectionValidator extends SectionValidatorBase {
 
     const rolesByHolders = new Map<string, Set<string>>();
     for (const role in contractEntry.ozNonEnumerableAcl) {
-      for (const holder of contractEntry.ozNonEnumerableAcl[role]) {
+      const holders = contractEntry.ozNonEnumerableAcl[role];
+      for (const holder of holders) {
         incChecks();
         if (!rolesByHolders.has(holder)) {
           rolesByHolders.set(holder, new Set<string>());
@@ -72,7 +74,7 @@ export class OzNonEnumerableAclSectionValidator extends SectionValidatorBase {
         try {
           const isRoleOnHolder: unknown = await contract.getFunction("hasRole").staticCall(role, holder);
           assert.isTrue(isRoleOnHolder);
-          logHandle.success(`${isRoleOnHolder}`);
+          logHandle.success(String(isRoleOnHolder));
         } catch (error) {
           const errorMessage = `REVERTED with: ${(error as Error).message}`;
           logHandle.failure(errorMessage);
@@ -83,20 +85,22 @@ export class OzNonEnumerableAclSectionValidator extends SectionValidatorBase {
 
     for (const [holder, rolesExpectedOnTheHolder] of rolesByHolders) {
       for (const role in contractEntry.ozNonEnumerableAcl) {
-        if (!rolesExpectedOnTheHolder.has(role)) {
-          incChecks();
-          const methodName = `.hasRole(${role}, ${holder})`;
-          const logHandle = new LogCommand(methodName);
-          setErrorContext({ method: methodName });
-          try {
-            const isRoleOnHolder: unknown = await contract.getFunction("hasRole").staticCall(role, holder);
-            assert.isFalse(isRoleOnHolder);
-            logHandle.success(`${isRoleOnHolder}`);
-          } catch (error) {
-            const errorMessage = `REVERTED with: ${(error as Error).message}`;
-            logHandle.failure(errorMessage);
-            incErrors(errorMessage);
-          }
+        if (rolesExpectedOnTheHolder.has(role)) {
+          continue;
+        }
+
+        incChecks();
+        const methodName = `.hasRole(${role}, ${holder})`;
+        const logHandle = new LogCommand(methodName);
+        setErrorContext({ method: methodName });
+        try {
+          const isRoleOnHolder: unknown = await contract.getFunction("hasRole").staticCall(role, holder);
+          assert.isFalse(isRoleOnHolder);
+          logHandle.success(String(isRoleOnHolder));
+        } catch (error) {
+          const errorMessage = `REVERTED with: ${(error as Error).message}`;
+          logHandle.failure(errorMessage);
+          incErrors(errorMessage);
         }
       }
     }
