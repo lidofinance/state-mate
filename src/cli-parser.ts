@@ -12,7 +12,7 @@ type CheckOnlyOptionType = null | {
   method?: string;
 };
 
-export function parseCmdLineArguments() {
+export function parseCommandLineArguments() {
   program
     .argument("<config-path>", "path to .yaml state config file")
     .allowExcessArguments(false)

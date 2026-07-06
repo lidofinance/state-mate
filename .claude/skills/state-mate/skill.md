@@ -1,6 +1,6 @@
 ---
 name: state-mate
-description: Configure and verify state-mate YAML for EVM smart-contract state checks — contracts, proxies (Transparent, Ossifiable, AppProxyUpgradeable), Safe multisigs, ozAcl and ozNonEnumerableAcl access control, ABI resolution and updates, EIP-1967 storage slots, seed configs and --generate, REPLACEME discovery, and common error triage.
+description: Use this skill when writing, debugging, or reviewing state-mate YAML configs that verify on-chain EVM contract state — proxy patterns and their storage, multisig wallets, role-based access control, ABI resolution, generating starter configs, and discovering unknown on-chain values. Also applies when verifying or auditing a deployment against a config: pre-vote state review, role audit, checking that implementations are neutered and constants aren't forged. Applies even when the user just says a check is failing or asks to add a contract to an existing config, without naming state-mate explicitly.
 ---
 
 # State-Mate Skill
@@ -9,16 +9,17 @@ Validate EVM smart-contract state against YAML configs. state-mate calls view fu
 
 ## Pick a section
 
-| Task                                                   | Go to                                                              |
-| ------------------------------------------------------ | ------------------------------------------------------------------ |
-| New config from scratch                                | [Top-level structure](#top-level-structure), [Workflow](#workflow) |
-| Contract with a proxy                                  | [Proxy patterns](#proxy-patterns)                                  |
-| Multisig checks                                        | [Gnosis Safe](#gnosis-safe)                                        |
-| Role/ACL checks                                        | [Access control](#access-control)                                  |
-| Unknown return values                                  | [REPLACEME discovery](#replaceme-discovery)                        |
-| Overloaded function (two ABI fragments with same name) | [Function overloads](#function-overloads)                          |
-| Seed config (`--generate`)                             | [Seed configs](#seed-configs)                                      |
-| ABI not found / rate-limit / revert reading            | [Troubleshooting](#troubleshooting)                                |
+| Task                                                    | Go to                                                              |
+| ------------------------------------------------------- | ------------------------------------------------------------------ |
+| New config from scratch                                 | [Top-level structure](#top-level-structure), [Workflow](#workflow) |
+| Contract with a proxy                                   | [Proxy patterns](#proxy-patterns)                                  |
+| Multisig checks                                         | [Gnosis Safe](#gnosis-safe)                                        |
+| Role/ACL checks                                         | [Access control](#access-control)                                  |
+| Unknown return values                                   | [REPLACEME discovery](#replaceme-discovery)                        |
+| Overloaded function (two ABI fragments with same name)  | [Function overloads](#function-overloads)                          |
+| Seed config (`--generate`)                              | [Seed configs](#seed-configs)                                      |
+| ABI not found / rate-limit / revert reading             | [Troubleshooting](#troubleshooting)                                |
+| Deployment verification / audit (pre-vote state, roles) | Read `references/verification-playbook.md`                         |
 
 ## Top-level structure
 
@@ -46,11 +47,11 @@ roles: # bytes32 role hashes, often many (one per domain)
 eoa: # named EOAs (deployer, signer addresses); useful for "deployer renounced" checks
   - &deployer "0x..."
 
-l1: # per-chain section — key matches deployed.* key
+l1: # per-chain section — literal key name, not the chain's own name
   rpcUrl: L1_MAINNET_RPC_URL # env-var name, or inline URL
   explorerHostname: api.etherscan.io/v2/api
   explorerTokenEnv: ETHERSCAN_TOKEN
-  chainId: 1
+  chainId: 1 # number or string
   contracts:
     contractName:
       # ...
@@ -60,7 +61,9 @@ l2: # present when deployed.l2 exists
   # ...
 ```
 
-`parameters`, `deployed`, `misc`, `roles`, `eoa` are anchor-only sections — they define YAML anchors (`&name`) that later sections reference via `*name`. Only `<chain-key>` sections with `contracts:` produce on-chain calls.
+`parameters`, `deployed`, `misc`, `roles`, `eoa` are anchor-only sections — they define YAML anchors (`&name`) that later sections reference via `*name`. `deployed-aux`, `tvl`, `delays`, `signers`, `selectors`, `validators` are optional anchor-only sections too, same shape as `misc`. Only `<chain-key>` sections with `contracts:` produce on-chain calls.
+
+`deployed` and the per-chain sections accept exactly two keys: `l1` (required) and `l2` (optional) — fixed schema literals, not placeholders for the actual network's name. A config for a single L2 chain still uses `l1:`, never the chain's own name.
 
 ## Contract patterns
 
@@ -68,7 +71,7 @@ l2: # present when deployed.l2 exists
 
 ```yaml
 contractName:
-  name: ContractName                 # must match ABI filename
+  name: ContractName # must match ABI filename
   address: *contractAddress
   checks:
     functionName: expectedValue
@@ -77,7 +80,7 @@ contractName:
 
 ### Proxy patterns
 
-**Transparent Upgradeable Proxy** (OpenZeppelin classic). `proxyChecks: {}` because the admin/impl live in EIP-1967 slots, which you verify via `storage:`:
+**Transparent Upgradeable Proxy**. `proxyChecks: {}` because the admin/impl live in EIP-1967 slots, which you verify via `storage:`:
 
 ```yaml
 contractName:
@@ -110,7 +113,7 @@ contractName:
   proxyName: OssifiableProxy
   implementation: *implAddress
   proxyChecks:
-    proxy__getAdmin: *aragonAgent
+    proxy__getAdmin: *proxyAdminAddress
     proxy__getImplementation: *implAddress
     proxy__getIsOssified: false
   checks:
@@ -119,20 +122,20 @@ contractName:
     someFunction: *ZERO_ADDRESS
 ```
 
-**AppProxyUpgradeable** (Aragon apps) has its own shape:
+**AppProxyUpgradeable** has its own shape:
 
 ```yaml
 contractName:
-  name: Lido
-  address: *lido
+  name: ContractName
+  address: *contractAddress
   proxyName: AppProxyUpgradeable
-  implementation: *lidoImplAddress
+  implementation: *implAddress
   proxyChecks:
     proxyType: *PROXY_TYPE_APP_PROXY_UPGRADEABLE
     isDepositable: false
-    implementation: *lidoImplAddress
-    appId: *LIDO_APP_ID
-    kernel: *aragonKernel
+    implementation: *implAddress
+    appId: *APP_ID
+    kernel: *kernelAddress
 ```
 
 ### ProxyAdmin
@@ -155,10 +158,19 @@ cast call $ADDRESS "VERSION()(string)" --rpc-url $RPC
 # Safe → returns "1.4.1"; EOA or non-Safe → reverts
 ```
 
+A Safe is a SafeProxy delegating to a singleton — model it as a proxy. `name:` is the singleton contract (its ABI carries all view functions); SafeProxy exposes no view functions (`masterCopy()` is a fallback trick absent from the ABI), so `proxyChecks: {}` and the linkage is verified via slot 0:
+
 ```yaml
 multisigName:
-  name: GnosisSafe
+  name: Safe # GnosisSafe for pre-1.3.0 deployments
   address: *multisigAddress
+  proxyName: SafeProxy
+  implementation: *safeSingleton # canonical singleton for that version
+  proxyChecks: {}
+  storage:
+    - slot: "0x0000000000000000000000000000000000000000000000000000000000000000"
+      expected: *safeSingleton
+      label: singleton
   checks:
     VERSION: "1.4.1"
     getThreshold: *THRESHOLD_VALUE
@@ -186,7 +198,7 @@ checks:
     - args: [1]
       result: *item2
     - args: [2]
-      mustRevert: true        # out of bounds
+      mustRevert: true # out of bounds
 ```
 
 Multi-arg indexed getter:
@@ -260,9 +272,9 @@ When the ABI has two fragments with the same name, state-mate needs disambiguati
 ```yaml
 checks:
   domainSeparatorV4:
-    - args: [*lido]
+    - args: [*contractAddress]
       signature: "domainSeparatorV4(address)"
-      result: *LIDO_DOMAIN_SEPARATOR
+      result: *DOMAIN_SEPARATOR
 ```
 
 ## Access control
@@ -274,8 +286,8 @@ Use when `getRoleMemberCount(bytes32)` succeeds:
 ```yaml
 ozAcl:
   *DEFAULT_ADMIN_ROLE : [*adminAddress]
-  *SOME_ROLE          : [*holder1, *holder2]
-  *UNUSED_ROLE        : []             # explicit: 0 members
+  *SOME_ROLE : [*holder1, *holder2]
+  *UNUSED_ROLE : [] # explicit: 0 members
 ```
 
 ### Non-enumerable AccessControl → `ozNonEnumerableAcl:`
@@ -284,8 +296,8 @@ Same shape as `ozAcl`, but state-mate verifies via per-address `hasRole` instead
 
 ```yaml
 ozNonEnumerableAcl:
-  *DEFAULT_ADMIN_ROLE      : [*agent]
-  *DEPOSITS_ENABLER_ROLE   : [*agent]
+  *DEFAULT_ADMIN_ROLE : [*agent]
+  *DEPOSITS_ENABLER_ROLE : [*agent]
   *WITHDRAWALS_DISABLER_ROLE : [*agent, *emergencyMultisig]
 ```
 
@@ -346,14 +358,14 @@ cast call $CONTRACT "hasRole(bytes32,address)(bool)" $ROLE $ADDRESS --rpc-url $R
 
 ## Seed configs
 
-A seed config is a thin starter file named `*.seed.yml`. It contains only address-book and chain-explorer sections (`deployed:`, `l1:` / `l2:` with `rpcUrl` / `explorerHostname`, optional `eoa:` / `roles:` / `misc:`) — **no `contracts:` block**. `yarn start <seed> --generate` walks every anchor under `deployed:`, resolves the ABI for each address, and writes a sibling `*.seed.generated.yml` with a populated `contracts:` block where each function value is `REPLACEME` (and, for proxies, a commented-out `implementationChecks` stub).
+A seed config is a thin starter file named `*.seed.yaml`. It contains only address-book and chain-explorer sections (`deployed:`, `l1:` / `l2:` with `rpcUrl` / `explorerHostname`, optional `eoa:` / `roles:` / `misc:`) — **no `contracts:` block**. `yarn start <seed> --generate` walks every anchor under `deployed:`, resolves the ABI for each address, and writes a sibling `*.seed.generated.yaml` with a populated `contracts:` block where each function value is `REPLACEME` (and, for proxies, a commented-out `implementationChecks` stub).
 
 `--generate` on its own does not fetch ABIs — it only uses ABIs already on disk. Combine with `--update-abi-missing` on first run.
 
 ```bash
-yarn start configs/proto/mainnet.seed.yml --generate --update-abi-missing
-# Review *.seed.generated.yml, replace REPLACEME with real expectations, then:
-yarn start configs/proto/mainnet.seed.generated.yml
+yarn start configs/proto/mainnet.seed.yaml --generate --update-abi-missing
+# Review *.seed.generated.yaml, replace REPLACEME with real expectations, then:
+yarn start configs/proto/mainnet.seed.generated.yaml
 ```
 
 ## Workflow
@@ -389,7 +401,7 @@ yarn start config.yml -o l1/contractName                  # specific contract (g
 yarn start config.yml -o l1/contractName/checks/funcName  # single function
 yarn start config.yml --update-abi-missing                # download only missing ABIs (preferred)
 yarn start config.yml --update-abi                        # overwrite all ABIs (rarely needed)
-yarn start config.seed.yml --generate                     # expand seed → *.seed.generated.yml
+yarn start config.seed.yaml --generate                    # expand seed → *.seed.generated.yaml
 ```
 
 ## Best practices
@@ -413,6 +425,10 @@ yarn start config.seed.yml --generate                     # expand seed → *.se
 
 - The contract is standard AccessControl, not Enumerable — switch to `ozNonEnumerableAcl:` or raw `hasRole` checks.
 - Or the contract doesn't expose role management at all — skip the role block.
+
+### `Non-covered functions: ...`
+
+- `checks:` must list every view function of the ABI (unknown ones as `null`). `implementationChecks:` doesn't have this requirement: it auto-fills unlisted functions as skipped.
 
 ### `missing revert data` with `data=null`
 
