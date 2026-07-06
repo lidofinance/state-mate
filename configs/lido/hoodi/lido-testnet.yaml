@@ -12,7 +12,7 @@ deployed:
     - &wstETHReferralStaker "0xf886BcC68b240316103fE8A12453Ce7831c2e835"
     - &eip712StETH "0x2A1d51BF3aAA7A7D027C8f561e5f579876a17B0a"
     - &stakingRouter "0xCc820558B39ee15C7C45B59390B503b83fb499A8"
-    - &stakingRouterImplAddress "0x2107dffDf8C2934A5197C8C6c5eC646099C51204"
+    - &stakingRouterImplAddress "0x05C392877165372Bf76dd08d52D4445bFEd6FF1F"
     - &executionLayerRewardsVault "0x9b108015fe433F173696Af3Aa0CF7CDb3E104258"
     - &withdrawalQueueERC721 "0xfe56573178f1bcdf53F01A6E9977670dcBBD9186"
     - &withdrawalQueueERC721ImplAddress "0xD0a60e52837e045F4567193Cf8921191C486eCD5"
@@ -22,18 +22,24 @@ deployed:
     - &accountingImplAddress "0xA39fe063A6d1420E59d218d318d52D84Fbd9202F"
     - &burner "0xb2c99cd38a2636a6281a849C8de938B3eF4A7C3D"
     - &burnerImplAddress "0xBb77f95A29D1ccE1A54F6ED9144D48be38D43dbC"
-    - &minFirstAllocationStrategy "0x6d1a9bBFF97f7565e9532FEB7b499982848E5e07"
+    - &minFirstAllocationStrategy "0xB2A07615cDe70Dc99f493aA5556175405537B21b"
+    # External libraries linked into StakingRouter
+    - &srLib "0x7c178B9B797C6ea6776A784C22A0f95a79385c9b"
+    - &beaconChainDepositor "0x963ea462c33684Df516405B4f59c718EE4E22932"
     - &mevBoostRelayAllowedList "0x279d3A456212a1294DaEd0faEE98675a52E8A4Bf" # TODO: add checks ?
     - &triggerableWithdrawalsGateway "0x6679090D92b08a2a686eF8614feECD8cDFE209db"
     - &consolidationGateway "0xC9991Bb865d025364BCbBd99f36e85889Fb68e69"
     - &consolidationBus "0xe09fBcE63826468867eE66Eda491E444829E022A"
+    - &consolidationBusImplAddress "0x2908c4B32548D8799fDc601C1a75E7d5C2FbC556"
+    - &consolidationMigrator "0x747d357F5b6410B80Eb63406FaC5E2A91131B4f8"
+    - &consolidationMigratorImplAddress "0x8BF11ead77fFe142AB27BE486Bc5aB22D9baF520"
     - &topUpGateway "0x10DBEb3367876826d00D21718D1d893e0fbD2956"
     - &topUpGatewayImplAddress "0x8621D8a402fdf2a131E38e16ac50f4C97660Fc2b"
     - &validatorExitDelayVerifier "0xa5F5A9360275390fF9728262a29384399f38d2f0"
     - &vaultHub "0x4C9fFC325392090F789255b9948Ab1659b797964"
     - &vaultHubImplAddress "0xAd2C869FE66Ff4c0E347A0824Af92D2B7C91288A"
     - &predepositGuarantee "0xa5F55f3402beA2B14AE15Dae1b6811457D43581d"
-    - &predepositGuaranteeImplAddress "0xd1245b75d243a7e0b655479043f9c30b3e8717f5"
+    - &predepositGuaranteeImplAddress "0xd1245b75d243A7e0b655479043f9C30b3e8717F5"
     - &operatorGrid "0x501e678182bB5dF3f733281521D3f3D1aDe69917"
     - &operatorGridImplAddress "0x4c29A1D1e14BaD29650c8B91Ad91c5AEdF5fd811"
 
@@ -65,6 +71,8 @@ deployed:
     - &aragonKernelImplAddress "0xEEf274E065964Ec22Bd44ddEbE7557c6638b368C"
     - &ldo "0xEf2573966D009CcEA0Fc74451dee2193564198dc"
     - &aragonVoting "0x49B3512c44891bef83F8967d075121Bd1b07a01B"
+    # deployed-hoodi.json already lists the next impl 0xb75B2756329c1ceeaEd265A0cD7a5B548D2Bd9a2,
+    # but the live proxy still delegates here until the vote passes — keep the live value.
     - &aragonVotingImplAddress "0x3a84F1156E30570519e316b47b2ca72cac2fBE25"
     - &aragonTokenManager "0x8ab4a56721Ad8e68c6Ad86F9D9929782A78E39E5"
     - &aragonTokenManagerImplAddress "0x16A3BedF659b40a15C607134a9853eFc0B1D9297"
@@ -88,6 +96,13 @@ deployed:
 
     # --- CircuitBreaker ---
     - &circuitBreaker "0x44a5789dFeDa59cD176Ab5709ec2F4829dE4d555"
+
+    # --- Gate Seals ---
+    - &gateSealFactory "0xA402349F560D45310D301E92B1AA4DeCABe147B3"
+    - &gateSealBlueprint "0x8685Ca0311E4aBd846ee1b5b8B09299E990523F7"
+    - &gateSealWithdrawalQueue "0x73d76Bd3D589B2b2185c402da82cdAfbc18b958D"
+    - &gateSealVEBAndTWG "0x368f2fcb593170823cc844F1B29e75E3d26879A1"
+    - &gateSealVaulthubAndPredepositGuarantee "0x2291496c76CC2e9368DbE9d4977ED2623cbDfb32"
 
     # --- Staking modules ---
     - &nodeOperatorsRegistry "0x5cDbE1590c083b5A2A64427fAA63A7cfDB91FbB5"
@@ -233,6 +248,7 @@ misc:
   - &DURATION_1_MINUTE 60
   - &DURATION_1_HOUR 3600
   - &DURATION_1_DAY 86400
+  - &DURATION_2_WEEKS 1209600
   - &DURATION_30_DAYS 2592000
   - &DURATION_1_YEAR 31536000
   - &DURATION_3_YEARS 94608000
@@ -308,6 +324,8 @@ eoa:
   - &nomManager "0xF865A1d43D36c713B4DA085f32b7d1e9739B9275"
   - &csmManager "0x4AF43Ee34a6fcD1fEcA1e1F832124C763561dA53"
   - &circuitBreakerCommittee "0x83BCE68B4e8b7071b2a664a26e6D3Bc17eEe3102"
+  # Same shared testnet EOA as deployer / circuitBreakerCommittee.
+  - &gateSealCommittee "0x83BCE68B4e8b7071b2a664a26e6D3Bc17eEe3102"
   - &topUpGatewayTopUpper "0x9b186cE78Ddd6fF098b4a533Dd17a139e1FFeD76"
 
 roles:
@@ -351,6 +369,15 @@ roles:
   - &CG_EXIT_LIMIT_MANAGER_ROLE "0xd452c9ff45a69fd8e9f95392cb8951f7a5b2599cd40b9704b6a786ab77072d33"
   - &CG_PAUSE_ROLE "0x139c2898040ef16910dc9f44dc697df79363da767d8bc92f2e310312b816e46d"
   - &CG_RESUME_ROLE "0x2fc10cc8ae19568712f7a176fb4978616a610650813c9d05326c34abb62749c7"
+
+  # ConsolidationBus
+  - &CB_MANAGE_ROLE "0xa076a07f65bcd51bcb15a0f01a65bc18f2d922acb81bcfd8af4caf5adb557091"
+  - &CB_PUBLISH_ROLE "0xf3156f38966c62e303ac6c7519c63e00636409e3b3ca4abecd13cd0092fee53e"
+  - &CB_REMOVE_ROLE "0x0a55cd9c498e2688378e5cd183217e75c0fa1cdbaa909387f565177cd47670f5"
+
+  # ConsolidationMigrator
+  - &CM_ALLOW_PAIR_ROLE "0x11b7ee1b50f8c4aefc7ba573dc738d6c20f03c1869ff81aa1d8be99ab7cfd7c1"
+  - &CM_DISALLOW_PAIR_ROLE "0x4638c3377b40c5fdb49ab3032cbb02972024761b03e6a0d7dcf113f5673c03a8"
 
   # TopUpGateway
   - &TUG_MANAGE_LIMITS_ROLE "0xc9da297dc33922e2669dab38953561bc469b71b9de771c775696dfd703a6f95b"
@@ -2217,6 +2244,19 @@ l1:
       checks:
         allocate: null
 
+    srLib:
+      name: SRLib
+      address: *srLib
+      checks:
+        _getDepositAllocations: null
+        _getModuleDepositAllocation: null
+        _validateReportValidatorBalancesByStakingModule: null
+
+    beaconChainDepositor:
+      name: BeaconChainDepositor
+      address: *beaconChainDepositor
+      checks: {}
+
     triggerableWithdrawalsGateway:
       name: TriggerableWithdrawalsGateway
       address: *triggerableWithdrawalsGateway
@@ -2292,6 +2332,85 @@ l1:
         *CG_EXIT_LIMIT_MANAGER_ROLE : []
         *CG_PAUSE_ROLE : [*circuitBreaker, *resealManager]
         *CG_RESUME_ROLE : [*resealManager]
+
+    consolidationBus:
+      name: ConsolidationBus
+      address: *consolidationBus
+      proxyName: OssifiableProxy
+      implementation: *consolidationBusImplAddress
+      proxyChecks:
+        proxy__getAdmin: *aragonAgent
+        proxy__getImplementation: *consolidationBusImplAddress
+        proxy__getIsOssified: false
+      checks:
+        DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
+        MANAGE_ROLE: *CB_MANAGE_ROLE
+        PUBLISH_ROLE: *CB_PUBLISH_ROLE
+        REMOVE_ROLE: *CB_REMOVE_ROLE
+        batchSize: 200
+        executionDelay: *DURATION_1_DAY
+        maxGroupsInBatch: 10
+        getConsolidationGateway: *consolidationGateway
+        getBatchInfo: null
+        getRoleAdmin: null
+        getRoleMember: null
+        getRoleMemberCount: null
+        getRoleMembers: null
+        hasRole: null
+        supportsInterface: null
+      ozAcl:
+        *DEFAULT_ADMIN_ROLE : [*aragonAgent]
+        *CB_MANAGE_ROLE : []
+        *CB_PUBLISH_ROLE : [*consolidationMigrator]
+        *CB_REMOVE_ROLE : [*curatedCircuitBreakerPauser]
+      implementationChecks:
+        DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
+        MANAGE_ROLE: *CB_MANAGE_ROLE
+        PUBLISH_ROLE: *CB_PUBLISH_ROLE
+        REMOVE_ROLE: *CB_REMOVE_ROLE
+        getConsolidationGateway: *consolidationGateway # immutable
+        batchSize: 0
+
+    consolidationMigrator:
+      name: ConsolidationMigrator
+      address: *consolidationMigrator
+      proxyName: OssifiableProxy
+      implementation: *consolidationMigratorImplAddress
+      proxyChecks:
+        proxy__getAdmin: *aragonAgent
+        proxy__getImplementation: *consolidationMigratorImplAddress
+        proxy__getIsOssified: false
+      checks:
+        DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
+        ALLOW_PAIR_ROLE: *CM_ALLOW_PAIR_ROLE
+        DISALLOW_PAIR_ROLE: *CM_DISALLOW_PAIR_ROLE
+        PUBKEY_LENGTH: 48
+        getConsolidationBus: *consolidationBus
+        getStakingRouter: *stakingRouter
+        sourceModuleId: 1 # NOR
+        targetModuleId: 5 # Curated Module v2
+        getAllowedTargets: null # reverts while no pairs are allowed
+        getSubmitter: null # reverts while unset
+        isPairAllowed: null
+        getRoleAdmin: null
+        getRoleMember: null
+        getRoleMemberCount: null
+        getRoleMembers: null
+        hasRole: null
+        supportsInterface: null
+      ozAcl:
+        *DEFAULT_ADMIN_ROLE : [*aragonAgent]
+        *CM_ALLOW_PAIR_ROLE : [*evmScriptExecutor]
+        *CM_DISALLOW_PAIR_ROLE : [*curatedCircuitBreakerPauser]
+      implementationChecks:
+        DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
+        ALLOW_PAIR_ROLE: *CM_ALLOW_PAIR_ROLE
+        DISALLOW_PAIR_ROLE: *CM_DISALLOW_PAIR_ROLE
+        PUBKEY_LENGTH: 48
+        getConsolidationBus: *consolidationBus # immutable
+        getStakingRouter: *stakingRouter # immutable
+        sourceModuleId: 1 # immutable
+        targetModuleId: 5 # immutable
 
     topUpGateway:
       name: TopUpGateway
@@ -3772,6 +3891,57 @@ l1:
         baseACL: "0x866Ad4D7283C4dcF00A01c1884DCDa98c2F1aE0A"
         regFactory: *evmScriptRegistryFactory
         baseKernel: "0x14dDb33F1D85997Bc35546e7E8CC306F5A7B9DD1"
+
+    gateSealBlueprint:
+      name: GateSeal
+      address: *gateSealBlueprint
+      checks:
+        get_sealing_committee:
+          - mustRevert: true
+        get_seal_duration_seconds:
+          - mustRevert: true
+        get_sealables:
+          - mustRevert: true
+        get_expiry_timestamp:
+          - mustRevert: true
+        is_expired:
+          - mustRevert: true
+
+    gateSealFactory:
+      name: GateSealFactory
+      address: *gateSealFactory
+      checks:
+        get_blueprint: *gateSealBlueprint
+
+    gateSealWithdrawalQueue:
+      name: GateSeal
+      address: *gateSealWithdrawalQueue
+      checks:
+        get_sealing_committee: *gateSealCommittee
+        get_seal_duration_seconds: *DURATION_2_WEEKS
+        get_sealables: [*withdrawalQueueERC721]
+        get_expiry_timestamp: 1784217696 # Wednesday, July 15, 2026 3:21:36 PM
+        is_expired: false
+
+    gateSealVEBAndTWG:
+      name: GateSeal
+      address: *gateSealVEBAndTWG
+      checks:
+        get_sealing_committee: *gateSealCommittee
+        get_seal_duration_seconds: *DURATION_2_WEEKS
+        get_sealables: [*triggerableWithdrawalsGateway, *validatorsExitBusOracle]
+        get_expiry_timestamp: 1784217696 # Wednesday, July 15, 2026 3:21:36 PM
+        is_expired: false
+
+    gateSealVaulthubAndPredepositGuarantee:
+      name: GateSeal
+      address: *gateSealVaulthubAndPredepositGuarantee
+      checks:
+        get_sealing_committee: *gateSealCommittee
+        get_seal_duration_seconds: *DURATION_2_WEEKS
+        get_sealables: [*vaultHub, *predepositGuarantee]
+        get_expiry_timestamp: 1791454296 # Wednesday, October 7, 2026 9:31:36 AM
+        is_expired: false
 
     circuitBreaker:
       name: CircuitBreaker
