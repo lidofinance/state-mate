@@ -75,7 +75,9 @@ function loadStateFromYaml(configPath: string): unknown {
   try {
     const configContent = fs.readFileSync(file, "utf8");
 
-    return YAML.parse(configContent, reviver, { schema: "core", intAsBigInt: true });
+    // maxAliasCount guards against alias-based resource exhaustion in untrusted input;
+    // our configs are first-party and the large ones legitimately exceed the default budget
+    return YAML.parse(configContent, reviver, { schema: "core", intAsBigInt: true, maxAliasCount: -1 });
   } catch (error) {
     logErrorAndExit(`Failed to convert the YAML file ${chalk.magenta(configPath)} to JSON:\n${printError(error)}`);
   }
