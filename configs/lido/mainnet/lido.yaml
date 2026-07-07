@@ -110,6 +110,36 @@ deployed:
     - &CSStrikesImpl "0x3E5021424c9e13FC853e523Cd68ebBec848956a0"
     - &CSHashConsensus "0x71093efF8D8599b5fA340D665Ad60fA7C80688e4"
 
+    # --- CMv2 ---
+    - &CuratedModule "0xDa5F930cE326EB5205085D66c72A4E79d60cB8C1"
+    - &CuratedModuleImpl "0x959fc67fe53c8a6c7a1aed73430aa07a36ed9337"
+    - &CuratedAccounting "0x2F91e3A8C5d6593bf4F8403fCfeCcd62dF59f6F6"
+    - &CuratedAccountingImpl "0xB41F5d2721906b3BE4fC7ae08261266C801076C2"
+    - &CuratedFeeDistributor "0x367d23c756599c20DCc8D6943F4976E8F88D60d7"
+    - &CuratedFeeDistributorImpl "0x7C8FEE1dcC95Df60fC9b5BE7603c28Eb3af16753"
+    - &CuratedParametersRegistry "0xffC1C5d59CeAC6F6c27E701F04a70cb50474607C"
+    - &CuratedParametersRegistryImpl "0xfF419BbBC5f44d46547079922a88d691886d192a"
+    - &CuratedExitPenalties "0x004aFb7DAA7dEA20EbAaB75c9F4892C879FaCCe0"
+    - &CuratedExitPenaltiesImpl "0x3766ABbA4635EE0fC3E6A7EB3EF169fe930df9c2"
+    - &CuratedFeeOracle "0x8EeFCdbD984c30E472BcbF545783D051CB5114e5"
+    - &CuratedFeeOracleImpl "0x16804084408B6Caad10046F49aD421cBA56C0b5e"
+    - &CuratedEjector "0xe181A377A2d2BDE9A83f1474BC3DB7A412de091E"
+    - &CuratedHashConsensus "0x902D64c93F6595339aA46105627a085591051aFb"
+    - &CuratedMetaRegistry "0xA64b339eebD3dC3De848298B6a140955932901d8"
+    - &CuratedMetaRegistryImpl "0x6d852907463496622bb5FE5bc55cc30C4682E10e"
+    - &CuratedValidatorStrikes "0xf4618370a1fBf46905B16C10817c8CFaD924D6db"
+    - &CuratedValidatorStrikesImpl "0x239Ee6ab18fB06370ad53Ce05097B32208fB0a30"
+    - &CuratedVerifier "0xC392F457960f1B13Ebaf1aa6C065479dD507E1E3"
+    - &ProfessionalOperatorGate "0x6093EFA6B5E2FF3be54d1c895c9deA932805c49F"
+    - &ProfessionalTrustedOperatorGate "0x8c002c6eE10cf8adb78D1F9EB2e134FdaF8A7C1a"
+    - &PublicGoodOperatorGate "0x207798e6fD1aa7Ee8a63782A64c959cD6727b78C"
+    - &DecentralizationOperatorGate "0xeF273Ca4A21Ba7B414Ae3C9f9b443038cb133F72"
+    - &ExtraEffortOperatorGate "0x3BbBb175f7F07954DE00052b20E1c5572223F24D"
+    - &IntraOperatorDVTClusterGate "0x86A8d4E0db5938D21d98047544668FCCB1A9ADc8"
+    - &IntraOperatorDVTClusterPlusGate "0x773933F9db8964A17d62fb808f2EC7A2de4247CC"
+    - &CuratedGateImpl "0x3cb948FD454ad6b20DE67633f25DcbDbEaa0e849"
+    - &CuratedGateFactory "0xDdE99d63b352A665d04339D4792E6852Ce89d1B7"
+
     # --- Easy Track ---
     - &easyTrack "0xF0211b7660680B49De1A7E9f25C65660F0a13Fea"
     - &evmScriptExecutor "0xFE5986E06210aC1eCC1aDCafc0cc7f8D63B3F977"
@@ -121,6 +151,7 @@ deployed:
     - &resealManager "0x7914b5a1539b97Bd0bbd155757F25FD79A522d24"
     - &sealCommittee "0x8772E3a2D86B9347A2688f9bc1808A6d8917760C"
     - &csmCommittee "0xC52fC3081123073078698F1EAc2f1Dc7Bd71880f"
+    - &curatedModuleCommittee "0x2570e0b22AD904501dfB0d49575991ACB801dD91"
 
 misc:
   # --- Chain and deployment constants ---
@@ -137,12 +168,14 @@ misc:
   - &AO_CONTRACT_VERSION 4
 
   # --- Beacon/Genesis roots and validator info ---
+  # https://github.com/lidofinance/staking-modules just gindex
   - &GI_FIRST_BLOCK_ROOT_IN_SUMMARY_ELECTRA "0x000000000000000000000000000000000000000000000000000000000040000d"
   - &GI_FIRST_VALIDATOR_ELECTRA "0x0000000000000000000000000000000000000000000000000096000000000028"
   - &GI_FIRST_WITHDRAWAL_ELECTRA "0x000000000000000000000000000000000000000000000000000000000161c004"
   - &GI_PUBKEY_WC_PARENT_ELECTRA "0x0000000000000000000000000000000000000000000000000000000000000402"
   - &GI_FIRST_HISTORICAL_SUMMARY_ELECTRA "0x000000000000000000000000000000000000000000000000000000b600000018"
   - &GI_STATE_ROOT_ELECTRA "0x0000000000000000000000000000000000000000000000000000000000000b03"
+  - &GI_FIRST_BALANCES_NODE_ELECTRA "0x0000000000000000000000000000000000000000000000000026000000000028"
 
   # --- Addresses / Zero values ---
   - &ZERO_ADDRESS "0x0000000000000000000000000000000000000000"
@@ -231,6 +264,9 @@ misc:
   - &HC_CSM_START 434490
   - &HC_CSM_FAST_LANE 300 # https://github.com/lidofinance/staking-modules/blob/3b0c016c77590c208f2b71ca51410cb55ea2dcc2/script/csm/DeployMainnet.s.sol#L22
   - &HC_CSM_FRAME_EPOCHS 6300 # https://github.com/lidofinance/staking-modules/blob/3b0c016c77590c208f2b71ca51410cb55ea2dcc2/script/csm/DeployMainnet.s.sol#L21
+  - &HC_CM_START 48038396021100853 # Update after the vote
+  - &HC_CM_FAST_LANE 300 # https://github.com/lidofinance/staking-modules/blob/4d3de6658499e1c1774951780a97d7ae25ca18b8/script/curated/DeployMainnet.s.sol#L21
+  - &HC_CM_FRAME_EPOCHS 3150 # https://github.com/lidofinance/staking-modules/blob/4d3de6658499e1c1774951780a97d7ae25ca18b8/script/curated/DeployMainnet.s.sol#L22
   - &HASH_CONSENSUS_QUORUM 5
   - &HASH_CONSENSUS_MEMBERS [
         "0x73181107c8D9ED4ce0bbeF7A0b4ccf3320C41d12", # Instadapp
@@ -322,6 +358,43 @@ misc:
   - &icsQueueConfig [0, 10]
   - &icsRewardShareData [[1, 10000], [17, 5834]]
   - &icsStrikesParams [6, 4]
+
+  # --- CMv2 constants ---
+  # https://github.com/lidofinance/staking-modules/blob/v3.0/script/curated/DeployMainnet.s.sol
+  - &CURATED_TYPE "0x637572617465642d6f6e636861696e2d76320000000000000000000000000000" # bytes32("curated-onchain-v2")
+
+  - &defaultCuratedBondCurve [
+      [[1, 11000000000000000000, 11000000000000000000], [2, 12000000000000000000, 1000000000000000000]],
+    ]
+  - &trustedBondCurve [
+      [[1, 11000000000000000000, 11000000000000000000], [2, 11100000000000000000, 100000000000000000], [19, 13400000000000000000, 700000000000000000]],
+    ]
+
+  - &curatedDefaultAllowedExitDelay 345600 # 4 days
+  - &curatedDefaultBadPerformancePenalty 0
+  - &curatedDefaultExitDelayFee 10000000000000000
+  - &curatedDefaultGeneralDelayedPenaltyAdditionalFine 100000000000000000
+  - &curatedDefaultKeyRemovalCharge 0
+  - &curatedDefaultKeysLimit 100
+  - &curatedDefaultMaxElWithdrawalRequestFee 100000000000000000
+  - &curatedDefaultPerformanceCoefficients [54, 8, 2]
+  - &curatedDefaultPerformanceLeeway 10000
+  - &curatedDefaultPerformanceLeewayData [[1, 10000]]
+  - &curatedDefaultQueueConfig [0, 4294967295]
+  - &curatedDefaultRewardShare 6250
+  - &curatedDefaultStrikesParams [6, 3]
+
+  - &curatedTrustedGeneralDelayedPenaltyAdditionalFine 50000000000000000
+  - &curatedTrustedKeysLimit 500
+  - &curatedUntrustedKeysLimit 80
+  - &curatedTrustedExitDelayFee 5000000000000000
+  - &curatedTrustedRewardShareData [[1, 8750]]
+  - &curatedUntrustedRewardShareData [[1, 6250]]
+  - &curatedPremiumRewardShareData [[1, 10000]]
+  - &curatedTrustedBondCurveWeight 100000
+  - &curatedUntrustedBondCurveWeight 50000
+
+  - &curatedMinWithdrawalRatio 9950
 
 eoa:
   - &deployer "0xAD2F7e30AeA89f6D45D942D0f52aFB8B395965f2"
@@ -449,23 +522,34 @@ roles:
   # OperatorGrid
   - &REGISTRY_ROLE "0xa495a3428837724c7f7648cda02eb83c9c4c778c8688d6f254c7f3f80c154d55"
 
-  # CSAccounting
-  - &CS_MANAGE_BOND_CURVES_ROLE "0xd35e4a788498271198ec69c34f1dc762a1eee8200c111f598da1b3dde946783d"
-  - &CS_SET_BOND_CURVE_ROLE "0x645c9e6d2a86805cb5a28b1e4751c0dab493df7cf935070ce405489ba1a7bf72"
-  - &CS_RECOVERER_ROLE "0xb3e25b5404b87e5a838579cb5d7481d61ad96ee284d38ec1e97c07ba64e7f6fc"
-  - &CS_RESUME_ROLE "0x2fc10cc8ae19568712f7a176fb4978616a610650813c9d05326c34abb62749c7"
-  - &CS_PAUSE_ROLE "0x139c2898040ef16910dc9f44dc697df79363da767d8bc92f2e310312b816e46d"
-
-  # CSModule
-  - &CS_CREATE_NODE_OPERATOR_ROLE "0xc72a21b38830f4d6418a239e17db78b945cc7cfee674bac97fd596eaf0438478"
-  - &CS_REPORT_EL_REWARDS_STEALING_PENALTY_ROLE "0x59911a6aa08a72fe3824aec4500dc42335c6d0702b6d5c5c72ceb265a0de9302"
-  - &CS_SETTLE_EL_REWARDS_STEALING_PENALTY_ROLE "0xe85fdec10fe0f93d0792364051df7c3d73e37c17b3a954bffe593960e3cd3012"
-  - &CS_VERIFIER_ROLE "0x0ce23c3e399818cfee81a7ab0880f714e53d7672b08df0fa62f2843416e1ea09"
-
-  # CSVettedGate
-  - &CS_SET_TREE_ROLE "0x932ff8b4c99f097090996a04c43547e4ab5096f3d09b9d577303a7f3c1c1de56"
-  - &CS_START_REFERRAL_SEASON_ROLE "0xc0bd4bb446c4ce6fd2289aa78c8ea233de3ad2b870bc787b2ba154e19c271f12"
-  - &CS_END_REFERRAL_SEASON_ROLE "0x4a1304957825c6a76938ccf907b92b9b872c8348083e23dae57e7e6111105d0c"
+  # Stakimg Modules
+  - &SM_MANAGE_BOND_CURVES_ROLE "0xd35e4a788498271198ec69c34f1dc762a1eee8200c111f598da1b3dde946783d"
+  - &SM_SET_BOND_CURVE_ROLE "0x645c9e6d2a86805cb5a28b1e4751c0dab493df7cf935070ce405489ba1a7bf72"
+  - &SM_RECOVERER_ROLE "0xb3e25b5404b87e5a838579cb5d7481d61ad96ee284d38ec1e97c07ba64e7f6fc"
+  - &SM_RESUME_ROLE "0x2fc10cc8ae19568712f7a176fb4978616a610650813c9d05326c34abb62749c7"
+  - &SM_PAUSE_ROLE "0x139c2898040ef16910dc9f44dc697df79363da767d8bc92f2e310312b816e46d"
+  - &SM_CREATE_NODE_OPERATOR_ROLE "0xc72a21b38830f4d6418a239e17db78b945cc7cfee674bac97fd596eaf0438478"
+  - &SM_REPORT_EL_REWARDS_STEALING_PENALTY_ROLE "0x59911a6aa08a72fe3824aec4500dc42335c6d0702b6d5c5c72ceb265a0de9302"
+  - &SM_SETTLE_EL_REWARDS_STEALING_PENALTY_ROLE "0xe85fdec10fe0f93d0792364051df7c3d73e37c17b3a954bffe593960e3cd3012"
+  - &SM_VERIFIER_ROLE "0x0ce23c3e399818cfee81a7ab0880f714e53d7672b08df0fa62f2843416e1ea09"
+  - &SM_SET_TREE_ROLE "0x932ff8b4c99f097090996a04c43547e4ab5096f3d09b9d577303a7f3c1c1de56"
+  - &SM_START_REFERRAL_SEASON_ROLE "0xc0bd4bb446c4ce6fd2289aa78c8ea233de3ad2b870bc787b2ba154e19c271f12"
+  - &SM_END_REFERRAL_SEASON_ROLE "0x4a1304957825c6a76938ccf907b92b9b872c8348083e23dae57e7e6111105d0c"
+  - &SM_OPERATOR_ADDRESSES_ADMIN_ROLE "0x345e59b4376c6f29f90479f5cbd4035c078c4d1b68a48554f3db0c61b6b547e2"
+  - &SM_REPORT_GENERAL_DELAYED_PENALTY_ROLE "0xa2c92d51d5647473735e9dfd5e2edf65bcf2fc2c139c95cbed53c19dc227c0b5"
+  - &SM_REPORT_REGULAR_WITHDRAWN_VALIDATORS_ROLE "0xb169cb0459e6d91326174ff566a2fcc3c7bb31ef3d4d83bec1d5679c611ab094"
+  - &SM_REPORT_SLASHED_WITHDRAWN_VALIDATORS_ROLE "0x2dba60a7b2c6bc437f1868d48dc8e53a95d71e78cef88de0aff6d952ecff8daa"
+  - &SM_SETTLE_GENERAL_DELAYED_PENALTY_ROLE "0xe4c6f42648e5067520394b287613558d8b8a48bc7a320523da96c04d46253bda"
+  - &SM_MANAGE_CURVE_PARAMETERS_ROLE "0x2ea86fa86b8394b93915254c102ea62e584d45bf5fd06dbc4e2efaddacd2d925"
+  - &SM_MANAGE_GENERAL_PENALTIES_AND_CHARGES_ROLE "0x00b6097bf7ad894f88f786cd383df3190b971af96510047737d0cb2e9bd25558"
+  - &SM_MANAGE_KEYS_LIMIT_ROLE "0x8f6bef53ecccae66884f4ae9160a8fba8b146d4eabddefaeddb0706f62952254"
+  - &SM_MANAGE_PERFORMANCE_PARAMETERS_ROLE "0xd666ac12142ea6b17cbd3b20ce48766157bfcbedf8d893791e3ef8da18f2d853"
+  - &SM_MANAGE_QUEUE_CONFIG_ROLE "0x306f841338895926a06720f02a56c6146e425ced159a34e060ff856b562ae158"
+  - &SM_MANAGE_REWARD_SHARE_ROLE "0xf6eba7055c295a32ada68e8a33ec0aaa8df5901431e000fdeb51c109ac72ea58"
+  - &SM_MANAGE_VALIDATOR_EXIT_PARAMETERS_ROLE "0x657d62f166d9cc64e4e71d25b862e4881dc53ad8805dbdedcf05c72f6dc874ba"
+  - &SM_MANAGE_OPERATOR_GROUPS_ROLE "0xbd52a11eecbed162251d4104ff65b5bf0f6c161e7f24994550fc61db8659b4e9"
+  - &SM_SET_BOND_CURVE_WEIGHT_ROLE "0x77f24e2f4c3e4aeb84f9ae8dec5abb6bae04631b05a67d5deb16b70498e67f32"
+  - &SM_SET_OPERATOR_INFO_ROLE "0xa5d637221c1b6367879c2d833ce35c3f9149e645ec28f1c21dd81f6fec2344a7"
 
 l1:
   rpcUrl: MAINNET_REMOTE_RPC_URL # https://ethereum-rpc.publicnode.com
@@ -1078,17 +1162,17 @@ l1:
         FEE_DISTRIBUTOR: *CSFeeDistributor
         LIDO: *lido
         LIDO_LOCATOR: *lidoLocator
-        MANAGE_BOND_CURVES_ROLE: *CS_MANAGE_BOND_CURVES_ROLE
+        MANAGE_BOND_CURVES_ROLE: *SM_MANAGE_BOND_CURVES_ROLE
         MAX_BOND_LOCK_PERIOD: *DURATION_1_YEAR
         MAX_CURVE_LENGTH: *MAX_CURVE_LENGTH
         MIN_BOND_LOCK_PERIOD: *DURATION_28_DAYS
         MIN_CURVE_LENGTH: *MIN_CURVE_LENGTH
         MODULE: *CSModule
         PAUSE_INFINITELY: *MAX_UINT256
-        PAUSE_ROLE: *CS_PAUSE_ROLE
-        RECOVERER_ROLE: *CS_RECOVERER_ROLE
-        RESUME_ROLE: *CS_RESUME_ROLE
-        SET_BOND_CURVE_ROLE: *CS_SET_BOND_CURVE_ROLE
+        PAUSE_ROLE: *SM_PAUSE_ROLE
+        RECOVERER_ROLE: *SM_RECOVERER_ROLE
+        RESUME_ROLE: *SM_RESUME_ROLE
+        SET_BOND_CURVE_ROLE: *SM_SET_BOND_CURVE_ROLE
         WITHDRAWAL_QUEUE: *withdrawalQueueERC721
         WSTETH: *wstETH
         chargePenaltyRecipient: *aragonAgent
@@ -1131,28 +1215,28 @@ l1:
         totalBondShares: null
       ozAcl:
         *DEFAULT_ADMIN_ROLE : [*aragonAgent]
-        *CS_MANAGE_BOND_CURVES_ROLE : []
-        *CS_SET_BOND_CURVE_ROLE : [*csmCommittee, *CSVettedGate]
-        *CS_RECOVERER_ROLE : []
-        *CS_RESUME_ROLE : [*resealManager]
-        *CS_PAUSE_ROLE : [*resealManager, *circuitBreaker]
+        *SM_MANAGE_BOND_CURVES_ROLE : []
+        *SM_SET_BOND_CURVE_ROLE : [*csmCommittee, *CSVettedGate]
+        *SM_RECOVERER_ROLE : []
+        *SM_RESUME_ROLE : [*resealManager]
+        *SM_PAUSE_ROLE : [*resealManager, *circuitBreaker]
       implementationChecks:
         DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
         DEFAULT_BOND_CURVE_ID: 0
         FEE_DISTRIBUTOR: *CSFeeDistributor
         LIDO: *lido
         LIDO_LOCATOR: *lidoLocator
-        MANAGE_BOND_CURVES_ROLE: *CS_MANAGE_BOND_CURVES_ROLE
+        MANAGE_BOND_CURVES_ROLE: *SM_MANAGE_BOND_CURVES_ROLE
         MAX_BOND_LOCK_PERIOD: *DURATION_1_YEAR
         MAX_CURVE_LENGTH: *MAX_CURVE_LENGTH
         MIN_BOND_LOCK_PERIOD: *DURATION_28_DAYS
         MIN_CURVE_LENGTH: *MIN_CURVE_LENGTH
         MODULE: *CSModule
         PAUSE_INFINITELY: *MAX_UINT256
-        PAUSE_ROLE: *CS_PAUSE_ROLE
-        RECOVERER_ROLE: *CS_RECOVERER_ROLE
-        RESUME_ROLE: *CS_RESUME_ROLE
-        SET_BOND_CURVE_ROLE: *CS_SET_BOND_CURVE_ROLE
+        PAUSE_ROLE: *SM_PAUSE_ROLE
+        RECOVERER_ROLE: *SM_RECOVERER_ROLE
+        RESUME_ROLE: *SM_RESUME_ROLE
+        SET_BOND_CURVE_ROLE: *SM_SET_BOND_CURVE_ROLE
         WITHDRAWAL_QUEUE: *withdrawalQueueERC721
         WSTETH: *wstETH
         chargePenaltyRecipient: *ZERO_ADDRESS
@@ -1199,14 +1283,14 @@ l1:
         proxy__getIsOssified: false
       checks:
         DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
-        PAUSE_ROLE: *CS_PAUSE_ROLE
-        RESUME_ROLE: *CS_RESUME_ROLE
-        RECOVERER_ROLE: *CS_RECOVERER_ROLE
+        PAUSE_ROLE: *SM_PAUSE_ROLE
+        RESUME_ROLE: *SM_RESUME_ROLE
+        RECOVERER_ROLE: *SM_RECOVERER_ROLE
         STAKING_ROUTER_ROLE: *STAKING_ROUTER_ROLE
-        CREATE_NODE_OPERATOR_ROLE: *CS_CREATE_NODE_OPERATOR_ROLE
-        REPORT_EL_REWARDS_STEALING_PENALTY_ROLE: *CS_REPORT_EL_REWARDS_STEALING_PENALTY_ROLE
-        SETTLE_EL_REWARDS_STEALING_PENALTY_ROLE: *CS_SETTLE_EL_REWARDS_STEALING_PENALTY_ROLE
-        VERIFIER_ROLE: *CS_VERIFIER_ROLE
+        CREATE_NODE_OPERATOR_ROLE: *SM_CREATE_NODE_OPERATOR_ROLE
+        REPORT_EL_REWARDS_STEALING_PENALTY_ROLE: *SM_REPORT_EL_REWARDS_STEALING_PENALTY_ROLE
+        SETTLE_EL_REWARDS_STEALING_PENALTY_ROLE: *SM_SETTLE_EL_REWARDS_STEALING_PENALTY_ROLE
+        VERIFIER_ROLE: *SM_VERIFIER_ROLE
         PAUSE_INFINITELY: *MAX_UINT256
         isPaused: false
         ACCOUNTING: *CSAccounting
@@ -1248,24 +1332,24 @@ l1:
         supportsInterface: null
       ozAcl:
         *DEFAULT_ADMIN_ROLE : [*aragonAgent]
-        *CS_PAUSE_ROLE : [*resealManager, *circuitBreaker]
-        *CS_RESUME_ROLE : [*resealManager]
-        *CS_RECOVERER_ROLE : []
+        *SM_PAUSE_ROLE : [*resealManager, *circuitBreaker]
+        *SM_RESUME_ROLE : [*resealManager]
+        *SM_RECOVERER_ROLE : []
         *STAKING_ROUTER_ROLE : [*stakingRouter]
-        *CS_CREATE_NODE_OPERATOR_ROLE : [*CSPermissionlessGate, *CSVettedGate]
-        *CS_REPORT_EL_REWARDS_STEALING_PENALTY_ROLE : [*csmCommittee]
-        *CS_SETTLE_EL_REWARDS_STEALING_PENALTY_ROLE : [*evmScriptExecutor]
-        *CS_VERIFIER_ROLE : [*CSVerifier]
+        *SM_CREATE_NODE_OPERATOR_ROLE : [*CSPermissionlessGate, *CSVettedGate]
+        *SM_REPORT_EL_REWARDS_STEALING_PENALTY_ROLE : [*csmCommittee]
+        *SM_SETTLE_EL_REWARDS_STEALING_PENALTY_ROLE : [*evmScriptExecutor]
+        *SM_VERIFIER_ROLE : [*CSVerifier]
       implementationChecks:
         DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
-        PAUSE_ROLE: *CS_PAUSE_ROLE
-        RESUME_ROLE: *CS_RESUME_ROLE
-        RECOVERER_ROLE: *CS_RECOVERER_ROLE
+        PAUSE_ROLE: *SM_PAUSE_ROLE
+        RESUME_ROLE: *SM_RESUME_ROLE
+        RECOVERER_ROLE: *SM_RECOVERER_ROLE
         STAKING_ROUTER_ROLE: *STAKING_ROUTER_ROLE
-        CREATE_NODE_OPERATOR_ROLE: *CS_CREATE_NODE_OPERATOR_ROLE
-        REPORT_EL_REWARDS_STEALING_PENALTY_ROLE: *CS_REPORT_EL_REWARDS_STEALING_PENALTY_ROLE
-        SETTLE_EL_REWARDS_STEALING_PENALTY_ROLE: *CS_SETTLE_EL_REWARDS_STEALING_PENALTY_ROLE
-        VERIFIER_ROLE: *CS_VERIFIER_ROLE
+        CREATE_NODE_OPERATOR_ROLE: *SM_CREATE_NODE_OPERATOR_ROLE
+        REPORT_EL_REWARDS_STEALING_PENALTY_ROLE: *SM_REPORT_EL_REWARDS_STEALING_PENALTY_ROLE
+        SETTLE_EL_REWARDS_STEALING_PENALTY_ROLE: *SM_SETTLE_EL_REWARDS_STEALING_PENALTY_ROLE
+        VERIFIER_ROLE: *SM_VERIFIER_ROLE
         PAUSE_INFINITELY: *MAX_UINT256
         isPaused: false
         ACCOUNTING: *CSAccounting
@@ -1317,9 +1401,9 @@ l1:
         proxy__getIsOssified: false
       checks:
         DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
-        PAUSE_ROLE: *CS_PAUSE_ROLE
-        RESUME_ROLE: *CS_RESUME_ROLE
-        RECOVERER_ROLE: *CS_RECOVERER_ROLE
+        PAUSE_ROLE: *SM_PAUSE_ROLE
+        RESUME_ROLE: *SM_RESUME_ROLE
+        RECOVERER_ROLE: *SM_RECOVERER_ROLE
         MANAGE_CONSENSUS_CONTRACT_ROLE: *ORACLE_MANAGE_CONSENSUS_CONTRACT_ROLE
         MANAGE_CONSENSUS_VERSION_ROLE: *ORACLE_MANAGE_CONSENSUS_VERSION_ROLE
         SUBMIT_DATA_ROLE: *ORACLE_SUBMIT_DATA_ROLE
@@ -1342,17 +1426,17 @@ l1:
         supportsInterface: null
       ozAcl:
         *DEFAULT_ADMIN_ROLE : [*aragonAgent]
-        *CS_PAUSE_ROLE : [*resealManager, *circuitBreaker]
-        *CS_RESUME_ROLE : [*resealManager]
-        *CS_RECOVERER_ROLE : []
+        *SM_PAUSE_ROLE : [*resealManager, *circuitBreaker]
+        *SM_RESUME_ROLE : [*resealManager]
+        *SM_RECOVERER_ROLE : []
         *ORACLE_MANAGE_CONSENSUS_CONTRACT_ROLE : []
         *ORACLE_MANAGE_CONSENSUS_VERSION_ROLE : []
         *ORACLE_SUBMIT_DATA_ROLE : []
       implementationChecks:
         DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
-        PAUSE_ROLE: *CS_PAUSE_ROLE
-        RESUME_ROLE: *CS_RESUME_ROLE
-        RECOVERER_ROLE: *CS_RECOVERER_ROLE
+        PAUSE_ROLE: *SM_PAUSE_ROLE
+        RESUME_ROLE: *SM_RESUME_ROLE
+        RECOVERER_ROLE: *SM_RECOVERER_ROLE
         MANAGE_CONSENSUS_CONTRACT_ROLE: *ORACLE_MANAGE_CONSENSUS_CONTRACT_ROLE
         MANAGE_CONSENSUS_VERSION_ROLE: *ORACLE_MANAGE_CONSENSUS_VERSION_ROLE
         SUBMIT_DATA_ROLE: *ORACLE_SUBMIT_DATA_ROLE
@@ -1392,9 +1476,9 @@ l1:
         GI_FIRST_WITHDRAWAL_PREV: *GI_FIRST_WITHDRAWAL_ELECTRA
         MODULE: *CSModule
         PAUSE_INFINITELY: *MAX_UINT256
-        PAUSE_ROLE: *CS_PAUSE_ROLE
+        PAUSE_ROLE: *SM_PAUSE_ROLE
         PIVOT_SLOT: *ELECTRA_SLOT
-        RESUME_ROLE: *CS_RESUME_ROLE
+        RESUME_ROLE: *SM_RESUME_ROLE
         SLOTS_PER_EPOCH: *SLOTS_PER_EPOCH
         SLOTS_PER_HISTORICAL_ROOT: *SLOTS_PER_HISTORICAL_ROOT
         WITHDRAWAL_ADDRESS: *withdrawalVault
@@ -1407,8 +1491,8 @@ l1:
         supportsInterface: null
       ozAcl:
         *DEFAULT_ADMIN_ROLE : [*aragonAgent]
-        *CS_PAUSE_ROLE : [*resealManager, *circuitBreaker]
-        *CS_RESUME_ROLE : [*resealManager]
+        *SM_PAUSE_ROLE : [*resealManager, *circuitBreaker]
+        *SM_RESUME_ROLE : [*resealManager]
 
     CSVettedGate:
       name: VettedGate
@@ -1421,12 +1505,12 @@ l1:
         proxy__getIsOssified: false
       checks:
         DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
-        PAUSE_ROLE: *CS_PAUSE_ROLE
-        RESUME_ROLE: *CS_RESUME_ROLE
-        RECOVERER_ROLE: *CS_RECOVERER_ROLE
-        SET_TREE_ROLE: *CS_SET_TREE_ROLE
-        START_REFERRAL_SEASON_ROLE: *CS_START_REFERRAL_SEASON_ROLE
-        END_REFERRAL_SEASON_ROLE: *CS_END_REFERRAL_SEASON_ROLE
+        PAUSE_ROLE: *SM_PAUSE_ROLE
+        RESUME_ROLE: *SM_RESUME_ROLE
+        RECOVERER_ROLE: *SM_RECOVERER_ROLE
+        SET_TREE_ROLE: *SM_SET_TREE_ROLE
+        START_REFERRAL_SEASON_ROLE: *SM_START_REFERRAL_SEASON_ROLE
+        END_REFERRAL_SEASON_ROLE: *SM_END_REFERRAL_SEASON_ROLE
         PAUSE_INFINITELY: *MAX_UINT256
         isPaused: false
         ACCOUNTING: *CSAccounting
@@ -1452,20 +1536,20 @@ l1:
         verifyProof: null
       ozAcl:
         *DEFAULT_ADMIN_ROLE : [*aragonAgent]
-        *CS_PAUSE_ROLE : [*resealManager, *circuitBreaker]
-        *CS_RESUME_ROLE : [*resealManager]
-        *CS_RECOVERER_ROLE : []
-        *CS_SET_TREE_ROLE : [*evmScriptExecutor]
-        *CS_START_REFERRAL_SEASON_ROLE : [*aragonAgent]
-        *CS_END_REFERRAL_SEASON_ROLE : [*csmCommittee]
+        *SM_PAUSE_ROLE : [*resealManager, *circuitBreaker]
+        *SM_RESUME_ROLE : [*resealManager]
+        *SM_RECOVERER_ROLE : []
+        *SM_SET_TREE_ROLE : [*evmScriptExecutor]
+        *SM_START_REFERRAL_SEASON_ROLE : [*aragonAgent]
+        *SM_END_REFERRAL_SEASON_ROLE : [*csmCommittee]
       implementationChecks:
         DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
-        PAUSE_ROLE: *CS_PAUSE_ROLE
-        RESUME_ROLE: *CS_RESUME_ROLE
-        RECOVERER_ROLE: *CS_RECOVERER_ROLE
-        SET_TREE_ROLE: *CS_SET_TREE_ROLE
-        START_REFERRAL_SEASON_ROLE: *CS_START_REFERRAL_SEASON_ROLE
-        END_REFERRAL_SEASON_ROLE: *CS_END_REFERRAL_SEASON_ROLE
+        PAUSE_ROLE: *SM_PAUSE_ROLE
+        RESUME_ROLE: *SM_RESUME_ROLE
+        RECOVERER_ROLE: *SM_RECOVERER_ROLE
+        SET_TREE_ROLE: *SM_SET_TREE_ROLE
+        START_REFERRAL_SEASON_ROLE: *SM_START_REFERRAL_SEASON_ROLE
+        END_REFERRAL_SEASON_ROLE: *SM_END_REFERRAL_SEASON_ROLE
         PAUSE_INFINITELY: *MAX_UINT256
         isPaused: false
         ACCOUNTING: *CSAccounting
@@ -1497,7 +1581,7 @@ l1:
         CURVE_ID: 0
         DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
         MODULE: *CSModule
-        RECOVERER_ROLE: *CS_RECOVERER_ROLE
+        RECOVERER_ROLE: *SM_RECOVERER_ROLE
         getRoleAdmin: null
         getRoleMember: null
         getRoleMemberCount: null
@@ -1505,16 +1589,16 @@ l1:
         supportsInterface: null
       ozAcl:
         *DEFAULT_ADMIN_ROLE : [*aragonAgent]
-        *CS_RECOVERER_ROLE : []
+        *SM_RECOVERER_ROLE : []
 
     CSEjector:
       name: CSEjector
       address: *CSEjector
       checks:
         DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
-        PAUSE_ROLE: *CS_PAUSE_ROLE
-        RESUME_ROLE: *CS_RESUME_ROLE
-        RECOVERER_ROLE: *CS_RECOVERER_ROLE
+        PAUSE_ROLE: *SM_PAUSE_ROLE
+        RESUME_ROLE: *SM_RESUME_ROLE
+        RECOVERER_ROLE: *SM_RECOVERER_ROLE
         PAUSE_INFINITELY: *MAX_UINT256
         isPaused: false
         MODULE: *CSModule
@@ -1531,9 +1615,9 @@ l1:
         triggerableWithdrawalsGateway: *triggerableWithdrawalsGateway
       ozAcl:
         *DEFAULT_ADMIN_ROLE : [*aragonAgent]
-        *CS_PAUSE_ROLE : [*resealManager, *circuitBreaker]
-        *CS_RESUME_ROLE : [*resealManager]
-        *CS_RECOVERER_ROLE : []
+        *SM_PAUSE_ROLE : [*resealManager, *circuitBreaker]
+        *SM_RESUME_ROLE : [*resealManager]
+        *SM_RECOVERER_ROLE : []
 
     CSFeeDistributor:
       name: CSFeeDistributor
@@ -1548,7 +1632,7 @@ l1:
         ACCOUNTING: *CSAccounting
         DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
         ORACLE: *CSFeeOracle
-        RECOVERER_ROLE: *CS_RECOVERER_ROLE
+        RECOVERER_ROLE: *SM_RECOVERER_ROLE
         STETH: *lido
         distributedShares: null
         distributionDataHistoryCount: null
@@ -1569,12 +1653,12 @@ l1:
         treeRoot: null
       ozAcl:
         *DEFAULT_ADMIN_ROLE : [*aragonAgent]
-        *CS_RECOVERER_ROLE : []
+        *SM_RECOVERER_ROLE : []
       implementationChecks:
         ACCOUNTING: *CSAccounting
         DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
         ORACLE: *CSFeeOracle
-        RECOVERER_ROLE: *CS_RECOVERER_ROLE
+        RECOVERER_ROLE: *SM_RECOVERER_ROLE
         STETH: *lido
         distributedShares: null
         distributionDataHistoryCount: null
@@ -1847,6 +1931,1453 @@ l1:
         *MANAGE_MEMBERS_AND_QUORUM_ROLE : [*aragonAgent]
         *MANAGE_REPORT_PROCESSOR_ROLE : []
 
+    # --- CMv2 ---
+
+    CuratedModule:
+      name: CuratedModule
+      address: *CuratedModule
+      proxyName: OssifiableProxy
+      implementation: *CuratedModuleImpl
+      proxyChecks:
+        proxy__getAdmin: *aragonAgent
+        proxy__getImplementation: *CuratedModuleImpl
+        proxy__getIsOssified: false
+      checks:
+        ACCOUNTING: *CuratedAccounting
+        CREATE_NODE_OPERATOR_ROLE: *SM_CREATE_NODE_OPERATOR_ROLE
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        EXIT_PENALTIES: *CuratedExitPenalties
+        FEE_DISTRIBUTOR: *CuratedFeeDistributor
+        LIDO_LOCATOR: *lidoLocator
+        META_REGISTRY: *CuratedMetaRegistry
+        OPERATOR_ADDRESSES_ADMIN_ROLE: *SM_OPERATOR_ADDRESSES_ADMIN_ROLE
+        PARAMETERS_REGISTRY: *CuratedParametersRegistry
+        PAUSE_INFINITELY: *MAX_UINT256
+        PAUSE_ROLE: *SM_PAUSE_ROLE
+        RECOVERER_ROLE: *SM_RECOVERER_ROLE
+        REPORT_GENERAL_DELAYED_PENALTY_ROLE: *SM_REPORT_GENERAL_DELAYED_PENALTY_ROLE
+        REPORT_REGULAR_WITHDRAWN_VALIDATORS_ROLE: *SM_REPORT_REGULAR_WITHDRAWN_VALIDATORS_ROLE
+        REPORT_SLASHED_WITHDRAWN_VALIDATORS_ROLE: *SM_REPORT_SLASHED_WITHDRAWN_VALIDATORS_ROLE
+        RESUME_ROLE: *SM_RESUME_ROLE
+        SETTLE_GENERAL_DELAYED_PENALTY_ROLE: *SM_SETTLE_GENERAL_DELAYED_PENALTY_ROLE
+        STAKING_ROUTER_ROLE: *STAKING_ROUTER_ROLE
+        STETH: *lido
+        VERIFIER_ROLE: *SM_VERIFIER_ROLE
+        exitDeadlineThreshold: null
+        getActiveNodeOperatorsCount: 0
+        getDepositAllocationTargets: null
+        getDepositsAllocation: null
+        getInitializedVersion: 1
+        getKeyAllocatedBalances: null
+        getKeyConfirmedBalances: null
+        getNodeOperator: null
+        getNodeOperatorBalance: null
+        getNodeOperatorDepositInfoToUpdateCount: null
+        getNodeOperatorIds: null
+        getNodeOperatorIsActive: null
+        getNodeOperatorManagementProperties: null
+        getNodeOperatorNonWithdrawnKeys: null
+        getNodeOperatorOwner: null
+        getNodeOperatorSummary: null
+        getNodeOperatorWeightAndExternalStake: null
+        getNodeOperatorsCount: 0
+        getNonce: null
+        getOperatorWeights: null
+        getResumeSinceTimestamp: null
+        getRoleAdmin: null
+        getRoleMember: null
+        getRoleMemberCount: null
+        getRoleMembers: null
+        getSigningKeys: null
+        getSigningKeysWithSignatures: null
+        getStakingModuleSummary: null
+        getTopUpAllocationTargets: null
+        getTotalModuleStake: null
+        getType: *CURATED_TYPE
+        hasRole: null
+        isPaused: true
+        isValidatorExitDelayPenaltyApplicable: null
+        isValidatorSlashed: null
+        isValidatorWithdrawn: null
+        onExitedAndStuckValidatorsCountsUpdated: null
+        onWithdrawalCredentialsChanged: null
+        supportsInterface: null
+      ozAcl:
+        *DEFAULT_ADMIN_ROLE : [*aragonAgent]
+        *SM_PAUSE_ROLE : [*resealManager, *circuitBreaker]
+        *SM_RESUME_ROLE : [*resealManager]
+        *SM_RECOVERER_ROLE : []
+        *STAKING_ROUTER_ROLE : [*stakingRouter]
+        *SM_CREATE_NODE_OPERATOR_ROLE : [*ProfessionalOperatorGate, *ProfessionalTrustedOperatorGate, *PublicGoodOperatorGate, *DecentralizationOperatorGate, *ExtraEffortOperatorGate, *IntraOperatorDVTClusterGate, *IntraOperatorDVTClusterPlusGate]
+        *SM_REPORT_GENERAL_DELAYED_PENALTY_ROLE : [*curatedModuleCommittee]
+        *SM_REPORT_REGULAR_WITHDRAWN_VALIDATORS_ROLE : [*CuratedVerifier]
+        *SM_REPORT_SLASHED_WITHDRAWN_VALIDATORS_ROLE : [*evmScriptExecutor]
+        *SM_SETTLE_GENERAL_DELAYED_PENALTY_ROLE : [*evmScriptExecutor]
+        *SM_VERIFIER_ROLE : [*CuratedVerifier]
+      implementationChecks:
+        ACCOUNTING: *CuratedAccounting
+        CREATE_NODE_OPERATOR_ROLE: *SM_CREATE_NODE_OPERATOR_ROLE
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        EXIT_PENALTIES: *CuratedExitPenalties
+        FEE_DISTRIBUTOR: *CuratedFeeDistributor
+        LIDO_LOCATOR: *lidoLocator
+        META_REGISTRY: *CuratedMetaRegistry
+        OPERATOR_ADDRESSES_ADMIN_ROLE: *SM_OPERATOR_ADDRESSES_ADMIN_ROLE
+        PARAMETERS_REGISTRY: *CuratedParametersRegistry
+        PAUSE_INFINITELY: *MAX_UINT256
+        PAUSE_ROLE: *SM_PAUSE_ROLE
+        RECOVERER_ROLE: *SM_RECOVERER_ROLE
+        REPORT_GENERAL_DELAYED_PENALTY_ROLE: *SM_REPORT_GENERAL_DELAYED_PENALTY_ROLE
+        REPORT_REGULAR_WITHDRAWN_VALIDATORS_ROLE: *SM_REPORT_REGULAR_WITHDRAWN_VALIDATORS_ROLE
+        REPORT_SLASHED_WITHDRAWN_VALIDATORS_ROLE: *SM_REPORT_SLASHED_WITHDRAWN_VALIDATORS_ROLE
+        RESUME_ROLE: *SM_RESUME_ROLE
+        SETTLE_GENERAL_DELAYED_PENALTY_ROLE: *SM_SETTLE_GENERAL_DELAYED_PENALTY_ROLE
+        STAKING_ROUTER_ROLE: *STAKING_ROUTER_ROLE
+        STETH: *lido
+        VERIFIER_ROLE: *SM_VERIFIER_ROLE
+        exitDeadlineThreshold: null
+        getActiveNodeOperatorsCount: 0
+        getDepositAllocationTargets: null
+        getDepositsAllocation: null
+        getInitializedVersion: *MAX_UINT64 # Initialization disabled for implementation contract
+        getKeyAllocatedBalances: null
+        getKeyConfirmedBalances: null
+        getNodeOperator: null
+        getNodeOperatorBalance: null
+        getNodeOperatorDepositInfoToUpdateCount: null
+        getNodeOperatorIds: null
+        getNodeOperatorIsActive: null
+        getNodeOperatorManagementProperties: null
+        getNodeOperatorNonWithdrawnKeys: null
+        getNodeOperatorOwner: null
+        getNodeOperatorSummary: null
+        getNodeOperatorWeightAndExternalStake: null
+        getNodeOperatorsCount: 0
+        getNonce: null
+        getOperatorWeights: null
+        getResumeSinceTimestamp: null
+        getRoleAdmin: null
+        getRoleMember: null
+        getRoleMemberCount: null
+        getRoleMembers: null
+        getSigningKeys: null
+        getSigningKeysWithSignatures: null
+        getStakingModuleSummary: null
+        getTopUpAllocationTargets: null
+        getTotalModuleStake: null
+        getType: *CURATED_TYPE
+        hasRole: null
+        isPaused: null
+        isValidatorExitDelayPenaltyApplicable: null
+        isValidatorSlashed: null
+        isValidatorWithdrawn: null
+        onExitedAndStuckValidatorsCountsUpdated: null
+        onWithdrawalCredentialsChanged: null
+        supportsInterface: null
+
+
+    CuratedAccounting:
+      name: Accounting
+      address: *CuratedAccounting
+      proxyName: OssifiableProxy
+      implementation: *CuratedAccountingImpl
+      proxyChecks:
+        proxy__getAdmin: *aragonAgent
+        proxy__getImplementation: *CuratedAccountingImpl
+        proxy__getIsOssified: false
+      checks:
+        BURNER: *burner
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        DEFAULT_BOND_CURVE_ID: 0
+        FEE_DISTRIBUTOR: *CuratedFeeDistributor
+        LIDO: *lido
+        LIDO_LOCATOR: *lidoLocator
+        MANAGE_BOND_CURVES_ROLE: *SM_MANAGE_BOND_CURVES_ROLE
+        MAX_BOND_LOCK_PERIOD: *DURATION_1_YEAR
+        MAX_FEE_SPLITS: 10
+        MIN_BOND_LOCK_PERIOD: *DURATION_28_DAYS
+        MODULE: *CuratedModule
+        PAUSE_INFINITELY: *MAX_UINT256
+        PAUSE_ROLE: *SM_PAUSE_ROLE
+        RECOVERER_ROLE: *SM_RECOVERER_ROLE
+        RESUME_ROLE: *SM_RESUME_ROLE
+        SET_BOND_CURVE_ROLE: *SM_SET_BOND_CURVE_ROLE
+        WITHDRAWAL_QUEUE: *withdrawalQueueERC721
+        WSTETH: *wstETH
+        chargePenaltyRecipient: *aragonAgent
+        getBond: null
+        getBondAmountByKeysCount: null
+        getBondAmountByKeysCountWstETH: null
+        getBondCurve: null
+        getBondCurveId: null
+        getBondDebt: null
+        getBondLockNonce: null
+        getBondLockPeriod: *DURATION_60_DAYS
+        getBondShares: null
+        getBondSummary: null
+        getBondSummaryShares: null
+        getClaimableBondShares: null
+        getClaimableRewardsAndBondShares: null
+        getCurveInfo:
+          - result: *defaultCuratedBondCurve # Professional Operator Curve
+            args: [0]
+          - result: *trustedBondCurve
+            args: [1]
+          - result: *trustedBondCurve
+            args: [2]
+          - result: *trustedBondCurve
+            args: [3]
+          - result: *trustedBondCurve
+            args: [4]
+          - result: *trustedBondCurve
+            args: [5]
+          - result: *trustedBondCurve
+            args: [6]
+        getCurvesCount: 7
+        getCustomRewardsClaimer: null
+        getFeeSplitTransfers: null
+        getFeeSplits: null
+        getInitializedVersion: 3
+        getKeysCountByBondAmount: null
+        getLockedBond: null
+        getLockedBondInfo: null
+        getNodeOperatorBondInfo: null
+        getPendingSharesToSplit: null
+        getRequiredBondForNextKeys: null
+        getRequiredBondForNextKeysWstETH: null
+        getResumeSinceTimestamp: null
+        getRoleAdmin: null
+        getRoleMember: null
+        getRoleMemberCount: null
+        getRoleMembers: null
+        getUnbondedKeysCount: null
+        getUnbondedKeysCountToEject: null
+        hasRole: null
+        hasSplits: null
+        isLockExpired: null
+        isPaused: false
+        supportsInterface: null
+        totalBondShares: 0
+      ozAcl:
+        *DEFAULT_ADMIN_ROLE : [*aragonAgent]
+        *SM_PAUSE_ROLE : [*resealManager, *circuitBreaker]
+        *SM_RESUME_ROLE : [*resealManager]
+        *SM_RECOVERER_ROLE : []
+        *SM_MANAGE_BOND_CURVES_ROLE : []
+        *SM_SET_BOND_CURVE_ROLE : [*ProfessionalTrustedOperatorGate, *PublicGoodOperatorGate, *DecentralizationOperatorGate, *ExtraEffortOperatorGate, *IntraOperatorDVTClusterGate, *IntraOperatorDVTClusterPlusGate]
+      implementationChecks:
+        BURNER: *burner
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        DEFAULT_BOND_CURVE_ID: 0
+        FEE_DISTRIBUTOR: *CuratedFeeDistributor
+        LIDO: *lido
+        LIDO_LOCATOR: *lidoLocator
+        MANAGE_BOND_CURVES_ROLE: *SM_MANAGE_BOND_CURVES_ROLE
+        MAX_BOND_LOCK_PERIOD: *DURATION_1_YEAR
+        MAX_FEE_SPLITS: 10
+        MIN_BOND_LOCK_PERIOD: *DURATION_28_DAYS
+        MODULE: *CuratedModule
+        PAUSE_INFINITELY: *MAX_UINT256
+        PAUSE_ROLE: *SM_PAUSE_ROLE
+        RECOVERER_ROLE: *SM_RECOVERER_ROLE
+        RESUME_ROLE: *SM_RESUME_ROLE
+        SET_BOND_CURVE_ROLE: *SM_SET_BOND_CURVE_ROLE
+        WITHDRAWAL_QUEUE: *withdrawalQueueERC721
+        WSTETH: *wstETH
+        chargePenaltyRecipient: *ZERO_ADDRESS
+        getBond: null
+        getBondAmountByKeysCount: null
+        getBondAmountByKeysCountWstETH: null
+        getBondCurve: null
+        getBondCurveId: null
+        getBondDebt: null
+        getBondLockNonce: null
+        getBondLockPeriod: 0
+        getBondShares: null
+        getBondSummary: null
+        getBondSummaryShares: null
+        getClaimableBondShares: null
+        getClaimableRewardsAndBondShares: null
+        getCurveInfo: null
+        getCurvesCount: 0
+        getCustomRewardsClaimer: null
+        getFeeSplitTransfers: null
+        getFeeSplits: null
+        getInitializedVersion: *MAX_UINT64 # Initialization disabled for implementation contract
+        getKeysCountByBondAmount: null
+        getLockedBond: null
+        getLockedBondInfo: null
+        getNodeOperatorBondInfo: null
+        getPendingSharesToSplit: null
+        getRequiredBondForNextKeys: null
+        getRequiredBondForNextKeysWstETH: null
+        getResumeSinceTimestamp: null
+        getRoleAdmin: null
+        getRoleMember: null
+        getRoleMemberCount: null
+        getRoleMembers: null
+        getUnbondedKeysCount: null
+        getUnbondedKeysCountToEject: null
+        hasRole: null
+        hasSplits: null
+        isLockExpired: null
+        isPaused: false
+        supportsInterface: null
+        totalBondShares: 0
+
+    CuratedFeeDistributor:
+      name: FeeDistributor
+      address: *CuratedFeeDistributor
+      proxyName: OssifiableProxy
+      implementation: *CuratedFeeDistributorImpl
+      proxyChecks:
+        proxy__getAdmin: *aragonAgent
+        proxy__getImplementation: *CuratedFeeDistributorImpl
+        proxy__getIsOssified: false
+      checks:
+        ACCOUNTING: *CuratedAccounting
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        ORACLE: *CuratedFeeOracle
+        RECOVERER_ROLE: *SM_RECOVERER_ROLE
+        STETH: *lido
+        distributedShares: null
+        distributionDataHistoryCount: 0 # change to null after mainnet vote
+        getFeesToDistribute: null
+        getHistoricalDistributionData: null
+        getInitializedVersion: 3
+        getRoleAdmin: null
+        getRoleMember: null
+        getRoleMemberCount: null
+        getRoleMembers: null
+        hasRole: null
+        hashLeaf: null
+        logCid: "" # change to null after mainnet vote
+        pendingSharesToDistribute: 0 # change to null after mainnet vote
+        rebateRecipient: *aragonAgent
+        supportsInterface: null
+        totalClaimableShares: 0 # change to null after mainnet vote
+        treeCid: "" # change to null after mainnet vote
+        treeRoot: 0x0000000000000000000000000000000000000000000000000000000000000000 # change to null after mainnet vote
+      ozAcl:
+        *DEFAULT_ADMIN_ROLE : [*aragonAgent]
+        *SM_RECOVERER_ROLE : []
+      implementationChecks:
+        ACCOUNTING: *CuratedAccounting
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        ORACLE: *CuratedFeeOracle
+        RECOVERER_ROLE: *SM_RECOVERER_ROLE
+        STETH: *lido
+        distributedShares: null
+        distributionDataHistoryCount: 0
+        getFeesToDistribute: null
+        getHistoricalDistributionData: null
+        getInitializedVersion: *MAX_UINT64 # Initialization disabled for implementation contract
+        getRoleAdmin: null
+        getRoleMember: null
+        getRoleMemberCount: null
+        getRoleMembers: null
+        hasRole: null
+        hashLeaf: null
+        logCid: ""
+        pendingSharesToDistribute: 0
+        rebateRecipient: *ZERO_ADDRESS
+        supportsInterface: null
+        totalClaimableShares: 0
+        treeCid: ""
+        treeRoot: 0x0000000000000000000000000000000000000000000000000000000000000000
+
+    CuratedParametersRegistry:
+      name: ParametersRegistry
+      address: *CuratedParametersRegistry
+      proxyName: OssifiableProxy
+      implementation: *CuratedParametersRegistryImpl
+      proxyChecks:
+        proxy__getAdmin: *aragonAgent
+        proxy__getImplementation: *CuratedParametersRegistryImpl
+        proxy__getIsOssified: false
+      checks:
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        MANAGE_CURVE_PARAMETERS_ROLE: *SM_MANAGE_CURVE_PARAMETERS_ROLE
+        MANAGE_GENERAL_PENALTIES_AND_CHARGES_ROLE: *SM_MANAGE_GENERAL_PENALTIES_AND_CHARGES_ROLE
+        MANAGE_KEYS_LIMIT_ROLE: *SM_MANAGE_KEYS_LIMIT_ROLE
+        MANAGE_PERFORMANCE_PARAMETERS_ROLE: *SM_MANAGE_PERFORMANCE_PARAMETERS_ROLE
+        MANAGE_QUEUE_CONFIG_ROLE: *SM_MANAGE_QUEUE_CONFIG_ROLE
+        MANAGE_REWARD_SHARE_ROLE: *SM_MANAGE_REWARD_SHARE_ROLE
+        MANAGE_VALIDATOR_EXIT_PARAMETERS_ROLE: *SM_MANAGE_VALIDATOR_EXIT_PARAMETERS_ROLE
+        QUEUE_LOWEST_PRIORITY: 0
+        defaultAllowedExitDelay: *curatedDefaultAllowedExitDelay
+        defaultBadPerformancePenalty: *curatedDefaultBadPerformancePenalty
+        defaultExitDelayFee: *curatedDefaultExitDelayFee
+        defaultGeneralDelayedPenaltyAdditionalFine: *curatedDefaultGeneralDelayedPenaltyAdditionalFine
+        defaultKeyRemovalCharge: *curatedDefaultKeyRemovalCharge
+        defaultKeysLimit: *curatedDefaultKeysLimit
+        defaultMaxElWithdrawalRequestFee: *curatedDefaultMaxElWithdrawalRequestFee
+        defaultPerformanceCoefficients: *curatedDefaultPerformanceCoefficients
+        defaultPerformanceLeeway: *curatedDefaultPerformanceLeeway
+        defaultQueueConfig: *curatedDefaultQueueConfig
+        defaultRewardShare: *curatedDefaultRewardShare
+        defaultStrikesParams: *curatedDefaultStrikesParams
+        getAllowedExitDelay:
+          - result: *curatedDefaultAllowedExitDelay
+            args: [0]
+          - result: *curatedDefaultAllowedExitDelay
+            args: [1]
+          - result: *curatedDefaultAllowedExitDelay
+            args: [2]
+          - result: *curatedDefaultAllowedExitDelay
+            args: [3]
+          - result: *curatedDefaultAllowedExitDelay
+            args: [4]
+          - result: *curatedDefaultAllowedExitDelay
+            args: [5]
+          - result: *curatedDefaultAllowedExitDelay
+            args: [6]
+        getBadPerformancePenalty:
+          - result: *curatedDefaultBadPerformancePenalty
+            args: [0]
+          - result: *curatedDefaultBadPerformancePenalty
+            args: [1]
+          - result: *curatedDefaultBadPerformancePenalty
+            args: [2]
+          - result: *curatedDefaultBadPerformancePenalty
+            args: [3]
+          - result: *curatedDefaultBadPerformancePenalty
+            args: [4]
+          - result: *curatedDefaultBadPerformancePenalty
+            args: [5]
+          - result: *curatedDefaultBadPerformancePenalty
+            args: [6]
+        getCurveParameters: null # this is just a batch view for UI, so we do not check it to keep config clean
+        getExitDelayFee:
+          - result: *curatedDefaultExitDelayFee
+            args: [0]
+          - result: *curatedTrustedExitDelayFee
+            args: [1]
+          - result: *curatedTrustedExitDelayFee
+            args: [2]
+          - result: *curatedTrustedExitDelayFee
+            args: [3]
+          - result: *curatedTrustedExitDelayFee
+            args: [4]
+          - result: *curatedTrustedExitDelayFee
+            args: [5]
+          - result: *curatedTrustedExitDelayFee
+            args: [6]
+        getGeneralDelayedPenaltyAdditionalFine:
+          - result: *curatedDefaultGeneralDelayedPenaltyAdditionalFine
+            args: [0]
+          - result: *curatedTrustedGeneralDelayedPenaltyAdditionalFine
+            args: [1]
+          - result: *curatedTrustedGeneralDelayedPenaltyAdditionalFine
+            args: [2]
+          - result: *curatedTrustedGeneralDelayedPenaltyAdditionalFine
+            args: [3]
+          - result: *curatedTrustedGeneralDelayedPenaltyAdditionalFine
+            args: [4]
+          - result: *curatedTrustedGeneralDelayedPenaltyAdditionalFine
+            args: [5]
+          - result: *curatedTrustedGeneralDelayedPenaltyAdditionalFine
+            args: [6]
+        getInitializedVersion: 3
+        getKeyRemovalCharge:
+          - result: *curatedDefaultKeyRemovalCharge
+            args: [0]
+          - result: *curatedDefaultKeyRemovalCharge
+            args: [1]
+          - result: *curatedDefaultKeyRemovalCharge
+            args: [2]
+          - result: *curatedDefaultKeyRemovalCharge
+            args: [3]
+          - result: *curatedDefaultKeyRemovalCharge
+            args: [4]
+          - result: *curatedDefaultKeyRemovalCharge
+            args: [5]
+          - result: *curatedDefaultKeyRemovalCharge
+            args: [6]
+        getKeysLimit:
+          - result: *curatedUntrustedKeysLimit
+            args: [0]
+          - result: *curatedTrustedKeysLimit
+            args: [1]
+          - result: *curatedTrustedKeysLimit
+            args: [2]
+          - result: *curatedTrustedKeysLimit
+            args: [3]
+          - result: *curatedTrustedKeysLimit
+            args: [4]
+          - result: *curatedTrustedKeysLimit
+            args: [5]
+          - result: *curatedTrustedKeysLimit
+            args: [6]
+        getMaxElWithdrawalRequestFee:
+          - result: *curatedDefaultMaxElWithdrawalRequestFee
+            args: [0]
+          - result: *curatedDefaultMaxElWithdrawalRequestFee
+            args: [1]
+          - result: *curatedDefaultMaxElWithdrawalRequestFee
+            args: [2]
+          - result: *curatedDefaultMaxElWithdrawalRequestFee
+            args: [3]
+          - result: *curatedDefaultMaxElWithdrawalRequestFee
+            args: [4]
+          - result: *curatedDefaultMaxElWithdrawalRequestFee
+            args: [5]
+          - result: *curatedDefaultMaxElWithdrawalRequestFee
+            args: [6]
+        getPerformanceCoefficients:
+          - result: *curatedDefaultPerformanceCoefficients
+            args: [0]
+          - result: *curatedDefaultPerformanceCoefficients
+            args: [1]
+          - result: *curatedDefaultPerformanceCoefficients
+            args: [2]
+          - result: *curatedDefaultPerformanceCoefficients
+            args: [3]
+          - result: *curatedDefaultPerformanceCoefficients
+            args: [4]
+          - result: *curatedDefaultPerformanceCoefficients
+            args: [5]
+          - result: *curatedDefaultPerformanceCoefficients
+            args: [6]
+        getPerformanceLeewayData:
+          - result: *curatedDefaultPerformanceLeewayData
+            args: [0]
+          - result: *curatedDefaultPerformanceLeewayData
+            args: [1]
+          - result: *curatedDefaultPerformanceLeewayData
+            args: [2]
+          - result: *curatedDefaultPerformanceLeewayData
+            args: [3]
+          - result: *curatedDefaultPerformanceLeewayData
+            args: [4]
+          - result: *curatedDefaultPerformanceLeewayData
+            args: [5]
+          - result: *curatedDefaultPerformanceLeewayData
+            args: [6]
+        getQueueConfig:
+          - result: *curatedDefaultQueueConfig
+            args: [0]
+          - result: *curatedDefaultQueueConfig
+            args: [1]
+          - result: *curatedDefaultQueueConfig
+            args: [2]
+          - result: *curatedDefaultQueueConfig
+            args: [3]
+          - result: *curatedDefaultQueueConfig
+            args: [4]
+          - result: *curatedDefaultQueueConfig
+            args: [5]
+          - result: *curatedDefaultQueueConfig
+            args: [6]
+        getRewardShareData:
+          - result: *curatedUntrustedRewardShareData
+            args: [0]
+          - result: *curatedTrustedRewardShareData
+            args: [1]
+          - result: *curatedPremiumRewardShareData
+            args: [2]
+          - result: *curatedPremiumRewardShareData
+            args: [3]
+          - result: *curatedPremiumRewardShareData
+            args: [4]
+          - result: *curatedTrustedRewardShareData
+            args: [5]
+          - result: *curatedPremiumRewardShareData
+            args: [6]
+        getRoleAdmin: null
+        getRoleMember: null
+        getRoleMemberCount: null
+        getRoleMembers: null
+        getStrikesParams:
+          - result: *curatedDefaultStrikesParams
+            args: [0]
+          - result: *curatedDefaultStrikesParams
+            args: [1]
+          - result: *curatedDefaultStrikesParams
+            args: [2]
+          - result: *curatedDefaultStrikesParams
+            args: [3]
+          - result: *curatedDefaultStrikesParams
+            args: [4]
+          - result: *curatedDefaultStrikesParams
+            args: [5]
+          - result: *curatedDefaultStrikesParams
+            args: [6]
+        hasRole: null
+        supportsInterface: null
+      ozAcl:
+        *DEFAULT_ADMIN_ROLE : [*aragonAgent]
+        *SM_MANAGE_CURVE_PARAMETERS_ROLE : []
+        *SM_MANAGE_GENERAL_PENALTIES_AND_CHARGES_ROLE : [*curatedModuleCommittee]
+        *SM_MANAGE_KEYS_LIMIT_ROLE : []
+        *SM_MANAGE_PERFORMANCE_PARAMETERS_ROLE : []
+        *SM_MANAGE_QUEUE_CONFIG_ROLE : []
+        *SM_MANAGE_REWARD_SHARE_ROLE : []
+        *SM_MANAGE_VALIDATOR_EXIT_PARAMETERS_ROLE : []
+      implementationChecks:
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        MANAGE_CURVE_PARAMETERS_ROLE: *SM_MANAGE_CURVE_PARAMETERS_ROLE
+        MANAGE_GENERAL_PENALTIES_AND_CHARGES_ROLE: *SM_MANAGE_GENERAL_PENALTIES_AND_CHARGES_ROLE
+        MANAGE_KEYS_LIMIT_ROLE: *SM_MANAGE_KEYS_LIMIT_ROLE
+        MANAGE_PERFORMANCE_PARAMETERS_ROLE: *SM_MANAGE_PERFORMANCE_PARAMETERS_ROLE
+        MANAGE_QUEUE_CONFIG_ROLE: *SM_MANAGE_QUEUE_CONFIG_ROLE
+        MANAGE_REWARD_SHARE_ROLE: *SM_MANAGE_REWARD_SHARE_ROLE
+        MANAGE_VALIDATOR_EXIT_PARAMETERS_ROLE: *SM_MANAGE_VALIDATOR_EXIT_PARAMETERS_ROLE
+        QUEUE_LOWEST_PRIORITY: 0
+        defaultAllowedExitDelay: 0
+        defaultBadPerformancePenalty: 0
+        defaultExitDelayFee: 0
+        defaultGeneralDelayedPenaltyAdditionalFine: 0
+        defaultKeyRemovalCharge: 0
+        defaultKeysLimit: 0
+        defaultMaxElWithdrawalRequestFee: 0
+        defaultPerformanceCoefficients: [0,0,0]
+        defaultPerformanceLeeway: 0
+        defaultQueueConfig: [0,0]
+        defaultRewardShare: 0
+        defaultStrikesParams: [0,0]
+        getAllowedExitDelay: null
+        getBadPerformancePenalty: null
+        getCurveParameters: null
+        getExitDelayFee: null
+        getGeneralDelayedPenaltyAdditionalFine: null
+        getInitializedVersion: *MAX_UINT64 # Initialization disabled for implementation contract
+        getKeyRemovalCharge: null
+        getKeysLimit: null
+        getMaxElWithdrawalRequestFee: null
+        getPerformanceCoefficients: null
+        getPerformanceLeewayData: null
+        getQueueConfig: null
+        getRewardShareData: null
+        getRoleAdmin: null
+        getRoleMember: null
+        getRoleMemberCount: null
+        getRoleMembers: null
+        getStrikesParams: null
+        hasRole: null
+        supportsInterface: null
+
+    CuratedExitPenalties:
+      name: ExitPenalties
+      address: *CuratedExitPenalties
+      proxyName: OssifiableProxy
+      implementation: *CuratedExitPenaltiesImpl
+      proxyChecks:
+        proxy__getAdmin: *aragonAgent
+        proxy__getImplementation: *CuratedExitPenaltiesImpl
+        proxy__getIsOssified: false
+      checks:
+        ACCOUNTING: *CuratedAccounting
+        MODULE: *CuratedModule
+        PARAMETERS_REGISTRY: *CuratedParametersRegistry
+        STRIKES: *CuratedValidatorStrikes
+        STRIKES_EXIT_TYPE_ID: 1
+        VOLUNTARY_EXIT_TYPE_ID: 0
+        getExitPenaltyInfo: null
+        isValidatorExitDelayPenaltyApplicable: null
+      implementationChecks:
+        ACCOUNTING: *CuratedAccounting
+        MODULE: *CuratedModule
+        PARAMETERS_REGISTRY: *CuratedParametersRegistry
+        STRIKES: *CuratedValidatorStrikes
+        STRIKES_EXIT_TYPE_ID: 1
+        VOLUNTARY_EXIT_TYPE_ID: 0
+        getExitPenaltyInfo: null
+        isValidatorExitDelayPenaltyApplicable: null
+
+    CuratedFeeOracle:
+      name: FeeOracle
+      address: *CuratedFeeOracle
+      proxyName: OssifiableProxy
+      implementation: *CuratedFeeOracleImpl
+      proxyChecks:
+        proxy__getAdmin: *aragonAgent
+        proxy__getImplementation: *CuratedFeeOracleImpl
+        proxy__getIsOssified: false
+      checks:
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        FEE_DISTRIBUTOR: *CuratedFeeDistributor
+        GENESIS_TIME: *GENESIS_TIME
+        MANAGE_CONSENSUS_CONTRACT_ROLE: *ORACLE_MANAGE_CONSENSUS_CONTRACT_ROLE
+        MANAGE_CONSENSUS_VERSION_ROLE: *ORACLE_MANAGE_CONSENSUS_VERSION_ROLE
+        PAUSE_INFINITELY: *MAX_UINT256
+        PAUSE_ROLE: *SM_PAUSE_ROLE
+        RECOVERER_ROLE: *SM_RECOVERER_ROLE
+        RESUME_ROLE: *SM_RESUME_ROLE
+        SECONDS_PER_SLOT: *SECONDS_PER_SLOT
+        STRIKES: *CuratedValidatorStrikes
+        SUBMIT_DATA_ROLE: *ORACLE_SUBMIT_DATA_ROLE
+        getConsensusContract: *CuratedHashConsensus
+        getConsensusReport: null
+        getConsensusVersion: 4
+        getContractVersion: 3
+        getLastProcessingRefSlot: 0 # change to null after mainnet vote
+        getResumeSinceTimestamp: 0 # change to null after mainnet vote
+        getRoleAdmin: null
+        getRoleMember: null 
+        getRoleMemberCount: null 
+        getRoleMembers: null 
+        hasRole: null 
+        isPaused: false
+        supportsInterface: null 
+      implementationChecks:
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        FEE_DISTRIBUTOR: *CuratedFeeDistributor
+        GENESIS_TIME: *GENESIS_TIME
+        MANAGE_CONSENSUS_CONTRACT_ROLE: *ORACLE_MANAGE_CONSENSUS_CONTRACT_ROLE
+        MANAGE_CONSENSUS_VERSION_ROLE: *ORACLE_MANAGE_CONSENSUS_VERSION_ROLE
+        PAUSE_INFINITELY: *MAX_UINT256
+        PAUSE_ROLE: *SM_PAUSE_ROLE
+        RECOVERER_ROLE: *SM_RECOVERER_ROLE
+        RESUME_ROLE: *SM_RESUME_ROLE
+        SECONDS_PER_SLOT: *SECONDS_PER_SLOT
+        STRIKES: *CuratedValidatorStrikes
+        SUBMIT_DATA_ROLE: *ORACLE_SUBMIT_DATA_ROLE
+        getConsensusContract: *ZERO_ADDRESS
+        getConsensusReport: null
+        getConsensusVersion: 0
+        getContractVersion: *MAX_UINT256 # Initialization disabled for implementation contract
+        getLastProcessingRefSlot: 0
+        getResumeSinceTimestamp: 0
+        getRoleAdmin: null
+        getRoleMember: null 
+        getRoleMemberCount: null 
+        getRoleMembers: null 
+        hasRole: null 
+        isPaused: false
+        supportsInterface: null 
+
+    CuratedEjector:
+      name: Ejector
+      address: *CuratedEjector
+      checks:
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        MODULE: *CuratedModule
+        PAUSE_INFINITELY: *MAX_UINT256
+        PAUSE_ROLE: *SM_PAUSE_ROLE
+        RECOVERER_ROLE: *SM_RECOVERER_ROLE
+        RESUME_ROLE: *SM_RESUME_ROLE
+        STRIKES: *CuratedValidatorStrikes
+        STRIKES_EXIT_TYPE_ID: 1
+        VOLUNTARY_EXIT_TYPE_ID: 0
+        getResumeSinceTimestamp: null
+        getRoleAdmin: null
+        getRoleMember: null
+        getRoleMemberCount: null
+        getRoleMembers: null
+        hasRole: null
+        isPaused: false
+        stakingModuleId: 0
+        supportsInterface: null
+        triggerableWithdrawalsGateway: *triggerableWithdrawalsGateway
+      ozAcl:
+        *DEFAULT_ADMIN_ROLE : [*aragonAgent]
+        *SM_PAUSE_ROLE : [*resealManager, *circuitBreaker]
+        *SM_RESUME_ROLE : [*resealManager]
+        *SM_RECOVERER_ROLE : []
+
+    CuratedHashConsensus:
+      name: HashConsensus
+      address: *CuratedHashConsensus
+      checks:
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        DISABLE_CONSENSUS_ROLE: *DISABLE_CONSENSUS_ROLE
+        MANAGE_FAST_LANE_CONFIG_ROLE: *MANAGE_FAST_LANE_CONFIG_ROLE
+        MANAGE_FRAME_CONFIG_ROLE: *MANAGE_FRAME_CONFIG_ROLE
+        MANAGE_MEMBERS_AND_QUORUM_ROLE: *MANAGE_MEMBERS_AND_QUORUM_ROLE
+        MANAGE_REPORT_PROCESSOR_ROLE: *MANAGE_REPORT_PROCESSOR_ROLE
+        getChainConfig:
+          - *SLOTS_PER_EPOCH
+          - *SECONDS_PER_SLOT
+          - *GENESIS_TIME
+        getFrameConfig:
+          - *HC_CM_START
+          - *HC_CM_FRAME_EPOCHS
+          - *HC_CM_FAST_LANE
+        getConsensusState: null
+        getConsensusStateForMember: null
+        getCurrentFrame: null
+        getFastLaneMembers: null
+        getInitialRefSlot: null
+        getIsFastLaneMember: null
+        getIsMember: null
+        getMembers: [*HASH_CONSENSUS_MEMBERS, null]
+        getQuorum: *HASH_CONSENSUS_QUORUM
+        getReportProcessor: *CuratedFeeOracle
+        getReportVariants: null
+        getRoleAdmin: null
+        getRoleMember: null
+        getRoleMembers: null
+        getRoleMemberCount: null
+        hasRole: null
+        supportsInterface: null
+      ozAcl:
+        *DEFAULT_ADMIN_ROLE : [*aragonAgent]
+        *DISABLE_CONSENSUS_ROLE : []
+        *MANAGE_FAST_LANE_CONFIG_ROLE : []
+        *MANAGE_FRAME_CONFIG_ROLE : []
+        *MANAGE_MEMBERS_AND_QUORUM_ROLE : [*aragonAgent]
+        *MANAGE_REPORT_PROCESSOR_ROLE : []
+
+    CuratedMetaRegistry:
+      name: MetaRegistry
+      address: *CuratedMetaRegistry
+      proxyName: OssifiableProxy
+      implementation: *CuratedMetaRegistryImpl
+      proxyChecks:
+        proxy__getAdmin: *aragonAgent
+        proxy__getImplementation: *CuratedMetaRegistryImpl
+        proxy__getIsOssified: false
+      checks:
+        ACCOUNTING: *CuratedAccounting
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        MANAGE_OPERATOR_GROUPS_ROLE: *SM_MANAGE_OPERATOR_GROUPS_ROLE
+        MODULE: *CuratedModule
+        NO_GROUP_ID: 0
+        SET_BOND_CURVE_WEIGHT_ROLE: *SM_SET_BOND_CURVE_WEIGHT_ROLE
+        SET_OPERATOR_INFO_ROLE: *SM_SET_OPERATOR_INFO_ROLE
+        STAKING_ROUTER: *stakingRouter
+        getBondCurveWeight:
+          - result: *curatedUntrustedBondCurveWeight
+            args: [0]
+          - result: *curatedTrustedBondCurveWeight
+            args: [1]
+          - result: *curatedTrustedBondCurveWeight
+            args: [2]
+          - result: *curatedTrustedBondCurveWeight
+            args: [3]
+          - result: *curatedTrustedBondCurveWeight
+            args: [4]
+          - result: *curatedTrustedBondCurveWeight
+            args: [5]
+          - result: *curatedTrustedBondCurveWeight
+            args: [6]
+        getExternalOperatorGroupId: null
+        getInitializedVersion: 1
+        getNodeOperatorGroupId: null
+        getNodeOperatorWeight: null
+        getNodeOperatorWeightAndExternalStake: null
+        getOperatorGroup: null
+        getOperatorGroupsCount: 0 # change to null after mainnet vote
+        getOperatorMetadata: null
+        getOperatorWeights: null
+        getRoleAdmin: null
+        getRoleMember: null
+        getRoleMemberCount: null
+        getRoleMembers: null
+        hasRole: null
+        supportsInterface: null
+      ozAcl:
+        *DEFAULT_ADMIN_ROLE : [*aragonAgent]
+        *SM_MANAGE_OPERATOR_GROUPS_ROLE : [*evmScriptExecutor]
+        *SM_SET_BOND_CURVE_WEIGHT_ROLE : []
+        *SM_SET_OPERATOR_INFO_ROLE : [*curatedModuleCommittee, *ProfessionalOperatorGate, *ProfessionalTrustedOperatorGate, *PublicGoodOperatorGate, *DecentralizationOperatorGate, *ExtraEffortOperatorGate, *IntraOperatorDVTClusterGate, *IntraOperatorDVTClusterPlusGate]
+      implementationChecks:
+        ACCOUNTING: *CuratedAccounting
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        MANAGE_OPERATOR_GROUPS_ROLE: *SM_MANAGE_OPERATOR_GROUPS_ROLE
+        MODULE: *CuratedModule
+        NO_GROUP_ID: 0
+        SET_BOND_CURVE_WEIGHT_ROLE: *SM_SET_BOND_CURVE_WEIGHT_ROLE
+        SET_OPERATOR_INFO_ROLE: *SM_SET_OPERATOR_INFO_ROLE
+        STAKING_ROUTER: *stakingRouter
+        getBondCurveWeight: null
+        getExternalOperatorGroupId: null
+        getInitializedVersion: *MAX_UINT64 # Initialization disabled for implementation contract
+        getNodeOperatorGroupId: null
+        getNodeOperatorWeight: null
+        getNodeOperatorWeightAndExternalStake: null
+        getOperatorGroup: null
+        getOperatorGroupsCount: 0
+        getOperatorMetadata: null
+        getOperatorWeights: null
+        getRoleAdmin: null
+        getRoleMember: null
+        getRoleMemberCount: null
+        getRoleMembers: null
+        hasRole: null
+        supportsInterface: null
+
+    CuratedValidatorStrikes:
+      name: ValidatorStrikes
+      address: *CuratedValidatorStrikes
+      proxyName: OssifiableProxy
+      implementation: *CuratedValidatorStrikesImpl
+      proxyChecks:
+        proxy__getAdmin: *aragonAgent
+        proxy__getImplementation: *CuratedValidatorStrikesImpl
+        proxy__getIsOssified: false
+      checks:
+        ACCOUNTING: *CuratedAccounting
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        EXIT_PENALTIES: *CuratedExitPenalties
+        MODULE: *CuratedModule
+        ORACLE: *CuratedFeeOracle
+        PARAMETERS_REGISTRY: *CuratedParametersRegistry
+        ejector: *CuratedEjector
+        getInitializedVersion: 1
+        getRoleAdmin: null
+        getRoleMember: null
+        getRoleMemberCount: null
+        getRoleMembers: null
+        hasRole: null
+        hashLeaf: null
+        supportsInterface: null
+        treeCid: "" # We do not expect validator strikes in CMv2
+        treeRoot: 0x0000000000000000000000000000000000000000000000000000000000000000 # We do not expect validator strikes in CMv2
+        verifyProof: null
+      ozAcl:
+        *DEFAULT_ADMIN_ROLE : [*aragonAgent]
+      implementationChecks:
+        ACCOUNTING: *CuratedAccounting
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        EXIT_PENALTIES: *CuratedExitPenalties
+        MODULE: *CuratedModule
+        ORACLE: *CuratedFeeOracle
+        PARAMETERS_REGISTRY: *CuratedParametersRegistry
+        ejector: *ZERO_ADDRESS
+        getInitializedVersion: *MAX_UINT64 # Initialization disabled for implementation contract
+        getRoleAdmin: null
+        getRoleMember: null
+        getRoleMemberCount: null
+        getRoleMembers: null
+        hasRole: null
+        hashLeaf: null
+        supportsInterface: null
+        treeCid: "" # We do not expect validator strikes in CMv2
+        treeRoot: 0x0000000000000000000000000000000000000000000000000000000000000000 # We do not expect validator strikes in CMv2
+        verifyProof: null
+
+    CuratedVerifier:
+      name: Verifier
+      address: *CuratedVerifier
+      checks:
+        BEACON_ROOTS: *EIP4788_BEACON_ROOTS_CONTRACT
+        CAPELLA_SLOT: *CAPELLA_SLOT
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        FIRST_SUPPORTED_SLOT: *ELECTRA_SLOT
+        GI_FIRST_BALANCES_NODE_CURR: *GI_FIRST_BALANCES_NODE_ELECTRA
+        GI_FIRST_BALANCES_NODE_PREV: *GI_FIRST_BALANCES_NODE_ELECTRA
+        GI_FIRST_BLOCK_ROOT_IN_SUMMARY: *GI_FIRST_BLOCK_ROOT_IN_SUMMARY_ELECTRA
+        GI_FIRST_HISTORICAL_SUMMARY_CURR: *GI_FIRST_HISTORICAL_SUMMARY_ELECTRA
+        GI_FIRST_HISTORICAL_SUMMARY_PREV: *GI_FIRST_HISTORICAL_SUMMARY_ELECTRA
+        GI_FIRST_VALIDATOR_CURR: *GI_FIRST_VALIDATOR_ELECTRA
+        GI_FIRST_VALIDATOR_PREV: *GI_FIRST_VALIDATOR_ELECTRA
+        GI_FIRST_WITHDRAWAL_CURR: *GI_FIRST_WITHDRAWAL_ELECTRA
+        GI_FIRST_WITHDRAWAL_PREV: *GI_FIRST_WITHDRAWAL_ELECTRA
+        MIN_WITHDRAWAL_RATIO: *curatedMinWithdrawalRatio
+        MODULE: *CuratedModule
+        PAUSE_INFINITELY: *MAX_UINT256
+        PAUSE_ROLE: *SM_PAUSE_ROLE
+        PIVOT_SLOT: *ELECTRA_SLOT
+        RESUME_ROLE: *SM_RESUME_ROLE
+        SLOTS_PER_EPOCH: *SLOTS_PER_EPOCH
+        SLOTS_PER_HISTORICAL_ROOT: *SLOTS_PER_HISTORICAL_ROOT
+        WITHDRAWAL_ADDRESS: *withdrawalVault
+        getResumeSinceTimestamp: null
+        getRoleAdmin: null
+        getRoleMember: null
+        getRoleMemberCount: null
+        getRoleMembers: null
+        hasRole: null
+        isPaused: false
+        supportsInterface: null
+
+    ProfessionalOperatorGate:
+      name: CuratedGate
+      address: *ProfessionalOperatorGate
+      proxyName: OssifiableProxy
+      implementation: *CuratedGateImpl
+      proxyChecks:
+        proxy__getAdmin: *aragonAgent
+        proxy__getImplementation: *CuratedGateImpl
+        proxy__getIsOssified: false
+      checks:
+        ACCOUNTING: *CuratedAccounting
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        DEFAULT_BOND_CURVE_ID: 0
+        META_REGISTRY: *CuratedMetaRegistry
+        MODULE: *CuratedModule
+        PAUSE_INFINITELY: *MAX_UINT256
+        PAUSE_ROLE: *SM_PAUSE_ROLE
+        RECOVERER_ROLE: *SM_RECOVERER_ROLE
+        RESUME_ROLE: *SM_RESUME_ROLE
+        SET_TREE_ROLE: *SM_SET_TREE_ROLE
+        curveId: 0
+        getInitializedVersion: 1
+        getResumeSinceTimestamp: null
+        getRoleAdmin: null
+        getRoleMember: null
+        getRoleMemberCount: null
+        getRoleMembers: null
+        hasRole: null
+        hashLeaf: null
+        isConsumed: null
+        isPaused: false
+        name: "Professional Operator Gate"
+        supportsInterface: null
+        treeCid: QmU4cnyaKWgMVCZVLiuQaqu6yGXahjzi4F1Vcnq2SXBBmT
+        treeRoot: 0x1111111111111111111111111111111111111111111111111111111111111111
+        verifyProof: null
+      ozAcl:
+        *DEFAULT_ADMIN_ROLE : [*aragonAgent]
+        *SM_PAUSE_ROLE : [*curatedModuleCommittee]
+        *SM_RESUME_ROLE : []
+        *SM_RECOVERER_ROLE : []
+        *SM_SET_TREE_ROLE : [*evmScriptExecutor]
+      implementationChecks:
+        ACCOUNTING: *CuratedAccounting
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        DEFAULT_BOND_CURVE_ID: 0
+        META_REGISTRY: *CuratedMetaRegistry
+        MODULE: *CuratedModule
+        PAUSE_INFINITELY: *MAX_UINT256
+        PAUSE_ROLE: *SM_PAUSE_ROLE
+        RECOVERER_ROLE: *SM_RECOVERER_ROLE
+        RESUME_ROLE: *SM_RESUME_ROLE
+        SET_TREE_ROLE: *SM_SET_TREE_ROLE
+        curveId: 0
+        getInitializedVersion: *MAX_UINT64 # Initialization disabled for implementation contract
+        getResumeSinceTimestamp: null
+        getRoleAdmin: null
+        getRoleMember: null
+        getRoleMemberCount: null
+        getRoleMembers: null
+        hasRole: null
+        hashLeaf: null
+        isConsumed: null
+        isPaused: false
+        name: ""
+        supportsInterface: null
+        treeCid: ""
+        treeRoot: *ZERO_BYTES32
+        verifyProof: null
+
+    ProfessionalTrustedOperatorGate:
+      name: CuratedGate
+      address: *ProfessionalTrustedOperatorGate
+      proxyName: OssifiableProxy
+      implementation: *CuratedGateImpl
+      proxyChecks:
+        proxy__getAdmin: *aragonAgent
+        proxy__getImplementation: *CuratedGateImpl
+        proxy__getIsOssified: false
+      checks:
+        ACCOUNTING: *CuratedAccounting
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        DEFAULT_BOND_CURVE_ID: 0
+        META_REGISTRY: *CuratedMetaRegistry
+        MODULE: *CuratedModule
+        PAUSE_INFINITELY: *MAX_UINT256
+        PAUSE_ROLE: *SM_PAUSE_ROLE
+        RECOVERER_ROLE: *SM_RECOVERER_ROLE
+        RESUME_ROLE: *SM_RESUME_ROLE
+        SET_TREE_ROLE: *SM_SET_TREE_ROLE
+        curveId: 1
+        getInitializedVersion: 1
+        getResumeSinceTimestamp: null
+        getRoleAdmin: null
+        getRoleMember: null
+        getRoleMemberCount: null
+        getRoleMembers: null
+        hasRole: null
+        hashLeaf: null
+        isConsumed: null
+        isPaused: false
+        name: "Professional Trusted Operator Gate"
+        supportsInterface: null
+        treeCid: bafkreidgr4wofdx5x2efyianenyi3ldq5hxareq6ydj6pjoolpu3izqq2u
+        treeRoot: 0x2be2e6ef3183615954ff2eef0a1425133132db440efa6c2b6162906d92057a97
+        verifyProof: null
+      ozAcl:
+        *DEFAULT_ADMIN_ROLE : [*aragonAgent]
+        *SM_PAUSE_ROLE : [*curatedModuleCommittee]
+        *SM_RESUME_ROLE : []
+        *SM_RECOVERER_ROLE : []
+        *SM_SET_TREE_ROLE : [*evmScriptExecutor]
+      implementationChecks:
+        ACCOUNTING: *CuratedAccounting
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        DEFAULT_BOND_CURVE_ID: 0
+        META_REGISTRY: *CuratedMetaRegistry
+        MODULE: *CuratedModule
+        PAUSE_INFINITELY: *MAX_UINT256
+        PAUSE_ROLE: *SM_PAUSE_ROLE
+        RECOVERER_ROLE: *SM_RECOVERER_ROLE
+        RESUME_ROLE: *SM_RESUME_ROLE
+        SET_TREE_ROLE: *SM_SET_TREE_ROLE
+        curveId: 0
+        getInitializedVersion: *MAX_UINT64 # Initialization disabled for implementation contract
+        getResumeSinceTimestamp: null
+        getRoleAdmin: null
+        getRoleMember: null
+        getRoleMemberCount: null
+        getRoleMembers: null
+        hasRole: null
+        hashLeaf: null
+        isConsumed: null
+        isPaused: false
+        name: ""
+        supportsInterface: null
+        treeCid: ""
+        treeRoot: *ZERO_BYTES32
+        verifyProof: null
+
+    PublicGoodOperatorGate:
+      name: CuratedGate
+      address: *PublicGoodOperatorGate
+      proxyName: OssifiableProxy
+      implementation: *CuratedGateImpl
+      proxyChecks:
+        proxy__getAdmin: *aragonAgent
+        proxy__getImplementation: *CuratedGateImpl
+        proxy__getIsOssified: false
+      checks:
+        ACCOUNTING: *CuratedAccounting
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        DEFAULT_BOND_CURVE_ID: 0
+        META_REGISTRY: *CuratedMetaRegistry
+        MODULE: *CuratedModule
+        PAUSE_INFINITELY: *MAX_UINT256
+        PAUSE_ROLE: *SM_PAUSE_ROLE
+        RECOVERER_ROLE: *SM_RECOVERER_ROLE
+        RESUME_ROLE: *SM_RESUME_ROLE
+        SET_TREE_ROLE: *SM_SET_TREE_ROLE
+        curveId: 2
+        getInitializedVersion: 1
+        getResumeSinceTimestamp: null
+        getRoleAdmin: null
+        getRoleMember: null
+        getRoleMemberCount: null
+        getRoleMembers: null
+        hasRole: null
+        hashLeaf: null
+        isConsumed: null
+        isPaused: false
+        name: "Public Good Operator Gate"
+        supportsInterface: null
+        treeCid: bafkreihicf5dj4rfa42j4prxegrzxfcdkhwzgvgqjhuntgytdvffxkhjim
+        treeRoot: 0x57db3289376dfbe035e073d81d5b297b8f5269fbdfee12643ded0180aac80839
+        verifyProof: null
+      ozAcl:
+        *DEFAULT_ADMIN_ROLE : [*aragonAgent]
+        *SM_PAUSE_ROLE : [*curatedModuleCommittee]
+        *SM_RESUME_ROLE : []
+        *SM_RECOVERER_ROLE : []
+        *SM_SET_TREE_ROLE : [*evmScriptExecutor]
+      implementationChecks:
+        ACCOUNTING: *CuratedAccounting
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        DEFAULT_BOND_CURVE_ID: 0
+        META_REGISTRY: *CuratedMetaRegistry
+        MODULE: *CuratedModule
+        PAUSE_INFINITELY: *MAX_UINT256
+        PAUSE_ROLE: *SM_PAUSE_ROLE
+        RECOVERER_ROLE: *SM_RECOVERER_ROLE
+        RESUME_ROLE: *SM_RESUME_ROLE
+        SET_TREE_ROLE: *SM_SET_TREE_ROLE
+        curveId: 0
+        getInitializedVersion: *MAX_UINT64 # Initialization disabled for implementation contract
+        getResumeSinceTimestamp: null
+        getRoleAdmin: null
+        getRoleMember: null
+        getRoleMemberCount: null
+        getRoleMembers: null
+        hasRole: null
+        hashLeaf: null
+        isConsumed: null
+        isPaused: false
+        name: ""
+        supportsInterface: null
+        treeCid: ""
+        treeRoot: *ZERO_BYTES32
+        verifyProof: null
+
+    DecentralizationOperatorGate:
+      name: CuratedGate
+      address: *DecentralizationOperatorGate
+      proxyName: OssifiableProxy
+      implementation: *CuratedGateImpl
+      proxyChecks:
+        proxy__getAdmin: *aragonAgent
+        proxy__getImplementation: *CuratedGateImpl
+        proxy__getIsOssified: false
+      checks:
+        ACCOUNTING: *CuratedAccounting
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        DEFAULT_BOND_CURVE_ID: 0
+        META_REGISTRY: *CuratedMetaRegistry
+        MODULE: *CuratedModule
+        PAUSE_INFINITELY: *MAX_UINT256
+        PAUSE_ROLE: *SM_PAUSE_ROLE
+        RECOVERER_ROLE: *SM_RECOVERER_ROLE
+        RESUME_ROLE: *SM_RESUME_ROLE
+        SET_TREE_ROLE: *SM_SET_TREE_ROLE
+        curveId: 3
+        getInitializedVersion: 1
+        getResumeSinceTimestamp: null
+        getRoleAdmin: null
+        getRoleMember: null
+        getRoleMemberCount: null
+        getRoleMembers: null
+        hasRole: null
+        hashLeaf: null
+        isConsumed: null
+        isPaused: false
+        name: "Decentralization Operator Gate"
+        supportsInterface: null
+        treeCid: QmU4cnyaKWgMVCZVLiuQaqu6yGXahjzi4F1Vcnq2SXBBmT
+        treeRoot: 0x1111111111111111111111111111111111111111111111111111111111111111
+        verifyProof: null
+      ozAcl:
+        *DEFAULT_ADMIN_ROLE : [*aragonAgent]
+        *SM_PAUSE_ROLE : [*curatedModuleCommittee]
+        *SM_RESUME_ROLE : []
+        *SM_RECOVERER_ROLE : []
+        *SM_SET_TREE_ROLE : [*evmScriptExecutor]
+      implementationChecks:
+        ACCOUNTING: *CuratedAccounting
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        DEFAULT_BOND_CURVE_ID: 0
+        META_REGISTRY: *CuratedMetaRegistry
+        MODULE: *CuratedModule
+        PAUSE_INFINITELY: *MAX_UINT256
+        PAUSE_ROLE: *SM_PAUSE_ROLE
+        RECOVERER_ROLE: *SM_RECOVERER_ROLE
+        RESUME_ROLE: *SM_RESUME_ROLE
+        SET_TREE_ROLE: *SM_SET_TREE_ROLE
+        curveId: 0
+        getInitializedVersion: *MAX_UINT64 # Initialization disabled for implementation contract
+        getResumeSinceTimestamp: null
+        getRoleAdmin: null
+        getRoleMember: null
+        getRoleMemberCount: null
+        getRoleMembers: null
+        hasRole: null
+        hashLeaf: null
+        isConsumed: null
+        isPaused: false
+        name: ""
+        supportsInterface: null
+        treeCid: ""
+        treeRoot: *ZERO_BYTES32
+        verifyProof: null
+
+    ExtraEffortOperatorGate:
+      name: CuratedGate
+      address: *ExtraEffortOperatorGate
+      proxyName: OssifiableProxy
+      implementation: *CuratedGateImpl
+      proxyChecks:
+        proxy__getAdmin: *aragonAgent
+        proxy__getImplementation: *CuratedGateImpl
+        proxy__getIsOssified: false
+      checks:
+        ACCOUNTING: *CuratedAccounting
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        DEFAULT_BOND_CURVE_ID: 0
+        META_REGISTRY: *CuratedMetaRegistry
+        MODULE: *CuratedModule
+        PAUSE_INFINITELY: *MAX_UINT256
+        PAUSE_ROLE: *SM_PAUSE_ROLE
+        RECOVERER_ROLE: *SM_RECOVERER_ROLE
+        RESUME_ROLE: *SM_RESUME_ROLE
+        SET_TREE_ROLE: *SM_SET_TREE_ROLE
+        curveId: 4
+        getInitializedVersion: 1
+        getResumeSinceTimestamp: null
+        getRoleAdmin: null
+        getRoleMember: null
+        getRoleMemberCount: null
+        getRoleMembers: null
+        hasRole: null
+        hashLeaf: null
+        isConsumed: null
+        isPaused: false
+        name: "Extra Effort Operator Gate"
+        supportsInterface: null
+        treeCid: QmU4cnyaKWgMVCZVLiuQaqu6yGXahjzi4F1Vcnq2SXBBmT
+        treeRoot: 0x1111111111111111111111111111111111111111111111111111111111111111
+        verifyProof: null
+      ozAcl:
+        *DEFAULT_ADMIN_ROLE : [*aragonAgent]
+        *SM_PAUSE_ROLE : [*curatedModuleCommittee]
+        *SM_RESUME_ROLE : []
+        *SM_RECOVERER_ROLE : []
+        *SM_SET_TREE_ROLE : [*evmScriptExecutor]
+      implementationChecks:
+        ACCOUNTING: *CuratedAccounting
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        DEFAULT_BOND_CURVE_ID: 0
+        META_REGISTRY: *CuratedMetaRegistry
+        MODULE: *CuratedModule
+        PAUSE_INFINITELY: *MAX_UINT256
+        PAUSE_ROLE: *SM_PAUSE_ROLE
+        RECOVERER_ROLE: *SM_RECOVERER_ROLE
+        RESUME_ROLE: *SM_RESUME_ROLE
+        SET_TREE_ROLE: *SM_SET_TREE_ROLE
+        curveId: 0
+        getInitializedVersion: *MAX_UINT64 # Initialization disabled for implementation contract
+        getResumeSinceTimestamp: null
+        getRoleAdmin: null
+        getRoleMember: null
+        getRoleMemberCount: null
+        getRoleMembers: null
+        hasRole: null
+        hashLeaf: null
+        isConsumed: null
+        isPaused: false
+        name: ""
+        supportsInterface: null
+        treeCid: ""
+        treeRoot: *ZERO_BYTES32
+        verifyProof: null
+
+    IntraOperatorDVTClusterGate:
+      name: CuratedGate
+      address: *IntraOperatorDVTClusterGate
+      proxyName: OssifiableProxy
+      implementation: *CuratedGateImpl
+      proxyChecks:
+        proxy__getAdmin: *aragonAgent
+        proxy__getImplementation: *CuratedGateImpl
+        proxy__getIsOssified: false
+      checks:
+        ACCOUNTING: *CuratedAccounting
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        DEFAULT_BOND_CURVE_ID: 0
+        META_REGISTRY: *CuratedMetaRegistry
+        MODULE: *CuratedModule
+        PAUSE_INFINITELY: *MAX_UINT256
+        PAUSE_ROLE: *SM_PAUSE_ROLE
+        RECOVERER_ROLE: *SM_RECOVERER_ROLE
+        RESUME_ROLE: *SM_RESUME_ROLE
+        SET_TREE_ROLE: *SM_SET_TREE_ROLE
+        curveId: 5
+        getInitializedVersion: 1
+        getResumeSinceTimestamp: null
+        getRoleAdmin: null
+        getRoleMember: null
+        getRoleMemberCount: null
+        getRoleMembers: null
+        hasRole: null
+        hashLeaf: null
+        isConsumed: null
+        isPaused: false
+        name: "Intra-Operator DVT Cluster Gate"
+        supportsInterface: null
+        treeCid: bafkreigm3mqlqdto2ggxpq22w7tblfbx4p4o4a3gudf2lkfduwxeh2m62e
+        treeRoot: 0xfda6c221ae0f44dfa57c64324ebbd0c468bb402cbcc20326ad65a18e96a3df0c
+        verifyProof: null
+      ozAcl:
+        *DEFAULT_ADMIN_ROLE : [*aragonAgent]
+        *SM_PAUSE_ROLE : [*curatedModuleCommittee]
+        *SM_RESUME_ROLE : []
+        *SM_RECOVERER_ROLE : []
+        *SM_SET_TREE_ROLE : [*evmScriptExecutor]
+      implementationChecks:
+        ACCOUNTING: *CuratedAccounting
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        DEFAULT_BOND_CURVE_ID: 0
+        META_REGISTRY: *CuratedMetaRegistry
+        MODULE: *CuratedModule
+        PAUSE_INFINITELY: *MAX_UINT256
+        PAUSE_ROLE: *SM_PAUSE_ROLE
+        RECOVERER_ROLE: *SM_RECOVERER_ROLE
+        RESUME_ROLE: *SM_RESUME_ROLE
+        SET_TREE_ROLE: *SM_SET_TREE_ROLE
+        curveId: 0
+        getInitializedVersion: *MAX_UINT64 # Initialization disabled for implementation contract
+        getResumeSinceTimestamp: null
+        getRoleAdmin: null
+        getRoleMember: null
+        getRoleMemberCount: null
+        getRoleMembers: null
+        hasRole: null
+        hashLeaf: null
+        isConsumed: null
+        isPaused: false
+        name: ""
+        supportsInterface: null
+        treeCid: ""
+        treeRoot: *ZERO_BYTES32
+        verifyProof: null
+
+    IntraOperatorDVTClusterPlusGate:
+      name: CuratedGate
+      address: *IntraOperatorDVTClusterPlusGate
+      proxyName: OssifiableProxy
+      implementation: *CuratedGateImpl
+      proxyChecks:
+        proxy__getAdmin: *aragonAgent
+        proxy__getImplementation: *CuratedGateImpl
+        proxy__getIsOssified: false
+      checks:
+        ACCOUNTING: *CuratedAccounting
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        DEFAULT_BOND_CURVE_ID: 0
+        META_REGISTRY: *CuratedMetaRegistry
+        MODULE: *CuratedModule
+        PAUSE_INFINITELY: *MAX_UINT256
+        PAUSE_ROLE: *SM_PAUSE_ROLE
+        RECOVERER_ROLE: *SM_RECOVERER_ROLE
+        RESUME_ROLE: *SM_RESUME_ROLE
+        SET_TREE_ROLE: *SM_SET_TREE_ROLE
+        curveId: 6
+        getInitializedVersion: 1
+        getResumeSinceTimestamp: null
+        getRoleAdmin: null
+        getRoleMember: null
+        getRoleMemberCount: null
+        getRoleMembers: null
+        hasRole: null
+        hashLeaf: null
+        isConsumed: null
+        isPaused: false
+        name: "Intra-Operator DVT Cluster Plus Gate"
+        supportsInterface: null
+        treeCid: QmU4cnyaKWgMVCZVLiuQaqu6yGXahjzi4F1Vcnq2SXBBmT
+        treeRoot: 0x1111111111111111111111111111111111111111111111111111111111111111
+        verifyProof: null
+      ozAcl:
+        *DEFAULT_ADMIN_ROLE : [*aragonAgent]
+        *SM_PAUSE_ROLE : [*curatedModuleCommittee]
+        *SM_RESUME_ROLE : []
+        *SM_RECOVERER_ROLE : []
+        *SM_SET_TREE_ROLE : [*evmScriptExecutor]
+      implementationChecks:
+        ACCOUNTING: *CuratedAccounting
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        DEFAULT_BOND_CURVE_ID: 0
+        META_REGISTRY: *CuratedMetaRegistry
+        MODULE: *CuratedModule
+        PAUSE_INFINITELY: *MAX_UINT256
+        PAUSE_ROLE: *SM_PAUSE_ROLE
+        RECOVERER_ROLE: *SM_RECOVERER_ROLE
+        RESUME_ROLE: *SM_RESUME_ROLE
+        SET_TREE_ROLE: *SM_SET_TREE_ROLE
+        curveId: 0
+        getInitializedVersion: *MAX_UINT64 # Initialization disabled for implementation contract
+        getResumeSinceTimestamp: null
+        getRoleAdmin: null
+        getRoleMember: null
+        getRoleMemberCount: null
+        getRoleMembers: null
+        hasRole: null
+        hashLeaf: null
+        isConsumed: null
+        isPaused: false
+        name: ""
+        supportsInterface: null
+        treeCid: ""
+        treeRoot: *ZERO_BYTES32
+        verifyProof: null
+
+    CuratedGateFactory:
+      name: MerkleGateFactory
+      address: *CuratedGateFactory
+      checks:
+        GATE_IMPL: *CuratedGateImpl
     # ------
 
     minFirstAllocationStrategy:
