@@ -269,16 +269,16 @@ misc:
   - &HC_CM_FRAME_EPOCHS 3150 # https://github.com/lidofinance/staking-modules/blob/4d3de6658499e1c1774951780a97d7ae25ca18b8/script/curated/DeployMainnet.s.sol#L22
   - &HASH_CONSENSUS_QUORUM 5
   - &HASH_CONSENSUS_MEMBERS [
-        "0x73181107c8D9ED4ce0bbeF7A0b4ccf3320C41d12", # Instadapp
-        "0x4118DAD7f348A4063bD15786c299De2f3B1333F3", # Caliber
-        "0x404335BcE530400a5814375E7Ec1FB55fAff3eA2", # Staking Facilities
-        "0x8dB977C13CAA938BC58464bFD622DF0570564b78", # Chorus One
-        "0x007DE4a5F7bc37E2F26c0cb2E8A95006EE9B89b5", # P2P
-        "0xc79F702202E3A6B0B6310B537E786B9ACAA19BAf", # Chainlayer
-        "0x61c91ECd902EB56e314bB2D5c5C07785444Ea1c8", # bloXroute
-        "0xe57B3792aDCc5da47EF4fF588883F0ee0c9835C9", # MatrixedLink
-        "0x042a9e5acCfa17e28300F1b5967f20891E973922", # Stakefish
-  ]
+      "0x73181107c8D9ED4ce0bbeF7A0b4ccf3320C41d12", # Instadapp
+      "0x4118DAD7f348A4063bD15786c299De2f3B1333F3", # Caliber
+      "0x404335BcE530400a5814375E7Ec1FB55fAff3eA2", # Staking Facilities
+      "0x8dB977C13CAA938BC58464bFD622DF0570564b78", # Chorus One
+      "0x007DE4a5F7bc37E2F26c0cb2E8A95006EE9B89b5", # P2P
+      "0xc79F702202E3A6B0B6310B537E786B9ACAA19BAf", # Chainlayer
+      "0x61c91ECd902EB56e314bB2D5c5C07785444Ea1c8", # bloXroute
+      "0xe57B3792aDCc5da47EF4fF588883F0ee0c9835C9", # MatrixedLink
+      "0x042a9e5acCfa17e28300F1b5967f20891E973922", # Stakefish
+    ]
 
   # --- Node/operator limits ---
   - &MAX_NODE_OPERATORS_COUNT 200
@@ -367,7 +367,11 @@ misc:
       [[1, 11000000000000000000, 11000000000000000000], [2, 12000000000000000000, 1000000000000000000]],
     ]
   - &trustedBondCurve [
-      [[1, 11000000000000000000, 11000000000000000000], [2, 11100000000000000000, 100000000000000000], [19, 13400000000000000000, 700000000000000000]],
+      [
+        [1, 11000000000000000000, 11000000000000000000],
+        [2, 11100000000000000000, 100000000000000000],
+        [19, 13400000000000000000, 700000000000000000],
+      ],
     ]
 
   - &curatedDefaultAllowedExitDelay 345600 # 4 days
@@ -2008,7 +2012,16 @@ l1:
         *SM_RESUME_ROLE : [*resealManager]
         *SM_RECOVERER_ROLE : []
         *STAKING_ROUTER_ROLE : [*stakingRouter]
-        *SM_CREATE_NODE_OPERATOR_ROLE : [*ProfessionalOperatorGate, *ProfessionalTrustedOperatorGate, *PublicGoodOperatorGate, *DecentralizationOperatorGate, *ExtraEffortOperatorGate, *IntraOperatorDVTClusterGate, *IntraOperatorDVTClusterPlusGate]
+        *SM_CREATE_NODE_OPERATOR_ROLE :
+          [
+            *ProfessionalOperatorGate,
+            *ProfessionalTrustedOperatorGate,
+            *PublicGoodOperatorGate,
+            *DecentralizationOperatorGate,
+            *ExtraEffortOperatorGate,
+            *IntraOperatorDVTClusterGate,
+            *IntraOperatorDVTClusterPlusGate,
+          ]
         *SM_REPORT_GENERAL_DELAYED_PENALTY_ROLE : [*curatedModuleCommittee]
         *SM_REPORT_REGULAR_WITHDRAWN_VALIDATORS_ROLE : [*CuratedVerifier]
         *SM_REPORT_SLASHED_WITHDRAWN_VALIDATORS_ROLE : [*evmScriptExecutor]
@@ -2074,7 +2087,6 @@ l1:
         onExitedAndStuckValidatorsCountsUpdated: null
         onWithdrawalCredentialsChanged: null
         supportsInterface: null
-
 
     CuratedAccounting:
       name: Accounting
@@ -2164,7 +2176,15 @@ l1:
         *SM_RESUME_ROLE : [*resealManager]
         *SM_RECOVERER_ROLE : []
         *SM_MANAGE_BOND_CURVES_ROLE : []
-        *SM_SET_BOND_CURVE_ROLE : [*ProfessionalTrustedOperatorGate, *PublicGoodOperatorGate, *DecentralizationOperatorGate, *ExtraEffortOperatorGate, *IntraOperatorDVTClusterGate, *IntraOperatorDVTClusterPlusGate]
+        *SM_SET_BOND_CURVE_ROLE :
+          [
+            *ProfessionalTrustedOperatorGate,
+            *PublicGoodOperatorGate,
+            *DecentralizationOperatorGate,
+            *ExtraEffortOperatorGate,
+            *IntraOperatorDVTClusterGate,
+            *IntraOperatorDVTClusterPlusGate,
+          ]
       implementationChecks:
         BURNER: *burner
         DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
@@ -2531,11 +2551,11 @@ l1:
         defaultKeyRemovalCharge: 0
         defaultKeysLimit: 0
         defaultMaxElWithdrawalRequestFee: 0
-        defaultPerformanceCoefficients: [0,0,0]
+        defaultPerformanceCoefficients: [0, 0, 0]
         defaultPerformanceLeeway: 0
-        defaultQueueConfig: [0,0]
+        defaultQueueConfig: [0, 0]
         defaultRewardShare: 0
-        defaultStrikesParams: [0,0]
+        defaultStrikesParams: [0, 0]
         getAllowedExitDelay: null
         getBadPerformancePenalty: null
         getCurveParameters: null
@@ -2614,12 +2634,12 @@ l1:
         getLastProcessingRefSlot: 0 # change to null after mainnet vote
         getResumeSinceTimestamp: 0 # change to null after mainnet vote
         getRoleAdmin: null
-        getRoleMember: null 
-        getRoleMemberCount: null 
-        getRoleMembers: null 
-        hasRole: null 
+        getRoleMember: null
+        getRoleMemberCount: null
+        getRoleMembers: null
+        hasRole: null
         isPaused: false
-        supportsInterface: null 
+        supportsInterface: null
       implementationChecks:
         DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
         FEE_DISTRIBUTOR: *CuratedFeeDistributor
@@ -2640,12 +2660,12 @@ l1:
         getLastProcessingRefSlot: 0
         getResumeSinceTimestamp: 0
         getRoleAdmin: null
-        getRoleMember: null 
-        getRoleMemberCount: null 
-        getRoleMembers: null 
-        hasRole: null 
+        getRoleMember: null
+        getRoleMemberCount: null
+        getRoleMembers: null
+        hasRole: null
         isPaused: false
-        supportsInterface: null 
+        supportsInterface: null
 
     CuratedEjector:
       name: Ejector
@@ -2771,7 +2791,17 @@ l1:
         *DEFAULT_ADMIN_ROLE : [*aragonAgent]
         *SM_MANAGE_OPERATOR_GROUPS_ROLE : [*evmScriptExecutor]
         *SM_SET_BOND_CURVE_WEIGHT_ROLE : []
-        *SM_SET_OPERATOR_INFO_ROLE : [*curatedModuleCommittee, *ProfessionalOperatorGate, *ProfessionalTrustedOperatorGate, *PublicGoodOperatorGate, *DecentralizationOperatorGate, *ExtraEffortOperatorGate, *IntraOperatorDVTClusterGate, *IntraOperatorDVTClusterPlusGate]
+        *SM_SET_OPERATOR_INFO_ROLE :
+          [
+            *curatedModuleCommittee,
+            *ProfessionalOperatorGate,
+            *ProfessionalTrustedOperatorGate,
+            *PublicGoodOperatorGate,
+            *DecentralizationOperatorGate,
+            *ExtraEffortOperatorGate,
+            *IntraOperatorDVTClusterGate,
+            *IntraOperatorDVTClusterPlusGate,
+          ]
       implementationChecks:
         ACCOUNTING: *CuratedAccounting
         DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
