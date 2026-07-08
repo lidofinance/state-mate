@@ -2,15 +2,24 @@ parameters:
   # Token addresses
   - &ldoToken "0x5A98FcBEA516Cf06857215779Fd812CA3beF1B32"
   - &wstethToken "0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0"
-  # Curve related addresses
+  - &stethToken "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84"
+  # Governance
+  - &aragonVoting "0x2e59A20f205bB85a89C53f1936454680651E618e"
+  # External dependencies
   - &curveAdmin "0x97aA696e37659Fb4f0B53824246d802Df40E980A"
   - &curveFeeCollector "0xa2Bcd1a4Efbd04B63cd03f5aFf2561106ebCCE00"
   - &curveMathImplementation "0x1Fd8Af16DC4BEBd950521308D55d0543b6cDF4A1"
+  - &chainlinkFeedRegistry "0x47Fb2585D2C56Fe188D0E6ec628a38b74fCeeeDf"
+
+misc:
+  - &ZERO_ADDRESS "0x0000000000000000000000000000000000000000"
 
 deployed:
   l1:
     - &curvePoolLdoWsteth "0xD7f1dA0a28E39dd0dB70E6Acdc2B49846AD22760"
     - &curveTwocryptoFactory "0x98EE851a00abeE0d95D08cF4CA2BdCE32aeaAF7F"
+    - &oracleRouter "0x79ef3a538200Fe4981D67E7e886bfb36D4Cb5a31"
+    - &amountConverterEthAnchored "0x70dA04C5D0f325F5AF1426dE6672BF2424B4593d"
 
 l1:
   chainId: 1
@@ -101,3 +110,39 @@ l1:
         get_market_counts:
         pool_count:
         pool_list:
+
+    oracleRouter:
+      name: OracleRouter
+      address: *oracleRouter
+      checks:
+        ADMIN: *aragonVoting
+        FEED_REGISTRY: *chainlinkFeedRegistry
+        # Constants
+        MAX_DECIMALS: 38
+        PRICE_DECIMALS: 18
+        PRICE_UNIT: 1000000000000000000
+        # Operational config TODO: change after sync
+        emergencyOperator: *ZERO_ADDRESS
+        manager: *ZERO_ADDRESS
+        # [scaleNumerator, scaleDenominator, aggregator, maxStalenessSeconds, aggregatorDecimals]
+        ethUsdBridge: [0, 0, *ZERO_ADDRESS, 0, 0]
+        isBridgeInSync: false
+        getPricesAndDecimals:
+        getUsdPrices:
+        isFeedInSync:
+        tokenConfig:
+
+    amountConverterEthAnchored:
+      name: AmountConverter
+      address: *amountConverterEthAnchored
+      checks:
+        ORACLE_ROUTER: *oracleRouter
+        ROUTER_MAX_DECIMALS: 38
+        USE_ETH_ANCHOR: true
+        allowedTokensToSell:
+          - args: [*stethToken]
+            result: true
+        allowedTokensToBuy:
+          - args: [*ldoToken]
+            result: true
+        getExpectedOut:
