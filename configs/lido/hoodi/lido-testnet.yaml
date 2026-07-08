@@ -1334,7 +1334,7 @@ l1:
         getResumeSinceTimestamp: 1742289204
         getType: "0x636f6d6d756e6974792d6f6e636861696e2d7631000000000000000000000000"
         isPaused: false
-        OPERATOR_ADDRESSES_ADMIN_ROLE: null
+        OPERATOR_ADDRESSES_ADMIN_ROLE: *CS_OPERATOR_ADDRESSES_ADMIN_ROLE
         depositQueueItem: null
         depositQueuePointers: null
         exitDeadlineThreshold: null
@@ -1696,7 +1696,7 @@ l1:
         getInitializedVersion: 1
         getResumeSinceTimestamp: 0
         isPaused: false
-        name: null
+        name: "Identified Community Stakers Gate"
         getRoleAdmin: null
         getRoleMember: null
         getRoleMemberCount: null
@@ -1751,7 +1751,7 @@ l1:
         getInitializedVersion: 1
         getResumeSinceTimestamp: 0
         isPaused: false
-        name: null
+        name: "Identified DVT Cluster Gate"
         getRoleAdmin: null
         getRoleMember: null
         getRoleMemberCount: null
