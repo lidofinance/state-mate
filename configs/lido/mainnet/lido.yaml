@@ -1988,7 +1988,31 @@ l1:
         getNonce: null
         getOperatorWeights: null
         getResumeSinceTimestamp: null
-        getRoleAdmin: null
+        getRoleAdmin:
+          - result: *DEFAULT_ADMIN_ROLE
+            args: [*SM_CREATE_NODE_OPERATOR_ROLE]
+          - result: *DEFAULT_ADMIN_ROLE
+            args: [*DEFAULT_ADMIN_ROLE]
+          - result: *DEFAULT_ADMIN_ROLE
+            args: [*SM_OPERATOR_ADDRESSES_ADMIN_ROLE]
+          - result: *DEFAULT_ADMIN_ROLE
+            args: [*SM_PAUSE_ROLE]
+          - result: *DEFAULT_ADMIN_ROLE
+            args: [*SM_RECOVERER_ROLE]
+          - result: *DEFAULT_ADMIN_ROLE
+            args: [*SM_REPORT_GENERAL_DELAYED_PENALTY_ROLE]
+          - result: *DEFAULT_ADMIN_ROLE
+            args: [*SM_REPORT_REGULAR_WITHDRAWN_VALIDATORS_ROLE]
+          - result: *DEFAULT_ADMIN_ROLE
+            args: [*SM_REPORT_SLASHED_WITHDRAWN_VALIDATORS_ROLE]
+          - result: *DEFAULT_ADMIN_ROLE
+            args: [*SM_RESUME_ROLE]
+          - result: *DEFAULT_ADMIN_ROLE
+            args: [*SM_SETTLE_GENERAL_DELAYED_PENALTY_ROLE]
+          - result: *DEFAULT_ADMIN_ROLE
+            args: [*STAKING_ROUTER_ROLE]
+          - result: *DEFAULT_ADMIN_ROLE
+            args: [*SM_VERIFIER_ROLE]
         getRoleMember: null
         getRoleMemberCount: null
         getRoleMembers: null
@@ -2027,6 +2051,7 @@ l1:
         *SM_REPORT_SLASHED_WITHDRAWN_VALIDATORS_ROLE : [*evmScriptExecutor]
         *SM_SETTLE_GENERAL_DELAYED_PENALTY_ROLE : [*evmScriptExecutor]
         *SM_VERIFIER_ROLE : [*CuratedVerifier]
+        *SM_OPERATOR_ADDRESSES_ADMIN_ROLE : []
       implementationChecks:
         ACCOUNTING: *CuratedAccounting
         CREATE_NODE_OPERATOR_ROLE: *SM_CREATE_NODE_OPERATOR_ROLE
@@ -2145,6 +2170,8 @@ l1:
             args: [5]
           - result: *trustedBondCurve
             args: [6]
+          - mustRevert: true
+            args: [7]
         getCurvesCount: 7
         getCustomRewardsClaimer: null
         getFeeSplitTransfers: null
@@ -2158,7 +2185,19 @@ l1:
         getRequiredBondForNextKeys: null
         getRequiredBondForNextKeysWstETH: null
         getResumeSinceTimestamp: null
-        getRoleAdmin: null
+        getRoleAdmin:
+          - result: *DEFAULT_ADMIN_ROLE
+            args: [*DEFAULT_ADMIN_ROLE]
+          - result: *DEFAULT_ADMIN_ROLE
+            args: [*SM_MANAGE_BOND_CURVES_ROLE]
+          - result: *DEFAULT_ADMIN_ROLE
+            args: [*SM_PAUSE_ROLE]
+          - result: *DEFAULT_ADMIN_ROLE
+            args: [*SM_RECOVERER_ROLE]
+          - result: *DEFAULT_ADMIN_ROLE
+            args: [*SM_RESUME_ROLE]
+          - result: *DEFAULT_ADMIN_ROLE
+            args: [*SM_SET_BOND_CURVE_ROLE]
         getRoleMember: null
         getRoleMemberCount: null
         getRoleMembers: null
@@ -2265,7 +2304,11 @@ l1:
         getFeesToDistribute: null
         getHistoricalDistributionData: null
         getInitializedVersion: 3
-        getRoleAdmin: null
+        getRoleAdmin:
+          - result: *DEFAULT_ADMIN_ROLE
+            args: [*DEFAULT_ADMIN_ROLE]
+          - result: *DEFAULT_ADMIN_ROLE
+            args: [*SM_RECOVERER_ROLE]
         getRoleMember: null
         getRoleMemberCount: null
         getRoleMembers: null
@@ -2504,7 +2547,23 @@ l1:
             args: [5]
           - result: *curatedPremiumRewardShareData
             args: [6]
-        getRoleAdmin: null
+        getRoleAdmin:
+          - result: *DEFAULT_ADMIN_ROLE
+            args: [*DEFAULT_ADMIN_ROLE]
+          - result: *DEFAULT_ADMIN_ROLE
+            args: [*SM_MANAGE_CURVE_PARAMETERS_ROLE]
+          - result: *DEFAULT_ADMIN_ROLE
+            args: [*SM_MANAGE_GENERAL_PENALTIES_AND_CHARGES_ROLE]
+          - result: *DEFAULT_ADMIN_ROLE
+            args: [*SM_MANAGE_KEYS_LIMIT_ROLE]
+          - result: *DEFAULT_ADMIN_ROLE
+            args: [*SM_MANAGE_PERFORMANCE_PARAMETERS_ROLE]
+          - result: *DEFAULT_ADMIN_ROLE
+            args: [*SM_MANAGE_QUEUE_CONFIG_ROLE]
+          - result: *DEFAULT_ADMIN_ROLE
+            args: [*SM_MANAGE_REWARD_SHARE_ROLE]
+          - result: *DEFAULT_ADMIN_ROLE
+            args: [*SM_MANAGE_VALIDATOR_EXIT_PARAMETERS_ROLE]
         getRoleMember: null
         getRoleMemberCount: null
         getRoleMembers: null
@@ -2633,13 +2692,35 @@ l1:
         getContractVersion: 3
         getLastProcessingRefSlot: 0 # change to null after mainnet vote
         getResumeSinceTimestamp: 0 # change to null after mainnet vote
-        getRoleAdmin: null
+        getRoleAdmin:
+          - result: *DEFAULT_ADMIN_ROLE
+            args: [*DEFAULT_ADMIN_ROLE]
+          - result: *DEFAULT_ADMIN_ROLE
+            args: [*ORACLE_MANAGE_CONSENSUS_CONTRACT_ROLE]
+          - result: *DEFAULT_ADMIN_ROLE
+            args: [*ORACLE_MANAGE_CONSENSUS_VERSION_ROLE]
+          - result: *DEFAULT_ADMIN_ROLE
+            args: [*SM_PAUSE_ROLE]
+          - result: *DEFAULT_ADMIN_ROLE
+            args: [*SM_RECOVERER_ROLE]
+          - result: *DEFAULT_ADMIN_ROLE
+            args: [*SM_RESUME_ROLE]
+          - result: *DEFAULT_ADMIN_ROLE
+            args: [*ORACLE_SUBMIT_DATA_ROLE]
         getRoleMember: null
         getRoleMemberCount: null
         getRoleMembers: null
         hasRole: null
         isPaused: false
         supportsInterface: null
+      ozAcl:
+        *DEFAULT_ADMIN_ROLE : [*aragonAgent]
+        *ORACLE_MANAGE_CONSENSUS_CONTRACT_ROLE : []
+        *ORACLE_MANAGE_CONSENSUS_VERSION_ROLE : []
+        *ORACLE_SUBMIT_DATA_ROLE : []
+        *SM_PAUSE_ROLE : [*resealManager, *circuitBreaker]
+        *SM_RESUME_ROLE : [*resealManager]
+        *SM_RECOVERER_ROLE : []
       implementationChecks:
         DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
         FEE_DISTRIBUTOR: *CuratedFeeDistributor
@@ -2681,7 +2762,15 @@ l1:
         STRIKES_EXIT_TYPE_ID: 1
         VOLUNTARY_EXIT_TYPE_ID: 0
         getResumeSinceTimestamp: null
-        getRoleAdmin: null
+        getRoleAdmin:
+          - result: *DEFAULT_ADMIN_ROLE
+            args: [*DEFAULT_ADMIN_ROLE]
+          - result: *DEFAULT_ADMIN_ROLE
+            args: [*SM_PAUSE_ROLE]
+          - result: *DEFAULT_ADMIN_ROLE
+            args: [*SM_RECOVERER_ROLE]
+          - result: *DEFAULT_ADMIN_ROLE
+            args: [*SM_RESUME_ROLE]
         getRoleMember: null
         getRoleMemberCount: null
         getRoleMembers: null
@@ -2725,7 +2814,19 @@ l1:
         getQuorum: *HASH_CONSENSUS_QUORUM
         getReportProcessor: *CuratedFeeOracle
         getReportVariants: null
-        getRoleAdmin: null
+        getRoleAdmin:
+          - result: *DEFAULT_ADMIN_ROLE
+            args: [*DEFAULT_ADMIN_ROLE]
+          - result: *DEFAULT_ADMIN_ROLE
+            args: [*DISABLE_CONSENSUS_ROLE]
+          - result: *DEFAULT_ADMIN_ROLE
+            args: [*MANAGE_FAST_LANE_CONFIG_ROLE]
+          - result: *DEFAULT_ADMIN_ROLE
+            args: [*MANAGE_FRAME_CONFIG_ROLE]
+          - result: *DEFAULT_ADMIN_ROLE
+            args: [*MANAGE_MEMBERS_AND_QUORUM_ROLE]
+          - result: *DEFAULT_ADMIN_ROLE
+            args: [*MANAGE_REPORT_PROCESSOR_ROLE]
         getRoleMember: null
         getRoleMembers: null
         getRoleMemberCount: null
@@ -2781,7 +2882,15 @@ l1:
         getOperatorGroupsCount: 0 # change to null after mainnet vote
         getOperatorMetadata: null
         getOperatorWeights: null
-        getRoleAdmin: null
+        getRoleAdmin:
+          - result: *DEFAULT_ADMIN_ROLE
+            args: [*DEFAULT_ADMIN_ROLE]
+          - result: *DEFAULT_ADMIN_ROLE
+            args: [*SM_MANAGE_OPERATOR_GROUPS_ROLE]
+          - result: *DEFAULT_ADMIN_ROLE
+            args: [*SM_SET_BOND_CURVE_WEIGHT_ROLE]
+          - result: *DEFAULT_ADMIN_ROLE
+            args: [*SM_SET_OPERATOR_INFO_ROLE]
         getRoleMember: null
         getRoleMemberCount: null
         getRoleMembers: null
@@ -2846,7 +2955,9 @@ l1:
         PARAMETERS_REGISTRY: *CuratedParametersRegistry
         ejector: *CuratedEjector
         getInitializedVersion: 1
-        getRoleAdmin: null
+        getRoleAdmin:
+          - result: *DEFAULT_ADMIN_ROLE
+            args: [*DEFAULT_ADMIN_ROLE]
         getRoleMember: null
         getRoleMemberCount: null
         getRoleMembers: null
@@ -2905,13 +3016,23 @@ l1:
         SLOTS_PER_HISTORICAL_ROOT: *SLOTS_PER_HISTORICAL_ROOT
         WITHDRAWAL_ADDRESS: *withdrawalVault
         getResumeSinceTimestamp: null
-        getRoleAdmin: null
+        getRoleAdmin:
+          - result: *DEFAULT_ADMIN_ROLE
+            args: [*DEFAULT_ADMIN_ROLE]
+          - result: *DEFAULT_ADMIN_ROLE
+            args: [*SM_PAUSE_ROLE]
+          - result: *DEFAULT_ADMIN_ROLE
+            args: [*SM_RESUME_ROLE]
         getRoleMember: null
         getRoleMemberCount: null
         getRoleMembers: null
         hasRole: null
         isPaused: false
         supportsInterface: null
+      ozAcl:
+        *DEFAULT_ADMIN_ROLE : [*aragonAgent]
+        *SM_PAUSE_ROLE : [*resealManager, *circuitBreaker]
+        *SM_RESUME_ROLE : [*resealManager]
 
     ProfessionalOperatorGate:
       name: CuratedGate
@@ -2936,7 +3057,17 @@ l1:
         curveId: 0
         getInitializedVersion: 1
         getResumeSinceTimestamp: null
-        getRoleAdmin: null
+        getRoleAdmin:
+          - result: *DEFAULT_ADMIN_ROLE
+            args: [*DEFAULT_ADMIN_ROLE]
+          - result: *DEFAULT_ADMIN_ROLE
+            args: [*SM_PAUSE_ROLE]
+          - result: *DEFAULT_ADMIN_ROLE
+            args: [*SM_RECOVERER_ROLE]
+          - result: *DEFAULT_ADMIN_ROLE
+            args: [*SM_RESUME_ROLE]
+          - result: *DEFAULT_ADMIN_ROLE
+            args: [*SM_SET_TREE_ROLE]
         getRoleMember: null
         getRoleMemberCount: null
         getRoleMembers: null
@@ -3006,7 +3137,17 @@ l1:
         curveId: 1
         getInitializedVersion: 1
         getResumeSinceTimestamp: null
-        getRoleAdmin: null
+        getRoleAdmin:
+          - result: *DEFAULT_ADMIN_ROLE
+            args: [*DEFAULT_ADMIN_ROLE]
+          - result: *DEFAULT_ADMIN_ROLE
+            args: [*SM_PAUSE_ROLE]
+          - result: *DEFAULT_ADMIN_ROLE
+            args: [*SM_RECOVERER_ROLE]
+          - result: *DEFAULT_ADMIN_ROLE
+            args: [*SM_RESUME_ROLE]
+          - result: *DEFAULT_ADMIN_ROLE
+            args: [*SM_SET_TREE_ROLE]
         getRoleMember: null
         getRoleMemberCount: null
         getRoleMembers: null
@@ -3076,7 +3217,17 @@ l1:
         curveId: 2
         getInitializedVersion: 1
         getResumeSinceTimestamp: null
-        getRoleAdmin: null
+        getRoleAdmin:
+          - result: *DEFAULT_ADMIN_ROLE
+            args: [*DEFAULT_ADMIN_ROLE]
+          - result: *DEFAULT_ADMIN_ROLE
+            args: [*SM_PAUSE_ROLE]
+          - result: *DEFAULT_ADMIN_ROLE
+            args: [*SM_RECOVERER_ROLE]
+          - result: *DEFAULT_ADMIN_ROLE
+            args: [*SM_RESUME_ROLE]
+          - result: *DEFAULT_ADMIN_ROLE
+            args: [*SM_SET_TREE_ROLE]
         getRoleMember: null
         getRoleMemberCount: null
         getRoleMembers: null
@@ -3146,7 +3297,17 @@ l1:
         curveId: 3
         getInitializedVersion: 1
         getResumeSinceTimestamp: null
-        getRoleAdmin: null
+        getRoleAdmin:
+          - result: *DEFAULT_ADMIN_ROLE
+            args: [*DEFAULT_ADMIN_ROLE]
+          - result: *DEFAULT_ADMIN_ROLE
+            args: [*SM_PAUSE_ROLE]
+          - result: *DEFAULT_ADMIN_ROLE
+            args: [*SM_RECOVERER_ROLE]
+          - result: *DEFAULT_ADMIN_ROLE
+            args: [*SM_RESUME_ROLE]
+          - result: *DEFAULT_ADMIN_ROLE
+            args: [*SM_SET_TREE_ROLE]
         getRoleMember: null
         getRoleMemberCount: null
         getRoleMembers: null
@@ -3216,7 +3377,17 @@ l1:
         curveId: 4
         getInitializedVersion: 1
         getResumeSinceTimestamp: null
-        getRoleAdmin: null
+        getRoleAdmin:
+          - result: *DEFAULT_ADMIN_ROLE
+            args: [*DEFAULT_ADMIN_ROLE]
+          - result: *DEFAULT_ADMIN_ROLE
+            args: [*SM_PAUSE_ROLE]
+          - result: *DEFAULT_ADMIN_ROLE
+            args: [*SM_RECOVERER_ROLE]
+          - result: *DEFAULT_ADMIN_ROLE
+            args: [*SM_RESUME_ROLE]
+          - result: *DEFAULT_ADMIN_ROLE
+            args: [*SM_SET_TREE_ROLE]
         getRoleMember: null
         getRoleMemberCount: null
         getRoleMembers: null
@@ -3286,7 +3457,17 @@ l1:
         curveId: 5
         getInitializedVersion: 1
         getResumeSinceTimestamp: null
-        getRoleAdmin: null
+        getRoleAdmin:
+          - result: *DEFAULT_ADMIN_ROLE
+            args: [*DEFAULT_ADMIN_ROLE]
+          - result: *DEFAULT_ADMIN_ROLE
+            args: [*SM_PAUSE_ROLE]
+          - result: *DEFAULT_ADMIN_ROLE
+            args: [*SM_RECOVERER_ROLE]
+          - result: *DEFAULT_ADMIN_ROLE
+            args: [*SM_RESUME_ROLE]
+          - result: *DEFAULT_ADMIN_ROLE
+            args: [*SM_SET_TREE_ROLE]
         getRoleMember: null
         getRoleMemberCount: null
         getRoleMembers: null
@@ -3356,7 +3537,17 @@ l1:
         curveId: 6
         getInitializedVersion: 1
         getResumeSinceTimestamp: null
-        getRoleAdmin: null
+        getRoleAdmin:
+          - result: *DEFAULT_ADMIN_ROLE
+            args: [*DEFAULT_ADMIN_ROLE]
+          - result: *DEFAULT_ADMIN_ROLE
+            args: [*SM_PAUSE_ROLE]
+          - result: *DEFAULT_ADMIN_ROLE
+            args: [*SM_RECOVERER_ROLE]
+          - result: *DEFAULT_ADMIN_ROLE
+            args: [*SM_RESUME_ROLE]
+          - result: *DEFAULT_ADMIN_ROLE
+            args: [*SM_SET_TREE_ROLE]
         getRoleMember: null
         getRoleMemberCount: null
         getRoleMembers: null
