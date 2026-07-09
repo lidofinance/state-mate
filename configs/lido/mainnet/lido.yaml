@@ -92,7 +92,7 @@ deployed:
     - &CSModule "0xdA7dE2ECdDfccC6c3AF10108Db212ACBBf9EA83F"
     - &CSModuleImpl "0x1eB6d4da13ca9566c17F526aE0715325d7a07665"
     - &CSAccounting "0x4d72BFF1BeaC69925F8Bd12526a39BAAb069e5Da"
-    - &CSAccountingImpl "0x6f09d2426c7405C5546413e6059F884D2D03f449"
+    - &CSAccountingImpl "0xe768572cc5aE5C698345C59288d871a949Ea8bd3"
     - &CSFeeDistributor "0xD99CC66fEC647E68294C6477B40fC7E0F6F618D0"
     - &CSFeeDistributorImpl "0x5DCF7cF7c6645E9E822a379dF046a8b0390251A1"
     - &CSVettedGate "0xB314D4A76C457c93150d308787939063F4Cc67E0"
@@ -1326,7 +1326,7 @@ l1:
     # --- CSM ---
 
     CSAccounting:
-      name: CSAccounting
+      name: Accounting
       address: *CSAccounting
       proxyName: OssifiableProxy
       implementation: *CSAccountingImpl
@@ -1342,9 +1342,7 @@ l1:
         LIDO_LOCATOR: *lidoLocator
         MANAGE_BOND_CURVES_ROLE: *SM_MANAGE_BOND_CURVES_ROLE
         MAX_BOND_LOCK_PERIOD: *DURATION_1_YEAR
-        MAX_CURVE_LENGTH: *MAX_CURVE_LENGTH
         MIN_BOND_LOCK_PERIOD: *DURATION_28_DAYS
-        MIN_CURVE_LENGTH: *MIN_CURVE_LENGTH
         MODULE: *CSModule
         PAUSE_INFINITELY: *MAX_UINT256
         PAUSE_ROLE: *SM_PAUSE_ROLE
@@ -1354,7 +1352,6 @@ l1:
         WITHDRAWAL_QUEUE: *withdrawalQueueERC721
         WSTETH: *wstETH
         chargePenaltyRecipient: *aragonAgent
-        feeDistributor: *CSFeeDistributor
         getActualLockedBond: null
         getBond: null
         getBondAmountByKeysCount: null
@@ -1375,7 +1372,7 @@ l1:
           - result: *icsBondingCurve
             args: [2]
         getCurvesCount: 3
-        getInitializedVersion: 2
+        getInitializedVersion: 3
         getKeysCountByBondAmount: null
         getLockedBondInfo: null
         getRequiredBondForNextKeys: null
@@ -1391,6 +1388,18 @@ l1:
         isPaused: false
         supportsInterface: null
         totalBondShares: null
+        BURNER: null
+        MAX_FEE_SPLITS: null
+        getBondDebt: null
+        getBondLockNonce: null
+        getCustomRewardsClaimer: null
+        getFeeSplitTransfers: null
+        getFeeSplits: null
+        getLockedBond: null
+        getNodeOperatorBondInfo: null
+        getPendingSharesToSplit: null
+        hasSplits: null
+        isLockExpired: null
       ozAcl:
         *DEFAULT_ADMIN_ROLE : [*aragonAgent]
         *SM_MANAGE_BOND_CURVES_ROLE : []
@@ -1406,9 +1415,7 @@ l1:
         LIDO_LOCATOR: *lidoLocator
         MANAGE_BOND_CURVES_ROLE: *SM_MANAGE_BOND_CURVES_ROLE
         MAX_BOND_LOCK_PERIOD: *DURATION_1_YEAR
-        MAX_CURVE_LENGTH: *MAX_CURVE_LENGTH
         MIN_BOND_LOCK_PERIOD: *DURATION_28_DAYS
-        MIN_CURVE_LENGTH: *MIN_CURVE_LENGTH
         MODULE: *CSModule
         PAUSE_INFINITELY: *MAX_UINT256
         PAUSE_ROLE: *SM_PAUSE_ROLE
@@ -1418,7 +1425,6 @@ l1:
         WITHDRAWAL_QUEUE: *withdrawalQueueERC721
         WSTETH: *wstETH
         chargePenaltyRecipient: *ZERO_ADDRESS
-        feeDistributor: *CSFeeDistributor
         getActualLockedBond: null
         getBond: null
         getBondAmountByKeysCount: null
