@@ -174,6 +174,11 @@ deployed:
     - &newBeaconChainDepositor "0xf98AC162eAB766bDB9507c3584c00C535B8F6216"
     - &newSrLib "0xc0be9942Fd8f54aB126A5F0Ba649A90049ccad14"
 
+    # --- SRv3 upgrade: vote template, its config and vote script (before voting) ---
+    - &upgradeTemplate "0xD92b6303Ba39297Cb69a3a17A88b47586A6af14C"
+    - &upgradeConfig "0xf94e7A95C559728AcA33bFa7136Ea5De40B0338E"
+    - &upgradeVoteScript "0xE6530830A2cf90773cB232748b2c674c27b6E0CA"
+
     # Deploy tooling; must hold no roles after setup
     - &upgradeTemporaryAdmin "0x57Cc953D3d27E7E8bAd04566bfd4Cd416c3B0855"
 
@@ -6256,3 +6261,204 @@ l1:
         isOwner:
         nonce:
         signedMessages:
+
+    # --- SRv3 upgrade: vote template, its config and vote script (before voting) ---
+    # https://github.com/lidofinance/core/blob/4c889ca95f66a8d57fb8d1eb2b83d251e51f8718/deployed-mainnet.json
+    # yarn start configs/lido/mainnet/lido.yaml -o l1/upgradeTemplate
+    # yarn start configs/lido/mainnet/lido.yaml -o l1/upgradeConfig
+    # yarn start configs/lido/mainnet/lido.yaml -o l1/upgradeVoteScript
+    upgradeTemplate:
+      name: UpgradeTemplate
+      address: *upgradeTemplate
+      checks:
+        CONFIG: *upgradeConfig # deployed by the UpgradeTemplate constructor
+        EXPIRE_SINCE_INCLUSIVE: 1786147199 # 2026-08-04; startUpgrade() reverts since this timestamp
+        upgradeBlockNumber: 0 # change to null after mainnet vote
+        isUpgradeFinished: false # change to true after mainnet vote
+        EXPECTED_FINAL_LIDO_VERSION: 4
+        EXPECTED_FINAL_STAKING_ROUTER_VERSION: 4
+        EXPECTED_FINAL_ACCOUNTING_ORACLE_VERSION: 5
+        EXPECTED_FINAL_ACCOUNTING_ORACLE_CONSENSUS_VERSION: 6
+        EXPECTED_FINAL_VALIDATORS_EXIT_BUS_ORACLE_VERSION: 3
+        EXPECTED_FINAL_VALIDATORS_EXIT_BUS_ORACLE_CONSENSUS_VERSION: 5
+        EXPECTED_FINAL_WITHDRAWAL_VAULT_VERSION: 3
+        EXPECTED_FINAL_COMMUNITY_FEE_ORACLE_VERSION: 3
+        EXPECTED_FINAL_DSM_VERSION: 4
+        EXPECTED_FINAL_CSM_MODULE_INITIALIZED_VERSION: 3
+        EXPECTED_FINAL_CSM_PARAMETERS_REGISTRY_INITIALIZED_VERSION: 3
+        EXPECTED_FINAL_CSM_ACCOUNTING_INITIALIZED_VERSION: 3
+        EXPECTED_FINAL_CSM_FEE_DISTRIBUTOR_INITIALIZED_VERSION: 3
+        EXPECTED_FINAL_CSM_VALIDATOR_STRIKES_INITIALIZED_VERSION: 1
+        EXPECTED_FINAL_CSM_VETTED_GATE_INITIALIZED_VERSION: 1
+        EXPECTED_FINAL_CM_MODULE_INITIALIZED_VERSION: 1
+        EXPECTED_FINAL_CM_PARAMETERS_REGISTRY_INITIALIZED_VERSION: 3
+        EXPECTED_FINAL_CM_ACCOUNTING_INITIALIZED_VERSION: 3
+        EXPECTED_FINAL_CM_FEE_DISTRIBUTOR_INITIALIZED_VERSION: 3
+        EXPECTED_FINAL_CM_VALIDATOR_STRIKES_INITIALIZED_VERSION: 1
+    upgradeConfig:
+      name: UpgradeConfig
+      address: *upgradeConfig
+      checks:
+        LOCATOR: *lidoLocator
+        AGENT: *aragonAgent
+        VOTING: *aragonVoting
+        DUAL_GOVERNANCE: "0xC1db28B3301331277e307FDCfF8DE28242A4486E"
+        RESEAL_MANAGER: *resealManager
+        CIRCUIT_BREAKER: *circuitBreaker
+        CIRCUIT_BREAKER_COMMITTEE: *sealCommittee
+        BURNER: *burner
+        # [agent, lido, burner, resealManager, circuitBreaker, circuitBreakerCommittee,
+        #  easyTrack, easyTrackEVMScriptExecutor, stakingRouter, triggerableWithdrawalsGateway]
+        getGlobalConfig:
+          - *aragonAgent
+          - *lido
+          - *burner
+          - *resealManager
+          - *circuitBreaker
+          - *sealCommittee
+          - *easyTrack
+          - *evmScriptExecutor
+          - *stakingRouter
+          - *triggerableWithdrawalsGateway
+        # [EasyTrackNewFactories, EasyTrackOldFactories]
+        getEasyTrackConfig:
+          - - "0x0C6703F1d8D9DdfB6c6e5F57b4f7432a6500D6D8" # UpdateStakingModuleShareLimits
+            - "0x29e23B1EF0c9fffAc8330F9abaCebDDD827E4b5C" # AllowConsolidationPair
+            - "0xf3ec30B86c3dC1b8a1C754D885F9bE3160e15B4c" # SetMerkleGateTreeForCSM
+            - "0xE330516a03bDdEBA4209b5591112f1aa3dd90F0A" # ReportWithdrawalsForSlashedValidatorsForCSM
+            - "0xB71755bE764abB4Ce26cb4dADf056Be57fB8880F" # SettleGeneralDelayedPenaltyForCSM
+            - "0xa121667D1780a1D54EAEd67AE17ee13d0f872D60" # SetMerkleGateTreeForCM
+            - "0x71862Abd99819597670007bb992A7a7562fE50f2" # ReportWithdrawalsForSlashedValidatorsForCM
+            - "0xfffEFC16231eDC6Dc9C93e364ff4D4E3f787f416" # SettleGeneralDelayedPenaltyForCM
+            - "0x2fC78638b77381e9D040163Bd6EB1cac967bDBdF" # CreateOrUpdateOperatorGroupForCM
+          - - "0xF6B6E7997338C48Ea3a8BCfa4BB64a315fDa76f4" # CSMSettleElStealingPenalty
+            - "0xBc5642bDD6F2a54b01A75605aAe9143525D97308" # CSMSetVettedGateTree
+        # [kernel, acl, lidoAppId, locator, oldDepositSecurityModule,
+        #  newLocatorImpl, newLidoImpl, newAccountingImpl, newAccountingOracleImpl, newStakingRouterImpl,
+        #  newWithdrawalVaultImpl, newValidatorsExitBusOracleImpl, newOracleReportSanityChecker,
+        #  newDepositSecurityModule, consolidationBusImpl, consolidationMigratorImpl, topUpGatewayImpl,
+        #  accounting, accountingOracle, validatorsExitBusOracle, withdrawalVault, consolidationGateway,
+        #  consolidationBus, consolidationMigrator, topUpGateway, lidoDepositsReserveTarget,
+        #  consolidationCommittee, topUpGatewayDepositor, twMaxExitRequestsLimit, twExitsPerFrame,
+        #  twFrameDurationInSec, aoConsensusVersion, veboMaxValidatorsPerReport, veboMaxExitBalanceEth,
+        #  veboBalancePerFrameEth, veboFrameDurationInSec, veboConsensusVersion, maxTopUpPerBlockGwei]
+        getCoreUpgradeConfig:
+          - *aragonKernel
+          - *aragonAcl
+          - *LIDO_APP_ID
+          - *lidoLocator
+          - *depositSecurityModule # oldDepositSecurityModule
+          - *newLidoLocatorImpl
+          - *newLidoImpl
+          - *newAccountingImpl
+          - *newAccountingOracleImpl
+          - *newStakingRouterImpl
+          - *newWithdrawalVaultImpl
+          - *newValidatorsExitBusOracleImpl
+          - *newOracleReportSanityChecker
+          - *newDepositSecurityModule
+          - *newConsolidationBusImpl
+          - *newConsolidationMigratorImpl
+          - *newTopUpGatewayImpl
+          - *accounting
+          - *accountingOracle
+          - *validatorsExitBusOracle
+          - *withdrawalVault
+          - *newConsolidationGateway
+          - *newConsolidationBus
+          - *newConsolidationMigrator
+          - *newTopUpGateway
+          - "1500000000000000000000" # lidoDepositsReserveTarget; 1500 ETH
+          - *curatedModuleCommittee # consolidationCommittee
+          - *depositorBot # topUpGatewayDepositor
+          - 250 # twMaxExitRequestsLimit
+          - 1 # twExitsPerFrame
+          - 240 # twFrameDurationInSec
+          - 6 # aoConsensusVersion
+          - 600 # veboMaxValidatorsPerReport
+          - 358400 # veboMaxExitBalanceEth
+          - 32 # veboBalancePerFrameEth
+          - 48 # veboFrameDurationInSec
+          - 5 # veboConsensusVersion
+          - "3200000000000" # maxTopUpPerBlockGwei; 3200 ETH
+        # [csm, csmImpl, parametersRegistry, parametersRegistryImpl, feeOracle, feeOracleImpl,
+        #  feeOracleConsensusVersion, vettedGate, vettedGateImpl, identifiedDVTClusterGate,
+        #  identifiedDVTClusterCurveSetup, identifiedDVTClusterBondCurveId, accounting, accountingImpl,
+        #  feeDistributor, feeDistributorImpl, exitPenalties, exitPenaltiesImpl, strikes, strikesImpl,
+        #  oldPermissionlessGate, newPermissionlessGate, oldVerifier, newVerifier, oldEjector,
+        #  newEjector, csmCommittee]
+        getCSMUpgradeConfig:
+          - *CSModule
+          - "0x63992a86f009fcC796a8369feEfB68880aef4e3a" # csmImpl
+          - *CSParametersRegistry
+          - "0x107d287F178cD54792614d7D63C47D8242240BeD" # parametersRegistryImpl
+          - *CSFeeOracle
+          - "0xecE6e0Cde61078F76b66Ef0C338a6875E5D01F79" # feeOracleImpl
+          - 4 # feeOracleConsensusVersion
+          - *CSVettedGate
+          - "0x66ADb8b3F58d3DFdF6bAdB595E41f19e947E5c14" # vettedGateImpl
+          - "0xa12760721A72A7199aB38059DA6690b9Cd4ed7B8" # identifiedDVTClusterGate
+          - "0x711985E069f4d702e0457C0dACAde3D3894Ce4E3" # identifiedDVTClusterCurveSetup
+          - 3 # identifiedDVTClusterBondCurveId
+          - *CSAccounting
+          - "0xe768572cc5aE5C698345C59288d871a949Ea8bd3" # accountingImpl
+          - *CSFeeDistributor
+          - "0x936da7cDB7eed1084d294E23eA1d7Ad72DCcfE0E" # feeDistributorImpl
+          - *CSExitPenalties
+          - "0xA5b9e96E951089E629Ab0834AEaF242a81394EA0" # exitPenaltiesImpl
+          - *CSStrikes
+          - "0xd25E7C3923d2e68c325980b0e15eD20d62B2691F" # strikesImpl
+          - *CSPermissionlessGate # oldPermissionlessGate
+          - "0xb8cd8F059Ad7a5dB8CAfDe34aAb007317F7156C8" # newPermissionlessGate
+          - *CSVerifier # oldVerifier
+          - "0xfce7aB839e55de77730716D05b3553e45ab3A5Ba" # newVerifier
+          - *CSEjector # oldEjector
+          - "0x610B517D380f287c239C93F8eF6FfBd567AA4bA5" # newEjector
+          - *csmCommittee
+        # [module, curatedGates, parametersRegistry, accounting, ejector, verifier,
+        #  circuitBreakerPauser, feeDistributor, feeOracle, hashConsensus, strikes, moduleName,
+        #  stakeShareLimit, priorityExitShareThreshold, stakingModuleFee, treasuryFee,
+        #  maxDepositsPerBlock, minDepositBlockDistance, feeOracleConsensusVersion,
+        #  hashConsensusInitialEpoch, metaRegistry]
+        getCuratedModuleConfig:
+          - *CuratedModule
+          - - *ProfessionalOperatorGate
+            - *ProfessionalTrustedOperatorGate
+            - *PublicGoodOperatorGate
+            - *DecentralizationOperatorGate
+            - *ExtraEffortOperatorGate
+            - *IntraOperatorDVTClusterGate
+            - *IntraOperatorDVTClusterPlusGate
+          - *CuratedParametersRegistry
+          - *CuratedAccounting
+          - *CuratedEjector
+          - *CuratedVerifier
+          - *curatedModuleCommittee # circuitBreakerPauser
+          - *CuratedFeeDistributor
+          - *CuratedFeeOracle
+          - *CuratedHashConsensus
+          - *CuratedValidatorStrikes
+          - "curated-onchain-v2" # moduleName
+          - 10000 # stakeShareLimit
+          - 10000 # priorityExitShareThreshold
+          - 400 # stakingModuleFee
+          - 600 # treasuryFee
+          - 100 # maxDepositsPerBlock
+          - 75 # minDepositBlockDistance
+          - 4 # feeOracleConsensusVersion
+          - 467564 # hashConsensusInitialEpoch
+          - *CuratedMetaRegistry
+    upgradeVoteScript:
+      name: UpgradeVoteScript
+      address: *upgradeVoteScript
+      checks:
+        TEMPLATE: *upgradeTemplate
+        CONFIG: *upgradeConfig
+        DG_ITEMS_COUNT: 69
+        VOTING_ITEMS_COUNT: 11
+        getVoteItems: null
+        getVoteItemsRaw: null
+        getVotingVoteItems: null
+        getEVMScript: null
+        getNewVoteCallBytecode: null
+        isValidVoteScript: null
