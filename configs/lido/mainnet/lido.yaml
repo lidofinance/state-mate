@@ -484,6 +484,9 @@ eoa:
   # https://research.lido.fi/t/proposal-to-refund-money-spent-on-deposits-on-ethereum-to-the-dev-team/1882
   - &depositorBot "0xF82aC5937A20dC862F9bc0668779031E06000f17"
 
+  # SRv3 upgrade contracts deployer must hold no roles after deployment
+  - &srv3Deployer "0x22c79cD20D8Da8E6910E965086968075867447c0"
+
 roles:
   # Lido
   # cast keccak "STAKING_CONTROL_ROLE"
@@ -597,6 +600,9 @@ roles:
   - &OZ_RESUME_ROLE "0xa79a6aede309e0d48bf2ef0f71355c06ad317956d4c0da2deb0dc47cc34f826c"
 
   # Aragon
+  # cast keccak "APP_MANAGER_ROLE" — Kernel.setApp gatekeeper, i.e. the implementation-upgrade
+  # authority for the Kernel itself and every Aragon app (Lido, NOR, sDVT, Voting, ...)
+  - &APP_MANAGER_ROLE "0xb6d92708f3d4817afc106147d969e229ced5c46e65e0a5002a0d391287762bd0"
   - &KERNEL_APP_ID "0x3b4bf6bf3ad5000ecf0f989d5befde585c6860fea3e574a4fab4c49d1c177d9c"
   - &DEFAULT_ACL_APP_ID "0xe3262375f45a6e2026b7e7b18c2b807434f2508fe1a2a3dfb493c7df8f4aad6a"
   - &VOTING_APP_ID "0x0abcd104777321a82b010357f20887d61247493d89d2e987ff57bcecbde00e1e"
@@ -917,18 +923,30 @@ l1:
         getPooledEthBySharesRoundUp:
           - args: [0]
             result: 0
-        getRecoveryVault: null
-        DOMAIN_SEPARATOR: null
-        getTotalPooledEther: null
-        getTreasury: null
-        getEVMScriptRegistry: null
-        getFee: null
-        getExternalEther: null
-        getDepositableEther: null
-        totalSupply: null
-        getBalanceStats: null
-        getDepositsReserve: null
-        getWithdrawalsReserve: null
+        getRecoveryVault:
+          - mustRevert: true # due to zero kernel
+        DOMAIN_SEPARATOR:
+          - mustRevert: true # due to zero getEIP712StETH
+        getTotalPooledEther:
+          - mustRevert: true # due to division by zero in "(externalShares * _internalEther) / internalShares" in getExternalEther
+        getTreasury:
+          - mustRevert: true # due to zero locator
+        getEVMScriptRegistry:
+          - mustRevert: true # due to zero kernel
+        getFee:
+          - mustRevert: true # due to zero staking router due to zero locator
+        getExternalEther:
+          - mustRevert: true # due to division by zero in "(externalShares * _internalEther) / internalShares"
+        getDepositableEther:
+          - mustRevert: true # due to zero withdrawal queue due to zero locator
+        totalSupply:
+          - mustRevert: true # due to division by zero in _getTotalPooledEther in getExternalEther
+        getBalanceStats:
+          - mustRevert: true # due to zero locator
+        getDepositsReserve:
+          - mustRevert: true # due to zero withdrawal queue due to zero locator
+        getWithdrawalsReserve:
+          - mustRevert: true # due to zero withdrawal queue due to zero locator
         getSharesByPooledEth: null
         getEVMScriptExecutor: null
         getWithdrawalCredentials: null
@@ -4924,6 +4942,9 @@ l1:
         hasRole:
           - args: [*DEFAULT_ADMIN_ROLE, *upgradeTemporaryAdmin]
             result: false
+          # deployer renounced admin (and thus cannot manage roles or upgrades)
+          - args: [*DEFAULT_ADMIN_ROLE, *srv3Deployer]
+            result: false
         isPostMigrationFirstReportDone: false # flips to true after the first post-migration AO report
         lastReportTimestamp: null
         lastVaultBalanceAfterTransfer: null
@@ -5065,7 +5086,7 @@ l1:
         CORE_NAMESPACE: "0xc681a85306374a5ab27f0bbc385296a54bcd314a1948b6cf61c4ea1bc44bb9f8"
         recoveryVaultAppId: *ZERO_BYTES32
         getInitializationBlock: 11473216
-        APP_MANAGER_ROLE: "0xb6d92708f3d4817afc106147d969e229ced5c46e65e0a5002a0d391287762bd0"
+        APP_MANAGER_ROLE: *APP_MANAGER_ROLE
         APP_BASES_NAMESPACE: "0xf1f3eb40f5bc1ad1344716ced8b8a0431d840b5783aea1fd01786bc26f35ac0f"
         acl: *aragonAcl
         isPetrified: false
@@ -5082,7 +5103,7 @@ l1:
         CORE_NAMESPACE: "0xc681a85306374a5ab27f0bbc385296a54bcd314a1948b6cf61c4ea1bc44bb9f8"
         recoveryVaultAppId: *ZERO_BYTES32
         getInitializationBlock: *MAX_UINT256
-        APP_MANAGER_ROLE: "0xb6d92708f3d4817afc106147d969e229ced5c46e65e0a5002a0d391287762bd0"
+        APP_MANAGER_ROLE: *APP_MANAGER_ROLE
         APP_BASES_NAMESPACE: "0xf1f3eb40f5bc1ad1344716ced8b8a0431d840b5783aea1fd01786bc26f35ac0f"
         acl: *ZERO_ADDRESS
         isPetrified: true
@@ -5427,12 +5448,26 @@ l1:
         getPermissionParamsLength: null
         evalParams: null
         getEVMScriptExecutor: null
-        hasPermission: null
+        hasPermission:
+          # APP_MANAGER_ROLE must be held by no one permanently: votes grant it to the Agent
+          # transiently and revoke it in the same script (see "Revoke Aragon APP_MANAGER_ROLE")
+          - args: [*aragonVoting, *aragonKernel, *APP_MANAGER_ROLE]
+            signature: "hasPermission(address,address,bytes32)"
+            result: false
+          - args: [*aragonAgent, *aragonKernel, *APP_MANAGER_ROLE]
+            signature: "hasPermission(address,address,bytes32)"
+            result: false
+          - args: [*srv3Deployer, *aragonKernel, *APP_MANAGER_ROLE]
+            signature: "hasPermission(address,address,bytes32)"
+            result: false
         allowRecoverability: null
         getInitializationBlock: null
         getPermissionParam: null
         canPerform: null
-        getPermissionManager: null
+        getPermissionManager:
+          # only the Agent (via a vote) can re-grant the upgrade permission
+          - args: [*aragonKernel, *APP_MANAGER_ROLE]
+            result: *aragonAgent
       implementationChecks:
         hasInitialized: false
         NO_PERMISSION: *ZERO_BYTES32
@@ -5957,6 +5992,12 @@ l1:
         hasRole:
           - args: [*DEFAULT_ADMIN_ROLE, *upgradeTemporaryAdmin]
             result: false
+          # deployer renounced admin (and thus cannot manage roles or upgrades)
+          - args: [*DEFAULT_ADMIN_ROLE, *srv3Deployer]
+            result: false
+          # deploy-time "for testing" grant must be revoked after handoff
+          - args: [*ADD_CONSOLIDATION_REQUEST_ROLE, *srv3Deployer]
+            result: false
         isPaused: false
         supportsInterface:
       ozAcl:
@@ -6018,6 +6059,9 @@ l1:
         getTargetBalanceGwei: 2046750000000
         hasRole:
           - args: [*DEFAULT_ADMIN_ROLE, *upgradeTemporaryAdmin]
+            result: false
+          # deployer renounced admin (and thus cannot manage roles or upgrades)
+          - args: [*DEFAULT_ADMIN_ROLE, *srv3Deployer]
             result: false
         isBlockDistancePassed: true
         isPaused: false
@@ -6110,6 +6154,12 @@ l1:
         hasRole:
           - args: [*DEFAULT_ADMIN_ROLE, *upgradeTemporaryAdmin]
             result: false
+          # deployer renounced admin (and thus cannot manage roles or upgrades)
+          - args: [*DEFAULT_ADMIN_ROLE, *srv3Deployer]
+            result: false
+          # deploy-time "for testing" grant must be revoked after handoff
+          - args: [*MANAGE_ROLE, *srv3Deployer]
+            result: false
         maxGroupsInBatch: 10
         supportsInterface:
       ozAcl:
@@ -6186,6 +6236,12 @@ l1:
             result: *ZERO_ADDRESS
         hasRole:
           - args: [*DEFAULT_ADMIN_ROLE, *upgradeTemporaryAdmin]
+            result: false
+          # deployer renounced admin (and thus cannot manage roles or upgrades)
+          - args: [*DEFAULT_ADMIN_ROLE, *srv3Deployer]
+            result: false
+          # deploy-time "for testing" grant must be revoked after handoff
+          - args: [*ALLOW_PAIR_ROLE, *srv3Deployer]
             result: false
         isPairAllowed:
           - args: [1, 1]
