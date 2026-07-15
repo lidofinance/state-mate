@@ -74,7 +74,7 @@ parameters:
 
   # --- Lido signers ---
   - &LIDO_SIGNER_1 "0x59F8D74Fe49d5ebEAc069E3baf07eB4b614BD5A7"
-  - &LIDO_SIGNER_2 "0xa94e4ADceC38074967b17F6e8856AB12368686B5"
+  - &LIDO_SIGNER_2 "0x9777AF8c6727D57F74f7d381AD47eB4A65f042Ff"
   - &LIDO_SIGNER_3 "0xEA685f0AF4A0BF5E7D6729b2C63eDF574D3EE27f"
   - &LIDO_SIGNER_4 "0xFB864C1127ff77215d0A8e652bB632F526A4A89f"
 
@@ -1312,7 +1312,7 @@ l1:
         getVerificationResult:
         hashCall:
         isAllowedCall:
-        merkleRoot: "0x0c2fffab0e8e6e75e6bb8eed57fe7afe310c7b1a2ec9712f58bcbd47cf5c4bbf"
+        merkleRoot: "0xb48bc1bc970a4679a656c1f523c5d2cf1170aa49a3bd473f4f3b88fe4df2bd65"
         vault: *vault
         verifyCall:
       implementationChecks:
@@ -1420,7 +1420,7 @@ l1:
         getTransactionHash:
         isModuleEnabled:
         isOwner:
-        nonce: 2
+        nonce:
         signedMessages:
       implementationChecks:
         VERSION: 1.4.1
@@ -1514,7 +1514,7 @@ l1:
         getTransactionHash:
         isModuleEnabled:
         isOwner:
-        nonce: 1
+        nonce:
         signedMessages:
       implementationChecks:
         VERSION:

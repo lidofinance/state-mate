@@ -74,7 +74,7 @@ parameters:
 
   # --- Lido signers ---
   - &LIDO_SIGNER_1 "0x59F8D74Fe49d5ebEAc069E3baf07eB4b614BD5A7"
-  - &LIDO_SIGNER_2 "0xa94e4ADceC38074967b17F6e8856AB12368686B5"
+  - &LIDO_SIGNER_2 "0x9777AF8c6727D57F74f7d381AD47eB4A65f042Ff"
   - &LIDO_SIGNER_3 "0xEA685f0AF4A0BF5E7D6729b2C63eDF574D3EE27f"
   - &LIDO_SIGNER_4 "0xFB864C1127ff77215d0A8e652bB632F526A4A89f"
 
@@ -121,6 +121,7 @@ deployed:
     - &vaultImplementation "0x0000000615B2771511dAa693aC07BE5622869E01"
     - &bitmaskVerifier "0x0000000263Fb29C3D6B0C5837883519eF05ea20A"
     - &ERC20VerifierFactory "0x77A83AcBf7A6df20f1D681b4810437d74AE790F8"
+    - &symbioticVerifierFactory "0x41C443F10a92D597e6c9E271140BC94c10f5159F"
     - &ERC20Verifier "0x00000009207D366cBB8549837F8Ae4bf800Af2D6"
     - &vaultConfigurator "0x000000028be48f9E62E13403480B60C4822C5aa5"
     - &basicRedeemHook "0x0000000637f1b1ccDA4Af2dB6CDDf5e5Ec45fd93"
@@ -186,10 +187,10 @@ l1:
       implementation: *factoryImplementation
       proxyChecks: {}
       checks:
-        entities: 12
+        entities:
         entityAt:
           - args: [12]
-            mustRevert: true
+            result: *symbioticVerifierFactory
           - args: [11]
             result: *swapModuleFactory
           - args: [10]
@@ -360,10 +361,8 @@ l1:
       implementation: *factoryImplementation
       proxyChecks: {}
       checks:
-        entities: 3
+        entities:
         entityAt:
-          - args: [3]
-            mustRevert: true
           - args: [2]
             result: *feeManager2
           - args: [1]
@@ -408,10 +407,8 @@ l1:
       implementation: *factoryImplementation
       proxyChecks: {}
       checks:
-        entities: 3
+        entities:
         entityAt:
-          - args: [3]
-            mustRevert: true
           - args: [2]
             result: *oracle2
           - args: [1]
@@ -516,10 +513,8 @@ l1:
       implementation: *factoryImplementation
       proxyChecks: {}
       checks:
-        entities: 3
+        entities:
         entityAt:
-          - args: [3]
-            mustRevert: true
           - args: [2]
             result: *riskManager2
           - args: [1]
@@ -564,10 +559,8 @@ l1:
       implementation: *factoryImplementation
       proxyChecks: {}
       checks:
-        entities: 3
+        entities:
         entityAt:
-          - args: [3]
-            mustRevert: true
           - args: [2]
             result: *shareManager2
           - args: [1]
@@ -660,10 +653,8 @@ l1:
       implementation: *factoryImplementation
       proxyChecks: {}
       checks:
-        entities: 8
+        entities:
         entityAt:
-          - args: [8]
-            mustRevert: true
           - args: [7]
             result: *subvault7
           - args: [6]
@@ -726,10 +717,8 @@ l1:
       implementation: *factoryImplementation
       proxyChecks: {}
       checks:
-        entities: 8
+        entities:
         entityAt:
-          - args: [8]
-            mustRevert: true
           - args: [7]
             result: *verifier7
           - args: [6]
@@ -794,10 +783,8 @@ l1:
       implementation: *factoryImplementation
       proxyChecks: {}
       checks:
-        entities: 3
+        entities:
         entityAt:
-          - args: [3]
-            mustRevert: true
           - args: [2]
             result: *vault2
           - args: [1]
@@ -1400,7 +1387,7 @@ l1:
         getVerificationResult:
         hashCall:
         isAllowedCall:
-        merkleRoot: "0xb66c6f56357f781b2956b6f202d2b019cb3078bf3c65463626d9cd4fa652c33b"
+        merkleRoot: "0x46b4d9020b339c92cdeffba1afcce7409d4f960538bc5355b2d1c72cea9f6b9a"
         vault: *vault
         verifyCall:
       implementationChecks:
@@ -1508,7 +1495,7 @@ l1:
         getTransactionHash:
         isModuleEnabled:
         isOwner:
-        nonce: 2
+        nonce:
         signedMessages:
       implementationChecks:
         VERSION: 1.4.1
@@ -1556,7 +1543,7 @@ l1:
         getTransactionHash:
         isModuleEnabled:
         isOwner:
-        nonce: 5
+        nonce:
         signedMessages:
       implementationChecks:
         VERSION:
@@ -1637,6 +1624,7 @@ l1:
         getChainId: 9745
         getModulesPaginated:
         getOwners:
+          - *EXT_MELLOW_SIGNER_1
           - *EXT_MELLOW_SIGNER_5
           - *EXT_MELLOW_SIGNER_2
           - *MELLOW_SIGNER_2
@@ -1649,7 +1637,7 @@ l1:
         getTransactionHash:
         isModuleEnabled:
         isOwner:
-        nonce: 17
+        nonce:
         signedMessages:
       implementationChecks:
         VERSION:
