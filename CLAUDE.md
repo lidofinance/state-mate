@@ -11,7 +11,7 @@ Validates EVM smart-contract state against YAML configs. Calls view functions on
 
 ## Layout
 
-`configs/<project>/<mainnet|testnet>/` per deployment — projects: `lido` (core + easy track + safeharbor; testnet = hoodi), `lido-multichain` (wstETH/stETH/a.DI on L2s), `lido-earn`, `mellow` (strategy + DVV), `defiwrapper`. Filenames carry the product and network when a directory spans several (`lido-multichain/mainnet/wsteth-optimism.yaml`, `lido-earn/mainnet/earnusd-vaults-base.yaml`); ABI stores are chainId-scoped so one `abis.json.gz` per directory covers all chains. `src/` is TypeScript; entry is `src/state-mate.ts`. Requires Node ≥20, yarn 4.3.1.
+`configs/<project>/<mainnet|testnet>/` per deployment — projects: `lido` (core + easy track + safeharbor; testnet = hoodi), `lido-multichain` (wstETH/stETH/a.DI on L2s), `lido-earn` (vaults + mellow strategies), `mellow` (DVV), `defiwrapper`. Filenames carry the product and network when a directory spans several (`lido-multichain/mainnet/wsteth-optimism.yaml`, `lido-earn/mainnet/earnusd-vaults-base.yaml`); ABI stores are chainId-scoped so one `abis.json.gz` per directory covers all chains. `src/` is TypeScript; entry is `src/state-mate.ts`. Requires Node ≥20, yarn 4.3.1.
 
 ## Scripts (package.json)
 
