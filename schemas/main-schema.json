@@ -159,6 +159,7 @@
       "type": "object",
       "required": [
         "rpcUrl",
+        "chainId",
         "contracts"
       ],
       "properties": {
@@ -2338,6 +2339,7 @@
       "type": "object",
       "required": [
         "rpcUrl",
+        "chainId",
         "contracts"
       ],
       "properties": {

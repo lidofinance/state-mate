@@ -1,28 +1,22 @@
-import path from "node:path";
-
 import { program } from "commander";
 
 import { EntryField } from "./common";
+import { CheckOnly } from "./context";
 import { logErrorAndExit } from "./logger";
 
-type CheckOnlyOptionType = null | {
-  section: string;
-  contract?: string;
-  checksType?: string;
-  method?: string;
-};
+type CheckOnlyOptionType = null | CheckOnly;
 
 export function parseCommandLineArguments() {
   program
-    .argument("<config-path>", "path to .yaml state config file")
+    .argument("<config-path>", "path to a .yaml state config file, or a directory to run every config inside it")
     .allowExcessArguments(false)
     .option(
       "-o, --only <check-path>",
       `only checks to do, e.g. 'l2/proxyAdmin/${EntryField.checks}/owner', 'l1', 'l1/controller'`,
     )
     .option("--generate", "generate a populated config from the seed one")
-    .option("--update-abi", "download all ABIs replacing existing files")
-    .option("--update-abi-missing", "download only missing ABIs (skip existing)")
+    .option("--update-abi", "download missing ABIs (never overwrites existing ones)")
+    .option("-q, --quiet", "print only contract headers, per-contract totals and errors")
     .parse();
 
   const configPath = program.args[0];
@@ -45,11 +39,10 @@ export function parseCommandLineArguments() {
 
   return {
     configPath,
-    abiDirPath: path.join(path.dirname(configPath), "abi"),
     checkOnly,
     checkOnlyCmdArg: options.only,
     generate: options.generate,
-    updateAbi: options.updateAbi || options.updateAbiMissing,
-    updateAbiMissingOnly: options.updateAbiMissing,
+    updateAbi: options.updateAbi,
+    quiet: Boolean(options.quiet),
   };
 }

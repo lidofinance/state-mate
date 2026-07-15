@@ -1,4 +1,4 @@
-# yaml-language-server: $schema=../../schemas/main-schema.json
+# yaml-language-server: $schema=../../../schemas/main-schema.json
 ---
 deployed:
   l1:
@@ -735,7 +735,7 @@ roles:
   - &DISALLOW_PAIR_ROLE "0x4638c3377b40c5fdb49ab3032cbb02972024761b03e6a0d7dcf113f5673c03a8"
 
 l1:
-  rpcUrl: MAINNET_REMOTE_RPC_URL # https://ethereum-rpc.publicnode.com
+  rpcUrl: ETH_RPC_URL
   explorerHostname: api.etherscan.io
   explorerTokenEnv: ETHERSCAN_TOKEN
   chainId: *CHAIN_ID

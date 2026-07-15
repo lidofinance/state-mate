@@ -7,11 +7,16 @@ import chalk from "chalk";
 import { Contract, JsonRpcProvider } from "ethers";
 import * as YAML from "yaml";
 
-import { loadAbiFromFile } from "./abi-provider";
-import { getNonMutables, readUrlOrFromEnvironment, EntryField, printError } from "./common";
-import { collectStaticCallResults, loadContract, loadContractInfoFromExplorer } from "./explorer-provider";
+import { checkAllAbi, flushAbiUpdates, getAbiNameForAddress, loadAbiFromFile } from "./abi-provider";
+import { getNonMutables, normalizeChainId, readUrlOrFromEnvironment, EntryField, printError } from "./common";
+import { context as appContext } from "./context";
+import {
+  collectStaticCallResults,
+  loadContract,
+  loadContractInfoFromExplorer,
+  verifyChainIdWithExplorer,
+} from "./explorer-provider";
 import { logErrorAndExit, log, logError } from "./logger";
-import { g_Arguments as g_Arguments } from "./state-mate";
 import { ContractEntry, EntireDocument, ExplorerSectionTB, isTypeOfTB, NetworkSection, SeedDocument } from "./typebox";
 import { MethodCallResults, Abi } from "./types";
 
@@ -33,7 +38,7 @@ export async function doGenerateBoilerplate(seedConfigPath: string, jsonDocument
     const { address, deployedNode, explorerHostname, rpcUrl, sectionName, explorerKey, chainId } = context;
     if (!explorerHostname) {
       logErrorAndExit(
-        `The field ${chalk.magenta(`explorerHostname`)} is required in the ${chalk.magenta(g_Arguments.configPath)}`,
+        `The field ${chalk.magenta(`explorerHostname`)} is required in the ${chalk.magenta(appContext.configPath)}`,
       );
     }
     const contractInfo = await loadContractInfoFromExplorer(address, explorerHostname, explorerKey, chainId);
@@ -42,7 +47,12 @@ export async function doGenerateBoilerplate(seedConfigPath: string, jsonDocument
     }
     const { contractName, implementation } = contractInfo;
 
-    const provider = new JsonRpcProvider(rpcUrl);
+    if (appContext.updateAbi && implementation && getAbiNameForAddress(chainId, implementation.address) === undefined) {
+      await checkAllAbi(chainId, implementation);
+      flushAbiUpdates();
+    }
+
+    const provider = new JsonRpcProvider(rpcUrl, undefined, { staticNetwork: true });
     let contractEntryIfProxy;
     let contractEntryIfRegular;
     const logOperation = (section: EntryField) => {
@@ -51,13 +61,12 @@ export async function doGenerateBoilerplate(seedConfigPath: string, jsonDocument
       );
     };
     if (implementation) {
-      const proxyAbi = loadAbiFromFile(contractName, address);
+      const proxyAbi = loadAbiFromFile(chainId, contractName, address);
       const proxyContract = loadContract(address, proxyAbi, provider);
 
-      const abi = loadAbiFromFile(implementation.contractName, address);
-      const contract = loadContract(address, abi, provider);
-
-      const implementationAbi = loadAbiFromFile(implementation.contractName, implementation.address);
+      const implementationAbi = loadAbiFromFile(chainId, implementation.contractName, implementation.address);
+      // Implementation functions are called through the proxy address
+      const contract = loadContract(address, implementationAbi, provider);
       const implementationContract = loadContract(implementation.address, implementationAbi, provider);
 
       logOperation(EntryField.checks);
@@ -81,7 +90,7 @@ export async function doGenerateBoilerplate(seedConfigPath: string, jsonDocument
         [EntryField.implementationChecks]: implementationChecks,
       };
     } else {
-      const abi = loadAbiFromFile(contractName, address);
+      const abi = loadAbiFromFile(chainId, contractName, address);
       const contract = loadContract(address, abi, provider);
       logOperation(EntryField.checks);
       const checks = await _makeBoilerplateForAllNonMutableFunctions(abi, contract);
@@ -126,26 +135,27 @@ function addSchemaIntoYaml(filePath: string, fileContent: string): string {
   return fileContent;
 }
 
-type DeployedAddressInfo = Pick<NetworkSection, "explorerHostname" | "rpcUrl" | "chainId"> &
+type DeployedAddressInfo = Pick<NetworkSection, "explorerHostname" | "rpcUrl"> &
   Pick<ContractEntry, "address"> & {
     [Key in keyof Pick<NetworkSection, "explorerTokenEnv"> as `explorerKey`]: string;
-  } & { deployedNode: YAML.Scalar } & { sectionName: string };
+  } & { chainId: string; deployedNode: YAML.Scalar; sectionName: string };
 
 async function _iterateDeployedAddresses<T extends EntireDocument | SeedDocument>(
   seedDocument: YAML.Document,
   jsonDocument: T,
   callback: (context: DeployedAddressInfo) => Promise<void>,
 ) {
-  const abiDirectoryPath = path.resolve(path.dirname(g_Arguments.configPath), "abi");
-  fs.mkdirSync(abiDirectoryPath, { recursive: true });
-
   for (const [explorerSectionKey, addresses] of Object.entries(jsonDocument.deployed)) {
     const explorerSection = jsonDocument[explorerSectionKey as keyof T];
 
     if (isTypeOfTB(explorerSection, ExplorerSectionTB)) {
       const { explorerHostname, explorerTokenEnv } = explorerSection;
       const rpcUrl = readUrlOrFromEnvironment(explorerSection.rpcUrl);
+      const chainId = normalizeChainId(explorerSection.chainId);
       const explorerKey = explorerTokenEnv ? process.env[explorerTokenEnv] : "";
+      if (explorerHostname) {
+        await verifyChainIdWithExplorer(explorerHostname, chainId, explorerKey);
+      }
       const scalars: YAML.Scalar[] = _getScalarsWithAnchors(seedDocument, explorerSectionKey);
       for (const address of addresses) {
         const deployedNode = scalars.find((scalar) => {
@@ -157,7 +167,7 @@ async function _iterateDeployedAddresses<T extends EntireDocument | SeedDocument
             explorerHostname,
             explorerKey,
             rpcUrl,
-            chainId: explorerSection.chainId,
+            chainId,
             deployedNode,
             sectionName: explorerSectionKey,
           });

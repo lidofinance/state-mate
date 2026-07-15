@@ -4,12 +4,13 @@ import { loadAbiFromFile } from "src/abi-provider";
 import { EntryField, getNonMutables } from "src/common";
 import { logHeader2 } from "src/logger";
 import { ContractEntry, isTypeOfTB, ProxyContractEntryTB, RegularChecks } from "src/typebox";
+import { ChainId } from "src/types";
 
 import { ChecksSectionValidator } from "./checks";
 
 export class ImplementationChecksSectionValidator extends ChecksSectionValidator {
-  constructor(provider: JsonRpcProvider) {
-    super(provider, EntryField.implementationChecks);
+  constructor(provider: JsonRpcProvider, chainId: ChainId) {
+    super(provider, chainId, EntryField.implementationChecks);
   }
 
   override async validateSection(contractEntry: ContractEntry, contractAlias: string, basePath?: string) {
@@ -24,7 +25,7 @@ export class ImplementationChecksSectionValidator extends ChecksSectionValidator
     logHeader2(basePath ? `${basePath}/${this.sectionName}` : this.sectionName);
     const { implementation, name, implementationChecks } = contractEntry;
 
-    const allNonMutable = getNonMutables(loadAbiFromFile(name, implementation));
+    const allNonMutable = getNonMutables(loadAbiFromFile(this.chainId, name, implementation));
     const skippedChecks: RegularChecks = {};
 
     for (const x of allNonMutable) {

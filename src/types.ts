@@ -1,5 +1,7 @@
 import { JsonFragment } from "ethers";
 
+export type ChainId = number | string | bigint;
+
 export type MethodCallResults = { methodName: string; staticCallResult: string }[];
 
 export type ContractInfo = {

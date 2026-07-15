@@ -35,7 +35,8 @@
       "additionalProperties": false,
       "type": "object",
       "required": [
-        "rpcUrl"
+        "rpcUrl",
+        "chainId"
       ],
       "properties": {
         "rpcUrl": {
@@ -63,7 +64,8 @@
       "additionalProperties": false,
       "type": "object",
       "required": [
-        "rpcUrl"
+        "rpcUrl",
+        "chainId"
       ],
       "properties": {
         "rpcUrl": {
