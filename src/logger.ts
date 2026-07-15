@@ -2,6 +2,8 @@ import * as readline from "node:readline";
 
 import chalk from "chalk";
 
+import { context } from "./context";
+
 export const SUCCESS_MARK = chalk.green("✔");
 export const FAILURE_MARK = chalk.red("✘");
 export const WARNING_MARK = chalk.yellow("⚠");
@@ -28,18 +30,22 @@ export class LogCommand {
   }
 
   private initialPrint(): void {
+    if (context.quiet) return;
     const prefix = getItemPrefix();
     process.stdout.write(`${prefix}  ${this.description}: ...`);
   }
 
   public printResult(statusSymbol: string, result: string): void {
-    readline.cursorTo(process.stdout, 0);
-    readline.clearLine(process.stdout, 0);
     const prefix = getItemPrefix();
+    if (!context.quiet) {
+      readline.cursorTo(process.stdout, 0);
+      readline.clearLine(process.stdout, 0);
+    }
     process.stdout.write(`${prefix}${statusSymbol} ${this.description}: ${chalk.yellow(result)}\n`);
   }
 
   public success(result: string): void {
+    if (context.quiet) return;
     this.printResult(SUCCESS_MARK, result);
   }
 
@@ -48,6 +54,7 @@ export class LogCommand {
   }
 
   public warning(result: string): void {
+    if (context.quiet) return;
     this.printResult(WARNING_MARK, result);
   }
 }
@@ -58,17 +65,18 @@ export function logHeader1(argument: string) {
 }
 
 export function logHeader2(path: string) {
-  log(`${TREE_BRANCH} ${chalk.magenta(path)}`);
+  if (!context.quiet) log(`${TREE_BRANCH} ${chalk.magenta(path)}`);
   itemPrefix = TREE_PIPE;
 }
 
 export function logSubHeader(path: string, isLast: boolean = false) {
   const branch = isLast ? TREE_LAST : TREE_BRANCH;
-  log(`${TREE_PIPE}${branch} ${chalk.magenta(path)}`);
+  if (!context.quiet) log(`${TREE_PIPE}${branch} ${chalk.magenta(path)}`);
   itemPrefix = TREE_PIPE + (isLast ? TREE_SPACE : TREE_PIPE);
 }
 
 export function logMethodSkipped(methodName: string) {
+  if (context.quiet) return;
   const prefix = getItemPrefix();
   log(`${prefix}${WARNING_MARK} .${methodName}: ${chalk.yellow("skipped")}`);
 }

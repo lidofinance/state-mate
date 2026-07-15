@@ -46,7 +46,7 @@ jobs:
         run: cp .env.sample .env
 
       - name: Run state-mate
-        run: yarn start ${{ matrix.config }}
+        run: yarn start ${{ matrix.config }} --quiet
 
   unit:
     name: Unit Tests

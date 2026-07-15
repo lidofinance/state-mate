@@ -23,6 +23,7 @@ export const context = {
   checkOnlyCmdArg: undefined as string | undefined,
   generate: false,
   updateAbi: false,
+  quiet: false,
 };
 
 export const stats = {

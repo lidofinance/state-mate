@@ -16,6 +16,7 @@ export function parseCommandLineArguments() {
     )
     .option("--generate", "generate a populated config from the seed one")
     .option("--update-abi", "download missing ABIs (never overwrites existing ones)")
+    .option("-q, --quiet", "print only contract headers, per-contract totals and errors")
     .parse();
 
   const configPath = program.args[0];
@@ -42,5 +43,6 @@ export function parseCommandLineArguments() {
     checkOnlyCmdArg: options.only,
     generate: options.generate,
     updateAbi: options.updateAbi,
+    quiet: Boolean(options.quiet),
   };
 }
