@@ -1,4 +1,4 @@
-# yaml-language-server: $schema=../../schemas/main-schema.json
+# yaml-language-server: $schema=../../../schemas/main-schema.json
 
 parameters:
   - &trustedCaller "0x18A1065c81b0Cc356F1b1C843ddd5E14e4AefffF"
@@ -44,8 +44,8 @@ deployed:
     - &SetLiabilitySharesTargetInVaultHub "0x647DeE7bF33e44829e6430F7A08F63b3319694f0"
 
 l1:
-  rpcUrl: MAINNET_REMOTE_RPC_URL
-  explorerHostname: api.etherscan.io/v2/api
+  rpcUrl: ETH_RPC_URL
+  explorerHostname: api.etherscan.io
   explorerTokenEnv: ETHERSCAN_TOKEN
   chainId: 1
   contracts:

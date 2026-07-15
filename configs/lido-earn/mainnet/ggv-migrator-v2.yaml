@@ -1,0 +1,158 @@
+# yaml-language-server: $schema=../../../schemas/main-schema.json
+# GGVMigratorV2 — commit 07adcc04ecc3279edb9de0b67194ab0a91dbe025
+# Audit: Lido GGV Migrator V2 Security Audit Report (MixBytes), 27.05.2026
+#
+# Only addresses with their own contract stanza live here; reference-only
+# addresses (expected check values) are anchors under `misc`.
+deployed:
+  l1:
+    - &ggvMigratorV2 "0x00000000333B254A17361C550ec49cED9D40E0F4"
+    - &ownerSafe "0x81698f87C6482bF1ce9bFcfC0F103C4A0Adf0Af0"
+
+misc:
+  - &ZERO_ADDRESS "0x0000000000000000000000000000000000000000"
+  - &SAFE_IMPL_1_3_0 "0xd9Db270c1B5E3Bd161E8c8503c55cEABeE709552"
+  - &SAFE_GUARD_SLOT "0x4a204f620c8c5ccdca3fd54d003badd85ba500436a431f0cbda4f558c93c34c8"
+  - &SAFE_SENTINEL "0x0000000000000000000000000000000000000001"
+  - &SAFE_DOMAIN_SEPARATOR "0x90468bd6f3155511c3cb7b455a07664de4779c3a328ac577fdd4cc584ee815d0"
+  - &SAFE_THRESHOLD 5
+
+  # --- Admin Safe ---
+  - &SAFE_OWNER_1 "0xEA685f0AF4A0BF5E7D6729b2C63eDF574D3EE27f"
+  - &SAFE_OWNER_2 "0x9777AF8c6727D57F74f7d381AD47eB4A65f042Ff"
+  - &SAFE_OWNER_3 "0xFB864C1127ff77215d0A8e652bB632F526A4A89f"
+  - &SAFE_OWNER_4 "0x59F8D74Fe49d5ebEAc069E3baf07eB4b614BD5A7"
+  - &SAFE_OWNER_5 "0x185111c113d9B19Ea4C424D3cD8628A1ee09Be6A"
+  - &SAFE_OWNER_6 "0x06C3992a6067bEA8FB3Af7F004EdEbC13656761F"
+  - &SAFE_OWNER_7 "0x44A388BBD782AE1D7f4542aEb6C3569E2CfdF5a1"
+  - &SAFE_OWNER_8 "0x8888843c607F4Bbd6aD72128F478085256Bdd15D"
+
+  # --- Lido / Mellow ---
+  - &GGV "0xef417FCE1883c6653E7dC6AF7c6F85CCDE84Aa09"
+  - &SUBVAULT "0x893aa69FBAA1ee81B536f0FbE3A3453e86290080"
+  - &strETH "0x277C6A642564A91ff78b008022D65683cEE5CCC5"
+
+  # --- underlying tokens ---
+  - &WETH "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
+  - &WEETH "0xCd5fE23C85820F7B72D0926FC9b05b43E359b7ee"
+
+  # --- Aave V3 ---
+  - &AAVE "0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2"
+  - &ORACLE "0x54586bE62E3c3580375aE3723C145253060Ca0C2"
+  - &WETH_ATOKEN "0x4d5F47FA6A74757f35C14fD3a6Ef8E3C9BC514E8"
+  - &WETH_DEBT_TOKEN "0xeA51d7853EEFb32b6ee06b1C12E6dcCA88Be0fFE"
+  - &WEETH_ATOKEN "0xBdfa7b7893081B35Fb54027489e2Bc7A38275129"
+
+  # --- GGVMigratorV2 safety constants ---
+  - &GGV_MIN_ALLOWED_HF_D18 1010000000000000000 # 1.01
+  - &MELLOW_MIN_ALLOWED_HF_D18 1010000000000000000 # 1.01
+  - &MAX_ALLOWED_CUMULATIVE_ERROR 100000000 # 1e8 (~$1, Aave 8-decimal base)
+  - &MAX_ALLOWED_ITERATIONS 30
+  - &MAX_WETH_DEBT_ERROR 1000000000 # 1 gwei
+  - &MIN_WETH_DEBT_FOR_MIGRATION 1000000000000000000 # 1 ether
+
+l1:
+  chainId: 1
+  rpcUrl: ETH_RPC_URL
+  explorerHostname: api.etherscan.io
+  explorerTokenEnv: ETHERSCAN_TOKEN
+  contracts:
+    ggvMigratorV2:
+      name: GGVMigratorV2
+      address: *ggvMigratorV2
+      checks:
+        owner: *ownerSafe
+        migrated: false
+        AAVE: *AAVE
+        ORACLE: *ORACLE
+        WETH_ATOKEN: *WETH_ATOKEN
+        WETH_DEBT_TOKEN: *WETH_DEBT_TOKEN
+        WEETH_ATOKEN: *WEETH_ATOKEN
+        WETH: *WETH
+        WEETH: *WEETH
+        GGV: *GGV
+        SUBVAULT: *SUBVAULT
+        SUBVAULT_INDEX: 1
+        strETH: *strETH
+        GGV_MIN_ALLOWED_HF_D18: *GGV_MIN_ALLOWED_HF_D18
+        MELLOW_MIN_ALLOWED_HF_D18: *MELLOW_MIN_ALLOWED_HF_D18
+        MAX_ALLOWED_CUMULATIVE_ERROR: *MAX_ALLOWED_CUMULATIVE_ERROR
+        MAX_ALLOWED_ITERATIONS: *MAX_ALLOWED_ITERATIONS
+        MAX_WETH_DEBT_ERROR: *MAX_WETH_DEBT_ERROR
+        MIN_WETH_DEBT_FOR_MIGRATION: *MIN_WETH_DEBT_FOR_MIGRATION
+        calculateSteps: null
+        checkHFAndGetEquity: null
+
+    ownerSafe:
+      name: GnosisSafe
+      address: *ownerSafe
+      proxyName: GnosisSafeProxy
+      implementation: *SAFE_IMPL_1_3_0
+      proxyChecks: {}
+      storage:
+        - slot: "0x0"
+          expected: *SAFE_IMPL_1_3_0
+          label: singleton
+        - slot: *SAFE_GUARD_SLOT
+          expected: *ZERO_ADDRESS
+          label: guard
+      checks:
+        VERSION: "1.3.0"
+        getChainId: 1
+        getThreshold: *SAFE_THRESHOLD
+        domainSeparator: *SAFE_DOMAIN_SEPARATOR
+        getOwners:
+          - *SAFE_OWNER_1
+          - *SAFE_OWNER_2
+          - *SAFE_OWNER_3
+          - *SAFE_OWNER_4
+          - *SAFE_OWNER_5
+          - *SAFE_OWNER_6
+          - *SAFE_OWNER_7
+          - *SAFE_OWNER_8
+        isOwner:
+          - args: [*SAFE_OWNER_1]
+            result: true
+          - args: [*SAFE_OWNER_2]
+            result: true
+          - args: [*SAFE_OWNER_3]
+            result: true
+          - args: [*SAFE_OWNER_4]
+            result: true
+          - args: [*SAFE_OWNER_5]
+            result: true
+          - args: [*SAFE_OWNER_6]
+            result: true
+          - args: [*SAFE_OWNER_7]
+            result: true
+          - args: [*SAFE_OWNER_8]
+            result: true
+        getModulesPaginated:
+          - args: [*SAFE_SENTINEL, 10]
+            result: [[], *SAFE_SENTINEL]
+        approvedHashes: null # need to specify args
+        checkNSignatures: null # need to specify args
+        checkSignatures: null # need to specify args
+        encodeTransactionData: null # need to specify args
+        getStorageAt: null
+        getTransactionHash: null
+        isModuleEnabled: null
+        nonce: null # transient
+        signedMessages: null
+      implementationChecks:
+        VERSION: "1.3.0"
+        getChainId: null
+        domainSeparator: null
+        getThreshold: 1
+        getOwners: null
+        isOwner: null
+        getModulesPaginated: null
+        approvedHashes: null
+        checkNSignatures: null
+        checkSignatures: null
+        encodeTransactionData: null
+        getStorageAt: null
+        getTransactionHash: null
+        isModuleEnabled: null
+        nonce: 0
+        signedMessages: null

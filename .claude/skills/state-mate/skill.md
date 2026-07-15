@@ -48,7 +48,7 @@ eoa: # named EOAs (deployer, signer addresses); useful for "deployer renounced" 
   - &deployer "0x..."
 
 l1: # per-chain section — literal key name, not the chain's own name
-  rpcUrl: L1_MAINNET_RPC_URL # env-var name, or inline URL
+  rpcUrl: ETH_RPC_URL # env-var name, or inline URL
   explorerHostname: api.etherscan.io/v2/api
   explorerTokenEnv: ETHERSCAN_TOKEN
   chainId: 1 # number or string
@@ -57,7 +57,7 @@ l1: # per-chain section — literal key name, not the chain's own name
       # ...
 
 l2: # present when deployed.l2 exists
-  rpcUrl: L2_MAINNET_RPC_URL
+  rpcUrl: OPTIMISM_RPC_URL
   # ...
 ```
 
@@ -71,7 +71,7 @@ l2: # present when deployed.l2 exists
 
 ```yaml
 contractName:
-  name: ContractName # must match ABI filename
+  name: ContractName # must match the name stored in abis.json.gz for this chain and address
   address: *contractAddress
   checks:
     functionName: expectedValue
@@ -360,10 +360,10 @@ cast call $CONTRACT "hasRole(bytes32,address)(bool)" $ROLE $ADDRESS --rpc-url $R
 
 A seed config is a thin starter file named `*.seed.yaml`. It contains only address-book and chain-explorer sections (`deployed:`, `l1:` / `l2:` with `rpcUrl` / `explorerHostname`, optional `eoa:` / `roles:` / `misc:`) — **no `contracts:` block**. `yarn start <seed> --generate` walks every anchor under `deployed:`, resolves the ABI for each address, and writes a sibling `*.seed.generated.yaml` with a populated `contracts:` block where each function value is `REPLACEME` (and, for proxies, a commented-out `implementationChecks` stub).
 
-`--generate` on its own does not fetch ABIs — it only uses ABIs already on disk. Combine with `--update-abi-missing` on first run.
+`--generate` on its own does not fetch ABIs — it only uses ABIs already on disk. Combine with `--update-abi` on first run.
 
 ```bash
-yarn start configs/proto/mainnet.seed.yaml --generate --update-abi-missing
+yarn start configs/proto/mainnet.seed.yaml --generate --update-abi
 # Review *.seed.generated.yaml, replace REPLACEME with real expectations, then:
 yarn start configs/proto/mainnet.seed.generated.yaml
 ```
@@ -375,7 +375,7 @@ Adding a new contract to an existing config:
 1. **Resolve addresses** — `cast admin` / `cast implementation` for proxies; EIP-1967 slots for anything non-standard.
 2. **Define anchors** in `deployed:` (and `implementation:` addresses in the same section with a matching name).
 3. **Write the contract stanza** — pick the proxy pattern, seed `checks:` with function names, leave unknowns as `REPLACEME`.
-4. **Download ABIs** — `yarn start config.yml --update-abi-missing`. Resolution depends on mode: consolidated (`abis.json.gz`) tries the `Name-{address}` key first, then `Name`; individual-file mode (`abi/*.json`) tries `Name.json`, then `Name.sol/Name.json`, then `Name-{address}.json`.
+4. **Download ABIs** — `yarn start config.yml --update-abi`. ABIs live in `abis.json.gz` next to the config, keyed by EVM chain ID and lowercase address: `{ "1:0x…": { name, abi } }`. `checks` resolve the ABI at `implementation:` (or `address:` for non-proxies), `proxyChecks` at `address:`; the YAML `name:`/`proxyName:` must equal the stored contract name.
 5. **Run, read actuals, replace** — iterate `yarn start config.yml -o l1/contractName` until green.
 6. **Access control** — probe with `cast call getRoleMemberCount`; choose `ozAcl` / `ozNonEnumerableAcl` / `hasRole`. List every role constant, including empty ones (`[]`).
 
@@ -399,8 +399,7 @@ yarn start config.yml                                     # full config
 yarn start config.yml -o l1                               # specific section
 yarn start config.yml -o l1/contractName                  # specific contract (great for rate-limited RPC)
 yarn start config.yml -o l1/contractName/checks/funcName  # single function
-yarn start config.yml --update-abi-missing                # download only missing ABIs (preferred)
-yarn start config.yml --update-abi                        # overwrite all ABIs (rarely needed)
+yarn start config.yml --update-abi                        # download missing ABIs (existing untouched)
 yarn start config.seed.yaml --generate                    # expand seed → *.seed.generated.yaml
 ```
 
@@ -417,9 +416,9 @@ yarn start config.seed.yaml --generate                    # expand seed → *.se
 
 ### `ABI not found` / `Cannot find ABI file`
 
-- Run `yarn start <config> --update-abi-missing`.
-- Verify `name:` matches the ABI filename (the `{proxyAddr}` / `{implAddr}` suffix is optional).
-- Individual-file resolution order: `Name.json` → `Name.sol/Name.json` → `Name-{address}.json`. Consolidated (`abis.json.gz`) tries `Name-{address}` key first, then `Name`.
+- Run `yarn start <config> --update-abi`.
+- The store is keyed by chain ID and address, so "not found" means that pair has no entry — download it. A "belongs to X, config expects Y" error means the YAML `name:`/`proxyName:` disagrees with the verified contract name at that address — fix the YAML.
+- For proxies, `checks` need the entry at `implementation:` — make sure the field is present and points at the right address.
 
 ### `getRoleMemberCount` reverted / `no matching function`
 

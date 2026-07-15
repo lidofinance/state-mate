@@ -50,8 +50,8 @@ yarn install
 ```sh
 # config.seed.yaml
 
-export L1_MAINNET_RPC_URL=%YOUR_RPC_URL%
-export L2_MAINNET_RPC_URL=%YOUR_RPC_URL%
+export ETH_RPC_URL=%YOUR_RPC_URL%
+export OPTIMISM_RPC_URL=%YOUR_RPC_URL%
 ```
 
 4. Prepare a seed config
@@ -67,12 +67,12 @@ deployed:
     - &l2GovExecutor "0x2aCeC6D8ABA90685927b61968D84CfFf6192B32C"
 
 l1:
-  rpcUrl: L1_MAINNET_RPC_URL
+  rpcUrl: ETH_RPC_URL
   explorerHostname: api.etherscan.io
   explorerTokenEnv: ETHERSCAN_TOKEN
 
 l2:
-  rpcUrl: L2_MAINNET_RPC_URL
+  rpcUrl: OPTIMISM_RPC_URL
   explorerHostname: explorer.mode.network
   # explorerTokenEnv: ETHERSCAN_MODE_TOKEN
 ```
@@ -110,7 +110,7 @@ roles:
   - &DEFAULT_ADMIN_ROLE "0x0000000000000000000000000000000000000000000000000000000000000000"
 
 l1:
-  rpcUrl: L1_MAINNET_RPC_URL # env variable
+  rpcUrl: ETH_RPC_URL # env variable
   contracts:
     myContract:
       name: "myContract"
@@ -128,44 +128,23 @@ l1:
 
 ### ABIs
 
-All required ABIs are located in the same directory as the config and placed under `abi` folder being downloaded upon the first launch. See [configs](/configs/).
+state-mate keeps all ABIs for a config in a single compressed `abis.json.gz` file next to the config, keyed by EVM chain ID and lowercase contract address:
 
-state-mate supports two ABI storage formats:
-
-1. **Individual files** (default): Each contract ABI is stored as a separate JSON file in the `abi/` directory
-2. **Consolidated file**: All ABIs are stored in a single `abis.json` or `abis.json.gz` file alongside the config
-
-#### Consolidating ABIs
-
-For large projects with many contracts, you can consolidate all individual ABI files into a single compressed file to reduce repository size and improve performance:
-
-```sh
-yarn consolidate-abi path/to/config/abi --compress
+```json
+{ "1:0x17144556fd3424edc8fc8a4c940b2d04936d17eb": { "name": "Lido", "abi": [...] } }
 ```
 
-This command:
-
-- Reads all `.json` files from the specified ABI directory
-- Validates each ABI format
-- Consolidates them into a single `abis.json.gz` file (or `abis.json` without `--compress`)
-- Places the output file alongside your config file
-- Provides compression statistics
-
-**Note**: You cannot use both consolidated and individual ABI files simultaneously. state-mate will automatically detect which format you're using.
+The chain ID distinguishes contracts deployed at the same address on different networks. The `name:` / `proxyName:` fields in YAML serve as a sanity check: state-mate compares them with the stored name and fails on mismatch. For proxies, `checks` resolve the ABI at `implementation:`, `proxyChecks` at `address:`. See [configs](/configs/).
 
 #### Updating ABIs
 
-Use the `--update-abi` option to download all ABIs, overwriting existing files:
+`--update-abi` downloads the ABIs missing from `abis.json.gz` and leaves existing entries alone:
 
 ```sh
 yarn start path/to/config.yaml --update-abi
 ```
 
-To download only missing ABIs (without updating existing ones):
-
-```sh
-yarn start path/to/config.yaml --update-abi-missing
-```
+To re-download a stale ABI, delete its `chainId:address` entry from `abis.json.gz` (or the whole file) and run `--update-abi` again.
 
 ## 🔧 Contributing
 
