@@ -1,25 +1,23 @@
 import { Contract, JsonRpcProvider } from "ethers";
 
-import { loadAbiFromFile } from "src/abi-provider";
 import { EntryField } from "src/common";
 import { loadContract } from "src/explorer-provider";
-import { log, logErrorAndExit } from "src/logger";
+import { logErrorAndExit } from "src/logger";
 import {
   ArrayOfStaticCallCheckTB,
   ChecksEntryValue,
   ContractEntry,
   isTypeOfTB,
-  ProxyContractEntryTB,
   StaticCallCheckTB,
   ViewResultTB,
 } from "src/typebox";
-import { Abi } from "src/types";
+import { ChainId } from "src/types";
 
 import { CheckLevel, needCheck, SectionValidatorBase } from "./base";
 
 export class ChecksSectionValidator extends SectionValidatorBase {
-  constructor(provider: JsonRpcProvider, sectionName: EntryField = EntryField.checks) {
-    super(provider, sectionName);
+  constructor(provider: JsonRpcProvider, chainId: ChainId, sectionName: EntryField = EntryField.checks) {
+    super(provider, sectionName, chainId);
   }
 
   private async _validateSubsection(contract: Contract, method: string, checkEntryValue: ChecksEntryValue) {
@@ -43,7 +41,7 @@ export class ChecksSectionValidator extends SectionValidatorBase {
   override async validateSection(contractEntry: ContractEntry, contractAlias: string, basePath?: string) {
     void basePath; // Used for interface compatibility - header printed by contract.ts
     const { address, checks } = contractEntry;
-    const abi = this._loadAbiWithImplementationFallback(contractEntry);
+    const abi = this._loadContractAbi(contractEntry);
     this._reportNonCoveredNonMutableChecks(contractAlias, abi, Object.keys(checks));
 
     const contract = loadContract(address, abi, this.provider);
@@ -52,31 +50,5 @@ export class ChecksSectionValidator extends SectionValidatorBase {
 
       await this._validateSubsection(contract, method, checkEntryValue);
     }
-  }
-
-  /**
-   * For proxy contracts, prefer loading ABI from the implementation address
-   * since the proxy delegates calls to the implementation.
-   * Falls back to the proxy address ABI if implementation ABI is not available.
-   */
-  protected _loadAbiWithImplementationFallback(contractEntry: ContractEntry): Abi {
-    const { name, address } = contractEntry;
-
-    // Check if this is a proxy contract with an implementation
-    if (isTypeOfTB(contractEntry, ProxyContractEntryTB) && contractEntry.implementation) {
-      // Try implementation ABI with strict contract name match.
-      // If the implementation ABI is saved under a different name, fall back to proxy ABI.
-      const implementationAbi = loadAbiFromFile(name, contractEntry.implementation, {
-        allowAddressFallback: false,
-        failSilently: true,
-      });
-      if (implementationAbi) {
-        return implementationAbi;
-      }
-      // Fall back to proxy address ABI
-      log(`  (Using proxy ABI as implementation ABI for ${name} at ${contractEntry.implementation} was not found)`);
-    }
-
-    return loadAbiFromFile(name, address);
   }
 }

@@ -5,7 +5,8 @@ import { printError } from "./common";
 import { BlockscoutHandler } from "./explorers/blockscout";
 import { EtherscanHandler } from "./explorers/etherscan";
 import { ModeHandler } from "./explorers/mode";
-import { LogCommand, logError, logErrorAndExit, logReplaceLine } from "./logger";
+import { fetchSourcifySupportsChain, loadContractInfoFromSourcify } from "./explorers/sourcify";
+import { log, LogCommand, logError, logErrorAndExit, logReplaceLine, WARNING_MARK } from "./logger";
 import {
   Abi,
   AbiArgumentsLength,
@@ -81,6 +82,12 @@ export async function loadContractInfoFromExplorer(
   explorerKey?: string,
   chainId?: number | string,
 ): Promise<ContractInfo | undefined> {
+  if (explorerHostname.includes("sourcify")) {
+    if (chainId === undefined) {
+      logErrorAndExit(`The field ${chalk.magenta("chainId")} is required to query Sourcify`);
+    }
+    return loadContractInfoFromSourcify(address, chainId);
+  }
   let explorer: IExplorerHandler;
   if (explorerHostname.includes("mode.network")) {
     explorer = new ModeHandler();
@@ -157,6 +164,87 @@ export async function httpGetAsync<T>(url: string): Promise<T> | never {
     return response.json() as Promise<T>;
   } catch (error) {
     throw new Error(`Failed to fetch contract source code: ${printError(error)}`);
+  }
+}
+
+function _hexToDecimal(value: unknown): string | undefined {
+  return typeof value === "string" && /^0x[0-9a-fA-F]+$/.test(value) ? BigInt(value).toString() : undefined;
+}
+
+export async function fetchExplorerChainId(
+  explorerHostname: string,
+  chainId: number | string,
+  explorerKey?: string,
+): Promise<string | undefined> {
+  if (explorerHostname.includes("sourcify")) {
+    try {
+      return (await fetchSourcifySupportsChain(chainId)) ? String(chainId) : undefined;
+    } catch {
+      return undefined;
+    }
+  }
+
+  if (explorerHostname.includes("etherscan.io")) {
+    let url = `https://api.etherscan.io/v2/api?chainid=${chainId}&module=proxy&action=eth_gasPrice`;
+    if (explorerKey) {
+      url += `&apikey=${explorerKey}`;
+    }
+    let response: { result?: unknown };
+    try {
+      response = await httpGetAsync<{ result?: unknown }>(url);
+    } catch {
+      return undefined;
+    }
+    if (_hexToDecimal(response.result) !== undefined) return String(chainId);
+    if (typeof response.result === "string" && response.result.includes("Free API access is not supported")) {
+      logErrorAndExit(
+        `Chain ${chalk.yellow(chainId)} is not covered by the free Etherscan API plan. ` +
+          `Switch ${chalk.magenta("explorerHostname")} to an explorer that serves this chain, or use a paid API key`,
+      );
+    }
+    return undefined;
+  }
+
+  try {
+    const response = await fetch(`https://${explorerHostname}/api/eth-rpc`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ jsonrpc: "2.0", method: "eth_chainId", params: [], id: 1 }),
+    });
+    if (response.ok) {
+      const decimal = _hexToDecimal(((await response.json()) as { result?: unknown }).result);
+      if (decimal !== undefined) return decimal;
+    }
+  } catch {
+    /* fall through to the etherscan-compatible endpoint */
+  }
+
+  let url = `https://${explorerHostname}/api?module=proxy&action=eth_chainId`;
+  if (explorerKey) {
+    url += `&apikey=${explorerKey}`;
+  }
+  try {
+    const response = await httpGetAsync<{ result?: unknown }>(url);
+    return _hexToDecimal(response.result);
+  } catch {
+    return undefined;
+  }
+}
+
+export async function verifyChainIdWithExplorer(
+  explorerHostname: string,
+  chainId: string,
+  explorerKey?: string,
+): Promise<void> {
+  const explorerChainId = await fetchExplorerChainId(explorerHostname, chainId, explorerKey);
+  if (explorerChainId === undefined) {
+    log(`${WARNING_MARK} ${chalk.yellow(`could not verify chainId ${chainId} against explorer ${explorerHostname}`)}`);
+    return;
+  }
+  if (explorerChainId !== chainId) {
+    logErrorAndExit(
+      `The chainId ${chalk.yellow(chainId)} in the config does not match the explorer ${chalk.magenta(explorerHostname)} chain ${chalk.yellow(explorerChainId)}`,
+    );
   }
 }
 

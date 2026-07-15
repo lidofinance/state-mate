@@ -5,12 +5,13 @@ import { EntryField } from "src/common";
 import { loadContract } from "src/explorer-provider";
 import { logErrorAndExit, logHeader2 } from "src/logger";
 import { ChecksEntryValue, ContractEntry, isTypeOfTB, ProxyContractEntryTB, ViewResultTB } from "src/typebox";
+import { ChainId } from "src/types";
 
 import { CheckLevel, needCheck, SectionValidatorBase } from "./base";
 
 export class ProxyCheckSectionValidator extends SectionValidatorBase {
-  constructor(provider: JsonRpcProvider) {
-    super(provider, EntryField.proxyChecks);
+  constructor(provider: JsonRpcProvider, chainId: ChainId) {
+    super(provider, EntryField.proxyChecks, chainId);
   }
 
   private async _validateSubsection(contract: Contract, method: string, checkEntryValue: ChecksEntryValue) {
@@ -33,7 +34,7 @@ export class ProxyCheckSectionValidator extends SectionValidatorBase {
 
     logHeader2(basePath ? `${basePath}/${this.sectionName}` : this.sectionName);
 
-    const abi = loadAbiFromFile(proxyName, address);
+    const abi = loadAbiFromFile(this.chainId, proxyName, address);
     this._reportNonCoveredNonMutableChecks(contractAlias, abi, Object.keys(proxyChecks));
 
     const contract = loadContract(address, abi, this.provider);

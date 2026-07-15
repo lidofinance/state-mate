@@ -16,14 +16,14 @@
   "scripts": {
     "build": "tsc",
     "start": "ts-node -r tsconfig-paths/register src/state-mate.ts",
-    "consolidate-abi": "sh -c 'ts-node src/consolidate-abis.ts \"$1\" --compress' --",
     "lint": "eslint . --max-warnings=0",
     "lint:fix": "yarn lint --fix",
     "format": "prettier . --ignore-path .gitignore --ignore-path .prettierignore --check",
     "format:fix": "prettier . --ignore-path .gitignore --ignore-path .prettierignore --write",
     "postinstall": "husky",
-    "test": "ts-node src/test-util/app.ts",
-    "schemas": "ts-node src/gen-schemas.ts"
+    "test": "node --require ts-node/register --require tsconfig-paths/register --test \"tests/**/*.test.ts\"",
+    "schemas": "ts-node src/gen-schemas.ts",
+    "test:coverage": "node --require ts-node/register --require tsconfig-paths/register --test --experimental-test-coverage \"tests/**/*.test.ts\""
   },
   "lint-staged": {
     "./**.{ts,md,json}": [
@@ -40,7 +40,6 @@
     "@eslint/compat": "^2.0.5",
     "@sinclair/typebox": "^0.34.49",
     "@tsconfig/node20": "^20.1.9",
-    "@types/json-diff": "^1.0.3",
     "@types/node": "^26.0.1",
     "@typescript-eslint/eslint-plugin": "^8.62.0",
     "@typescript-eslint/parser": "^8.62.0",
@@ -65,7 +64,6 @@
     "commander": "^15.0.0",
     "dotenv": "^17.4.2",
     "ethers": "^6.17.0",
-    "json-diff": "^1.0.6",
     "tsconfig-paths": "^4.2.0",
     "yaml": "^2.9.0"
   }

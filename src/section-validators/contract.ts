@@ -4,6 +4,7 @@ import { JsonRpcProvider } from "ethers";
 import { EntryField } from "src/common";
 import { logFinalStatus, logHeader1, logHeader2 } from "src/logger";
 import { ContractEntry } from "src/typebox";
+import { ChainId } from "src/types";
 
 import {
   CheckLevel,
@@ -24,7 +25,7 @@ import { StorageSectionValidator } from "./storage";
 export class ContractSectionValidator {
   private map: Map<EntryField, SectionValidatorBase> = new Map();
 
-  constructor(provider: JsonRpcProvider) {
+  constructor(provider: JsonRpcProvider, chainId: ChainId) {
     const sections = [
       EntryField.checks,
       EntryField.storage,
@@ -36,27 +37,27 @@ export class ContractSectionValidator {
     for (const section of sections) {
       switch (section) {
         case EntryField.checks: {
-          this.map.set(section, new ChecksSectionValidator(provider, section));
+          this.map.set(section, new ChecksSectionValidator(provider, chainId, section));
           break;
         }
         case EntryField.storage: {
-          this.map.set(section, new StorageSectionValidator(provider));
+          this.map.set(section, new StorageSectionValidator(provider, chainId));
           break;
         }
         case EntryField.proxyChecks: {
-          this.map.set(section, new ProxyCheckSectionValidator(provider));
+          this.map.set(section, new ProxyCheckSectionValidator(provider, chainId));
           break;
         }
         case EntryField.ozNonEnumerableAcl: {
-          this.map.set(section, new OzNonEnumerableAclSectionValidator(provider));
+          this.map.set(section, new OzNonEnumerableAclSectionValidator(provider, chainId));
           break;
         }
         case EntryField.implementationChecks: {
-          this.map.set(section, new ImplementationChecksSectionValidator(provider));
+          this.map.set(section, new ImplementationChecksSectionValidator(provider, chainId));
           break;
         }
         case EntryField.ozAcl: {
-          this.map.set(section, new OzAclSectionValidator(provider));
+          this.map.set(section, new OzAclSectionValidator(provider, chainId));
           break;
         }
         default: {
