@@ -1,6 +1,6 @@
 # Lido Direct Staking (Chainlink CCIP CSR) — Linea lane.
 # CustomSender accepts ETH/WETH, swaps against the OraclePool and syncs accumulated WETH to the L1
-# LidoCustomReceiver (see l1.yaml). Source of truth: lidofinance/l2-direct-staking config/state
+# LidoCustomReceiver (see ethereum.yaml). Source of truth: lidofinance/l2-direct-staking config/state
 # (l2.yaml + the Linea-only l2-linea-extras.yaml, folded in here: the legacy Gelato keeper de-role).
 #
 # Current on-chain profile: STAGE-1 CANARY — the new OraclePool/SyncTrigger/CREReceiver are deployed
@@ -40,7 +40,7 @@ selectors:
   - &ethMainnetCcipChainSelector "5009297550715157269"
 
 deployed:
-  l1: [] # the L1 receiver side is verified by l1.yaml
+  l1: [] # the L1 receiver side is verified by ethereum.yaml
   l2:
     - &l2CustomSender "0x328de900860816d29D1367F6903a24D8ed40C997"
     - &l2CustomSenderImpl "0xBf96561e4519182CFA4cebBf95494D9CA5a316f9"

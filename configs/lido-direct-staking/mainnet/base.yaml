@@ -1,6 +1,6 @@
-# Lido Direct Staking (Chainlink CCIP CSR) — Optimism lane.
+# Lido Direct Staking (Chainlink CCIP CSR) — Base lane.
 # CustomSender accepts ETH/WETH, swaps against the OraclePool and syncs accumulated WETH to the L1
-# LidoCustomReceiver (see l1.yaml). Source of truth: lidofinance/l2-direct-staking config/state.
+# LidoCustomReceiver (see ethereum.yaml). Source of truth: lidofinance/l2-direct-staking config/state.
 #
 # Current on-chain profile: STAGE-1 CANARY — the new OraclePool/SyncTrigger/CREReceiver are deployed
 # and owned by the deployer with test knobs (delay 60s, minAmount 0.05e18); the CustomSender still
@@ -16,9 +16,9 @@ parameters:
   - &liquidityOwner "0x5A9d695c518e95CD6Ea101f2f25fC2AE18486A61" # handoff: production owner of pool/trigger/receiver
   - &ovmL2CrossDomainMessenger "0x4200000000000000000000000000000000000007"
   - &l2Weth "0x4200000000000000000000000000000000000006"
-  - &l2Wsteth "0x1F32b1c2345538c0c6f582fCB022739c4A194Ebb"
-  - &l2LinkToken "0x350a791Bfc2C21F9Ed5d10980Dad2e2638ffa7f6"
-  - &l2CcipRouter "0x3206695CaE29952f4b0c22a169725a865bc8Ce0f"
+  - &l2Wsteth "0xc1CBa3fCea344f92D9239c08C0568f6F2F0ee452"
+  - &l2LinkToken "0x88Fb150BDc53A65fe94Dea0c9BA0a6dAf8C6e196"
+  - &l2CcipRouter "0x881e3A65B4d4a04dD529061dd0071cf975F58bCD"
   - &l2PriceOracle "0x301cBCDA894c932E9EDa3Cf8878f78304e69E367"
   - &l2CreForwarder "0xF8344CFd5c43616a4366C34E3EEE75af79a74482" # handoff: Chainlink CRE Keystone forwarder replaces the deployer
   - &l2OldSyncAutomation "0x3776CC14ce997827F7A87091018Daa1739dc2790"
@@ -27,10 +27,10 @@ parameters:
   - &syncMinAmount "50000000000000000" # 0.05e18 canary; handoff: 5e18
   - &syncMaxAmount "100000000000000000000" # 100e18
   - &syncDelay 60 # canary; handoff: 43200 (12h)
-  - &maxGasLimit 7000000 # SyncTrigger.getMaxGasLimit() — Optimism EVM2EVMOnRamp (v1.5) maxPerMsgGasLimit
+  - &maxGasLimit 7000000 # SyncTrigger.getMaxGasLimit() — Base FeeQuoter maxPerMsgGasLimit
   # feeOtoD = FeeCodec.encodeCCIP(maxFee=0.125e18, payInLink=false, gasLimit=1_000_000)
   - &feeOtoD "0x000000000000000001bc16d674ec800000000f4240"
-  # feeDtoO = FeeCodec.encodeOptimismL1toL2(originL2Gas=100_000) — OP-stack feeAmount is always 0
+  # feeDtoO = FeeCodec.encodeBaseL1toL2(originL2Gas=100_000) — OP-stack feeAmount is always 0
   - &feeDtoO "0x0000000000000000000000000000000000000186a0"
   - &maxNativeFee "125000000000000000" # getMaxFees() = maxFee + DtoO(0) = 0.125e18
 
@@ -38,7 +38,7 @@ selectors:
   - &ethMainnetCcipChainSelector "5009297550715157269"
 
 deployed:
-  l1: [] # the L1 receiver side is verified by l1.yaml
+  l1: [] # the L1 receiver side is verified by ethereum.yaml
   l2:
     - &l2CustomSender "0x328de900860816d29D1367F6903a24D8ed40C997"
     - &l2CustomSenderImpl "0x65498495DdC07c52E12EEe3c44D3a1166eed8703"
@@ -47,7 +47,7 @@ deployed:
     - &l2SyncTrigger "0x1594705D5f9BbDb36453ACF15C94d041c0E02c62"
     - &l2CreReceiver "0x29113eD7AE4C97Ee2F20A5511C852aa37C0d6b85"
     # not Lido-deployed, but listed here so --update-abi resolves their ABIs
-    - &l2GovernanceExecutor "0xEfa0dB536d2c8089685630fafe88CF7805966FC3"
+    - &l2GovernanceExecutor "0x0E37599436974a25dDeEdF795C848d30Af46eaCF"
     - &l2OldOraclePool "0x6F357d53d6bE3238180316BA5F8f11467e164588"
 
 misc:
@@ -66,9 +66,9 @@ l1:
   contracts: {}
 
 l2:
-  rpcUrl: OPTIMISM_RPC_URL
-  explorerHostname: optimism.blockscout.com
-  chainId: 10
+  rpcUrl: BASE_RPC_URL
+  explorerHostname: base.blockscout.com
+  chainId: 8453
   contracts:
     customSender:
       name: CustomSenderReferral
