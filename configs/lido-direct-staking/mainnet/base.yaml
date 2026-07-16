@@ -38,8 +38,7 @@ selectors:
   - &ethMainnetCcipChainSelector "5009297550715157269"
 
 deployed:
-  l1: [] # the L1 receiver side is verified by ethereum.yaml
-  l2:
+  base:
     - &l2CustomSender "0x328de900860816d29D1367F6903a24D8ed40C997"
     - &l2CustomSenderImpl "0x65498495DdC07c52E12EEe3c44D3a1166eed8703"
     - &l2ProxyAdmin "0x4c8c4A15c1e810e481c412A9B06Be5f79dC02192"
@@ -58,14 +57,7 @@ roles:
   - &DEFAULT_ADMIN_ROLE "0x0000000000000000000000000000000000000000000000000000000000000000"
   - &SYNC_ROLE "0xbb1ef2b79fa8154a13ffa50bd30e5f91ed93ff9b924bd04be671240cbc9d4b71"
 
-l1:
-  rpcUrl: ETH_RPC_URL
-  explorerHostname: api.etherscan.io
-  explorerTokenEnv: ETHERSCAN_TOKEN
-  chainId: 1
-  contracts: {}
-
-l2:
+base:
   rpcUrl: BASE_RPC_URL
   explorerHostname: base.blockscout.com
   chainId: 8453

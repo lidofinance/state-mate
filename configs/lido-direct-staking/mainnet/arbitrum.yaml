@@ -37,8 +37,7 @@ selectors:
   - &ethMainnetCcipChainSelector "5009297550715157269"
 
 deployed:
-  l1: [] # the L1 receiver side is verified by ethereum.yaml
-  l2:
+  arbitrum:
     - &l2CustomSender "0x72229141D4B016682d3618ECe47c046f30Da4AD1"
     - &l2CustomSenderImpl "0x220F64A4793Bc8aca7330ceCc4ae4e2F3B5Bc664"
     - &l2ProxyAdmin "0x5B42aEbFe95247f1d22e282831e2A513bF050217"
@@ -57,14 +56,7 @@ roles:
   - &DEFAULT_ADMIN_ROLE "0x0000000000000000000000000000000000000000000000000000000000000000"
   - &SYNC_ROLE "0xbb1ef2b79fa8154a13ffa50bd30e5f91ed93ff9b924bd04be671240cbc9d4b71"
 
-l1:
-  rpcUrl: ETH_RPC_URL
-  explorerHostname: api.etherscan.io
-  explorerTokenEnv: ETHERSCAN_TOKEN
-  chainId: 1
-  contracts: {}
-
-l2:
+arbitrum:
   rpcUrl: ARBITRUM_RPC_URL
   explorerHostname: arbitrum.blockscout.com
   chainId: 42161
