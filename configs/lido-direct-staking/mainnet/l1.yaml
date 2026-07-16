@@ -1,0 +1,166 @@
+# Lido Direct Staking (Chainlink CCIP CSR) — L1 Ethereum side, shared by all four L2 lanes.
+# LidoCustomReceiver receives WETH synced from the L2 CustomSenders, stakes it and bridges wstETH
+# back via the per-lane adapters. Source of truth: lidofinance/l2-direct-staking config/state.
+#
+# Current on-chain profile: PRE-MIGRATION — DEFAULT_ADMIN_ROLE and ProxyAdmin owner are still held
+# by the Initial Owner. The Stage-2 migration rotates both to the Lido DAO Agent; flips are marked
+# with "migration:" comments.
+
+# yaml-language-server: $schema=./../../../schemas/main-schema.json
+
+parameters:
+  - &lidoDaoAgent "0x3e40D73EB977Dc6a537aF587D48316feE66E9C8c"
+  - &initialOwner "0xb5c336a5c60D3482b29d83C742C65AE8351b91a8"
+  - &l1Weth "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
+  - &l1Wsteth "0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0"
+  - &l1CcipRouter "0x80226fc0Ee2b096224EeAc085Bb9a8cba1146f7D"
+  - &minFailedMessageGas 45000 # LidoCustomReceiver.MIN_FAILED_MESSAGE_GAS (CCIPDefensiveReceiver immutable)
+  # Per-lane L1 bridge infra (external, not Lido-deployed) + per-chain L2 wstETH targets
+  - &l1OptimismStandardBridge "0x76943C0D61395d8F2edF9060e1533529cAe05dE6"
+  - &l1BaseStandardBridge "0x9de443AdC5A411E83F1878Ef24C3F52C61571e72"
+  - &l1ArbitrumGatewayRouter "0x72Ce9c846789fdB6fC1f34aC4AD25Dd9ef7031ef"
+  - &l1ArbitrumTokenGateway "0x0F25c1DC2a9922304f2eac71DCa9B07E310e8E5a"
+  - &l1LineaTokenBridge "0x051F1D88f0aF5763fB888eC4378b4D8B29ea3319"
+  - &l2OptimismWsteth "0x1F32b1c2345538c0c6f582fCB022739c4A194Ebb"
+  - &l2BaseWsteth "0xc1CBa3fCea344f92D9239c08C0568f6F2F0ee452"
+  # L2 CustomSender addresses encoded as bytes32 (CustomReceiver.getSender(selector))
+  - &l2OptimismSenderBytes32 "0x000000000000000000000000328de900860816d29d1367f6903a24d8ed40c997"
+  - &l2ArbitrumSenderBytes32 "0x00000000000000000000000072229141d4b016682d3618ece47c046f30da4ad1"
+  - &l2BaseSenderBytes32 "0x000000000000000000000000328de900860816d29d1367f6903a24d8ed40c997"
+  - &l2LineaSenderBytes32 "0x000000000000000000000000328de900860816d29d1367f6903a24d8ed40c997"
+
+selectors:
+  # CCIP chain selectors of the four L2 lanes (Ethereum is their sync destination)
+  - &optimismCcipChainSelector "3734403246176062136"
+  - &arbitrumCcipChainSelector "4949039107694359620"
+  - &baseCcipChainSelector "15971525489660198786"
+  - &lineaCcipChainSelector "4627098889531055414"
+
+deployed:
+  l1:
+    - &l1LidoCustomReceiver "0x6F357d53d6bE3238180316BA5F8f11467e164588"
+    - &l1LidoCustomReceiverImpl "0x301cBCDA894c932E9EDa3Cf8878f78304e69E367"
+    - &l1ProxyAdmin "0x88a45d2760b63c1500E3D2E3552b28e5Cdaa37BD"
+    # L1 adapters per lane (CustomReceiver.getAdapter(selector) → adapter)
+    - &l1OptimismAdapter "0x328de900860816d29D1367F6903a24D8ed40C997"
+    - &l1ArbitrumAdapter "0xBf96561e4519182CFA4cebBf95494D9CA5a316f9"
+    - &l1BaseAdapter "0x9c27c304cFdf0D9177002ff186A4aE0A5489Aace"
+    - &l1LineaAdapter "0x122beD1eB48DC4679DDF2C8fc159e9c498344397"
+
+misc:
+  - &EIP1967_IMPLEMENTATION_SLOT "0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc"
+  - &EIP1967_ADMIN_SLOT "0xb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d6103"
+
+roles:
+  - &DEFAULT_ADMIN_ROLE "0x0000000000000000000000000000000000000000000000000000000000000000"
+
+l1:
+  rpcUrl: ETH_RPC_URL
+  explorerHostname: api.etherscan.io
+  explorerTokenEnv: ETHERSCAN_TOKEN
+  chainId: 1
+  contracts:
+    lidoCustomReceiver:
+      name: LidoCustomReceiver
+      address: *l1LidoCustomReceiver
+      proxyName: TransparentUpgradeableProxy
+      implementation: *l1LidoCustomReceiverImpl
+      proxyChecks: {}
+      storage:
+        - slot: *EIP1967_IMPLEMENTATION_SLOT
+          expected: *l1LidoCustomReceiverImpl
+          label: implementation
+        - slot: *EIP1967_ADMIN_SLOT
+          expected: *l1ProxyAdmin
+          label: admin
+      checks:
+        CCIP_ROUTER: *l1CcipRouter
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        MIN_FAILED_MESSAGE_GAS: *minFailedMessageGas
+        WNATIVE: *l1Weth
+        WSTETH: *l1Wsteth
+        hasRole:
+          - args: [*DEFAULT_ADMIN_ROLE, *initialOwner]
+            result: true # migration: rotates to false
+          - args: [*DEFAULT_ADMIN_ROLE, *lidoDaoAgent]
+            result: false # migration: rotates to true
+        getAdapter:
+          - args: [*optimismCcipChainSelector]
+            result: *l1OptimismAdapter
+          - args: [*arbitrumCcipChainSelector]
+            result: *l1ArbitrumAdapter
+          - args: [*baseCcipChainSelector]
+            result: *l1BaseAdapter
+          - args: [*lineaCcipChainSelector]
+            result: *l1LineaAdapter
+        getSender:
+          - args: [*optimismCcipChainSelector]
+            result: *l2OptimismSenderBytes32
+          - args: [*arbitrumCcipChainSelector]
+            result: *l2ArbitrumSenderBytes32
+          - args: [*baseCcipChainSelector]
+            result: *l2BaseSenderBytes32
+          - args: [*lineaCcipChainSelector]
+            result: *l2LineaSenderBytes32
+        supportsInterface:
+          - args: ["0x01ffc9a7"] # IERC165
+            result: true
+        getFailedMessageHash: null # per-message; not pinnable in static yaml
+        getRoleAdmin: null # always DEFAULT_ADMIN_ROLE on AccessControl
+      ozNonEnumerableAcl:
+        *DEFAULT_ADMIN_ROLE : [*initialOwner] # migration: rotates to the Lido DAO Agent
+      implementationChecks:
+        # Implementation is uninitialized (initializer disabled in constructor) —
+        # immutables still readable; admin role unset.
+        CCIP_ROUTER: *l1CcipRouter
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        MIN_FAILED_MESSAGE_GAS: *minFailedMessageGas
+        WNATIVE: *l1Weth
+        WSTETH: *l1Wsteth
+        hasRole:
+          - args: [*DEFAULT_ADMIN_ROLE, *initialOwner]
+            result: false
+          - args: [*DEFAULT_ADMIN_ROLE, *lidoDaoAgent]
+            result: false
+
+    proxyAdmin:
+      name: ProxyAdmin
+      address: *l1ProxyAdmin
+      checks:
+        UPGRADE_INTERFACE_VERSION: "5.0.0"
+        owner: *initialOwner # migration: transfers to the Lido DAO Agent
+
+    optimismAdapter:
+      name: OptimismLegacyAdapterL1toL2
+      address: *l1OptimismAdapter
+      checks:
+        DELEGATOR: *l1LidoCustomReceiver
+        L1_TOKEN: *l1Wsteth
+        L1_ERC20_BRIDGE: *l1OptimismStandardBridge
+        L2_TOKEN: *l2OptimismWsteth
+
+    arbitrumAdapter:
+      name: ArbitrumLegacyAdapterL1toL2
+      address: *l1ArbitrumAdapter
+      checks:
+        DELEGATOR: *l1LidoCustomReceiver
+        L1_TOKEN: *l1Wsteth
+        L1_GATEWAY_ROUTER: *l1ArbitrumGatewayRouter
+        L1_TOKEN_GATEWAY: *l1ArbitrumTokenGateway
+
+    baseAdapter:
+      name: BaseLegacyAdapterL1toL2
+      address: *l1BaseAdapter
+      checks:
+        DELEGATOR: *l1LidoCustomReceiver
+        L1_TOKEN: *l1Wsteth
+        L1_ERC20_BRIDGE: *l1BaseStandardBridge
+        L2_TOKEN: *l2BaseWsteth
+
+    lineaAdapter:
+      name: LineaAdapterL1toL2
+      address: *l1LineaAdapter
+      checks:
+        DELEGATOR: *l1LidoCustomReceiver
+        TOKEN: *l1Wsteth
+        TOKEN_BRIDGE: *l1LineaTokenBridge

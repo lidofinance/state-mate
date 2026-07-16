@@ -21,6 +21,7 @@ jobs:
         include:
           - config: configs/lido/mainnet
           - config: configs/lido/testnet
+          - config: configs/lido-direct-staking/mainnet
           - config: configs/lido-earn/mainnet
           - config: configs/lido-multichain/mainnet
           - config: configs/lido-multichain/testnet

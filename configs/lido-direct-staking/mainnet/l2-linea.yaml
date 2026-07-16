@@ -1,0 +1,216 @@
+# Lido Direct Staking (Chainlink CCIP CSR) — Linea lane.
+# CustomSender accepts ETH/WETH, swaps against the OraclePool and syncs accumulated WETH to the L1
+# LidoCustomReceiver (see l1.yaml). Source of truth: lidofinance/l2-direct-staking config/state
+# (l2.yaml + the Linea-only l2-linea-extras.yaml, folded in here: the legacy Gelato keeper de-role).
+#
+# Current on-chain profile: STAGE-1 CANARY — the new OraclePool/SyncTrigger/CREReceiver are deployed
+# and owned by the deployer with test knobs (delay 60s, minAmount 0.05e18); the CustomSender still
+# points at the old pool and the legacy Gelato keeper keeps SYNC_ROLE. Flips are marked with
+# "migration:" (re-wiring + ACL rotation) and "handoff:" (ownership → Liquidity Owner, production knobs).
+
+# yaml-language-server: $schema=./../../../schemas/main-schema.json
+
+parameters:
+  - &lidoDaoAgent "0x3e40D73EB977Dc6a537aF587D48316feE66E9C8c"
+  - &initialOwner "0xb5c336a5c60D3482b29d83C742C65AE8351b91a8"
+  - &deployer "0xBeedf0c72D63eE8f8784eDB4A9326Fb43b69D50c" # mainnet deployer (canary owner)
+  - &liquidityOwner "0xA8ef4Db842D95DE72433a8b5b8FF40CB7C74C1b6" # handoff: production owner of pool/trigger/receiver
+  - &lineaMessageService "0x508Ca82Df566dCD1B0DE8296e70a96332cD644ec"
+  - &l2Weth "0xe5D7C2a44FfDDf6b295A15c148167daaAf5Cf34f"
+  - &l2Wsteth "0xB5beDd42000b71FddE22D3eE8a79Bd49A568fC8F"
+  - &l2LinkToken "0xa18152629128738a5c081eb226335FEd4B9C95e9"
+  - &l2CcipRouter "0x549FEB73F2348F6cD99b9fc8c69252034897f06C"
+  - &l2PriceOracle "0x301cBCDA894c932E9EDa3Cf8878f78304e69E367"
+  - &l2CreForwarder "0x9eF6468C5f37b976E57d52054c693269479A784d" # handoff: Chainlink CRE Keystone forwarder replaces the deployer
+  - &l2OldSyncAutomation "0x9c27c304cFdf0D9177002ff186A4aE0A5489Aace"
+  - &l2OldGelatoSyncAutomation "0xFbdDDF18Bc681Ae649991f1Aced55b2252a1acAe" # legacy Gelato keeper, Linea-only
+  - &l1LidoCustomReceiverBytes32 "0x0000000000000000000000006f357d53d6be3238180316ba5f8f11467e164588"
+  - &minProcessMessageGas 75000 # CustomSender.MIN_PROCESS_MESSAGE_GAS
+  - &syncMinAmount "50000000000000000" # 0.05e18 canary; handoff: 5e18
+  - &syncMaxAmount "100000000000000000000" # 100e18
+  - &syncDelay 60 # canary; handoff: 43200 (12h)
+  - &maxGasLimit 3000000 # SyncTrigger.getMaxGasLimit() — Linea EVM2EVMOnRamp (v1.5) maxPerMsgGasLimit (lowest of the four)
+  # feeOtoD = FeeCodec.encodeCCIP(maxFee=0.125e18, payInLink=false, gasLimit=500_000) — Linea gasLimit is 500k
+  - &feeOtoD "0x000000000000000001bc16d674ec8000000007a120"
+  # feeDtoO = FeeCodec.encodeLineaL1toL2() — 17-byte zero blob (feeAmount always 0 on Linea)
+  - &feeDtoO "0x0000000000000000000000000000000000"
+  - &maxNativeFee "125000000000000000" # getMaxFees() = maxFee + DtoO(0) = 0.125e18
+
+selectors:
+  - &ethMainnetCcipChainSelector "5009297550715157269"
+
+deployed:
+  l1: [] # the L1 receiver side is verified by l1.yaml
+  l2:
+    - &l2CustomSender "0x328de900860816d29D1367F6903a24D8ed40C997"
+    - &l2CustomSenderImpl "0xBf96561e4519182CFA4cebBf95494D9CA5a316f9"
+    - &l2ProxyAdmin "0x4c8c4A15c1e810e481c412A9B06Be5f79dC02192"
+    - &l2OraclePool "0xac143bF41BBA4a8014b4Ef5a5F46b39a36AE40A8"
+    - &l2SyncTrigger "0x1594705D5f9BbDb36453ACF15C94d041c0E02c62"
+    - &l2CreReceiver "0x29113eD7AE4C97Ee2F20A5511C852aa37C0d6b85"
+    # not Lido-deployed, but listed here so --update-abi resolves their ABIs
+    - &l2GovernanceExecutor "0x74Be82F00CC867614803ffd7f36A2a4aF0405670"
+    - &l2OldOraclePool "0x6F357d53d6bE3238180316BA5F8f11467e164588"
+
+misc:
+  - &EIP1967_IMPLEMENTATION_SLOT "0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc"
+  - &EIP1967_ADMIN_SLOT "0xb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d6103"
+
+roles:
+  - &DEFAULT_ADMIN_ROLE "0x0000000000000000000000000000000000000000000000000000000000000000"
+  - &SYNC_ROLE "0xbb1ef2b79fa8154a13ffa50bd30e5f91ed93ff9b924bd04be671240cbc9d4b71"
+
+l1:
+  rpcUrl: ETH_RPC_URL
+  explorerHostname: api.etherscan.io
+  explorerTokenEnv: ETHERSCAN_TOKEN
+  chainId: 1
+  contracts: {}
+
+l2:
+  rpcUrl: LINEA_RPC_URL
+  explorerHostname: explorer.linea.build
+  chainId: 59144
+  contracts:
+    customSender:
+      name: CustomSenderReferral
+      address: *l2CustomSender
+      proxyName: TransparentUpgradeableProxy
+      implementation: *l2CustomSenderImpl
+      proxyChecks: {}
+      storage:
+        - slot: *EIP1967_IMPLEMENTATION_SLOT
+          expected: *l2CustomSenderImpl
+          label: implementation
+        - slot: *EIP1967_ADMIN_SLOT
+          expected: *l2ProxyAdmin
+          label: admin
+      checks:
+        CCIP_ROUTER: *l2CcipRouter
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        LINK_TOKEN: *l2LinkToken
+        MIN_PROCESS_MESSAGE_GAS: *minProcessMessageGas
+        SYNC_ROLE: *SYNC_ROLE
+        TOKEN: *l2Weth
+        WNATIVE: *l2Weth
+        getOraclePool: *l2OldOraclePool # migration: re-wires to *l2OraclePool
+        getReceiver:
+          args: [*ethMainnetCcipChainSelector]
+          result: *l1LidoCustomReceiverBytes32
+        hasRole:
+          - args: [*DEFAULT_ADMIN_ROLE, *initialOwner]
+            result: true # migration: rotates to false
+          - args: [*DEFAULT_ADMIN_ROLE, *l2GovernanceExecutor]
+            result: false # migration: rotates to true
+          - args: [*DEFAULT_ADMIN_ROLE, *deployer]
+            result: false
+          - args: [*SYNC_ROLE, *l2OldGelatoSyncAutomation]
+            result: true # migration: revoked (Linea-only legacy Gelato keeper de-role)
+          - args: [*SYNC_ROLE, *l2OldSyncAutomation]
+            result: false
+          - args: [*SYNC_ROLE, *l2SyncTrigger]
+            result: false # migration: granted
+        supportsInterface:
+          - args: ["0x01ffc9a7"] # IERC165
+            result: true
+        getRoleAdmin: null # always DEFAULT_ADMIN_ROLE on AccessControl
+      ozNonEnumerableAcl:
+        *DEFAULT_ADMIN_ROLE : [*initialOwner] # migration: rotates to the governance executor
+        *SYNC_ROLE : [*l2OldGelatoSyncAutomation] # migration: rotates to the SyncTrigger
+      implementationChecks:
+        CCIP_ROUTER: *l2CcipRouter
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        LINK_TOKEN: *l2LinkToken
+        MIN_PROCESS_MESSAGE_GAS: *minProcessMessageGas
+        SYNC_ROLE: *SYNC_ROLE
+        TOKEN: *l2Weth
+        WNATIVE: *l2Weth
+
+    proxyAdmin:
+      name: ProxyAdmin
+      address: *l2ProxyAdmin
+      checks:
+        UPGRADE_INTERFACE_VERSION: "5.0.0"
+        owner: *initialOwner # migration: transfers to the governance executor
+
+    governanceExecutor:
+      name: LineaBridgeExecutor
+      address: *l2GovernanceExecutor
+      checks:
+        LINEA_MESSAGE_SERVICE: *lineaMessageService
+        getEthereumGovernanceExecutor: *lidoDaoAgent
+        getDelay: 0
+        getGracePeriod: 86400 # 24h
+        getGuardian: "0x0000000000000000000000000000000000000000"
+        getMinimumDelay: 0
+        getMaximumDelay: 1
+        getActionsSetCount: null # grows over time
+        getActionsSetById: null
+        getCurrentState: null
+        isActionQueued: null
+
+    oraclePool:
+      name: PausableImmutableOraclePool
+      address: *l2OraclePool
+      checks:
+        SENDER: *l2CustomSender
+        TOKEN_IN: *l2Weth
+        TOKEN_OUT: *l2Wsteth
+        getFee: 0
+        getOracle: *l2PriceOracle
+        setFee: null # immutable pool: setter overridden to always revert
+        setOracle: null # immutable pool: setter overridden to always revert
+        owner: *deployer # handoff: transfers to *liquidityOwner
+        paused: false
+
+    # Old pool — still the active one until the migration re-wires customSender.getOraclePool().
+    oldOraclePool:
+      name: PausableImmutableOraclePool
+      address: *l2OldOraclePool
+      checks:
+        SENDER: *l2CustomSender
+        TOKEN_IN: *l2Weth
+        TOKEN_OUT: *l2Wsteth
+        getFee: 0
+        getOracle: *l2PriceOracle
+        setFee: null # immutable pool: setter overridden to always revert
+        setOracle: null # immutable pool: setter overridden to always revert
+        owner: # intentionally not asserted: stays with the Initial Liquidity Owner after migration orphans this pool
+        paused: false
+
+    syncTrigger:
+      name: SyncTrigger
+      address: *l2SyncTrigger
+      checks:
+        SENDER: *l2CustomSender
+        DEST_CHAIN_SELECTOR: *ethMainnetCcipChainSelector
+        WNATIVE: *l2Weth
+        MIN_DELAY: 60 # immutable 1-minute rate-limiter floor, lane-invariant
+        owner: *deployer # handoff: transfers to *liquidityOwner
+        getDelay: *syncDelay
+        getAmounts:
+          result: [*syncMinAmount, *syncMaxAmount]
+        getForwarder: *l2CreReceiver # pinned during Stage-1 deploy
+        getFeeOtoD: *feeOtoD
+        getFeeDtoO: *feeDtoO
+        getMaxFees: *maxNativeFee
+        getMaxGasLimit: *maxGasLimit
+        getLastExecution: null # timestamp, drifts per sync
+        shouldSyncAmount: null # accumulated-WETH-due amount, drifts
+        canSync: null # reads the per-sync fee float, drifts
+
+    creReceiver:
+      name: CREReceiver
+      address: *l2CreReceiver
+      checks:
+        owner: *deployer # handoff: transfers to *liquidityOwner
+        getForwarder: *deployer # canary drives onReport directly; handoff: *l2CreForwarder
+        getExpectedAuthor: *deployer # handoff: *liquidityOwner (CRE workflow owner)
+        isCallAllowed:
+          - args: [*l2SyncTrigger, "0x340b2b0b"] # triggerSync()
+            result: true
+        supportsInterface:
+          - args: ["0x805f2132"] # IReceiver (onReport-only) id the CRE forwarder queries
+            result: true
+          - args: ["0x01ffc9a7"] # ERC-165 base id
+            result: true
