@@ -58,7 +58,8 @@ roles:
 
 arbitrum:
   rpcUrl: ARBITRUM_RPC_URL
-  explorerHostname: arbitrum.blockscout.com
+  explorerHostname: api.etherscan.io
+  explorerTokenEnv: ETHERSCAN_TOKEN
   chainId: 42161
   contracts:
     customSender:

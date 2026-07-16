@@ -185,21 +185,22 @@ export async function fetchExplorerChainId(
   }
 
   if (explorerHostname.includes("etherscan.io")) {
-    let url = `https://api.etherscan.io/v2/api?chainid=${chainId}&module=proxy&action=eth_gasPrice`;
-    if (explorerKey) {
-      url += `&apikey=${explorerKey}`;
-    }
+    // The chainlist endpoint is free on every plan, unlike the module=proxy actions.
     let response: { result?: unknown };
     try {
-      response = await httpGetAsync<{ result?: unknown }>(url);
+      response = await httpGetAsync<{ result?: unknown }>(`https://api.etherscan.io/v2/chainlist`);
     } catch {
       return undefined;
     }
-    if (_hexToDecimal(response.result) !== undefined) return String(chainId);
-    if (typeof response.result === "string" && response.result.includes("Free API access is not supported")) {
+    if (Array.isArray(response.result)) {
+      const served = response.result.some(
+        (entry: unknown) =>
+          typeof entry === "object" && entry !== null && (entry as { chainid?: unknown }).chainid === String(chainId),
+      );
+      if (served) return String(chainId);
       logErrorAndExit(
-        `Chain ${chalk.yellow(chainId)} is not covered by the free Etherscan API plan. ` +
-          `Switch ${chalk.magenta("explorerHostname")} to an explorer that serves this chain, or use a paid API key`,
+        `Chain ${chalk.yellow(chainId)} is not served by the Etherscan v2 API. ` +
+          `Switch ${chalk.magenta("explorerHostname")} to an explorer that serves this chain`,
       );
     }
     return undefined;

@@ -61,7 +61,8 @@ roles:
 
 linea:
   rpcUrl: LINEA_RPC_URL
-  explorerHostname: explorer.linea.build
+  explorerHostname: api.etherscan.io
+  explorerTokenEnv: ETHERSCAN_TOKEN
   chainId: 59144
   contracts:
     customSender:

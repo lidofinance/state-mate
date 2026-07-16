@@ -62,16 +62,22 @@ describe("verifyChainIdWithExplorer", () => {
     }
   });
 
-  it("refuses to run when the chain is paywalled on the free etherscan plan", async () => {
-    const fetchMock = mockExplorerResponse({
-      status: "0",
-      message: "NOTOK",
-      result: "Free API access is not supported for this chain. Please upgrade your api plan for full chain coverage.",
-    });
+  it("refuses to run when the etherscan v2 chainlist does not serve the chain", async () => {
+    const fetchMock = mockExplorerResponse({ result: [{ chainid: "1" }, { chainid: "10" }] });
     try {
       const message = await captureExit(() => verifyChainIdWithExplorer("api.etherscan.io", "56"));
       assert.notEqual(message, undefined);
-      assert.match(message as string, /not covered by the free Etherscan API plan/);
+      assert.match(message as string, /not served by the Etherscan v2 API/);
+    } finally {
+      fetchMock.mock.restore();
+    }
+  });
+
+  it("passes when the etherscan v2 chainlist serves the chain", async () => {
+    const fetchMock = mockExplorerResponse({ result: [{ chainid: "56" }] });
+    try {
+      const message = await captureExit(() => verifyChainIdWithExplorer("api.etherscan.io", "56"));
+      assert.equal(message, undefined);
     } finally {
       fetchMock.mock.restore();
     }

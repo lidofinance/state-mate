@@ -155,6 +155,9 @@ describe("downloadAndCheckAllAbi", () => {
       [scopedKey(ETH_CHAIN_ID, PROXY_ADDRESS)]: { name: "OssifiableProxy", abi: PROXY_ABI },
     });
     const fetchMock = mock.method(globalThis, "fetch", async (url: Parameters<typeof fetch>[0]) => {
+      if (String(url).includes("chainlist")) {
+        return { ok: true, json: async () => ({ result: [{ chainid: "1" }] }) } as Response;
+      }
       if (/eth_gasPrice|eth-rpc|eth_chainId/.test(String(url))) {
         return { ok: true, json: async () => ({ jsonrpc: "2.0", id: 83, result: "0x1" }) } as Response;
       }
@@ -178,6 +181,9 @@ describe("downloadAndCheckAllAbi", () => {
       [scopedKey(ETH_CHAIN_ID, PROXY_ADDRESS)]: { name: "ERC1967Proxy", abi: PROXY_ABI },
     });
     const fetchMock = mock.method(globalThis, "fetch", async (url: Parameters<typeof fetch>[0]) => {
+      if (String(url).includes("chainlist")) {
+        return { ok: true, json: async () => ({ result: [{ chainid: String(ETH_CHAIN_ID) }] }) } as Response;
+      }
       if (/eth_gasPrice|eth-rpc|eth_chainId/.test(String(url))) {
         const chainId = String(url).includes("bscscan") ? BSC_CHAIN_ID : ETH_CHAIN_ID;
         return {
