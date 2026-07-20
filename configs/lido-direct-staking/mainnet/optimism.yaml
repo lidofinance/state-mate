@@ -2,27 +2,59 @@
 # CustomSender accepts ETH/WETH, swaps against the OraclePool and syncs accumulated WETH to the L1
 # LidoCustomReceiver (see ethereum.yaml). Source of truth: lidofinance/l2-direct-staking config/state.
 #
-# Current on-chain profile: STAGE-1 CANARY — the new OraclePool/SyncTrigger/CREReceiver are deployed
-# and owned by the deployer with test knobs (delay 60s, minAmount 0.05e18); the CustomSender still
-# points at the old pool and the old SyncAutomation keeps SYNC_ROLE. Flips are marked with
-# "migration:" (re-wiring + ACL rotation) and "handoff:" (ownership → Liquidity Owner, production knobs).
-
 # yaml-language-server: $schema=./../../../schemas/main-schema.json
 
 parameters:
+  # OP-stack predeploys: https://specs.optimism.io/protocol/predeploys.html
+  - &l2Weth "0x4200000000000000000000000000000000000006"
+  - &ovmL2CrossDomainMessenger "0x4200000000000000000000000000000000000007"
+
+  # https://docs.lido.fi/deployed-contracts
   - &lidoDaoAgent "0x3e40D73EB977Dc6a537aF587D48316feE66E9C8c"
+  - &l2Wsteth "0x1F32b1c2345538c0c6f582fCB022739c4A194Ebb"
+  - &liquidityOwner "0x5A9d695c518e95CD6Ea101f2f25fC2AE18486A61" # handoff: production owner of pool/receiver (trigger goes to GovExec)
+
+  # CCIP router (Optimism): https://docs.chain.link/ccip/directory/mainnet/chain/ethereum-mainnet-optimism-1
+  - &l2CcipRouter "0x3206695CaE29952f4b0c22a169725a865bc8Ce0f"
+
+  # LINK: https://docs.chain.link/resources/link-token-contracts
+  - &l2LinkToken "0x350a791Bfc2C21F9Ed5d10980Dad2e2638ffa7f6"
+
+  # PriceOracle.AGGREGATOR — Chainlink wstETH/stETH Exchange Rate: https://data.chain.link/feeds/optimism/mainnet/wsteth-steth%20exchangerate
+  - &l2WstethOracleAggregator "0xe59EBa0D492cA53C6f46015EEa00517F2707dc77"
+
+  # CRE KeystoneForwarder: https://docs.chain.link/cre/guides/workflow/using-evm-client/forwarder-directory-ts
+  - &l2CreForwarder "0xF8344CFd5c43616a4366C34E3EEE75af79a74482" # handoff: Chainlink CRE Keystone forwarder replaces the deployer
+
   - &initialOwner "0xb5c336a5c60D3482b29d83C742C65AE8351b91a8"
   - &deployer "0xBeedf0c72D63eE8f8784eDB4A9326Fb43b69D50c" # mainnet deployer (canary owner)
-  - &liquidityOwner "0x5A9d695c518e95CD6Ea101f2f25fC2AE18486A61" # handoff: production owner of pool/trigger/receiver
-  - &ovmL2CrossDomainMessenger "0x4200000000000000000000000000000000000007"
-  - &l2Weth "0x4200000000000000000000000000000000000006"
-  - &l2Wsteth "0x1F32b1c2345538c0c6f582fCB022739c4A194Ebb"
-  - &l2LinkToken "0x350a791Bfc2C21F9Ed5d10980Dad2e2638ffa7f6"
-  - &l2CcipRouter "0x3206695CaE29952f4b0c22a169725a865bc8Ce0f"
-  - &l2PriceOracle "0x301cBCDA894c932E9EDa3Cf8878f78304e69E367"
-  - &l2CreForwarder "0xF8344CFd5c43616a4366C34E3EEE75af79a74482" # handoff: Chainlink CRE Keystone forwarder replaces the deployer
   - &l2OldSyncAutomation "0x3776CC14ce997827F7A87091018Daa1739dc2790"
+
+deployed:
+  optimism:
+    - &l2CustomSender "0x328de900860816d29D1367F6903a24D8ed40C997"
+    - &l2CustomSenderImpl "0x65498495DdC07c52E12EEe3c44D3a1166eed8703"
+    - &l2ProxyAdmin "0x4c8c4A15c1e810e481c412A9B06Be5f79dC02192"
+    # Stage-1 canary deploys (not yet pinned in l2-direct-staking)
+    - &l2OraclePool "0xac143bF41BBA4a8014b4Ef5a5F46b39a36AE40A8"
+    - &l2SyncTrigger "0x1594705D5f9BbDb36453ACF15C94d041c0E02c62"
+    - &l2CreReceiver "0x29113eD7AE4C97Ee2F20A5511C852aa37C0d6b85"
+    # not Lido-deployed, but listed here so --update-abi resolves their ABIs
+    - &l2GovernanceExecutor "0xEfa0dB536d2c8089685630fafe88CF7805966FC3"
+    - &l2OldOraclePool "0x6F357d53d6bE3238180316BA5F8f11467e164588"
+    - &l2PriceOracle "0x301cBCDA894c932E9EDa3Cf8878f78304e69E367" # Chainlink CSR PriceOracle wrapper, shared by both pools
+
+misc:
+  - &EIP1967_IMPLEMENTATION_SLOT "0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc" # keccak256("eip1967.proxy.implementation") - 1
+  - &EIP1967_ADMIN_SLOT "0xb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d6103" # keccak256("eip1967.proxy.admin") - 1
+
+  # L1 LidoCustomReceiver encoded as bytes32 (CustomSender.getReceiver(selector))
   - &l1LidoCustomReceiverBytes32 "0x0000000000000000000000006f357d53d6be3238180316ba5f8f11467e164588"
+
+  # CCIP chain selector of Ethereum mainnet (the sync destination):
+  # https://docs.chain.link/ccip/directory/mainnet/chain/mainnet
+  - &ethMainnetCcipChainSelector "5009297550715157269"
+
   - &minProcessMessageGas 75000 # CustomSender.MIN_PROCESS_MESSAGE_GAS
   - &syncMinAmount "50000000000000000" # 0.05e18 canary; handoff: 5e18
   - &syncMaxAmount "100000000000000000000" # 100e18
@@ -33,25 +65,6 @@ parameters:
   # feeDtoO = FeeCodec.encodeOptimismL1toL2(originL2Gas=100_000) — OP-stack feeAmount is always 0
   - &feeDtoO "0x0000000000000000000000000000000000000186a0"
   - &maxNativeFee "125000000000000000" # getMaxFees() = maxFee + DtoO(0) = 0.125e18
-
-selectors:
-  - &ethMainnetCcipChainSelector "5009297550715157269"
-
-deployed:
-  optimism:
-    - &l2CustomSender "0x328de900860816d29D1367F6903a24D8ed40C997"
-    - &l2CustomSenderImpl "0x65498495DdC07c52E12EEe3c44D3a1166eed8703"
-    - &l2ProxyAdmin "0x4c8c4A15c1e810e481c412A9B06Be5f79dC02192"
-    - &l2OraclePool "0xac143bF41BBA4a8014b4Ef5a5F46b39a36AE40A8"
-    - &l2SyncTrigger "0x1594705D5f9BbDb36453ACF15C94d041c0E02c62"
-    - &l2CreReceiver "0x29113eD7AE4C97Ee2F20A5511C852aa37C0d6b85"
-    # not Lido-deployed, but listed here so --update-abi resolves their ABIs
-    - &l2GovernanceExecutor "0xEfa0dB536d2c8089685630fafe88CF7805966FC3"
-    - &l2OldOraclePool "0x6F357d53d6bE3238180316BA5F8f11467e164588"
-
-misc:
-  - &EIP1967_IMPLEMENTATION_SLOT "0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc"
-  - &EIP1967_ADMIN_SLOT "0xb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d6103"
 
 roles:
   - &DEFAULT_ADMIN_ROLE "0x0000000000000000000000000000000000000000000000000000000000000000"
@@ -102,7 +115,11 @@ optimism:
         supportsInterface:
           - args: ["0x01ffc9a7"] # IERC165
             result: true
-        getRoleAdmin: null # always DEFAULT_ADMIN_ROLE on AccessControl
+        getRoleAdmin:
+          - args: [*DEFAULT_ADMIN_ROLE]
+            result: *DEFAULT_ADMIN_ROLE
+          - args: [*SYNC_ROLE]
+            result: *DEFAULT_ADMIN_ROLE
       ozNonEnumerableAcl:
         *DEFAULT_ADMIN_ROLE : [*initialOwner] # migration: rotates to the governance executor
         *SYNC_ROLE : [*l2OldSyncAutomation] # migration: rotates to the SyncTrigger
@@ -114,6 +131,13 @@ optimism:
         SYNC_ROLE: *SYNC_ROLE
         TOKEN: *l2Weth
         WNATIVE: *l2Weth
+        hasRole:
+          - args: [*DEFAULT_ADMIN_ROLE, *initialOwner]
+            result: false
+          - args: [*DEFAULT_ADMIN_ROLE, *l2GovernanceExecutor]
+            result: false
+          - args: [*DEFAULT_ADMIN_ROLE, *deployer]
+            result: false
 
     proxyAdmin:
       name: ProxyAdmin
@@ -133,10 +157,10 @@ optimism:
         getGuardian: "0x0000000000000000000000000000000000000000"
         getMinimumDelay: 0
         getMaximumDelay: 1
-        getActionsSetCount: null # grows over time
-        getActionsSetById: null
-        getCurrentState: null
-        isActionQueued: null
+        getActionsSetCount:
+        getActionsSetById:
+        getCurrentState:
+        isActionQueued:
 
     oraclePool:
       name: PausableImmutableOraclePool
@@ -147,12 +171,15 @@ optimism:
         TOKEN_OUT: *l2Wsteth
         getFee: 0
         getOracle: *l2PriceOracle
-        setFee: null # immutable pool: setter overridden to always revert
-        setOracle: null # immutable pool: setter overridden to always revert
+        setFee:
+          - args: [0]
+            mustRevert: true
+        setOracle:
+          - args: ["0x0000000000000000000000000000000000000000"]
+            mustRevert: true
         owner: *deployer # handoff: transfers to *liquidityOwner
         paused: false
 
-    # Old pool — still the active one until the migration re-wires customSender.getOraclePool().
     oldOraclePool:
       name: PausableImmutableOraclePool
       address: *l2OldOraclePool
@@ -162,10 +189,24 @@ optimism:
         TOKEN_OUT: *l2Wsteth
         getFee: 0
         getOracle: *l2PriceOracle
-        setFee: null # immutable pool: setter overridden to always revert
-        setOracle: null # immutable pool: setter overridden to always revert
+        setFee:
+          - args: [0]
+            mustRevert: true
+        setOracle:
+          - args: ["0x0000000000000000000000000000000000000000"]
+            mustRevert: true
         owner: # intentionally not asserted: stays with the Initial Liquidity Owner after migration orphans this pool
         paused: false
+
+    priceOracle:
+      name: PriceOracle
+      address: *l2PriceOracle
+      checks:
+        AGGREGATOR: *l2WstethOracleAggregator
+        DECIMALS: 18
+        HEARTBEAT: 86400 # 24h staleness bound
+        IS_INVERSE: false
+        getLatestAnswer:
 
     syncTrigger:
       name: SyncTrigger
@@ -174,32 +215,32 @@ optimism:
         SENDER: *l2CustomSender
         DEST_CHAIN_SELECTOR: *ethMainnetCcipChainSelector
         WNATIVE: *l2Weth
-        MIN_DELAY: 60 # immutable 1-minute rate-limiter floor, lane-invariant
-        owner: *deployer # handoff: transfers to *liquidityOwner
+        MIN_DELAY: 60
+        owner: *deployer # handoff: transfers to *l2GovernanceExecutor
         getDelay: *syncDelay
         getAmounts:
           result: [*syncMinAmount, *syncMaxAmount]
-        getForwarder: *l2CreReceiver # pinned during Stage-1 deploy
+        getForwarder: *l2CreReceiver
         getFeeOtoD: *feeOtoD
         getFeeDtoO: *feeDtoO
         getMaxFees: *maxNativeFee
         getMaxGasLimit: *maxGasLimit
-        getLastExecution: null # timestamp, drifts per sync
-        shouldSyncAmount: null # accumulated-WETH-due amount, drifts
-        canSync: null # reads the per-sync fee float, drifts
+        getLastExecution:
+        shouldSyncAmount:
+        canSync:
 
     creReceiver:
       name: CREReceiver
       address: *l2CreReceiver
       checks:
         owner: *deployer # handoff: transfers to *liquidityOwner
-        getForwarder: *deployer # canary drives onReport directly; handoff: *l2CreForwarder
-        getExpectedAuthor: *deployer # handoff: *liquidityOwner (CRE workflow owner)
+        getForwarder: *deployer # handoff: *l2CreForwarder
+        getExpectedAuthor: *deployer # handoff: *liquidityOwner
         isCallAllowed:
           - args: [*l2SyncTrigger, "0x340b2b0b"] # triggerSync()
             result: true
         supportsInterface:
-          - args: ["0x805f2132"] # IReceiver (onReport-only) id the CRE forwarder queries
+          - args: ["0x805f2132"] # IReceiver
             result: true
-          - args: ["0x01ffc9a7"] # ERC-165 base id
+          - args: ["0x01ffc9a7"] # ERC-165
             result: true
