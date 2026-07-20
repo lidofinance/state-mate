@@ -27,11 +27,11 @@ Validate EVM smart-contract state against YAML configs. state-mate calls view fu
 parameters: # optional — arbitrary constants used across the file
   - &someConstant "0x..."
 
-deployed: # address book, grouped by chain
-  l1:
+deployed: # address book, grouped by chain; keys mirror the network section names below
+  ethereum:
     - &contractAddress "0x..."
     - &implAddress "0x..."
-  l2: # for multi-chain configs (e.g. L1↔L2 bridges)
+  optimism: # for multi-chain configs (e.g. L1↔L2 bridges)
     - &l2ContractAddress "0x..."
 
 misc: # numeric/bytes32 constants, EIP slots, zeros
@@ -47,7 +47,7 @@ roles: # bytes32 role hashes, often many (one per domain)
 eoa: # named EOAs (deployer, signer addresses); useful for "deployer renounced" checks
   - &deployer "0x..."
 
-l1: # per-chain section — literal key name, not the chain's own name
+ethereum: # per-chain section — the name is arbitrary (l1/l2, ethereum, optimism, …)
   rpcUrl: ETH_RPC_URL # env-var name, or inline URL
   explorerHostname: api.etherscan.io/v2/api
   explorerTokenEnv: ETHERSCAN_TOKEN
@@ -56,14 +56,14 @@ l1: # per-chain section — literal key name, not the chain's own name
     contractName:
       # ...
 
-l2: # present when deployed.l2 exists
+optimism: # one section per chain, as many as needed
   rpcUrl: OPTIMISM_RPC_URL
   # ...
 ```
 
 `parameters`, `deployed`, `misc`, `roles`, `eoa` are anchor-only sections — they define YAML anchors (`&name`) that later sections reference via `*name`. `deployed-aux`, `tvl`, `delays`, `signers`, `selectors`, `validators` are optional anchor-only sections too, same shape as `misc`. Only `<chain-key>` sections with `contracts:` produce on-chain calls.
 
-`deployed` and the per-chain sections accept exactly two keys: `l1` (required) and `l2` (optional) — fixed schema literals, not placeholders for the actual network's name. A config for a single L2 chain still uses `l1:`, never the chain's own name.
+Per-chain section names are arbitrary (`l1`/`l2` in older configs, network names like `ethereum`/`optimism` in newer ones): any top-level key that isn't one of the anchor-only sections must be a network section with `rpcUrl`/`chainId`/`contracts`. Each key under `deployed:` must match the name of its network section — `--update-abi` resolves ABIs through that pairing, and `-o` scopes use the section name (`-o ethereum/contractName`).
 
 ## Contract patterns
 

@@ -1,91 +1,48 @@
 {
-  "additionalProperties": false,
+  "additionalProperties": {
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "rpcUrl",
+      "chainId"
+    ],
+    "properties": {
+      "rpcUrl": {
+        "type": "string"
+      },
+      "explorerHostname": {
+        "type": "string"
+      },
+      "explorerTokenEnv": {
+        "type": "string"
+      },
+      "chainId": {
+        "anyOf": [
+          {
+            "type": "number"
+          },
+          {
+            "type": "string"
+          }
+        ]
+      }
+    }
+  },
   "type": "object",
   "required": [
-    "deployed",
-    "l1"
+    "deployed"
   ],
   "properties": {
     "deployed": {
-      "additionalProperties": false,
       "type": "object",
-      "required": [
-        "l1"
-      ],
-      "properties": {
-        "l1": {
+      "patternProperties": {
+        "^(.*)$": {
           "type": "array",
           "items": {
             "format": "ethereum-string",
             "pattern": "^(0x[a-fA-F0-9]{40}|0x[a-fA-F0-9]{64}|.+)$",
             "type": "string"
           }
-        },
-        "l2": {
-          "type": "array",
-          "items": {
-            "format": "ethereum-string",
-            "pattern": "^(0x[a-fA-F0-9]{40}|0x[a-fA-F0-9]{64}|.+)$",
-            "type": "string"
-          }
-        }
-      }
-    },
-    "l1": {
-      "additionalProperties": false,
-      "type": "object",
-      "required": [
-        "rpcUrl",
-        "chainId"
-      ],
-      "properties": {
-        "rpcUrl": {
-          "type": "string"
-        },
-        "explorerHostname": {
-          "type": "string"
-        },
-        "explorerTokenEnv": {
-          "type": "string"
-        },
-        "chainId": {
-          "anyOf": [
-            {
-              "type": "number"
-            },
-            {
-              "type": "string"
-            }
-          ]
-        }
-      }
-    },
-    "l2": {
-      "additionalProperties": false,
-      "type": "object",
-      "required": [
-        "rpcUrl",
-        "chainId"
-      ],
-      "properties": {
-        "rpcUrl": {
-          "type": "string"
-        },
-        "explorerHostname": {
-          "type": "string"
-        },
-        "explorerTokenEnv": {
-          "type": "string"
-        },
-        "chainId": {
-          "anyOf": [
-            {
-              "type": "number"
-            },
-            {
-              "type": "string"
-            }
-          ]
         }
       }
     },

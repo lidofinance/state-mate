@@ -215,15 +215,9 @@ export const NetworkSectionTB = Type.Readonly(
   ),
 );
 
-const DeployedSectionTB = Type.Readonly(
-  Type.Object(
-    {
-      l1: EthereumStringArrayTB,
-      l2: Type.Optional(EthereumStringArrayTB),
-    },
-    { additionalProperties: false },
-  ),
-);
+// Section names are arbitrary (e.g. l1/l2, ethereum, optimism) — each key groups the deployed
+// addresses of the same-named network section below.
+const DeployedSectionTB = Type.Readonly(Type.Record(Type.String(), EthereumStringArrayTB));
 
 export const EntireDocumentTB = Type.Readonly(
   Type.Object(
@@ -234,15 +228,14 @@ export const EntireDocumentTB = Type.Readonly(
       eoa: Type.Optional(EthereumStringArrayTB),
       deployed: DeployedSectionTB,
       "deployed-aux": Type.Optional(EthereumStringArrayTB),
-      l1: NetworkSectionTB,
-      l2: Type.Optional(NetworkSectionTB),
       tvl: Type.Optional(PlainValueOrArray),
       delays: Type.Optional(PlainValueOrArray),
       signers: Type.Optional(PlainValueOrArray),
       selectors: Type.Optional(PlainValueOrArray),
       validators: Type.Optional(PlainValueOrArray),
     },
-    { additionalProperties: false },
+    // Any other top-level key is a network section with an arbitrary name (l1, ethereum, optimism, …)
+    { additionalProperties: NetworkSectionTB },
   ),
 );
 
@@ -250,12 +243,10 @@ export const SeedDocumentTB = Type.Readonly(
   Type.Object(
     {
       deployed: DeployedSectionTB,
-      l1: ExplorerSectionTB,
-      l2: Type.Optional(ExplorerSectionTB),
       eoa: Type.Optional(EthereumStringArrayTB),
       roles: Type.Optional(Type.Union([EthereumStringArrayTB, Type.Null()])),
       misc: Type.Optional(PlainValueOrArray),
     },
-    { additionalProperties: false },
+    { additionalProperties: ExplorerSectionTB },
   ),
 );
