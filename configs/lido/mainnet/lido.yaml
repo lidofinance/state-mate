@@ -2486,7 +2486,7 @@ l1:
         STETH: *lido
         VERIFIER_ROLE: *SM_VERIFIER_ROLE
         exitDeadlineThreshold: null
-        getActiveNodeOperatorsCount: 0
+        getActiveNodeOperatorsCount: null
         getDepositAllocationTargets: null
         getDepositsAllocation: null
         getInitializedVersion: 1
@@ -2502,7 +2502,7 @@ l1:
         getNodeOperatorOwner: null
         getNodeOperatorSummary: null
         getNodeOperatorWeightAndExternalStake: null
-        getNodeOperatorsCount: 0
+        getNodeOperatorsCount: null
         getNonce: null
         getOperatorWeights: null
         getResumeSinceTimestamp: null

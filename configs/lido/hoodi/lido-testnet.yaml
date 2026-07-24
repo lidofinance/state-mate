@@ -5,7 +5,7 @@ deployed:
   l1:
     # --- Core protocol ---
     - &lidoLocator "0xe2EF9536DAAAEBFf5b1c130957AB3E80056b06D8"
-    - &lidoLocatorImplAddress "0x1dB06d15976954D48765f40d4bDd840C257CD4B9"
+    - &lidoLocatorImplAddress "0xa519Be1BBfd95445cEdFea56C12AB0B28330CC2F"
     - &lido "0x3508A952176b3c15387C97BE809eaffB1982176a"
     - &lidoImplAddress "0xB9A2Fb8336f3775d790b3FdD6151e3F193AA7352"
     - &wstETH "0x7E99eE3C66636DE415D2d7C880938F2f40f94De4"
@@ -59,7 +59,7 @@ deployed:
     - &validatorsExitBusOracleImplAddress "0xA881F320E17Aa97d6Ce0bE76B0e2620bd2FC555A"
     - &hashConsensusForValidatorsExitBusOracle "0x30308CD8844fb2DB3ec4D056F1d475a802DCA07c"
     - &oracleReportSanityChecker "0xD0261b0032A00a7449ee7fbE14d3f98702996441"
-    - &postTokenRebaseReceiver "0x9c53d0075eA00ad77dDAd1b71E67bb97AaBC1e3D"
+    - &postTokenRebaseReceiver "0xe2d1307a8e0eb6996eE9eB6FB5949124F17EDf65"
     - &oracleDaemonConfig "0x2a833402e3F46fFC1ecAb3598c599147a78731a9"
     - &lazyOracle "0xf41491C79C30e8f4862d3F4A5b790171adB8e04A"
     - &lazyOracleImplAddress "0xC372aBC601C4eE5aA82CA2bcb54Da5a1Ef492E82"
@@ -96,13 +96,6 @@ deployed:
 
     # --- CircuitBreaker ---
     - &circuitBreaker "0x44a5789dFeDa59cD176Ab5709ec2F4829dE4d555"
-
-    # --- Gate Seals ---
-    - &gateSealFactory "0xA402349F560D45310D301E92B1AA4DeCABe147B3"
-    - &gateSealBlueprint "0x8685Ca0311E4aBd846ee1b5b8B09299E990523F7"
-    - &gateSealWithdrawalQueue "0x73d76Bd3D589B2b2185c402da82cdAfbc18b958D"
-    - &gateSealVEBAndTWG "0x368f2fcb593170823cc844F1B29e75E3d26879A1"
-    - &gateSealVaulthubAndPredepositGuarantee "0x2291496c76CC2e9368DbE9d4977ED2623cbDfb32"
 
     # --- Staking modules ---
     - &nodeOperatorsRegistry "0x5cDbE1590c083b5A2A64427fAA63A7cfDB91FbB5"
@@ -324,8 +317,6 @@ eoa:
   - &nomManager "0xF865A1d43D36c713B4DA085f32b7d1e9739B9275"
   - &csmManager "0x4AF43Ee34a6fcD1fEcA1e1F832124C763561dA53"
   - &circuitBreakerCommittee "0x83BCE68B4e8b7071b2a664a26e6D3Bc17eEe3102"
-  # Same shared testnet EOA as deployer / circuitBreakerCommittee.
-  - &gateSealCommittee "0x83BCE68B4e8b7071b2a664a26e6D3Bc17eEe3102"
   - &topUpGatewayTopUpper "0x9b186cE78Ddd6fF098b4a533Dd17a139e1FFeD76"
 
 roles:
@@ -3891,57 +3882,6 @@ l1:
         baseACL: "0x866Ad4D7283C4dcF00A01c1884DCDa98c2F1aE0A"
         regFactory: *evmScriptRegistryFactory
         baseKernel: "0x14dDb33F1D85997Bc35546e7E8CC306F5A7B9DD1"
-
-    gateSealBlueprint:
-      name: GateSeal
-      address: *gateSealBlueprint
-      checks:
-        get_sealing_committee:
-          - mustRevert: true
-        get_seal_duration_seconds:
-          - mustRevert: true
-        get_sealables:
-          - mustRevert: true
-        get_expiry_timestamp:
-          - mustRevert: true
-        is_expired:
-          - mustRevert: true
-
-    gateSealFactory:
-      name: GateSealFactory
-      address: *gateSealFactory
-      checks:
-        get_blueprint: *gateSealBlueprint
-
-    gateSealWithdrawalQueue:
-      name: GateSeal
-      address: *gateSealWithdrawalQueue
-      checks:
-        get_sealing_committee: *gateSealCommittee
-        get_seal_duration_seconds: *DURATION_2_WEEKS
-        get_sealables: [*withdrawalQueueERC721]
-        get_expiry_timestamp: 1784217696 # Wednesday, July 15, 2026 3:21:36 PM
-        is_expired: false
-
-    gateSealVEBAndTWG:
-      name: GateSeal
-      address: *gateSealVEBAndTWG
-      checks:
-        get_sealing_committee: *gateSealCommittee
-        get_seal_duration_seconds: *DURATION_2_WEEKS
-        get_sealables: [*triggerableWithdrawalsGateway, *validatorsExitBusOracle]
-        get_expiry_timestamp: 1784217696 # Wednesday, July 15, 2026 3:21:36 PM
-        is_expired: false
-
-    gateSealVaulthubAndPredepositGuarantee:
-      name: GateSeal
-      address: *gateSealVaulthubAndPredepositGuarantee
-      checks:
-        get_sealing_committee: *gateSealCommittee
-        get_seal_duration_seconds: *DURATION_2_WEEKS
-        get_sealables: [*vaultHub, *predepositGuarantee]
-        get_expiry_timestamp: 1791454296 # Wednesday, October 7, 2026 9:31:36 AM
-        is_expired: false
 
     circuitBreaker:
       name: CircuitBreaker
