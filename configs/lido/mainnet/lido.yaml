@@ -85,13 +85,6 @@ deployed:
     - &aragonEvmScriptRegistry "0x853cc0D5917f49B57B8e9F89e491F5E18919093A"
     - &aragonEvmScriptRegistryImplAddress "0xBF1Ce0Bc4EdaAD8e576b3b55e19c4C15Cf6999eb"
 
-    # --- GateSeal ---
-    - &gateSealBlueprint "0xEe06EA501f7d9DC6F4200385A8D910182D155d3e"
-    - &gateSealFactory "0x6c82877cac5a7a739f16ca0a89c0a328b8764a24"
-    - &gateSealVEBAndTWG "0xA6BC802fAa064414AA62117B4a53D27fFfF741F1"
-    - &gateSealWithdrawalQueue "0x8A854C4E750CDf24f138f34A9061b2f556066912"
-    - &gateSealVaulthubAndPredepositGuarantee "0x881dAd714679A6FeaA636446A0499101375A365c"
-    - &gateSealCSAccounting "0xE1686C2E90eb41a48356c1cC7FaA17629af3ADB3"
     - &circuitBreaker "0x6019CB557978296BA3C08a7B73225C0975DFB2F7"
 
     # --- Staking modules ---
@@ -161,7 +154,7 @@ deployed:
 
     # --- Committees (Safe msigs) ---
     - &resealManager "0x7914b5a1539b97Bd0bbd155757F25FD79A522d24"
-    - &sealCommittee "0x8772E3a2D86B9347A2688f9bc1808A6d8917760C"
+    - &circuitBreakerCommittee "0x8772E3a2D86B9347A2688f9bc1808A6d8917760C"
     - &csmCommittee "0xC52fC3081123073078698F1EAc2f1Dc7Bd71880f"
     - &curatedModuleCommittee "0x2570e0b22AD904501dfB0d49575991ACB801dD91"
 
@@ -5540,57 +5533,6 @@ l1:
         isValidBump: null
         getLatest: null
 
-    gateSealBlueprint:
-      name: GateSeal
-      address: *gateSealBlueprint
-      checks:
-        get_sealing_committee:
-          - mustRevert: true
-        get_seal_duration_seconds:
-          - mustRevert: true
-        get_sealables:
-          - mustRevert: true
-        get_expiry_timestamp:
-          - mustRevert: true
-        is_expired:
-          - mustRevert: true
-
-    gateSealFactory:
-      name: GateSealFactory
-      address: *gateSealFactory
-      checks:
-        get_blueprint: *gateSealBlueprint
-
-    gateSealWithdrawalQueue:
-      name: GateSeal
-      address: *gateSealWithdrawalQueue
-      checks:
-        get_sealing_committee: *sealCommittee
-        get_seal_duration_seconds: *DURATION_2_WEEKS
-        get_sealables: [*withdrawalQueueERC721]
-        get_expiry_timestamp: 1789207187
-        is_expired: false
-
-    gateSealVaulthubAndPredepositGuarantee:
-      name: GateSeal
-      address: *gateSealVaulthubAndPredepositGuarantee
-      checks:
-        get_sealing_committee: *sealCommittee
-        get_seal_duration_seconds: *DURATION_2_WEEKS
-        get_sealables: [*vaultHub, *predepositGuarantee]
-        get_expiry_timestamp: 1796302499 # Thursday, December 3, 2026 12:54:59 PM
-        is_expired: false
-
-    gateSealVEBAndTWG:
-      name: GateSeal
-      address: *gateSealVEBAndTWG
-      checks:
-        get_sealing_committee: *sealCommittee
-        get_seal_duration_seconds: *DURATION_2_WEEKS
-        get_sealables: [*triggerableWithdrawalsGateway, *validatorsExitBusOracle]
-        get_expiry_timestamp: 1789207187
-        is_expired: false
-
     circuitBreaker:
       name: CircuitBreaker
       address: *circuitBreaker
@@ -5625,19 +5567,19 @@ l1:
           - *CuratedEjector
         getPauser:
           - args: [*withdrawalQueueERC721]
-            result: *sealCommittee
+            result: *circuitBreakerCommittee
           - args: [*validatorsExitBusOracle]
-            result: *sealCommittee
+            result: *circuitBreakerCommittee
           - args: [*triggerableWithdrawalsGateway]
-            result: *sealCommittee
+            result: *circuitBreakerCommittee
           - args: [*vaultHub]
-            result: *sealCommittee
+            result: *circuitBreakerCommittee
           - args: [*predepositGuarantee]
-            result: *sealCommittee
+            result: *circuitBreakerCommittee
           - args: [*topUpGateway]
-            result: *sealCommittee
+            result: *circuitBreakerCommittee
           - args: [*consolidationGateway]
-            result: *sealCommittee
+            result: *circuitBreakerCommittee
           - args: [*CSModule]
             result: *csmCommittee
           - args: [*CSAccounting]
@@ -5663,14 +5605,14 @@ l1:
           - args: [*CuratedVerifier]
             result: *curatedModuleCommittee
         getPausableCount:
-          - args: [*sealCommittee]
+          - args: [*circuitBreakerCommittee]
             result: 7
           - args: [*csmCommittee]
             result: 7
           - args: [*curatedModuleCommittee]
             result: 5
         isPauserLive:
-          - args: [*sealCommittee]
+          - args: [*circuitBreakerCommittee]
             result: true
           - args: [*csmCommittee]
             result: true

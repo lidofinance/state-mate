@@ -1157,7 +1157,7 @@ l1:
         supportsInterface: null
 
     CSAccounting:
-      name: CSAccounting
+      name: Accounting
       address: *CSAccounting
       proxyName: OssifiableProxy
       implementation: *CSAccountingImplAddress
@@ -1397,7 +1397,7 @@ l1:
         VERIFIER_ROLE: *CS_VERIFIER_ROLE
 
     CSParametersRegistry:
-      name: CSParametersRegistry
+      name: ParametersRegistry
       address: *CSParametersRegistry
       proxyName: OssifiableProxy
       implementation: *CSParametersRegistryImplAddress
@@ -1471,7 +1471,7 @@ l1:
         QUEUE_LOWEST_PRIORITY: 5
 
     CSFeeOracle:
-      name: CSFeeOracle
+      name: FeeOracle
       address: *CSFeeOracle
       proxyName: OssifiableProxy
       implementation: *CSFeeOracleImplAddress
@@ -1530,7 +1530,7 @@ l1:
         isPaused: false
 
     CSFeeDistributor:
-      name: CSFeeDistributor
+      name: FeeDistributor
       address: *CSFeeDistributor
       proxyName: OssifiableProxy
       implementation: *CSFeeDistributorImplAddress
@@ -1579,7 +1579,7 @@ l1:
         treeRoot: *ZERO_BYTES32
 
     CSExitPenalties:
-      name: CSExitPenalties
+      name: ExitPenalties
       address: *CSExitPenalties
       proxyName: OssifiableProxy
       implementation: *CSExitPenaltiesImplAddress
@@ -1605,7 +1605,7 @@ l1:
         VOLUNTARY_EXIT_TYPE_ID: 0
 
     CSStrikes:
-      name: CSStrikes
+      name: ValidatorStrikes
       address: *CSStrikes
       proxyName: OssifiableProxy
       implementation: *CSStrikesImplAddress
@@ -1775,7 +1775,7 @@ l1:
         treeRoot: *ZERO_BYTES32
 
     verifierV3:
-      name: CSVerifier
+      name: Verifier
       address: *verifierV3
       checks:
         BEACON_ROOTS: *BEACON_ROOTS
@@ -1956,7 +1956,7 @@ l1:
         VERIFIER_ROLE: *CS_VERIFIER_ROLE
 
     curatedAccounting:
-      name: CSAccounting
+      name: Accounting
       address: *curatedAccounting
       proxyName: OssifiableProxy
       implementation: *curatedAccountingImplAddress
@@ -2059,7 +2059,7 @@ l1:
         WSTETH: *wstETH
 
     curatedFeeOracle:
-      name: CSFeeOracle
+      name: FeeOracle
       address: *curatedFeeOracle
       proxyName: OssifiableProxy
       implementation: *curatedFeeOracleImplAddress
@@ -2118,7 +2118,7 @@ l1:
         isPaused: false
 
     curatedVerifier:
-      name: CSVerifier
+      name: Verifier
       address: *curatedVerifier
       checks:
         BEACON_ROOTS: *BEACON_ROOTS
