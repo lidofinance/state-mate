@@ -1,35 +1,34 @@
-# yaml-language-server: $schema=../../schemas/main-schema.json
+# yaml-language-server: $schema=../../../schemas/main-schema.json
 
 parameters:
   - &trustedCaller "0x18A1065c81b0Cc356F1b1C843ddd5E14e4AefffF"
-  - &initialValidatorExitFeeLimit "100000000000000000"
-  - &maxGroupShareLimit "1000000000000000000000000"
-  - &maxDefaultTierShareLimit "1000000000000000000000000"
+  - &INITIAL_VALIDATOR_EXIT_FEE_LIMIT "100000000000000000"
+  - &MAX_GROUP_SHARE_LIMIT "1000000000000000000000000"
+  - &MAX_DEFAULT_TIER_SHARE_LIMIT "1000000000000000000000000"
   - &csmCommittee "0xC52fC3081123073078698F1EAc2f1Dc7Bd71880f"
   - &curatedModuleCommittee "0x2570e0b22AD904501dfB0d49575991ACB801dD91"
   # https://research.lido.fi/t/community-staking-module/5917/218
-  - &maxPriorityExitShareThresholdDecrease 600
-  - &maxPriorityExitShareThresholdIncrease 600
-  - &maxStakeShareLimitDecrease 500
-  - &maxStakeShareLimitIncrease 500
+  - &MAX_PRIORITY_EXIT_SHARE_THRESHOLD_DECREASE 600
+  - &MAX_PRIORITY_EXIT_SHARE_THRESHOLD_INCREASE 600
+  - &MAX_STAKE_SHARE_LIMIT_DECREASE 500
+  - &MAX_STAKE_SHARE_LIMIT_INCREASE 500
 
 misc:
   - &DEFAULT_TIER_OPERATOR "0xFFfFfFffFFfffFFfFFfFFFFFffFFFffffFfFFFfF"
   - &locator "0xC1d0b3DE6792Bf6b4b37EccdcC24e45978Cfd2Eb"
   - &evmScriptExecutor "0xFE5986E06210aC1eCC1aDCafc0cc7f8D63B3F977"
   - &withdrawalRequestPredeployAddress "0x00000961Ef480Eb55e80D19ad83579A64c007002"
-  - &ET_CANCEL_ROLE "0x9f959e00d95122f5cbd677010436cf273ef535b86b056afc172852144b9491d7"
   - &ZERO_BYTES32 "0x0000000000000000000000000000000000000000000000000000000000000000"
   - &EASYTRACK_MAX_MOTIONS_LIMIT 24
   - &EASYTRACK_MAX_OBJECTIONS_THRESHOLD 500
   - &EASYTRACK_MIN_MOTION_DURATION 172800 # 2 days
-  - &ET_PAUSE_ROLE "0x139c2898040ef16910dc9f44dc697df79363da767d8bc92f2e310312b816e46d"
-  - &ET_UNPAUSE_ROLE "0x265b220c5a8891efdd9e1b1b7fa72f257bd5169f8d87e319cf3dad6ff52b94ae"
   - &ldo "0x5A98FcBEA516Cf06857215779Fd812CA3beF1B32"
-  - &ET_FIRST_FACTORY "0xFeBd8FAC16De88206d4b18764e826AF38546AfE0"
-  - &NEW_SDVT_SUBMIT_EXIT_HASHES_FACTORY "0x58A59dDC6Aea9b1D5743D024E15DfA4badB56E37"
-  - &NEW_CURATED_SUBMIT_EXIT_HASHES_FACTORY "0x4F716AD3Cc7A3A5cdA2359e5B2c84335c171dCde"
-  - &EMERGENCY_BRAKES "0x73b047fe6337183A454c5217241D780a932777bD"
+  - &etFirstFactory "0xFeBd8FAC16De88206d4b18764e826AF38546AfE0"
+  - &emergencyBrakes "0x73b047fe6337183A454c5217241D780a932777bD"
+  - &nodeOperatorsRegistry "0x55032650b14df07b85bF18A3a3eC8E0Af2e028d5"
+  - &simpleDVT "0xaE7B191A31f627b4eB1d4DaC64eaB9976995b433"
+  - &validatorsExitBusOracle "0x0De4Ea0184c2ad0BacA7183356Aea5B8d5Bf5c6e"
+  - &sdvtTrustedCaller "0x08637515E85A4633E23dfc7861e2A9f53af640f7"
   - &communityStakingModule "0xdA7dE2ECdDfccC6c3AF10108Db212ACBBf9EA83F"
   - &csmAccounting "0x4d72BFF1BeaC69925F8Bd12526a39BAAb069e5Da"
   - &curatedModule "0xDa5F930cE326EB5205085D66c72A4E79d60cB8C1"
@@ -39,53 +38,60 @@ misc:
   - &consolidationMigrator "0x9Dc70b5A4f4F5E4AF9058C983D560564F031f1D7"
 
   # -- Max fees ---
-  - &maxInfraFeeBP "100" # 1%
-  - &maxLiquidityFeeBP "1000" # 10%
-  - &maxReservationFeeBP "0" # 0%
+  - &MAX_INFRA_FEE_BP "100" # 1%
+  - &MAX_LIQUIDITY_FEE_BP "1000" # 10%
+  - &MAX_RESERVATION_FEE_BP "0" # 0%
 
   # --- Factory permissions ---
-  - &CSMUpdateStakingModuleShareLimitsPermissions "0x0c6703f1d8d9ddfb6c6e5f57b4f7432a6500d6d85adcee90fddf38947afb03c621c71b06c9c70bce73f1299913976a06" # cast concat-hex "0x0C6703F1d8D9DdfB6c6e5F57b4f7432a6500D6D8" $(cast sig "validateParams((uint16,uint16,uint16,uint16))") "0xFdDf38947aFB03C621C71b06C9C70bce73f12999" $(cast sig "updateModuleShares(uint256,uint16,uint16)") | awk '{print tolower($0)}'
-  - &AllowConsolidationPairCMv1CMv2Permissions "0x9dc70b5a4f4f5e4af9058c983d560564f031f1d7b4ecbe1a" # cast concat-hex "0x9Dc70b5A4f4F5E4AF9058C983D560564F031f1D7" $(cast sig "allowPair(uint256,uint256,address)") | awk '{print tolower($0)}'
-  - &CSMSetMerkleGateTreePermissions "0xf3ec30b86c3dc1b8a1c754d885f9be3160e15b4c672c809eb314d4a76c457c93150d308787939063f4cc67e0ed4b1869a12760721a72a7199ab38059da6690b9cd4ed7b8ed4b1869" # cast concat-hex "0xf3ec30B86c3dC1b8a1C754D885F9bE3160e15B4c" $(cast sig "validateInputData(address,bytes32,string,bytes32,string)") "0xB314D4A76C457c93150d308787939063F4Cc67E0" $(cast sig "setTreeParams(bytes32,string)") "0xa12760721A72A7199aB38059DA6690b9Cd4ed7B8" $(cast sig "setTreeParams(bytes32,string)") | awk '{print tolower($0)}'
-  - &CSMReportWithdrawalsForSlashedValidatorsPermissions "0xda7de2ecddfccc6c3af10108db212acbbf9ea83f4412f7aa" # cast concat-hex "0xdA7dE2ECdDfccC6c3AF10108Db212ACBBf9EA83F" $(cast sig "reportSlashedWithdrawnValidators((uint256,uint256,uint256,uint256,bool)[])") | awk '{print tolower($0)}'
-  - &CSMSettleGeneralDelayedPenaltyPermissions "0xda7de2ecddfccc6c3af10108db212acbbf9ea83f187d9f92" # cast concat-hex "0xdA7dE2ECdDfccC6c3AF10108Db212ACBBf9EA83F" $(cast sig "settleGeneralDelayedPenalty(uint256[],uint256[])") | awk '{print tolower($0)}'
-  - &CMSetMerkleGateTreePermissions "0xa121667d1780a1d54eaed67ae17ee13d0f872d60672c809e6093efa6b5e2ff3be54d1c895c9dea932805c49fed4b18698c002c6ee10cf8adb78d1f9eb2e134fdaf8a7c1aed4b1869207798e6fd1aa7ee8a63782a64c959cd6727b78ced4b1869ef273ca4a21ba7b414ae3c9f9b443038cb133f72ed4b18693bbbb175f7f07954de00052b20e1c5572223f24ded4b186986a8d4e0db5938d21d98047544668fccb1a9adc8ed4b1869773933f9db8964a17d62fb808f2ec7a2de4247cced4b1869" # cast concat-hex "0xa121667D1780a1D54EAEd67AE17ee13d0f872D60" $(cast sig "validateInputData(address,bytes32,string,bytes32,string)") "0x6093EFA6B5E2FF3be54d1c895c9deA932805c49F" $(cast sig "setTreeParams(bytes32,string)") "0x8c002c6eE10cf8adb78D1F9EB2e134FdaF8A7C1a" $(cast sig "setTreeParams(bytes32,string)") "0x207798e6fD1aa7Ee8a63782A64c959cD6727b78C" $(cast sig "setTreeParams(bytes32,string)") "0xeF273Ca4A21Ba7B414Ae3C9f9b443038cb133F72" $(cast sig "setTreeParams(bytes32,string)") "0x3BbBb175f7F07954DE00052b20E1c5572223F24D" $(cast sig "setTreeParams(bytes32,string)") "0x86A8d4E0db5938D21d98047544668FCCB1A9ADc8" $(cast sig "setTreeParams(bytes32,string)") "0x773933F9db8964A17d62fb808f2EC7A2de4247CC" $(cast sig "setTreeParams(bytes32,string)") | awk '{print tolower($0)}'
-  - &CMReportWithdrawalsForSlashedValidatorsPermissions "0xda5f930ce326eb5205085d66c72a4e79d60cb8c14412f7aa" # cast concat-hex "0xDa5F930cE326EB5205085D66c72A4E79d60cB8C1" $(cast sig "reportSlashedWithdrawnValidators((uint256,uint256,uint256,uint256,bool)[])") | awk '{print tolower($0)}'
-  - &CMSettleGeneralDelayedPenaltyPermissions "0xda5f930ce326eb5205085d66c72a4e79d60cb8c1187d9f92" # cast concat-hex "0xDa5F930cE326EB5205085D66c72A4E79d60cB8C1" $(cast sig "settleGeneralDelayedPenalty(uint256[],uint256[])") | awk '{print tolower($0)}'
-  - &CMCreateOrUpdateOperatorGroupPermissions "0x2fc78638b77381e9d040163bd6eb1cac967bdbdfc4e88725a64b339eebd3dc3de848298b6a140955932901d852d13274" # cast concat-hex "0x2fC78638b77381e9D040163Bd6EB1cac967bDBdF" $(cast sig "validateInputData(uint256,(string,(uint64,uint16)[],(bytes)[]),(string,(uint64,uint16)[],(bytes)[]))") "0xA64b339eebD3dC3De848298B6a140955932901d8" $(cast sig "createOrUpdateOperatorGroup(uint256,(string,(uint64,uint16)[],(bytes)[]))") | awk '{print tolower($0)}'
+  - &CSM_UPDATE_STAKING_MODULE_SHARE_LIMITS_PERMISSIONS "0x0c6703f1d8d9ddfb6c6e5f57b4f7432a6500d6d85adcee90fddf38947afb03c621c71b06c9c70bce73f1299913976a06" # cast concat-hex "0x0C6703F1d8D9DdfB6c6e5F57b4f7432a6500D6D8" $(cast sig "validateParams((uint16,uint16,uint16,uint16))") "0xFdDf38947aFB03C621C71b06C9C70bce73f12999" $(cast sig "updateModuleShares(uint256,uint16,uint16)") | awk '{print tolower($0)}'
+  - &ALLOW_CONSOLIDATION_PAIR_CMV1_CMV2_PERMISSIONS "0x9dc70b5a4f4f5e4af9058c983d560564f031f1d7b4ecbe1a" # cast concat-hex "0x9Dc70b5A4f4F5E4AF9058C983D560564F031f1D7" $(cast sig "allowPair(uint256,uint256,address)") | awk '{print tolower($0)}'
+  - &CSM_SET_MERKLE_GATE_TREE_PERMISSIONS "0xf3ec30b86c3dc1b8a1c754d885f9be3160e15b4c672c809eb314d4a76c457c93150d308787939063f4cc67e0ed4b1869a12760721a72a7199ab38059da6690b9cd4ed7b8ed4b1869" # cast concat-hex "0xf3ec30B86c3dC1b8a1C754D885F9bE3160e15B4c" $(cast sig "validateInputData(address,bytes32,string,bytes32,string)") "0xB314D4A76C457c93150d308787939063F4Cc67E0" $(cast sig "setTreeParams(bytes32,string)") "0xa12760721A72A7199aB38059DA6690b9Cd4ed7B8" $(cast sig "setTreeParams(bytes32,string)") | awk '{print tolower($0)}'
+  - &CSM_REPORT_WITHDRAWALS_FOR_SLASHED_VALIDATORS_PERMISSIONS "0xda7de2ecddfccc6c3af10108db212acbbf9ea83f4412f7aa" # cast concat-hex "0xdA7dE2ECdDfccC6c3AF10108Db212ACBBf9EA83F" $(cast sig "reportSlashedWithdrawnValidators((uint256,uint256,uint256,uint256,bool)[])") | awk '{print tolower($0)}'
+  - &CSM_SETTLE_GENERAL_DELAYED_PENALTY_PERMISSIONS "0xda7de2ecddfccc6c3af10108db212acbbf9ea83f187d9f92" # cast concat-hex "0xdA7dE2ECdDfccC6c3AF10108Db212ACBBf9EA83F" $(cast sig "settleGeneralDelayedPenalty(uint256[],uint256[])") | awk '{print tolower($0)}'
+  - &CM_SET_MERKLE_GATE_TREE_PERMISSIONS "0xa121667d1780a1d54eaed67ae17ee13d0f872d60672c809e6093efa6b5e2ff3be54d1c895c9dea932805c49fed4b18698c002c6ee10cf8adb78d1f9eb2e134fdaf8a7c1aed4b1869207798e6fd1aa7ee8a63782a64c959cd6727b78ced4b1869ef273ca4a21ba7b414ae3c9f9b443038cb133f72ed4b18693bbbb175f7f07954de00052b20e1c5572223f24ded4b186986a8d4e0db5938d21d98047544668fccb1a9adc8ed4b1869773933f9db8964a17d62fb808f2ec7a2de4247cced4b1869" # cast concat-hex "0xa121667D1780a1D54EAEd67AE17ee13d0f872D60" $(cast sig "validateInputData(address,bytes32,string,bytes32,string)") "0x6093EFA6B5E2FF3be54d1c895c9deA932805c49F" $(cast sig "setTreeParams(bytes32,string)") "0x8c002c6eE10cf8adb78D1F9EB2e134FdaF8A7C1a" $(cast sig "setTreeParams(bytes32,string)") "0x207798e6fD1aa7Ee8a63782A64c959cD6727b78C" $(cast sig "setTreeParams(bytes32,string)") "0xeF273Ca4A21Ba7B414Ae3C9f9b443038cb133F72" $(cast sig "setTreeParams(bytes32,string)") "0x3BbBb175f7F07954DE00052b20E1c5572223F24D" $(cast sig "setTreeParams(bytes32,string)") "0x86A8d4E0db5938D21d98047544668FCCB1A9ADc8" $(cast sig "setTreeParams(bytes32,string)") "0x773933F9db8964A17d62fb808f2EC7A2de4247CC" $(cast sig "setTreeParams(bytes32,string)") | awk '{print tolower($0)}'
+  - &CM_REPORT_WITHDRAWALS_FOR_SLASHED_VALIDATORS_PERMISSIONS "0xda5f930ce326eb5205085d66c72a4e79d60cb8c14412f7aa" # cast concat-hex "0xDa5F930cE326EB5205085D66c72A4E79d60cB8C1" $(cast sig "reportSlashedWithdrawnValidators((uint256,uint256,uint256,uint256,bool)[])") | awk '{print tolower($0)}'
+  - &CM_SETTLE_GENERAL_DELAYED_PENALTY_PERMISSIONS "0xda5f930ce326eb5205085d66c72a4e79d60cb8c1187d9f92" # cast concat-hex "0xDa5F930cE326EB5205085D66c72A4E79d60cB8C1" $(cast sig "settleGeneralDelayedPenalty(uint256[],uint256[])") | awk '{print tolower($0)}'
+  - &CM_CREATE_OR_UPDATE_OPERATOR_GROUP_PERMISSIONS "0x2fc78638b77381e9d040163bd6eb1cac967bdbdfc4e88725a64b339eebd3dc3de848298b6a140955932901d852d13274" # cast concat-hex "0x2fC78638b77381e9D040163Bd6EB1cac967bDBdF" $(cast sig "validateInputData(uint256,(string,(uint64,uint16)[],(bytes)[]),(string,(uint64,uint16)[],(bytes)[]))") "0xA64b339eebD3dC3De848298B6a140955932901d8" $(cast sig "createOrUpdateOperatorGroup(uint256,(string,(uint64,uint16)[],(bytes)[]))") | awk '{print tolower($0)}'
+
+roles:
+  - &ET_CANCEL_ROLE "0x9f959e00d95122f5cbd677010436cf273ef535b86b056afc172852144b9491d7"
+  - &ET_PAUSE_ROLE "0x139c2898040ef16910dc9f44dc697df79363da767d8bc92f2e310312b816e46d"
+  - &ET_UNPAUSE_ROLE "0x265b220c5a8891efdd9e1b1b7fa72f257bd5169f8d87e319cf3dad6ff52b94ae"
 
 deployed:
   l1:
-    - &EasyTrack "0xF0211b7660680B49De1A7E9f25C65660F0a13Fea"
-    - &RegisterGroupsInOperatorGrid "0x17305dB55c908e84C58BbDCa57258A7D1f7eEa7c"
-    - &UpdateGroupsShareLimitInOperatorGrid "0xf23559De8ab37fF7a154384B0822dA867Cfa7Eac"
-    - &RegisterTiersInOperatorGrid "0x6b535F441F95046562406F4E2518D9AD7Db2dc0D"
-    - &AlterTiersInOperatorGrid "0x37d9B09EDA477a84E3913fCB4d032EFb0BF9B62E"
-    - &VaultsAdapter "0x28F9Ac198C4E0FA6A9Ad2c2f97CB38F1A3120f27"
-    - &SetJailStatusInOperatorGrid "0x6a4f33F05E7412A11100353724Bb6a152Cf0D305"
-    - &UpdateVaultsFeesInOperatorGrid "0xDfA0bc38113B6d53c2881573FD764CEEFf468610"
-    - &ForceValidatorExitsInVaultHub "0x6F5c0A5a824773E8f8285bC5aA59ea0Aab2A6400"
-    - &SocializeBadDebtInVaultHub "0xaf35A63a4114B7481589fDD9FDB3e35Fd65fAed7"
-    - &SetLiabilitySharesTargetInVaultHub "0x647DeE7bF33e44829e6430F7A08F63b3319694f0"
-    - &CSMSetMerkleGateTree "0xf3ec30B86c3dC1b8a1C754D885F9bE3160e15B4c"
-    - &CSMReportWithdrawalsForSlashedValidators "0xE330516a03bDdEBA4209b5591112f1aa3dd90F0A"
-    - &CSMSettleGeneralDelayedPenalty "0xB71755bE764abB4Ce26cb4dADf056Be57fB8880F"
-    - &CSMUpdateStakingModuleShareLimits "0x0C6703F1d8D9DdfB6c6e5F57b4f7432a6500D6D8"
-    - &CMSetMerkleGateTree "0xa121667D1780a1D54EAEd67AE17ee13d0f872D60"
-    - &CMReportWithdrawalsForSlashedValidators "0x71862Abd99819597670007bb992A7a7562fE50f2"
-    - &CMSettleGeneralDelayedPenalty "0xfffEFC16231eDC6Dc9C93e364ff4D4E3f787f416"
-    - &CMCreateOrUpdateOperatorGroup "0x2fC78638b77381e9D040163Bd6EB1cac967bDBdF"
-    - &AllowConsolidationPairCMv1CMv2 "0x29e23B1EF0c9fffAc8330F9abaCebDDD827E4b5C"
+    - &easyTrack "0xF0211b7660680B49De1A7E9f25C65660F0a13Fea"
+    - &registerGroupsInOperatorGrid "0x17305dB55c908e84C58BbDCa57258A7D1f7eEa7c"
+    - &updateGroupsShareLimitInOperatorGrid "0xf23559De8ab37fF7a154384B0822dA867Cfa7Eac"
+    - &registerTiersInOperatorGrid "0x6b535F441F95046562406F4E2518D9AD7Db2dc0D"
+    - &alterTiersInOperatorGrid "0x37d9B09EDA477a84E3913fCB4d032EFb0BF9B62E"
+    - &vaultsAdapter "0x28F9Ac198C4E0FA6A9Ad2c2f97CB38F1A3120f27"
+    - &setJailStatusInOperatorGrid "0x6a4f33F05E7412A11100353724Bb6a152Cf0D305"
+    - &updateVaultsFeesInOperatorGrid "0xDfA0bc38113B6d53c2881573FD764CEEFf468610"
+    - &forceValidatorExitsInVaultHub "0x6F5c0A5a824773E8f8285bC5aA59ea0Aab2A6400"
+    - &socializeBadDebtInVaultHub "0xaf35A63a4114B7481589fDD9FDB3e35Fd65fAed7"
+    - &setLiabilitySharesTargetInVaultHub "0x647DeE7bF33e44829e6430F7A08F63b3319694f0"
+    - &csmSetMerkleGateTree "0xf3ec30B86c3dC1b8a1C754D885F9bE3160e15B4c"
+    - &csmReportWithdrawalsForSlashedValidators "0xE330516a03bDdEBA4209b5591112f1aa3dd90F0A"
+    - &csmSettleGeneralDelayedPenalty "0xB71755bE764abB4Ce26cb4dADf056Be57fB8880F"
+    - &csmUpdateStakingModuleShareLimits "0x0C6703F1d8D9DdfB6c6e5F57b4f7432a6500D6D8"
+    - &cmSetMerkleGateTree "0xa121667D1780a1D54EAEd67AE17ee13d0f872D60"
+    - &cmReportWithdrawalsForSlashedValidators "0x71862Abd99819597670007bb992A7a7562fE50f2"
+    - &cmSettleGeneralDelayedPenalty "0xfffEFC16231eDC6Dc9C93e364ff4D4E3f787f416"
+    - &cmCreateOrUpdateOperatorGroup "0x2fC78638b77381e9D040163Bd6EB1cac967bDBdF"
+    - &allowConsolidationPairCMv1CMv2 "0x29e23B1EF0c9fffAc8330F9abaCebDDD827E4b5C"
+    - &newSdvtSubmitExitHashesFactory "0x58A59dDC6Aea9b1D5743D024E15DfA4badB56E37"
+    - &newCuratedSubmitExitHashesFactory "0x4F716AD3Cc7A3A5cdA2359e5B2c84335c171dCde"
 
 l1:
-  rpcUrl: MAINNET_REMOTE_RPC_URL
-  explorerHostname: api.etherscan.io/v2/api
+  rpcUrl: ETH_RPC_URL
+  explorerHostname: api.etherscan.io
   explorerTokenEnv: ETHERSCAN_TOKEN
   chainId: 1
   contracts:
     EasyTrack:
       name: EasyTrack
-      address: *EasyTrack
+      address: *easyTrack
       checks:
         CANCEL_ROLE: *ET_CANCEL_ROLE
         DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
@@ -98,72 +104,72 @@ l1:
         evmScriptExecutor: *evmScriptExecutor
         evmScriptFactories:
           - args: [0]
-            result: *ET_FIRST_FACTORY
+            result: *etFirstFactory
           - args: [3]
-            result: *AlterTiersInOperatorGrid
+            result: *alterTiersInOperatorGrid
           - args: [30]
-            result: *RegisterTiersInOperatorGrid
+            result: *registerTiersInOperatorGrid
           - args: [31]
-            result: *UpdateVaultsFeesInOperatorGrid
+            result: *updateVaultsFeesInOperatorGrid
           - args: [32]
-            result: *SocializeBadDebtInVaultHub
+            result: *socializeBadDebtInVaultHub
           - args: [33]
-            result: *SetJailStatusInOperatorGrid
+            result: *setJailStatusInOperatorGrid
           - args: [34]
-            result: *ForceValidatorExitsInVaultHub
+            result: *forceValidatorExitsInVaultHub
           - args: [35]
-            result: *NEW_SDVT_SUBMIT_EXIT_HASHES_FACTORY
+            result: *newSdvtSubmitExitHashesFactory
           - args: [36]
-            result: *NEW_CURATED_SUBMIT_EXIT_HASHES_FACTORY
+            result: *newCuratedSubmitExitHashesFactory
           - args: [37]
-            result: *UpdateGroupsShareLimitInOperatorGrid
+            result: *updateGroupsShareLimitInOperatorGrid
           - args: [38]
-            result: *RegisterGroupsInOperatorGrid
+            result: *registerGroupsInOperatorGrid
           - args: [39]
-            result: *CSMUpdateStakingModuleShareLimits
+            result: *csmUpdateStakingModuleShareLimits
           - args: [40]
-            result: *AllowConsolidationPairCMv1CMv2
+            result: *allowConsolidationPairCMv1CMv2
           - args: [41]
-            result: *CSMSetMerkleGateTree
+            result: *csmSetMerkleGateTree
           - args: [42]
-            result: *CSMReportWithdrawalsForSlashedValidators
+            result: *csmReportWithdrawalsForSlashedValidators
           - args: [43]
-            result: *CSMSettleGeneralDelayedPenalty
+            result: *csmSettleGeneralDelayedPenalty
           - args: [44]
-            result: *CMSetMerkleGateTree
+            result: *cmSetMerkleGateTree
           - args: [45]
-            result: *CMReportWithdrawalsForSlashedValidators
+            result: *cmReportWithdrawalsForSlashedValidators
           - args: [46]
-            result: *CMSettleGeneralDelayedPenalty
+            result: *cmSettleGeneralDelayedPenalty
           - args: [47]
-            result: *CMCreateOrUpdateOperatorGroup
+            result: *cmCreateOrUpdateOperatorGroup
           - args: [48]
             mustRevert: true
         evmScriptFactoryPermissions:
-          - args: [*CSMUpdateStakingModuleShareLimits]
-            result: *CSMUpdateStakingModuleShareLimitsPermissions
-          - args: [*AllowConsolidationPairCMv1CMv2]
-            result: *AllowConsolidationPairCMv1CMv2Permissions
-          - args: [*CSMSetMerkleGateTree]
-            result: *CSMSetMerkleGateTreePermissions
-          - args: [*CSMReportWithdrawalsForSlashedValidators]
-            result: *CSMReportWithdrawalsForSlashedValidatorsPermissions
-          - args: [*CSMSettleGeneralDelayedPenalty]
-            result: *CSMSettleGeneralDelayedPenaltyPermissions
-          - args: [*CMSetMerkleGateTree]
-            result: *CMSetMerkleGateTreePermissions
-          - args: [*CMReportWithdrawalsForSlashedValidators]
-            result: *CMReportWithdrawalsForSlashedValidatorsPermissions
-          - args: [*CMSettleGeneralDelayedPenalty]
-            result: *CMSettleGeneralDelayedPenaltyPermissions
-          - args: [*CMCreateOrUpdateOperatorGroup]
-            result: *CMCreateOrUpdateOperatorGroupPermissions
+          - args: [*csmUpdateStakingModuleShareLimits]
+            result: *CSM_UPDATE_STAKING_MODULE_SHARE_LIMITS_PERMISSIONS
+          - args: [*allowConsolidationPairCMv1CMv2]
+            result: *ALLOW_CONSOLIDATION_PAIR_CMV1_CMV2_PERMISSIONS
+          - args: [*csmSetMerkleGateTree]
+            result: *CSM_SET_MERKLE_GATE_TREE_PERMISSIONS
+          - args: [*csmReportWithdrawalsForSlashedValidators]
+            result: *CSM_REPORT_WITHDRAWALS_FOR_SLASHED_VALIDATORS_PERMISSIONS
+          - args: [*csmSettleGeneralDelayedPenalty]
+            result: *CSM_SETTLE_GENERAL_DELAYED_PENALTY_PERMISSIONS
+          - args: [*cmSetMerkleGateTree]
+            result: *CM_SET_MERKLE_GATE_TREE_PERMISSIONS
+          - args: [*cmReportWithdrawalsForSlashedValidators]
+            result: *CM_REPORT_WITHDRAWALS_FOR_SLASHED_VALIDATORS_PERMISSIONS
+          - args: [*cmSettleGeneralDelayedPenalty]
+            result: *CM_SETTLE_GENERAL_DELAYED_PENALTY_PERMISSIONS
+          - args: [*cmCreateOrUpdateOperatorGroup]
+            result: *CM_CREATE_OR_UPDATE_OPERATOR_GROUP_PERMISSIONS
         getEVMScriptFactories:
           [
-            *ET_FIRST_FACTORY,
+            *etFirstFactory,
             0x7E8eFfAb3083fB26aCE6832bFcA4C377905F97d7,
             0x9721c0f77E3Ea40eD592B9DCf3032DaF269c0306,
-            *AlterTiersInOperatorGrid,
+            *alterTiersInOperatorGrid,
             0xBd2b6dC189EefD51B273F5cb2d99BA1ce565fb8C,
             0x48c135Ff690C2Aa7F5B11C539104B5855A4f9252,
             0x200dA0b6a9905A377CF8D469664C65dB267009d1,
@@ -190,72 +196,72 @@ l1:
             0x6e04aED774B7c89BB43721AcDD7D03C872a51B69,
             0x0d2aefA542aFa8d9D1Ec35376068B88042FEF5f6,
             0x161a4552A625844c822954C5AcBac928ee0f399B,
-            *RegisterTiersInOperatorGrid,
-            *UpdateVaultsFeesInOperatorGrid,
-            *SocializeBadDebtInVaultHub,
-            *SetJailStatusInOperatorGrid,
-            *ForceValidatorExitsInVaultHub,
-            *NEW_SDVT_SUBMIT_EXIT_HASHES_FACTORY,
-            *NEW_CURATED_SUBMIT_EXIT_HASHES_FACTORY,
-            *UpdateGroupsShareLimitInOperatorGrid,
-            *RegisterGroupsInOperatorGrid,
-            *CSMUpdateStakingModuleShareLimits,
-            *AllowConsolidationPairCMv1CMv2,
-            *CSMSetMerkleGateTree,
-            *CSMReportWithdrawalsForSlashedValidators,
-            *CSMSettleGeneralDelayedPenalty,
-            *CMSetMerkleGateTree,
-            *CMReportWithdrawalsForSlashedValidators,
-            *CMSettleGeneralDelayedPenalty,
-            *CMCreateOrUpdateOperatorGroup,
+            *registerTiersInOperatorGrid,
+            *updateVaultsFeesInOperatorGrid,
+            *socializeBadDebtInVaultHub,
+            *setJailStatusInOperatorGrid,
+            *forceValidatorExitsInVaultHub,
+            *newSdvtSubmitExitHashesFactory,
+            *newCuratedSubmitExitHashesFactory,
+            *updateGroupsShareLimitInOperatorGrid,
+            *registerGroupsInOperatorGrid,
+            *csmUpdateStakingModuleShareLimits,
+            *allowConsolidationPairCMv1CMv2,
+            *csmSetMerkleGateTree,
+            *csmReportWithdrawalsForSlashedValidators,
+            *csmSettleGeneralDelayedPenalty,
+            *cmSetMerkleGateTree,
+            *cmReportWithdrawalsForSlashedValidators,
+            *cmSettleGeneralDelayedPenalty,
+            *cmCreateOrUpdateOperatorGroup,
           ]
         getMotion: null
         getMotions: null
         getRoleAdmin: null
         governanceToken: *ldo
         hasRole:
-          - args: [*ET_PAUSE_ROLE, *EMERGENCY_BRAKES]
+          - args: [*ET_PAUSE_ROLE, *emergencyBrakes]
             result: true
         isEVMScriptFactory:
-          - args: [*ET_FIRST_FACTORY]
+          - args: [*etFirstFactory]
             result: true
-          - args: [*RegisterGroupsInOperatorGrid]
+          - args: [*registerGroupsInOperatorGrid]
             result: true
-          - args: [*RegisterTiersInOperatorGrid]
+          - args: [*registerTiersInOperatorGrid]
             result: true
-          - args: [*AlterTiersInOperatorGrid]
+          - args: [*alterTiersInOperatorGrid]
             result: true
-          - args: [*UpdateGroupsShareLimitInOperatorGrid]
+          - args: [*updateGroupsShareLimitInOperatorGrid]
             result: true
-          - args: [*VaultsAdapter]
+          - args: [*vaultsAdapter]
             result: false
-          - args: [*SetJailStatusInOperatorGrid]
+          - args: [*setJailStatusInOperatorGrid]
             result: true
-          - args: [*UpdateVaultsFeesInOperatorGrid]
+          - args: [*updateVaultsFeesInOperatorGrid]
             result: true
-          - args: [*ForceValidatorExitsInVaultHub]
+          - args: [*forceValidatorExitsInVaultHub]
             result: true
-          - args: [*SocializeBadDebtInVaultHub]
+          - args: [*socializeBadDebtInVaultHub]
             result: true
-          - args: [*SetLiabilitySharesTargetInVaultHub]
+          - args: [*setLiabilitySharesTargetInVaultHub]
             result: false
-          - args: [*CSMUpdateStakingModuleShareLimits]
+          - args: [*csmUpdateStakingModuleShareLimits]
             result: true
-          - args: [*AllowConsolidationPairCMv1CMv2]
+          - args: [*allowConsolidationPairCMv1CMv2]
             result: true
-          - args: [*CSMSetMerkleGateTree]
+          - args: [*csmSetMerkleGateTree]
             result: true
-          - args: [*CSMReportWithdrawalsForSlashedValidators]
+          - args: [*csmReportWithdrawalsForSlashedValidators]
             result: true
-          - args: [*CSMSettleGeneralDelayedPenalty]
+          - args: [*csmSettleGeneralDelayedPenalty]
             result: true
-          - args: [*CMSetMerkleGateTree]
+          - args: [*cmSetMerkleGateTree]
             result: true
-          - args: [*CMReportWithdrawalsForSlashedValidators]
+          - args: [*cmReportWithdrawalsForSlashedValidators]
             result: true
-          - args: [*CMSettleGeneralDelayedPenalty]
+          - args: [*cmSettleGeneralDelayedPenalty]
             result: true
-          - args: [*CMCreateOrUpdateOperatorGroup]
+          - args: [*cmCreateOrUpdateOperatorGroup]
             result: true
         motionDuration: 259200
         motions: null
@@ -266,26 +272,26 @@ l1:
         supportsInterface: null
     RegisterGroupsInOperatorGrid:
       name: RegisterGroupsInOperatorGrid
-      address: *RegisterGroupsInOperatorGrid
+      address: *registerGroupsInOperatorGrid
       checks:
         DEFAULT_TIER_OPERATOR: *DEFAULT_TIER_OPERATOR
         createEVMScript: null
         decodeEVMScriptCallData: null
         lidoLocator: *locator
-        maxShareLimit: *maxGroupShareLimit
+        maxShareLimit: *MAX_GROUP_SHARE_LIMIT
         trustedCaller: *trustedCaller
     UpdateGroupsShareLimitInOperatorGrid:
       name: UpdateGroupsShareLimitInOperatorGrid
-      address: *UpdateGroupsShareLimitInOperatorGrid
+      address: *updateGroupsShareLimitInOperatorGrid
       checks:
         createEVMScript: null
         decodeEVMScriptCallData: null
         lidoLocator: *locator
-        maxShareLimit: *maxGroupShareLimit
+        maxShareLimit: *MAX_GROUP_SHARE_LIMIT
         trustedCaller: *trustedCaller
     RegisterTiersInOperatorGrid:
       name: RegisterTiersInOperatorGrid
-      address: *RegisterTiersInOperatorGrid
+      address: *registerTiersInOperatorGrid
       checks:
         DEFAULT_TIER_OPERATOR: *DEFAULT_TIER_OPERATOR
         createEVMScript: null
@@ -294,70 +300,70 @@ l1:
         trustedCaller: *trustedCaller
     AlterTiersInOperatorGrid:
       name: AlterTiersInOperatorGrid
-      address: *AlterTiersInOperatorGrid
+      address: *alterTiersInOperatorGrid
       checks:
         createEVMScript: null
         decodeEVMScriptCallData: null
-        defaultTierMaxShareLimit: *maxDefaultTierShareLimit
+        defaultTierMaxShareLimit: *MAX_DEFAULT_TIER_SHARE_LIMIT
         lidoLocator: *locator
         trustedCaller: *trustedCaller
     VaultsAdapter:
       name: VaultsAdapter
-      address: *VaultsAdapter
+      address: *vaultsAdapter
       checks:
         WITHDRAWAL_REQUEST_PREDEPLOY_ADDRESS: *withdrawalRequestPredeployAddress
         evmScriptExecutor: *evmScriptExecutor
         lidoLocator: *locator
         trustedCaller: *trustedCaller
-        validatorExitFeeLimit: *initialValidatorExitFeeLimit
+        validatorExitFeeLimit: *INITIAL_VALIDATOR_EXIT_FEE_LIMIT
     SetJailStatusInOperatorGrid:
       name: SetJailStatusInOperatorGrid
-      address: *SetJailStatusInOperatorGrid
+      address: *setJailStatusInOperatorGrid
       checks:
         createEVMScript: null
         decodeEVMScriptCallData: null
         trustedCaller: *trustedCaller
-        vaultsAdapter: *VaultsAdapter
+        vaultsAdapter: *vaultsAdapter
     UpdateVaultsFeesInOperatorGrid:
       name: UpdateVaultsFeesInOperatorGrid
-      address: *UpdateVaultsFeesInOperatorGrid
+      address: *updateVaultsFeesInOperatorGrid
       checks:
         createEVMScript: null
         decodeEVMScriptCallData: null
         lidoLocator: *locator
         trustedCaller: *trustedCaller
-        vaultsAdapter: *VaultsAdapter
-        maxInfraFeeBP: *maxInfraFeeBP
-        maxLiquidityFeeBP: *maxLiquidityFeeBP
-        maxReservationFeeBP: *maxReservationFeeBP
+        vaultsAdapter: *vaultsAdapter
+        maxInfraFeeBP: *MAX_INFRA_FEE_BP
+        maxLiquidityFeeBP: *MAX_LIQUIDITY_FEE_BP
+        maxReservationFeeBP: *MAX_RESERVATION_FEE_BP
     ForceValidatorExitsInVaultHub:
       name: ForceValidatorExitsInVaultHub
-      address: *ForceValidatorExitsInVaultHub
+      address: *forceValidatorExitsInVaultHub
       checks:
         WITHDRAWAL_REQUEST_PREDEPLOY_ADDRESS: *withdrawalRequestPredeployAddress
         createEVMScript: null
         decodeEVMScriptCallData: null
         trustedCaller: *trustedCaller
-        vaultsAdapter: *VaultsAdapter
+        vaultsAdapter: *vaultsAdapter
     SocializeBadDebtInVaultHub:
       name: SocializeBadDebtInVaultHub
-      address: *SocializeBadDebtInVaultHub
+      address: *socializeBadDebtInVaultHub
       checks:
         createEVMScript: null
         decodeEVMScriptCallData: null
         trustedCaller: *trustedCaller
-        vaultsAdapter: *VaultsAdapter
+        vaultsAdapter: *vaultsAdapter
     SetLiabilitySharesTargetInVaultHub:
       name: SetLiabilitySharesTargetInVaultHub
-      address: *SetLiabilitySharesTargetInVaultHub
+      address: *setLiabilitySharesTargetInVaultHub
       checks:
         createEVMScript: null
         decodeEVMScriptCallData: null
         trustedCaller: *trustedCaller
-        vaultsAdapter: *VaultsAdapter
+        vaultsAdapter: *vaultsAdapter
     CSMSetMerkleGateTree:
       name: SetMerkleGateTree
-      address: *CSMSetMerkleGateTree
+      address: *csmSetMerkleGateTree
       checks:
         createEVMScript: null
         decodeEVMScriptCallData: null
@@ -366,7 +372,7 @@ l1:
         validateInputData: null
     CSMReportWithdrawalsForSlashedValidators:
       name: ReportWithdrawalsForSlashedValidators
-      address: *CSMReportWithdrawalsForSlashedValidators
+      address: *csmReportWithdrawalsForSlashedValidators
       checks:
         createEVMScript: null
         decodeEVMScriptCallData: null
@@ -375,7 +381,7 @@ l1:
         trustedCaller: *csmCommittee
     CSMSettleGeneralDelayedPenalty:
       name: SettleGeneralDelayedPenalty
-      address: *CSMSettleGeneralDelayedPenalty
+      address: *csmSettleGeneralDelayedPenalty
       checks:
         accounting: *csmAccounting
         createEVMScript: null
@@ -385,14 +391,14 @@ l1:
         trustedCaller: *csmCommittee
     CSMUpdateStakingModuleShareLimits:
       name: UpdateStakingModuleShareLimits
-      address: *CSMUpdateStakingModuleShareLimits
+      address: *csmUpdateStakingModuleShareLimits
       checks:
         createEVMScript: null
         decodeEVMScriptCallData: null
-        maxPriorityExitShareThresholdDecrease: *maxPriorityExitShareThresholdDecrease
-        maxPriorityExitShareThresholdIncrease: *maxPriorityExitShareThresholdIncrease
-        maxStakeShareLimitDecrease: *maxStakeShareLimitDecrease
-        maxStakeShareLimitIncrease: *maxStakeShareLimitIncrease
+        maxPriorityExitShareThresholdDecrease: *MAX_PRIORITY_EXIT_SHARE_THRESHOLD_DECREASE
+        maxPriorityExitShareThresholdIncrease: *MAX_PRIORITY_EXIT_SHARE_THRESHOLD_INCREASE
+        maxStakeShareLimitDecrease: *MAX_STAKE_SHARE_LIMIT_DECREASE
+        maxStakeShareLimitIncrease: *MAX_STAKE_SHARE_LIMIT_INCREASE
         name: CSM
         stakingModuleId: 3
         stakingRouter: *stakingRouter
@@ -400,7 +406,7 @@ l1:
         validateParams: null
     CMSetMerkleGateTree:
       name: SetMerkleGateTree
-      address: *CMSetMerkleGateTree
+      address: *cmSetMerkleGateTree
       checks:
         createEVMScript: null
         decodeEVMScriptCallData: null
@@ -409,7 +415,7 @@ l1:
         validateInputData: null
     CMReportWithdrawalsForSlashedValidators:
       name: ReportWithdrawalsForSlashedValidators
-      address: *CMReportWithdrawalsForSlashedValidators
+      address: *cmReportWithdrawalsForSlashedValidators
       checks:
         createEVMScript: null
         decodeEVMScriptCallData: null
@@ -418,7 +424,7 @@ l1:
         trustedCaller: *curatedModuleCommittee
     CMSettleGeneralDelayedPenalty:
       name: SettleGeneralDelayedPenalty
-      address: *CMSettleGeneralDelayedPenalty
+      address: *cmSettleGeneralDelayedPenalty
       checks:
         accounting: *curatedAccounting
         createEVMScript: null
@@ -428,7 +434,7 @@ l1:
         trustedCaller: *curatedModuleCommittee
     CMCreateOrUpdateOperatorGroup:
       name: CreateOrUpdateOperatorGroup
-      address: *CMCreateOrUpdateOperatorGroup
+      address: *cmCreateOrUpdateOperatorGroup
       checks:
         allowedExternalModuleId: 1
         createEVMScript: null
@@ -443,7 +449,7 @@ l1:
         validateInputData: null
     AllowConsolidationPairCMv1CMv2:
       name: AllowConsolidationPair
-      address: *AllowConsolidationPairCMv1CMv2
+      address: *allowConsolidationPairCMv1CMv2
       checks:
         consolidationMigrator: *consolidationMigrator
         createEVMScript: null
@@ -451,3 +457,22 @@ l1:
         sourceModuleId: 1
         stakingRouter: *stakingRouter
         targetModuleId: 4
+    CuratedSubmitExitRequestHashes:
+      name: CuratedSubmitExitRequestHashes
+      address: *newCuratedSubmitExitHashesFactory
+      checks:
+        createEVMScript: null
+        decodeEVMScriptCallData: null
+        nodeOperatorsRegistry: *nodeOperatorsRegistry
+        stakingRouter: *stakingRouter
+        validatorsExitBusOracle: *validatorsExitBusOracle
+    SdvtSubmitExitRequestHashes:
+      name: SDVTSubmitExitRequestHashes
+      address: *newSdvtSubmitExitHashesFactory
+      checks:
+        createEVMScript: null
+        decodeEVMScriptCallData: null
+        nodeOperatorsRegistry: *simpleDVT
+        stakingRouter: *stakingRouter
+        trustedCaller: *sdvtTrustedCaller
+        validatorsExitBusOracle: *validatorsExitBusOracle

@@ -8,7 +8,7 @@ import chalk from "chalk";
 
 import { printError } from "./common";
 import { logErrorAndExit, logHeader1 } from "./logger";
-import { EntireDocumentTB, SeedDocumentTB } from "./typebox";
+import { EntireDocumentTB } from "./typebox";
 
 function generateBothSchemas() {
   const schemasPath = path.resolve(path.dirname(__dirname), path.join("schemas"));
@@ -26,7 +26,6 @@ function generateBothSchemas() {
     }
   };
   saveSchema("main-schema.json", EntireDocumentTB);
-  saveSchema("seed-schema.json", SeedDocumentTB);
 }
 async function main() {
   generateBothSchemas();

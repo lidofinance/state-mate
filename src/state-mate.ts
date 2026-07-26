@@ -7,22 +7,28 @@ import { Static, TSchema } from "@sinclair/typebox";
 import Ajv, { ValidateFunction } from "ajv";
 import addFormats from "ajv-formats";
 import chalk from "chalk";
-import { JsonRpcProvider } from "ethers";
 import * as YAML from "yaml";
 
 import {
-  abiExistsForAddress,
   checkAllAbi,
   flushAbiUpdates,
-  renameAllAbiToLowerCase,
-  resetAbiModeCache,
+  getAbiNameForAddress,
+  keepStoredAbi,
+  pruneAbiStores,
+  resetAbiCache,
+  wasWalkedThisRun,
 } from "./abi-provider";
-import { doGenerateBoilerplate } from "./boilerplate-generator";
 import { parseCommandLineArguments } from "./cli-parser";
-import { printError, readUrlOrFromEnvironment } from "./common";
-import { loadContractInfoFromExplorer } from "./explorer-provider";
+import { normalizeChainId, printError, readUrlOrFromEnvironment } from "./common";
+import { context, resetStats, stats } from "./context";
+import {
+  assertProviderChain,
+  createProvider,
+  explorerNeedsApiKey,
+  loadContractInfo,
+  verifyChainIdWithExplorer,
+} from "./explorer";
 import { FAILURE_MARK, log, logError, logErrorAndExit, logHeader1, SUCCESS_MARK, WARNING_MARK } from "./logger";
-import { g_error_details, g_errors, g_total_checks } from "./section-validators/base";
 import { ContractSectionValidator } from "./section-validators/contract";
 import {
   EntireDocument,
@@ -33,12 +39,8 @@ import {
   MaxIntFormat,
   NetworkSection,
   NetworkSectionTB,
-  SeedDocument,
-  SeedDocumentTB,
 } from "./typebox";
 import { ContractInfo } from "./types";
-
-export let g_Arguments: ReturnType<typeof parseCommandLineArguments>;
 
 declare global {
   interface BigInt {
@@ -88,7 +90,7 @@ function validateJsonWithSchema<T extends TSchema>(
   schemaPrototype: T,
   { silent }: { silent: boolean } = { silent: false },
 ): jsonDocument is Static<T> {
-  if (!silent) log(`Validating ${chalk.yellow(g_Arguments.configPath)} against schema...`);
+  if (!silent) log(`Validating ${chalk.yellow(context.configPath)} against schema...`);
 
   const ajv = new Ajv({ verbose: true, allErrors: true });
   addFormats(ajv);
@@ -111,7 +113,7 @@ function validateJsonWithSchema<T extends TSchema>(
   if (!valid) {
     if (silent) return false;
     logErrorAndExit(
-      `The YAML file ${chalk.magenta(g_Arguments!.configPath)} contains errors that do not comply with the JSON schema. ` +
+      `The YAML file ${chalk.magenta(context.configPath)} contains errors that do not comply with the JSON schema. ` +
         `Please correct them and try again\n\n${formatAjvErrors(validate.errors)} `,
     );
   }
@@ -125,110 +127,127 @@ async function doChecks(jsonDocument: EntireDocument) {
   }
   // Show final summary (outside the tree)
   log(""); // Separator line
-  const statusMark = g_errors ? FAILURE_MARK : SUCCESS_MARK;
-  const statusMessage = g_errors
-    ? `${g_total_checks} checks, ${chalk.red(`${g_errors} errors`)}`
-    : `${g_total_checks} checks passed`;
+  const statusMark = stats.errors ? FAILURE_MARK : SUCCESS_MARK;
+  const statusMessage = stats.errors
+    ? `${stats.totalChecks} checks, ${chalk.red(`${stats.errors} errors`)}`
+    : `${stats.totalChecks} checks passed`;
   log(`${statusMark} ${chalk.bold("Total:")} ${statusMessage}`);
 
-  if (g_Arguments.checkOnly) {
-    log(`${WARNING_MARK} filtered: ${chalk.yellow(`"${g_Arguments.checkOnlyCmdArg}"`)}`);
+  if (context.checkOnly) {
+    log(`${WARNING_MARK} filtered: ${chalk.yellow(`"${context.checkOnlyCmdArg}"`)}`);
   }
 
-  if (g_errors) {
-    // Display detailed error summary
-    if (g_error_details.length > 0) {
-      logHeader1("Error Summary");
-      for (let index = 0; index < g_error_details.length; index++) {
-        const error = g_error_details[index];
-        log(
-          `\n${chalk.red(`[${index + 1}/${g_error_details.length}]`)} ` +
-            `${chalk.cyan("Section:")} ${chalk.yellow(error.section)} | ` +
-            `${chalk.cyan("Contract:")} ${chalk.yellow(error.contract)} ` +
-            chalk.gray(`(${error.contractAddress})`) +
-            `\n    ${chalk.cyan("Check Type:")} ${chalk.yellow(error.checksType)} | ` +
-            `${chalk.cyan("Method:")} ${chalk.yellow(error.method)}` +
-            `\n    ${chalk.cyan("Error:")} ${chalk.red(error.message)}`,
-        );
-      }
-      log(""); // Empty line at the end
+  // Display detailed error summary
+  if (stats.errors && stats.errorDetails.length > 0) {
+    logHeader1("Error Summary");
+    for (let index = 0; index < stats.errorDetails.length; index++) {
+      const error = stats.errorDetails[index];
+      log(
+        `\n${chalk.red(`[${index + 1}/${stats.errorDetails.length}]`)} ` +
+          `${chalk.cyan("Section:")} ${chalk.yellow(error.section)} | ` +
+          `${chalk.cyan("Contract:")} ${chalk.yellow(error.contract)} ` +
+          chalk.gray(`(${error.contractAddress})`) +
+          `\n    ${chalk.cyan("Check Type:")} ${chalk.yellow(error.checksType)} | ` +
+          `${chalk.cyan("Method:")} ${chalk.yellow(error.method)}` +
+          `\n    ${chalk.cyan("Error:")} ${chalk.red(error.message)}`,
+      );
     }
-
-    process.exit(g_errors);
+    log(""); // Empty line at the end
   }
 }
 
-async function downloadAndCheckAllAbi<T extends EntireDocument | SeedDocument>(jsonDocument: T) {
-  const abiDirectoryPath = path.resolve(path.dirname(g_Arguments.configPath), "abi");
-  fs.mkdirSync(abiDirectoryPath, { recursive: true });
+export async function downloadAndCheckAllAbi(jsonDocument: EntireDocument) {
   logHeader1("ABI checking");
   await iterateLoadedContracts(jsonDocument, checkAllAbi);
-  // Flush any pending ABI updates in consolidated mode
   flushAbiUpdates();
-  // Reset ABI mode cache so newly downloaded ABIs are detected in subsequent checks
-  resetAbiModeCache();
-
-  log(
-    `\n💡 To consolidate individual ABI files into a single compressed file, run:\n` +
-      `   ${chalk.cyan(`yarn consolidate-abi ${path.relative(process.cwd(), abiDirectoryPath)}`)}\n`,
-  );
 }
 
-async function iterateLoadedContracts<T extends EntireDocument | SeedDocument>(
-  jsonDocument: T,
-  callback: (contractInfo: ContractInfo) => Promise<void> | void,
+async function iterateLoadedContracts(
+  jsonDocument: EntireDocument,
+  callback: (chainId: string, contractInfo: ContractInfo) => Promise<void> | void,
 ) {
-  const abiDirectoryPath = path.resolve(path.dirname(g_Arguments.configPath), "abi");
-  fs.mkdirSync(abiDirectoryPath, { recursive: true });
-
   for (const [explorerSectionKey, addresses] of Object.entries(jsonDocument.deployed)) {
-    const explorerSection = jsonDocument[explorerSectionKey as keyof T];
+    const explorerSection = jsonDocument[explorerSectionKey as keyof EntireDocument];
 
     if (isTypeOfTB(explorerSection, ExplorerSectionTB) || isTypeOfTB(explorerSection, NetworkSectionTB)) {
       const { explorerHostname, explorerTokenEnv } = explorerSection;
+      const chainId = normalizeChainId(explorerSection.chainId);
       if (!explorerHostname) {
-        logErrorAndExit(
-          `The field ${chalk.magenta(`explorerHostname`)} is required in the ${chalk.magenta(g_Arguments.configPath)}`,
+        log(
+          `${WARNING_MARK} ${chalk.yellow(`No ${chalk.magenta("explorerHostname")} in the ${chalk.magenta(context.configPath)}, ABIs cannot be downloaded for ${explorerSectionKey}`)}`,
         );
+        if (context.updateAbi) {
+          // A chain with no explorer cannot re-download, so the rebuild keeps what the store
+          // already holds for it
+          const uniqueAddresses = new Set(addresses);
+          for (const address of uniqueAddresses) {
+            const keptName = keepStoredAbi(chainId, address);
+            if (keptName) log(`ABI ${chalk.magenta(`${keptName} @ ${address}`)} ${chalk.green("Kept (no explorer)")}`);
+          }
+        }
+        continue;
       }
       const explorerKey = explorerTokenEnv ? process.env[explorerTokenEnv] : "";
+      await verifyChainIdWithExplorer(explorerHostname, chainId, explorerKey);
 
-      if (!explorerTokenEnv) {
+      if (!explorerTokenEnv && explorerNeedsApiKey(explorerHostname)) {
         log(
-          `${WARNING_MARK} ${chalk.yellow("explorerTokenEnv")} is not set in the ${chalk.magenta(g_Arguments.configPath)}, the section ${chalk.magenta(explorerSectionKey)}`,
+          `${WARNING_MARK} ${chalk.yellow("explorerTokenEnv")} is not set in the ${chalk.magenta(context.configPath)}, the section ${chalk.magenta(explorerSectionKey)}`,
         );
-      } else if (!explorerKey) {
+      } else if (explorerTokenEnv && !explorerKey) {
         log(`\n${WARNING_MARK} ${chalk.yellow(`The env var ${explorerTokenEnv} is not set`)}\n`);
       }
-      for (const address of addresses) {
-        // Skip explorer call if ABI already exists and we only want to update missing
-        if (g_Arguments.updateAbiMissingOnly && abiExistsForAddress(address)) {
-          log(`ABI ${chalk.magenta(address)} ${chalk.green("Skipped (exists)")}`);
+      const toDownload: string[] = [];
+      // a duplicated address in the YAML must not spend two download slots
+      const uniqueAddresses = new Set(addresses);
+      for (const address of uniqueAddresses) {
+        const existingAbiName = getAbiNameForAddress(chainId, address);
+        // Bytecode at an address never changes, so a stored ABI can only be refreshed on demand;
+        // a rebuild re-downloads each address once, sibling configs of the run reuse the result
+        const fresh = context.updateAbi && !wasWalkedThisRun(chainId, address);
+        if (existingAbiName !== undefined && !fresh) {
+          log(`ABI ${chalk.magenta(`${existingAbiName} @ ${address}`)} ${chalk.green("Skipped (exists)")}`);
           continue;
         }
-        const contractInfo = await loadContractInfoFromExplorer(
+        toDownload.push(address);
+      }
+
+      // All requests start at once and the pacer spaces them to the explorer's per-second budget,
+      // so a slow response never stalls the rest; the callbacks stay sequential to keep the log
+      // readable and the store writes ordered
+      const downloads = await Promise.all(
+        toDownload.map(async (address) => ({
           address,
-          explorerHostname,
-          explorerKey,
-          // chainId is optional in schema; only relevant for etherscan v2
-          (explorerSection as { chainId?: number | string }).chainId,
-        );
-        if (!contractInfo) {
+          info: await loadContractInfo(address, explorerHostname, explorerKey, chainId),
+        })),
+      );
+      for (const { address, info } of downloads) {
+        if (info) {
+          await callback(chainId, info);
           continue;
         }
-        await callback(contractInfo);
+        const keptName = keepStoredAbi(chainId, address);
+        if (keptName) {
+          log(`ABI ${chalk.magenta(`${keptName} @ ${address}`)} ${chalk.green("Kept (explorer served none)")}`);
+        }
       }
     }
   }
 }
 
 async function checkNetworkSection(sectionTitle: string, section: NetworkSection) {
-  if (g_Arguments.checkOnly && g_Arguments.checkOnly.section !== sectionTitle) {
+  if (context.checkOnly && context.checkOnly.section !== sectionTitle) {
     return;
   }
   const rpcUrl = readUrlOrFromEnvironment(section.rpcUrl);
-  const provider = new JsonRpcProvider(rpcUrl);
-  const contractSectionChecker = new ContractSectionValidator(provider);
+  const provider = createProvider(rpcUrl);
+  const chainId = normalizeChainId(section.chainId);
+  await assertProviderChain(provider, chainId);
+  if (section.explorerHostname) {
+    const explorerKey = section.explorerTokenEnv ? process.env[section.explorerTokenEnv] : undefined;
+    await verifyChainIdWithExplorer(section.explorerHostname, chainId, explorerKey);
+  }
+  const contractSectionChecker = new ContractSectionValidator(provider, chainId);
 
   for (const contractAlias in section.contracts) {
     const contractEntry = section.contracts[contractAlias];
@@ -236,47 +255,76 @@ async function checkNetworkSection(sectionTitle: string, section: NetworkSection
   }
 }
 
-async function main() {
-  g_Arguments = parseCommandLineArguments();
+export function collectYamlConfigs(directory: string): string[] {
+  const files: string[] = [];
+  const entries = fs.readdirSync(directory, { withFileTypes: true });
+  for (const entry of entries) {
+    const fullPath = path.join(directory, entry.name);
+    if (entry.isDirectory()) {
+      files.push(...collectYamlConfigs(fullPath));
+    } else if (/\.ya?ml$/.test(entry.name) && !entry.name.includes(".seed.")) {
+      // seed files and their generated siblings are leftovers of the removed --generate flow
+      files.push(fullPath);
+    }
+  }
+  return files.toSorted((a, b) => a.localeCompare(b));
+}
 
-  if (g_Arguments.updateAbi) {
-    renameAllAbiToLowerCase();
+async function main() {
+  Object.assign(context, parseCommandLineArguments());
+
+  if (!fs.existsSync(context.configPath)) {
+    logErrorAndExit(`No such file or directory: ${chalk.magenta(context.configPath)}`);
   }
 
-  const jsonDocument = loadStateFromYaml(g_Arguments.configPath);
+  if (fs.statSync(context.configPath).isDirectory()) {
+    if (context.checkOnly) {
+      logErrorAndExit(`The ${chalk.yellow("-o")} option requires a single config file, not a directory`);
+    }
+    const configs = collectYamlConfigs(context.configPath);
+    if (configs.length === 0) {
+      logErrorAndExit(`No YAML configs found in ${chalk.magenta(context.configPath)}`);
+    }
+    const failed: string[] = [];
+    for (const configPath of configs) {
+      context.configPath = configPath;
+      resetAbiCache();
+      resetStats();
+      logHeader1(configPath);
+      await runConfig();
+      if (stats.errors) failed.push(`${configPath} (${stats.errors} errors)`);
+    }
+    pruneAbiStores();
+    log("");
+    if (failed.length > 0) {
+      logError(
+        `${FAILURE_MARK} ${chalk.bold(`${failed.length}/${configs.length} configs failed:`)}\n${failed.join("\n")}`,
+      );
+      process.exit(1);
+    }
+    log(`${SUCCESS_MARK} ${chalk.bold(`All ${configs.length} configs passed`)}`);
+    return;
+  }
 
-  if (g_Arguments.generate) {
-    if (validateJsonWithSchema(jsonDocument, EntireDocumentTB, { silent: true })) {
-      logErrorAndExit(
-        chalk.yellow(
-          `A main YAML was specified, but a seed YAML was expected: ${g_Arguments.configPath}\n` +
-            chalk.yellow("Alternatively, the `--generate` parameter was specified for the main YAML"),
-        ),
-      );
-    }
-    if (validateJsonWithSchema(jsonDocument, SeedDocumentTB)) {
-      if (g_Arguments.updateAbi) {
-        await downloadAndCheckAllAbi(jsonDocument);
-      }
-      await doGenerateBoilerplate(g_Arguments.configPath, jsonDocument);
-    }
-  } else {
-    if (validateJsonWithSchema(jsonDocument, SeedDocumentTB, { silent: true })) {
-      logErrorAndExit(
-        chalk.yellow(`A seed YAML was specified, but a main YAML was expected: ${g_Arguments.configPath}\n`) +
-          chalk.yellow("Alternatively, the `--generate` parameter was not specified for the seed YAML"),
-      );
-    }
-    if (validateJsonWithSchema(jsonDocument, EntireDocumentTB)) {
-      if (g_Arguments.updateAbi) {
-        await downloadAndCheckAllAbi(jsonDocument);
-      }
-      await doChecks(jsonDocument);
-    }
+  // No prune here: a single-file run has walked only its own addresses, and sweeping the shared
+  // store now would drop the sibling configs' ABIs
+  await runConfig();
+  if (stats.errors) process.exit(stats.errors);
+}
+
+async function runConfig() {
+  const jsonDocument = loadStateFromYaml(context.configPath);
+
+  if (validateJsonWithSchema(jsonDocument, EntireDocumentTB)) {
+    await downloadAndCheckAllAbi(jsonDocument);
+    await doChecks(jsonDocument);
   }
 }
 
-main().catch((error) => {
-  logError(error);
-  process.exitCode = 1;
-});
+// Do not run when imported (e.g. by unit tests) — only as the CLI entrypoint
+if (require.main === module) {
+  main().catch((error) => {
+    logError(error);
+    process.exitCode = 1;
+  });
+}

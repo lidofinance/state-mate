@@ -159,6 +159,7 @@
       "type": "object",
       "required": [
         "rpcUrl",
+        "chainId",
         "contracts"
       ],
       "properties": {
@@ -174,9 +175,11 @@
         "chainId": {
           "anyOf": [
             {
-              "type": "number"
+              "minimum": 1,
+              "type": "integer"
             },
             {
+              "pattern": "^[0-9]+$",
               "type": "string"
             }
           ]
@@ -1491,6 +1494,11 @@
                       "type": "string"
                     },
                     "implementation": {
+                      "format": "ethereum-string",
+                      "pattern": "^(0x[a-fA-F0-9]{40}|0x[a-fA-F0-9]{64}|.+)$",
+                      "type": "string"
+                    },
+                    "proxyAdminOwner": {
                       "format": "ethereum-string",
                       "pattern": "^(0x[a-fA-F0-9]{40}|0x[a-fA-F0-9]{64}|.+)$",
                       "type": "string"
@@ -2338,6 +2346,7 @@
       "type": "object",
       "required": [
         "rpcUrl",
+        "chainId",
         "contracts"
       ],
       "properties": {
@@ -2353,9 +2362,11 @@
         "chainId": {
           "anyOf": [
             {
-              "type": "number"
+              "minimum": 1,
+              "type": "integer"
             },
             {
+              "pattern": "^[0-9]+$",
               "type": "string"
             }
           ]
@@ -3670,6 +3681,11 @@
                       "type": "string"
                     },
                     "implementation": {
+                      "format": "ethereum-string",
+                      "pattern": "^(0x[a-fA-F0-9]{40}|0x[a-fA-F0-9]{64}|.+)$",
+                      "type": "string"
+                    },
+                    "proxyAdminOwner": {
                       "format": "ethereum-string",
                       "pattern": "^(0x[a-fA-F0-9]{40}|0x[a-fA-F0-9]{64}|.+)$",
                       "type": "string"
