@@ -27,4 +27,13 @@ describe("collectYamlConfigs", () => {
       path.join(directory, "testnet", "c.yaml"),
     ]);
   });
+
+  it("leaves seed files and their generated siblings out of a directory run", () => {
+    directory = fs.mkdtempSync(path.join(os.tmpdir(), "state-mate-test-"));
+    fs.writeFileSync(path.join(directory, "main.yaml"), "");
+    fs.writeFileSync(path.join(directory, "proto.seed.yaml"), "");
+    fs.writeFileSync(path.join(directory, "proto.seed.generated.yaml"), "");
+
+    assert.deepEqual(collectYamlConfigs(directory), [path.join(directory, "main.yaml")]);
+  });
 });

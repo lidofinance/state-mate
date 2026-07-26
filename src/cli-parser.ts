@@ -14,8 +14,8 @@ export function parseCommandLineArguments() {
       "-o, --only <check-path>",
       `only checks to do, e.g. 'l2/proxyAdmin/${EntryField.checks}/owner', 'l1', 'l1/controller'`,
     )
-    .option("--generate", "generate a populated config from the seed one")
-    .option("--update-abi", "download missing ABIs (never overwrites existing ones)")
+    .option("--update-abi", "re-download every ABI; missing ones are downloaded without the flag too")
+    .option("--skip-implementation-check", "do not verify implementation addresses against the chain")
     .option("-q, --quiet", "print only contract headers, per-contract totals and errors")
     .parse();
 
@@ -41,8 +41,8 @@ export function parseCommandLineArguments() {
     configPath,
     checkOnly,
     checkOnlyCmdArg: options.only,
-    generate: options.generate,
     updateAbi: options.updateAbi,
+    skipImplementationCheck: Boolean(options.skipImplementationCheck),
     quiet: Boolean(options.quiet),
   };
 }

@@ -2,7 +2,7 @@ import { assert } from "chai";
 import { JsonRpcProvider } from "ethers";
 
 import { EntryField } from "src/common";
-import { loadContract } from "src/explorer-provider";
+import { loadContract } from "src/explorer";
 import { log, LogCommand, logHeader2, WARNING_MARK } from "src/logger";
 import { ContractEntry } from "src/typebox";
 import { ChainId } from "src/types";

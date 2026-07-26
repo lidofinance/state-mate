@@ -16,6 +16,7 @@ import {
   setErrorContext,
 } from "./base";
 import { ChecksSectionValidator } from "./checks";
+import { checkImplementation, checkProxyAdminOwner } from "./implementation";
 import { ImplementationChecksSectionValidator } from "./implementation-checks";
 import { OzAclSectionValidator } from "./oz-acl";
 import { OzNonEnumerableAclSectionValidator } from "./oz-non-enumerable-acl";
@@ -25,7 +26,10 @@ import { StorageSectionValidator } from "./storage";
 export class ContractSectionValidator {
   private map: Map<EntryField, SectionValidatorBase> = new Map();
 
-  constructor(provider: JsonRpcProvider, chainId: ChainId) {
+  constructor(
+    private provider: JsonRpcProvider,
+    chainId: ChainId,
+  ) {
     const sections = [
       EntryField.checks,
       EntryField.storage,
@@ -85,6 +89,9 @@ export class ContractSectionValidator {
     });
 
     const basePath = `${sectionTitle}/${contractAlias}`;
+
+    await checkImplementation(this.provider, contractEntry);
+    await checkProxyAdminOwner(this.provider, contractEntry);
 
     if (needCheck(CheckLevel.checksType, EntryField.checks)) {
       logHeader2(`${basePath}/${EntryField.checks}`);

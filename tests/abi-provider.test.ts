@@ -11,15 +11,18 @@ import {
   checkAllAbi,
   flushAbiUpdates,
   getAbiNameForAddress,
+  keepStoredAbi,
   loadAbiFromFile,
+  pruneAbiStores,
   resetAbiCache,
+  resetAbiRebuildState,
 } from "../src/abi-provider";
 import { EntryField } from "../src/common";
 import { context } from "../src/context";
-import { fetchExplorerChainId } from "../src/explorer-provider";
+import { fetchExplorerChainId } from "../src/explorer";
 import { SectionValidatorBase } from "../src/section-validators/base";
 import * as stateMate from "../src/state-mate";
-import { ContractEntry, SeedDocument } from "../src/typebox";
+import { ContractEntry, EntireDocument } from "../src/typebox";
 import { Abi, ContractInfo } from "../src/types";
 
 const PROXY_ADDRESS = "0xAaAaAAaaAaAAAaaAAaAaaaAAaAAAaaaAaaaaaaa1";
@@ -93,6 +96,8 @@ function expectExit(callback: () => unknown): string {
 }
 
 afterEach(() => {
+  context.updateAbi = false;
+  resetAbiRebuildState();
   for (const directory of temporaryDirectories) {
     fs.rmSync(directory, { recursive: true, force: true });
   }
@@ -108,20 +113,6 @@ describe("loadAbiFromFile", () => {
   it("normalizes uppercase store keys on load", () => {
     setupConfigDirectory({ [`${ETH_CHAIN_ID}:${PROXY_ADDRESS}`]: { name: "Lido", abi: LIDO_ABI } });
     assert.deepEqual(loadAbiFromFile(ETH_CHAIN_ID, "Lido", PROXY_ADDRESS.toLowerCase()), LIDO_ABI);
-  });
-
-  it("reads a legacy address-only entry", () => {
-    setupConfigDirectory({ [PROXY_ADDRESS.toLowerCase()]: { name: "Lido", abi: LIDO_ABI } });
-    assert.deepEqual(loadAbiFromFile(ETH_CHAIN_ID, "Lido", PROXY_ADDRESS), LIDO_ABI);
-  });
-
-  it("does not use a legacy entry as a fallback in a partially scoped store", () => {
-    setupConfigDirectory({
-      [PROXY_ADDRESS.toLowerCase()]: { name: "Lido", abi: LIDO_ABI },
-      [scopedKey(ETH_CHAIN_ID, IMPL_ADDRESS)]: { name: "Lido", abi: LIDO_ABI },
-    });
-    const message = expectExit(() => loadAbiFromFile(BSC_CHAIN_ID, "Lido", PROXY_ADDRESS));
-    assert.match(message, /ABI not found/);
   });
 
   it("exits when the stored name differs from the expected one", () => {
@@ -165,7 +156,7 @@ describe("downloadAndCheckAllAbi", () => {
       await stateMate.downloadAndCheckAllAbi({
         deployed: { l1: [PROXY_ADDRESS] },
         l1: { rpcUrl: "http://localhost:1", explorerHostname: "api.etherscan.io", chainId: 1 },
-      } as SeedDocument);
+      } as EntireDocument);
       const sourceRequests = fetchMock.mock.calls.filter((c) => String(c.arguments[0]).includes("getsourcecode"));
       assert.equal(sourceRequests.length, 0);
     } finally {
@@ -200,7 +191,7 @@ describe("downloadAndCheckAllAbi", () => {
         deployed: { l1: [PROXY_ADDRESS], l2: [PROXY_ADDRESS] },
         l1: { rpcUrl: "http://localhost:1", explorerHostname: "api.etherscan.io", chainId: ETH_CHAIN_ID },
         l2: { rpcUrl: "http://localhost:2", explorerHostname: "api.bscscan.com", chainId: BSC_CHAIN_ID },
-      } as SeedDocument);
+      } as EntireDocument);
 
       const sourceRequests = fetchMock.mock.calls.filter((c) => String(c.arguments[0]).includes("getsourcecode"));
       assert.equal(sourceRequests.length, 1);
@@ -217,6 +208,105 @@ describe("downloadAndCheckAllAbi", () => {
       fetchMock.mock.restore();
     }
   });
+
+  it("downloads a shared address once per --update-abi run, later configs reuse it", async () => {
+    const directory = setupConfigDirectory();
+    context.updateAbi = true;
+    const fetchMock = mock.method(globalThis, "fetch", async (url: Parameters<typeof fetch>[0]) => {
+      if (/eth_gasPrice|eth-rpc|eth_chainId/.test(String(url))) {
+        return { ok: true, json: async () => ({ jsonrpc: "2.0", id: 83, result: "0x1" }) } as Response;
+      }
+      return {
+        ok: true,
+        json: async () => ({
+          status: "1",
+          message: "OK",
+          result: [{ ABI: JSON.stringify(WORMHOLE_ABI), ContractName: "WormholeTransceiver", IsProxy: "false" }],
+        }),
+      } as Response;
+    });
+
+    const jsonDocument = {
+      deployed: { l1: [PROXY_ADDRESS] },
+      l1: { rpcUrl: "http://localhost:1", explorerHostname: "api.etherscan.io", chainId: ETH_CHAIN_ID },
+    } as unknown as EntireDocument;
+    try {
+      await stateMate.downloadAndCheckAllAbi(jsonDocument);
+      // the next config of the directory run starts with a fresh cache but the same walked set
+      resetAbiCache();
+      await stateMate.downloadAndCheckAllAbi(jsonDocument);
+
+      const sourceRequests = fetchMock.mock.calls.filter((c) => String(c.arguments[0]).includes("getsourcecode"));
+      assert.equal(sourceRequests.length, 1);
+      assert.equal(readStore(directory)[scopedKey(ETH_CHAIN_ID, PROXY_ADDRESS)].name, "WormholeTransceiver");
+    } finally {
+      fetchMock.mock.restore();
+    }
+  });
+
+  it("keeps stored ABIs of a section that has no explorer instead of dying under --update-abi", async () => {
+    const directory = setupConfigDirectory({
+      [scopedKey(ETH_CHAIN_ID, PROXY_ADDRESS)]: { name: "OssifiableProxy", abi: PROXY_ABI },
+    });
+    context.updateAbi = true;
+    const fetchMock = mock.method(globalThis, "fetch", async () => {
+      throw new Error("no explorer should be contacted");
+    });
+
+    const originalExit = process.exit;
+    let exited = false;
+    process.exit = (() => {
+      exited = true;
+      throw new ExitSignal();
+    }) as typeof process.exit;
+    try {
+      await stateMate.downloadAndCheckAllAbi({
+        deployed: { l1: [PROXY_ADDRESS] },
+        l1: { rpcUrl: "http://localhost:1", chainId: ETH_CHAIN_ID },
+      } as EntireDocument);
+    } catch (error) {
+      if (!(error instanceof ExitSignal)) throw error;
+    } finally {
+      process.exit = originalExit;
+      fetchMock.mock.restore();
+    }
+    assert.equal(exited, false, "a section without explorerHostname must not abort the rebuild");
+
+    pruneAbiStores();
+    const store = readStore(directory);
+    assert.equal(store[scopedKey(ETH_CHAIN_ID, PROXY_ADDRESS)].name, "OssifiableProxy");
+  });
+
+  it("keeps a stored ABI the explorer refuses to serve and sweeps unreferenced ones", async () => {
+    const directory = setupConfigDirectory({
+      [scopedKey(ETH_CHAIN_ID, PROXY_ADDRESS)]: { name: "SignatureRedeemQueue", abi: PROXY_ABI },
+      [scopedKey(ETH_CHAIN_ID, CROSS_CHAIN_ADDRESS)]: { name: "Orphan", abi: WORMHOLE_ABI },
+    });
+    context.updateAbi = true;
+    const fetchMock = mock.method(globalThis, "fetch", async (url: Parameters<typeof fetch>[0]) => {
+      if (/eth_gasPrice|eth-rpc|eth_chainId/.test(String(url))) {
+        return { ok: true, json: async () => ({ jsonrpc: "2.0", id: 83, result: "0x1" }) } as Response;
+      }
+      return {
+        ok: true,
+        json: async () => ({ status: "0", message: "NOTOK", result: "Contract source code not verified" }),
+      } as Response;
+    });
+
+    try {
+      await stateMate.downloadAndCheckAllAbi({
+        deployed: { l1: [PROXY_ADDRESS] },
+        l1: { rpcUrl: "http://localhost:1", explorerHostname: "api.etherscan.io", chainId: ETH_CHAIN_ID },
+      } as EntireDocument);
+      pruneAbiStores();
+
+      const store = readStore(directory);
+      assert.equal(store[scopedKey(ETH_CHAIN_ID, PROXY_ADDRESS)].name, "SignatureRedeemQueue");
+      assert.equal(store[scopedKey(ETH_CHAIN_ID, CROSS_CHAIN_ADDRESS)], undefined);
+    } finally {
+      fetchMock.mock.restore();
+    }
+  });
 });
 
 describe("getAbiNameForAddress", () => {
@@ -229,13 +319,72 @@ describe("getAbiNameForAddress", () => {
   });
 });
 
+describe("keepStoredAbi + pruneAbiStores", () => {
+  it("keeps an ABI the checks loaded even when its address is outside deployed", async () => {
+    // a proxyChecks ABI resolves at an address the config keeps in parameters, not in deployed;
+    // the sweep must not treat what the run actually used as unreferenced
+    const directory = setupConfigDirectory({
+      [scopedKey(ETH_CHAIN_ID, PROXY_ADDRESS)]: { name: "OssifiableProxy", abi: PROXY_ABI },
+    });
+    context.updateAbi = true;
+
+    await checkAllAbi(ETH_CHAIN_ID, {
+      contractName: "WormholeTransceiver",
+      address: BSC_PROXY_ADDRESS,
+      abi: WORMHOLE_ABI,
+    });
+    loadAbiFromFile(ETH_CHAIN_ID, "OssifiableProxy", PROXY_ADDRESS);
+    flushAbiUpdates();
+    pruneAbiStores();
+
+    const store = readStore(directory);
+    assert.equal(store[scopedKey(ETH_CHAIN_ID, PROXY_ADDRESS)].name, "OssifiableProxy");
+  });
+
+  it("rebuilds an unreadable store from scratch under --update-abi", () => {
+    // the pre-consolidation format kept bare ABI arrays; --update-abi is the upgrade path
+    setupConfigDirectory({ [PROXY_ADDRESS.toLowerCase()]: PROXY_ABI });
+    context.updateAbi = true;
+
+    assert.equal(getAbiNameForAddress(ETH_CHAIN_ID, PROXY_ADDRESS), undefined);
+  });
+
+  it("warns and keeps going when a store cannot be pruned", async () => {
+    const directory = setupConfigDirectory();
+    context.updateAbi = true;
+    await checkAllAbi(ETH_CHAIN_ID, {
+      contractName: "OssifiableProxy",
+      address: PROXY_ADDRESS,
+      abi: PROXY_ABI,
+    });
+    flushAbiUpdates();
+    // the store turns unreadable between the flush and the sweep
+    fs.writeFileSync(path.join(directory, "abis.json.gz"), "not gzip at all");
+
+    const originalExit = process.exit;
+    let exited = false;
+    process.exit = (() => {
+      exited = true;
+      throw new ExitSignal();
+    }) as typeof process.exit;
+    try {
+      pruneAbiStores();
+    } catch (error) {
+      if (!(error instanceof ExitSignal)) throw error;
+    } finally {
+      process.exit = originalExit;
+    }
+    assert.equal(exited, false, "pruneAbiStores must not exit the process on a broken store");
+  });
+});
+
 describe("fetchExplorerChainId", () => {
   it("reports the explorer's chain as a decimal string", async () => {
     const fetchMock = mock.method(globalThis, "fetch", async () => {
       return { ok: true, json: async () => ({ jsonrpc: "2.0", id: 83, result: "0x38" }) } as Response;
     });
     try {
-      assert.equal(await fetchExplorerChainId("api.bscscan.com", 56), "56");
+      assert.equal(await fetchExplorerChainId("api.bscscan.com"), "56");
     } finally {
       fetchMock.mock.restore();
     }
@@ -246,7 +395,7 @@ describe("fetchExplorerChainId", () => {
       return { ok: true, json: async () => ({ status: "0", message: "NOTOK", result: "Invalid API URL" }) } as Response;
     });
     try {
-      assert.equal(await fetchExplorerChainId("api.bscscan.com", 56), undefined);
+      assert.equal(await fetchExplorerChainId("api.bscscan.com"), undefined);
     } finally {
       fetchMock.mock.restore();
     }
@@ -289,6 +438,81 @@ describe("checkAllAbi + flushAbiUpdates", () => {
     const store = readStore(directory);
     assert.deepEqual(store[scopedKey(ETH_CHAIN_ID, PROXY_ADDRESS)].abi, PROXY_ABI);
     assert.deepEqual(store[scopedKey(ETH_CHAIN_ID, IMPL_ADDRESS)], { name: "Lido", abi: LIDO_ABI });
+  });
+
+  it("re-downloads an existing entry with --update-abi", async () => {
+    const directory = setupConfigDirectory({
+      [scopedKey(ETH_CHAIN_ID, PROXY_ADDRESS)]: { name: "OssifiableProxy", abi: PROXY_ABI },
+    });
+    const freshAbi: Abi = [{ type: "function", name: "fresh", inputs: [], stateMutability: "view" }];
+    context.updateAbi = true;
+
+    await checkAllAbi(ETH_CHAIN_ID, { ...contractInfo, abi: freshAbi });
+    flushAbiUpdates();
+
+    assert.deepEqual(readStore(directory)[scopedKey(ETH_CHAIN_ID, PROXY_ADDRESS)].abi, freshAbi);
+  });
+
+  it("drops entries the run did not walk when rebuilding with --update-abi", async () => {
+    const directory = setupConfigDirectory({
+      [scopedKey(ETH_CHAIN_ID, CROSS_CHAIN_ADDRESS)]: { name: "Orphan", abi: WORMHOLE_ABI },
+    });
+    context.updateAbi = true;
+
+    await checkAllAbi(ETH_CHAIN_ID, contractInfo);
+    flushAbiUpdates();
+    pruneAbiStores();
+
+    const store = readStore(directory);
+    assert.deepEqual(
+      new Set(Object.keys(store)),
+      new Set([scopedKey(ETH_CHAIN_ID, PROXY_ADDRESS), scopedKey(ETH_CHAIN_ID, IMPL_ADDRESS)]),
+    );
+  });
+
+  it("keeps what an earlier config in the same directory rebuilt", async () => {
+    const directory = setupConfigDirectory({
+      [scopedKey(ETH_CHAIN_ID, CROSS_CHAIN_ADDRESS)]: { name: "Orphan", abi: WORMHOLE_ABI },
+    });
+    context.updateAbi = true;
+
+    await checkAllAbi(ETH_CHAIN_ID, contractInfo);
+    flushAbiUpdates();
+    // the next config of a directory run: same store, its own addresses
+    resetAbiCache();
+    await checkAllAbi(BSC_CHAIN_ID, {
+      contractName: "WormholeTransceiver",
+      address: BSC_PROXY_ADDRESS,
+      abi: WORMHOLE_ABI,
+    });
+    flushAbiUpdates();
+    pruneAbiStores();
+
+    const store = readStore(directory);
+    assert.equal(store[scopedKey(ETH_CHAIN_ID, PROXY_ADDRESS)].name, "OssifiableProxy");
+    assert.equal(store[scopedKey(BSC_CHAIN_ID, BSC_PROXY_ADDRESS)].name, "WormholeTransceiver");
+    assert.equal(store[scopedKey(ETH_CHAIN_ID, CROSS_CHAIN_ADDRESS)], undefined);
+  });
+
+  it("keeps an entry the explorer refuses to serve when a later config of the directory walks it", async () => {
+    const directory = setupConfigDirectory({
+      [scopedKey(BSC_CHAIN_ID, BSC_PROXY_ADDRESS)]: { name: "SignatureRedeemQueue", abi: LIDO_ABI },
+    });
+    context.updateAbi = true;
+
+    // first config of the directory downloads its own addresses
+    await checkAllAbi(ETH_CHAIN_ID, contractInfo);
+    flushAbiUpdates();
+    // second config walks an address the explorer no longer serves
+    resetAbiCache();
+    assert.equal(keepStoredAbi(BSC_CHAIN_ID, BSC_PROXY_ADDRESS), "SignatureRedeemQueue");
+    assert.equal(keepStoredAbi(BSC_CHAIN_ID, PROXY_ADDRESS), undefined);
+    flushAbiUpdates();
+    pruneAbiStores();
+
+    const store = readStore(directory);
+    assert.equal(store[scopedKey(BSC_CHAIN_ID, BSC_PROXY_ADDRESS)].name, "SignatureRedeemQueue");
+    assert.equal(store[scopedKey(ETH_CHAIN_ID, PROXY_ADDRESS)].name, "OssifiableProxy");
   });
 
   it("stores different ABIs for the same address on different chains", async () => {

@@ -6,13 +6,14 @@ import chalk from "chalk";
 
 import { normalizeChainId, printError } from "./common";
 import { context } from "./context";
-import { LogCommand, logErrorAndExit } from "./logger";
+import { log, LogCommand, logErrorAndExit, WARNING_MARK } from "./logger";
 import { Abi, ChainId, ContractInfo, isValidAbi } from "./types";
 
 type StoredAbi = { name: string; abi: Abi };
 
 let consolidatedAbisCache: Record<string, StoredAbi> | null = null;
 let pendingAbiUpdates: Record<string, StoredAbi> | null = null;
+const walkedAbiKeys = new Map<string, Set<string>>();
 const CONSOLIDATED_ABI_FILENAME_GZ = "abis.json.gz";
 const KEYS_PREVIEW_LIMIT = 40;
 
@@ -28,36 +29,46 @@ function loadConsolidatedAbis(): Record<string, StoredAbi> {
 
   const abisPath = getConsolidatedAbiPath();
   if (!fs.existsSync(abisPath)) {
-    // No file yet (fresh config): start empty, --update-abi will populate it
+    // No file yet (fresh config): start empty, the download pass will populate it
     consolidatedAbisCache = {};
     return consolidatedAbisCache;
   }
 
+  // --update-abi is the upgrade path from any store state: a file the loader cannot read,
+  // the pre-consolidation format included, starts over instead of blocking its own rebuild
+  const invalid = (reason: string): Record<string, StoredAbi> | never => {
+    if (context.updateAbi) {
+      log(`${WARNING_MARK} ${chalk.yellow(`${reason}, rebuilding the store from scratch`)}`);
+      consolidatedAbisCache = {};
+      return consolidatedAbisCache;
+    }
+    logErrorAndExit(`${reason}. Run with ${chalk.yellow("--update-abi")} to rebuild the store`);
+  };
+
+  let parsed: unknown;
   try {
-    const content = zlib.gunzipSync(fs.readFileSync(abisPath)).toString("utf8");
-    const parsed: unknown = JSON.parse(content);
-
-    if (typeof parsed !== "object" || parsed === null) {
-      logErrorAndExit(`Consolidated ABI file ${chalk.magenta(abisPath)} is not a valid JSON object`);
-    }
-
-    const normalized: Record<string, StoredAbi> = {};
-    for (const [address, value] of Object.entries(parsed)) {
-      const entry = value as StoredAbi;
-      if (typeof entry !== "object" || entry === null || typeof entry.name !== "string" || !isValidAbi(entry.abi)) {
-        logErrorAndExit(
-          `Consolidated ABI file ${chalk.magenta(abisPath)} contains an invalid entry for ${chalk.yellow(address)}: ` +
-            `expected { name, abi }`,
-        );
-      }
-      normalized[address.toLowerCase()] = entry;
-    }
-
-    consolidatedAbisCache = normalized;
-    return consolidatedAbisCache;
+    parsed = JSON.parse(zlib.gunzipSync(fs.readFileSync(abisPath)).toString("utf8"));
   } catch (error) {
-    logErrorAndExit(`Failed to read consolidated ABI file at ${abisPath}: ${printError(error)}`);
+    return invalid(`Failed to read consolidated ABI file at ${chalk.magenta(abisPath)}: ${printError(error)}`);
   }
+  if (typeof parsed !== "object" || parsed === null) {
+    return invalid(`Consolidated ABI file ${chalk.magenta(abisPath)} is not a valid JSON object`);
+  }
+
+  const normalized: Record<string, StoredAbi> = {};
+  for (const [address, value] of Object.entries(parsed)) {
+    const entry = value as StoredAbi;
+    if (typeof entry !== "object" || entry === null || typeof entry.name !== "string" || !isValidAbi(entry.abi)) {
+      return invalid(
+        `Consolidated ABI file ${chalk.magenta(abisPath)} contains an invalid entry for ${chalk.yellow(address)}: ` +
+          `expected { name, abi }`,
+      );
+    }
+    normalized[address.toLowerCase()] = entry;
+  }
+
+  consolidatedAbisCache = normalized;
+  return consolidatedAbisCache;
 }
 
 function formatKnownContracts(abis: Record<string, StoredAbi>): string {
@@ -73,25 +84,27 @@ function getAbiKey(chainId: ChainId, address: string): string {
 }
 
 export function loadAbiFromFile(chainId: ChainId, contractName: string, address: string): Abi | never {
-  const normalizedAddress = address.toLowerCase();
   const key = getAbiKey(chainId, address);
 
   if (!fs.existsSync(getConsolidatedAbiPath())) {
     logErrorAndExit(
       `No consolidated ABI file found at ${chalk.magenta(getConsolidatedAbiPath())}\n\n` +
-        chalk.yellow.bold(`Try running with the '--update-abi' option to download the ABIs`),
+        chalk.yellow.bold(`The explorer served no ABI for it; check that the contract is verified`),
     );
   }
 
+  // Everything the checks actually load is in use, wherever the config keeps the address;
+  // the --update-abi sweep must never drop it
+  _markWalked(key);
+
   const abis = loadConsolidatedAbis();
-  const isLegacyStore = Object.keys(abis).every((storedKey) => !storedKey.includes(":"));
-  const entry = abis[key] ?? (isLegacyStore ? abis[normalizedAddress] : undefined);
+  const entry = abis[key];
 
   if (!entry) {
     logErrorAndExit(
       `ABI not found for ${chalk.yellow(`${contractName} @ ${key}`)}\n` +
         `Known contracts:\n${formatKnownContracts(abis)}\n\n` +
-        chalk.yellow.bold(`Try running with the '--update-abi' option to download the ABI`),
+        chalk.yellow.bold(`Missing ABIs download on every run, so the explorer served none for this address`),
     );
   }
 
@@ -100,7 +113,7 @@ export function loadAbiFromFile(chainId: ChainId, contractName: string, address:
       `The ABI stored for ${chalk.yellow(key)} belongs to ${chalk.yellow(entry.name)}, ` +
         `while the config expects ${chalk.yellow(contractName)}.\n` +
         `Fix the contract name in the YAML, or delete the entry from ${chalk.magenta(CONSOLIDATED_ABI_FILENAME_GZ)} ` +
-        `and re-run with '--update-abi'`,
+        `and re-run to download it again`,
     );
   }
 
@@ -109,6 +122,20 @@ export function loadAbiFromFile(chainId: ChainId, contractName: string, address:
 
 export function getAbiNameForAddress(chainId: ChainId, address: string): string | undefined {
   return loadConsolidatedAbis()[getAbiKey(chainId, address)]?.name;
+}
+
+/**
+ * Marks the stored entry for an address the explorer refuses to serve, so the rebuild sweep keeps
+ * it. Without the mark an unverified contract drops out of the store and the next run fails on a
+ * missing ABI.
+ */
+export function keepStoredAbi(chainId: ChainId, address: string): string | undefined {
+  const key = getAbiKey(chainId, address);
+  const entry = loadConsolidatedAbis()[key];
+  if (!entry) return undefined;
+
+  _markWalked(key);
+  return entry.name;
 }
 
 export async function checkAllAbi(chainId: ChainId, contractInfo: ContractInfo) {
@@ -121,22 +148,37 @@ export async function checkAllAbi(chainId: ChainId, contractInfo: ContractInfo) 
 
 async function _checkAbi(chainId: ChainId, contractName: string, address: string, abiFromExplorer: Abi): Promise<void> {
   const key = getAbiKey(chainId, address);
+  _markWalked(key);
   const logHandler = new LogCommand(`ABI ${chalk.magenta(`${contractName} @ ${address.toLowerCase()}`)}`);
 
-  if (Object.hasOwn(loadConsolidatedAbis(), key)) {
+  if (!context.updateAbi && Object.hasOwn(loadConsolidatedAbis(), key)) {
     logHandler.success("Skipped (exists)");
     return;
   }
 
   _saveAbi(key, { name: contractName, abi: abiFromExplorer });
-  logHandler.success("Saved");
+  logHandler.success(context.updateAbi ? "Downloaded" : "Saved");
+}
+
+/** Reports whether this run already fetched or kept the address, whatever config did it. */
+export function wasWalkedThisRun(chainId: ChainId, address: string): boolean {
+  return walkedAbiKeys.get(getConsolidatedAbiPath())?.has(getAbiKey(chainId, address)) ?? false;
+}
+
+function _markWalked(key: string) {
+  const storePath = getConsolidatedAbiPath();
+  let keys = walkedAbiKeys.get(storePath);
+  if (!keys) {
+    keys = new Set();
+    walkedAbiKeys.set(storePath, keys);
+  }
+  keys.add(key);
 }
 
 function _saveAbi(key: string, entry: StoredAbi) {
-  // Initialize pending updates on first call
-  if (!pendingAbiUpdates) {
-    pendingAbiUpdates = { ...loadConsolidatedAbis() };
-  }
+  // Merge into what the store already holds; the rebuild never starts empty, so a download the
+  // explorer refuses cannot cost a stored ABI. pruneAbiStores drops the unreferenced keys instead.
+  pendingAbiUpdates ??= { ...loadConsolidatedAbis() };
 
   // Stage the update instead of writing immediately
   pendingAbiUpdates[key] = entry;
@@ -149,6 +191,39 @@ function _saveAbi(key: string, entry: StoredAbi) {
 export function resetAbiCache(): void {
   consolidatedAbisCache = null;
   pendingAbiUpdates = null;
+}
+
+/** Only tests run more than one --update-abi rebuild per process. */
+export function resetAbiRebuildState(): void {
+  walkedAbiKeys.clear();
+}
+
+/**
+ * Drops every store key the --update-abi run did not walk, which is how entries no config
+ * references any more disappear. Runs once, after the last config of a directory: one store
+ * serves every config in it, and pruning earlier would sweep the keys of configs not walked yet.
+ */
+export function pruneAbiStores(): void {
+  if (!context.updateAbi) return;
+
+  for (const [storePath, walked] of walkedAbiKeys) {
+    if (!fs.existsSync(storePath)) continue;
+    try {
+      const store = JSON.parse(zlib.gunzipSync(fs.readFileSync(storePath)).toString("utf8")) as Record<
+        string,
+        StoredAbi
+      >;
+      const kept = Object.fromEntries(Object.entries(store).filter(([key]) => walked.has(key.toLowerCase())));
+      const dropped = Object.keys(store).length - Object.keys(kept).length;
+      if (dropped === 0) continue;
+      fs.writeFileSync(storePath, zlib.gzipSync(JSON.stringify(kept, null, 2)));
+      log(`Pruned ${chalk.yellow(dropped)} ABI entries no config references from ${chalk.magenta(storePath)}`);
+    } catch (error) {
+      // A store the sweep cannot read keeps its extra keys, which is safe; the other stores
+      // still get their pass
+      log(`${WARNING_MARK} ${chalk.yellow(`could not prune ${chalk.magenta(storePath)}: ${printError(error)}`)}`);
+    }
+  }
 }
 
 /**

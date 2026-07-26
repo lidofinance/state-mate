@@ -21,8 +21,9 @@ export const context = {
   configPath: "",
   checkOnly: null as CheckOnly | null,
   checkOnlyCmdArg: undefined as string | undefined,
-  generate: false,
+  // --update-abi: rebuild the store from scratch instead of only downloading what is missing
   updateAbi: false,
+  skipImplementationCheck: false,
   quiet: false,
 };
 

@@ -41,11 +41,11 @@ export function readUrlOrFromEnvironment(urlOrEnvironmentVariableName: string) {
 }
 
 export function normalizeChainId(chainId: ChainId): string {
-  try {
-    return BigInt(chainId).toString();
-  } catch {
+  // BigInt would happily coerce whitespace to 0 or accept a negative — neither is a chain
+  if (!/^\d+$/.test(String(chainId))) {
     logErrorAndExit(`Invalid chain ID: ${chalk.yellow(String(chainId))}`);
   }
+  return BigInt(chainId).toString();
 }
 
 export function getNonMutables(abi: Abi): AbiArgumentsLength {

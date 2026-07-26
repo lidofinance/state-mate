@@ -1,7 +1,7 @@
 import { Contract, JsonRpcProvider } from "ethers";
 
 import { EntryField } from "src/common";
-import { loadContract } from "src/explorer-provider";
+import { loadContract } from "src/explorer";
 import { logErrorAndExit } from "src/logger";
 import {
   ArrayOfStaticCallCheckTB,

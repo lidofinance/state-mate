@@ -54,7 +54,7 @@ export class LogCommand {
   }
 
   public warning(result: string): void {
-    if (context.quiet) return;
+    // A warning is a check that did not happen; --quiet must not hide that from CI logs
     this.printResult(WARNING_MARK, result);
   }
 }

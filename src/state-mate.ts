@@ -7,15 +7,27 @@ import { Static, TSchema } from "@sinclair/typebox";
 import Ajv, { ValidateFunction } from "ajv";
 import addFormats from "ajv-formats";
 import chalk from "chalk";
-import { JsonRpcProvider } from "ethers";
 import * as YAML from "yaml";
 
-import { checkAllAbi, flushAbiUpdates, getAbiNameForAddress, resetAbiCache } from "./abi-provider";
-import { doGenerateBoilerplate } from "./boilerplate-generator";
+import {
+  checkAllAbi,
+  flushAbiUpdates,
+  getAbiNameForAddress,
+  keepStoredAbi,
+  pruneAbiStores,
+  resetAbiCache,
+  wasWalkedThisRun,
+} from "./abi-provider";
 import { parseCommandLineArguments } from "./cli-parser";
 import { normalizeChainId, printError, readUrlOrFromEnvironment } from "./common";
 import { context, resetStats, stats } from "./context";
-import { loadContractInfoFromExplorer, verifyChainIdWithExplorer } from "./explorer-provider";
+import {
+  assertProviderChain,
+  createProvider,
+  explorerNeedsApiKey,
+  loadContractInfo,
+  verifyChainIdWithExplorer,
+} from "./explorer";
 import { FAILURE_MARK, log, logError, logErrorAndExit, logHeader1, SUCCESS_MARK, WARNING_MARK } from "./logger";
 import { ContractSectionValidator } from "./section-validators/contract";
 import {
@@ -27,8 +39,6 @@ import {
   MaxIntFormat,
   NetworkSection,
   NetworkSectionTB,
-  SeedDocument,
-  SeedDocumentTB,
 } from "./typebox";
 import { ContractInfo } from "./types";
 
@@ -146,48 +156,80 @@ async function doChecks(jsonDocument: EntireDocument) {
   }
 }
 
-export async function downloadAndCheckAllAbi<T extends EntireDocument | SeedDocument>(jsonDocument: T) {
+export async function downloadAndCheckAllAbi(jsonDocument: EntireDocument) {
   logHeader1("ABI checking");
   await iterateLoadedContracts(jsonDocument, checkAllAbi);
   flushAbiUpdates();
 }
 
-async function iterateLoadedContracts<T extends EntireDocument | SeedDocument>(
-  jsonDocument: T,
+async function iterateLoadedContracts(
+  jsonDocument: EntireDocument,
   callback: (chainId: string, contractInfo: ContractInfo) => Promise<void> | void,
 ) {
   for (const [explorerSectionKey, addresses] of Object.entries(jsonDocument.deployed)) {
-    const explorerSection = jsonDocument[explorerSectionKey as keyof T];
+    const explorerSection = jsonDocument[explorerSectionKey as keyof EntireDocument];
 
     if (isTypeOfTB(explorerSection, ExplorerSectionTB) || isTypeOfTB(explorerSection, NetworkSectionTB)) {
       const { explorerHostname, explorerTokenEnv } = explorerSection;
+      const chainId = normalizeChainId(explorerSection.chainId);
       if (!explorerHostname) {
-        logErrorAndExit(
-          `The field ${chalk.magenta(`explorerHostname`)} is required in the ${chalk.magenta(context.configPath)}`,
+        log(
+          `${WARNING_MARK} ${chalk.yellow(`No ${chalk.magenta("explorerHostname")} in the ${chalk.magenta(context.configPath)}, ABIs cannot be downloaded for ${explorerSectionKey}`)}`,
         );
+        if (context.updateAbi) {
+          // A chain with no explorer cannot re-download, so the rebuild keeps what the store
+          // already holds for it
+          const uniqueAddresses = new Set(addresses);
+          for (const address of uniqueAddresses) {
+            const keptName = keepStoredAbi(chainId, address);
+            if (keptName) log(`ABI ${chalk.magenta(`${keptName} @ ${address}`)} ${chalk.green("Kept (no explorer)")}`);
+          }
+        }
+        continue;
       }
       const explorerKey = explorerTokenEnv ? process.env[explorerTokenEnv] : "";
-      const chainId = normalizeChainId(explorerSection.chainId);
       await verifyChainIdWithExplorer(explorerHostname, chainId, explorerKey);
 
-      if (!explorerTokenEnv) {
+      if (!explorerTokenEnv && explorerNeedsApiKey(explorerHostname)) {
         log(
           `${WARNING_MARK} ${chalk.yellow("explorerTokenEnv")} is not set in the ${chalk.magenta(context.configPath)}, the section ${chalk.magenta(explorerSectionKey)}`,
         );
-      } else if (!explorerKey) {
+      } else if (explorerTokenEnv && !explorerKey) {
         log(`\n${WARNING_MARK} ${chalk.yellow(`The env var ${explorerTokenEnv} is not set`)}\n`);
       }
-      for (const address of addresses) {
+      const toDownload: string[] = [];
+      // a duplicated address in the YAML must not spend two download slots
+      const uniqueAddresses = new Set(addresses);
+      for (const address of uniqueAddresses) {
         const existingAbiName = getAbiNameForAddress(chainId, address);
-        if (existingAbiName !== undefined) {
+        // Bytecode at an address never changes, so a stored ABI can only be refreshed on demand;
+        // a rebuild re-downloads each address once, sibling configs of the run reuse the result
+        const fresh = context.updateAbi && !wasWalkedThisRun(chainId, address);
+        if (existingAbiName !== undefined && !fresh) {
           log(`ABI ${chalk.magenta(`${existingAbiName} @ ${address}`)} ${chalk.green("Skipped (exists)")}`);
           continue;
         }
-        const contractInfo = await loadContractInfoFromExplorer(address, explorerHostname, explorerKey, chainId);
-        if (!contractInfo) {
+        toDownload.push(address);
+      }
+
+      // All requests start at once and the pacer spaces them to the explorer's per-second budget,
+      // so a slow response never stalls the rest; the callbacks stay sequential to keep the log
+      // readable and the store writes ordered
+      const downloads = await Promise.all(
+        toDownload.map(async (address) => ({
+          address,
+          info: await loadContractInfo(address, explorerHostname, explorerKey, chainId),
+        })),
+      );
+      for (const { address, info } of downloads) {
+        if (info) {
+          await callback(chainId, info);
           continue;
         }
-        await callback(chainId, contractInfo);
+        const keptName = keepStoredAbi(chainId, address);
+        if (keptName) {
+          log(`ABI ${chalk.magenta(`${keptName} @ ${address}`)} ${chalk.green("Kept (explorer served none)")}`);
+        }
       }
     }
   }
@@ -198,10 +240,9 @@ async function checkNetworkSection(sectionTitle: string, section: NetworkSection
     return;
   }
   const rpcUrl = readUrlOrFromEnvironment(section.rpcUrl);
-  // staticNetwork stops ethers from re-sending eth_chainId with every call,
-  // which otherwise doubles traffic and trips rate limits on public RPCs
-  const provider = new JsonRpcProvider(rpcUrl, undefined, { staticNetwork: true });
+  const provider = createProvider(rpcUrl);
   const chainId = normalizeChainId(section.chainId);
+  await assertProviderChain(provider, chainId);
   if (section.explorerHostname) {
     const explorerKey = section.explorerTokenEnv ? process.env[section.explorerTokenEnv] : undefined;
     await verifyChainIdWithExplorer(section.explorerHostname, chainId, explorerKey);
@@ -221,7 +262,8 @@ export function collectYamlConfigs(directory: string): string[] {
     const fullPath = path.join(directory, entry.name);
     if (entry.isDirectory()) {
       files.push(...collectYamlConfigs(fullPath));
-    } else if (/\.ya?ml$/.test(entry.name)) {
+    } else if (/\.ya?ml$/.test(entry.name) && !entry.name.includes(".seed.")) {
+      // seed files and their generated siblings are leftovers of the removed --generate flow
       files.push(fullPath);
     }
   }
@@ -236,10 +278,8 @@ async function main() {
   }
 
   if (fs.statSync(context.configPath).isDirectory()) {
-    if (context.generate || context.checkOnly) {
-      logErrorAndExit(
-        `The ${chalk.yellow("--generate")} and ${chalk.yellow("-o")} options require a single config file, not a directory`,
-      );
+    if (context.checkOnly) {
+      logErrorAndExit(`The ${chalk.yellow("-o")} option requires a single config file, not a directory`);
     }
     const configs = collectYamlConfigs(context.configPath);
     if (configs.length === 0) {
@@ -254,6 +294,7 @@ async function main() {
       await runConfig();
       if (stats.errors) failed.push(`${configPath} (${stats.errors} errors)`);
     }
+    pruneAbiStores();
     log("");
     if (failed.length > 0) {
       logError(
@@ -265,6 +306,8 @@ async function main() {
     return;
   }
 
+  // No prune here: a single-file run has walked only its own addresses, and sweeping the shared
+  // store now would drop the sibling configs' ABIs
   await runConfig();
   if (stats.errors) process.exit(stats.errors);
 }
@@ -272,34 +315,9 @@ async function main() {
 async function runConfig() {
   const jsonDocument = loadStateFromYaml(context.configPath);
 
-  if (context.generate) {
-    if (validateJsonWithSchema(jsonDocument, EntireDocumentTB, { silent: true })) {
-      logErrorAndExit(
-        chalk.yellow(
-          `A main YAML was specified, but a seed YAML was expected: ${context.configPath}\n` +
-            chalk.yellow("Alternatively, the `--generate` parameter was specified for the main YAML"),
-        ),
-      );
-    }
-    if (validateJsonWithSchema(jsonDocument, SeedDocumentTB)) {
-      if (context.updateAbi) {
-        await downloadAndCheckAllAbi(jsonDocument);
-      }
-      await doGenerateBoilerplate(context.configPath, jsonDocument);
-    }
-  } else {
-    if (validateJsonWithSchema(jsonDocument, SeedDocumentTB, { silent: true })) {
-      logErrorAndExit(
-        chalk.yellow(`A seed YAML was specified, but a main YAML was expected: ${context.configPath}\n`) +
-          chalk.yellow("Alternatively, the `--generate` parameter was not specified for the seed YAML"),
-      );
-    }
-    if (validateJsonWithSchema(jsonDocument, EntireDocumentTB)) {
-      if (context.updateAbi) {
-        await downloadAndCheckAllAbi(jsonDocument);
-      }
-      await doChecks(jsonDocument);
-    }
+  if (validateJsonWithSchema(jsonDocument, EntireDocumentTB)) {
+    await downloadAndCheckAllAbi(jsonDocument);
+    await doChecks(jsonDocument);
   }
 }
 
