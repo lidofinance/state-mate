@@ -28,7 +28,7 @@ state-mate accepts a yaml file that includes contract addresses, view functions 
 ### Requirements
 
 - git
-- Node.js >=20,
+- Node.js >=22,
 - yarn
 
 ### Usage
@@ -45,45 +45,19 @@ corepack enable
 yarn install
 ```
 
-3. Specify RPC endpoints for your target networks, e.g.
+3. Specify RPC endpoints for your target networks: copy `.env.sample` to `.env` and adjust the URLs, or export the env vars a config names in its `rpcUrl:` fields, e.g.
 
 ```sh
-# config.seed.yaml
-
 export ETH_RPC_URL=%YOUR_RPC_URL%
-export OPTIMISM_RPC_URL=%YOUR_RPC_URL%
+export MODE_RPC_URL=%YOUR_RPC_URL%
 ```
 
-4. Prepare a seed config
-
-```yaml
----
-deployed:
-  l1:
-    - &l1TokenBridge "0xD0DeA0a3bd8E4D55170943129c025d3fe0493F2A"
-  l2:
-    - &l2TokenBridge "0xb8161F28a5a38cE58f155D9A96bDAc0104985FAc"
-    - &l2Wsteth "0x98f96A4B34D03a2E6f225B28b8f8Cb1279562d81"
-    - &l2GovExecutor "0x2aCeC6D8ABA90685927b61968D84CfFf6192B32C"
-
-l1:
-  rpcUrl: ETH_RPC_URL
-  explorerHostname: api.etherscan.io
-  explorerTokenEnv: ETHERSCAN_TOKEN
-
-l2:
-  rpcUrl: OPTIMISM_RPC_URL
-  explorerHostname: explorer.mode.network
-  # explorerTokenEnv: ETHERSCAN_MODE_TOKEN
-```
-
-4. Start the program to generate a populated config from the seed one
+4. Run a config, or every config in a directory
 
 ```sh
-yarn start path/to/config.seed.yaml --generate
+yarn start configs/lido/mainnet/lido.yaml
+yarn start configs/lido/mainnet
 ```
-
-5. Edit the generated config manually
 
 ### Configuration
 
@@ -136,15 +110,42 @@ state-mate keeps all ABIs for a config in a single compressed `abis.json.gz` fil
 
 The chain ID distinguishes contracts deployed at the same address on different networks. The `name:` / `proxyName:` fields in YAML serve as a sanity check: state-mate compares them with the stored name and fails on mismatch. For proxies, `checks` resolve the ABI at `implementation:`, `proxyChecks` at `address:`. See [configs](/configs/).
 
-#### Updating ABIs
+#### Implementation check
 
-`--update-abi` downloads the ABIs missing from `abis.json.gz` and leaves existing entries alone:
+`implementation:` decides which ABI the `checks` run against, so state-mate verifies it against the chain for every contract entry, with or without `proxyChecks`:
 
-```sh
-yarn start path/to/config.yaml --update-abi
+- an entry with `implementation:` must name the address the proxy delegates to. state-mate reads the EIP-1967 slot, falls back to `implementation()`, then to the first storage slot where Safe keeps its singleton;
+- an entry without `implementation:` must have an empty EIP-1967 slot. A non-empty slot means a proxy is described as a regular contract, and every check runs against the proxy ABI instead of the implementation's.
+
+Aragon proxies and Safes keep the implementation outside the EIP-1967 slot, so state-mate verifies them only when the config declares them as proxies; the Safe singleton slot is read only for `proxyName: SafeProxy` or `GnosisSafeProxy`, because anywhere else the first slot holds an ordinary variable. When no read returns an address, the check prints a warning and moves on. `--skip-implementation-check` turns the check off, and so does narrowing a run to one checks type (`-o l1/contractName/checks`); the `proxyAdminOwner:` check stays on either way, since it runs only where the config asks for it.
+
+#### Proxy admin owner
+
+An upgrade of a transparent proxy goes through the ProxyAdmin in its EIP-1967 admin slot, so what matters is who owns that ProxyAdmin. The optional `proxyAdminOwner:` field asserts it:
+
+```yaml
+someProxy:
+  name: Vault
+  address: *vault
+  proxyName: TransparentUpgradeableProxy
+  implementation: *vaultImplementation
+  proxyAdminOwner: *agent
+  proxyChecks: {}
 ```
 
-To re-download a stale ABI, delete its `chainId:address` entry from `abis.json.gz` (or the whole file) and run `--update-abi` again.
+state-mate reads the admin slot and calls `owner()` on whatever it finds, so the ProxyAdmin needs no anchor and no ABI in the store. Pin the admin address itself with a `storage:` check when you want both. An admin that answers no `owner()`, a Safe for instance, fails the check: assert such an admin through `storage:` instead.
+
+#### Updating ABIs
+
+Every run downloads the ABIs missing from `abis.json.gz`, so a config that gained an address needs no flag. Bytecode at an address never changes, so a stored ABI is never stale on its own.
+
+`--update-abi` rebuilds the store instead: it re-downloads every address the run walks and drops the entries no config references any more. An address the explorer refuses to serve keeps the ABI already stored for it, so a rebuild cannot lose a contract that was verified once and is not any more. CI runs pass `--quiet` to keep only failures and totals in the log.
+
+```sh
+yarn start configs/lido/mainnet --update-abi
+```
+
+One store serves every config in its directory. A single-file run refreshes its own ABIs and leaves every other entry alone; unreferenced keys are pruned only when the whole directory runs, since only then has every config declared what it needs. A section with no `explorerHostname` cannot re-download, so the rebuild keeps its stored ABIs as they are.
 
 ## 🔧 Contributing
 
