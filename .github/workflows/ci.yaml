@@ -27,23 +27,30 @@ jobs:
           - config: configs/mellow/mainnet
           - config: configs/defiwrapper/mainnet
 
-    # Real env vars take precedence over .env values. Map only secrets that
-    # actually exist: an empty mapping would shadow the .env.sample default.
-    env:
-      ETHERSCAN_TOKEN: ${{ secrets.ETHERSCAN_TOKEN }}
-      ETH_RPC_URL: ${{ secrets.MAINNET_REMOTE_RPC_URL }}
-      ETH_HOODI_RPC_URL: ${{ secrets.HOODI_REMOTE_RPC_URL }}
-      ARBITRUM_RPC_URL: ${{ secrets.ARBITRUM_RPC_URL }}
-      BASE_RPC_URL: ${{ secrets.BASE_RPC_URL }}
-      MANTLE_RPC_URL: ${{ secrets.MANTLE_RPC_URL }}
-      PLASMA_RPC_URL: ${{ secrets.PLASMA_RPC_URL }}
-
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - uses: ./.github/actions/setup
 
+      # Secrets are appended to .env instead of exported through `env:`: a missing secret exports
+      # an empty variable, and dotenv never overrides an existing one, even empty, so the
+      # .env.sample default would be lost. Within .env the last line wins.
       - name: Prepare .env
-        run: cp .env.sample .env
+        env:
+          ETHERSCAN_TOKEN: ${{ secrets.ETHERSCAN_TOKEN }}
+          ETH_RPC_URL: ${{ secrets.MAINNET_REMOTE_RPC_URL }}
+          ETH_HOODI_RPC_URL: ${{ secrets.HOODI_REMOTE_RPC_URL }}
+          ARBITRUM_RPC_URL: ${{ secrets.ARBITRUM_RPC_URL }}
+          BASE_RPC_URL: ${{ secrets.BASE_RPC_URL }}
+          MANTLE_RPC_URL: ${{ secrets.MANTLE_RPC_URL }}
+          PLASMA_RPC_URL: ${{ secrets.PLASMA_RPC_URL }}
+        run: |
+          cp .env.sample .env
+          for name in ETHERSCAN_TOKEN ETH_RPC_URL ETH_HOODI_RPC_URL ARBITRUM_RPC_URL BASE_RPC_URL MANTLE_RPC_URL PLASMA_RPC_URL; do
+            value=$(printenv "$name" || true)
+            if [ -n "$value" ]; then
+              printf '%s=%s\n' "$name" "$value" >> .env
+            fi
+          done
 
       - name: Run state-mate
         run: yarn start ${{ matrix.config }} --quiet
