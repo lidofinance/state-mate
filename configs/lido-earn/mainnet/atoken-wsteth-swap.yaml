@@ -6,7 +6,7 @@ deployed:
     - &profitReceiverSafe "0xcCf2daba8Bb04a232a2fDA0D01010D4EF6C69B85"
 
 misc:
-  - &SAFE_IMPL_1_4_1 "0x41675C099F32341bf84BFc5382aF534df5C7461a"
+  - &safeImpl_1_4_1 "0x41675C099F32341bf84BFc5382aF534df5C7461a"
 
 l1:
   chainId: 1
@@ -40,7 +40,7 @@ l1:
       name: Safe
       address: *ownerSafe
       proxyName: SafeProxy
-      implementation: *SAFE_IMPL_1_4_1
+      implementation: *safeImpl_1_4_1
       proxyChecks: {}
       checks:
         VERSION: "1.4.1"
@@ -98,7 +98,7 @@ l1:
       name: Safe
       address: *profitReceiverSafe
       proxyName: SafeProxy
-      implementation: *SAFE_IMPL_1_4_1
+      implementation: *safeImpl_1_4_1
       proxyChecks: {}
       checks:
         VERSION: "1.4.1"

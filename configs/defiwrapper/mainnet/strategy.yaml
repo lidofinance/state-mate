@@ -5,10 +5,10 @@ parameters:
 
 misc:
   # https://metavaults.mellow.finance/deployments.md
-  - &VAULT "0x6a37725ca7f4CE81c004c955f7280d5C704a249e"
-  - &ASYNC_DEPOSIT_QUEUE "0xe39EED9A454C4918F8d0682062777cB251cd513F" # DepositQueue (wstETH)
-  - &SYNC_DEPOSIT_QUEUE "0xECD2Bfe725fa14f5Ed86e9bDcc0eA4b34A4ed522" # SyncDepositQueue (wstETH)
-  - &ASYNC_REDEEM_QUEUE "0x095bFAca9f1c6F2B063Cd67C6d6bfcd0c3aaB7b4" # RedeemQueue (wstETH)
+  - &vault "0x6a37725ca7f4CE81c004c955f7280d5C704a249e"
+  - &asyncDepositQueue "0xe39EED9A454C4918F8d0682062777cB251cd513F" # DepositQueue (wstETH)
+  - &syncDepositQueue "0xECD2Bfe725fa14f5Ed86e9bDcc0eA4b34A4ed522" # SyncDepositQueue (wstETH)
+  - &asyncRedeemQueue "0x095bFAca9f1c6F2B063Cd67C6d6bfcd0c3aaB7b4" # RedeemQueue (wstETH)
 
 deployed:
   l1:
@@ -25,12 +25,12 @@ l1:
       name: MellowStrategyFactory
       address: *mellowStrategyFactory
       checks:
-        ASYNC_DEPOSIT_QUEUE: *ASYNC_DEPOSIT_QUEUE
-        ASYNC_REDEEM_QUEUE: *ASYNC_REDEEM_QUEUE
+        ASYNC_DEPOSIT_QUEUE: *asyncDepositQueue
+        ASYNC_REDEEM_QUEUE: *asyncRedeemQueue
         STRATEGY_CALL_FORWARDER_IMPLEMENTATION: *strategyCallForwarder
         STRATEGY_ID: *STRATEGY_ID
-        SYNC_DEPOSIT_QUEUE: *SYNC_DEPOSIT_QUEUE
-        VAULT: *VAULT
+        SYNC_DEPOSIT_QUEUE: *syncDepositQueue
+        VAULT: *vault
     strategyCallForwarder:
       name: StrategyCallForwarder
       address: *strategyCallForwarder

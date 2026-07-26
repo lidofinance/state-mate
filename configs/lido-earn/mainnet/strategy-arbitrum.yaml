@@ -4,14 +4,40 @@ parameters:
   # --- Special addresses and values ---
   - &ZERO_ADDRESS "0x0000000000000000000000000000000000000000"
   - &ZERO_BYTES32 "0x0000000000000000000000000000000000000000000000000000000000000000"
-  - &DEFAULT_ADMIN_ROLE "0x0000000000000000000000000000000000000000000000000000000000000000"
   - &ETH "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"
-  - &SAFE_IMPL_1_4_1 "0x41675c099f32341bf84bfc5382af534df5c7461a"
-  - &DEPLOYER "0xE98Be1E5538FCbD716C506052eB1Fd5d6fC495A3"
+  - &safeL2Impl_1_4_1 "0x29fcB43b46531BcA003ddC8FCB67FFE91900C762"
+  - &deployer "0xE98Be1E5538FCbD716C506052eB1Fd5d6fC495A3"
 
   #
-  # --- ROLES --- #
+  # --- MULTISIGS -- #
   #
+
+  # --- Mellow signers ---
+  - &mellowSigner1 "0x44A388BBD782AE1D7f4542aEb6C3569E2CfdF5a1"
+  - &mellowSigner2 "0x185111c113d9B19Ea4C424D3cD8628A1ee09Be6A"
+  - &mellowSigner3 "0x06C3992a6067bEA8FB3Af7F004EdEbC13656761F"
+  - &mellowSigner4 "0x8888843c607F4Bbd6aD72128F478085256Bdd15D"
+
+  # --- Lido signers ---
+  - &lidoSigner1 "0x59F8D74Fe49d5ebEAc069E3baf07eB4b614BD5A7"
+  - &lidoSigner2 "0x9777AF8c6727D57F74f7d381AD47eB4A65f042Ff"
+  - &lidoSigner3 "0xEA685f0AF4A0BF5E7D6729b2C63eDF574D3EE27f"
+  - &lidoSigner4 "0xFB864C1127ff77215d0A8e652bB632F526A4A89f"
+
+  # --- Ext Mellow signers ---
+  - &extMellowSigner1 "0x78Eb634731bE1957D370BEcbbD254F427Af5D13b"
+  - &extMellowSigner2 "0xe49384e6Aca6A26c82Eaa161A9211fA60fEee3Ef"
+  - &extMellowSigner3 "0x112C1aAB1463A32eD8B1f5F2e8b5244D876Ef740"
+  - &extMellowSigner4 "0x1f3E4c3dBF27056CD7881D8eb376B1D7815757a6"
+
+  # --- Thresholds for msigs ---
+  - &PROXY_ADMIN_THRESHOLD 5
+  - &LAZY_VAULT_ADMIN_THRESHOLD 5
+  - &ACTIVE_VAULT_ADMIN_THRESHOLD 3
+  - &CURATOR_THRESHOLD 3
+
+roles:
+  - &DEFAULT_ADMIN_ROLE "0x0000000000000000000000000000000000000000000000000000000000000000"
 
   # --- Roles: share manager ---
   - &SET_ACCOUNT_INFO_ROLE "0x58258f737b9cea9d7da81a3a12943f800a9668a2494235fec0d84cc60ad04cff"
@@ -62,50 +88,19 @@ parameters:
   - &SET_SECURITY_PARAMS_ROLE "0x79abe62d91dbd05fcda41b212f4c8c1f1d8be54ccddf859de3ccd1361b71fcb6"
   - &SUBMIT_REPORTS_ROLE "0xb54eea9408efadf36da92cc5ecd8af0f45d6dd90de54634bbc5a2113ddcb505d"
 
-  #
-  # --- MULTISIGS -- #
-  #
-
-  # --- Mellow signers ---
-  - &MELLOW_SIGNER_1 "0x44A388BBD782AE1D7f4542aEb6C3569E2CfdF5a1"
-  - &MELLOW_SIGNER_2 "0x185111c113d9B19Ea4C424D3cD8628A1ee09Be6A"
-  - &MELLOW_SIGNER_3 "0x06C3992a6067bEA8FB3Af7F004EdEbC13656761F"
-  - &MELLOW_SIGNER_4 "0x8888843c607F4Bbd6aD72128F478085256Bdd15D"
-
-  # --- Lido signers ---
-  - &LIDO_SIGNER_1 "0x59F8D74Fe49d5ebEAc069E3baf07eB4b614BD5A7"
-  - &LIDO_SIGNER_2 "0x9777AF8c6727D57F74f7d381AD47eB4A65f042Ff"
-  - &LIDO_SIGNER_3 "0xEA685f0AF4A0BF5E7D6729b2C63eDF574D3EE27f"
-  - &LIDO_SIGNER_4 "0xFB864C1127ff77215d0A8e652bB632F526A4A89f"
-
-  # --- Ext Mellow signers ---
-  - &EXT_MELLOW_SIGNER_1 "0x78Eb634731bE1957D370BEcbbD254F427Af5D13b"
-  - &EXT_MELLOW_SIGNER_2 "0xe49384e6Aca6A26c82Eaa161A9211fA60fEee3Ef"
-  - &EXT_MELLOW_SIGNER_3 "0x112C1aAB1463A32eD8B1f5F2e8b5244D876Ef740"
-  - &EXT_MELLOW_SIGNER_4 "0x1f3E4c3dBF27056CD7881D8eb376B1D7815757a6"
-
-  # --- Thresholds for msigs ---
-  - &PROXY_ADMIN_THRESHOLD 5
-  - &LAZY_VAULT_ADMIN_THRESHOLD 5
-  - &ACTIVE_VAULT_ADMIN_THRESHOLD 3
-  - &CURATOR_THRESHOLD 3
-
 deployed:
   l1:
     # --- Base contracts deployment (VERIFIED by Nethermind)---
     - &factoryImplementation "0x0000000397b71C8f3182Fd40D247330D218fdC72"
     - &factoryFactory "0x0000000f9686896836C39cf721141922Ce42639f"
     - &consensusFactory "0xaEEB06CBd91A18b51a2D30b61477eAeE3a9633C3"
-    - &consensusImplementation "0x0000000167598d2C78E2313fD5328E16bD9A0b13"
     - &depositQueueFactory "0xBB92A7B9695750e1234BaB18F83b73686dd09854"
-    - &depositQueueImplementation "0x00000006dA9f179BFE250Dd1c51cD2d3581930c8"
     - &signatureDepositQueueImplementation "0x00000003887dfBCEbD1e4097Ad89B690de7eFbf9"
     - &feeManagerFactory "0xF7223356819Ea48f25880b6c2ab3e907CC336D45"
     - &feeManagerImplementation "0x0000000dE74e5D51651326E0A3e1ACA94bEAF6E1"
     - &oracleFactory "0x0CdFf250C7a071fdc72340D820C5C8e29507Aaad"
     - &oracleImplementation "0x0000000F0d3D1c31b72368366A4049C05E291D58"
     - &redeemQueueFactory "0xfe76b5fd238553D65Ce6dd0A572C0fda629F8421"
-    - &redeemQueueImplementation "0x0000000285805eac535DADdb9648F1E10DfdC411"
     - &signatureRedeemQueueImplementation "0x0000000b2082667589A16c4cF18e9f923781c471"
     - &riskManagerFactory "0xa51E4FA916b939Fa451520D2B7600c740d86E5A0"
     - &riskManagerImplementation "0x0000000714cf2851baC1AE2f41871862e9D216fD"
@@ -125,7 +120,6 @@ deployed:
     - &basicRedeemHook "0x0000000637f1b1ccDA4Af2dB6CDDf5e5Ec45fd93"
     - &redirectingDepositHook "0x00000004d3B17e5391eb571dDb8fDF95646ca827"
     - &oracleHelper "0x000000005F543c38d5ea6D0bF10A50974Eb55E35"
-    - &swapModuleFactory "0x1B6C06E8ff3E2DD310E20a70a6a2Be048Fa26Dbd"
 
     # --- strETH deployment ---
     - &vault "0x40330720039352B309c70A5028322D1481F496d1"
@@ -137,20 +131,24 @@ deployed:
     - &verifier0 "0x022a33293aeD00E59E93D354D3810249Fa33d7D4"
     - &timelockController "0xda1674c1135eA98A311a3b4aa11865266ab52A7C"
 
-    # --- msvUSD deployment (present in shared core factories) ---
-    - &msvVault "0x13515096066708d14a06eAA2600c5c692954242E"
-    - &msvOracle "0xEF98fE4631d05e7Ab7Ffba49e7bd6D12F77D5585"
-    - &msvShareManager "0x92A27960f0AAD5c1dC6a9974fea813793D346FF7"
-    - &msvFeeManager "0xBE64F682F29a1B7351e79041bd77CB52c0b38656"
-    - &msvRiskManager "0x03f44997f7dC6070503aD4276aABB8568FFa7c64"
-    - &msvSubvault0 "0x9214Fb3563BC6FE429c608071CBc5278b0e43639"
-    - &msvVerifier0 "0x9488a58AE40D4ba7a1d555f160EF4942aD779AF7"
-
     # --- Actors (multisigs) ---
-    - &PROXY_ADMIN "0x81698f87C6482bF1ce9bFcfC0F103C4A0Adf0Af0"
-    - &LAZY_VAULT_ADMIN "0xAbE20D266Ae54b9Ae30492dEa6B6407bF18fEeb5"
-    - &ACTIVE_VAULT_ADMIN "0xeb1CaFBcC8923eCbc243ff251C385C201A6c734a"
-    - &CURATOR "0x5Dbf9287787A5825beCb0321A276C9c92d570a75"
+    - &proxyAdmin "0x81698f87C6482bF1ce9bFcfC0F103C4A0Adf0Af0"
+    - &lazyVaultAdmin "0xAbE20D266Ae54b9Ae30492dEa6B6407bF18fEeb5"
+    - &activeVaultAdmin "0xeb1CaFBcC8923eCbc243ff251C385C201A6c734a"
+    - &curator "0x5Dbf9287787A5825beCb0321A276C9c92d570a75"
+
+misc:
+  - &consensusImplementation "0x0000000167598d2C78E2313fD5328E16bD9A0b13"
+  - &depositQueueImplementation "0x00000006dA9f179BFE250Dd1c51cD2d3581930c8"
+  - &redeemQueueImplementation "0x0000000285805eac535DADdb9648F1E10DfdC411"
+  - &swapModuleFactory "0x1B6C06E8ff3E2DD310E20a70a6a2Be048Fa26Dbd"
+  - &msvVault "0x13515096066708d14a06eAA2600c5c692954242E"
+  - &msvOracle "0xEF98fE4631d05e7Ab7Ffba49e7bd6D12F77D5585"
+  - &msvShareManager "0x92A27960f0AAD5c1dC6a9974fea813793D346FF7"
+  - &msvFeeManager "0xBE64F682F29a1B7351e79041bd77CB52c0b38656"
+  - &msvRiskManager "0x03f44997f7dC6070503aD4276aABB8568FFa7c64"
+  - &msvSubvault0 "0x9214Fb3563BC6FE429c608071CBc5278b0e43639"
+  - &msvVerifier0 "0x9488a58AE40D4ba7a1d555f160EF4942aD779AF7"
 
 l1:
   rpcUrl: ARBITRUM_RPC_URL
@@ -166,6 +164,7 @@ l1:
       address: *factoryFactory
       proxyName: TransparentUpgradeableProxy
       implementation: *factoryImplementation
+      proxyAdminOwner: *proxyAdmin
       proxyChecks: {}
       checks:
         entities: 12
@@ -201,7 +200,7 @@ l1:
             result: *factoryImplementation
         implementations: 1
         isBlacklisted:
-          - args: [*factoryImplementation]
+          - args: [0]
             result: false
         isEntity:
           - args: [*swapModuleFactory]
@@ -228,7 +227,7 @@ l1:
             result: true
           - args: [*consensusFactory]
             result: true
-        owner: *PROXY_ADMIN
+        owner: *proxyAdmin
         proposalAt:
           - args: [0]
             mustRevert: true
@@ -248,6 +247,7 @@ l1:
       address: *consensusFactory
       proxyName: TransparentUpgradeableProxy
       implementation: *factoryImplementation
+      proxyAdminOwner: *proxyAdmin
       proxyChecks: {}
       checks:
         entities: 0
@@ -259,10 +259,10 @@ l1:
             result: *consensusImplementation
         implementations: 1
         isBlacklisted:
-          - args: [*consensusImplementation]
+          - args: [0]
             result: false
         isEntity:
-        owner: *PROXY_ADMIN
+        owner: *proxyAdmin
         proposalAt:
           - args: [0]
             mustRevert: true
@@ -282,6 +282,7 @@ l1:
       address: *depositQueueFactory
       proxyName: TransparentUpgradeableProxy
       implementation: *factoryImplementation
+      proxyAdminOwner: *proxyAdmin
       proxyChecks: {}
       checks:
         entities: 0
@@ -297,12 +298,12 @@ l1:
             mustRevert: true
         implementations: 2
         isBlacklisted:
-          - args: [*depositQueueImplementation]
+          - args: [0]
             result: false
-          - args: [*signatureDepositQueueImplementation]
+          - args: [1]
             result: false
         isEntity:
-        owner: *PROXY_ADMIN
+        owner: *proxyAdmin
         proposalAt:
           - args: [0]
             mustRevert: true
@@ -340,6 +341,7 @@ l1:
       address: *feeManagerFactory
       proxyName: TransparentUpgradeableProxy
       implementation: *factoryImplementation
+      proxyAdminOwner: *proxyAdmin
       proxyChecks: {}
       checks:
         entities: 2
@@ -357,14 +359,14 @@ l1:
             mustRevert: true
         implementations: 1
         isBlacklisted:
-          - args: [*feeManagerImplementation]
+          - args: [0]
             result: false
         isEntity:
           - args: [*msvFeeManager]
             result: true
           - args: [*feeManager]
             result: true
-        owner: *PROXY_ADMIN
+        owner: *proxyAdmin
         proposalAt:
           - args: [0]
             mustRevert: true
@@ -384,6 +386,7 @@ l1:
       address: *oracleFactory
       proxyName: TransparentUpgradeableProxy
       implementation: *factoryImplementation
+      proxyAdminOwner: *proxyAdmin
       proxyChecks: {}
       checks:
         entities: 2
@@ -401,14 +404,14 @@ l1:
             mustRevert: true
         implementations: 1
         isBlacklisted:
-          - args: [*oracleImplementation]
+          - args: [0]
             result: false
         isEntity:
           - args: [*msvOracle]
             result: true
           - args: [*oracle]
             result: true
-        owner: *PROXY_ADMIN
+        owner: *proxyAdmin
         proposalAt:
           - args: [0]
             mustRevert: true
@@ -428,6 +431,7 @@ l1:
       address: *redeemQueueFactory
       proxyName: TransparentUpgradeableProxy
       implementation: *factoryImplementation
+      proxyAdminOwner: *proxyAdmin
       proxyChecks: {}
       checks:
         entities: 0
@@ -443,12 +447,12 @@ l1:
             mustRevert: true
         implementations: 2
         isBlacklisted:
-          - args: [*redeemQueueImplementation]
+          - args: [0]
             result: false
-          - args: [*signatureRedeemQueueImplementation]
+          - args: [1]
             result: false
         isEntity:
-        owner: *PROXY_ADMIN
+        owner: *proxyAdmin
         proposalAt:
           - args: [0]
             mustRevert: true
@@ -488,6 +492,7 @@ l1:
       address: *riskManagerFactory
       proxyName: TransparentUpgradeableProxy
       implementation: *factoryImplementation
+      proxyAdminOwner: *proxyAdmin
       proxyChecks: {}
       checks:
         entities: 2
@@ -505,14 +510,14 @@ l1:
             mustRevert: true
         implementations: 1
         isBlacklisted:
-          - args: [*riskManagerImplementation]
+          - args: [0]
             result: false
         isEntity:
           - args: [*msvRiskManager]
             result: true
           - args: [*riskManager]
             result: true
-        owner: *PROXY_ADMIN
+        owner: *proxyAdmin
         proposalAt:
           - args: [0]
             mustRevert: true
@@ -532,6 +537,7 @@ l1:
       address: *shareManagerFactory
       proxyName: TransparentUpgradeableProxy
       implementation: *factoryImplementation
+      proxyAdminOwner: *proxyAdmin
       proxyChecks: {}
       checks:
         entities: 2
@@ -551,16 +557,16 @@ l1:
           - args: [2]
             mustRevert: true
         isBlacklisted:
-          - args: [*tokenizedShareManagerImplementation]
+          - args: [0]
             result: false
-          - args: [*basicShareManagerImplementation]
+          - args: [1]
             result: false
         isEntity:
           - args: [*msvShareManager]
             result: true
           - args: [*shareManager]
             result: true
-        owner: *PROXY_ADMIN
+        owner: *proxyAdmin
         proposalAt:
           - args: [0]
             mustRevert: true
@@ -624,6 +630,7 @@ l1:
       address: *subvaultFactory
       proxyName: TransparentUpgradeableProxy
       implementation: *factoryImplementation
+      proxyAdminOwner: *proxyAdmin
       proxyChecks: {}
       checks:
         entities: 2
@@ -639,14 +646,14 @@ l1:
           - args: [0]
             result: *subvaultImplementation
         isBlacklisted:
-          - args: [*subvaultImplementation]
+          - args: [0]
             result: false
         isEntity:
           - args: [*msvSubvault0]
             result: true
           - args: [*subvault0]
             result: true
-        owner: *PROXY_ADMIN
+        owner: *proxyAdmin
         proposalAt:
           - args: [0]
             mustRevert: true
@@ -666,6 +673,7 @@ l1:
       address: *verifierFactory
       proxyName: TransparentUpgradeableProxy
       implementation: *factoryImplementation
+      proxyAdminOwner: *proxyAdmin
       proxyChecks: {}
       checks:
         entities: 2
@@ -683,14 +691,14 @@ l1:
             mustRevert: true
         implementations: 1
         isBlacklisted:
-          - args: [*verifierImplementation]
+          - args: [0]
             result: false
         isEntity:
           - args: [*msvVerifier0]
             result: true
           - args: [*verifier0]
             result: true
-        owner: *PROXY_ADMIN
+        owner: *proxyAdmin
         proposalAt:
           - args: [0]
             mustRevert: true
@@ -710,6 +718,7 @@ l1:
       address: *vaultFactory
       proxyName: TransparentUpgradeableProxy
       implementation: *factoryImplementation
+      proxyAdminOwner: *proxyAdmin
       proxyChecks: {}
       checks:
         entities: 2
@@ -727,14 +736,14 @@ l1:
             mustRevert: true
         implementations: 1
         isBlacklisted:
-          - args: [*vaultImplementation]
+          - args: [0]
             result: false
         isEntity:
           - args: [*msvVault]
             result: true
           - args: [*vault]
             result: true
-        owner: *PROXY_ADMIN
+        owner: *proxyAdmin
         proposalAt:
           - args: [0]
             mustRevert: true
@@ -835,6 +844,7 @@ l1:
       address: *ERC20VerifierFactory
       proxyName: TransparentUpgradeableProxy
       implementation: *factoryImplementation
+      proxyAdminOwner: *proxyAdmin
       proxyChecks: {}
       checks:
         entities: 0
@@ -848,10 +858,10 @@ l1:
             mustRevert: true
         implementations: 1
         isBlacklisted:
-          - args: [*ERC20Verifier]
+          - args: [0]
             result: false
         isEntity:
-        owner: *PROXY_ADMIN
+        owner: *proxyAdmin
         proposalAt:
           - args: [0]
             mustRevert: true
@@ -915,6 +925,7 @@ l1:
       address: *vault
       proxyName: TransparentUpgradeableProxy
       implementation: *vaultImplementation
+      proxyAdminOwner: *proxyAdmin
       proxyChecks: {}
       checks:
         CREATE_QUEUE_ROLE: *CREATE_QUEUE_ROLE
@@ -975,11 +986,11 @@ l1:
             result: 0
         getRoleMembers:
           - args: [*DEFAULT_ADMIN_ROLE]
-            result: [*LAZY_VAULT_ADMIN]
+            result: [*lazyVaultAdmin]
           - args: [*ACCEPT_REPORT_ROLE]
             result: []
           - args: [*SET_MERKLE_ROOT_ROLE]
-            result: [*ACTIVE_VAULT_ADMIN, *timelockController]
+            result: [*activeVaultAdmin, *timelockController]
           - args: [*ALLOW_CALL_ROLE]
             result: []
           - args: [*DISALLOW_CALL_ROLE]
@@ -1001,7 +1012,7 @@ l1:
           - args: [*SUBMIT_REPORTS_ROLE]
             result: []
           - args: [*CALLER_ROLE]
-            result: [*CURATOR]
+            result: [*curator]
           - args: [*PULL_LIQUIDITY_ROLE]
             result: []
           - args: [*PUSH_LIQUIDITY_ROLE]
@@ -1125,6 +1136,7 @@ l1:
       address: *oracle
       proxyName: TransparentUpgradeableProxy
       implementation: *oracleImplementation
+      proxyAdminOwner: *proxyAdmin
       proxyChecks: {}
       checks:
         ACCEPT_REPORT_ROLE: *ACCEPT_REPORT_ROLE
@@ -1140,23 +1152,28 @@ l1:
         validatePrice:
         vault: *vault
       implementationChecks:
-        ACCEPT_REPORT_ROLE:
-        ADD_SUPPORTED_ASSETS_ROLE:
-        REMOVE_SUPPORTED_ASSETS_ROLE:
-        SET_SECURITY_PARAMS_ROLE:
-        SUBMIT_REPORTS_ROLE:
+        ACCEPT_REPORT_ROLE: *ACCEPT_REPORT_ROLE
+        ADD_SUPPORTED_ASSETS_ROLE: *ADD_SUPPORTED_ASSETS_ROLE
+        REMOVE_SUPPORTED_ASSETS_ROLE: *REMOVE_SUPPORTED_ASSETS_ROLE
+        SET_SECURITY_PARAMS_ROLE: *SET_SECURITY_PARAMS_ROLE
+        SUBMIT_REPORTS_ROLE: *SUBMIT_REPORTS_ROLE
         getReport:
         isSupportedAsset:
+          - args: [*ETH]
+            result: false
         securityParams:
         supportedAssetAt:
-        supportedAssets:
+          - args: [0]
+            mustRevert: true
+        supportedAssets: 0
         validatePrice:
-        vault:
+        vault: *ZERO_ADDRESS
     shareManager:
       name: TokenizedShareManager
       address: *shareManager
       proxyName: TransparentUpgradeableProxy
       implementation: *tokenizedShareManagerImplementation
+      proxyAdminOwner: *proxyAdmin
       proxyChecks: {}
       checks:
         SET_ACCOUNT_INFO_ROLE: *SET_ACCOUNT_INFO_ROLE
@@ -1207,6 +1224,7 @@ l1:
       address: *feeManager
       proxyName: TransparentUpgradeableProxy
       implementation: *feeManagerImplementation
+      proxyAdminOwner: *proxyAdmin
       proxyChecks: {}
       checks:
         baseAsset:
@@ -1214,9 +1232,9 @@ l1:
         calculateFee:
         calculateRedeemFee:
         depositFeeD6: 0
-        feeRecipient: *LAZY_VAULT_ADMIN
+        feeRecipient: *lazyVaultAdmin
         minPriceD18:
-        owner: *LAZY_VAULT_ADMIN
+        owner: *lazyVaultAdmin
         performanceFeeD6: 0
         protocolFeeD6: 0
         redeemFeeD6: 0
@@ -1226,19 +1244,20 @@ l1:
         calculateDepositFee:
         calculateFee:
         calculateRedeemFee:
-        depositFeeD6:
-        feeRecipient:
+        depositFeeD6: 0
+        feeRecipient: *ZERO_ADDRESS
         minPriceD18:
-        owner:
-        performanceFeeD6:
-        protocolFeeD6:
-        redeemFeeD6:
+        owner: *ZERO_ADDRESS
+        performanceFeeD6: 0
+        protocolFeeD6: 0
+        redeemFeeD6: 0
         timestamps:
     riskManager:
       name: RiskManager
       address: *riskManager
       proxyName: TransparentUpgradeableProxy
       implementation: *riskManagerImplementation
+      proxyAdminOwner: *proxyAdmin
       proxyChecks: {}
       checks:
         ALLOW_SUBVAULT_ASSETS_ROLE: *ALLOW_SUBVAULT_ASSETS_ROLE
@@ -1261,13 +1280,13 @@ l1:
         vault: *vault
         vaultState:
       implementationChecks:
-        ALLOW_SUBVAULT_ASSETS_ROLE:
-        DISALLOW_SUBVAULT_ASSETS_ROLE:
-        MODIFY_PENDING_ASSETS_ROLE:
-        MODIFY_SUBVAULT_BALANCE_ROLE:
-        MODIFY_VAULT_BALANCE_ROLE:
-        SET_SUBVAULT_LIMIT_ROLE:
-        SET_VAULT_LIMIT_ROLE:
+        ALLOW_SUBVAULT_ASSETS_ROLE: *ALLOW_SUBVAULT_ASSETS_ROLE
+        DISALLOW_SUBVAULT_ASSETS_ROLE: *DISALLOW_SUBVAULT_ASSETS_ROLE
+        MODIFY_PENDING_ASSETS_ROLE: *MODIFY_PENDING_ASSETS_ROLE
+        MODIFY_SUBVAULT_BALANCE_ROLE: *MODIFY_SUBVAULT_BALANCE_ROLE
+        MODIFY_VAULT_BALANCE_ROLE: *MODIFY_VAULT_BALANCE_ROLE
+        SET_SUBVAULT_LIMIT_ROLE: *SET_SUBVAULT_LIMIT_ROLE
+        SET_VAULT_LIMIT_ROLE: *SET_VAULT_LIMIT_ROLE
         allowedAssetAt:
         allowedAssets:
         convertToShares:
@@ -1278,13 +1297,14 @@ l1:
         pendingShares:
         requireValidSubvault:
         subvaultState:
-        vault:
+        vault: *ZERO_ADDRESS
         vaultState:
     subvault0:
       name: Subvault
       address: *subvault0
       proxyName: TransparentUpgradeableProxy
       implementation: *subvaultImplementation
+      proxyAdminOwner: *proxyAdmin
       proxyChecks: {}
       checks:
         getStorageAt:
@@ -1294,13 +1314,14 @@ l1:
       implementationChecks:
         getStorageAt:
         onERC721Received:
-        vault:
-        verifier:
+        vault: *ZERO_ADDRESS
+        verifier: *ZERO_ADDRESS
     verifier0:
       name: Verifier
       address: *verifier0
       proxyName: TransparentUpgradeableProxy
       implementation: *verifierImplementation
+      proxyAdminOwner: *proxyAdmin
       proxyChecks: {}
       checks:
         ALLOW_CALL_ROLE: *ALLOW_CALL_ROLE
@@ -1316,17 +1337,17 @@ l1:
         vault: *vault
         verifyCall:
       implementationChecks:
-        ALLOW_CALL_ROLE:
-        CALLER_ROLE:
-        DISALLOW_CALL_ROLE:
-        SET_MERKLE_ROOT_ROLE:
+        ALLOW_CALL_ROLE: *ALLOW_CALL_ROLE
+        CALLER_ROLE: *CALLER_ROLE
+        DISALLOW_CALL_ROLE: *DISALLOW_CALL_ROLE
+        SET_MERKLE_ROOT_ROLE: *SET_MERKLE_ROOT_ROLE
         allowedCallAt:
         allowedCalls:
         getVerificationResult:
         hashCall:
         isAllowedCall:
-        merkleRoot:
-        vault:
+        merkleRoot: *ZERO_BYTES32
+        vault: *ZERO_ADDRESS
         verifyCall:
     timelockController:
       name: TimelockController
@@ -1341,45 +1362,45 @@ l1:
         getRoleAdmin:
         getTimestamp:
         hasRole:
-          - args: [*DEFAULT_ADMIN_ROLE, *PROXY_ADMIN]
+          - args: [*DEFAULT_ADMIN_ROLE, *proxyAdmin]
             result: false
-          - args: [*DEFAULT_ADMIN_ROLE, *LAZY_VAULT_ADMIN]
+          - args: [*DEFAULT_ADMIN_ROLE, *lazyVaultAdmin]
             result: true # ???
-          - args: [*DEFAULT_ADMIN_ROLE, *ACTIVE_VAULT_ADMIN]
+          - args: [*DEFAULT_ADMIN_ROLE, *activeVaultAdmin]
             result: false
-          - args: [*DEFAULT_ADMIN_ROLE, *CURATOR]
+          - args: [*DEFAULT_ADMIN_ROLE, *curator]
             result: false
-          - args: [*DEFAULT_ADMIN_ROLE, *DEPLOYER]
+          - args: [*DEFAULT_ADMIN_ROLE, *deployer]
             result: false
-          - args: [*CANCELLER_ROLE, *PROXY_ADMIN]
+          - args: [*CANCELLER_ROLE, *proxyAdmin]
             result: false
-          - args: [*CANCELLER_ROLE, *LAZY_VAULT_ADMIN]
+          - args: [*CANCELLER_ROLE, *lazyVaultAdmin]
             result: true # ???
-          - args: [*CANCELLER_ROLE, *ACTIVE_VAULT_ADMIN]
+          - args: [*CANCELLER_ROLE, *activeVaultAdmin]
             result: false
-          - args: [*CANCELLER_ROLE, *CURATOR]
+          - args: [*CANCELLER_ROLE, *curator]
             result: false
-          - args: [*CANCELLER_ROLE, *DEPLOYER]
+          - args: [*CANCELLER_ROLE, *deployer]
             result: false
-          - args: [*EXECUTOR_ROLE, *PROXY_ADMIN]
+          - args: [*EXECUTOR_ROLE, *proxyAdmin]
             result: false
-          - args: [*EXECUTOR_ROLE, *LAZY_VAULT_ADMIN]
+          - args: [*EXECUTOR_ROLE, *lazyVaultAdmin]
             result: false
-          - args: [*EXECUTOR_ROLE, *ACTIVE_VAULT_ADMIN]
+          - args: [*EXECUTOR_ROLE, *activeVaultAdmin]
             result: true
-          - args: [*EXECUTOR_ROLE, *CURATOR]
+          - args: [*EXECUTOR_ROLE, *curator]
             result: true
-          - args: [*EXECUTOR_ROLE, *DEPLOYER]
+          - args: [*EXECUTOR_ROLE, *deployer]
             result: false
-          - args: [*PROPOSER_ROLE, *PROXY_ADMIN]
+          - args: [*PROPOSER_ROLE, *proxyAdmin]
             result: false
-          - args: [*PROPOSER_ROLE, *LAZY_VAULT_ADMIN]
+          - args: [*PROPOSER_ROLE, *lazyVaultAdmin]
             result: true # ???
-          - args: [*PROPOSER_ROLE, *ACTIVE_VAULT_ADMIN]
+          - args: [*PROPOSER_ROLE, *activeVaultAdmin]
             result: false
-          - args: [*PROPOSER_ROLE, *CURATOR]
+          - args: [*PROPOSER_ROLE, *curator]
             result: false
-          - args: [*PROPOSER_ROLE, *DEPLOYER]
+          - args: [*PROPOSER_ROLE, *deployer]
             result: false
         hashOperation:
         hashOperationBatch:
@@ -1392,10 +1413,10 @@ l1:
     # --- Multisigs ---
     #
     PROXY_ADMIN:
-      name: Safe
-      address: *PROXY_ADMIN
+      name: SafeL2
+      address: *proxyAdmin
       proxyName: GnosisSafeProxy
-      implementation: *SAFE_IMPL_1_4_1
+      implementation: *safeL2Impl_1_4_1
       proxyChecks: {}
       checks:
         VERSION: 1.4.1
@@ -1407,14 +1428,14 @@ l1:
         getChainId: 42161
         getModulesPaginated:
         getOwners:
-          - *LIDO_SIGNER_3
-          - *LIDO_SIGNER_2
-          - *LIDO_SIGNER_4
-          - *LIDO_SIGNER_1
-          - *MELLOW_SIGNER_2
-          - *MELLOW_SIGNER_3
-          - *MELLOW_SIGNER_1
-          - *MELLOW_SIGNER_4
+          - *lidoSigner3
+          - *lidoSigner2
+          - *lidoSigner4
+          - *lidoSigner1
+          - *mellowSigner2
+          - *mellowSigner3
+          - *mellowSigner1
+          - *mellowSigner4
         getStorageAt:
         getThreshold: *PROXY_ADMIN_THRESHOLD
         getTransactionHash:
@@ -1440,10 +1461,10 @@ l1:
         nonce:
         signedMessages:
     LAZY_VAULT_ADMIN:
-      name: Safe
-      address: *LAZY_VAULT_ADMIN
+      name: SafeL2
+      address: *lazyVaultAdmin
       proxyName: SafeProxy
-      implementation: *SAFE_IMPL_1_4_1
+      implementation: *safeL2Impl_1_4_1
       proxyChecks: {}
       checks:
         VERSION: 1.4.1
@@ -1455,14 +1476,14 @@ l1:
         getChainId: 42161
         getModulesPaginated:
         getOwners:
-          - *EXT_MELLOW_SIGNER_1
-          - *EXT_MELLOW_SIGNER_2
-          - *EXT_MELLOW_SIGNER_3
-          - *MELLOW_SIGNER_2
-          - *MELLOW_SIGNER_3
-          - *MELLOW_SIGNER_1
-          - *MELLOW_SIGNER_4
-          - *EXT_MELLOW_SIGNER_4
+          - *extMellowSigner1
+          - *extMellowSigner2
+          - *extMellowSigner3
+          - *mellowSigner2
+          - *mellowSigner3
+          - *mellowSigner1
+          - *mellowSigner4
+          - *extMellowSigner4
         getStorageAt:
         getThreshold: *LAZY_VAULT_ADMIN_THRESHOLD
         getTransactionHash:
@@ -1488,10 +1509,10 @@ l1:
         nonce:
         signedMessages:
     ACTIVE_VAULT_ADMIN:
-      name: Safe
-      address: *ACTIVE_VAULT_ADMIN
+      name: SafeL2
+      address: *activeVaultAdmin
       proxyName: SafeProxy
-      implementation: *SAFE_IMPL_1_4_1
+      implementation: *safeL2Impl_1_4_1
       proxyChecks: {}
       checks:
         VERSION: 1.4.1
@@ -1503,12 +1524,12 @@ l1:
         getChainId: 42161
         getModulesPaginated:
         getOwners:
-          - *EXT_MELLOW_SIGNER_2
-          - *MELLOW_SIGNER_2
-          - *MELLOW_SIGNER_3
-          - *MELLOW_SIGNER_1
-          - *MELLOW_SIGNER_4
-          - *EXT_MELLOW_SIGNER_4
+          - *extMellowSigner2
+          - *mellowSigner2
+          - *mellowSigner3
+          - *mellowSigner1
+          - *mellowSigner4
+          - *extMellowSigner4
         getStorageAt:
         getThreshold: *ACTIVE_VAULT_ADMIN_THRESHOLD
         getTransactionHash:
@@ -1534,10 +1555,10 @@ l1:
         nonce:
         signedMessages:
     CURATOR:
-      name: Safe
-      address: *CURATOR
+      name: SafeL2
+      address: *curator
       proxyName: SafeProxy
-      implementation: *SAFE_IMPL_1_4_1
+      implementation: *safeL2Impl_1_4_1
       proxyChecks: {}
       checks:
         VERSION: 1.4.1
@@ -1549,12 +1570,12 @@ l1:
         getChainId: 42161
         getModulesPaginated:
         getOwners:
-          - *EXT_MELLOW_SIGNER_2
-          - *MELLOW_SIGNER_2
-          - *MELLOW_SIGNER_3
-          - *MELLOW_SIGNER_1
-          - *MELLOW_SIGNER_4
-          - *EXT_MELLOW_SIGNER_4
+          - *extMellowSigner2
+          - *mellowSigner2
+          - *mellowSigner3
+          - *mellowSigner1
+          - *mellowSigner4
+          - *extMellowSigner4
         getStorageAt:
         getThreshold: *CURATOR_THRESHOLD
         getTransactionHash:
