@@ -2,9 +2,9 @@
 
 deployed:
   l1:
-    - &AgreementV2 "0xe19f54e8322214839a87408f084aa14ebefe9e87"
-    - &SafeProxy "0xA1E2CD361e17ba10DCfAe3aA33f463DcB53a2Ffd"
-    - &Safe "0x41675C099F32341bf84BFc5382aF534df5C7461a"
+    - &agreementV2 "0xe19f54e8322214839a87408f084aa14ebefe9e87"
+    - &safeProxy "0xA1E2CD361e17ba10DCfAe3aA33f463DcB53a2Ffd"
+    - &safe "0x41675C099F32341bf84BFc5382aF534df5C7461a"
 
 parameters:
   - &SAFE_VERSION "1.4.1"
@@ -191,15 +191,15 @@ l1:
   contracts:
     AgreementV2:
       name: AgreementV2
-      address: *AgreementV2
+      address: *agreementV2
       checks:
         getDetails: *AGREEMENT_DETAILS
-        owner: *SafeProxy
+        owner: *safeProxy
     SafeProxy:
       name: Safe
-      address: *SafeProxy
+      address: *safeProxy
       proxyName: SafeProxy
-      implementation: *Safe
+      implementation: *safe
       proxyChecks: {}
       checks:
         VERSION: *SAFE_VERSION
