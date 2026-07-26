@@ -5,8 +5,8 @@
 
 parameters:
   # Already deployed contracts or other parameters
-  - &ETH_DAO_AGENT_MOCK "0x184d39300f2fA4419d04998e9C58Cb5De586d879"
-  - &ETH_DAO_AGENT "0x3e40D73EB977Dc6a537aF587D48316feE66E9C8c"
+  - &ethDaoAgentMock "0x184d39300f2fA4419d04998e9C58Cb5De586d879"
+  - &ethDaoAgent "0x3e40D73EB977Dc6a537aF587D48316feE66E9C8c"
 
   # validityTimestamp means confirmation is to be gathered only from the messages after the timestamp
   # validityTimestamp common usage or by guardian (we don't use it) or on upgrade to invalidate
@@ -44,7 +44,6 @@ misc:
 deployed:
   l1:
     # Newly deployed contracts
-    - &ethProxyAdmin "0xADD673dC6A655AFD6f38fB88301028fA31A6fDeE"
     - &ethCCC "0x93559892D3C7F66DE4570132d68b69BD3c369A7C"
     - &ethCCCImp "0x5f456f29238F8d63b3ae69bCEF9e9d4E953f2c63"
     - &ethCCIPAdapter "0x29D4fA5FCC282ba2788A281860770c166F597d5d"
@@ -53,7 +52,6 @@ deployed:
     - &ethWormholeAdapter "0xEDc0D2cb2289BBa1587424dd42bDD1ca7eAbDF17"
 
   l2:
-    - &bnbProxyAdmin "0x29E6817db339795766244B96aEf5Dc534a98518d"
     - &bnbCCC "0x40C4464fCa8caCd550C33B39d674fC257966022F"
     - &bnbCCCImp "0xB7Ba81dd07885ae7BFD18452B36D3404d7EDD8Ee"
     - &bnbCCE "0x8E5175D17f74d1D512de59b2f5d5A5d8177A123d"
@@ -64,10 +62,9 @@ deployed:
 
 deployed-aux:
   # Extra data for LZ adapter
-  - &ethCCCBytes32 "0x00000000000000000000000093559892D3C7F66DE4570132d68b69BD3c369A7C"
-  - &bnbCCCBytes32 "0x00000000000000000000000040C4464fCa8caCd550C33B39d674fC257966022F"
+  - &ETH_CCC_BYTES32 "0x00000000000000000000000093559892D3C7F66DE4570132d68b69BD3c369A7C"
+  - &BNB_CCC_BYTES32 "0x00000000000000000000000040C4464fCa8caCd550C33B39d674fC257966022F"
 
-roles:
   # No roles check
 
 l1:
@@ -76,26 +73,15 @@ l1:
   explorerTokenEnv: ETHERSCAN_TOKEN
   chainId: 1
   contracts:
-    proxyAdmin:
-      name: "ProxyAdmin"
-      address: *ethProxyAdmin
-      checks:
-        owner: *ETH_DAO_AGENT
-        getProxyAdmin:
-          - args: [*ethCCC]
-            result: *ethProxyAdmin
-        getProxyImplementation:
-          - args: [*ethCCC]
-            result: *ethCCCImp
-
     crossChainController:
       name: "CrossChainController"
       address: *ethCCC
       proxyName: TransparentUpgradeableProxy
       implementation: *ethCCCImp
+      proxyAdminOwner: *ethDaoAgent
       proxyChecks: {}
       checks:
-        owner: *ETH_DAO_AGENT
+        owner: *ethDaoAgent
         guardian: *ZERO_ADDRESS
         # CrossChainReceiver
         getReceiverBridgeAdaptersByChain:
@@ -152,13 +138,13 @@ l1:
                 [*bnbWormholeAdapter, *ethWormholeAdapter],
               ]
         isSenderApproved:
-          - args: [*ETH_DAO_AGENT_MOCK]
+          - args: [*ethDaoAgentMock]
             result: false
-          - args: [*ETH_DAO_AGENT]
+          - args: [*ethDaoAgent]
             result: true
           - args: [*ZERO_ADDRESS]
             result: false
-        whoCanRescue: *ETH_DAO_AGENT
+        whoCanRescue: *ethDaoAgent
       implementationChecks:
         owner: *DEAD_ADDRESS
         guardian: *ZERO_ADDRESS
@@ -219,10 +205,10 @@ l1:
         CROSS_CHAIN_CONTROLLER: *ethCCC
         adapterName: "LayerZero adapter"
         allowInitializePath:
-          - args: [[*LZ_BNB_CHAIN_ID, *bnbCCCBytes32, 0]]
+          - args: [[*LZ_BNB_CHAIN_ID, *BNB_CCC_BYTES32, 0]]
             result: false
         nextNonce:
-          - args: [*LZ_BNB_CHAIN_ID, *bnbCCCBytes32]
+          - args: [*LZ_BNB_CHAIN_ID, *BNB_CCC_BYTES32]
             result: 0
         getTrustedRemoteByChainId:
           - args: [*BNB_CHAIN_ID]
@@ -256,27 +242,17 @@ l1:
 
 l2:
   rpcUrl: BNB_RPC_URL
-  explorerHostname: sourcify.dev
+  explorerHostname: api.etherscan.io
+  explorerTokenEnv: ETHERSCAN_TOKEN
   chainId: 56
 
   contracts:
-    proxyAdmin:
-      name: "ProxyAdmin"
-      address: *bnbProxyAdmin
-      checks:
-        owner: *bnbCCE
-        getProxyAdmin:
-          - args: [*bnbCCC]
-            result: *bnbProxyAdmin
-        getProxyImplementation:
-          - args: [*bnbCCC]
-            result: *bnbCCCImp
-
     crossChainController:
       name: "CrossChainController"
       address: *bnbCCC
       proxyName: TransparentUpgradeableProxy
       implementation: *bnbCCCImp
+      proxyAdminOwner: *bnbCCE
       proxyChecks: {}
       checks:
         owner: *bnbCCE
@@ -353,7 +329,7 @@ l2:
       checks:
         getCrossChainController: *bnbCCC
         getEthereumGovernanceChainId: *ETH_CHAIN_ID
-        getEthereumGovernanceExecutor: *ETH_DAO_AGENT
+        getEthereumGovernanceExecutor: *ethDaoAgent
         getDelay: *BNB_CCE_DELAY
         getGracePeriod: *BNB_CCE_GRACE_PERIOD
         getMinimumDelay: *BNB_CCE_MINIMUM_DELAY
@@ -424,10 +400,10 @@ l2:
         CROSS_CHAIN_CONTROLLER: *bnbCCC
         adapterName: "LayerZero adapter"
         allowInitializePath:
-          - args: [[*LZ_ETH_CHAIN_ID, *ethCCCBytes32, 0]]
+          - args: [[*LZ_ETH_CHAIN_ID, *ETH_CCC_BYTES32, 0]]
             result: true # allow to initialize messages
         nextNonce:
-          - args: [*LZ_ETH_CHAIN_ID, *ethCCCBytes32]
+          - args: [*LZ_ETH_CHAIN_ID, *ETH_CCC_BYTES32]
             result: 0
         getTrustedRemoteByChainId:
           - args: [*ETH_CHAIN_ID]

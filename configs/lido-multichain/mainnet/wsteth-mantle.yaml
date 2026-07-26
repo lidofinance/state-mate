@@ -31,6 +31,8 @@ roles:
 
 l1:
   rpcUrl: ETH_RPC_URL
+  explorerHostname: api.etherscan.io
+  explorerTokenEnv: ETHERSCAN_TOKEN
   chainId: 1
   contracts:
     tokenBridge:
@@ -73,6 +75,8 @@ l1:
 
 l2:
   rpcUrl: MANTLE_RPC_URL
+  explorerHostname: api.etherscan.io
+  explorerTokenEnv: ETHERSCAN_TOKEN
   chainId: 5000
   contracts:
     governanceExecutor:
@@ -91,7 +95,8 @@ l2:
         getCurrentState: null
         isActionQueued: null
     wstETH:
-      name: ERC20Bridged
+      # the implementation was re-verified under the Permit name; the ABI surface is unchanged
+      name: ERC20BridgedPermit
       address: *l2WstETH
       proxyName: OssifiableProxy
       implementation: *l2WstETHImpl

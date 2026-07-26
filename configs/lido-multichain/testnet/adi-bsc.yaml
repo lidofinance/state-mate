@@ -4,7 +4,7 @@
 
 parameters:
   # Already deployed contracts or other parameters
-  - &SEP_DAO_AGENT "0x32A0E5828B62AAb932362a4816ae03b860b65e83"
+  - &sepDaoAgent "0x32A0E5828B62AAb932362a4816ae03b860b65e83"
 
 misc:
   - &ZERO_ADDRESS "0x0000000000000000000000000000000000000000"
@@ -33,7 +33,6 @@ misc:
 deployed:
   # Newly deployed contracts
   l1:
-    - &sepProxyAdmin "0x7BE89331452883D335C2556d1863CD2925E76afc"
     - &sepCCC "0x9d8548963Fa0a9BE7C434cA482dd5b79E8062d3A"
     - &sepCCCImp "0x57B3C8DC50d1C881fCB384Da4d66f3d610671177"
     - &sepCCIPAdapter "0xA0362E6D6f399A3dca79a20cf6041807F7Bfd89e"
@@ -42,7 +41,6 @@ deployed:
     - &sepWormholeAdapter "0x82C16B1e054fa94bf60b54A1Aa9FA74c5872899d"
 
   l2:
-    - &bnbtProxyAdmin "0x490E441352635aacA64224c8205636FD9d2e3362"
     - &bnbtCCC "0x1FAa7AFD7851e7Cf931053e49CE26D4E262698b6"
     - &bnbtCCCImp "0x5EC23B39E6E8eb5BA0c7064a0c08b5e678b02F37"
     - &bnbtCCE "0x69EE990d0AADEfcbbA0F2de94E0F26521ae680ff"
@@ -53,10 +51,9 @@ deployed:
 
 deployed-aux:
   # Extra data for LZ adapter
-  - &sepCCCBytes32 "0x0000000000000000000000009d8548963Fa0a9BE7C434cA482dd5b79E8062d3A"
-  - &bnbtCCCBytes32 "0x0000000000000000000000001FAa7AFD7851e7Cf931053e49CE26D4E262698b6"
+  - &SEP_CCC_BYTES32 "0x0000000000000000000000009d8548963Fa0a9BE7C434cA482dd5b79E8062d3A"
+  - &BNBT_CCC_BYTES32 "0x0000000000000000000000001FAa7AFD7851e7Cf931053e49CE26D4E262698b6"
 
-roles:
 # No roles check
 
 l1:
@@ -65,26 +62,15 @@ l1:
   explorerTokenEnv: ETHERSCAN_TOKEN
   chainId: 11155111
   contracts:
-    proxyAdmin:
-      name: "ProxyAdmin"
-      address: *sepProxyAdmin
-      checks:
-        owner: *SEP_DAO_AGENT
-        getProxyAdmin:
-          - args: [*sepCCC]
-            result: *sepProxyAdmin
-        getProxyImplementation:
-          - args: [*sepCCC]
-            result: *sepCCCImp
-
     crossChainController:
       name: "CrossChainController"
       address: *sepCCC
       proxyName: TransparentUpgradeableProxy
       implementation: *sepCCCImp
+      proxyAdminOwner: *sepDaoAgent
       proxyChecks: {}
       checks:
-        owner: *SEP_DAO_AGENT
+        owner: *sepDaoAgent
         guardian: *ZERO_ADDRESS
         # CrossChainReceiver
         getReceiverBridgeAdaptersByChain:
@@ -141,11 +127,11 @@ l1:
                 [*bnbtWormholeAdapter, *sepWormholeAdapter],
               ]
         isSenderApproved:
-          - args: [*SEP_DAO_AGENT]
+          - args: [*sepDaoAgent]
             result: true
           - args: [*ZERO_ADDRESS]
             result: false
-        whoCanRescue: *SEP_DAO_AGENT
+        whoCanRescue: *sepDaoAgent
       implementationChecks:
         owner: *DEAD_ADDRESS
         guardian: *ZERO_ADDRESS
@@ -197,7 +183,7 @@ l1:
           - args: [*BNB_TEST_CHAIN_ID]
             result: []
         isSenderApproved:
-          - args: [*SEP_DAO_AGENT]
+          - args: [*sepDaoAgent]
             result: false
           - args: [*DEAD_ADDRESS]
             result: false
@@ -259,10 +245,10 @@ l1:
         CROSS_CHAIN_CONTROLLER: *sepCCC
         adapterName: "LayerZero adapter"
         allowInitializePath:
-          - args: [[*LZ_BNB_TEST_CHAIN_ID, *bnbtCCCBytes32, 0]]
+          - args: [[*LZ_BNB_TEST_CHAIN_ID, *BNBT_CCC_BYTES32, 0]]
             result: false
         nextNonce:
-          - args: [*LZ_BNB_TEST_CHAIN_ID, *bnbtCCCBytes32]
+          - args: [*LZ_BNB_TEST_CHAIN_ID, *BNBT_CCC_BYTES32]
             result: 0
         getTrustedRemoteByChainId:
           - args: [*BNB_TEST_CHAIN_ID]
@@ -296,26 +282,16 @@ l1:
 
 l2:
   rpcUrl: BNB_TESTNET_RPC_URL
-  explorerHostname: sourcify.dev
+  explorerHostname: api.etherscan.io
+  explorerTokenEnv: ETHERSCAN_TOKEN
   chainId: 97
   contracts:
-    proxyAdmin:
-      name: "ProxyAdmin"
-      address: *bnbtProxyAdmin
-      checks:
-        owner: *bnbtCCE
-        getProxyAdmin:
-          - args: [*bnbtCCC]
-            result: *bnbtProxyAdmin
-        getProxyImplementation:
-          - args: [*bnbtCCC]
-            result: *bnbtCCCImp
-
     crossChainController:
       name: "CrossChainController"
       address: *bnbtCCC
       proxyName: TransparentUpgradeableProxy
       implementation: *bnbtCCCImp
+      proxyAdminOwner: *bnbtCCE
       proxyChecks: {}
       checks:
         owner: *bnbtCCE
@@ -438,7 +414,7 @@ l2:
       checks:
         getCrossChainController: *bnbtCCC
         getEthereumGovernanceChainId: *SEP_CHAIN_ID
-        getEthereumGovernanceExecutor: *SEP_DAO_AGENT
+        getEthereumGovernanceExecutor: *sepDaoAgent
         getDelay: *BNB_CCE_DELAY
         getGracePeriod: *BNB_CCE_GRACE_PERIOD
         getMinimumDelay: *BNB_CCE_MINIMUM_DELAY
@@ -562,10 +538,10 @@ l2:
         CROSS_CHAIN_CONTROLLER: *bnbtCCC
         adapterName: "LayerZero adapter"
         allowInitializePath:
-          - args: [[*LZ_SEP_CHAIN_ID, *sepCCCBytes32, 0]]
+          - args: [[*LZ_SEP_CHAIN_ID, *SEP_CCC_BYTES32, 0]]
             result: true # allow to initialize messages
         nextNonce:
-          - args: [*LZ_SEP_CHAIN_ID, *sepCCCBytes32]
+          - args: [*LZ_SEP_CHAIN_ID, *SEP_CCC_BYTES32]
             result: 0
         getTrustedRemoteByChainId:
           - args: [*SEP_CHAIN_ID]

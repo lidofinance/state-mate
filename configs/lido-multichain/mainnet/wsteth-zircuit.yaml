@@ -11,6 +11,8 @@ deployed:
   l1:
     - &l1TokenBridge "0x912C7271a6A3622dfb8B218eb46a6122aB046C79"
     - &l1TokenBridgeImpl "0x6bc726C993103197C41d787dd72eCd4D2e1614E8"
+    - &l1EmergencyBreaksMultisig "0x73b047fe6337183A454c5217241D780a932777bD" # https://docs.lido.fi/token-guides/wsteth-bridging-guide/#mainnet
+    - &safeSingleton_1_3_0 "0xd9Db270c1B5E3Bd161E8c8503c55cEABeE709552"
   l2:
     - &l2TokenBridge "0xF4DC271cA48446a5d2b97Ff41D39918DF8A4Eb0e"
     - &l2TokenBridgeImpl "0x224F00AEDD7A9F10e571898662ad19CD5abd9F2c"
@@ -20,7 +22,9 @@ deployed:
     - &l2EmergencyBreaksMultisig "0x9Bff79BF7226cB5C16d0Cca9c1dc60450feE560d"
 
 parameters:
-  - &l1EmergencyBreaksMultisig "0x73b047fe6337183A454c5217241D780a932777bD" # https://docs.lido.fi/token-guides/wsteth-bridging-guide/#mainnet
+  # the eip155 deployment of the 1.3.0 singleton, pinned via storage only: the explorer serves
+  # no ABI for it
+  - &safeL2Singleton_1_3_0_eip155 "0xfb1bffC9d739B8D520DaF37dF666da4C687191EA"
   - &l1Agent "0x3e40D73EB977Dc6a537aF587D48316feE66E9C8c"
   - &l1Wsteth "0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0"
   - &l1CrossDomainMessenger "0x2a721cBE81a128be0F01040e3353c3805A5EA091"
@@ -106,6 +110,12 @@ l1:
       name: GnosisSafe
       proxyName: GnosisSafeProxy
       address: *l1EmergencyBreaksMultisig
+      implementation: *safeSingleton_1_3_0
+      proxyChecks: {}
+      storage:
+        - slot: "0x0000000000000000000000000000000000000000000000000000000000000000"
+          expected: *safeSingleton_1_3_0
+          label: singleton
       checks:
         getOwners:
           - *multisigOwner4
@@ -232,6 +242,11 @@ l2:
       name: GnosisSafeL2
       proxyName: GnosisSafeProxy
       address: *l2EmergencyBreaksMultisig
+      proxyChecks: {}
+      storage:
+        - slot: "0x0000000000000000000000000000000000000000000000000000000000000000"
+          expected: *safeL2Singleton_1_3_0_eip155
+          label: singleton
       checks:
         getOwners:
           - *multisigOwner4

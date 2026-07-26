@@ -5,11 +5,11 @@
 
 parameters:
   # Already deployed contracts or other parameters
-  - &L1_WSTETH "0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0"
-  - &ETH_DAO_AGENT "0x3e40D73EB977Dc6a537aF587D48316feE66E9C8c"
-  - &BSC_ADI_EXECUTOR "0x8E5175D17f74d1D512de59b2f5d5A5d8177A123d"
-  - &L1_EMERGENCY_BRAKES "0x73b047fe6337183A454c5217241D780a932777bD"
-  - &L2_EMERGENCY_BRAKES "0xC2b778fCc3FF311Cf1abBF4E53880277bfD14C8f"
+  - &l1Wsteth "0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0"
+  - &ethDaoAgent "0x3e40D73EB977Dc6a537aF587D48316feE66E9C8c"
+  - &bscAdiExecutor "0x8E5175D17f74d1D512de59b2f5d5A5d8177A123d"
+  - &l1EmergencyBrakes "0x73b047fe6337183A454c5217241D780a932777bD"
+  - &l2EmergencyBrakes "0xC2b778fCc3FF311Cf1abBF4E53880277bfD14C8f"
 
   - &L2_NTT_MANAGER_BYTES32_ADDR "0x0000000000000000000000006981f5621691cbfe3ddd524de71076b79f0a0278"
   - &L2_WORMHOLE_TRANSCEIVER_BYTES32_ADDR "0x000000000000000000000000be3f7e06872e0df6cd7ff35b7aa4bb1446dc9986"
@@ -22,7 +22,6 @@ misc:
   - &ZERO_ADDRESS "0x0000000000000000000000000000000000000000"
   - &ZERO_BYTES32 "0x0000000000000000000000000000000000000000000000000000000000000000"
   # Chains
-  - &SOL_CHAIN_ID 1 # Placeholder for ETH=2 reasoning ;[
   - &ETH_CHAIN_ID 2
   - &BSC_CHAIN_ID 4
   # Versions
@@ -42,17 +41,17 @@ misc:
   - &BURNING_MODE 1
 
   # Wormhole system contracts (https://docs.wormhole.com/wormhole/reference/blockchain-environments/evm)
-  - &L1_L2_WORMHOLE "0x98f3c9e6E3fAce36bAAd05FE09d375Ef1464288B"
-  - &L1_L2_WORMHOLE_RELAYER "0x27428DD2d3DD32A4D7f7C497eAaa23130d894911"
+  - &l1L2Wormhole "0x98f3c9e6E3fAce36bAAd05FE09d375Ef1464288B"
+  - &l1L2WormholeRelayer "0x27428DD2d3DD32A4D7f7C497eAaa23130d894911"
   # no evidence outside of the research forum, but unused
-  - &L1_L2_WORMHOLE_SPECIAL_RELAYER "0x63BE47835c7D66c4aA5B2C688Dc6ed9771c94C74"
+  - &l1L2WormholeSpecialRelayer "0x63BE47835c7D66c4aA5B2C688Dc6ed9771c94C74"
 
   # Axelar system contracts (https://docs.axelar.dev/dev/reference/mainnet-contract-addresses)
-  - &L1_AXELAR_GAS_SERVICE "0x2d5d7d31F671F86C782533cc367F14109a082712"
-  - &L1_AXELAR_GATEWAY "0x4F4495243837681061C4743b74B3eEdf548D56A5"
+  - &l1AxelarGasService "0x2d5d7d31F671F86C782533cc367F14109a082712"
+  - &l1AxelarGateway "0x4F4495243837681061C4743b74B3eEdf548D56A5"
 
-  - &L2_AXELAR_GAS_SERVICE "0x2d5d7d31F671F86C782533cc367F14109a082712"
-  - &L2_AXELAR_GATEWAY "0x304acf330bbE08d1e512eefaa92F6a57871fD895"
+  - &l2AxelarGasService "0x2d5d7d31F671F86C782533cc367F14109a082712"
+  - &l2AxelarGateway "0x304acf330bbE08d1e512eefaa92F6a57871fD895"
 
 deployed:
   l1:
@@ -131,13 +130,13 @@ l1:
             result: 0
         mode: *LOCKING_MODE
         nextMessageSequence:
-        owner: *ETH_DAO_AGENT
-        pauser: *L1_EMERGENCY_BRAKES
+        owner: *ethDaoAgent
+        pauser: *l1EmergencyBrakes
         quoteDeliveryPrice:
           - args: [*BSC_CHAIN_ID, "0x"]
             mustRevert: true
         rateLimitDuration: *RATE_LIMIT_DURATION
-        token: *L1_WSTETH
+        token: *l1Wsteth
         tokenDecimals: *DECIMALS
         transceiverAttestedToMessage:
           - args: [*ZERO_BYTES32, 0]
@@ -193,7 +192,7 @@ l1:
           - args: [*BSC_CHAIN_ID, "0x"]
             mustRevert: true
         rateLimitDuration: *RATE_LIMIT_DURATION
-        token: *L1_WSTETH
+        token: *l1Wsteth
         tokenDecimals: *DECIMALS
         transceiverAttestedToMessage:
           - args: [*ZERO_BYTES32, 0]
@@ -214,8 +213,8 @@ l1:
             mustRevert: true
         gasLimit: *GAS_LIMIT
         getMigratesImmutables: false
-        getNttManagerOwner: *ETH_DAO_AGENT
-        getNttManagerToken: *L1_WSTETH
+        getNttManagerOwner: *ethDaoAgent
+        getNttManagerToken: *l1Wsteth
         getTransceiverType: "wormhole"
         getWormholePeer:
           - args: [*ETH_CHAIN_ID]
@@ -242,18 +241,18 @@ l1:
           - args: [*BSC_CHAIN_ID]
             result: true
         nttManager: *l1NttManager
-        nttManagerToken: *L1_WSTETH
-        owner: *ETH_DAO_AGENT
+        nttManagerToken: *l1Wsteth
+        owner: *ethDaoAgent
         parseWormholeTransceiverInstruction:
           - args: ["0x"]
             result: [false]
-        pauser: *L1_EMERGENCY_BRAKES
+        pauser: *l1EmergencyBrakes
         quoteDeliveryPrice:
           - args: [*BSC_CHAIN_ID, "0x"]
             mustRevert: true
-        specialRelayer: *L1_L2_WORMHOLE_SPECIAL_RELAYER # unused
-        wormhole: *L1_L2_WORMHOLE
-        wormholeRelayer: *L1_L2_WORMHOLE_RELAYER
+        specialRelayer: *l1L2WormholeSpecialRelayer # unused
+        wormhole: *l1L2Wormhole
+        wormholeRelayer: *l1L2WormholeRelayer
       implementationChecks:
         WORMHOLE_TRANSCEIVER_VERSION: *NTT_MANAGER_VERSION
         consistencyLevel: 1
@@ -262,8 +261,8 @@ l1:
             mustRevert: true
         gasLimit: *GAS_LIMIT
         getMigratesImmutables: false
-        getNttManagerOwner: *ETH_DAO_AGENT
-        getNttManagerToken: *L1_WSTETH
+        getNttManagerOwner: *ethDaoAgent
+        getNttManagerToken: *l1Wsteth
         getTransceiverType: "wormhole"
         getWormholePeer:
           - args: [*ETH_CHAIN_ID]
@@ -290,7 +289,7 @@ l1:
           - args: [*BSC_CHAIN_ID]
             result: false # unplugged
         nttManager: *l1NttManager
-        nttManagerToken: *L1_WSTETH
+        nttManagerToken: *l1Wsteth
         owner: *ZERO_ADDRESS
         parseWormholeTransceiverInstruction:
           - args: ["0x"]
@@ -299,9 +298,9 @@ l1:
         quoteDeliveryPrice:
           - args: [*BSC_CHAIN_ID, "0x"]
             mustRevert: true
-        specialRelayer: *L1_L2_WORMHOLE_SPECIAL_RELAYER # unused
-        wormhole: *L1_L2_WORMHOLE
-        wormholeRelayer: *L1_L2_WORMHOLE_RELAYER
+        specialRelayer: *l1L2WormholeSpecialRelayer # unused
+        wormhole: *l1L2Wormhole
+        wormholeRelayer: *l1L2WormholeRelayer
     l1AxelarTransceiver:
       name: AxelarTransceiver
       address: *l1AxelarTransceiver
@@ -310,31 +309,31 @@ l1:
       proxyChecks: {}
       checks:
         AXELAR_TRANSCEIVER_VERSION: *NTT_MANAGER_VERSION
-        gasService: *L1_AXELAR_GAS_SERVICE
-        gateway: *L1_AXELAR_GATEWAY
+        gasService: *l1AxelarGasService
+        gateway: *l1AxelarGateway
         getMigratesImmutables: false
-        getNttManagerOwner: *ETH_DAO_AGENT
-        getNttManagerToken: *L1_WSTETH
+        getNttManagerOwner: *ethDaoAgent
+        getNttManagerToken: *l1Wsteth
         getTransceiverType: "axelar"
         isPaused: false
         nttManager: *l1NttManager
-        nttManagerToken: *L1_WSTETH
-        owner: *ETH_DAO_AGENT
-        pauser: *L1_EMERGENCY_BRAKES
+        nttManagerToken: *l1Wsteth
+        owner: *ethDaoAgent
+        pauser: *l1EmergencyBrakes
         quoteDeliveryPrice:
           - args: [*BSC_CHAIN_ID, "0x"]
             mustRevert: true
       implementationChecks:
         AXELAR_TRANSCEIVER_VERSION: *NTT_MANAGER_VERSION
-        gasService: *L1_AXELAR_GAS_SERVICE
-        gateway: *L1_AXELAR_GATEWAY
+        gasService: *l1AxelarGasService
+        gateway: *l1AxelarGateway
         getMigratesImmutables: false
-        getNttManagerOwner: *ETH_DAO_AGENT
-        getNttManagerToken: *L1_WSTETH
+        getNttManagerOwner: *ethDaoAgent
+        getNttManagerToken: *l1Wsteth
         getTransceiverType: "axelar"
         isPaused: false
         nttManager: *l1NttManager
-        nttManagerToken: *L1_WSTETH
+        nttManagerToken: *l1Wsteth
         owner: *ZERO_ADDRESS
         pauser: *ZERO_ADDRESS
         quoteDeliveryPrice:
@@ -343,7 +342,8 @@ l1:
 
 l2:
   rpcUrl: BNB_RPC_URL
-  explorerHostname: sourcify.dev
+  explorerHostname: api.etherscan.io
+  explorerTokenEnv: ETHERSCAN_TOKEN
   chainId: 56
   contracts:
     l2wstETHToken:
@@ -366,7 +366,7 @@ l2:
         decimals: *DECIMALS
         minter: *l2NttManager
         name: *TOKEN_NAME
-        owner: *BSC_ADI_EXECUTOR
+        owner: *bscAdiExecutor
         proxiableUUID:
           - args: []
             mustRevert: true
@@ -437,8 +437,8 @@ l2:
             result: 0
         mode: *BURNING_MODE
         nextMessageSequence:
-        owner: *BSC_ADI_EXECUTOR
-        pauser: *L2_EMERGENCY_BRAKES
+        owner: *bscAdiExecutor
+        pauser: *l2EmergencyBrakes
         quoteDeliveryPrice:
           - args: [*ETH_CHAIN_ID, "0x"]
             mustRevert: true
@@ -520,7 +520,7 @@ l2:
             mustRevert: true
         gasLimit: *GAS_LIMIT
         getMigratesImmutables: false
-        getNttManagerOwner: *BSC_ADI_EXECUTOR
+        getNttManagerOwner: *bscAdiExecutor
         getNttManagerToken: *l2wstETHToken
         getTransceiverType: "wormhole"
         getWormholePeer:
@@ -549,17 +549,17 @@ l2:
             result: false
         nttManager: *l2NttManager
         nttManagerToken: *l2wstETHToken
-        owner: *BSC_ADI_EXECUTOR
+        owner: *bscAdiExecutor
         parseWormholeTransceiverInstruction:
           - args: ["0x"]
             result: [false]
-        pauser: *L2_EMERGENCY_BRAKES
+        pauser: *l2EmergencyBrakes
         quoteDeliveryPrice:
           - args: [*BSC_CHAIN_ID, "0x"]
             mustRevert: true
-        specialRelayer: *L1_L2_WORMHOLE_SPECIAL_RELAYER
-        wormhole: *L1_L2_WORMHOLE
-        wormholeRelayer: *L1_L2_WORMHOLE_RELAYER
+        specialRelayer: *l1L2WormholeSpecialRelayer
+        wormhole: *l1L2Wormhole
+        wormholeRelayer: *l1L2WormholeRelayer
       implementationChecks:
         WORMHOLE_TRANSCEIVER_VERSION: *NTT_MANAGER_VERSION
         consistencyLevel: 15
@@ -568,7 +568,7 @@ l2:
             mustRevert: true
         gasLimit: *GAS_LIMIT
         getMigratesImmutables: false
-        getNttManagerOwner: *BSC_ADI_EXECUTOR
+        getNttManagerOwner: *bscAdiExecutor
         getNttManagerToken: *l2wstETHToken
         getTransceiverType: "wormhole"
         getWormholePeer:
@@ -605,9 +605,9 @@ l2:
         quoteDeliveryPrice:
           - args: [*BSC_CHAIN_ID, "0x"]
             mustRevert: true
-        specialRelayer: *L1_L2_WORMHOLE_SPECIAL_RELAYER # unused
-        wormhole: *L1_L2_WORMHOLE
-        wormholeRelayer: *L1_L2_WORMHOLE_RELAYER
+        specialRelayer: *l1L2WormholeSpecialRelayer # unused
+        wormhole: *l1L2Wormhole
+        wormholeRelayer: *l1L2WormholeRelayer
     l2AxelarTransceiver:
       name: AxelarTransceiver
       address: *l2AxelarTransceiver
@@ -616,26 +616,26 @@ l2:
       proxyChecks: {}
       checks:
         AXELAR_TRANSCEIVER_VERSION: *NTT_MANAGER_VERSION
-        gasService: *L2_AXELAR_GAS_SERVICE
-        gateway: *L2_AXELAR_GATEWAY
+        gasService: *l2AxelarGasService
+        gateway: *l2AxelarGateway
         getMigratesImmutables: false
-        getNttManagerOwner: *BSC_ADI_EXECUTOR
+        getNttManagerOwner: *bscAdiExecutor
         getNttManagerToken: *l2wstETHToken
         getTransceiverType: "axelar"
         isPaused: false
         nttManager: *l2NttManager
         nttManagerToken: *l2wstETHToken
-        owner: *BSC_ADI_EXECUTOR
-        pauser: *L2_EMERGENCY_BRAKES
+        owner: *bscAdiExecutor
+        pauser: *l2EmergencyBrakes
         quoteDeliveryPrice:
           - args: [*BSC_CHAIN_ID, "0x"]
             mustRevert: true
       implementationChecks:
         AXELAR_TRANSCEIVER_VERSION: *NTT_MANAGER_VERSION
-        gasService: *L2_AXELAR_GAS_SERVICE
-        gateway: *L2_AXELAR_GATEWAY
+        gasService: *l2AxelarGasService
+        gateway: *l2AxelarGateway
         getMigratesImmutables: false
-        getNttManagerOwner: *BSC_ADI_EXECUTOR
+        getNttManagerOwner: *bscAdiExecutor
         getNttManagerToken: *l2wstETHToken
         getTransceiverType: "axelar"
         isPaused: false

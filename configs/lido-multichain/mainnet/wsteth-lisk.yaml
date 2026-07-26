@@ -7,6 +7,8 @@ deployed:
   l1:
     - &l1TokenBridge "0x9348AF23B01F2B517AFE8f29B3183d2Bb7d69Fcf"
     - &l1TokenBridgeImpl "0xC7315f4FaaB2F700fc6b4704BB801c46ff6327AC"
+    - &l1EmergencyBreaksMultisig "0x73b047fe6337183A454c5217241D780a932777bD" # https://docs.lido.fi/token-guides/wsteth-bridging-guide/#mainnet
+    - &safeSingleton_1_3_0 "0xd9Db270c1B5E3Bd161E8c8503c55cEABeE709552"
   l2:
     - &l2TokenBridge "0xca498Ee83eD3546321d4DC25e2789B0624F15f68"
     - &l2TokenBridgeImpl "0xE766BE7B76E3F4d06551CB169Dd69B10a58ba91D"
@@ -14,9 +16,9 @@ deployed:
     - &l2WstethImpl "0x16B8006b49db9022BF5457BD2de0144a7d0F970b"
     - &l2GovExecutor "0xfD050cDa025f6378e54ab5fd5Da377D242Ed74d3"
     - &l2EmergencyBreaksMultisig "0x1356C0b19c2531bBf0Dd23E585b7C7f7096EeC39"
+    - &safeL2Singleton_1_4_1 "0x29fcB43b46531BcA003ddC8FCB67fFE91900C762"
 
 parameters:
-  - &l1EmergencyBreaksMultisig "0x73b047fe6337183A454c5217241D780a932777bD" # https://docs.lido.fi/token-guides/wsteth-bridging-guide/#mainnet
   - &l1Agent "0x3e40D73EB977Dc6a537aF587D48316feE66E9C8c"
   - &l1Wsteth "0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0"
   - &l1CrossDomainMessenger "0x31B72D76FB666844C41EdF08dF0254875Dbb7edB"
@@ -101,6 +103,12 @@ l1:
       name: GnosisSafe
       proxyName: GnosisSafeProxy
       address: *l1EmergencyBreaksMultisig
+      implementation: *safeSingleton_1_3_0
+      proxyChecks: {}
+      storage:
+        - slot: "0x0000000000000000000000000000000000000000000000000000000000000000"
+          expected: *safeSingleton_1_3_0
+          label: singleton
       checks:
         getOwners:
           - *multisigOwner1
@@ -223,9 +231,15 @@ l2:
         isActionQueued: null
 
     l2EmergencyBreaksMultisigContract:
-      name: GnosisSafeL2
-      proxyName: GnosisSafeProxy
+      name: SafeL2
+      proxyName: SafeProxy
       address: *l2EmergencyBreaksMultisig
+      implementation: *safeL2Singleton_1_4_1
+      proxyChecks: {}
+      storage:
+        - slot: "0x0000000000000000000000000000000000000000000000000000000000000000"
+          expected: *safeL2Singleton_1_4_1
+          label: singleton
       checks:
         getOwners:
           - *multisigOwner4

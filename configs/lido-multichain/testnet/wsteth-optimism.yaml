@@ -23,10 +23,11 @@ deployed:
     - &l2TokenBridgeImpl "0xD48c69358193a34aC035ea7dfB70daDea1600112"
     - &l2WstETH "0x24B47cd3A74f1799b32B2de11073764Cb1bb318B"
     - &l2WstETHImpl "0x298953B9426eba4F35a137a4754278a16d97A063"
-    - &l2StETH "0xf49D208B5C7b10415C7BeAFe9e656F2DF9eDfe3B"
 
 misc:
-  - &maxInt "115792089237316195423570985008687907853269984665640564039457584007913129639935"
+  - &l2StETH "0xf49D208B5C7b10415C7BeAFe9e656F2DF9eDfe3B"
+
+  - &MAX_INT "115792089237316195423570985008687907853269984665640564039457584007913129639935"
   - &ZERO_BYTES32 "0x0000000000000000000000000000000000000000000000000000000000000000"
 
 roles:
@@ -84,7 +85,7 @@ l1:
         *WITHDRAWALS_DISABLER_ROLE : [*agent, *l1EmergencyBreaksMultisig]
         *WITHDRAWALS_ENABLER_ROLE : [*agent]
       implementationChecks:
-        getContractVersion: *maxInt
+        getContractVersion: *MAX_INT
         isInitialized: false
         isDepositsEnabled: false
         isWithdrawalsEnabled: false
@@ -188,7 +189,7 @@ l2:
         *WITHDRAWALS_DISABLER_ROLE : [*l2GovernanceExecutor, *l2EmergencyBreaksMultisig]
         *WITHDRAWALS_ENABLER_ROLE : [*l2GovernanceExecutor]
       implementationChecks:
-        getContractVersion: *maxInt
+        getContractVersion: *MAX_INT
         isInitialized: false
         isDepositsEnabled: false
         isWithdrawalsEnabled: false

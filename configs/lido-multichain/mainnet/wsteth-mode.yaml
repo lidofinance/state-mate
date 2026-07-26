@@ -11,6 +11,8 @@ deployed:
   l1:
     - &l1TokenBridge "0xD0DeA0a3bd8E4D55170943129c025d3fe0493F2A"
     - &l1TokenBridgeImpl "0xE6A4ED59Ec73eD78aE3A10294c99F0EE18A6bF76"
+    - &l1EmergencyBreaksMultisig "0x73b047fe6337183A454c5217241D780a932777bD" # https://docs.lido.fi/token-guides/wsteth-bridging-guide/#mainnet
+    - &safeSingleton_1_3_0 "0xd9Db270c1B5E3Bd161E8c8503c55cEABeE709552"
   l2:
     - &l2TokenBridge "0xb8161F28a5a38cE58f155D9A96bDAc0104985FAc"
     - &l2TokenBridgeImpl "0x488cDB57E9a1006ab77730fC8b19e1BB76e1cB97"
@@ -18,9 +20,9 @@ deployed:
     - &l2WstethImpl "0xF27b1B121e55A13047d66dC4AAA8c17BA72c762A"
     - &l2GovExecutor "0x2aCeC6D8ABA90685927b61968D84CfFf6192B32C"
     - &l2EmergencyBreaksMultisig "0x244912352A639001ceCFa208cDaa7CB474c9eadE"
+    - &safeL2Singleton_1_3_0 "0x3E5c63644E683549055b9Be8653de26E0B4CD36E"
 
 parameters:
-  - &l1EmergencyBreaksMultisig "0x73b047fe6337183A454c5217241D780a932777bD" # https://docs.lido.fi/token-guides/wsteth-bridging-guide/#mainnet
   - &l1Agent "0x3e40D73EB977Dc6a537aF587D48316feE66E9C8c"
   - &l1Wsteth "0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0"
   - &l1CrossDomainMessenger "0x95bDCA6c8EdEB69C98Bd5bd17660BaCef1298A6f"
@@ -105,6 +107,12 @@ l1:
       name: GnosisSafe
       proxyName: GnosisSafeProxy
       address: *l1EmergencyBreaksMultisig
+      implementation: *safeSingleton_1_3_0
+      proxyChecks: {}
+      storage:
+        - slot: "0x0000000000000000000000000000000000000000000000000000000000000000"
+          expected: *safeSingleton_1_3_0
+          label: singleton
       checks:
         getOwners:
           - *multisigOwner1
@@ -231,6 +239,12 @@ l2:
       name: GnosisSafeL2
       proxyName: GnosisSafeProxy
       address: *l2EmergencyBreaksMultisig
+      implementation: *safeL2Singleton_1_3_0
+      proxyChecks: {}
+      storage:
+        - slot: "0x0000000000000000000000000000000000000000000000000000000000000000"
+          expected: *safeL2Singleton_1_3_0
+          label: singleton
       checks:
         getOwners:
           - *multisigOwner4

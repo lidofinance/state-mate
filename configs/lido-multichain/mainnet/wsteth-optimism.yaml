@@ -23,10 +23,11 @@ deployed:
     - &l2TokenBridgeImpl "0x2734602C0CEbbA68662552CacD5553370B283E2E"
     - &l2WstETH "0x1F32b1c2345538c0c6f582fCB022739c4A194Ebb"
     - &l2WstETHImpl "0xFe57042De76c8D6B1DF0E9E2047329fd3e2B7334"
-    - &l2StETH "0x76A50b8c7349cCDDb7578c6627e79b5d99D24138"
 
 misc:
-  - &maxInt "115792089237316195423570985008687907853269984665640564039457584007913129639935"
+  - &l2StETH "0x76A50b8c7349cCDDb7578c6627e79b5d99D24138"
+
+  - &MAX_INT "115792089237316195423570985008687907853269984665640564039457584007913129639935"
   - &ZERO_BYTES32 "0x0000000000000000000000000000000000000000000000000000000000000000"
 
 roles:
@@ -38,6 +39,8 @@ roles:
 
 l1:
   rpcUrl: ETH_RPC_URL
+  explorerHostname: api.etherscan.io
+  explorerTokenEnv: ETHERSCAN_TOKEN
   chainId: 1
   contracts:
     tokenBridge:
@@ -82,7 +85,7 @@ l1:
         *WITHDRAWALS_ENABLER_ROLE : [*agent]
         *WITHDRAWALS_DISABLER_ROLE : [*agent, *l1EmergencyBreaksMultisig]
       implementationChecks:
-        getContractVersion: *maxInt
+        getContractVersion: *MAX_INT
         isInitialized: false
         isDepositsEnabled: false
         isWithdrawalsEnabled: false
@@ -92,6 +95,8 @@ l1:
 
 l2:
   rpcUrl: OPTIMISM_RPC_URL
+  explorerHostname: api.etherscan.io
+  explorerTokenEnv: ETHERSCAN_TOKEN
   chainId: 10
   contracts:
     governanceExecutor:
@@ -176,7 +181,7 @@ l2:
         *WITHDRAWALS_DISABLER_ROLE : [*l2GovernanceExecutor, *l2EmergencyBreaksMultisig]
         *WITHDRAWALS_ENABLER_ROLE : [*l2GovernanceExecutor]
       implementationChecks:
-        getContractVersion: *maxInt
+        getContractVersion: *MAX_INT
         isInitialized: false
         isDepositsEnabled: false
         isWithdrawalsEnabled: false

@@ -4,7 +4,6 @@
 # yaml-language-server: $schema=./../../../schemas/main-schema.json
 
 parameters:
-  - &lido "0x3e3FE7dBc6B4C189E7128855dD526361c49b40Af"
   - &accountingOracle "0xd497Be005638efCf09F6BFC8DAFBBB0BB72cD991"
   - &wstETH "0xB82381A3fBD3FaFA77B3a7bE693342618240067b"
   - &stETH "0x3e3FE7dBc6B4C189E7128855dD526361c49b40Af"
@@ -42,6 +41,8 @@ roles:
 
 l1:
   rpcUrl: ETH_SEPOLIA_RPC_URL
+  explorerHostname: api.etherscan.io
+  explorerTokenEnv: ETHERSCAN_TOKEN
   chainId: 11155111
   contracts:
     opStackTokenRatePusher:
@@ -111,6 +112,7 @@ l1:
 
 l2:
   rpcUrl: SONEIUM_MINATO_RPC_URL
+  explorerHostname: soneium-minato.blockscout.com
   chainId: 1946
   contracts:
     governanceExecutor:
