@@ -1,0 +1,508 @@
+parameters:
+  # Token addresses
+  - &ldoToken "0x5A98FcBEA516Cf06857215779Fd812CA3beF1B32"
+  - &wstethToken "0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0"
+  - &stethToken "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84"
+  # Governance
+  - &aragonVoting "0x2e59A20f205bB85a89C53f1936454680651E618e"
+  - &aragonAgent "0x3e40D73EB977Dc6a537aF587D48316feE66E9C8c"
+  # Committees (https://research.lido.fi/t/liquid-buybacks-nest-execution-with-ldo-wsteth-liquidity/10894/99)
+  - &tmcMultisig "0xa02FC823cCE0D016bD7e17ac684c9abAb2d6D647" # Treasury Management Committee
+  - &emergencyBrakesMultisig "0x73b047fe6337183A454c5217241D780a932777bD" # Emergency Brakes on ETH
+  # Core
+  - &lidoLocator "0xC1d0b3DE6792Bf6b4b37EccdcC24e45978Cfd2Eb"
+  - &accounting "0x23ED611be0e1a820978875C0122F92260804cdDf"
+  # External dependencies
+  - &curveAdmin "0x97aA696e37659Fb4f0B53824246d802Df40E980A"
+  - &curveTwocryptoFactory "0x98EE851a00abeE0d95D08cF4CA2BdCE32aeaAF7F"
+  - &curveFeeReceiver "0xa2Bcd1a4Efbd04B63cd03f5aFf2561106ebCCE00"
+  - &curveMathImplementation "0x1Fd8Af16DC4BEBd950521308D55d0543b6cDF4A1"
+  - &chainlinkFeedRegistry "0x47Fb2585D2C56Fe188D0E6ec628a38b74fCeeeDf"
+  - &cowVaultRelayer "0xC92E8bdf79f0507f65a392b0ab4667716BFE0110"
+
+deployed:
+  l1:
+    - &curvePoolLdoWsteth "0xD7f1dA0a28E39dd0dB70E6Acdc2B49846AD22760"
+    - &oracleRouter "0x79ef3a538200Fe4981D67E7e886bfb36D4Cb5a31"
+    - &amountConverterEthAnchored "0x70dA04C5D0f325F5AF1426dE6672BF2424B4593d"
+    # Automated Buybacks (deployed 16.07.2026)
+    - &stonksFactory "0x632C0CCDca849eeD780FC685BBa9AbC3c7407Cb2"
+    - &orderSample "0x2569633AdB492ca9327cb7433277aa7c68D69e28"
+    - &stakingRevenueSource "0x6220212a33a87Ed7Cc386B67eB2c393974F28C38"
+    - &buybackExecutor "0x6c213ca5A10Cc26548C742229569B4AeD2A9C9B7"
+    - &buybackStonksLp "0x8c595aA4AEc6F42B9e7D77F83179768D37CE3042"
+    - &buybackStonksTreasury "0xb368586CB980895E51e1D82102E63b3F69d3F151"
+    - &buybackAllocator "0xAA568141c051f2D1132b110f8391F18D48E8D889"
+    # Core-side NEST upgrade: new TokenRateNotifier (forwards full rebase payload)
+    - &tokenRateNotifier "0xbe05d12Fd10919F1881125006523452F6aFF791b"
+
+misc:
+  - &ZERO_ADDRESS "0x0000000000000000000000000000000000000000"
+  - &ZERO_BYTES32 "0x0000000000000000000000000000000000000000000000000000000000000000"
+  - &MAX_UINT256 "115792089237316195423570985008687907853269984665640564039457584007913129639935"
+  - &PRICE_UNIT 1000000000000000000 # 1e18
+  - &MAX_BASIS_POINTS 10000
+  - &MAX_ORACLE_DECIMALS 38
+
+  # Buyback economic params
+  # https://github.com/lidofinance/lido-improvement-proposals/pull/116
+  - &BUYBACK_YEARLY_CAP_USD 10000000000000000000000000 # 10_000_000e18; "annualCapUSD: $10,000,000"
+  - &BUYBACK_DAILY_CAP_USD 50000000000000000000000 # 50_000e18; "dailyCapUSD: $50,000"
+  - &BUYBACK_SURPLUS_SHARE_BP 5000 # "surplusShareBps: 5000 (50%)"
+  - &BUYBACK_RESERVE_DAILY_RATE_USD 109589000000000000000000 # 109_589e18; "dailyRevenueThresholdUSD: $40,000,000 / 365"
+
+  # BuybackExecutor immutable constants
+  # https://hackmd.io/TKXZh2lKSLG6m9QDo5kpVg
+  - &MAX_POOL_BOOTSTRAP_MIN_TVL_USD 1000000000000000000000000 # 1_000_000e18; "poolBootstrapMinTvlUsd in (0, 1,000,000 USD]"
+  - &MAX_POOL_DIVERGENCE_TOLERANCE_BPS 1000 # "poolPriceDivergenceToleranceBps in (0, 1000]"
+  - &MIN_ORDER_RESIDUAL_TO_RECOVER 10 # sweep threshold, wei of stETH
+
+  # Guard & sizing params
+  # https://research.lido.fi/t/liquid-buybacks-nest-execution-with-ldo-wsteth-liquidity/10894/109
+  - &POOL_PRICE_DIVERGENCE_TOLERANCE_BPS 200 # 2%
+  - &MIN_ALLOWED_ORDER_AMOUNT 1000000000000000000 # 1 stETH
+  - &MAX_ALLOWED_ORDER_AMOUNT 20000000000000000000 # 20 stETH
+  - &MIN_DEPOSIT_VALUE_USD 1000000000000000000000 # 1_000e18
+  - &MAX_DEPOSIT_VALUE_USD 50000000000000000000000 # 50_000e18 (equals the daily cap)
+  - &MIN_SPEND_PER_CALL_USD 1000000000000000000000 # 1_000e18
+  - &POOL_BOOTSTRAP_MIN_TVL_USD 250000000000000000000000 # 250_000e18
+
+  # Stonks v2 instance params per the Stonks v2 spec: https://hackmd.io/p_ZC5s9tRAOMavh5nVOerw
+  - &STONKS_ORDER_DURATION_SECONDS 1800 # 30 min
+  - &STONKS_MARGIN_BPS 110 # 1.10%
+  - &STONKS_MARGIN_DIFF_BPS 9890 # = 10000 - 110
+  - &STONKS_PRICE_TOLERANCE_BPS 550 # 5.50%
+  - &STONKS_MAX_IMPROVEMENT_BPS 1000 # 10.00%
+
+  # Curve twocrypto-ng pool params
+  # https://research.lido.fi/t/liquid-buybacks-nest-execution-with-ldo-wsteth-liquidity/10894/109
+  - &CURVE_A 400000
+  - &CURVE_GAMMA 145000000000000 # 0.000145
+  - &CURVE_MID_FEE 500000 # 0.005%
+  - &CURVE_OUT_FEE 5000000 # 0.05%
+  - &CURVE_FEE_GAMMA 230000000000000 # 0.00023
+  - &CURVE_ALLOWED_EXTRA_PROFIT 2000000000000
+  - &CURVE_ADJUSTMENT_STEP 146000000000000
+  - &CURVE_MA_TIME 601 # stored packed as 866 = 601/ln(2); getter returns 866 * 694/1000
+
+  # cast sig "supportsInterface(bytes4)"
+  - &IERC165 "0x01ffc9a7"
+  # printf '0x%08x' $(( $(cast sig "hasRole(bytes32,address)") ^ $(cast sig "getRoleAdmin(bytes32)") ^ $(cast sig "grantRole(bytes32,address)") ^ $(cast sig "revokeRole(bytes32,address)") ^ $(cast sig "renounceRole(bytes32,address)") ))
+  - &IAccessControl "0x7965db0b"
+  # printf '0x%08x' $(( $(cast sig "getRoleMember(bytes32,uint256)") ^ $(cast sig "getRoleMemberCount(bytes32)") ))
+  - &IAccessControlEnumerable "0x5a05180f"
+  # cast sig "getCumulativeRevenueUSD()"
+  - &IRevenueSource "0x87c92437"
+  # cast sig "pushTokenRate()"
+  - &ITokenRatePusher "0xa16ba44d"
+  # cast sig "pushTokenRate(uint256,uint256,uint256,uint256,uint256,uint256,uint256)"
+  - &ITokenRatePusherWithArgs "0xbd18bfd6"
+
+roles:
+  - &DEFAULT_ADMIN_ROLE "0x0000000000000000000000000000000000000000000000000000000000000000"
+  - &ALLOCATOR_ROLE "0x87905334ad07701d0cd9b21ea0599de1a0cab067e0ab49596d423d87159ac7f2" # cast keccak "Buybacks.BuybackExecutor.ALLOCATOR_ROLE"
+  - &MANAGER_ROLE "0x24bec1f1283f989ed510b4d89bc7ef5002f20db1b60c1b3192336791c868543e" # cast keccak "Buybacks.MANAGER_ROLE"
+  - &EMERGENCY_ROLE "0xc748c205190870b4e890036f373e30556929f7fbf3db8644c998a652c1996dbd" # cast keccak "Buybacks.BuybackExecutor.EMERGENCY_ROLE"
+
+l1:
+  chainId: 1
+  rpcUrl: L1_MAINNET_RPC_URL
+  explorerHostname: api.etherscan.io
+  explorerTokenEnv: ETHERSCAN_TOKEN
+  contracts:
+    curvePoolLdoWsteth:
+      name: CurveTwocryptoOptimized
+      address: *curvePoolLdoWsteth
+      checks:
+        # Metadata
+        name: "Curve.fi LDO/wstETH"
+        symbol: "LDOwstETH-f"
+        decimals: 18
+        version: "v2.1.0"
+        DOMAIN_SEPARATOR: "0xd3d4e91189ec7a7d1aa87f43d39e5aeab7803dd600dbdc1727cfb9dbd8849bcd"
+        salt: "0x9cff4f6a46077356b5f51d8045bd5597f08443ebee48320faa82544eb276665d"
+        # Composition
+        coins:
+          - args: [0]
+            result: *ldoToken
+          - args: [1]
+            result: *wstethToken
+        precisions: [1, 1]
+        factory: *curveTwocryptoFactory
+        MATH: *curveMathImplementation
+        admin: *curveAdmin
+        fee_receiver: *curveFeeReceiver
+        ADMIN_FEE: 5000000000 # 50% of earned fees to Curve DAO (1e10 denominator)
+        A: *CURVE_A
+        gamma: *CURVE_GAMMA
+        mid_fee: *CURVE_MID_FEE
+        out_fee: *CURVE_OUT_FEE
+        fee_gamma: *CURVE_FEE_GAMMA
+        allowed_extra_profit: *CURVE_ALLOWED_EXTRA_PROFIT
+        adjustment_step: *CURVE_ADJUSTMENT_STEP
+        ma_time: *CURVE_MA_TIME
+        packed_fee_params: "170141183460469231823921024084661863808000000" # chisel eval "(500000 << 128) | (5000000 << 64) | 230000000000000"
+        packed_rebalancing_params: "680564733841876929619973849625130958848000000000866" # chisel eval "(2000000000000 << 128) | (146000000000000 << 64) | 866"
+        initial_A_gamma: "136112946768375385385349842972852284582400000" # chisel eval "(400000 << 128) | 145000000000000"
+        initial_A_gamma_time: 0
+        future_A_gamma: "136112946768375385385349842972852284582400000" # same as initial_A_gamma
+        future_A_gamma_time: 0
+        fee:
+        lp_price:
+        get_virtual_price:
+        virtual_price:
+        price_oracle:
+        price_scale:
+        last_prices:
+        last_timestamp:
+        balances:
+        D:
+        totalSupply:
+        xcp_profit:
+        xcp_profit_a:
+        balanceOf:
+        allowance:
+        nonces:
+        calc_token_amount:
+        calc_withdraw_one_coin:
+        calc_token_fee:
+        fee_calc:
+        get_dy:
+        get_dx:
+
+    oracleRouter:
+      name: OracleRouter
+      address: *oracleRouter
+      checks:
+        ADMIN: *aragonVoting
+        FEED_REGISTRY: *chainlinkFeedRegistry
+        # Constants
+        MAX_DECIMALS: *MAX_ORACLE_DECIMALS
+        PRICE_DECIMALS: 18
+        PRICE_UNIT: *PRICE_UNIT
+        # Operational config, zeroed until the ETH/USD bridge is configured and synced
+        emergencyOperator: *ZERO_ADDRESS
+        manager: *ZERO_ADDRESS
+        # [scaleNumerator, scaleDenominator, aggregator, maxStalenessSeconds, aggregatorDecimals]
+        ethUsdBridge: [0, 0, *ZERO_ADDRESS, 0, 0]
+        isBridgeInSync: false
+        getPricesAndDecimals:
+        getUsdPrices:
+        isFeedInSync:
+        tokenConfig:
+
+    amountConverterEthAnchored:
+      name: AmountConverter
+      address: *amountConverterEthAnchored
+      checks:
+        ORACLE_ROUTER: *oracleRouter
+        ROUTER_MAX_DECIMALS: *MAX_ORACLE_DECIMALS
+        USE_ETH_ANCHOR: true
+        allowedTokensToSell:
+          - args: [*stethToken]
+            result: true
+        allowedTokensToBuy:
+          - args: [*ldoToken]
+            result: true
+        getExpectedOut:
+
+    stonksFactory:
+      name: StonksFactory
+      address: *stonksFactory
+      checks:
+        ADMIN: *aragonVoting
+        AGENT: *aragonAgent
+        ORDER_SAMPLE: *orderSample
+
+    orderSample:
+      name: Order
+      address: *orderSample
+      checks:
+        ADMIN: *aragonVoting
+        AGENT: *aragonAgent
+        RELAYER: *cowVaultRelayer
+        # validate: domainSeparator() of CoW settlement 0x9008D19f58AAbD9eD0D60971565AA8510560ab41
+        DOMAIN_SEPARATOR: "0xc078f884a2676e1345748b1feace7b0abee5d00ecadb6e574dcdd109a63e8943"
+        allowPartialFill: false
+        cancelled: false
+        emergencyOperator: *ZERO_ADDRESS
+        manager: *ZERO_ADDRESS
+        stonks: *ZERO_ADDRESS
+        # [orderHash, tokenFrom, tokenTo, sellAmount, buyAmount, validTo, receiver]
+        getOrderDetails: [*ZERO_BYTES32, *ZERO_ADDRESS, *ZERO_ADDRESS, 0, 0, 0, *ZERO_ADDRESS]
+        isValidSignature:
+
+    stakingRevenueSource:
+      name: StakingRevenueSource
+      address: *stakingRevenueSource
+      checks:
+        ORACLE_ROUTER: *oracleRouter
+        LIDO_LOCATOR: *lidoLocator
+        PRICE_UNIT: *PRICE_UNIT
+        supportsInterface:
+          - args: [*IRevenueSource]
+            result: true
+          - args: [*ITokenRatePusherWithArgs]
+            result: true
+          - args: [*IERC165]
+            result: true
+        pendingRevenueStEth:
+        lastReportTimestamp:
+        getCumulativeRevenueUSD:
+
+    buybackExecutor:
+      name: BuybackExecutor
+      address: *buybackExecutor
+      checks:
+        # Immutable dependencies
+        STETH: *stethToken
+        WSTETH: *wstethToken
+        LDO: *ldoToken
+        ORACLE_ROUTER: *oracleRouter
+        CURVE_POOL_AND_TOKEN: *curvePoolLdoWsteth
+        TREASURY: *aragonAgent
+        # Role constants
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        ALLOCATOR_ROLE: *ALLOCATOR_ROLE
+        MANAGER_ROLE: *MANAGER_ROLE
+        EMERGENCY_ROLE: *EMERGENCY_ROLE
+        # Constants
+        PRICE_UNIT: *PRICE_UNIT
+        MAX_BASIS_POINTS: *MAX_BASIS_POINTS
+        MAX_POOL_BOOTSTRAP_MIN_TVL_USD: *MAX_POOL_BOOTSTRAP_MIN_TVL_USD
+        MAX_POOL_DIVERGENCE_TOLERANCE_BPS: *MAX_POOL_DIVERGENCE_TOLERANCE_BPS
+        MIN_ORDER_RESIDUAL_TO_RECOVER: *MIN_ORDER_RESIDUAL_TO_RECOVER
+        # Params
+        poolPriceDivergenceToleranceBps: *POOL_PRICE_DIVERGENCE_TOLERANCE_BPS
+        minAllowedOrderAmount: *MIN_ALLOWED_ORDER_AMOUNT
+        maxAllowedOrderAmount: *MAX_ALLOWED_ORDER_AMOUNT
+        minDepositValueUsd: *MIN_DEPOSIT_VALUE_USD
+        maxDepositValueUsd: *MAX_DEPOSIT_VALUE_USD
+        poolBootstrapMinTvlUsd: *POOL_BOOTSTRAP_MIN_TVL_USD
+        stonks: *ZERO_ADDRESS
+        # FIXME: after vote
+        # stonks: *buybackStonksTreasury
+        lpModeEnabled: false
+        paused: false
+        stonksOrderDurationSeconds: 0
+        # FIXME: after vote
+        # stonksOrderDurationSeconds: *STONKS_ORDER_DURATION_SECONDS
+        lastOrderAddress:
+        lastOrderValidTo:
+        getLpTokenBalance:
+        canAddLiquidity:
+        getAvailableLiquidity:
+        getPlacementStatus:
+        supportsInterface:
+          - args: [*IERC165]
+            result: true
+          - args: [*IAccessControl]
+            result: true
+          - args: [*IAccessControlEnumerable]
+            result: true
+        getRoleAdmin:
+        getRoleMember:
+        getRoleMemberCount:
+        hasRole:
+      ozAcl:
+        *DEFAULT_ADMIN_ROLE : [*aragonVoting]
+        *ALLOCATOR_ROLE : []
+        # FIXME: after vote
+        # *ALLOCATOR_ROLE : [*buybackAllocator]
+        *MANAGER_ROLE : []
+        # FIXME: after vote
+        # *MANAGER_ROLE : [*tmcMultisig]
+        *EMERGENCY_ROLE : []
+        # FIXME: after vote
+        # *EMERGENCY_ROLE : [*tmcMultisig, *emergencyBrakesMultisig]
+
+    # Both Stonks instances are identical except RECEIVER
+    buybackStonksLp:
+      name: Stonks
+      address: *buybackStonksLp
+      checks:
+        RECEIVER: *buybackExecutor # == manager => LP mode
+        manager: *buybackExecutor
+        ADMIN: *aragonVoting
+        AGENT: *aragonAgent
+        AMOUNT_CONVERTER: *amountConverterEthAnchored
+        ORDER_SAMPLE: *orderSample
+        TOKEN_FROM: *stethToken
+        TOKEN_TO: *ldoToken
+        ORDER_DURATION_IN_SECONDS: *STONKS_ORDER_DURATION_SECONDS
+        MARGIN_IN_BASIS_POINTS: *STONKS_MARGIN_BPS
+        MARGIN_DIFFERENCE_IN_BASIS_POINTS: *STONKS_MARGIN_DIFF_BPS
+        PRICE_TOLERANCE_IN_BASIS_POINTS: *STONKS_PRICE_TOLERANCE_BPS
+        MAX_IMPROVEMENT_IN_BASIS_POINTS: *STONKS_MAX_IMPROVEMENT_BPS
+        getMaxImprovementBps: *STONKS_MAX_IMPROVEMENT_BPS
+        getPriceTolerance: *STONKS_PRICE_TOLERANCE_BPS
+        ALLOW_PARTIAL_FILL: true
+        # [tokenFrom, tokenTo, orderDurationInSeconds]
+        getOrderParameters: [*stethToken, *ldoToken, *STONKS_ORDER_DURATION_SECONDS]
+        emergencyOperator: *ZERO_ADDRESS
+        isKilled: false
+        isCreationPaused: false
+        areSignaturesPaused: false
+        paused: false
+        estimateTradeOutput:
+        estimateTradeOutputFromCurrentBalance:
+
+    buybackStonksTreasury:
+      name: Stonks
+      address: *buybackStonksTreasury
+      checks:
+        RECEIVER: *aragonAgent # TREASURY => treasury mode
+        manager: *buybackExecutor
+        ADMIN: *aragonVoting
+        AGENT: *aragonAgent
+        AMOUNT_CONVERTER: *amountConverterEthAnchored
+        ORDER_SAMPLE: *orderSample
+        TOKEN_FROM: *stethToken
+        TOKEN_TO: *ldoToken
+        ORDER_DURATION_IN_SECONDS: *STONKS_ORDER_DURATION_SECONDS
+        MARGIN_IN_BASIS_POINTS: *STONKS_MARGIN_BPS
+        MARGIN_DIFFERENCE_IN_BASIS_POINTS: *STONKS_MARGIN_DIFF_BPS
+        PRICE_TOLERANCE_IN_BASIS_POINTS: *STONKS_PRICE_TOLERANCE_BPS
+        MAX_IMPROVEMENT_IN_BASIS_POINTS: *STONKS_MAX_IMPROVEMENT_BPS
+        getMaxImprovementBps: *STONKS_MAX_IMPROVEMENT_BPS
+        getPriceTolerance: *STONKS_PRICE_TOLERANCE_BPS
+        ALLOW_PARTIAL_FILL: true
+        # [tokenFrom, tokenTo, orderDurationInSeconds]
+        getOrderParameters: [*stethToken, *ldoToken, *STONKS_ORDER_DURATION_SECONDS]
+        emergencyOperator: *ZERO_ADDRESS
+        isKilled: false
+        isCreationPaused: false
+        areSignaturesPaused: false
+        paused: false
+        estimateTradeOutput:
+        estimateTradeOutputFromCurrentBalance:
+
+    buybackAllocator:
+      name: BuybackAllocator
+      address: *buybackAllocator
+      checks:
+        STETH: *stethToken
+        ORACLE_ROUTER: *oracleRouter
+        TREASURY: *aragonAgent
+        executor: *buybackExecutor
+        # Role constants
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        MANAGER_ROLE: *MANAGER_ROLE
+        # Constants
+        MAX_BASIS_POINTS: *MAX_BASIS_POINTS
+        MAX_REVENUE_SOURCES: 50
+        # Params
+        dailyCapUSD: *BUYBACK_DAILY_CAP_USD
+        yearlyCapUSD: *BUYBACK_YEARLY_CAP_USD
+        reserveDailyRateUSD: *BUYBACK_RESERVE_DAILY_RATE_USD
+        minStEthPriceUSD: 0 # floor disabled; post mentions "ETH > 3000" gate
+        minSpendPerCallUSD: *MIN_SPEND_PER_CALL_USD
+        surplusShareBP: *BUYBACK_SURPLUS_SHARE_BP
+        revenueSources:
+          - *stakingRevenueSource
+        # State
+        activationTS: 0 # FIXME: after vote: timestamp of the enacted activate() call
+        budgetUSD:
+        lastTotalRevenueUSD:
+        reserveAnchorTS:
+        daily:
+        yearly:
+        spendable:
+        supportsInterface:
+          - args: [*IERC165]
+            result: true
+          - args: [*IAccessControl]
+            result: true
+          - args: [*IAccessControlEnumerable]
+            result: true
+        getRoleAdmin:
+        getRoleMember:
+        getRoleMemberCount:
+        hasRole:
+      ozAcl:
+        *DEFAULT_ADMIN_ROLE : [*aragonVoting]
+        *MANAGER_ROLE : []
+        # FIXME: after vote
+        # *MANAGER_ROLE : [*tmcMultisig]
+
+    # Core-side NEST upgrade: new TokenRateNotifier forwarding the full rebase payload
+    tokenRateNotifier:
+      name: TokenRateNotifier
+      address: *tokenRateNotifier
+      checks:
+        owner: *aragonAgent
+        TOKEN_RATE_PROVIDER: *accounting
+        INDEX_NOT_FOUND: *MAX_UINT256
+        MAX_OBSERVERS_COUNT: 32
+        REQUIRED_INTERFACE_NO_ARGS: *ITokenRatePusher
+        REQUIRED_INTERFACE_WITH_ARGS: *ITokenRatePusherWithArgs
+        observersLength: 0
+        # FIXME: after vote
+        # observersLength: 1
+        observers:
+          - args: [0]
+            mustRevert: true
+        # FIXME: after vote
+        # observers:
+        #   - args: [0]
+        #     result: *stakingRevenueSource
+
+    # Committees
+    tmcMultisig:
+      name: GnosisSafe
+      proxyName: GnosisSafeProxy
+      address: *tmcMultisig
+      checks:
+        # Membership per https://research.lido.fi/t/proposal-to-approve-lido-dao-treasury-management-principles-and-authorize-the-formation-of-a-treasury-management-committee/4279
+        getOwners:
+          - "0x8ecd93982FfbB2f937ADa6c6e50d1950974081C0" # Armin
+          - "0xF3d5Fdb50154B1b3047F311485780Baa1D770492" # alex_l
+          - "0x8aA493BcD7f989caD67dd3CB48A4c2E6b40FeDB0" # dennis_sch
+          - "0x620bD63538Bf10a87214b6187f5bc85926C2971f" # Mol_Eliza
+          - "0x5da409e1cbDABeC67471dB01Ff956f804bb8879f" # pipistrella
+          - "0x83A8B5c6990cBC78FFc45cbbfE5748B895973623" # sabrychiaa
+          - "0x6402f26ae319b4edB6c4D459D437Fe274dE29f20" # nikita.p
+        getThreshold: 4
+        VERSION: "1.3.0"
+        getChainId: 1
+        approvedHashes:
+        checkNSignatures:
+        checkSignatures:
+        domainSeparator:
+        encodeTransactionData:
+        getModulesPaginated:
+        getStorageAt:
+        getTransactionHash:
+        isModuleEnabled:
+        isOwner:
+        nonce:
+        signedMessages:
+
+    emergencyBrakesMultisig:
+      name: GnosisSafe
+      proxyName: GnosisSafeProxy
+      address: *emergencyBrakesMultisig
+      checks:
+        # Membership per https://research.lido.fi/t/emergency-brakes-multi-sig-upgrade/2608
+        # and rotation https://research.lido.fi/t/emergency-brakes-signer-rotation/5286
+        getOwners:
+          - "0xCFfE0F3B089e46D8212408Ba061c425776E64322" # folkyatina
+          - "0xdd19274b614b5ecAcf493Bc43C380ef6B8dfB56c" # ujenjt
+          - "0x59F8D74Fe49d5ebEAc069E3baf07eB4b614BD5A7" # theDZhon
+          - "0x6f5c9B92DC47C89155930E708fBc305b55A5519A" # kadmil
+          - "0x2a61d3ba5030Ef471C74f612962c7367ECa3a62d" # psirex
+        getThreshold: 3
+        VERSION: "1.3.0"
+        getChainId: 1
+        approvedHashes:
+        checkNSignatures:
+        checkSignatures:
+        domainSeparator:
+        encodeTransactionData:
+        getModulesPaginated:
+        getStorageAt:
+        getTransactionHash:
+        isModuleEnabled:
+        isOwner:
+        nonce:
+        signedMessages:
