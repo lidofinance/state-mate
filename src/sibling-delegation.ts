@@ -70,6 +70,76 @@ export type ComposeResult = {
   overlayLabels: string[][];
 };
 
+type SiblingDocument = {
+  text: string;
+  spec: SiblingSpec;
+  /** Concrete path/name used to make validation failures attributable when a spec is repeated. */
+  sourceLabel?: string;
+};
+
+type OverlayDocument = {
+  text: string;
+  spec: OverlaySpec;
+  /** Concrete path/name used to make validation failures attributable. */
+  sourceLabel?: string;
+};
+
+type CollectedSibling = SiblingDocument & {
+  document: YAML.Document;
+  labels: Set<string>;
+  fileLabel: string;
+};
+
+function describeFile(fileLabel: string, sourceLabel?: string): string {
+  return sourceLabel ? `${fileLabel} ${JSON.stringify(sourceLabel)}` : fileLabel;
+}
+
+/**
+ * Serialize sibling documents for the final YAML composition. A repeated sibling kind may split its
+ * anchor book across files (currently used by repeatable `--inputs`), so concatenate same-named
+ * top-level sequences into one section before parsing. This avoids duplicate YAML mapping keys while
+ * retaining every entry node, anchor, and inline comment. Non-sequence sections remain single-file.
+ */
+function serializeSiblingDocuments(collected: CollectedSibling[]): string[] {
+  const serialized: string[] = [];
+  const emittedSpecs = new Set<SiblingSpec>();
+
+  for (const entry of collected) {
+    if (emittedSpecs.has(entry.spec)) continue;
+    emittedSpecs.add(entry.spec);
+
+    const sameSpec = collected.filter(({ spec }) => spec === entry.spec);
+    if (sameSpec.length === 1) {
+      serialized.push(entry.text);
+      continue;
+    }
+
+    const merged = new YAML.Document(undefined, YAML_PARSE_OPTIONS);
+    const mergedMap = new YAML.YAMLMap();
+    merged.contents = mergedMap;
+    for (const sectionKey of entry.spec.ownedSectionKeys) {
+      const sectionNodes = sameSpec
+        .map(({ document }) => document.get(sectionKey, true))
+        .filter((node): node is YAML.Node => node !== undefined);
+      if (sectionNodes.length === 0) continue;
+      if (!sectionNodes.every((node) => YAML.isSeq(node))) {
+        throw new Error(
+          `multiple ${entry.spec.fileLabel} documents may only split list-valued sections; ` +
+            `\`${sectionKey}:\` cannot be composed`,
+        );
+      }
+      const mergedSequence = new YAML.YAMLSeq();
+      for (const sectionNode of sectionNodes) {
+        mergedSequence.items.push(...(sectionNode as YAML.YAMLSeq).items);
+      }
+      mergedMap.items.push(new YAML.Pair(sectionKey, mergedSequence));
+    }
+    serialized.push(String(merged));
+  }
+
+  return serialized;
+}
+
 /** Derive the conventional sibling path: `lido.yaml` + `.deployed` -> `lido.deployed.yaml`. */
 export function deriveSiblingPath(configPath: string, infix: string): string {
   const extension = path.extname(configPath);
@@ -103,6 +173,23 @@ export function resolveExplicitFilePath(optionName: string, argument: string): s
     );
   }
   return resolved;
+}
+
+/** Resolve repeated explicit paths and reject the same underlying file selected more than once. */
+export function resolveDistinctExplicitFilePaths(optionName: string, arguments_: string[]): string[] {
+  const seen = new Map<string, string>();
+  return arguments_.map((argument) => {
+    const resolved = resolveExplicitFilePath(optionName, argument);
+    const canonical = fs.realpathSync(resolved);
+    const previous = seen.get(canonical);
+    if (previous) {
+      throw new Error(
+        `The ${optionName} file was selected more than once: ${argument} resolves to the same file as ${previous}`,
+      );
+    }
+    seen.set(canonical, argument);
+    return resolved;
+  });
 }
 
 /**
@@ -245,7 +332,7 @@ function buildOverlaySyntheticText(documents: YAML.Document[]): string {
       }
     }
   }
-  const synthetic = new YAML.Document();
+  const synthetic = new YAML.Document(undefined, YAML_PARSE_OPTIONS);
   const map = new YAML.YAMLMap();
   map.set(SYNTHETIC_OVERLAY_KEY, seq);
   synthetic.contents = map;
@@ -321,16 +408,25 @@ function inspectMainDocument(mainDocument: YAML.Document): {
  */
 export function composeWithSiblings(
   mainText: string,
-  siblings: { text: string; spec: SiblingSpec }[],
-  overlays: { text: string; spec: OverlaySpec }[] = [],
+  siblings: SiblingDocument[],
+  overlays: OverlayDocument[] = [],
 ): ComposeResult {
-  const collected = siblings.map(({ text, spec }) => {
-    const document = parseSingleDocument(text, spec.fileLabel);
-    assertNoParseErrors(document, spec.fileLabel);
-    assertOnlyOwnedSections(document, spec.ownedSectionKeys, spec.fileLabel);
-    const labels = spec.collectLabels(document);
-    assertNoStrayAnchors(document, labels, spec.fileLabel);
-    return { spec, labels, document };
+  const collected = siblings.map(({ text, spec, sourceLabel }) => {
+    const fileLabel = describeFile(spec.fileLabel, sourceLabel);
+    const document = parseSingleDocument(text, fileLabel);
+    assertNoParseErrors(document, fileLabel);
+    assertOnlyOwnedSections(document, spec.ownedSectionKeys, fileLabel);
+    let labels: Set<string>;
+    try {
+      labels = spec.collectLabels(document);
+    } catch (error) {
+      throw new Error(`${printError(error)}\nSource: ${fileLabel}`);
+    }
+    if (labels.size === 0) {
+      throw new Error(`${fileLabel} must contain at least one labeled entry`);
+    }
+    assertNoStrayAnchors(document, labels, fileLabel);
+    return { spec, labels, document, text, sourceLabel, fileLabel };
   });
 
   // Unresolved aliases are not parse errors (they only surface at `toJS`), so the wiring-only main
@@ -354,27 +450,33 @@ export function composeWithSiblings(
 
   // Per-sibling: no label collides with a main anchor or with another sibling's label; every label is
   // referenced by the main config.
-  const seenLabels = new Set<string>();
-  for (const { spec, labels } of collected) {
+  const labelSources = new Map<string, string>();
+  for (const { fileLabel, labels } of collected) {
     rejectLabels(
       labels,
       (label) => mainAnchors.has(label),
-      `label(s) defined in both the main config and ${spec.fileLabel}`,
+      `label(s) defined in both the main config and ${fileLabel}`,
     );
-    rejectLabels(labels, (label) => seenLabels.has(label), `label(s) defined in more than one delegated file`);
-    for (const label of labels) seenLabels.add(label);
+    const duplicates = [...labels].filter((label) => labelSources.has(label));
+    if (duplicates.length > 0) {
+      throw new Error(
+        `label(s) in ${fileLabel} are already defined in another delegated file: ` +
+          duplicates.map((label) => `&${label} (${labelSources.get(label)})`).join(", "),
+      );
+    }
+    for (const label of labels) labelSources.set(label, fileLabel);
     rejectLabels(
       labels,
       (label) => !mainAliases.has(label),
-      `label(s) in ${spec.fileLabel} are never referenced in the main config`,
+      `label(s) in ${fileLabel} are never referenced in the main config`,
     );
   }
 
   // Every alias in the main config must resolve to some sibling label or a main anchor.
-  const fileLabels = siblings.map(({ spec }) => spec.fileLabel).join(" / ");
+  const fileLabels = collected.map(({ fileLabel }) => fileLabel).join(" / ");
   rejectLabels(
     mainAliases,
-    (alias) => !seenLabels.has(alias) && !mainAnchors.has(alias),
+    (alias) => !labelSources.has(alias) && !mainAnchors.has(alias),
     `the main config references label(s) defined neither in it nor in ${fileLabels}`,
   );
 
@@ -386,12 +488,22 @@ export function composeWithSiblings(
   const overlayDocuments: YAML.Document[] = [];
   const overlayLabels: string[][] = [];
   const overlaySeen = new Set<string>();
-  for (const { text, spec } of overlays) {
-    const document = parseSingleDocument(text, spec.fileLabel);
-    assertNoParseErrors(document, spec.fileLabel);
-    assertOnlyOwnedSections(document, spec.ownedSectionKeys, spec.fileLabel);
-    const { labels, values, sections } = spec.collect(document, spec.fileLabel);
-    assertNoStrayAnchors(document, labels, spec.fileLabel);
+  for (const { text, spec, sourceLabel } of overlays) {
+    const fileLabel = describeFile(spec.fileLabel, sourceLabel);
+    const document = parseSingleDocument(text, fileLabel);
+    assertNoParseErrors(document, fileLabel);
+    assertOnlyOwnedSections(document, spec.ownedSectionKeys, fileLabel);
+    let collectedOverlay: ReturnType<OverlaySpec["collect"]>;
+    try {
+      collectedOverlay = spec.collect(document, fileLabel);
+    } catch (error) {
+      throw new Error(`${printError(error)}\nSource: ${fileLabel}`);
+    }
+    const { labels, values, sections } = collectedOverlay;
+    if (labels.size === 0) {
+      throw new Error(`${fileLabel} must contain at least one labeled entry`);
+    }
+    assertNoStrayAnchors(document, labels, fileLabel);
     const overlayLabelList = [...labels];
 
     const base = collected.find(({ spec: siblingSpec }) => siblingSpec === spec.baseSpec);
@@ -404,7 +516,7 @@ export function composeWithSiblings(
     rejectLabels(
       labels,
       (label) => !base.labels.has(label),
-      `label(s) in ${spec.fileLabel} are not defined in ${spec.baseSpec.fileLabel} (overrides cannot introduce new labels)`,
+      `label(s) in ${fileLabel} are not defined in ${spec.baseSpec.fileLabel} (overrides cannot introduce new labels)`,
     );
     rejectLabels(labels, (label) => overlaySeen.has(label), `label(s) overridden by more than one overrides file`);
     for (const label of labels) overlaySeen.add(label);
@@ -414,7 +526,7 @@ export function composeWithSiblings(
     const moved = overlayLabelList.filter((label) => sections.get(label) !== baseEntries.sections.get(label));
     if (moved.length > 0) {
       throw new Error(
-        `override(s) in ${spec.fileLabel} placed under a different section than ${spec.baseSpec.fileLabel}: ` +
+        `override(s) in ${fileLabel} placed under a different section than ${spec.baseSpec.fileLabel}: ` +
           moved
             .map((label) => `&${label} (\`${sections.get(label)}:\` vs \`${baseEntries.sections.get(label)}:\`)`)
             .join(", "),
@@ -430,7 +542,7 @@ export function composeWithSiblings(
     );
     if (noop.length > 0) {
       throw new Error(
-        `no-op override(s) in ${spec.fileLabel} — value unchanged from ${spec.baseSpec.fileLabel}: ` +
+        `no-op override(s) in ${fileLabel} — value unchanged from ${spec.baseSpec.fileLabel}: ` +
           noop.map((label) => `&${label}`).join(", "),
       );
     }
@@ -450,7 +562,7 @@ export function composeWithSiblings(
   // anchors go in one block after every sibling (hence after their base) and before the main aliases.
   const overlayText = overlayDocuments.length > 0 ? buildOverlaySyntheticText(overlayDocuments) : null;
   const combinedText = [
-    ...siblings.map(({ text }) => stripDocumentMarkers(text)),
+    ...serializeSiblingDocuments(collected).map((text) => stripDocumentMarkers(text)),
     ...(overlayText === null ? [] : [stripDocumentMarkers(overlayText)]),
     stripDocumentMarkers(mainText),
   ]
@@ -499,17 +611,19 @@ export function loadStateWithSiblings(
   overlays: { path: string; spec: OverlaySpec }[] = [],
 ): ComposeResult {
   let mainText: string;
-  let siblingTexts: { text: string; spec: SiblingSpec }[];
-  let overlayTexts: { text: string; spec: OverlaySpec }[];
+  let siblingTexts: SiblingDocument[];
+  let overlayTexts: OverlayDocument[];
   try {
     mainText = fs.readFileSync(path.resolve(configPath), "utf8");
     siblingTexts = siblings.map(({ path: siblingPath, spec }) => ({
       text: fs.readFileSync(path.resolve(siblingPath), "utf8"),
       spec,
+      sourceLabel: path.resolve(siblingPath),
     }));
     overlayTexts = overlays.map(({ path: overlayPath, spec }) => ({
       text: fs.readFileSync(path.resolve(overlayPath), "utf8"),
       spec,
+      sourceLabel: path.resolve(overlayPath),
     }));
   } catch (error) {
     return logErrorAndExit(`Failed to read config files:\n${printError(error)}`);

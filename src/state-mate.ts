@@ -31,6 +31,7 @@ import {
   loadStateWithSiblings,
   OverlaySpec,
   resolveExplicitFilePath,
+  resolveDistinctExplicitFilePaths,
   resolveSiblingFilePath,
   SiblingSpec,
 } from "./sibling-delegation";
@@ -83,9 +84,9 @@ function loadStateFromYaml(configPath: string): unknown {
 }
 
 // Load the main config, composing it with separate `.deployed` and/or `.inputs` sibling files when
-// selected (an explicit `--deployed`/`--inputs` path or, by convention, the `<name>.<infix>.<ext>`
-// sibling). Both may be in play at once. Sibling files are incompatible with `--generate`, which
-// operates on a seed document.
+// selected (an explicit `--deployed`, one or more explicit `--inputs` paths, or, by convention, the
+// `<name>.<infix>.<ext>` sibling). Both kinds may be in play at once. Sibling files are incompatible
+// with `--generate`, which operates on a seed document.
 type SelectedSibling = { path: string; spec: SiblingSpec; noun: string; explicit: boolean };
 
 // Inline `config:`/`externals:` sections would bypass every `.inputs` invariant (`&label` anchors,
@@ -118,14 +119,25 @@ function loadStateWithOptionalSiblings(): unknown {
         explicit: Boolean(g_Arguments.deployed),
       });
     }
-    const inputsPath = resolveSiblingFilePath(g_Arguments.configPath, INPUTS_SPEC, g_Arguments.inputs);
-    if (inputsPath) {
-      siblings.push({
-        path: inputsPath,
-        spec: INPUTS_SPEC,
-        noun: "input anchor(s)",
-        explicit: Boolean(g_Arguments.inputs),
-      });
+    if (g_Arguments.inputs.length > 0) {
+      for (const inputsPath of resolveDistinctExplicitFilePaths(INPUTS_SPEC.optionName, g_Arguments.inputs)) {
+        siblings.push({
+          path: inputsPath,
+          spec: INPUTS_SPEC,
+          noun: "input anchor(s)",
+          explicit: true,
+        });
+      }
+    } else {
+      const inputsPath = resolveSiblingFilePath(g_Arguments.configPath, INPUTS_SPEC);
+      if (inputsPath) {
+        siblings.push({
+          path: inputsPath,
+          spec: INPUTS_SPEC,
+          noun: "input anchor(s)",
+          explicit: false,
+        });
+      }
     }
     // The overrides file is explicit-only — never auto-discovered — so applying it (which changes
     // the effective input values) is always a deliberate choice.
@@ -165,7 +177,6 @@ function loadStateWithOptionalSiblings(): unknown {
         `add the convention <name>${INPUTS_SPEC.infix}.<ext> sibling)`,
     );
   }
-
   // Mixing an explicit variant of one sibling with the auto-discovered convention file of the other
   // (e.g. `--deployed lido.hoodi.deployed.yaml` next to a mainnet `lido.inputs.yaml`) is easy to do
   // by accident — surface the combination.

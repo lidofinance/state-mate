@@ -50,7 +50,7 @@ test("composes cross-file: aliases resolve to .deployed addresses and the deploy
     deployed: { l1: string[] };
     l1: { contracts: { fooContract: { address: string; checks: { bar: string; zero: string } } } };
   };
-  assert.deepEqual(labels.sort(), ["bar", "foo"]);
+  assert.deepEqual(labels.toSorted(), ["bar", "foo"]);
   assert.equal(document_.deployed.l1[0], "0x1111111111111111111111111111111111111111");
   assert.equal(document_.l1.contracts.fooContract.address, "0x1111111111111111111111111111111111111111");
   assert.equal(document_.l1.contracts.fooContract.checks.bar, "0x2222222222222222222222222222222222222222");
@@ -152,6 +152,13 @@ roles:
   - &ADMIN "0x0000000000000000000000000000000000000000000000000000000000000000"
 `;
   assert.throws(() => composeWithDeployedAddresses(MAIN_CONFIG, deployed), /may only contain/);
+});
+
+test("an empty deployed address book is rejected as a no-op", () => {
+  assert.throws(
+    () => composeWithDeployedAddresses("l1: {}\n", "deployed:\n  l1: []\n"),
+    /must contain at least one labeled entry/,
+  );
 });
 
 test("a syntax error in the main config is reported as a parse error, not an invariant violation", () => {

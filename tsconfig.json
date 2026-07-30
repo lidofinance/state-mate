@@ -2,7 +2,8 @@
   "extends": "@tsconfig/node20/tsconfig.json",
   "compilerOptions": {
     "outDir": "dist",
-    "baseUrl": "."
+    "baseUrl": ".",
+    "ignoreDeprecations": "6.0"
   },
   "exclude": ["node_modules", "tests", "dist", "**/*spec.ts", "**/*mock.ts"]
 }

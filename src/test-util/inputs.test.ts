@@ -10,6 +10,8 @@ import {
   composeWithSiblings,
   deriveSiblingPath,
   isSiblingFileName,
+  loadStateWithSiblings,
+  resolveDistinctExplicitFilePaths,
   resolveSiblingFilePath,
 } from "../sibling-delegation";
 
@@ -62,7 +64,7 @@ test("composes cross-file: aliases resolve to .inputs config knobs and externals
       contracts: { fooContract: { checks: { name: string; limits: string[]; deposit: string } } };
     };
   };
-  assert.deepEqual(labels.sort(), ["chainId", "depositContract", "lidoName", "oracleReportLimits"]);
+  assert.deepEqual(labels.toSorted(), ["chainId", "depositContract", "lidoName", "oracleReportLimits"]);
   const checks = document_.l1.contracts.fooContract.checks;
   assert.equal(checks.name, "Liquid staked Ether 2.0");
   // Numeric YAML values are stringified by the shared bigint reviver (as chainId is below).
@@ -358,11 +360,181 @@ externals:
   const document_ = document as {
     l1: { chainId: string; contracts: { fooContract: { address: string; checks: { name: string; deposit: string } } } };
   };
-  assert.deepEqual(labels[0].sort(), ["foo"]);
-  assert.deepEqual(labels[1].sort(), ["chainId", "depositContract", "lidoName"]);
+  assert.deepEqual(labels[0].toSorted(), ["foo"]);
+  assert.deepEqual(labels[1].toSorted(), ["chainId", "depositContract", "lidoName"]);
   assert.equal(document_.l1.contracts.fooContract.address, "0x1111111111111111111111111111111111111111");
   assert.equal(document_.l1.contracts.fooContract.checks.name, "stETH");
   assert.equal(document_.l1.chainId, "560048");
+});
+
+test("multi-input: disjoint common and lane input files compose together", () => {
+  const commonInputs = `
+config:
+  - &lidoName "Liquid staked Ether 2.0"
+  - &oracleReportLimits [3600, 1800, 1000, 50]
+externals:
+  - &depositContract "0x00000000219ab540356cBB839Cbe05303d7705Fa"
+`;
+  const laneInputs = `
+externals:
+  - &chainId 560048
+`;
+  const { document, labels } = composeWithSiblings(MAIN_CONFIG, [
+    { text: commonInputs, spec: INPUTS_SPEC },
+    { text: laneInputs, spec: INPUTS_SPEC },
+  ]);
+  const document_ = document as {
+    config: unknown[];
+    externals: unknown[];
+    l1: {
+      chainId: string;
+      contracts: { fooContract: { checks: { name: string; limits: string[]; deposit: string } } };
+    };
+  };
+
+  assert.deepEqual(labels[0].toSorted(), ["depositContract", "lidoName", "oracleReportLimits"]);
+  assert.deepEqual(labels[1], ["chainId"]);
+  assert.equal(document_.config.length, 2);
+  assert.equal(document_.externals.length, 2);
+  assert.equal(document_.l1.chainId, "560048");
+  assert.equal(document_.l1.contracts.fooContract.checks.name, "Liquid staked Ether 2.0");
+  assert.equal(document_.l1.contracts.fooContract.checks.deposit, "0x00000000219ab540356cBB839Cbe05303d7705Fa");
+});
+
+test("multi-input: a label duplicated across input files is rejected", () => {
+  const commonInputs = INPUTS;
+  const laneInputs = `
+externals:
+  - &chainId 1
+`;
+  assert.throws(
+    () =>
+      composeWithSiblings(MAIN_CONFIG, [
+        { text: commonInputs, spec: INPUTS_SPEC, sourceLabel: "common.inputs.yaml" },
+        { text: laneInputs, spec: INPUTS_SPEC, sourceLabel: "lane.inputs.yaml" },
+      ]),
+    /lane\.inputs\.yaml.*&chainId.*common\.inputs\.yaml/s,
+  );
+});
+
+test("multi-input: every selected file must contribute at least one labeled entry", () => {
+  assert.throws(
+    () =>
+      composeWithSiblings(MAIN_CONFIG, [
+        { text: INPUTS, spec: INPUTS_SPEC, sourceLabel: "common.inputs.yaml" },
+        { text: "config: []\nexternals: []\n", spec: INPUTS_SPEC, sourceLabel: "empty.inputs.yaml" },
+      ]),
+    /empty\.inputs\.yaml.*at least one labeled entry/,
+  );
+});
+
+test("single-input: an empty list-valued anchor book is rejected as a no-op", () => {
+  assert.throws(() => composeWithInputs("l1: {}\n", "config: []\n"), /must contain at least one labeled entry/);
+});
+
+test("multi-input: file-local validation errors identify the concrete source path", () => {
+  assert.throws(
+    () =>
+      composeWithSiblings(MAIN_CONFIG, [
+        { text: INPUTS, spec: INPUTS_SPEC, sourceLabel: "common.inputs.yaml" },
+        {
+          text: 'externals:\n  - &bad "REPLACEME"\n',
+          spec: INPUTS_SPEC,
+          sourceLabel: "optimism.inputs.yaml",
+        },
+      ]),
+    /&bad is not a valid address[\s\S]*optimism\.inputs\.yaml/,
+  );
+});
+
+test("multi-input: splitting at every entry boundary is equivalent to the unsplit input document", () => {
+  const entries = [
+    { section: "config", yaml: '&lidoName "Liquid staked Ether 2.0"' },
+    { section: "config", yaml: "&oracleReportLimits [3600, 1800, 1000, 50]" },
+    {
+      section: "externals",
+      yaml: '&depositContract "0x00000000219ab540356cBB839Cbe05303d7705Fa"',
+    },
+    { section: "externals", yaml: "&chainId 560048" },
+  ] as const;
+  type Entry = (typeof entries)[number];
+  const render = (selected: readonly Entry[]) =>
+    (["config", "externals"] as const)
+      .map((section) => {
+        const sectionEntries = selected.filter((entry) => entry.section === section);
+        return sectionEntries.length === 0
+          ? ""
+          : `${section}:\n${sectionEntries.map((entry) => `  - ${entry.yaml}`).join("\n")}\n`;
+      })
+      .join("");
+  const expected = composeWithInputs(MAIN_CONFIG, render(entries)).document;
+
+  for (let splitIndex = 1; splitIndex < entries.length; splitIndex++) {
+    const first = entries.slice(0, splitIndex);
+    const second = entries.slice(splitIndex);
+    const { document } = composeWithSiblings(MAIN_CONFIG, [
+      { text: render(first), spec: INPUTS_SPEC },
+      { text: render(second), spec: INPUTS_SPEC },
+    ]);
+    assert.deepEqual(document, expected, `split at entry ${splitIndex} changed the normalized document`);
+  }
+});
+
+test("repeated --inputs rejects duplicate paths, including symlink aliases", () => {
+  const directory = fs.mkdtempSync(path.join(os.tmpdir(), "state-mate-inputs-"));
+  try {
+    const inputPath = path.join(directory, "common.inputs.yaml");
+    const aliasPath = path.join(directory, "alias.inputs.yaml");
+    fs.writeFileSync(inputPath, INPUTS);
+    fs.symlinkSync(inputPath, aliasPath);
+    assert.throws(
+      () => resolveDistinctExplicitFilePaths("--inputs", [inputPath, aliasPath]),
+      /selected more than once/,
+    );
+  } finally {
+    fs.rmSync(directory, { recursive: true, force: true });
+  }
+});
+
+test("loadStateWithSiblings reports the invalid repeated input path", () => {
+  const directory = fs.mkdtempSync(path.join(os.tmpdir(), "state-mate-inputs-"));
+  try {
+    const mainPath = path.join(directory, "main.yaml");
+    const commonPath = path.join(directory, "common.inputs.yaml");
+    const invalidPath = path.join(directory, "invalid.inputs.yaml");
+    fs.writeFileSync(mainPath, MAIN_CONFIG);
+    fs.writeFileSync(commonPath, INPUTS);
+    fs.writeFileSync(invalidPath, 'externals:\n  - &bad "REPLACEME"\n');
+
+    const originalExit = process.exit;
+    const originalError = console.error;
+    const originalTrace = console.trace;
+    let message = "";
+    process.exit = (() => {
+      throw new Error("EXIT");
+    }) as typeof process.exit;
+    console.error = (value?: unknown) => {
+      message += String(value);
+    };
+    console.trace = () => {};
+    try {
+      assert.throws(
+        () =>
+          loadStateWithSiblings(mainPath, [
+            { path: commonPath, spec: INPUTS_SPEC },
+            { path: invalidPath, spec: INPUTS_SPEC },
+          ]),
+        /EXIT/,
+      );
+      assert.match(message, new RegExp(invalidPath.replaceAll(/[.*+?^${}()|[\]\\]/g, String.raw`\$&`)));
+    } finally {
+      process.exit = originalExit;
+      console.error = originalError;
+      console.trace = originalTrace;
+    }
+  } finally {
+    fs.rmSync(directory, { recursive: true, force: true });
+  }
 });
 
 test("multi-sibling: a label colliding across the two sibling files is rejected", () => {
@@ -388,7 +560,7 @@ externals:
         { text: deployed, spec: DEPLOYED_SPEC },
         { text: inputs, spec: INPUTS_SPEC },
       ]),
-    /defined in more than one delegated file/,
+    /already defined in another delegated file/,
   );
 });
 

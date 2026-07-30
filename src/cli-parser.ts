@@ -1,6 +1,6 @@
 import path from "node:path";
 
-import { program } from "commander";
+import { Command } from "commander";
 
 import { EntryField } from "./common";
 import { logErrorAndExit } from "./logger";
@@ -12,7 +12,10 @@ type CheckOnlyOptionType = null | {
   method?: string;
 };
 
-export function parseCmdLineArguments() {
+const collectOption = (value: string, previous: string[]): string[] => [...previous, value];
+
+export function parseCmdLineArguments(argv: string[] = process.argv) {
+  const program = new Command();
   program
     .argument("<config-path>", "path to .yaml state config file")
     .allowExcessArguments(false)
@@ -28,8 +31,11 @@ export function parseCmdLineArguments() {
     )
     .option(
       "--inputs <path>",
-      "path to a '.inputs' YAML file that provides the config/externals anchors for a wiring-only main " +
-        "config (defaults to the sibling '<name>.inputs.<ext>' if it exists)",
+      "path to a '.inputs' YAML file that provides some or all config/externals anchors for a wiring-only " +
+        "main config; repeat to compose disjoint input files (defaults to the sibling " +
+        "'<name>.inputs.<ext>' if omitted and that sibling exists)",
+      collectOption,
+      [],
     )
     .option(
       "--overrides <path>",
@@ -39,10 +45,16 @@ export function parseCmdLineArguments() {
     )
     .option("--update-abi", "download all ABIs replacing existing files")
     .option("--update-abi-missing", "download only missing ABIs (skip existing)")
-    .parse();
+    .parse(argv);
 
   const configPath = program.args[0];
   const options = program.opts();
+  const inputs = options.inputs as string[];
+  if (options.overrides && inputs.length > 1 && !options.generate) {
+    throw new Error(
+      `--overrides currently supports exactly one --inputs file; it cannot be combined with repeated --inputs options`,
+    );
+  }
   let checkOnly: CheckOnlyOptionType = null;
   if (options.only) {
     const checksPath = String(options.only).split("/");
@@ -66,7 +78,7 @@ export function parseCmdLineArguments() {
     checkOnlyCmdArg: options.only,
     generate: options.generate,
     deployed: options.deployed as string | undefined,
-    inputs: options.inputs as string | undefined,
+    inputs,
     overrides: options.overrides as string | undefined,
     updateAbi: options.updateAbi || options.updateAbiMissing,
     updateAbiMissingOnly: options.updateAbiMissing,

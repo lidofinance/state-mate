@@ -221,6 +221,13 @@ test("per-file: an empty/section-less overrides file is rejected", () => {
   assert.throws(() => composeWithOverrides(MAIN_CONFIG, INPUTS, "{}\n"), /the overrides file must contain/);
 });
 
+test("per-file: list-valued but empty overrides are rejected as a no-op", () => {
+  assert.throws(
+    () => composeWithOverrides(MAIN_CONFIG, INPUTS, "config: []\n"),
+    /must contain at least one labeled entry/,
+  );
+});
+
 test("base presence: an overrides file with no .inputs in play is rejected", () => {
   // A `.deployed` sibling satisfies the main aliases (so the alias-resolution check passes); the
   // overlay then has no `.inputs` base to override.
