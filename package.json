@@ -35,7 +35,7 @@
     ]
   },
   "devDependencies": {
-    "@commitlint/cli": "^21.0.2",
+    "@commitlint/cli": "^21.2.1",
     "@commitlint/config-conventional": "^21.1.0",
     "@eslint/compat": "^2.0.5",
     "@sinclair/typebox": "^0.34.49",
