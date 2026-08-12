@@ -14,6 +14,7 @@ type StoredAbi = { name: string; abi: Abi };
 let consolidatedAbisCache: Record<string, StoredAbi> | null = null;
 let pendingAbiUpdates: Record<string, StoredAbi> | null = null;
 const walkedAbiKeys = new Map<string, Set<string>>();
+const fetchedAbiKeys = new Map<string, Set<string>>();
 const CONSOLIDATED_ABI_FILENAME_GZ = "abis.json.gz";
 const KEYS_PREVIEW_LIMIT = 40;
 
@@ -38,7 +39,15 @@ function loadConsolidatedAbis(): Record<string, StoredAbi> {
   // the pre-consolidation format included, starts over instead of blocking its own rebuild
   const invalid = (reason: string): Record<string, StoredAbi> | never => {
     if (context.updateAbi) {
-      log(`${WARNING_MARK} ${chalk.yellow(`${reason}, rebuilding the store from scratch`)}`);
+      // The rebuild starts empty, so the unreadable archive is the only copy of whatever it
+      // holds; move it aside instead of overwriting it with a partial download. A later recovery
+      // must not overwrite an earlier backup either
+      let backupPath = `${abisPath}.invalid`;
+      for (let index = 1; fs.existsSync(backupPath); index++) backupPath = `${abisPath}.invalid.${index}`;
+      fs.renameSync(abisPath, backupPath);
+      log(
+        `${WARNING_MARK} ${chalk.yellow(`${reason}; the archive is preserved at ${chalk.magenta(backupPath)}, rebuilding the store from scratch`)}`,
+      );
       consolidatedAbisCache = {};
       return consolidatedAbisCache;
     }
@@ -134,21 +143,18 @@ export function keepStoredAbi(chainId: ChainId, address: string): string | undef
   const entry = loadConsolidatedAbis()[key];
   if (!entry) return undefined;
 
-  _markWalked(key);
+  _markFetched(key);
   return entry.name;
 }
 
 export async function checkAllAbi(chainId: ChainId, contractInfo: ContractInfo) {
-  const { contractName, address, abi, implementation } = contractInfo;
+  const { contractName, address, abi } = contractInfo;
   await _checkAbi(chainId, contractName, address, abi);
-  if (implementation) {
-    await _checkAbi(chainId, implementation.contractName, implementation.address, implementation.abi);
-  }
 }
 
 async function _checkAbi(chainId: ChainId, contractName: string, address: string, abiFromExplorer: Abi): Promise<void> {
   const key = getAbiKey(chainId, address);
-  _markWalked(key);
+  _markFetched(key);
   const logHandler = new LogCommand(`ABI ${chalk.magenta(`${contractName} @ ${address.toLowerCase()}`)}`);
 
   if (!context.updateAbi && Object.hasOwn(loadConsolidatedAbis(), key)) {
@@ -160,17 +166,29 @@ async function _checkAbi(chainId: ChainId, contractName: string, address: string
   logHandler.success(context.updateAbi ? "Downloaded" : "Saved");
 }
 
-/** Reports whether this run already fetched or kept the address, whatever config did it. */
-export function wasWalkedThisRun(chainId: ChainId, address: string): boolean {
-  return walkedAbiKeys.get(getConsolidatedAbiPath())?.has(getAbiKey(chainId, address)) ?? false;
+/**
+ * Reports whether this run already re-downloaded or kept the address, whatever config did it.
+ * Reading an ABI for checks does not count: a rebuild must still refresh it.
+ */
+export function wasFetchedThisRun(chainId: ChainId, address: string): boolean {
+  return fetchedAbiKeys.get(getConsolidatedAbiPath())?.has(getAbiKey(chainId, address)) ?? false;
 }
 
 function _markWalked(key: string) {
+  _markIn(walkedAbiKeys, key);
+}
+
+function _markFetched(key: string) {
+  _markIn(walkedAbiKeys, key);
+  _markIn(fetchedAbiKeys, key);
+}
+
+function _markIn(registry: Map<string, Set<string>>, key: string) {
   const storePath = getConsolidatedAbiPath();
-  let keys = walkedAbiKeys.get(storePath);
+  let keys = registry.get(storePath);
   if (!keys) {
     keys = new Set();
-    walkedAbiKeys.set(storePath, keys);
+    registry.set(storePath, keys);
   }
   keys.add(key);
 }
@@ -196,6 +214,7 @@ export function resetAbiCache(): void {
 /** Only tests run more than one --update-abi rebuild per process. */
 export function resetAbiRebuildState(): void {
   walkedAbiKeys.clear();
+  fetchedAbiKeys.clear();
 }
 
 /**
@@ -216,7 +235,9 @@ export function pruneAbiStores(): void {
       const kept = Object.fromEntries(Object.entries(store).filter(([key]) => walked.has(key.toLowerCase())));
       const dropped = Object.keys(store).length - Object.keys(kept).length;
       if (dropped === 0) continue;
-      fs.writeFileSync(storePath, zlib.gzipSync(JSON.stringify(kept, null, 2)));
+      // temp + rename keeps the store whole if the write dies short, same as flushAbiUpdates
+      fs.writeFileSync(`${storePath}.tmp`, zlib.gzipSync(JSON.stringify(kept, null, 2)));
+      fs.renameSync(`${storePath}.tmp`, storePath);
       log(`Pruned ${chalk.yellow(dropped)} ABI entries no config references from ${chalk.magenta(storePath)}`);
     } catch (error) {
       // A store the sweep cannot read keeps its extra keys, which is safe; the other stores
@@ -236,7 +257,9 @@ export function flushAbiUpdates(): void {
   const outputPath = getConsolidatedAbiPath();
   try {
     const compressed = zlib.gzipSync(JSON.stringify(pendingAbiUpdates, null, 2));
-    fs.writeFileSync(outputPath, compressed);
+    // temp + rename keeps the store whole if the process dies mid-write
+    fs.writeFileSync(`${outputPath}.tmp`, compressed);
+    fs.renameSync(`${outputPath}.tmp`, outputPath);
 
     // Update cache only after successful write
     consolidatedAbisCache = pendingAbiUpdates;

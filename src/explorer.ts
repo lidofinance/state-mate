@@ -2,19 +2,8 @@ import chalk from "chalk";
 import { Contract, JsonRpcProvider } from "ethers";
 
 import { printError } from "./common";
-import { log, logErrorAndExit, logReplaceLine, WARNING_MARK } from "./logger";
-import {
-  Abi,
-  AbiArgumentsLength,
-  CommonResponseOkResult,
-  ContractInfo,
-  isCommonResponseOkResult,
-  isResponseBad,
-  isResponseOk,
-  isValidAbi,
-  MethodCallResults,
-  ResponseBad,
-} from "./types";
+import { log, logErrorAndExit, WARNING_MARK } from "./logger";
+import { Abi, ContractInfo, isCommonResponseOkResult, isResponseBad, isResponseOk, isValidAbi } from "./types";
 
 /** Blockscout instances serve ABIs without a key; etherscan does not. */
 export function explorerNeedsApiKey(explorerHostname: string): boolean {
@@ -25,61 +14,24 @@ export function loadContract(address: string, abi: Abi, provider: JsonRpcProvide
   return new Contract(address, abi as unknown as string, provider);
 }
 
-export async function collectStaticCallResults(
-  nonMutables: AbiArgumentsLength,
-  contract: Contract,
-): Promise<MethodCallResults> {
-  const results: MethodCallResults = [];
-
-  for (const { name: methodName, numArgs } of nonMutables) {
-    let viewFunction: ReturnType<typeof contract.getFunction>;
-    try {
-      viewFunction = contract.getFunction(methodName);
-    } catch {
-      logErrorAndExit(`Failed to get method ${chalk.yellow(methodName)} from contract`);
-    }
-    let staticCallResult: string;
-    logReplaceLine(`${methodName}...`);
-    if (numArgs === 0) {
-      try {
-        const result: unknown = await viewFunction.staticCall();
-        staticCallResult = ` ${result}`;
-      } catch {
-        staticCallResult = " view call reverted";
-      }
-    } else {
-      staticCallResult = " need to specify args";
-    }
-    results.push({ methodName, staticCallResult });
-  }
-  logReplaceLine(`Done\n`);
-  return results;
-}
-
-// Etherscan, blockscout and mode answer getsourcecode alike and only disagree on the key that
-// carries the implementation address
-type ExplorerContractResult = CommonResponseOkResult & {
-  Implementation?: string;
-  ImplementationAddress?: string;
-  ImplementationAddresses?: string[];
-};
-
-function implementationAddressOf(result: ExplorerContractResult): string | undefined {
-  const candidates = [result.Implementation, result.ImplementationAddress, result.ImplementationAddresses?.[0]];
-  return candidates.find((candidate) => typeof candidate === "string" && candidate.length > 0);
-}
-
 const RATE_LIMIT_RETRY_MS = 6 * 1000; // 5 seconds is not enough for BscScan free tier
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-async function retryOnRateLimit(response: ResponseBad, sourcesUrl: string, explorerHostname: string) {
-  if (!response.result.includes("rate limit") && !response.message.includes("rate limit")) {
-    return response;
+// A proxy answers a burst with a plain 429, an overloaded backend with a 5xx or a 408 timeout;
+// for an idempotent request all of them deserve another try
+const isTransientHttpStatus = (status: number) => status === 408 || status === 429 || status >= 500;
+
+// Carries whether one more attempt could help, so the single retry loop upstairs can decide
+// without parsing messages
+class ExplorerHttpError extends Error {
+  constructor(
+    message: string,
+    readonly transient: boolean,
+    readonly retryDelayMs = 0,
+  ) {
+    super(message);
   }
-  log(`Reached rate limit ${explorerHostname}, waiting for ${RATE_LIMIT_RETRY_MS} ms...`);
-  await sleep(RATE_LIMIT_RETRY_MS);
-  return httpGetAsync(sourcesUrl);
 }
 
 export async function loadContractInfo(
@@ -87,32 +39,51 @@ export async function loadContractInfo(
   explorerHostname: string,
   explorerKey?: string,
   chainId?: number | string,
-  visited: Set<string> = new Set(),
 ): Promise<ContractInfo | undefined> {
-  visited.add(address.toLowerCase());
+  let outcome = await _fetchContractInfo(address, explorerHostname, explorerKey, chainId);
+  if (!outcome.contract && outcome.transient) {
+    if (outcome.retryDelayMs) await sleep(outcome.retryDelayMs);
+    outcome = await _fetchContractInfo(address, explorerHostname, explorerKey, chainId);
+  }
+  return outcome.contract;
+}
+
+type FetchOutcome = { contract?: ContractInfo; retryDelayMs?: number; transient?: boolean };
+
+async function _fetchContractInfo(
+  address: string,
+  explorerHostname: string,
+  explorerKey?: string,
+  chainId?: number | string,
+): Promise<FetchOutcome> {
   const sourcesUrl = _getExplorerApiUrl(explorerHostname, address, explorerKey, chainId);
 
   // One address the explorer cannot serve, an unverified contract or a dead host for instance, must
-  // not take the whole run down: the caller skips it and the ABIs downloaded so far reach the store
-  const skip = (reason: string): undefined => {
+  // not take the whole run down: the caller skips it and the ABIs downloaded so far reach the store.
+  // `transient` marks the failures worth one more fetch, against the definitive answers
+  const skip = (reason: string, transient = false, retryDelayMs = 0): FetchOutcome => {
     log(`${WARNING_MARK} ${chalk.yellow(`ABI ${address}: ${reason}`)}`);
+    return { retryDelayMs, transient };
   };
 
   let sourcesResponse: unknown;
   try {
     sourcesResponse = await httpGetAsync(sourcesUrl);
-    if (isResponseBad(sourcesResponse)) {
-      sourcesResponse = await retryOnRateLimit(sourcesResponse, sourcesUrl, explorerHostname);
-    }
   } catch (error) {
-    return skip(`${explorerHostname} is unreachable: ${printError(error)}`);
+    const transient = error instanceof ExplorerHttpError && error.transient;
+    const retryDelayMs = error instanceof ExplorerHttpError ? error.retryDelayMs : 0;
+    return skip(`${explorerHostname} is unreachable: ${printError(error)}`, transient, retryDelayMs);
   }
 
   if (isResponseBad(sourcesResponse)) {
-    return skip(`${explorerHostname} refused: ${sourcesResponse.message} ${JSON.stringify(sourcesResponse.result)}`);
+    const answer = `${sourcesResponse.message} ${JSON.stringify(sourcesResponse.result)}`;
+    // "not verified" is the explorer's final word; a rate limit deserves the retry after the
+    // longer pause the free tiers want, an unexplained refusal after none
+    if (/not verified/i.test(answer)) return skip(`${explorerHostname} refused: ${answer}`);
+    return skip(`${explorerHostname} refused: ${answer}`, true, /rate limit/i.test(answer) ? RATE_LIMIT_RETRY_MS : 0);
   }
   if (!isResponseOk(sourcesResponse)) {
-    return skip(`unexpected explorer response ${JSON.stringify(sourcesResponse)}`);
+    return skip(`unexpected explorer response ${JSON.stringify(sourcesResponse)}`, true);
   }
   const result = sourcesResponse.result[0];
   if (!isCommonResponseOkResult(result)) {
@@ -129,17 +100,8 @@ export async function loadContractInfo(
     return skip(`ABI is not valid (type mismatch): ${JSON.stringify(abi)}`);
   }
 
-  const implementationAddress = implementationAddressOf(result);
-  // An implementation chain that loops back on itself, a broken proxy for instance, would keep
-  // the walk going forever
-  const shouldDescend = implementationAddress && !visited.has(implementationAddress.toLowerCase());
   return {
-    abi,
-    address,
-    contractName: result.ContractName,
-    implementation: shouldDescend
-      ? await loadContractInfo(implementationAddress, explorerHostname, explorerKey, chainId, visited)
-      : undefined,
+    contract: { abi, address, contractName: result.ContractName },
   };
 }
 
@@ -160,32 +122,28 @@ export function resetRequestSlots(): void {
   nextRequestAt = 0;
 }
 
-export async function httpGetAsync<T>(url: string): Promise<T> | never {
-  for (let attempt = 0; ; attempt++) {
-    const delay = reserveRequestSlot(Date.now());
-    if (delay > 0) await sleep(delay);
-    let response: Response;
-    try {
-      response = await fetch(url, { method: "GET" });
-    } catch (error) {
-      throw new Error(`Failed to fetch contract source code: ${printError(error)}`);
-    }
-    // A proxy in front of the explorer answers a burst with a plain 429 instead of the JSON-style
-    // rate-limit body; give it the same single retry
-    if (response.status === 429 && attempt === 0) {
-      await sleep(RATE_LIMIT_RETRY_MS);
-      continue;
-    }
-    if (!response.ok) {
-      throw new Error(
-        `Failed to fetch contract source code: HTTP status code ${response.status}: ${response.statusText}`,
-      );
-    }
-    try {
-      return (await response.json()) as T;
-    } catch (error) {
-      throw new Error(`Failed to fetch contract source code: ${printError(error)}`);
-    }
+// A single request with no retries of its own: loadContractInfo owns the whole retry budget,
+// and a second layer of attempts here would multiply it
+export async function httpGetAsync<T>(url: string): Promise<T> {
+  const delay = reserveRequestSlot(Date.now());
+  if (delay > 0) await sleep(delay);
+  let response: Response;
+  try {
+    response = await fetch(url, { method: "GET" });
+  } catch (error) {
+    throw new ExplorerHttpError(`Failed to fetch contract source code: ${printError(error)}`, true);
+  }
+  if (!response.ok) {
+    throw new ExplorerHttpError(
+      `Failed to fetch contract source code: HTTP status code ${response.status}: ${response.statusText}`,
+      isTransientHttpStatus(response.status),
+      response.status === 429 ? RATE_LIMIT_RETRY_MS : 0,
+    );
+  }
+  try {
+    return (await response.json()) as T;
+  } catch (error) {
+    throw new ExplorerHttpError(`Failed to fetch contract source code: ${printError(error)}`, true);
   }
 }
 
@@ -197,30 +155,51 @@ export async function fetchExplorerChainId(
   explorerHostname: string,
   explorerKey?: string,
 ): Promise<string | undefined> {
-  try {
-    const response = await fetch(`https://${explorerHostname}/api/eth-rpc`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ jsonrpc: "2.0", method: "eth_chainId", params: [], id: 1 }),
-    });
-    if (response.ok) {
+  // A probe nobody answered blocks ABI downloads outright, so each route gets its own bounded
+  // retry on a flake; the two-fetch budget of loadContractInfo is not involved.
+  // The eth-rpc route is the one every checked blockscout actually serves, so giving up on it
+  // early would send the probe to a fallback that answers "Unknown module"
+  for (let attempt = 0; attempt < 2; attempt++) {
+    try {
+      const response = await fetch(`https://${explorerHostname}/api/eth-rpc`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ jsonrpc: "2.0", method: "eth_chainId", params: [], id: 1 }),
+      });
+      if (!response.ok) {
+        if (!isTransientHttpStatus(response.status) || attempt > 0) break;
+        if (response.status === 429) await sleep(RATE_LIMIT_RETRY_MS);
+        continue;
+      }
       const decimal = _hexToDecimal(((await response.json()) as { result?: unknown }).result);
       if (decimal !== undefined) return decimal;
+      // the host answered without a chainId: it does not serve this route
+      break;
+    } catch {
+      if (attempt > 0) break;
+      /* a network flake: one more try, then the etherscan-compatible endpoint */
     }
-  } catch {
-    /* fall through to the etherscan-compatible endpoint */
   }
 
   let url = `https://${explorerHostname}/api?module=proxy&action=eth_chainId`;
   if (explorerKey) {
     url += `&apikey=${explorerKey}`;
   }
-  try {
-    const response = await httpGetAsync<{ result?: unknown }>(url);
-    return _hexToDecimal(response.result);
-  } catch {
-    return undefined;
+  for (let attempt = 0; attempt < 2; attempt++) {
+    try {
+      const response = await httpGetAsync<{ message?: unknown; result?: unknown }>(url);
+      const decimal = _hexToDecimal(response.result);
+      if (decimal !== undefined) return decimal;
+      // a rate-limited answer arrives as HTTP 200 with a JSON complaint; worth the second try
+      const answer = `${String(response.message ?? "")} ${JSON.stringify(response.result ?? "")}`;
+      if (!/rate limit/i.test(answer) || attempt > 0) return undefined;
+      await sleep(RATE_LIMIT_RETRY_MS);
+    } catch (error) {
+      if (!(error instanceof ExplorerHttpError) || !error.transient || attempt > 0) return undefined;
+      if (error.retryDelayMs) await sleep(error.retryDelayMs);
+    }
   }
+  return undefined;
 }
 
 const TRANSIENT_RPC_RETRY_MS = 2000;
@@ -274,23 +253,24 @@ export async function assertProviderChain(provider: JsonRpcProvider, chainId: st
 
 const verifiedExplorerChains = new Set<string>();
 
+/** Returns whether the explorer vouched for the chain; a mismatch exits outright. */
 export async function verifyChainIdWithExplorer(
   explorerHostname: string,
   chainId: string,
   explorerKey?: string,
-): Promise<void> {
+): Promise<boolean> {
   // etherscan v2 takes the chain as a request parameter, so the host cannot disagree with it;
   // only a host that serves a single fixed chain can contradict the config
-  if (explorerHostname.includes("etherscan.io")) return;
+  if (explorerHostname.includes("etherscan.io")) return true;
 
   // one probe per host and chain: the ABI pass and the checks pass ask about the same sections
   const memoKey = `${explorerHostname}|${chainId}`;
-  if (verifiedExplorerChains.has(memoKey)) return;
+  if (verifiedExplorerChains.has(memoKey)) return true;
 
   const explorerChainId = await fetchExplorerChainId(explorerHostname, explorerKey);
   if (explorerChainId === undefined) {
     log(`${WARNING_MARK} ${chalk.yellow(`could not verify chainId ${chainId} against explorer ${explorerHostname}`)}`);
-    return;
+    return false;
   }
   if (explorerChainId !== chainId) {
     logErrorAndExit(
@@ -298,6 +278,7 @@ export async function verifyChainIdWithExplorer(
     );
   }
   verifiedExplorerChains.add(memoKey);
+  return true;
 }
 
 function _getExplorerApiUrl(

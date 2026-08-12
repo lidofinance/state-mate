@@ -1,6 +1,6 @@
 ---
 name: state-mate
-description: Use this skill when writing, debugging, or reviewing state-mate YAML configs that verify on-chain EVM contract state — proxy patterns and their storage, multisig wallets, role-based access control, ABI resolution, generating starter configs, and discovering unknown on-chain values. Also applies when verifying or auditing a deployment against a config: pre-vote state review, role audit, checking that implementations are neutered and constants aren't forged. Applies even when the user just says a check is failing or asks to add a contract to an existing config, without naming state-mate explicitly.
+description: Use this skill when writing, debugging, or reviewing state-mate YAML configs that verify on-chain EVM contract state — proxy patterns and their storage, multisig wallets, role-based access control, ABI resolution, and discovering unknown on-chain values. Also applies when verifying or auditing a deployment against a config: pre-vote state review, role audit, checking that implementations are neutered and constants aren't forged. Applies even when the user just says a check is failing or asks to add a contract to an existing config, without naming state-mate explicitly.
 ---
 
 # State-Mate Skill

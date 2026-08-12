@@ -14,6 +14,8 @@ const EIP1967_IMPLEMENTATION_SLOT = "0x360894a13ba1a3210667c828492db98dca3e2076c
 const EIP1967_ADMIN_SLOT = "0xb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d6103";
 // implementation(). Aragon-style proxies leave the slot empty and expose this getter instead
 const IMPLEMENTATION_SELECTOR = "0x5c60da1b";
+// proxy__getImplementation(), the OssifiableProxy getter
+const PROXY_GET_IMPLEMENTATION_SELECTOR = "0xad729a71";
 // owner()
 const OWNER_SELECTOR = "0x8da5cb5b";
 const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
@@ -64,6 +66,21 @@ async function callAsAddress(
   return addressFromWord(await callWord(provider, address, selector));
 }
 
+/** Numeric comparison, so hex case, word width and leading zeros do not matter. */
+function sameWord(a: string, b: string): boolean {
+  try {
+    return BigInt(a) === BigInt(b);
+  } catch {
+    return false;
+  }
+}
+
+/** True when a `storage:` check already pins the same word. */
+function pinsStorageWord(contractEntry: ContractEntry, slot: string, expected: string): boolean {
+  const { storage } = contractEntry as { storage?: { expected: string; slot: string }[] };
+  return (storage ?? []).some((check) => sameWord(check.slot, slot) && sameWord(check.expected, expected));
+}
+
 /**
  * Verifies `implementation:` against the chain for every entry, including entries with no
  * `proxyChecks`. A stale address, or a proxy described as a regular contract, makes state-mate
@@ -77,6 +94,13 @@ export async function checkImplementation(provider: JsonRpcProvider, contractEnt
   const proxyEntry = isTypeOfTB(contractEntry, ProxyContractEntryTB) ? contractEntry : undefined;
   const expected = proxyEntry?.implementation;
 
+  // Let the storage validator own an assertion the config already expresses. Running the same
+  // eth_getStorageAt twice would only duplicate the check and its counters.
+  const implementationSlot = SAFE_PROXY_NAMES.has(proxyEntry?.proxyName ?? "")
+    ? SAFE_SINGLETON_SLOT
+    : EIP1967_IMPLEMENTATION_SLOT;
+  if (expected && pinsStorageWord(contractEntry, implementationSlot, expected)) return;
+
   setErrorContext({ checksType: "implementation", method: "implementation" });
   const logHandle = new LogCommand("implementation");
   // An inconclusive read is a skip, not a pass: only a verdict counts towards the totals
@@ -86,49 +110,84 @@ export async function checkImplementation(provider: JsonRpcProvider, contractEnt
     incErrors(message);
   };
 
-  const slotRead = await readSlotWord(provider, address, EIP1967_IMPLEMENTATION_SLOT);
-  const slotImplementation = addressFromWord(slotRead.word);
+  let actual: string | undefined;
 
-  if (!expected) {
-    // Judge an undeclared entry by this slot alone. A beacon answers implementation() legitimately,
-    // and the first slot of an ordinary contract holds whatever its first variable is
-    if (slotImplementation) {
-      const complaint = proxyEntry?.proxyName
-        ? `the config pins no implementation. Add ${chalk.yellow("implementation")}`
-        : `the config describes it as a regular contract. ` +
-          `Add ${chalk.yellow("proxyName")} and ${chalk.yellow("implementation")}`;
-      fail(`${address} delegates to ${slotImplementation}, but ${complaint}, or ${BYPASS_HINT}`);
+  if (SAFE_PROXY_NAMES.has(proxyEntry?.proxyName ?? "")) {
+    // A SafeProxy delegates to slot 0 whatever the EIP-1967 slot holds, and answers no getters,
+    // so slot 0 is the only read that can vouch for it
+    const safeSlot = await readSlotWord(provider, address, SAFE_SINGLETON_SLOT);
+    if (safeSlot.failed) {
+      fail(`the singleton slot of ${address} could not be read, so nothing was verified; retry, or ${BYPASS_HINT}`);
       return;
     }
-    if (SAFE_PROXY_NAMES.has(proxyEntry?.proxyName ?? "")) {
-      // A Safe keeps its singleton in slot 0; a storage: check may pin it, so a missing
-      // implementation only warns
-      const safeSlot = await readSlotWord(provider, address, SAFE_SINGLETON_SLOT);
-      const singleton = addressFromWord(safeSlot.word);
-      if (singleton) {
+    const singleton = addressFromWord(safeSlot.word);
+    if (!expected) {
+      if (!singleton) {
+        fail(
+          `${address} is declared ${proxyEntry?.proxyName}, but no implementation could be read on-chain. ` +
+            `Add ${chalk.yellow("implementation")}, or ${BYPASS_HINT}`,
+        );
+        return;
+      }
+      // A storage: check pinning slot 0 to the same singleton asserts the linkage elsewhere in
+      // the entry; anything less leaves the delegation unverified
+      if (pinsStorageWord(contractEntry, SAFE_SINGLETON_SLOT, singleton)) {
         logHandle.warning(`delegates to ${singleton}, but the config pins no implementation`);
         return;
       }
-    }
-    if (slotRead.failed) {
-      logHandle.warning("could not be read on-chain, skipped");
+      fail(
+        `${address} delegates to ${singleton}, but the config pins no implementation. ` +
+          `Add ${chalk.yellow("implementation")}, or ${BYPASS_HINT}`,
+      );
       return;
     }
-    incChecks();
-    logHandle.success("not a proxy");
-    return;
+    actual = singleton;
+  } else {
+    const slotRead = await readSlotWord(provider, address, EIP1967_IMPLEMENTATION_SLOT);
+    const slotImplementation = addressFromWord(slotRead.word);
+
+    if (!expected) {
+      // Judge an undeclared entry by this slot alone. A beacon answers implementation()
+      // legitimately, and the first slot of an ordinary contract holds whatever its first
+      // variable is
+      if (slotImplementation) {
+        const complaint = proxyEntry?.proxyName
+          ? `the config pins no implementation. Add ${chalk.yellow("implementation")}`
+          : `the config describes it as a regular contract. ` +
+            `Add ${chalk.yellow("proxyName")} and ${chalk.yellow("implementation")}`;
+        fail(`${address} delegates to ${slotImplementation}, but ${complaint}, or ${BYPASS_HINT}`);
+        return;
+      }
+      if (slotRead.failed) {
+        fail(
+          `the implementation slot of ${address} could not be read, so nothing was verified; retry, or ${BYPASS_HINT}`,
+        );
+        return;
+      }
+      if (proxyEntry?.proxyName) {
+        // The config calls it a proxy; a getter may still name the implementation the empty
+        // EIP-1967 slot did not, and either way "not a proxy" would contradict the config
+        const viaGetter =
+          (await callAsAddress(provider, address, IMPLEMENTATION_SELECTOR)) ??
+          (await callAsAddress(provider, address, PROXY_GET_IMPLEMENTATION_SELECTOR));
+        const complaint = viaGetter
+          ? `${address} delegates to ${viaGetter}, but the config pins no implementation`
+          : `${address} is declared ${proxyEntry.proxyName}, but no implementation could be read on-chain`;
+        fail(`${complaint}. Add ${chalk.yellow("implementation")}, or ${BYPASS_HINT}`);
+        return;
+      }
+      incChecks();
+      logHandle.success("not a proxy");
+      return;
+    }
+
+    // The config declares this one a proxy, so the riskier reads are safe to try
+    actual = slotImplementation ?? (await callAsAddress(provider, address, IMPLEMENTATION_SELECTOR));
+    actual ??= await callAsAddress(provider, address, PROXY_GET_IMPLEMENTATION_SELECTOR);
   }
 
-  // The config declares this one a proxy, so the riskier reads are safe to try
-  let actual = slotImplementation ?? (await callAsAddress(provider, address, IMPLEMENTATION_SELECTOR));
-  if (!actual && SAFE_PROXY_NAMES.has(proxyEntry?.proxyName ?? "")) {
-    const safeSlot = await readSlotWord(provider, address, SAFE_SINGLETON_SLOT);
-    actual = addressFromWord(safeSlot.word);
-  }
-
-  // Beacon proxies and a rate-limited RPC land here alike, and neither proves the config wrong
   if (!actual) {
-    logHandle.warning("could not be read on-chain, skipped");
+    fail(`the implementation of ${address} could not be read, so nothing was verified; retry, or ${BYPASS_HINT}`);
     return;
   }
 
@@ -151,7 +210,6 @@ export async function checkImplementation(provider: JsonRpcProvider, contractEnt
  */
 export async function checkProxyAdminOwner(provider: JsonRpcProvider, contractEntry: ContractEntry): Promise<void> {
   if (!isTypeOfTB(contractEntry, ProxyContractEntryTB) || !contractEntry.proxyAdminOwner) return;
-  if (context.checkOnly?.checksType) return;
 
   const { address, proxyAdminOwner: expected } = contractEntry;
   setErrorContext({ checksType: "proxyAdminOwner", method: "proxyAdminOwner" });

@@ -75,9 +75,12 @@ misc:
   - &FOO "foo"
 
 deployed:
-  # Contract addresses
-  - &myContract "0x0000000000000000000000000000000000000001"
-  - &adminMultisig "0x0000000000000000000000000000000000000002"
+  # Contract addresses, grouped by chain; implementations included — this list is what
+  # the ABI download walks
+  l1:
+    - &myContract "0x0000000000000000000000000000000000000001"
+    - &myContractImpl "0x0000000000000000000000000000000000000003"
+    - &adminMultisig "0x0000000000000000000000000000000000000002"
 
 roles:
   # ACL checks
@@ -85,11 +88,13 @@ roles:
 
 l1:
   rpcUrl: ETH_RPC_URL # env variable
+  chainId: 1
   contracts:
     myContract:
-      name: "myContract"
+      name: "MyContract"
       address: *myContract
-      implementation: "%implementation address%"
+      proxyName: OssifiableProxy
+      implementation: *myContractImpl
       proxyChecks:
         proxy__getAdmin: *adminMultisig
       checks:
@@ -114,10 +119,10 @@ The chain ID distinguishes contracts deployed at the same address on different n
 
 `implementation:` decides which ABI the `checks` run against, so state-mate verifies it against the chain for every contract entry, with or without `proxyChecks`:
 
-- an entry with `implementation:` must name the address the proxy delegates to. state-mate reads the EIP-1967 slot, falls back to `implementation()`, then to the first storage slot where Safe keeps its singleton;
-- an entry without `implementation:` must have an empty EIP-1967 slot. A non-empty slot means a proxy is described as a regular contract, and every check runs against the proxy ABI instead of the implementation's.
+- an entry with `implementation:` must name the address the proxy delegates to. state-mate reads the EIP-1967 slot, falls back to `implementation()`, then `proxy__getImplementation()`. For `proxyName: SafeProxy` or `GnosisSafeProxy` only the singleton slot is read: a Safe delegates to slot 0 whatever the EIP-1967 slot holds, and answers no getters;
+- an entry without `implementation:` must have an empty EIP-1967 slot. A non-empty slot means a proxy is described as a regular contract, and every check runs against the proxy ABI instead of the implementation's. An entry that declares `proxyName:` but pins no `implementation:` fails; a Safe warns instead when a `storage:` check pins slot 0 to the same singleton.
 
-Aragon proxies and Safes keep the implementation outside the EIP-1967 slot, so state-mate verifies them only when the config declares them as proxies; the Safe singleton slot is read only for `proxyName: SafeProxy` or `GnosisSafeProxy`, because anywhere else the first slot holds an ordinary variable. When no read returns an address, the check prints a warning and moves on. `--skip-implementation-check` turns the check off, and so does narrowing a run to one checks type (`-o l1/contractName/checks`); the `proxyAdminOwner:` check stays on either way, since it runs only where the config asks for it.
+Aragon proxies and Safes keep the implementation outside the EIP-1967 slot, so state-mate verifies them only when the config declares them as proxies; the Safe singleton slot is read only for `proxyName: SafeProxy` or `GnosisSafeProxy`, because anywhere else the first slot holds an ordinary variable. A read that answers nothing fails the check — an unverified proxy must never pass silently; `--skip-implementation-check` is the deliberate bypass, and narrowing a run to one checks type (`-o l1/contractName/checks`) skips it too. The `proxyAdminOwner:` check stays on either way, since it runs only where the config asks for it.
 
 #### Proxy admin owner
 
@@ -138,6 +143,8 @@ state-mate reads the admin slot and calls `owner()` on whatever it finds, so the
 #### Updating ABIs
 
 Every run downloads the ABIs missing from `abis.json.gz`, so a config that gained an address needs no flag. Bytecode at an address never changes, so a stored ABI is never stale on its own.
+
+When a run has ABIs to download, state-mate first asks the explorer for its chain ID and compares it with the config's. A mismatch stops the run; an explorer that cannot answer blocks the downloads too, since an ABI it serves could come from another network and would be stored under the config's chain ID regardless. `--allow-unverified-explorer` lifts the block deliberately. A run with a full store asks the explorer nothing, so the checks never wait on it.
 
 `--update-abi` rebuilds the store instead: it re-downloads every address the run walks and drops the entries no config references any more. An address the explorer refuses to serve keeps the ABI already stored for it, so a rebuild cannot lose a contract that was verified once and is not any more. CI runs pass `--quiet` to keep only failures and totals in the log.
 

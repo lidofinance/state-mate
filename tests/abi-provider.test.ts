@@ -18,7 +18,7 @@ import {
   resetAbiRebuildState,
 } from "../src/abi-provider";
 import { EntryField } from "../src/common";
-import { context } from "../src/context";
+import { context, resetStats, stats } from "../src/context";
 import { fetchExplorerChainId } from "../src/explorer";
 import { SectionValidatorBase } from "../src/section-validators/base";
 import * as stateMate from "../src/state-mate";
@@ -97,6 +97,7 @@ function expectExit(callback: () => unknown): string {
 
 afterEach(() => {
   context.updateAbi = false;
+  context.allowUnverifiedExplorer = false;
   resetAbiRebuildState();
   for (const directory of temporaryDirectories) {
     fs.rmSync(directory, { recursive: true, force: true });
@@ -153,12 +154,15 @@ describe("downloadAndCheckAllAbi", () => {
     });
 
     try {
+      // a blockscout-style host: etherscan skips the chain probe anyway, so it could not prove
+      // that a full store keeps the run silent
       await stateMate.downloadAndCheckAllAbi({
         deployed: { l1: [PROXY_ADDRESS] },
-        l1: { rpcUrl: "http://localhost:1", explorerHostname: "api.etherscan.io", chainId: 1 },
+        l1: { rpcUrl: "http://localhost:1", explorerHostname: "idle.blockscout.example", chainId: 1 },
       } as EntireDocument);
-      const sourceRequests = fetchMock.mock.calls.filter((c) => String(c.arguments[0]).includes("getsourcecode"));
-      assert.equal(sourceRequests.length, 0);
+      // with nothing to download, neither a source request nor a chain probe may fire: a full
+      // store must not depend on the explorer being awake
+      assert.equal(fetchMock.mock.calls.length, 0);
     } finally {
       fetchMock.mock.restore();
     }
@@ -277,6 +281,103 @@ describe("downloadAndCheckAllAbi", () => {
     assert.equal(store[scopedKey(ETH_CHAIN_ID, PROXY_ADDRESS)].name, "OssifiableProxy");
   });
 
+  it("refuses to download from an explorer that does not confirm the chain, unless allowed", async () => {
+    // the store key takes chainId from the YAML, so an ABI served by an explorer of another
+    // network would be filed under the wrong chain and verify the wrong contract
+    const directory = setupConfigDirectory();
+    const fetchMock = mock.method(globalThis, "fetch", async (url: Parameters<typeof fetch>[0]) => {
+      if (/eth-rpc|eth_chainId/.test(String(url))) {
+        return { ok: true, json: async () => ({ status: "0", message: "NOTOK", result: "no rpc here" }) } as Response;
+      }
+      return {
+        ok: true,
+        json: async () => ({
+          status: "1",
+          message: "OK",
+          result: [{ ABI: JSON.stringify(WORMHOLE_ABI), ContractName: "ForeignChainContract" }],
+        }),
+      } as Response;
+    });
+    const jsonDocument = {
+      deployed: { l1: [PROXY_ADDRESS] },
+      l1: { rpcUrl: "http://localhost:1", explorerHostname: "unverified.blockscout.example", chainId: ETH_CHAIN_ID },
+    } as EntireDocument;
+
+    const originalExit = process.exit;
+    let exited = false;
+    process.exit = (() => {
+      exited = true;
+      throw new ExitSignal();
+    }) as typeof process.exit;
+    try {
+      await stateMate.downloadAndCheckAllAbi(jsonDocument);
+    } catch (error) {
+      if (!(error instanceof ExitSignal)) throw error;
+    } finally {
+      process.exit = originalExit;
+    }
+    assert.equal(exited, true, "a missing ABI plus an unconfirmed explorer must stop the run");
+    assert.equal(fs.existsSync(path.join(directory, "abis.json.gz")), false, "nothing may reach the store");
+
+    // the flag is the deliberate bypass
+    context.allowUnverifiedExplorer = true;
+    try {
+      await stateMate.downloadAndCheckAllAbi(jsonDocument);
+    } finally {
+      fetchMock.mock.restore();
+    }
+    assert.equal(readStore(directory)[scopedKey(ETH_CHAIN_ID, PROXY_ADDRESS)].name, "ForeignChainContract");
+  });
+
+  it("downloads the ABI pinned at implementation: even when the proxy itself is stored", async () => {
+    // a Safe singleton lives in implementation: and nowhere in deployed; a store that already
+    // holds the proxy must not suppress the singleton download
+    const directory = setupConfigDirectory({
+      [scopedKey(ETH_CHAIN_ID, PROXY_ADDRESS)]: { name: "SafeProxy", abi: PROXY_ABI },
+    });
+    const fetchMock = mock.method(globalThis, "fetch", async (url: Parameters<typeof fetch>[0]) => {
+      if (/eth_gasPrice|eth-rpc|eth_chainId/.test(String(url))) {
+        return { ok: true, json: async () => ({ jsonrpc: "2.0", id: 83, result: "0x1" }) } as Response;
+      }
+      return {
+        ok: true,
+        json: async () => ({
+          status: "1",
+          message: "OK",
+          result: [{ ABI: JSON.stringify(LIDO_ABI), ContractName: "GnosisSafe" }],
+        }),
+      } as Response;
+    });
+
+    try {
+      await stateMate.downloadAndCheckAllAbi({
+        deployed: { l1: [PROXY_ADDRESS] },
+        l1: {
+          rpcUrl: "http://localhost:1",
+          explorerHostname: "api.etherscan.io",
+          chainId: ETH_CHAIN_ID,
+          contracts: {
+            multisig: {
+              name: "GnosisSafe",
+              address: PROXY_ADDRESS,
+              proxyName: "SafeProxy",
+              implementation: IMPL_ADDRESS,
+              proxyChecks: {},
+              checks: {},
+            },
+          },
+        },
+      } as unknown as EntireDocument);
+
+      const sourceRequests = fetchMock.mock.calls.filter((c) => String(c.arguments[0]).includes("getsourcecode"));
+      assert.equal(sourceRequests.length, 1);
+      assert.ok(String(sourceRequests[0].arguments[0]).toLowerCase().includes(IMPL_ADDRESS.toLowerCase()));
+      assert.equal(readStore(directory)[scopedKey(ETH_CHAIN_ID, IMPL_ADDRESS)].name, "GnosisSafe");
+    } finally {
+      fetchMock.mock.restore();
+    }
+  });
+
   it("keeps a stored ABI the explorer refuses to serve and sweeps unreferenced ones", async () => {
     const directory = setupConfigDirectory({
       [scopedKey(ETH_CHAIN_ID, PROXY_ADDRESS)]: { name: "SignatureRedeemQueue", abi: PROXY_ABI },
@@ -341,12 +442,109 @@ describe("keepStoredAbi + pruneAbiStores", () => {
     assert.equal(store[scopedKey(ETH_CHAIN_ID, PROXY_ADDRESS)].name, "OssifiableProxy");
   });
 
-  it("rebuilds an unreadable store from scratch under --update-abi", () => {
-    // the pre-consolidation format kept bare ABI arrays; --update-abi is the upgrade path
-    setupConfigDirectory({ [PROXY_ADDRESS.toLowerCase()]: PROXY_ABI });
+  it("rebuilds an unreadable store from scratch under --update-abi and keeps a backup", async () => {
+    // the pre-consolidation format kept bare ABI arrays; --update-abi is the upgrade path, and
+    // the original archive must survive a partial rebuild
+    const directory = setupConfigDirectory({ [PROXY_ADDRESS.toLowerCase()]: PROXY_ABI });
+    const original = fs.readFileSync(path.join(directory, "abis.json.gz"));
     context.updateAbi = true;
 
     assert.equal(getAbiNameForAddress(ETH_CHAIN_ID, PROXY_ADDRESS), undefined);
+
+    await checkAllAbi(ETH_CHAIN_ID, {
+      contractName: "WormholeTransceiver",
+      address: BSC_PROXY_ADDRESS,
+      abi: WORMHOLE_ABI,
+    });
+    flushAbiUpdates();
+
+    const store = readStore(directory);
+    assert.equal(store[scopedKey(ETH_CHAIN_ID, BSC_PROXY_ADDRESS)].name, "WormholeTransceiver");
+    const backup = path.join(directory, "abis.json.gz.invalid");
+    assert.ok(fs.existsSync(backup), "the unreadable archive must be preserved as a backup");
+    assert.deepEqual(fs.readFileSync(backup), original);
+  });
+
+  it("keeps the earlier backup when recovery runs twice", async () => {
+    const directory = setupConfigDirectory({ [PROXY_ADDRESS.toLowerCase()]: PROXY_ABI });
+    const original = fs.readFileSync(path.join(directory, "abis.json.gz"));
+    context.updateAbi = true;
+
+    assert.equal(getAbiNameForAddress(ETH_CHAIN_ID, PROXY_ADDRESS), undefined);
+
+    // the store turns unreadable again after the first recovery
+    fs.writeFileSync(path.join(directory, "abis.json.gz"), "not gzip at all");
+    resetAbiCache();
+    assert.equal(getAbiNameForAddress(ETH_CHAIN_ID, PROXY_ADDRESS), undefined);
+
+    assert.deepEqual(fs.readFileSync(path.join(directory, "abis.json.gz.invalid")), original);
+    assert.ok(
+      fs.existsSync(path.join(directory, "abis.json.gz.invalid.1")),
+      "the second backup must not overwrite the first",
+    );
+  });
+
+  it("leaves the store intact when the pruned copy cannot be written in full", async () => {
+    const directory = setupConfigDirectory({
+      [scopedKey(ETH_CHAIN_ID, PROXY_ADDRESS)]: { name: "OssifiableProxy", abi: PROXY_ABI },
+      [scopedKey(ETH_CHAIN_ID, CROSS_CHAIN_ADDRESS)]: { name: "Orphan", abi: WORMHOLE_ABI },
+    });
+    context.updateAbi = true;
+    loadAbiFromFile(ETH_CHAIN_ID, "OssifiableProxy", PROXY_ADDRESS);
+
+    const realWrite = fs.writeFileSync.bind(fs);
+    const writeMock = mock.method(fs, "writeFileSync", ((
+      file: Parameters<typeof fs.writeFileSync>[0],
+      data: Parameters<typeof fs.writeFileSync>[1],
+    ) => {
+      if (String(file).includes("abis.json.gz")) {
+        // a full disk cuts the write short
+        realWrite(file, (data as Buffer).subarray(0, 7));
+        throw new Error("ENOSPC: no space left on device");
+      }
+      return realWrite(file, data);
+    }) as typeof fs.writeFileSync);
+    try {
+      pruneAbiStores();
+    } finally {
+      writeMock.mock.restore();
+    }
+
+    // the sweep failed, so nothing was dropped, but the archive must still be readable
+    const store = readStore(directory);
+    assert.equal(store[scopedKey(ETH_CHAIN_ID, PROXY_ADDRESS)].name, "OssifiableProxy");
+    assert.equal(store[scopedKey(ETH_CHAIN_ID, CROSS_CHAIN_ADDRESS)].name, "Orphan");
+  });
+
+  it("re-downloads under --update-abi an ABI a sibling config only read", async () => {
+    // config A loading an ABI for its checks must not convince config B the address was
+    // already re-downloaded
+    setupConfigDirectory({
+      [scopedKey(ETH_CHAIN_ID, PROXY_ADDRESS)]: { name: "WormholeTransceiver", abi: WORMHOLE_ABI },
+    });
+    context.updateAbi = true;
+    loadAbiFromFile(ETH_CHAIN_ID, "WormholeTransceiver", PROXY_ADDRESS);
+
+    const fetchMock = mock.method(globalThis, "fetch", async () => {
+      return {
+        ok: true,
+        json: async () => ({
+          status: "1",
+          message: "OK",
+          result: [{ ABI: JSON.stringify(WORMHOLE_ABI), ContractName: "WormholeTransceiver", IsProxy: "false" }],
+        }),
+      } as Response;
+    });
+    try {
+      await stateMate.downloadAndCheckAllAbi({
+        deployed: { l1: [PROXY_ADDRESS] },
+        l1: { rpcUrl: "http://localhost:1", explorerHostname: "api.etherscan.io", chainId: ETH_CHAIN_ID },
+      } as EntireDocument);
+      const sourceRequests = fetchMock.mock.calls.filter((c) => String(c.arguments[0]).includes("getsourcecode"));
+      assert.equal(sourceRequests.length, 1);
+    } finally {
+      fetchMock.mock.restore();
+    }
   });
 
   it("warns and keeps going when a store cannot be pruned", async () => {
@@ -400,19 +598,135 @@ describe("fetchExplorerChainId", () => {
       fetchMock.mock.restore();
     }
   });
+
+  it("retries the eth-rpc route instead of abandoning it for a fallback that cannot answer", async () => {
+    // the eth-rpc route is the one blockscout hosts serve; the legacy fallback answers
+    // "Unknown module" there, so one flaked primary request must not decide the probe
+    let primaryCalls = 0;
+    let fallbackCalls = 0;
+    const fetchMock = mock.method(globalThis, "fetch", async (url: Parameters<typeof fetch>[0]) => {
+      if (String(url).includes("eth-rpc")) {
+        primaryCalls++;
+        if (primaryCalls === 1) {
+          return { ok: false, status: 429, statusText: "Too Many Requests" } as Response;
+        }
+        return { ok: true, json: async () => ({ jsonrpc: "2.0", id: 83, result: "0x38" }) } as Response;
+      }
+      fallbackCalls++;
+      return { ok: true, json: async () => ({ status: "0", message: "NOTOK", result: "Unknown module" }) } as Response;
+    });
+    mock.timers.enable({ apis: ["setTimeout"] });
+    try {
+      const pending = fetchExplorerChainId("api.bscscan.com");
+      for (let round = 0; round < 8; round++) {
+        await new Promise((resolve) => setImmediate(resolve));
+        mock.timers.tick(7000);
+      }
+      assert.equal(await pending, "56");
+      assert.equal(primaryCalls, 2);
+      assert.equal(fallbackCalls, 0);
+    } finally {
+      mock.timers.reset();
+      fetchMock.mock.restore();
+    }
+  });
+
+  it("retries the fallback after a rate limit served as HTTP 200", async () => {
+    // free tiers complain about the rate limit in a JSON body, not in the HTTP status
+    let fallbackCalls = 0;
+    const fetchMock = mock.method(globalThis, "fetch", async (url: Parameters<typeof fetch>[0]) => {
+      if (String(url).includes("eth-rpc")) {
+        return { ok: true, json: async () => ({ status: "0", message: "NOTOK", result: "no rpc here" }) } as Response;
+      }
+      fallbackCalls++;
+      if (fallbackCalls === 1) {
+        return {
+          ok: true,
+          json: async () => ({ status: "0", message: "NOTOK", result: "Max Rate limit reached" }),
+        } as Response;
+      }
+      return { ok: true, json: async () => ({ jsonrpc: "2.0", id: 83, result: "0x38" }) } as Response;
+    });
+    mock.timers.enable({ apis: ["setTimeout"] });
+    try {
+      const pending = fetchExplorerChainId("api.bscscan.com");
+      for (let round = 0; round < 8; round++) {
+        await new Promise((resolve) => setImmediate(resolve));
+        mock.timers.tick(7000);
+      }
+      assert.equal(await pending, "56");
+      assert.equal(fallbackCalls, 2);
+    } finally {
+      mock.timers.reset();
+      fetchMock.mock.restore();
+    }
+  });
+
+  it("retries a flaked fallback probe instead of blocking downloads on it", async () => {
+    // an unanswered probe makes the download gate fatal, so one 429 must not decide it
+    let fallbackCalls = 0;
+    const fetchMock = mock.method(globalThis, "fetch", async (url: Parameters<typeof fetch>[0]) => {
+      if (String(url).includes("eth-rpc")) {
+        return { ok: true, json: async () => ({ status: "0", message: "NOTOK", result: "no rpc here" }) } as Response;
+      }
+      fallbackCalls++;
+      if (fallbackCalls === 1) {
+        return { ok: false, status: 429, statusText: "Too Many Requests" } as Response;
+      }
+      return { ok: true, json: async () => ({ jsonrpc: "2.0", id: 83, result: "0x38" }) } as Response;
+    });
+    mock.timers.enable({ apis: ["setTimeout"] });
+    try {
+      const pending = fetchExplorerChainId("api.bscscan.com");
+      for (let round = 0; round < 8; round++) {
+        await new Promise((resolve) => setImmediate(resolve));
+        mock.timers.tick(7000);
+      }
+      assert.equal(await pending, "56");
+      assert.equal(fallbackCalls, 2);
+    } finally {
+      mock.timers.reset();
+      fetchMock.mock.restore();
+    }
+  });
+
+  it("gives the fallback probe two attempts at most", async () => {
+    let fallbackCalls = 0;
+    const fetchMock = mock.method(globalThis, "fetch", async (url: Parameters<typeof fetch>[0]) => {
+      if (String(url).includes("eth-rpc")) {
+        return { ok: true, json: async () => ({ status: "0", message: "NOTOK", result: "no rpc here" }) } as Response;
+      }
+      fallbackCalls++;
+      return { ok: false, status: 429, statusText: "Too Many Requests" } as Response;
+    });
+    mock.timers.enable({ apis: ["setTimeout"] });
+    try {
+      const pending = fetchExplorerChainId("api.bscscan.com");
+      for (let round = 0; round < 8; round++) {
+        await new Promise((resolve) => setImmediate(resolve));
+        mock.timers.tick(7000);
+      }
+      assert.equal(await pending, undefined);
+      assert.equal(fallbackCalls, 2);
+    } finally {
+      mock.timers.reset();
+      fetchMock.mock.restore();
+    }
+  });
 });
 
 describe("checkAllAbi + flushAbiUpdates", () => {
-  const contractInfo: ContractInfo = {
+  const proxyInfo: ContractInfo = {
     contractName: "OssifiableProxy",
     address: PROXY_ADDRESS,
     abi: PROXY_ABI,
-    implementation: { contractName: "Lido", address: IMPL_ADDRESS, abi: LIDO_ABI },
   };
+  const implementationInfo: ContractInfo = { contractName: "Lido", address: IMPL_ADDRESS, abi: LIDO_ABI };
 
   it("creates the store with proxy and implementation entries under chain-scoped lowercase keys", async () => {
     const directory = setupConfigDirectory();
-    await checkAllAbi(ETH_CHAIN_ID, contractInfo);
+    await checkAllAbi(ETH_CHAIN_ID, proxyInfo);
+    await checkAllAbi(ETH_CHAIN_ID, implementationInfo);
     flushAbiUpdates();
 
     const store = readStore(directory);
@@ -427,12 +741,13 @@ describe("checkAllAbi + flushAbiUpdates", () => {
     assert.deepEqual(loadAbiFromFile(ETH_CHAIN_ID, "Lido", IMPL_ADDRESS), LIDO_ABI);
   });
 
-  it("keeps an existing proxy ABI and saves its newly discovered implementation", async () => {
+  it("keeps an existing proxy ABI and saves its implementation fetched separately", async () => {
     const directory = setupConfigDirectory({
       [scopedKey(ETH_CHAIN_ID, PROXY_ADDRESS)]: { name: "OssifiableProxy", abi: PROXY_ABI },
     });
     const differentAbi: Abi = [{ type: "function", name: "other", inputs: [], stateMutability: "view" }];
-    await checkAllAbi(ETH_CHAIN_ID, { ...contractInfo, abi: differentAbi });
+    await checkAllAbi(ETH_CHAIN_ID, { ...proxyInfo, abi: differentAbi });
+    await checkAllAbi(ETH_CHAIN_ID, implementationInfo);
     flushAbiUpdates();
 
     const store = readStore(directory);
@@ -447,7 +762,7 @@ describe("checkAllAbi + flushAbiUpdates", () => {
     const freshAbi: Abi = [{ type: "function", name: "fresh", inputs: [], stateMutability: "view" }];
     context.updateAbi = true;
 
-    await checkAllAbi(ETH_CHAIN_ID, { ...contractInfo, abi: freshAbi });
+    await checkAllAbi(ETH_CHAIN_ID, { ...proxyInfo, abi: freshAbi });
     flushAbiUpdates();
 
     assert.deepEqual(readStore(directory)[scopedKey(ETH_CHAIN_ID, PROXY_ADDRESS)].abi, freshAbi);
@@ -459,7 +774,8 @@ describe("checkAllAbi + flushAbiUpdates", () => {
     });
     context.updateAbi = true;
 
-    await checkAllAbi(ETH_CHAIN_ID, contractInfo);
+    await checkAllAbi(ETH_CHAIN_ID, proxyInfo);
+    await checkAllAbi(ETH_CHAIN_ID, implementationInfo);
     flushAbiUpdates();
     pruneAbiStores();
 
@@ -476,7 +792,8 @@ describe("checkAllAbi + flushAbiUpdates", () => {
     });
     context.updateAbi = true;
 
-    await checkAllAbi(ETH_CHAIN_ID, contractInfo);
+    await checkAllAbi(ETH_CHAIN_ID, proxyInfo);
+    await checkAllAbi(ETH_CHAIN_ID, implementationInfo);
     flushAbiUpdates();
     // the next config of a directory run: same store, its own addresses
     resetAbiCache();
@@ -501,7 +818,8 @@ describe("checkAllAbi + flushAbiUpdates", () => {
     context.updateAbi = true;
 
     // first config of the directory downloads its own addresses
-    await checkAllAbi(ETH_CHAIN_ID, contractInfo);
+    await checkAllAbi(ETH_CHAIN_ID, proxyInfo);
+    await checkAllAbi(ETH_CHAIN_ID, implementationInfo);
     flushAbiUpdates();
     // second config walks an address the explorer no longer serves
     resetAbiCache();
@@ -527,11 +845,11 @@ describe("checkAllAbi + flushAbiUpdates", () => {
       contractName: "ERC1967Proxy",
       address: BSC_PROXY_ADDRESS,
       abi: PROXY_ABI,
-      implementation: {
-        contractName: "WormholeTransceiver",
-        address: CROSS_CHAIN_ADDRESS,
-        abi: WORMHOLE_ABI,
-      },
+    });
+    await checkAllAbi(BSC_CHAIN_ID, {
+      contractName: "WormholeTransceiver",
+      address: CROSS_CHAIN_ADDRESS,
+      abi: WORMHOLE_ABI,
     });
     flushAbiUpdates();
 
@@ -584,6 +902,30 @@ describe("checks ABI resolution", () => {
     setupConfigDirectory({ [scopedKey(ETH_CHAIN_ID, IMPL_ADDRESS)]: { name: "Lido", abi: LIDO_ABI } });
     const regularEntry = { name: "Lido", address: IMPL_ADDRESS, checks: {} } as unknown as ContractEntry;
     assert.deepEqual(validator.resolve(regularEntry), LIDO_ABI);
+  });
+});
+
+describe("tuple checks", () => {
+  class ProbeValidator extends SectionValidatorBase {
+    override async validateSection(): Promise<void> {}
+    check(contract: unknown, method: string, expected: unknown): Promise<void> {
+      return this._checkViewFunction(contract as never, method, { result: expected } as never);
+    }
+  }
+  const validator = new ProbeValidator(new JsonRpcProvider("http://localhost:1"), EntryField.checks, ETH_CHAIN_ID);
+  const contractReturning = (value: unknown) => ({ getFunction: () => ({ staticCall: async () => value }) }) as unknown;
+
+  it("skips tuple elements pinned as null and verifies the rest", async () => {
+    resetStats();
+    await validator.check(contractReturning([250n, 1n, 240n, 247n, 250n]), "limits", [250, 1, 240, null, null]);
+    assert.equal(stats.errors, 0);
+    assert.equal(stats.totalChecks, 1);
+  });
+
+  it("still fails when a pinned tuple element drifts", async () => {
+    resetStats();
+    await validator.check(contractReturning([250n, 2n, 240n, 247n, 250n]), "limits", [250, 1, 240, null, null]);
+    assert.equal(stats.errors, 1);
   });
 });
 

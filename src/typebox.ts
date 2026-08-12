@@ -197,7 +197,7 @@ export const ExplorerSectionTB = Type.Readonly(
       rpcUrl: Type.String(),
       explorerHostname: Type.Optional(Type.String()),
       explorerTokenEnv: Type.Optional(Type.String()),
-      chainId: Type.Union([Type.Integer({ minimum: 1 }), Type.String({ pattern: "^[0-9]+$" })]),
+      chainId: Type.Union([Type.Integer({ minimum: 1 }), Type.String({ pattern: "^[1-9][0-9]*$" })]),
     },
     { additionalProperties: false },
   ),

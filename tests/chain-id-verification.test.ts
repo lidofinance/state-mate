@@ -73,10 +73,13 @@ describe("verifyChainIdWithExplorer", () => {
   });
 
   it("warns but continues when the explorer cannot answer", async () => {
+    // a hostname of its own: reusing a host-chain pair a passing test has already verified
+    // would hit the memo and prove nothing
     const fetchMock = mockExplorerResponse({ status: "0", message: "NOTOK", result: "Invalid API URL" });
     try {
-      const message = await captureExit(() => verifyChainIdWithExplorer("api.bscscan.com", "56"));
+      const message = await captureExit(() => verifyChainIdWithExplorer("api.unanswered.blockscout.example", "56"));
       assert.equal(message, undefined);
+      assert.ok(fetchMock.mock.calls.length > 0, "the probe must actually run");
     } finally {
       fetchMock.mock.restore();
     }
@@ -163,6 +166,8 @@ describe("chainId is required by the schema", () => {
 
   it("rejects chain ids that are not positive integers", () => {
     assert.equal(isTypeOfTB({ ...section, chainId: -1 }, ExplorerSectionTB), false);
+    assert.equal(isTypeOfTB({ ...section, chainId: 0 }, ExplorerSectionTB), false);
+    assert.equal(isTypeOfTB({ ...section, chainId: "0" }, ExplorerSectionTB), false);
     assert.equal(isTypeOfTB({ ...section, chainId: " " }, ExplorerSectionTB), false);
     assert.equal(isTypeOfTB({ ...section, chainId: "0x1" }, ExplorerSectionTB), false);
     assert.equal(isTypeOfTB({ ...section, chainId: "56" }, ExplorerSectionTB), true);
@@ -171,7 +176,7 @@ describe("chainId is required by the schema", () => {
 
 describe("normalizeChainId", () => {
   it("refuses garbage instead of normalizing it to a wrong chain", async () => {
-    for (const garbage of [" ", "-1", "1.5", "0x1"]) {
+    for (const garbage of [" ", "-1", "1.5", "0x1", "0", 0]) {
       const message = await captureExit(async () => normalizeChainId(garbage));
       assert.notEqual(message, undefined, `expected exit for ${JSON.stringify(garbage)}`);
     }
@@ -233,29 +238,186 @@ describe("loadContractInfo", () => {
   const ADDRESS = "0xAaAaAAaaAaAAAaaAAaAaaaAAaAAAaaaAaaaaaaa1";
   const ABI = [{ type: "function", name: "getFee", inputs: [], stateMutability: "view" }];
 
-  it("terminates when the explorer reports an implementation cycle", async () => {
-    // a proxy whose implementation points back at itself must not loop forever
+  it("does not follow implementation metadata recursively", async () => {
+    const IMPL = "0xBbbBBBbbbBBbbbBbbBbbbbBBbBBbbBbBbbbbbbb2";
     const fetchMock = mock.method(globalThis, "fetch", async () => {
       return {
         ok: true,
         json: async () => ({
           status: "1",
           message: "OK",
-          result: [{ ABI: JSON.stringify(ABI), ContractName: "Loop", Implementation: ADDRESS }],
+          result: [{ ABI: JSON.stringify(ABI), ContractName: "Proxy", Implementation: IMPL }],
         }),
       } as Response;
     });
-    let timer: NodeJS.Timeout | undefined;
     try {
-      const info = await Promise.race([
-        loadContractInfo(ADDRESS, "api.etherscan.io", "", 1),
-        new Promise<never>((_, reject) => {
-          timer = setTimeout(() => reject(new Error("did not terminate")), 1500);
-        }),
-      ]);
-      assert.equal(info?.contractName, "Loop");
+      const info = await loadContractInfo(ADDRESS, "api.etherscan.io", "", 1);
+      assert.equal(info?.contractName, "Proxy");
+      assert.equal(fetchMock.mock.calls.length, 1);
     } finally {
-      if (timer) clearTimeout(timer);
+      fetchMock.mock.restore();
+    }
+  });
+
+  it("gives a later reference its own attempt after the bounded retry fails", async () => {
+    // a later call gets a fresh retry budget after a flaking explorer exhausts the first one
+    let calls = 0;
+    const fetchMock = mock.method(globalThis, "fetch", async () => {
+      calls++;
+      if (calls <= 2) {
+        return {
+          ok: true,
+          json: async () => ({ status: "0", message: "NOTOK", result: "something went wrong" }),
+        } as Response;
+      }
+      return {
+        ok: true,
+        json: async () => ({
+          status: "1",
+          message: "OK",
+          result: [{ ABI: JSON.stringify(ABI), ContractName: "Lido" }],
+        }),
+      } as Response;
+    });
+    try {
+      assert.equal(await loadContractInfo(ADDRESS, "api.etherscan.io", "", 1), undefined);
+      assert.equal(calls, 2, "the retry is bounded to one extra attempt");
+      const retried = await loadContractInfo(ADDRESS, "api.etherscan.io", "", 1);
+      assert.equal(retried?.contractName, "Lido");
+      assert.equal(calls, 3);
+    } finally {
+      fetchMock.mock.restore();
+    }
+  });
+
+  it("spends at most two fetches whatever failures the explorer mixes", async () => {
+    // transport and application failures share one retry budget; layered retries once turned a
+    // rate-limited batch into 8 requests, and a capitalized "Rate limit" into a lost ABI
+    const ok = {
+      ok: true,
+      json: async () => ({ status: "1", message: "OK", result: [{ ABI: JSON.stringify(ABI), ContractName: "Lido" }] }),
+    } as Response;
+    const notok = (result: string) =>
+      ({ ok: true, json: async () => ({ status: "0", message: "NOTOK", result }) }) as Response;
+    const scenarios: { answers: (() => Response)[]; name: string; recovers: boolean }[] = [
+      {
+        name: "network flake, then success",
+        answers: [
+          () => {
+            throw new Error("socket hang up");
+          },
+          () => ok,
+        ],
+        recovers: true,
+      },
+      {
+        name: "HTTP 429, then success",
+        answers: [() => ({ ok: false, status: 429, statusText: "Too Many Requests" }) as Response, () => ok],
+        recovers: true,
+      },
+      {
+        name: "HTTP 408, then success",
+        answers: [() => ({ ok: false, status: 408, statusText: "Request Timeout" }) as Response, () => ok],
+        recovers: true,
+      },
+      {
+        name: "capitalized rate limit, then success",
+        answers: [() => notok("Max Rate limit reached"), () => ok],
+        recovers: true,
+      },
+      {
+        name: "malformed body, then success",
+        answers: [
+          () =>
+            ({
+              ok: true,
+              json: async () => {
+                throw new SyntaxError("Unexpected token <");
+              },
+            }) as unknown as Response,
+          () => ok,
+        ],
+        recovers: true,
+      },
+      {
+        name: "network flake, then rate limit",
+        answers: [
+          () => {
+            throw new Error("socket hang up");
+          },
+          () => notok("rate limit reached"),
+        ],
+        recovers: false,
+      },
+      {
+        name: "not verified, then success",
+        answers: [() => notok("Contract source code not verified"), () => ok],
+        recovers: false,
+      },
+    ];
+
+    for (const scenario of scenarios) {
+      resetRequestSlots();
+      let calls = 0;
+      const fetchMock = mock.method(globalThis, "fetch", async () => {
+        const answer = scenario.answers[Math.min(calls, scenario.answers.length - 1)];
+        calls++;
+        return answer();
+      });
+      mock.timers.enable({ apis: ["setTimeout"] });
+      try {
+        const pending = loadContractInfo(ADDRESS, "api.etherscan.io", "", 1);
+        for (let round = 0; round < 8; round++) {
+          await new Promise((resolve) => setImmediate(resolve));
+          mock.timers.tick(7000);
+        }
+        const info = await pending;
+        assert.ok(calls <= 2, `${scenario.name}: ${calls} fetches`);
+        assert.equal(info?.contractName, scenario.recovers ? "Lido" : undefined, scenario.name);
+      } finally {
+        mock.timers.reset();
+        fetchMock.mock.restore();
+      }
+    }
+  });
+
+  it("stops after two requests when the explorer keeps answering 429", async () => {
+    // the HTTP layer owns the whole retry budget; the transient-answer retry above it must not
+    // multiply attempts during a rate limit
+    let calls = 0;
+    const fetchMock = mock.method(globalThis, "fetch", async () => {
+      calls++;
+      return { ok: false, status: 429, statusText: "Too Many Requests" } as Response;
+    });
+    mock.timers.enable({ apis: ["setTimeout"] });
+    try {
+      const pending = loadContractInfo(ADDRESS, "api.etherscan.io", "", 1);
+      for (let round = 0; round < 8; round++) {
+        await new Promise((resolve) => setImmediate(resolve));
+        mock.timers.tick(7000);
+      }
+      assert.equal(await pending, undefined);
+      assert.equal(calls, 2);
+    } finally {
+      mock.timers.reset();
+      fetchMock.mock.restore();
+    }
+  });
+
+  it("asks only once about a contract the explorer says is not verified", async () => {
+    // "not verified" is a final answer; a second request and a second warning help nobody
+    let calls = 0;
+    const fetchMock = mock.method(globalThis, "fetch", async () => {
+      calls++;
+      return {
+        ok: true,
+        json: async () => ({ status: "0", message: "NOTOK", result: "Contract source code not verified" }),
+      } as Response;
+    });
+    try {
+      assert.equal(await loadContractInfo(ADDRESS, "api.etherscan.io", "", 1), undefined);
+      assert.equal(calls, 1);
+    } finally {
       fetchMock.mock.restore();
     }
   });

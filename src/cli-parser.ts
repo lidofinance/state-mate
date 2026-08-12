@@ -16,6 +16,7 @@ export function parseCommandLineArguments() {
     )
     .option("--update-abi", "re-download every ABI; missing ones are downloaded without the flag too")
     .option("--skip-implementation-check", "do not verify implementation addresses against the chain")
+    .option("--allow-unverified-explorer", "download ABIs even when the explorer does not confirm the config's chainId")
     .option("-q, --quiet", "print only contract headers, per-contract totals and errors")
     .parse();
 
@@ -43,6 +44,7 @@ export function parseCommandLineArguments() {
     checkOnlyCmdArg: options.only,
     updateAbi: options.updateAbi,
     skipImplementationCheck: Boolean(options.skipImplementationCheck),
+    allowUnverifiedExplorer: Boolean(options.allowUnverifiedExplorer),
     quiet: Boolean(options.quiet),
   };
 }

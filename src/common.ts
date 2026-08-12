@@ -41,8 +41,8 @@ export function readUrlOrFromEnvironment(urlOrEnvironmentVariableName: string) {
 }
 
 export function normalizeChainId(chainId: ChainId): string {
-  // BigInt would happily coerce whitespace to 0 or accept a negative — neither is a chain
-  if (!/^\d+$/.test(String(chainId))) {
+  // BigInt would happily coerce whitespace to 0 or accept a negative; zero is no chain either
+  if (!/^\d+$/.test(String(chainId)) || BigInt(chainId) === 0n) {
     logErrorAndExit(`Invalid chain ID: ${chalk.yellow(String(chainId))}`);
   }
   return BigInt(chainId).toString();

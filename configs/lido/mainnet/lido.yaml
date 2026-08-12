@@ -4117,8 +4117,8 @@ l1:
         TW_EXIT_LIMIT_MANAGER_ROLE: *TW_EXIT_LIMIT_MANAGER_ROLE
         VERSION: *VERSION_1
         # [maxExitRequestsLimit, exitsPerFrame, frameDurationInSec, prevExitRequestsLimit, currentExitRequestsLimit]
-        # the last two drain and refill with every exit request, pinning the tuple fails on live traffic
-        getExitRequestLimitFullInfo: null
+        # the last two drain and refill with every exit request, so only they stay unpinned
+        getExitRequestLimitFullInfo: [250, 1, 240, null, null]
         getResumeSinceTimestamp: 0
         getRoleAdmin: null
         getRoleMember: null
@@ -4706,8 +4706,8 @@ l1:
         getContractVersion: *VERSION_3
         getMaxValidatorsPerReport: 600
         # [maxExitBalanceEth, balancePerFrameEth, frameDurationInSec, prevExitBalanceEth, currentExitBalanceEth]
-        # the last two drain and refill with every exit request, pinning the tuple fails on live traffic
-        getExitRequestLimitFullInfo: null
+        # the last two drain and refill with every exit request, so only they stay unpinned
+        getExitRequestLimitFullInfo: [358400, 32, 48, null, null]
         getTotalRequestsProcessed: null
         isPaused: false
         getConsensusReport: null

@@ -16,7 +16,7 @@ import {
   keepStoredAbi,
   pruneAbiStores,
   resetAbiCache,
-  wasWalkedThisRun,
+  wasFetchedThisRun,
 } from "./abi-provider";
 import { parseCommandLineArguments } from "./cli-parser";
 import { normalizeChainId, printError, readUrlOrFromEnvironment } from "./common";
@@ -172,6 +172,18 @@ async function iterateLoadedContracts(
     if (isTypeOfTB(explorerSection, ExplorerSectionTB) || isTypeOfTB(explorerSection, NetworkSectionTB)) {
       const { explorerHostname, explorerTokenEnv } = explorerSection;
       const chainId = normalizeChainId(explorerSection.chainId);
+      // `checks` resolve their ABI at `implementation:`, so the walk covers those addresses even
+      // when the config lists only the proxy in deployed; Safe singletons are pinned exactly so.
+      // Deduplicated by case: a duplicated address must not spend two download slots
+      const implementations = Object.values("contracts" in explorerSection ? explorerSection.contracts : {})
+        .map((entry) => (entry as { implementation?: string }).implementation)
+        .filter((value): value is string => typeof value === "string");
+      const seen = new Set<string>();
+      const uniqueAddresses = [...addresses, ...implementations].filter((address) => {
+        if (seen.has(address.toLowerCase())) return false;
+        seen.add(address.toLowerCase());
+        return true;
+      });
       if (!explorerHostname) {
         log(
           `${WARNING_MARK} ${chalk.yellow(`No ${chalk.magenta("explorerHostname")} in the ${chalk.magenta(context.configPath)}, ABIs cannot be downloaded for ${explorerSectionKey}`)}`,
@@ -179,7 +191,6 @@ async function iterateLoadedContracts(
         if (context.updateAbi) {
           // A chain with no explorer cannot re-download, so the rebuild keeps what the store
           // already holds for it
-          const uniqueAddresses = new Set(addresses);
           for (const address of uniqueAddresses) {
             const keptName = keepStoredAbi(chainId, address);
             if (keptName) log(`ABI ${chalk.magenta(`${keptName} @ ${address}`)} ${chalk.green("Kept (no explorer)")}`);
@@ -188,7 +199,6 @@ async function iterateLoadedContracts(
         continue;
       }
       const explorerKey = explorerTokenEnv ? process.env[explorerTokenEnv] : "";
-      await verifyChainIdWithExplorer(explorerHostname, chainId, explorerKey);
 
       if (!explorerTokenEnv && explorerNeedsApiKey(explorerHostname)) {
         log(
@@ -198,18 +208,29 @@ async function iterateLoadedContracts(
         log(`\n${WARNING_MARK} ${chalk.yellow(`The env var ${explorerTokenEnv} is not set`)}\n`);
       }
       const toDownload: string[] = [];
-      // a duplicated address in the YAML must not spend two download slots
-      const uniqueAddresses = new Set(addresses);
       for (const address of uniqueAddresses) {
         const existingAbiName = getAbiNameForAddress(chainId, address);
         // Bytecode at an address never changes, so a stored ABI can only be refreshed on demand;
         // a rebuild re-downloads each address once, sibling configs of the run reuse the result
-        const fresh = context.updateAbi && !wasWalkedThisRun(chainId, address);
+        const fresh = context.updateAbi && !wasFetchedThisRun(chainId, address);
         if (existingAbiName !== undefined && !fresh) {
           log(`ABI ${chalk.magenta(`${existingAbiName} @ ${address}`)} ${chalk.green("Skipped (exists)")}`);
           continue;
         }
         toDownload.push(address);
+      }
+
+      // The probe matters only when something will be downloaded: a fresh ABI from an explorer
+      // of another network would be stored under the config's chainId regardless. A full store
+      // must not depend on the explorer being awake, so nothing is asked otherwise
+      if (toDownload.length > 0) {
+        const explorerVerified = await verifyChainIdWithExplorer(explorerHostname, chainId, explorerKey);
+        if (!explorerVerified && !context.allowUnverifiedExplorer) {
+          logErrorAndExit(
+            `${chalk.magenta(explorerHostname)} did not confirm chainId ${chalk.yellow(chainId)}, and ${chalk.yellow(toDownload.length)} ABIs are missing. ` +
+              `Retry when the explorer answers, or pass ${chalk.yellow("--allow-unverified-explorer")}`,
+          );
+        }
       }
 
       // All requests start at once and the pacer spaces them to the explorer's per-second budget,
@@ -242,11 +263,9 @@ async function checkNetworkSection(sectionTitle: string, section: NetworkSection
   const rpcUrl = readUrlOrFromEnvironment(section.rpcUrl);
   const provider = createProvider(rpcUrl);
   const chainId = normalizeChainId(section.chainId);
+  // assertProviderChain vouches for the RPC; the explorer is probed by the ABI pass, and only
+  // when it has something to download
   await assertProviderChain(provider, chainId);
-  if (section.explorerHostname) {
-    const explorerKey = section.explorerTokenEnv ? process.env[section.explorerTokenEnv] : undefined;
-    await verifyChainIdWithExplorer(section.explorerHostname, chainId, explorerKey);
-  }
   const contractSectionChecker = new ContractSectionValidator(provider, chainId);
 
   for (const contractAlias in section.contracts) {

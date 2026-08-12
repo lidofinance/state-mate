@@ -25,6 +25,8 @@ function word(address: string): string {
 type ProviderStub = {
   callResult?: Error | string;
   calls?: Record<string, Error | string>;
+  selectors?: Record<string, Error | string>;
+  slotErrors?: Record<string, Error>;
   slots?: Record<string, string>;
 };
 
@@ -32,14 +34,16 @@ type ProviderStub = {
 function stubProvider(stub: ProviderStub): { provider: JsonRpcProvider; reads: string[] } {
   const reads: string[] = [];
   const provider = {
-    async call({ to }: { to: string }) {
+    async call({ data, to }: { data: string; to: string }) {
       reads.push(`call:${to.toLowerCase()}`);
-      const answer = stub.calls?.[to.toLowerCase()] ?? stub.callResult;
+      const answer = stub.selectors?.[data] ?? stub.calls?.[to.toLowerCase()] ?? stub.callResult;
       if (answer instanceof Error) throw answer;
       return answer ?? ZERO_WORD;
     },
     async getStorage(address: string, slot: string) {
       reads.push(`slot:${slot}`);
+      const failure = stub.slotErrors?.[slot];
+      if (failure) throw failure;
       return stub.slots?.[slot] ?? ZERO_WORD;
     },
   } as unknown as JsonRpcProvider;
@@ -59,6 +63,14 @@ function proxyEntry(implementation?: string, proxyName = "OssifiableProxy"): Con
 
 function regularEntry(): ContractEntry {
   return { address: PROXY_ADDRESS, checks: {}, name: "Lido" } as ContractEntry;
+}
+
+// storage: pins in the configs hold the singleton as a plain address, the way anchors keep it
+function safePinnedEntry(singleton: string): ContractEntry {
+  return {
+    ...proxyEntry(undefined, "SafeProxy"),
+    storage: [{ slot: ZERO_WORD, expected: singleton, label: "singleton" }],
+  } as ContractEntry;
 }
 
 function adminOwnerEntry(proxyAdminOwner?: string): ContractEntry {
@@ -101,6 +113,20 @@ describe("checkImplementation", () => {
     assert.deepEqual(reads, [`slot:${EIP1967_SLOT}`]);
   });
 
+  it("leaves an implementation slot already pinned in storage to the storage validator", async () => {
+    const { provider, reads } = stubProvider({ slots: { [EIP1967_SLOT]: word(IMPL_ADDRESS) } });
+    const entry = {
+      ...proxyEntry(IMPL_ADDRESS),
+      storage: [{ expected: IMPL_ADDRESS, label: "implementation", slot: EIP1967_SLOT }],
+    } as ContractEntry;
+
+    await checkImplementation(provider, entry);
+
+    assert.equal(stats.errors, 0);
+    assert.equal(stats.totalChecks, 0);
+    assert.deepEqual(reads, []);
+  });
+
   it("reports the on-chain and the expected implementation when they differ", async () => {
     const { provider } = stubProvider({ slots: { [EIP1967_SLOT]: word(OTHER_IMPL_ADDRESS) } });
 
@@ -122,7 +148,7 @@ describe("checkImplementation", () => {
     assert.deepEqual(reads, [`slot:${EIP1967_SLOT}`, `call:${PROXY_ADDRESS.toLowerCase()}`]);
   });
 
-  it("falls back to the first storage slot for a Safe when implementation() reverts", async () => {
+  it("reads only the singleton slot for a Safe, skipping the getters a Safe never answers", async () => {
     const { provider, reads } = stubProvider({
       callResult: new Error("execution reverted"),
       slots: { [SAFE_SLOT]: word(IMPL_ADDRESS) },
@@ -131,7 +157,21 @@ describe("checkImplementation", () => {
     await checkImplementation(provider, proxyEntry(IMPL_ADDRESS, "SafeProxy"));
 
     assert.equal(stats.errors, 0);
-    assert.deepEqual(reads, [`slot:${EIP1967_SLOT}`, `call:${PROXY_ADDRESS.toLowerCase()}`, `slot:${SAFE_SLOT}`]);
+    // one read total: reverting getter calls and the EIP-1967 slot say nothing about a Safe
+    assert.deepEqual(reads, [`slot:${SAFE_SLOT}`]);
+  });
+
+  it("judges a Safe by slot 0 even when the EIP-1967 slot shows the expected address", async () => {
+    // a SafeProxy delegates to slot 0; an EIP-1967 slot that happens to agree with the config
+    // must not vouch for it
+    const { provider } = stubProvider({
+      slots: { [EIP1967_SLOT]: word(IMPL_ADDRESS), [SAFE_SLOT]: word(OTHER_IMPL_ADDRESS) },
+    });
+
+    await checkImplementation(provider, proxyEntry(IMPL_ADDRESS, "SafeProxy"));
+
+    assert.equal(stats.errors, 1);
+    assert.match(stats.errorDetails[0].message, new RegExp(OTHER_IMPL_ADDRESS, "i"));
   });
 
   it("does not judge a non-Safe proxy by its first storage slot", async () => {
@@ -144,50 +184,104 @@ describe("checkImplementation", () => {
 
     await checkImplementation(provider, proxyEntry(IMPL_ADDRESS));
 
-    assert.equal(stats.errors, 0);
+    // the entry still fails as unresolved, but never on the garbage slot 0 holds
+    assert.equal(stats.errors, 1);
+    assert.doesNotMatch(stats.errorDetails[0].message, new RegExp(OTHER_IMPL_ADDRESS, "i"));
     assert.ok(!reads.includes(`slot:${SAFE_SLOT}`), `slot 0 was read: ${reads.join(", ")}`);
   });
 
-  it("warns instead of failing when no resolution step yields an address", async () => {
+  it("fails when no resolution step yields an address", async () => {
+    // a persistent RPC failure must not let the run finish green; the bypass flag is the
+    // deliberate way out
     const { provider } = stubProvider({ callResult: new Error("execution reverted") });
+
+    await checkImplementation(provider, proxyEntry(IMPL_ADDRESS));
+
+    assert.equal(stats.errors, 1);
+    assert.equal(stats.totalChecks, 1);
+    assert.match(stats.errorDetails[0].message, /--skip-implementation-check/);
+  });
+
+  it("resolves through proxy__getImplementation before giving up", async () => {
+    const { provider } = stubProvider({
+      callResult: new Error("execution reverted"),
+      selectors: { "0xad729a71": word(IMPL_ADDRESS) },
+    });
 
     await checkImplementation(provider, proxyEntry(IMPL_ADDRESS));
 
     assert.equal(stats.errors, 0);
+    assert.equal(stats.totalChecks, 1);
   });
 
-  it("does not count an unreadable implementation as a passed check", async () => {
-    const { provider } = stubProvider({ callResult: new Error("execution reverted") });
-
-    await checkImplementation(provider, proxyEntry(IMPL_ADDRESS));
-
-    // an inconclusive read is a skip, not a pass: the totals must not claim it was verified
-    assert.equal(stats.totalChecks, 0);
-    assert.equal(stats.errors, 0);
-  });
-
-  it("prints the skip warning even under --quiet", async () => {
-    const { provider } = stubProvider({ callResult: new Error("execution reverted") });
-    context.quiet = true;
-    const captured = captureOutput();
-
-    await checkImplementation(provider, proxyEntry(IMPL_ADDRESS));
-
-    assert.match(captured.output(), /could not be read/);
-  });
-
-  it("warns that a Safe entry pins no implementation instead of calling it not a proxy", async () => {
+  it("prints the pins-no-implementation warning even under --quiet", async () => {
     const { provider } = stubProvider({
       callResult: new Error("execution reverted"),
       slots: { [SAFE_SLOT]: word(IMPL_ADDRESS) },
     });
+    context.quiet = true;
     const captured = captureOutput();
 
+    await checkImplementation(provider, safePinnedEntry(IMPL_ADDRESS));
+
+    assert.match(captured.output(), /pins no implementation/);
+  });
+
+  it("fails when the Safe singleton slot cannot be read for an undeclared entry", async () => {
+    const { provider } = stubProvider({
+      callResult: new Error("execution reverted"),
+      slotErrors: { [SAFE_SLOT]: new Error("rate limited") },
+    });
+
     await checkImplementation(provider, proxyEntry(undefined, "SafeProxy"));
+
+    assert.equal(stats.errors, 1);
+  });
+
+  it("warns instead of failing when a storage check pins slot 0 to the same singleton", async () => {
+    const { provider } = stubProvider({ slots: { [SAFE_SLOT]: word(IMPL_ADDRESS) } });
+    const captured = captureOutput();
+
+    await checkImplementation(provider, safePinnedEntry(IMPL_ADDRESS));
 
     assert.equal(stats.errors, 0);
     assert.match(captured.output(), /pins no implementation/);
     assert.doesNotMatch(captured.output(), /not a proxy/);
+  });
+
+  it("fails a Safe that pins its singleton neither as implementation nor in storage", async () => {
+    // an unpinned delegation is unverified; the warning is reserved for entries that assert
+    // slot 0 through a storage: check
+    const { provider } = stubProvider({ slots: { [SAFE_SLOT]: word(IMPL_ADDRESS) } });
+
+    await checkImplementation(provider, proxyEntry(undefined, "SafeProxy"));
+
+    assert.equal(stats.errors, 1);
+    const { message } = stats.errorDetails[0];
+    assert.match(message, new RegExp(IMPL_ADDRESS, "i"));
+    assert.match(message, /pins no implementation/);
+  });
+
+  it("accepts a slot-0 pin written as a short slot and a full mixed-case word", async () => {
+    // the schema lets the slot be "0" and the pin be a 32-byte word in any case; the comparison
+    // is numeric, so notation must not fail a matching pin or crash on a checksum
+    const entry = {
+      ...proxyEntry(undefined, "SafeProxy"),
+      storage: [{ slot: "0", expected: `0x${"0".repeat(24)}${IMPL_ADDRESS.slice(2)}`, label: "singleton" }],
+    } as ContractEntry;
+    const { provider } = stubProvider({ slots: { [SAFE_SLOT]: word(IMPL_ADDRESS) } });
+
+    await checkImplementation(provider, entry);
+
+    assert.equal(stats.errors, 0);
+  });
+
+  it("fails a Safe whose slot-0 storage pin disagrees with the chain", async () => {
+    const { provider } = stubProvider({ slots: { [SAFE_SLOT]: word(OTHER_IMPL_ADDRESS) } });
+
+    await checkImplementation(provider, safePinnedEntry(IMPL_ADDRESS));
+
+    assert.equal(stats.errors, 1);
   });
 
   it("fails when a contract described as regular delegates to an implementation", async () => {
@@ -214,7 +308,7 @@ describe("checkImplementation", () => {
     assert.doesNotMatch(message, /proxyName/);
   });
 
-  it("reports a failed slot read on a regular entry instead of confirming it is not a proxy", async () => {
+  it("fails a regular entry whose implementation slot cannot be read", async () => {
     const failingProvider = {
       async call() {
         throw new Error("rate limited");
@@ -223,17 +317,11 @@ describe("checkImplementation", () => {
         throw new Error("rate limited");
       },
     } as unknown as JsonRpcProvider;
-    let output = "";
-    process.stdout.write = ((chunk: string) => {
-      output += chunk;
-      return true;
-    }) as typeof process.stdout.write;
 
     await checkImplementation(failingProvider, regularEntry());
 
-    assert.equal(stats.errors, 0);
-    assert.match(output, /could not be read/);
-    assert.doesNotMatch(output, /not a proxy/);
+    assert.equal(stats.errors, 1);
+    assert.match(stats.errorDetails[0].message, /--skip-implementation-check/);
   });
 
   it("accepts a regular contract that holds no implementation", async () => {
@@ -246,12 +334,30 @@ describe("checkImplementation", () => {
     assert.deepEqual(reads, [`slot:${EIP1967_SLOT}`]);
   });
 
-  it("ignores a proxy entry without a declared implementation", async () => {
-    const { provider } = stubProvider({ slots: { [SAFE_SLOT]: word(IMPL_ADDRESS) } });
+  it("fails a declared proxy that pins no implementation and answers no getter", async () => {
+    // proxyName in the config is a promise; passing the entry as "not a proxy" would contradict it
+    const { provider } = stubProvider({ callResult: new Error("execution reverted") });
 
     await checkImplementation(provider, proxyEntry());
 
-    assert.equal(stats.errors, 0);
+    assert.equal(stats.errors, 1);
+    const { message } = stats.errorDetails[0];
+    assert.match(message, /OssifiableProxy/);
+    assert.match(message, /--skip-implementation-check/);
+  });
+
+  it("names the implementation a getter reveals when the config pins none", async () => {
+    const { provider } = stubProvider({
+      callResult: new Error("execution reverted"),
+      selectors: { "0xad729a71": word(IMPL_ADDRESS) },
+    });
+
+    await checkImplementation(provider, proxyEntry());
+
+    assert.equal(stats.errors, 1);
+    const { message } = stats.errorDetails[0];
+    assert.match(message, new RegExp(IMPL_ADDRESS, "i"));
+    assert.match(message, /pins no implementation/);
   });
 
   it("touches the chain for nothing when --skip-implementation-check is set", async () => {
@@ -351,6 +457,19 @@ describe("checkProxyAdminOwner", () => {
     const { message } = stats.errorDetails[0];
     assert.match(message, new RegExp(`0x${"0".repeat(40)}`));
     assert.doesNotMatch(message, /does not answer/);
+  });
+
+  it("keeps running when the run is narrowed to one checks type", async () => {
+    const { provider } = stubProvider({
+      calls: { [PROXY_ADMIN_ADDRESS.toLowerCase()]: word(OWNER_ADDRESS) },
+      slots: { [ADMIN_SLOT]: word(PROXY_ADMIN_ADDRESS) },
+    });
+    context.checkOnly = { section: "l1", checksType: "checks" };
+
+    await checkProxyAdminOwner(provider, adminOwnerEntry(OWNER_ADDRESS));
+
+    assert.equal(stats.totalChecks, 1);
+    assert.equal(stats.errors, 0);
   });
 
   it("reads nothing for an entry without the field", async () => {

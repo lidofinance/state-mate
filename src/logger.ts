@@ -96,12 +96,6 @@ export function log(argument: unknown) {
   console.log(argument);
 }
 
-export function logReplaceLine(argument: unknown) {
-  process.stdout.clearLine(0);
-  process.stdout.cursorTo(0);
-  process.stdout.write(String(argument));
-}
-
 export function logError(argument: unknown) {
   const prefix = getItemPrefix();
   console.error(`${prefix}ERROR: ${String(argument)}`);

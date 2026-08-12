@@ -24,6 +24,7 @@ export const context = {
   // --update-abi: rebuild the store from scratch instead of only downloading what is missing
   updateAbi: false,
   skipImplementationCheck: false,
+  allowUnverifiedExplorer: false,
   quiet: false,
 };
 

@@ -179,7 +179,7 @@
               "type": "integer"
             },
             {
-              "pattern": "^[0-9]+$",
+              "pattern": "^[1-9][0-9]*$",
               "type": "string"
             }
           ]
@@ -2366,7 +2366,7 @@
               "type": "integer"
             },
             {
-              "pattern": "^[0-9]+$",
+              "pattern": "^[1-9][0-9]*$",
               "type": "string"
             }
           ]
