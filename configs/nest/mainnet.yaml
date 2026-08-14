@@ -6,14 +6,18 @@ parameters:
   # Governance
   - &aragonVoting "0x2e59A20f205bB85a89C53f1936454680651E618e"
   - &aragonAgent "0x3e40D73EB977Dc6a537aF587D48316feE66E9C8c"
+  - &treasuryCommittee "0xa02FC823cCE0D016bD7e17ac684c9abAb2d6D647"
+  - &emergencyBrakes "0x73b047fe6337183A454c5217241D780a932777bD"
   # Core
   - &lidoLocator "0xC1d0b3DE6792Bf6b4b37EccdcC24e45978Cfd2Eb"
   - &accounting "0x23ED611be0e1a820978875C0122F92260804cdDf"
+  - &l1OpStackTokenRatePusher "0xd54c1c6413caac3477AC14b2a80D5398E3c32FfE"
   # External dependencies
   - &curveAdmin "0x97aA696e37659Fb4f0B53824246d802Df40E980A"
   - &curveFeeReceiver "0xa2Bcd1a4Efbd04B63cd03f5aFf2561106ebCCE00"
   - &curveMathImplementation "0x1Fd8Af16DC4BEBd950521308D55d0543b6cDF4A1"
   - &chainlinkFeedRegistry "0x47Fb2585D2C56Fe188D0E6ec628a38b74fCeeeDf"
+  - &chainlinkEthUsdAggregator "0x7d4E742018fb52E48b08BE73d041C18B21de6Fb5"
   - &cowSettlement "0x9008D19f58AAbD9eD0D60971565AA8510560ab41"
   - &cowVaultRelayer "0xC92E8bdf79f0507f65a392b0ab4667716BFE0110"
 
@@ -145,12 +149,12 @@ l1:
         MAX_DECIMALS: 38
         PRICE_DECIMALS: 18
         PRICE_UNIT: 1000000000000000000
-        # Operational config TODO: change after sync
+        # Operational config
         emergencyOperator: *ZERO_ADDRESS
-        manager: *ZERO_ADDRESS
+        manager: *treasuryCommittee
         # [scaleNumerator, scaleDenominator, aggregator, maxStalenessSeconds, aggregatorDecimals]
-        ethUsdBridge: [0, 0, *ZERO_ADDRESS, 0, 0]
-        isBridgeInSync: false
+        ethUsdBridge: [10000000000, 1, *chainlinkEthUsdAggregator, 3600, 8]
+        isBridgeInSync: true
         getPricesAndDecimals:
         getUsdPrices:
         isFeedInSync:
@@ -244,10 +248,10 @@ l1:
         minDepositValueUsd: 1000000000000000000000 # 1_000e18
         maxDepositValueUsd: 50000000000000000000000 # 50_000e18
         poolBootstrapMinTvlUsd: 250000000000000000000000 # 250_000e18
-        stonks: *ZERO_ADDRESS # TODO: update after vote to actual address
+        stonks: *buybackStonksTreasury
         lpModeEnabled: false
         paused: false
-        stonksOrderDurationSeconds: 0 # TODO: update after vote
+        stonksOrderDurationSeconds: 1800
         lastOrderAddress:
         lastOrderValidTo:
         getLpTokenBalance:
@@ -265,12 +269,11 @@ l1:
         getRoleMember:
         getRoleMemberCount:
         hasRole:
-      # TODO: update roles after vote
       ozAcl:
         *DEFAULT_ADMIN_ROLE : [*aragonVoting]
-        *ALLOCATOR_ROLE : []
-        *MANAGER_ROLE : []
-        *EMERGENCY_ROLE : []
+        *ALLOCATOR_ROLE : [*buybackAllocator]
+        *MANAGER_ROLE : [*treasuryCommittee]
+        *EMERGENCY_ROLE : [*treasuryCommittee, *emergencyBrakes]
 
     # Both Stonks instances are identical except RECEIVER
     buybackStonksLp:
@@ -357,7 +360,7 @@ l1:
         revenueSources:
           - *stakingRevenueSource
         # State
-        activationTS: 0 # TODO: update after vote (activate())
+        activationTS: 1786320000
         budgetUSD:
         lastTotalRevenueUSD:
         reserveAnchorTS:
@@ -377,7 +380,7 @@ l1:
         hasRole:
       ozAcl:
         *DEFAULT_ADMIN_ROLE : [*aragonVoting]
-        *MANAGER_ROLE : [] # TODO: update after vote
+        *MANAGER_ROLE : [*treasuryCommittee]
 
     # Core-side NEST upgrade: new TokenRateNotifier forwarding the full rebase payload
     tokenRateNotifier:
@@ -390,7 +393,12 @@ l1:
         MAX_OBSERVERS_COUNT: 32
         REQUIRED_INTERFACE_NO_ARGS: "0xa16ba44d" # type(ITokenRatePusher).interfaceId
         REQUIRED_INTERFACE_WITH_ARGS: "0xbd18bfd6" # type(ITokenRatePusherWithArgs).interfaceId
-        observersLength: 0 # TODO: update after vote
+        observersLength: 2
+        # [addr, kind], kind: 0 = ITokenRatePusher, 1 = ITokenRatePusherWithArgs
         observers:
           - args: [0]
+            result: [*l1OpStackTokenRatePusher, 0]
+          - args: [1]
+            result: [*stakingRevenueSource, 1]
+          - args: [2]
             mustRevert: true
