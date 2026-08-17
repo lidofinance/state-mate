@@ -51,7 +51,7 @@
     "eslint-plugin-prettier": "^5.5.5",
     "eslint-plugin-unicorn": "^69.0.0",
     "husky": "^9.0.11",
-    "lint-staged": "^17.0.8",
+    "lint-staged": "^17.2.0",
     "prettier": "^3.9.0",
     "ts-node": ">=8.0.0",
     "typescript": "^6.0.3"
