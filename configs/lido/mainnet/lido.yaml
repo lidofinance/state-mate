@@ -1,4 +1,4 @@
-# yaml-language-server: $schema=../../schemas/main-schema.json
+# yaml-language-server: $schema=../../../schemas/main-schema.json
 ---
 deployed:
   l1:
@@ -85,13 +85,6 @@ deployed:
     - &aragonEvmScriptRegistry "0x853cc0D5917f49B57B8e9F89e491F5E18919093A"
     - &aragonEvmScriptRegistryImplAddress "0xBF1Ce0Bc4EdaAD8e576b3b55e19c4C15Cf6999eb"
 
-    # --- GateSeal ---
-    - &gateSealBlueprint "0xEe06EA501f7d9DC6F4200385A8D910182D155d3e"
-    - &gateSealFactory "0x6c82877cac5a7a739f16ca0a89c0a328b8764a24"
-    - &gateSealVEBAndTWG "0xA6BC802fAa064414AA62117B4a53D27fFfF741F1"
-    - &gateSealWithdrawalQueue "0x8A854C4E750CDf24f138f34A9061b2f556066912"
-    - &gateSealVaulthubAndPredepositGuarantee "0x881dAd714679A6FeaA636446A0499101375A365c"
-    - &gateSealCSAccounting "0xE1686C2E90eb41a48356c1cC7FaA17629af3ADB3"
     - &circuitBreaker "0x6019CB557978296BA3C08a7B73225C0975DFB2F7"
 
     # --- Staking modules ---
@@ -100,57 +93,57 @@ deployed:
     - &simpleDvt "0xaE7B191A31f627b4eB1d4DaC64eaB9976995b433"
 
     # --- CSM ---
-    - &CSModule "0xdA7dE2ECdDfccC6c3AF10108Db212ACBBf9EA83F"
-    - &CSModuleImpl "0x63992a86f009fcC796a8369feEfB68880aef4e3a"
-    - &CSAccounting "0x4d72BFF1BeaC69925F8Bd12526a39BAAb069e5Da"
-    - &CSAccountingImpl "0xe768572cc5aE5C698345C59288d871a949Ea8bd3"
-    - &CSFeeDistributor "0xD99CC66fEC647E68294C6477B40fC7E0F6F618D0"
-    - &CSFeeDistributorImpl "0x936da7cDB7eed1084d294E23eA1d7Ad72DCcfE0E"
-    - &CSIcsGate "0xB314D4A76C457c93150d308787939063F4Cc67E0"
-    - &CSVettedGateImpl "0x66ADb8b3F58d3DFdF6bAdB595E41f19e947E5c14"
-    - &CSEjector "0x610B517D380f287c239C93F8eF6FfBd567AA4bA5"
-    - &CSFeeOracle "0x4D4074628678Bd302921c20573EEa1ed38DdF7FB"
-    - &CSFeeOracleImpl "0xecE6e0Cde61078F76b66Ef0C338a6875E5D01F79"
-    - &CSVerifier "0xfce7aB839e55de77730716D05b3553e45ab3A5Ba"
-    - &CSPermissionlessGate "0xb8cd8F059Ad7a5dB8CAfDe34aAb007317F7156C8"
-    - &CSExitPenalties "0x06cd61045f958A209a0f8D746e103eCc625f4193"
-    - &CSExitPenaltiesImpl "0xA5b9e96E951089E629Ab0834AEaF242a81394EA0"
-    - &CSParametersRegistry "0x9D28ad303C90DF524BA960d7a2DAC56DcC31e428"
-    - &CSParametersRegistryImpl "0x107d287F178cD54792614d7D63C47D8242240BeD"
-    - &CSStrikes "0xaa328816027F2D32B9F56d190BC9Fa4A5C07637f"
-    - &CSStrikesImpl "0xd25E7C3923d2e68c325980b0e15eD20d62B2691F"
-    - &CSHashConsensus "0x71093efF8D8599b5fA340D665Ad60fA7C80688e4"
-    - &CSIdentifiedDVTClusterGate "0xa12760721A72A7199aB38059DA6690b9Cd4ed7B8"
+    - &csModule "0xdA7dE2ECdDfccC6c3AF10108Db212ACBBf9EA83F"
+    - &csModuleImpl "0x63992a86f009fcC796a8369feEfB68880aef4e3a"
+    - &csAccounting "0x4d72BFF1BeaC69925F8Bd12526a39BAAb069e5Da"
+    - &csAccountingImpl "0xe768572cc5aE5C698345C59288d871a949Ea8bd3"
+    - &csFeeDistributor "0xD99CC66fEC647E68294C6477B40fC7E0F6F618D0"
+    - &csFeeDistributorImpl "0x936da7cDB7eed1084d294E23eA1d7Ad72DCcfE0E"
+    - &csIcsGate "0xB314D4A76C457c93150d308787939063F4Cc67E0"
+    - &csVettedGateImpl "0x66ADb8b3F58d3DFdF6bAdB595E41f19e947E5c14"
+    - &csEjector "0x610B517D380f287c239C93F8eF6FfBd567AA4bA5"
+    - &csFeeOracle "0x4D4074628678Bd302921c20573EEa1ed38DdF7FB"
+    - &csFeeOracleImpl "0xecE6e0Cde61078F76b66Ef0C338a6875E5D01F79"
+    - &csVerifier "0xfce7aB839e55de77730716D05b3553e45ab3A5Ba"
+    - &csPermissionlessGate "0xb8cd8F059Ad7a5dB8CAfDe34aAb007317F7156C8"
+    - &csExitPenalties "0x06cd61045f958A209a0f8D746e103eCc625f4193"
+    - &csExitPenaltiesImpl "0xA5b9e96E951089E629Ab0834AEaF242a81394EA0"
+    - &csParametersRegistry "0x9D28ad303C90DF524BA960d7a2DAC56DcC31e428"
+    - &csParametersRegistryImpl "0x107d287F178cD54792614d7D63C47D8242240BeD"
+    - &csStrikes "0xaa328816027F2D32B9F56d190BC9Fa4A5C07637f"
+    - &csStrikesImpl "0xd25E7C3923d2e68c325980b0e15eD20d62B2691F"
+    - &csHashConsensus "0x71093efF8D8599b5fA340D665Ad60fA7C80688e4"
+    - &csIdentifiedDVTClusterGate "0xa12760721A72A7199aB38059DA6690b9Cd4ed7B8"
 
     # --- CMv2 ---
-    - &CuratedModule "0xDa5F930cE326EB5205085D66c72A4E79d60cB8C1"
-    - &CuratedModuleImpl "0x959fc67fe53c8a6c7a1aed73430aa07a36ed9337"
-    - &CuratedAccounting "0x2F91e3A8C5d6593bf4F8403fCfeCcd62dF59f6F6"
-    - &CuratedAccountingImpl "0xB41F5d2721906b3BE4fC7ae08261266C801076C2"
-    - &CuratedFeeDistributor "0x367d23c756599c20DCc8D6943F4976E8F88D60d7"
-    - &CuratedFeeDistributorImpl "0x7C8FEE1dcC95Df60fC9b5BE7603c28Eb3af16753"
-    - &CuratedParametersRegistry "0xffC1C5d59CeAC6F6c27E701F04a70cb50474607C"
-    - &CuratedParametersRegistryImpl "0xfF419BbBC5f44d46547079922a88d691886d192a"
-    - &CuratedExitPenalties "0x004aFb7DAA7dEA20EbAaB75c9F4892C879FaCCe0"
-    - &CuratedExitPenaltiesImpl "0x3766ABbA4635EE0fC3E6A7EB3EF169fe930df9c2"
-    - &CuratedFeeOracle "0x8EeFCdbD984c30E472BcbF545783D051CB5114e5"
-    - &CuratedFeeOracleImpl "0x16804084408B6Caad10046F49aD421cBA56C0b5e"
-    - &CuratedEjector "0xe181A377A2d2BDE9A83f1474BC3DB7A412de091E"
-    - &CuratedHashConsensus "0x902D64c93F6595339aA46105627a085591051aFb"
-    - &CuratedMetaRegistry "0xA64b339eebD3dC3De848298B6a140955932901d8"
-    - &CuratedMetaRegistryImpl "0x6d852907463496622bb5FE5bc55cc30C4682E10e"
-    - &CuratedValidatorStrikes "0xf4618370a1fBf46905B16C10817c8CFaD924D6db"
-    - &CuratedValidatorStrikesImpl "0x239Ee6ab18fB06370ad53Ce05097B32208fB0a30"
-    - &CuratedVerifier "0xC392F457960f1B13Ebaf1aa6C065479dD507E1E3"
-    - &ProfessionalOperatorGate "0x6093EFA6B5E2FF3be54d1c895c9deA932805c49F"
-    - &ProfessionalTrustedOperatorGate "0x8c002c6eE10cf8adb78D1F9EB2e134FdaF8A7C1a"
-    - &PublicGoodOperatorGate "0x207798e6fD1aa7Ee8a63782A64c959cD6727b78C"
-    - &DecentralizationOperatorGate "0xeF273Ca4A21Ba7B414Ae3C9f9b443038cb133F72"
-    - &ExtraEffortOperatorGate "0x3BbBb175f7F07954DE00052b20E1c5572223F24D"
-    - &IntraOperatorDVTClusterGate "0x86A8d4E0db5938D21d98047544668FCCB1A9ADc8"
-    - &IntraOperatorDVTClusterPlusGate "0x773933F9db8964A17d62fb808f2EC7A2de4247CC"
-    - &CuratedGateImpl "0x3cb948FD454ad6b20DE67633f25DcbDbEaa0e849"
-    - &CuratedGateFactory "0xDdE99d63b352A665d04339D4792E6852Ce89d1B7"
+    - &curatedModule "0xDa5F930cE326EB5205085D66c72A4E79d60cB8C1"
+    - &curatedModuleImpl "0x959fc67fe53c8a6c7a1aed73430aa07a36ed9337"
+    - &curatedAccounting "0x2F91e3A8C5d6593bf4F8403fCfeCcd62dF59f6F6"
+    - &curatedAccountingImpl "0xB41F5d2721906b3BE4fC7ae08261266C801076C2"
+    - &curatedFeeDistributor "0x367d23c756599c20DCc8D6943F4976E8F88D60d7"
+    - &curatedFeeDistributorImpl "0x7C8FEE1dcC95Df60fC9b5BE7603c28Eb3af16753"
+    - &curatedParametersRegistry "0xffC1C5d59CeAC6F6c27E701F04a70cb50474607C"
+    - &curatedParametersRegistryImpl "0xfF419BbBC5f44d46547079922a88d691886d192a"
+    - &curatedExitPenalties "0x004aFb7DAA7dEA20EbAaB75c9F4892C879FaCCe0"
+    - &curatedExitPenaltiesImpl "0x3766ABbA4635EE0fC3E6A7EB3EF169fe930df9c2"
+    - &curatedFeeOracle "0x8EeFCdbD984c30E472BcbF545783D051CB5114e5"
+    - &curatedFeeOracleImpl "0x16804084408B6Caad10046F49aD421cBA56C0b5e"
+    - &curatedEjector "0xe181A377A2d2BDE9A83f1474BC3DB7A412de091E"
+    - &curatedHashConsensus "0x902D64c93F6595339aA46105627a085591051aFb"
+    - &curatedMetaRegistry "0xA64b339eebD3dC3De848298B6a140955932901d8"
+    - &curatedMetaRegistryImpl "0x6d852907463496622bb5FE5bc55cc30C4682E10e"
+    - &curatedValidatorStrikes "0xf4618370a1fBf46905B16C10817c8CFaD924D6db"
+    - &curatedValidatorStrikesImpl "0x239Ee6ab18fB06370ad53Ce05097B32208fB0a30"
+    - &curatedVerifier "0xC392F457960f1B13Ebaf1aa6C065479dD507E1E3"
+    - &professionalOperatorGate "0x6093EFA6B5E2FF3be54d1c895c9deA932805c49F"
+    - &professionalTrustedOperatorGate "0x8c002c6eE10cf8adb78D1F9EB2e134FdaF8A7C1a"
+    - &publicGoodOperatorGate "0x207798e6fD1aa7Ee8a63782A64c959cD6727b78C"
+    - &decentralizationOperatorGate "0xeF273Ca4A21Ba7B414Ae3C9f9b443038cb133F72"
+    - &extraEffortOperatorGate "0x3BbBb175f7F07954DE00052b20E1c5572223F24D"
+    - &intraOperatorDVTClusterGate "0x86A8d4E0db5938D21d98047544668FCCB1A9ADc8"
+    - &intraOperatorDVTClusterPlusGate "0x773933F9db8964A17d62fb808f2EC7A2de4247CC"
+    - &curatedGateImpl "0x3cb948FD454ad6b20DE67633f25DcbDbEaa0e849"
+    - &curatedGateFactory "0xDdE99d63b352A665d04339D4792E6852Ce89d1B7"
 
     # --- Easy Track ---
     - &easyTrack "0xF0211b7660680B49De1A7E9f25C65660F0a13Fea"
@@ -160,12 +153,14 @@ deployed:
     - &lolAllowedRecipientsRegistry "0x48c4929630099b217136b64089E8543dB0E5163a"
 
     # --- Committees (Safe msigs) ---
-    - &resealManager "0x7914b5a1539b97Bd0bbd155757F25FD79A522d24"
-    - &sealCommittee "0x8772E3a2D86B9347A2688f9bc1808A6d8917760C"
+    - &circuitBreakerCommittee "0x8772E3a2D86B9347A2688f9bc1808A6d8917760C"
     - &csmCommittee "0xC52fC3081123073078698F1EAc2f1Dc7Bd71880f"
+    - &stVaultsCommittee "0x18A1065c81b0Cc356F1b1C843ddd5E14e4AefffF"
     - &curatedModuleCommittee "0x2570e0b22AD904501dfB0d49575991ACB801dD91"
 
 misc:
+  - &resealManager "0x7914b5a1539b97Bd0bbd155757F25FD79A522d24"
+
   # --- Chain and deployment constants ---
   - &CHAIN_ID "1"
   - &GENESIS_TIME "1606824023"
@@ -192,8 +187,6 @@ misc:
   # --- Addresses / Zero values ---
   - &ZERO_ADDRESS "0x0000000000000000000000000000000000000000"
   - &ZERO_BYTES32 "0x0000000000000000000000000000000000000000000000000000000000000000"
-  # bytes32(0): OZ default admin, not a keccak
-  - &DEFAULT_ADMIN_ROLE "0x0000000000000000000000000000000000000000000000000000000000000000"
 
   # --- General numeric constants ---
   - &MAX_UINT256 "115792089237316195423570985008687907853269984665640564039457584007913129639935"
@@ -218,7 +211,6 @@ misc:
   - &MAX_STETH_WITHDRAWAL_AMOUNT 1e+21
   - &MIN_STETH_WITHDRAWAL_AMOUNT 100
   - &VERSION_1 1
-  - &VERSION_2 2
   - &VERSION_3 3
   - &ONE_ETH_WEI 1000000000000000000
   - &ACTIVATION_DEPOSIT_AMOUNT 31000000000000000000
@@ -241,17 +233,15 @@ misc:
   - &SLOTS_PER_HISTORICAL_ROOT 8192
   - &SHARD_COMMITTEE_PERIOD_IN_SECONDS 98304
   - &EIP712_VERSION 2
-  - &EIP4788_BEACON_ROOTS_CONTRACT "0x000F3df6D732807Ef1319fB7B8bB8522d0Beac02"
+  - &eip4788BeaconRootsContract "0x000F3df6D732807Ef1319fB7B8bB8522d0Beac02"
   - &CAPELLA_SLOT 6209536 # https://github.com/eth-clients/mainnet/blob/main/metadata/config.yaml#L50
   - &ELECTRA_SLOT 11649024 # https://github.com/ethereum/EIPs/blob/master/EIPS/eip-7600.md#activation
-  - &MIN_ACTIVATION_BALANCE 32000000000000000000
-  - &DEPOSIT_CONTRACT "0x00000000219ab540356cBB839Cbe05303d7705Fa"
+  - &depositContract "0x00000000219ab540356cBB839Cbe05303d7705Fa"
 
   # --- Time durations (in seconds) ---
   - &DURATION_1_HOUR 3600
   - &DURATION_1_DAY 86400
   - &DURATION_5_DAYS 432000
-  - &DURATION_2_WEEKS 1209600
   - &DURATION_21_DAYS 1814400
   - &DURATION_28_DAYS 2419200
   - &DURATION_30_DAYS 2592000
@@ -338,26 +328,26 @@ misc:
   - &QUEUE_LOWEST_PRIORITY 5
 
   - &defaultBondCurve [[[1, 2400000000000000000, 2400000000000000000], [2, 3700000000000000000, 1300000000000000000]]]
-  - &defaultAllowedExitDelay 345600
-  - &defaultBadPerformancePenalty 258000000000000000
-  - &defaultGeneralDelayedPenaltyAdditionalFine 100000000000000000
-  - &defaultExitDelayFee 100000000000000000
-  - &defaultKeyRemovalCharge 20000000000000000
-  - &defaultMaxElWithdrawalRequestFee 100000000000000000
+  - &DEFAULT_ALLOWED_EXIT_DELAY 345600
+  - &DEFAULT_BAD_PERFORMANCE_PENALTY 258000000000000000
+  - &DEFAULT_GENERAL_DELAYED_PENALTY_ADDITIONAL_FINE 100000000000000000
+  - &DEFAULT_EXIT_DELAY_FEE 100000000000000000
+  - &DEFAULT_KEY_REMOVAL_CHARGE 20000000000000000
+  - &DEFAULT_MAX_EL_WITHDRAWAL_REQUEST_FEE 100000000000000000
   - &defaultPerformanceCoefficients [54, 8, 2]
-  - &defaultPerformanceLeeway 300
+  - &DEFAULT_PERFORMANCE_LEEWAY 300
   - &defaultPerformanceLeewayData [[1, 300]]
   - &defaultQueueConfig [5, *MAX_UINT32]
-  - &defaultRewardShare 5834
+  - &DEFAULT_REWARD_SHARE 5834
   - &defaultRewardShareData [[1, 5834]]
   - &defaultStrikesParams [6, 3]
 
   - &icsBondCurve [[[1, 1500000000000000000, 1500000000000000000], [2, 2800000000000000000, 1300000000000000000]]]
-  - &icsAllowedExitDelay 432000
-  - &icsBadPerformancePenalty 172000000000000000
-  - &icsGeneralDelayedPenaltyAdditionalFine 50000000000000000
-  - &icsExitDelayFee 50000000000000000
-  - &icsKeyRemovalCharge 10000000000000000
+  - &ICS_ALLOWED_EXIT_DELAY 432000
+  - &ICS_BAD_PERFORMANCE_PENALTY 172000000000000000
+  - &ICS_GENERAL_DELAYED_PENALTY_ADDITIONAL_FINE 50000000000000000
+  - &ICS_EXIT_DELAY_FEE 50000000000000000
+  - &ICS_KEY_REMOVAL_CHARGE 10000000000000000
   - &icsPerformanceCoefficients [54, 4, 2]
   - &icsPerformanceLeewayData [[1, 500], [151, 300]]
   - &icsQueueConfig [0, 10]
@@ -368,7 +358,7 @@ misc:
   - &idvtcQueueConfig [1, 40]
   - &idvtcRewardShareData [[1, 5834], [65, 3334]]
 
-  - &csmMinWithdrawalRatio 9900
+  - &CSM_MIN_WITHDRAWAL_RATIO 9900
   # --- CMv2 constants ---
   # https://github.com/lidofinance/staking-modules/blob/v3.0/script/curated/DeployMainnet.s.sol
   - &CURATED_TYPE "0x637572617465642d6f6e636861696e2d76320000000000000000000000000000" # bytes32("curated-onchain-v2")
@@ -384,37 +374,37 @@ misc:
       ],
     ]
 
-  - &curatedDefaultAllowedExitDelay 345600 # 4 days
-  - &curatedDefaultBadPerformancePenalty 0
-  - &curatedDefaultExitDelayFee 10000000000000000
-  - &curatedDefaultGeneralDelayedPenaltyAdditionalFine 100000000000000000
-  - &curatedDefaultKeyRemovalCharge 0
-  - &curatedDefaultKeysLimit 100
-  - &curatedDefaultMaxElWithdrawalRequestFee 100000000000000000
+  - &CURATED_DEFAULT_ALLOWED_EXIT_DELAY 345600 # 4 days
+  - &CURATED_DEFAULT_BAD_PERFORMANCE_PENALTY 0
+  - &CURATED_DEFAULT_EXIT_DELAY_FEE 10000000000000000
+  - &CURATED_DEFAULT_GENERAL_DELAYED_PENALTY_ADDITIONAL_FINE 100000000000000000
+  - &CURATED_DEFAULT_KEY_REMOVAL_CHARGE 0
+  - &CURATED_DEFAULT_KEYS_LIMIT 100
+  - &CURATED_DEFAULT_MAX_EL_WITHDRAWAL_REQUEST_FEE 100000000000000000
   - &curatedDefaultPerformanceCoefficients [54, 8, 2]
-  - &curatedDefaultPerformanceLeeway 10000
+  - &CURATED_DEFAULT_PERFORMANCE_LEEWAY 10000
   - &curatedDefaultPerformanceLeewayData [[1, 10000]]
   - &curatedDefaultQueueConfig [0, 4294967295]
-  - &curatedDefaultRewardShare 6250
+  - &CURATED_DEFAULT_REWARD_SHARE 6250
   - &curatedDefaultStrikesParams [6, 3]
 
-  - &curatedTrustedGeneralDelayedPenaltyAdditionalFine 50000000000000000
-  - &curatedTrustedKeysLimit 500
-  - &curatedUntrustedKeysLimit 80
-  - &curatedTrustedExitDelayFee 5000000000000000
+  - &CURATED_TRUSTED_GENERAL_DELAYED_PENALTY_ADDITIONAL_FINE 50000000000000000
+  - &CURATED_TRUSTED_KEYS_LIMIT 500
+  - &CURATED_UNTRUSTED_KEYS_LIMIT 80
+  - &CURATED_TRUSTED_EXIT_DELAY_FEE 5000000000000000
   - &curatedTrustedRewardShareData [[1, 8750]]
   - &curatedUntrustedRewardShareData [[1, 6250]]
   - &curatedPremiumRewardShareData [[1, 10000]]
-  - &curatedTrustedBondCurveWeight 100000
-  - &curatedUntrustedBondCurveWeight 50000
+  - &CURATED_TRUSTED_BOND_CURVE_WEIGHT 100000
+  - &CURATED_UNTRUSTED_BOND_CURVE_WEIGHT 50000
 
-  - &curatedMinWithdrawalRatio 9950
+  - &CURATED_MIN_WITHDRAWAL_RATIO 9950
   # --- SRv3 upgrade ---
   # System predeploys
   # EIP-7002 withdrawal requests
-  - &WITHDRAWAL_REQUEST_CONTRACT "0x00000961Ef480Eb55e80D19ad83579A64c007002"
+  - &withdrawalRequestContract "0x00000961Ef480Eb55e80D19ad83579A64c007002"
   # EIP-7251 consolidation requests
-  - &CONSOLIDATION_REQUEST_CONTRACT "0x0000BBdDc7CE488642fb579F8B00f3a590007251"
+  - &consolidationRequestContract "0x0000BBdDc7CE488642fb579F8B00f3a590007251"
 
   # EIP-1967 proxy slots
   # keccak256("eip1967.proxy.admin") - 1
@@ -429,56 +419,47 @@ misc:
 
   # OracleReportSanityChecker limits
   # https://hackmd.io/RLqefrGYQlaaPXnXEF8-ew#Deploy-params-OracleReportSanityChecker
-  - &exitedEthAmountPerDayLimit 57600
-  - &appearedEthAmountPerDayLimit 57600
-  - &annualBalanceIncreaseBPLimit 1000
-  - &simulatedShareRateDeviationBPLimit 50
-  - &maxBalanceExitRequestedPerReportInEth 19200
-  - &maxEffectiveBalanceWeightWCType01 32
-  - &maxEffectiveBalanceWeightWCType02 2048
-  - &maxItemsPerExtraDataTransaction 8
-  - &maxNodeOperatorsPerExtraDataItem 24
-  - &requestTimestampMargin 7680
-  - &maxPositiveTokenRebase 750000
-  - &maxCLBalanceDecreaseBP 360
-  - &clBalanceOraclesErrorUpperBPLimit 50
-  - &consolidationEthAmountPerDayLimit 93375
-  - &exitedValidatorEthAmountLimit 32
-  - &externalPendingBalanceCapEth 300
+  - &EXITED_ETH_AMOUNT_PER_DAY_LIMIT 57600
+  - &APPEARED_ETH_AMOUNT_PER_DAY_LIMIT 57600
+  - &ANNUAL_BALANCE_INCREASE_BP_LIMIT 1000
+  - &SIMULATED_SHARE_RATE_DEVIATION_BP_LIMIT 50
+  - &MAX_BALANCE_EXIT_REQUESTED_PER_REPORT_IN_ETH 19200
+  - &MAX_EFFECTIVE_BALANCE_WEIGHT_WC_TYPE01 32
+  - &MAX_EFFECTIVE_BALANCE_WEIGHT_WC_TYPE02 2048
+  - &MAX_ITEMS_PER_EXTRA_DATA_TRANSACTION 8
+  - &MAX_NODE_OPERATORS_PER_EXTRA_DATA_ITEM 24
+  - &REQUEST_TIMESTAMP_MARGIN 7680
+  - &MAX_POSITIVE_TOKEN_REBASE 750000
+  - &MAX_CL_BALANCE_DECREASE_BP 360
+  - &CL_BALANCE_ORACLES_ERROR_UPPER_BP_LIMIT 50
+  - &CONSOLIDATION_ETH_AMOUNT_PER_DAY_LIMIT 93375
+  - &EXITED_VALIDATOR_ETH_AMOUNT_LIMIT 32
+  - &EXTERNAL_PENDING_BALANCE_CAP_ETH 300
 
   # ConsolidationGateway limits
   # https://hackmd.io/RLqefrGYQlaaPXnXEF8-ew#Deploy-params-ConsolidationGateway
-  - &maxConsolidationRequestsLimit 2900
-  - &consolidationsPerFrame 1
-  - &frameDurationInSec 30
-
-  # ValidatorsExitBusOracle exit balance limits (finalizeUpgrade_v3 params in the SRv3 upgrade vote)
-  - &veboMaxExitBalanceEth 358400
-  - &veboBalancePerFrameEth 32
-  - &veboFrameDurationInSec 48
-
-  # TriggerableWithdrawalsGateway exit request limits ("Set TWG exit request limits" vote item)
-  - &twMaxExitRequestsLimit 250
-  - &twExitsPerFrame 1
-  - &twFrameDurationInSec 240
+  - &MAX_CONSOLIDATION_REQUESTS_LIMIT 2900
+  - &CONSOLIDATIONS_PER_FRAME 1
+  - &FRAME_DURATION_IN_SEC 30
 
   # Lido deposits reserve target (Lido finalizeUpgrade_v4 param in the SRv3 upgrade vote)
-  - &lidoDepositsReserveTarget 1500000000000000000000 # 1500 ETH
+  - &LIDO_DEPOSITS_RESERVE_TARGET 1500000000000000000000 # 1500 ETH
 
   # StakingRouter global per-block top-up cap (StakingRouter finalizeUpgrade_v4 param, LIP-35)
-  - &maxTopUpPerBlockGwei 3200000000000 # 3200 ETH
+  - &MAX_TOP_UP_PER_BLOCK_GWEI 3200000000000 # 3200 ETH
 
   # Safe singleton
   - &safeSingleton "0x41675C099F32341bf84BFc5382aF534df5C7461a"
+  - &safeSingleton_1_3_0 "0xd9Db270c1B5E3Bd161E8c8503c55cEABeE709552"
 
 eoa:
-  - &deployer "0xAD2F7e30AeA89f6D45D942D0f52aFB8B395965f2"
-
   # Lido depositor bot; holds TOP_UP_ROLE on the TopUpGateway
   # https://research.lido.fi/t/proposal-to-refund-money-spent-on-deposits-on-ethereum-to-the-dev-team/1882
   - &depositorBot "0xF82aC5937A20dC862F9bc0668779031E06000f17"
 
 roles:
+  # bytes32(0): OZ default admin, not a keccak
+  - &DEFAULT_ADMIN_ROLE "0x0000000000000000000000000000000000000000000000000000000000000000"
   # Lido
   # cast keccak "STAKING_CONTROL_ROLE"
   - &STAKING_CONTROL_ROLE "0xa42eee1333c0758ba72be38e728b6dadb32ea767de5b4ddbaea1dae85b1b051f"
@@ -613,10 +594,8 @@ roles:
   # Dashboard
   - &NODE_OPERATOR_MANAGER_ROLE "0x59783a4ae82167eefad593739a5430c1d9e896a16c35f1e5285ddd0c0980885c"
   - &BURN_ROLE "0x689f0a569be0c9b6cd2c11c81cb0add722272abdae6b649fdb1e05f1d9bb8a2f"
-  - &ETH_ADDR "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"
   - &FUND_ROLE "0x933b7d5c112a4d05b489cea0b2ced98acb27d3d0fc9827c92cdacb2d6c5559c2"
   - &MINT_ROLE "0xe996ac9b332538bb1fa3cd6743aa47011623cdb94bd964a494ee9d371e4a27d3"
-  - &LOCK_ROLE "0xaf5678186f680e15e8b3e8a8679bdd61c0eb1aaded90254c3e1b5b6b3fed62af"
   - &REBALANCE_ROLE "0x3f82ecf462ddac43fc17ba11472c35f18b7760b4f5a5fc50b9625f9b5a22cf62"
   - &WITHDRAW_ROLE "0x355caf1c2580ed8185acb5ea3573b71f85186b41bdf69e3eb8f1fcd122a562df"
   - &PAUSE_BEACON_CHAIN_DEPOSITS_ROLE "0xa90c7030a27f389f9fc8ed21a0556f40c88130cc14a80db936bed68261819b2c"
@@ -713,7 +692,7 @@ roles:
   - &DISALLOW_PAIR_ROLE "0x4638c3377b40c5fdb49ab3032cbb02972024761b03e6a0d7dcf113f5673c03a8"
 
 l1:
-  rpcUrl: MAINNET_REMOTE_RPC_URL # https://ethereum-rpc.publicnode.com
+  rpcUrl: ETH_RPC_URL
   explorerHostname: api.etherscan.io
   explorerTokenEnv: ETHERSCAN_TOKEN
   chainId: *CHAIN_ID
@@ -854,7 +833,7 @@ l1:
             args: [*ldo]
         getInitializationBlock: 11473216
         getMaxExternalRatioBP: *LIDO_MAX_EXTERNAL_RATIO_BP # <-- V3 critical parameter
-        getDepositsReserveTarget: *lidoDepositsReserveTarget
+        getDepositsReserveTarget: *LIDO_DEPOSITS_RESERVE_TARGET
         getFee: 999
         getBalanceStats: null
         getDepositsReserve: null
@@ -1019,7 +998,7 @@ l1:
         REPORT_VALIDATOR_EXITING_STATUS_ROLE: *REPORT_VALIDATOR_EXITING_STATUS_ROLE
         REPORT_VALIDATOR_EXIT_TRIGGERED_ROLE: *REPORT_VALIDATOR_EXIT_TRIGGERED_ROLE
         MANAGE_WITHDRAWAL_CREDENTIALS_ROLE: *MANAGE_WITHDRAWAL_CREDENTIALS_ROLE
-        DEPOSIT_CONTRACT: *DEPOSIT_CONTRACT
+        DEPOSIT_CONTRACT: *depositContract
         FEE_PRECISION_POINTS: *FEE_PRECISION_POINTS
         INITIAL_DEPOSIT_SIZE: *MIN_DEPOSIT
         MAX_EFFECTIVE_BALANCE_WC_TYPE_01: *MAX_EFFECTIVE_BALANCE_WC_TYPE_01
@@ -1029,7 +1008,7 @@ l1:
         MAX_STAKING_MODULE_NAME_LENGTH: *MAX_STAKING_MODULE_NAME_LENGTH
         LIDO: *lido
         LIDO_LOCATOR: *lidoLocator
-        getMaxTopUpPerBlockGwei: *maxTopUpPerBlockGwei
+        getMaxTopUpPerBlockGwei: *MAX_TOP_UP_PER_BLOCK_GWEI
         getAllNodeOperatorDigests: null
         getAllStakingModuleDigests: null
         getDepositAllocations: null
@@ -1081,7 +1060,7 @@ l1:
         *UNSAFE_SET_EXITED_VALIDATORS_ROLE : []
       implementationChecks:
         DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
-        DEPOSIT_CONTRACT: *DEPOSIT_CONTRACT
+        DEPOSIT_CONTRACT: *depositContract
         FEE_PRECISION_POINTS: *FEE_PRECISION_POINTS
         INITIAL_DEPOSIT_SIZE: *MIN_DEPOSIT
         LIDO: *lido
@@ -1156,7 +1135,7 @@ l1:
         # Prefixes = keccak256(keccak256("lido.DepositSecurityModule.<TAG>") ++ uint256(chainId) ++ dsmAddress),
         # verified for chainId 1 and this DSM address
         ATTEST_MESSAGE_PREFIX: "0x683df20ff74dc438e214ff44087d5e4b6ccf03b21e7f1ba074459a5212abd912"
-        DEPOSIT_CONTRACT: *DEPOSIT_CONTRACT
+        DEPOSIT_CONTRACT: *depositContract
         PAUSE_MESSAGE_PREFIX: "0xe3fb87228adf6fbdd12dc1496751f0251453f29ac84ebbd3a699461b51f1de7b"
         STAKING_ROUTER: *stakingRouter
         UNVET_MESSAGE_PREFIX: "0x90b2d3a4cbdc8a60c14ccf87f2bd90a9881cef5bd52d5bf4b3ec48497f97d06e"
@@ -1306,22 +1285,22 @@ l1:
         proxy_getIsOssified: false
       checks:
         CONSOLIDATION_GATEWAY: *consolidationGateway
-        CONSOLIDATION_REQUEST: *CONSOLIDATION_REQUEST_CONTRACT
+        CONSOLIDATION_REQUEST: *consolidationRequestContract
         LIDO: *lido
         TREASURY: *aragonAgent
         getContractVersion: *VERSION_3
         TRIGGERABLE_WITHDRAWALS_GATEWAY: *triggerableWithdrawalsGateway
-        WITHDRAWAL_REQUEST: *WITHDRAWAL_REQUEST_CONTRACT
+        WITHDRAWAL_REQUEST: *withdrawalRequestContract
         getConsolidationRequestFee: null # dynamic EIP-7251 fee
         getWithdrawalRequestFee: null # dynamic EIP-7002 fee
       implementationChecks:
         CONSOLIDATION_GATEWAY: *consolidationGateway
-        CONSOLIDATION_REQUEST: *CONSOLIDATION_REQUEST_CONTRACT
+        CONSOLIDATION_REQUEST: *consolidationRequestContract
         LIDO: *lido
         TREASURY: *aragonAgent
         getContractVersion: *MAX_UINT256
         TRIGGERABLE_WITHDRAWALS_GATEWAY: *triggerableWithdrawalsGateway
-        WITHDRAWAL_REQUEST: *WITHDRAWAL_REQUEST_CONTRACT
+        WITHDRAWAL_REQUEST: *withdrawalRequestContract
         getConsolidationRequestFee: null # dynamic EIP-7251 fee
         getWithdrawalRequestFee: null # dynamic EIP-7002 fee
 
@@ -1371,7 +1350,7 @@ l1:
         supportsInterface: null
       ozAcl:
         *DEFAULT_ADMIN_ROLE : [*aragonAgent]
-        *REQUEST_BURN_MY_STETH_ROLE : [*CSAccounting, *CuratedAccounting]
+        *REQUEST_BURN_MY_STETH_ROLE : [*csAccounting, *curatedAccounting]
         *REQUEST_BURN_SHARES_ROLE : [*accounting]
       implementationChecks:
         DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
@@ -1395,23 +1374,23 @@ l1:
 
     CSAccounting:
       name: Accounting
-      address: *CSAccounting
+      address: *csAccounting
       proxyName: OssifiableProxy
-      implementation: *CSAccountingImpl
+      implementation: *csAccountingImpl
       proxyChecks:
         proxy__getAdmin: *aragonAgent
-        proxy__getImplementation: *CSAccountingImpl
+        proxy__getImplementation: *csAccountingImpl
         proxy__getIsOssified: false
       checks:
         DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
         DEFAULT_BOND_CURVE_ID: 0
-        FEE_DISTRIBUTOR: *CSFeeDistributor
+        FEE_DISTRIBUTOR: *csFeeDistributor
         LIDO: *lido
         LIDO_LOCATOR: *lidoLocator
         MANAGE_BOND_CURVES_ROLE: *SM_MANAGE_BOND_CURVES_ROLE
         MAX_BOND_LOCK_PERIOD: *DURATION_1_YEAR
         MIN_BOND_LOCK_PERIOD: *DURATION_28_DAYS
-        MODULE: *CSModule
+        MODULE: *csModule
         PAUSE_INFINITELY: *MAX_UINT256
         PAUSE_ROLE: *SM_PAUSE_ROLE
         RECOVERER_ROLE: *SM_RECOVERER_ROLE
@@ -1487,20 +1466,20 @@ l1:
       ozAcl:
         *DEFAULT_ADMIN_ROLE : [*aragonAgent]
         *SM_MANAGE_BOND_CURVES_ROLE : []
-        *SM_SET_BOND_CURVE_ROLE : [*csmCommittee, *CSIcsGate, *CSIdentifiedDVTClusterGate]
+        *SM_SET_BOND_CURVE_ROLE : [*csmCommittee, *csIcsGate, *csIdentifiedDVTClusterGate]
         *SM_RECOVERER_ROLE : []
         *SM_RESUME_ROLE : [*resealManager]
         *SM_PAUSE_ROLE : [*resealManager, *circuitBreaker]
       implementationChecks:
         DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
         DEFAULT_BOND_CURVE_ID: 0
-        FEE_DISTRIBUTOR: *CSFeeDistributor
+        FEE_DISTRIBUTOR: *csFeeDistributor
         LIDO: *lido
         LIDO_LOCATOR: *lidoLocator
         MANAGE_BOND_CURVES_ROLE: *SM_MANAGE_BOND_CURVES_ROLE
         MAX_BOND_LOCK_PERIOD: *DURATION_1_YEAR
         MIN_BOND_LOCK_PERIOD: *DURATION_28_DAYS
-        MODULE: *CSModule
+        MODULE: *csModule
         PAUSE_INFINITELY: *MAX_UINT256
         PAUSE_ROLE: *SM_PAUSE_ROLE
         RECOVERER_ROLE: *SM_RECOVERER_ROLE
@@ -1542,12 +1521,12 @@ l1:
 
     CSModule:
       name: CSModule
-      address: *CSModule
+      address: *csModule
       proxyName: OssifiableProxy
-      implementation: *CSModuleImpl
+      implementation: *csModuleImpl
       proxyChecks:
         proxy__getAdmin: *aragonAgent
-        proxy__getImplementation: *CSModuleImpl
+        proxy__getImplementation: *csModuleImpl
         proxy__getIsOssified: false
       checks:
         DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
@@ -1566,11 +1545,11 @@ l1:
         VERIFIER_ROLE: *SM_VERIFIER_ROLE
         PAUSE_INFINITELY: *MAX_UINT256
         isPaused: false
-        ACCOUNTING: *CSAccounting
-        EXIT_PENALTIES: *CSExitPenalties
-        FEE_DISTRIBUTOR: *CSFeeDistributor
+        ACCOUNTING: *csAccounting
+        EXIT_PENALTIES: *csExitPenalties
+        FEE_DISTRIBUTOR: *csFeeDistributor
         LIDO_LOCATOR: *lidoLocator
-        PARAMETERS_REGISTRY: *CSParametersRegistry
+        PARAMETERS_REGISTRY: *csParametersRegistry
         STETH: *lido
         depositQueueItem: null
         depositQueuePointers: null
@@ -1645,15 +1624,15 @@ l1:
         *SM_RESUME_ROLE : [*resealManager]
         *SM_RECOVERER_ROLE : []
         *STAKING_ROUTER_ROLE : [*stakingRouter]
-        *SM_CREATE_NODE_OPERATOR_ROLE : [*CSPermissionlessGate, *CSIcsGate, *CSIdentifiedDVTClusterGate]
+        *SM_CREATE_NODE_OPERATOR_ROLE : [*csPermissionlessGate, *csIcsGate, *csIdentifiedDVTClusterGate]
         *SM_REPORT_EL_REWARDS_STEALING_PENALTY_ROLE : []
         *SM_SETTLE_EL_REWARDS_STEALING_PENALTY_ROLE : []
-        *SM_VERIFIER_ROLE : [*CSVerifier]
+        *SM_VERIFIER_ROLE : [*csVerifier]
         *SM_REPORT_GENERAL_DELAYED_PENALTY_ROLE : [*csmCommittee]
         *SM_SETTLE_GENERAL_DELAYED_PENALTY_ROLE : [*evmScriptExecutor]
         *SM_MANAGE_TOP_UP_QUEUE_ROLE : []
         *SM_OPERATOR_ADDRESSES_ADMIN_ROLE : []
-        *SM_REPORT_REGULAR_WITHDRAWN_VALIDATORS_ROLE : [*CSVerifier]
+        *SM_REPORT_REGULAR_WITHDRAWN_VALIDATORS_ROLE : [*csVerifier]
         *SM_REPORT_SLASHED_WITHDRAWN_VALIDATORS_ROLE : [*evmScriptExecutor]
         *SM_REWIND_TOP_UP_QUEUE_ROLE : []
       implementationChecks:
@@ -1673,11 +1652,11 @@ l1:
         VERIFIER_ROLE: *SM_VERIFIER_ROLE
         PAUSE_INFINITELY: *MAX_UINT256
         isPaused: false
-        ACCOUNTING: *CSAccounting
-        EXIT_PENALTIES: *CSExitPenalties
-        FEE_DISTRIBUTOR: *CSFeeDistributor
+        ACCOUNTING: *csAccounting
+        EXIT_PENALTIES: *csExitPenalties
+        FEE_DISTRIBUTOR: *csFeeDistributor
         LIDO_LOCATOR: *lidoLocator
-        PARAMETERS_REGISTRY: *CSParametersRegistry
+        PARAMETERS_REGISTRY: *csParametersRegistry
         STETH: *lido
         depositQueueItem: null
         depositQueuePointers: null
@@ -1721,12 +1700,12 @@ l1:
 
     CSFeeOracle:
       name: FeeOracle
-      address: *CSFeeOracle
+      address: *csFeeOracle
       proxyName: OssifiableProxy
-      implementation: *CSFeeOracleImpl
+      implementation: *csFeeOracleImpl
       proxyChecks:
         proxy__getAdmin: *aragonAgent
-        proxy__getImplementation: *CSFeeOracleImpl
+        proxy__getImplementation: *csFeeOracleImpl
         proxy__getIsOssified: false
       checks:
         DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
@@ -1738,11 +1717,11 @@ l1:
         SUBMIT_DATA_ROLE: *ORACLE_SUBMIT_DATA_ROLE
         PAUSE_INFINITELY: *MAX_UINT256
         isPaused: false
-        FEE_DISTRIBUTOR: *CSFeeDistributor
+        FEE_DISTRIBUTOR: *csFeeDistributor
         GENESIS_TIME: *GENESIS_TIME
         SECONDS_PER_SLOT: *SECONDS_PER_SLOT
-        STRIKES: *CSStrikes
-        getConsensusContract: *CSHashConsensus
+        STRIKES: *csStrikes
+        getConsensusContract: *csHashConsensus
         getConsensusReport: null
         getConsensusVersion: 4
         getContractVersion: 3
@@ -1786,10 +1765,10 @@ l1:
         SUBMIT_DATA_ROLE: *ORACLE_SUBMIT_DATA_ROLE
         PAUSE_INFINITELY: *MAX_UINT256
         isPaused: false
-        FEE_DISTRIBUTOR: *CSFeeDistributor
+        FEE_DISTRIBUTOR: *csFeeDistributor
         GENESIS_TIME: *GENESIS_TIME
         SECONDS_PER_SLOT: *SECONDS_PER_SLOT
-        STRIKES: *CSStrikes
+        STRIKES: *csStrikes
         getConsensusContract: *ZERO_ADDRESS
         getConsensusReport: null
         getConsensusVersion: 0
@@ -1805,9 +1784,9 @@ l1:
 
     CSVerifier:
       name: Verifier
-      address: *CSVerifier
+      address: *csVerifier
       checks:
-        BEACON_ROOTS: *EIP4788_BEACON_ROOTS_CONTRACT
+        BEACON_ROOTS: *eip4788BeaconRootsContract
         CAPELLA_SLOT: *CAPELLA_SLOT
         DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
         FIRST_SUPPORTED_SLOT: *ELECTRA_SLOT
@@ -1820,8 +1799,8 @@ l1:
         GI_FIRST_VALIDATOR_PREV: *GI_FIRST_VALIDATOR_ELECTRA
         GI_FIRST_WITHDRAWAL_CURR: *GI_FIRST_WITHDRAWAL_ELECTRA
         GI_FIRST_WITHDRAWAL_PREV: *GI_FIRST_WITHDRAWAL_ELECTRA
-        MIN_WITHDRAWAL_RATIO: *csmMinWithdrawalRatio
-        MODULE: *CSModule
+        MIN_WITHDRAWAL_RATIO: *CSM_MIN_WITHDRAWAL_RATIO
+        MODULE: *csModule
         PAUSE_INFINITELY: *MAX_UINT256
         PAUSE_ROLE: *SM_PAUSE_ROLE
         PIVOT_SLOT: *ELECTRA_SLOT
@@ -1850,12 +1829,12 @@ l1:
 
     CSIcsGate:
       name: VettedGate
-      address: *CSIcsGate
+      address: *csIcsGate
       proxyName: OssifiableProxy
-      implementation: *CSVettedGateImpl
+      implementation: *csVettedGateImpl
       proxyChecks:
         proxy__getAdmin: *aragonAgent
-        proxy__getImplementation: *CSVettedGateImpl
+        proxy__getImplementation: *csVettedGateImpl
         proxy__getIsOssified: false
       checks:
         DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
@@ -1865,8 +1844,8 @@ l1:
         SET_TREE_ROLE: *SM_SET_TREE_ROLE
         PAUSE_INFINITELY: *MAX_UINT256
         isPaused: false
-        ACCOUNTING: *CSAccounting
-        MODULE: *CSModule
+        ACCOUNTING: *csAccounting
+        MODULE: *csModule
         curveId: 2
         getInitializedVersion: 1
         getReferralsCount: null
@@ -1909,8 +1888,8 @@ l1:
         SET_TREE_ROLE: *SM_SET_TREE_ROLE
         PAUSE_INFINITELY: *MAX_UINT256
         isPaused: false
-        ACCOUNTING: *CSAccounting
-        MODULE: *CSModule
+        ACCOUNTING: *csAccounting
+        MODULE: *csModule
         curveId: 0
         getInitializedVersion: *MAX_UINT64 # Initialization disabled for implementation contract
         getReferralsCount: null
@@ -1930,12 +1909,12 @@ l1:
 
     CSIdentifiedDVTClusterGate:
       name: VettedGate
-      address: *CSIdentifiedDVTClusterGate
+      address: *csIdentifiedDVTClusterGate
       proxyName: OssifiableProxy
-      implementation: *CSVettedGateImpl
+      implementation: *csVettedGateImpl
       proxyChecks:
         proxy__getAdmin: *aragonAgent
-        proxy__getImplementation: *CSVettedGateImpl
+        proxy__getImplementation: *csVettedGateImpl
         proxy__getIsOssified: false
       checks:
         DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
@@ -1945,8 +1924,8 @@ l1:
         SET_TREE_ROLE: *SM_SET_TREE_ROLE
         PAUSE_INFINITELY: *MAX_UINT256
         isPaused: false
-        ACCOUNTING: *CSAccounting
-        MODULE: *CSModule
+        ACCOUNTING: *csAccounting
+        MODULE: *csModule
         curveId: 3
         getInitializedVersion: 1
         getReferralsCount: null
@@ -1989,8 +1968,8 @@ l1:
         SET_TREE_ROLE: *SM_SET_TREE_ROLE
         PAUSE_INFINITELY: *MAX_UINT256
         isPaused: false
-        ACCOUNTING: *CSAccounting
-        MODULE: *CSModule
+        ACCOUNTING: *csAccounting
+        MODULE: *csModule
         curveId: 0
         getInitializedVersion: *MAX_UINT64 # Initialization disabled for implementation contract
         getReferralsCount: null
@@ -2010,11 +1989,11 @@ l1:
 
     CSPermissionlessGate:
       name: PermissionlessGate
-      address: *CSPermissionlessGate
+      address: *csPermissionlessGate
       checks:
         CURVE_ID: 0
         DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
-        MODULE: *CSModule
+        MODULE: *csModule
         RECOVERER_ROLE: *SM_RECOVERER_ROLE
         getRoleAdmin:
           - result: *DEFAULT_ADMIN_ROLE
@@ -2032,7 +2011,7 @@ l1:
 
     CSEjector:
       name: Ejector
-      address: *CSEjector
+      address: *csEjector
       checks:
         DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
         PAUSE_ROLE: *SM_PAUSE_ROLE
@@ -2040,8 +2019,8 @@ l1:
         RECOVERER_ROLE: *SM_RECOVERER_ROLE
         PAUSE_INFINITELY: *MAX_UINT256
         isPaused: false
-        MODULE: *CSModule
-        STRIKES: *CSStrikes
+        MODULE: *csModule
+        STRIKES: *csStrikes
         STRIKES_EXIT_TYPE_ID: 1
         VOLUNTARY_EXIT_TYPE_ID: 0
         getResumeSinceTimestamp: null
@@ -2071,17 +2050,17 @@ l1:
 
     CSFeeDistributor:
       name: FeeDistributor
-      address: *CSFeeDistributor
+      address: *csFeeDistributor
       proxyName: OssifiableProxy
-      implementation: *CSFeeDistributorImpl
+      implementation: *csFeeDistributorImpl
       proxyChecks:
         proxy__getAdmin: *aragonAgent
-        proxy__getImplementation: *CSFeeDistributorImpl
+        proxy__getImplementation: *csFeeDistributorImpl
         proxy__getIsOssified: false
       checks:
-        ACCOUNTING: *CSAccounting
+        ACCOUNTING: *csAccounting
         DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
-        ORACLE: *CSFeeOracle
+        ORACLE: *csFeeOracle
         RECOVERER_ROLE: *SM_RECOVERER_ROLE
         STETH: *lido
         distributedShares: null
@@ -2110,9 +2089,9 @@ l1:
         *DEFAULT_ADMIN_ROLE : [*aragonAgent]
         *SM_RECOVERER_ROLE : []
       implementationChecks:
-        ACCOUNTING: *CSAccounting
+        ACCOUNTING: *csAccounting
         DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
-        ORACLE: *CSFeeOracle
+        ORACLE: *csFeeOracle
         RECOVERER_ROLE: *SM_RECOVERER_ROLE
         STETH: *lido
         distributedShares: null
@@ -2136,27 +2115,27 @@ l1:
 
     CSExitPenalties:
       name: ExitPenalties
-      address: *CSExitPenalties
+      address: *csExitPenalties
       proxyName: OssifiableProxy
-      implementation: *CSExitPenaltiesImpl
+      implementation: *csExitPenaltiesImpl
       proxyChecks:
         proxy__getAdmin: *aragonAgent
-        proxy__getImplementation: *CSExitPenaltiesImpl
+        proxy__getImplementation: *csExitPenaltiesImpl
         proxy__getIsOssified: false
       checks:
-        ACCOUNTING: *CSAccounting
-        MODULE: *CSModule
-        PARAMETERS_REGISTRY: *CSParametersRegistry
-        STRIKES: *CSStrikes
+        ACCOUNTING: *csAccounting
+        MODULE: *csModule
+        PARAMETERS_REGISTRY: *csParametersRegistry
+        STRIKES: *csStrikes
         STRIKES_EXIT_TYPE_ID: 1
         VOLUNTARY_EXIT_TYPE_ID: 0
         getExitPenaltyInfo: null
         isValidatorExitDelayPenaltyApplicable: null
       implementationChecks:
-        ACCOUNTING: *CSAccounting
-        MODULE: *CSModule
-        PARAMETERS_REGISTRY: *CSParametersRegistry
-        STRIKES: *CSStrikes
+        ACCOUNTING: *csAccounting
+        MODULE: *csModule
+        PARAMETERS_REGISTRY: *csParametersRegistry
+        STRIKES: *csStrikes
         STRIKES_EXIT_TYPE_ID: 1
         VOLUNTARY_EXIT_TYPE_ID: 0
         getExitPenaltyInfo: null
@@ -2164,12 +2143,12 @@ l1:
 
     CSParametersRegistry:
       name: ParametersRegistry
-      address: *CSParametersRegistry
+      address: *csParametersRegistry
       proxyName: OssifiableProxy
-      implementation: *CSParametersRegistryImpl
+      implementation: *csParametersRegistryImpl
       proxyChecks:
         proxy__getAdmin: *aragonAgent
-        proxy__getImplementation: *CSParametersRegistryImpl
+        proxy__getImplementation: *csParametersRegistryImpl
         proxy__getIsOssified: false
       checks:
         DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
@@ -2181,54 +2160,54 @@ l1:
         MANAGE_REWARD_SHARE_ROLE: *SM_MANAGE_REWARD_SHARE_ROLE
         MANAGE_VALIDATOR_EXIT_PARAMETERS_ROLE: *SM_MANAGE_VALIDATOR_EXIT_PARAMETERS_ROLE
         QUEUE_LOWEST_PRIORITY: *QUEUE_LOWEST_PRIORITY
-        defaultAllowedExitDelay: *defaultAllowedExitDelay
-        defaultBadPerformancePenalty: *defaultBadPerformancePenalty
-        defaultGeneralDelayedPenaltyAdditionalFine: *defaultGeneralDelayedPenaltyAdditionalFine
-        defaultExitDelayFee: *defaultExitDelayFee
-        defaultKeyRemovalCharge: *defaultKeyRemovalCharge
+        defaultAllowedExitDelay: *DEFAULT_ALLOWED_EXIT_DELAY
+        defaultBadPerformancePenalty: *DEFAULT_BAD_PERFORMANCE_PENALTY
+        defaultGeneralDelayedPenaltyAdditionalFine: *DEFAULT_GENERAL_DELAYED_PENALTY_ADDITIONAL_FINE
+        defaultExitDelayFee: *DEFAULT_EXIT_DELAY_FEE
+        defaultKeyRemovalCharge: *DEFAULT_KEY_REMOVAL_CHARGE
         defaultKeysLimit: *MAX_UINT256
-        defaultMaxElWithdrawalRequestFee: *defaultMaxElWithdrawalRequestFee
+        defaultMaxElWithdrawalRequestFee: *DEFAULT_MAX_EL_WITHDRAWAL_REQUEST_FEE
         defaultPerformanceCoefficients: *defaultPerformanceCoefficients
-        defaultPerformanceLeeway: *defaultPerformanceLeeway
+        defaultPerformanceLeeway: *DEFAULT_PERFORMANCE_LEEWAY
         defaultQueueConfig: *defaultQueueConfig
-        defaultRewardShare: *defaultRewardShare
+        defaultRewardShare: *DEFAULT_REWARD_SHARE
         defaultStrikesParams: *defaultStrikesParams
         getCurveParameters: null # This is just a batch view function, we check the individual getters below
         getAllowedExitDelay:
-          - result: *defaultAllowedExitDelay
+          - result: *DEFAULT_ALLOWED_EXIT_DELAY
             args: [1]
-          - result: *icsAllowedExitDelay
+          - result: *ICS_ALLOWED_EXIT_DELAY
             args: [2]
-          - result: *icsAllowedExitDelay
+          - result: *ICS_ALLOWED_EXIT_DELAY
             args: [3]
         getBadPerformancePenalty:
-          - result: *defaultBadPerformancePenalty
+          - result: *DEFAULT_BAD_PERFORMANCE_PENALTY
             args: [1]
-          - result: *icsBadPerformancePenalty
+          - result: *ICS_BAD_PERFORMANCE_PENALTY
             args: [2]
-          - result: *defaultBadPerformancePenalty
+          - result: *DEFAULT_BAD_PERFORMANCE_PENALTY
             args: [3]
         getGeneralDelayedPenaltyAdditionalFine:
-          - result: *defaultGeneralDelayedPenaltyAdditionalFine
+          - result: *DEFAULT_GENERAL_DELAYED_PENALTY_ADDITIONAL_FINE
             args: [1]
-          - result: *icsGeneralDelayedPenaltyAdditionalFine
+          - result: *ICS_GENERAL_DELAYED_PENALTY_ADDITIONAL_FINE
             args: [2]
-          - result: *icsGeneralDelayedPenaltyAdditionalFine
+          - result: *ICS_GENERAL_DELAYED_PENALTY_ADDITIONAL_FINE
             args: [3]
         getExitDelayFee:
-          - result: *defaultExitDelayFee
+          - result: *DEFAULT_EXIT_DELAY_FEE
             args: [1]
-          - result: *icsExitDelayFee
+          - result: *ICS_EXIT_DELAY_FEE
             args: [2]
-          - result: *icsExitDelayFee
+          - result: *ICS_EXIT_DELAY_FEE
             args: [3]
         getInitializedVersion: 3
         getKeyRemovalCharge:
-          - result: *defaultKeyRemovalCharge
+          - result: *DEFAULT_KEY_REMOVAL_CHARGE
             args: [1]
-          - result: *icsKeyRemovalCharge
+          - result: *ICS_KEY_REMOVAL_CHARGE
             args: [2]
-          - result: *icsKeyRemovalCharge
+          - result: *ICS_KEY_REMOVAL_CHARGE
             args: [3]
         getKeysLimit:
           - result: *MAX_UINT256
@@ -2238,11 +2217,11 @@ l1:
           - result: *MAX_UINT256
             args: [3]
         getMaxElWithdrawalRequestFee:
-          - result: *defaultMaxElWithdrawalRequestFee
+          - result: *DEFAULT_MAX_EL_WITHDRAWAL_REQUEST_FEE
             args: [1]
-          - result: *defaultMaxElWithdrawalRequestFee
+          - result: *DEFAULT_MAX_EL_WITHDRAWAL_REQUEST_FEE
             args: [2]
-          - result: *defaultMaxElWithdrawalRequestFee
+          - result: *DEFAULT_MAX_EL_WITHDRAWAL_REQUEST_FEE
             args: [3]
         getPerformanceCoefficients:
           - result: *defaultPerformanceCoefficients
@@ -2362,21 +2341,21 @@ l1:
 
     CSStrikes:
       name: ValidatorStrikes
-      address: *CSStrikes
+      address: *csStrikes
       proxyName: OssifiableProxy
-      implementation: *CSStrikesImpl
+      implementation: *csStrikesImpl
       proxyChecks:
         proxy__getAdmin: *aragonAgent
-        proxy__getImplementation: *CSStrikesImpl
+        proxy__getImplementation: *csStrikesImpl
         proxy__getIsOssified: false
       checks:
-        ACCOUNTING: *CSAccounting
+        ACCOUNTING: *csAccounting
         DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
-        EXIT_PENALTIES: *CSExitPenalties
-        MODULE: *CSModule
-        ORACLE: *CSFeeOracle
-        PARAMETERS_REGISTRY: *CSParametersRegistry
-        ejector: *CSEjector
+        EXIT_PENALTIES: *csExitPenalties
+        MODULE: *csModule
+        ORACLE: *csFeeOracle
+        PARAMETERS_REGISTRY: *csParametersRegistry
+        ejector: *csEjector
         getInitializedVersion: 1
         getRoleAdmin:
           - result: *DEFAULT_ADMIN_ROLE
@@ -2393,12 +2372,12 @@ l1:
       ozAcl:
         *DEFAULT_ADMIN_ROLE : [*aragonAgent]
       implementationChecks:
-        ACCOUNTING: *CSAccounting
+        ACCOUNTING: *csAccounting
         DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
-        EXIT_PENALTIES: *CSExitPenalties
-        MODULE: *CSModule
-        ORACLE: *CSFeeOracle
-        PARAMETERS_REGISTRY: *CSParametersRegistry
+        EXIT_PENALTIES: *csExitPenalties
+        MODULE: *csModule
+        ORACLE: *csFeeOracle
+        PARAMETERS_REGISTRY: *csParametersRegistry
         ejector: *ZERO_ADDRESS
         getInitializedVersion: *MAX_UINT64 # Initialization disabled for implementation contract
         getRoleAdmin: null
@@ -2413,7 +2392,7 @@ l1:
 
     CSHashConsensus:
       name: HashConsensus
-      address: *CSHashConsensus
+      address: *csHashConsensus
       checks:
         DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
         DISABLE_CONSENSUS_ROLE: *DISABLE_CONSENSUS_ROLE
@@ -2438,7 +2417,7 @@ l1:
         getIsMember: null
         getMembers: [*HASH_CONSENSUS_MEMBERS, null]
         getQuorum: *HASH_CONSENSUS_QUORUM
-        getReportProcessor: *CSFeeOracle
+        getReportProcessor: *csFeeOracle
         getReportVariants: null
         getRoleAdmin: null
         getRoleMember: null
@@ -2457,23 +2436,23 @@ l1:
 
     CuratedModule:
       name: CuratedModule
-      address: *CuratedModule
+      address: *curatedModule
       proxyName: OssifiableProxy
-      implementation: *CuratedModuleImpl
+      implementation: *curatedModuleImpl
       proxyChecks:
         proxy__getAdmin: *aragonAgent
-        proxy__getImplementation: *CuratedModuleImpl
+        proxy__getImplementation: *curatedModuleImpl
         proxy__getIsOssified: false
       checks:
-        ACCOUNTING: *CuratedAccounting
+        ACCOUNTING: *curatedAccounting
         CREATE_NODE_OPERATOR_ROLE: *SM_CREATE_NODE_OPERATOR_ROLE
         DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
-        EXIT_PENALTIES: *CuratedExitPenalties
-        FEE_DISTRIBUTOR: *CuratedFeeDistributor
+        EXIT_PENALTIES: *curatedExitPenalties
+        FEE_DISTRIBUTOR: *curatedFeeDistributor
         LIDO_LOCATOR: *lidoLocator
-        META_REGISTRY: *CuratedMetaRegistry
+        META_REGISTRY: *curatedMetaRegistry
         OPERATOR_ADDRESSES_ADMIN_ROLE: *SM_OPERATOR_ADDRESSES_ADMIN_ROLE
-        PARAMETERS_REGISTRY: *CuratedParametersRegistry
+        PARAMETERS_REGISTRY: *curatedParametersRegistry
         PAUSE_INFINITELY: *MAX_UINT256
         PAUSE_ROLE: *SM_PAUSE_ROLE
         RECOVERER_ROLE: *SM_RECOVERER_ROLE
@@ -2556,30 +2535,30 @@ l1:
         *STAKING_ROUTER_ROLE : [*stakingRouter]
         *SM_CREATE_NODE_OPERATOR_ROLE :
           [
-            *ProfessionalOperatorGate,
-            *ProfessionalTrustedOperatorGate,
-            *PublicGoodOperatorGate,
-            *DecentralizationOperatorGate,
-            *ExtraEffortOperatorGate,
-            *IntraOperatorDVTClusterGate,
-            *IntraOperatorDVTClusterPlusGate,
+            *professionalOperatorGate,
+            *professionalTrustedOperatorGate,
+            *publicGoodOperatorGate,
+            *decentralizationOperatorGate,
+            *extraEffortOperatorGate,
+            *intraOperatorDVTClusterGate,
+            *intraOperatorDVTClusterPlusGate,
           ]
         *SM_REPORT_GENERAL_DELAYED_PENALTY_ROLE : [*curatedModuleCommittee]
-        *SM_REPORT_REGULAR_WITHDRAWN_VALIDATORS_ROLE : [*CuratedVerifier]
+        *SM_REPORT_REGULAR_WITHDRAWN_VALIDATORS_ROLE : [*curatedVerifier]
         *SM_REPORT_SLASHED_WITHDRAWN_VALIDATORS_ROLE : [*evmScriptExecutor]
         *SM_SETTLE_GENERAL_DELAYED_PENALTY_ROLE : [*evmScriptExecutor]
-        *SM_VERIFIER_ROLE : [*CuratedVerifier]
+        *SM_VERIFIER_ROLE : [*curatedVerifier]
         *SM_OPERATOR_ADDRESSES_ADMIN_ROLE : []
       implementationChecks:
-        ACCOUNTING: *CuratedAccounting
+        ACCOUNTING: *curatedAccounting
         CREATE_NODE_OPERATOR_ROLE: *SM_CREATE_NODE_OPERATOR_ROLE
         DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
-        EXIT_PENALTIES: *CuratedExitPenalties
-        FEE_DISTRIBUTOR: *CuratedFeeDistributor
+        EXIT_PENALTIES: *curatedExitPenalties
+        FEE_DISTRIBUTOR: *curatedFeeDistributor
         LIDO_LOCATOR: *lidoLocator
-        META_REGISTRY: *CuratedMetaRegistry
+        META_REGISTRY: *curatedMetaRegistry
         OPERATOR_ADDRESSES_ADMIN_ROLE: *SM_OPERATOR_ADDRESSES_ADMIN_ROLE
-        PARAMETERS_REGISTRY: *CuratedParametersRegistry
+        PARAMETERS_REGISTRY: *curatedParametersRegistry
         PAUSE_INFINITELY: *MAX_UINT256
         PAUSE_ROLE: *SM_PAUSE_ROLE
         RECOVERER_ROLE: *SM_RECOVERER_ROLE
@@ -2633,25 +2612,25 @@ l1:
 
     CuratedAccounting:
       name: Accounting
-      address: *CuratedAccounting
+      address: *curatedAccounting
       proxyName: OssifiableProxy
-      implementation: *CuratedAccountingImpl
+      implementation: *curatedAccountingImpl
       proxyChecks:
         proxy__getAdmin: *aragonAgent
-        proxy__getImplementation: *CuratedAccountingImpl
+        proxy__getImplementation: *curatedAccountingImpl
         proxy__getIsOssified: false
       checks:
         BURNER: *burner
         DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
         DEFAULT_BOND_CURVE_ID: 0
-        FEE_DISTRIBUTOR: *CuratedFeeDistributor
+        FEE_DISTRIBUTOR: *curatedFeeDistributor
         LIDO: *lido
         LIDO_LOCATOR: *lidoLocator
         MANAGE_BOND_CURVES_ROLE: *SM_MANAGE_BOND_CURVES_ROLE
         MAX_BOND_LOCK_PERIOD: *DURATION_1_YEAR
         MAX_FEE_SPLITS: 10
         MIN_BOND_LOCK_PERIOD: *DURATION_28_DAYS
-        MODULE: *CuratedModule
+        MODULE: *curatedModule
         PAUSE_INFINITELY: *MAX_UINT256
         PAUSE_ROLE: *SM_PAUSE_ROLE
         RECOVERER_ROLE: *SM_RECOVERER_ROLE
@@ -2735,25 +2714,25 @@ l1:
         *SM_MANAGE_BOND_CURVES_ROLE : []
         *SM_SET_BOND_CURVE_ROLE :
           [
-            *ProfessionalTrustedOperatorGate,
-            *PublicGoodOperatorGate,
-            *DecentralizationOperatorGate,
-            *ExtraEffortOperatorGate,
-            *IntraOperatorDVTClusterGate,
-            *IntraOperatorDVTClusterPlusGate,
+            *professionalTrustedOperatorGate,
+            *publicGoodOperatorGate,
+            *decentralizationOperatorGate,
+            *extraEffortOperatorGate,
+            *intraOperatorDVTClusterGate,
+            *intraOperatorDVTClusterPlusGate,
           ]
       implementationChecks:
         BURNER: *burner
         DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
         DEFAULT_BOND_CURVE_ID: 0
-        FEE_DISTRIBUTOR: *CuratedFeeDistributor
+        FEE_DISTRIBUTOR: *curatedFeeDistributor
         LIDO: *lido
         LIDO_LOCATOR: *lidoLocator
         MANAGE_BOND_CURVES_ROLE: *SM_MANAGE_BOND_CURVES_ROLE
         MAX_BOND_LOCK_PERIOD: *DURATION_1_YEAR
         MAX_FEE_SPLITS: 10
         MIN_BOND_LOCK_PERIOD: *DURATION_28_DAYS
-        MODULE: *CuratedModule
+        MODULE: *curatedModule
         PAUSE_INFINITELY: *MAX_UINT256
         PAUSE_ROLE: *SM_PAUSE_ROLE
         RECOVERER_ROLE: *SM_RECOVERER_ROLE
@@ -2804,17 +2783,17 @@ l1:
 
     CuratedFeeDistributor:
       name: FeeDistributor
-      address: *CuratedFeeDistributor
+      address: *curatedFeeDistributor
       proxyName: OssifiableProxy
-      implementation: *CuratedFeeDistributorImpl
+      implementation: *curatedFeeDistributorImpl
       proxyChecks:
         proxy__getAdmin: *aragonAgent
-        proxy__getImplementation: *CuratedFeeDistributorImpl
+        proxy__getImplementation: *curatedFeeDistributorImpl
         proxy__getIsOssified: false
       checks:
-        ACCOUNTING: *CuratedAccounting
+        ACCOUNTING: *curatedAccounting
         DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
-        ORACLE: *CuratedFeeOracle
+        ORACLE: *curatedFeeOracle
         RECOVERER_ROLE: *SM_RECOVERER_ROLE
         STETH: *lido
         distributedShares: null
@@ -2843,9 +2822,9 @@ l1:
         *DEFAULT_ADMIN_ROLE : [*aragonAgent]
         *SM_RECOVERER_ROLE : []
       implementationChecks:
-        ACCOUNTING: *CuratedAccounting
+        ACCOUNTING: *curatedAccounting
         DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
-        ORACLE: *CuratedFeeOracle
+        ORACLE: *curatedFeeOracle
         RECOVERER_ROLE: *SM_RECOVERER_ROLE
         STETH: *lido
         distributedShares: null
@@ -2869,12 +2848,12 @@ l1:
 
     CuratedParametersRegistry:
       name: ParametersRegistry
-      address: *CuratedParametersRegistry
+      address: *curatedParametersRegistry
       proxyName: OssifiableProxy
-      implementation: *CuratedParametersRegistryImpl
+      implementation: *curatedParametersRegistryImpl
       proxyChecks:
         proxy__getAdmin: *aragonAgent
-        proxy__getImplementation: *CuratedParametersRegistryImpl
+        proxy__getImplementation: *curatedParametersRegistryImpl
         proxy__getIsOssified: false
       checks:
         DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
@@ -2886,124 +2865,124 @@ l1:
         MANAGE_REWARD_SHARE_ROLE: *SM_MANAGE_REWARD_SHARE_ROLE
         MANAGE_VALIDATOR_EXIT_PARAMETERS_ROLE: *SM_MANAGE_VALIDATOR_EXIT_PARAMETERS_ROLE
         QUEUE_LOWEST_PRIORITY: 0
-        defaultAllowedExitDelay: *curatedDefaultAllowedExitDelay
-        defaultBadPerformancePenalty: *curatedDefaultBadPerformancePenalty
-        defaultExitDelayFee: *curatedDefaultExitDelayFee
-        defaultGeneralDelayedPenaltyAdditionalFine: *curatedDefaultGeneralDelayedPenaltyAdditionalFine
-        defaultKeyRemovalCharge: *curatedDefaultKeyRemovalCharge
-        defaultKeysLimit: *curatedDefaultKeysLimit
-        defaultMaxElWithdrawalRequestFee: *curatedDefaultMaxElWithdrawalRequestFee
+        defaultAllowedExitDelay: *CURATED_DEFAULT_ALLOWED_EXIT_DELAY
+        defaultBadPerformancePenalty: *CURATED_DEFAULT_BAD_PERFORMANCE_PENALTY
+        defaultExitDelayFee: *CURATED_DEFAULT_EXIT_DELAY_FEE
+        defaultGeneralDelayedPenaltyAdditionalFine: *CURATED_DEFAULT_GENERAL_DELAYED_PENALTY_ADDITIONAL_FINE
+        defaultKeyRemovalCharge: *CURATED_DEFAULT_KEY_REMOVAL_CHARGE
+        defaultKeysLimit: *CURATED_DEFAULT_KEYS_LIMIT
+        defaultMaxElWithdrawalRequestFee: *CURATED_DEFAULT_MAX_EL_WITHDRAWAL_REQUEST_FEE
         defaultPerformanceCoefficients: *curatedDefaultPerformanceCoefficients
-        defaultPerformanceLeeway: *curatedDefaultPerformanceLeeway
+        defaultPerformanceLeeway: *CURATED_DEFAULT_PERFORMANCE_LEEWAY
         defaultQueueConfig: *curatedDefaultQueueConfig
-        defaultRewardShare: *curatedDefaultRewardShare
+        defaultRewardShare: *CURATED_DEFAULT_REWARD_SHARE
         defaultStrikesParams: *curatedDefaultStrikesParams
         getAllowedExitDelay:
-          - result: *curatedDefaultAllowedExitDelay
+          - result: *CURATED_DEFAULT_ALLOWED_EXIT_DELAY
             args: [0]
-          - result: *curatedDefaultAllowedExitDelay
+          - result: *CURATED_DEFAULT_ALLOWED_EXIT_DELAY
             args: [1]
-          - result: *curatedDefaultAllowedExitDelay
+          - result: *CURATED_DEFAULT_ALLOWED_EXIT_DELAY
             args: [2]
-          - result: *curatedDefaultAllowedExitDelay
+          - result: *CURATED_DEFAULT_ALLOWED_EXIT_DELAY
             args: [3]
-          - result: *curatedDefaultAllowedExitDelay
+          - result: *CURATED_DEFAULT_ALLOWED_EXIT_DELAY
             args: [4]
-          - result: *curatedDefaultAllowedExitDelay
+          - result: *CURATED_DEFAULT_ALLOWED_EXIT_DELAY
             args: [5]
-          - result: *curatedDefaultAllowedExitDelay
+          - result: *CURATED_DEFAULT_ALLOWED_EXIT_DELAY
             args: [6]
         getBadPerformancePenalty:
-          - result: *curatedDefaultBadPerformancePenalty
+          - result: *CURATED_DEFAULT_BAD_PERFORMANCE_PENALTY
             args: [0]
-          - result: *curatedDefaultBadPerformancePenalty
+          - result: *CURATED_DEFAULT_BAD_PERFORMANCE_PENALTY
             args: [1]
-          - result: *curatedDefaultBadPerformancePenalty
+          - result: *CURATED_DEFAULT_BAD_PERFORMANCE_PENALTY
             args: [2]
-          - result: *curatedDefaultBadPerformancePenalty
+          - result: *CURATED_DEFAULT_BAD_PERFORMANCE_PENALTY
             args: [3]
-          - result: *curatedDefaultBadPerformancePenalty
+          - result: *CURATED_DEFAULT_BAD_PERFORMANCE_PENALTY
             args: [4]
-          - result: *curatedDefaultBadPerformancePenalty
+          - result: *CURATED_DEFAULT_BAD_PERFORMANCE_PENALTY
             args: [5]
-          - result: *curatedDefaultBadPerformancePenalty
+          - result: *CURATED_DEFAULT_BAD_PERFORMANCE_PENALTY
             args: [6]
         getCurveParameters: null # this is just a batch view for UI, so we do not check it to keep config clean
         getExitDelayFee:
-          - result: *curatedDefaultExitDelayFee
+          - result: *CURATED_DEFAULT_EXIT_DELAY_FEE
             args: [0]
-          - result: *curatedTrustedExitDelayFee
+          - result: *CURATED_TRUSTED_EXIT_DELAY_FEE
             args: [1]
-          - result: *curatedTrustedExitDelayFee
+          - result: *CURATED_TRUSTED_EXIT_DELAY_FEE
             args: [2]
-          - result: *curatedTrustedExitDelayFee
+          - result: *CURATED_TRUSTED_EXIT_DELAY_FEE
             args: [3]
-          - result: *curatedTrustedExitDelayFee
+          - result: *CURATED_TRUSTED_EXIT_DELAY_FEE
             args: [4]
-          - result: *curatedTrustedExitDelayFee
+          - result: *CURATED_TRUSTED_EXIT_DELAY_FEE
             args: [5]
-          - result: *curatedTrustedExitDelayFee
+          - result: *CURATED_TRUSTED_EXIT_DELAY_FEE
             args: [6]
         getGeneralDelayedPenaltyAdditionalFine:
-          - result: *curatedDefaultGeneralDelayedPenaltyAdditionalFine
+          - result: *CURATED_DEFAULT_GENERAL_DELAYED_PENALTY_ADDITIONAL_FINE
             args: [0]
-          - result: *curatedTrustedGeneralDelayedPenaltyAdditionalFine
+          - result: *CURATED_TRUSTED_GENERAL_DELAYED_PENALTY_ADDITIONAL_FINE
             args: [1]
-          - result: *curatedTrustedGeneralDelayedPenaltyAdditionalFine
+          - result: *CURATED_TRUSTED_GENERAL_DELAYED_PENALTY_ADDITIONAL_FINE
             args: [2]
-          - result: *curatedTrustedGeneralDelayedPenaltyAdditionalFine
+          - result: *CURATED_TRUSTED_GENERAL_DELAYED_PENALTY_ADDITIONAL_FINE
             args: [3]
-          - result: *curatedTrustedGeneralDelayedPenaltyAdditionalFine
+          - result: *CURATED_TRUSTED_GENERAL_DELAYED_PENALTY_ADDITIONAL_FINE
             args: [4]
-          - result: *curatedTrustedGeneralDelayedPenaltyAdditionalFine
+          - result: *CURATED_TRUSTED_GENERAL_DELAYED_PENALTY_ADDITIONAL_FINE
             args: [5]
-          - result: *curatedTrustedGeneralDelayedPenaltyAdditionalFine
+          - result: *CURATED_TRUSTED_GENERAL_DELAYED_PENALTY_ADDITIONAL_FINE
             args: [6]
         getInitializedVersion: 3
         getKeyRemovalCharge:
-          - result: *curatedDefaultKeyRemovalCharge
+          - result: *CURATED_DEFAULT_KEY_REMOVAL_CHARGE
             args: [0]
-          - result: *curatedDefaultKeyRemovalCharge
+          - result: *CURATED_DEFAULT_KEY_REMOVAL_CHARGE
             args: [1]
-          - result: *curatedDefaultKeyRemovalCharge
+          - result: *CURATED_DEFAULT_KEY_REMOVAL_CHARGE
             args: [2]
-          - result: *curatedDefaultKeyRemovalCharge
+          - result: *CURATED_DEFAULT_KEY_REMOVAL_CHARGE
             args: [3]
-          - result: *curatedDefaultKeyRemovalCharge
+          - result: *CURATED_DEFAULT_KEY_REMOVAL_CHARGE
             args: [4]
-          - result: *curatedDefaultKeyRemovalCharge
+          - result: *CURATED_DEFAULT_KEY_REMOVAL_CHARGE
             args: [5]
-          - result: *curatedDefaultKeyRemovalCharge
+          - result: *CURATED_DEFAULT_KEY_REMOVAL_CHARGE
             args: [6]
         getKeysLimit:
-          - result: *curatedUntrustedKeysLimit
+          - result: *CURATED_UNTRUSTED_KEYS_LIMIT
             args: [0]
-          - result: *curatedTrustedKeysLimit
+          - result: *CURATED_TRUSTED_KEYS_LIMIT
             args: [1]
-          - result: *curatedTrustedKeysLimit
+          - result: *CURATED_TRUSTED_KEYS_LIMIT
             args: [2]
-          - result: *curatedTrustedKeysLimit
+          - result: *CURATED_TRUSTED_KEYS_LIMIT
             args: [3]
-          - result: *curatedTrustedKeysLimit
+          - result: *CURATED_TRUSTED_KEYS_LIMIT
             args: [4]
-          - result: *curatedTrustedKeysLimit
+          - result: *CURATED_TRUSTED_KEYS_LIMIT
             args: [5]
-          - result: *curatedTrustedKeysLimit
+          - result: *CURATED_TRUSTED_KEYS_LIMIT
             args: [6]
         getMaxElWithdrawalRequestFee:
-          - result: *curatedDefaultMaxElWithdrawalRequestFee
+          - result: *CURATED_DEFAULT_MAX_EL_WITHDRAWAL_REQUEST_FEE
             args: [0]
-          - result: *curatedDefaultMaxElWithdrawalRequestFee
+          - result: *CURATED_DEFAULT_MAX_EL_WITHDRAWAL_REQUEST_FEE
             args: [1]
-          - result: *curatedDefaultMaxElWithdrawalRequestFee
+          - result: *CURATED_DEFAULT_MAX_EL_WITHDRAWAL_REQUEST_FEE
             args: [2]
-          - result: *curatedDefaultMaxElWithdrawalRequestFee
+          - result: *CURATED_DEFAULT_MAX_EL_WITHDRAWAL_REQUEST_FEE
             args: [3]
-          - result: *curatedDefaultMaxElWithdrawalRequestFee
+          - result: *CURATED_DEFAULT_MAX_EL_WITHDRAWAL_REQUEST_FEE
             args: [4]
-          - result: *curatedDefaultMaxElWithdrawalRequestFee
+          - result: *CURATED_DEFAULT_MAX_EL_WITHDRAWAL_REQUEST_FEE
             args: [5]
-          - result: *curatedDefaultMaxElWithdrawalRequestFee
+          - result: *CURATED_DEFAULT_MAX_EL_WITHDRAWAL_REQUEST_FEE
             args: [6]
         getPerformanceCoefficients:
           - result: *curatedDefaultPerformanceCoefficients
@@ -3156,27 +3135,27 @@ l1:
 
     CuratedExitPenalties:
       name: ExitPenalties
-      address: *CuratedExitPenalties
+      address: *curatedExitPenalties
       proxyName: OssifiableProxy
-      implementation: *CuratedExitPenaltiesImpl
+      implementation: *curatedExitPenaltiesImpl
       proxyChecks:
         proxy__getAdmin: *aragonAgent
-        proxy__getImplementation: *CuratedExitPenaltiesImpl
+        proxy__getImplementation: *curatedExitPenaltiesImpl
         proxy__getIsOssified: false
       checks:
-        ACCOUNTING: *CuratedAccounting
-        MODULE: *CuratedModule
-        PARAMETERS_REGISTRY: *CuratedParametersRegistry
-        STRIKES: *CuratedValidatorStrikes
+        ACCOUNTING: *curatedAccounting
+        MODULE: *curatedModule
+        PARAMETERS_REGISTRY: *curatedParametersRegistry
+        STRIKES: *curatedValidatorStrikes
         STRIKES_EXIT_TYPE_ID: 1
         VOLUNTARY_EXIT_TYPE_ID: 0
         getExitPenaltyInfo: null
         isValidatorExitDelayPenaltyApplicable: null
       implementationChecks:
-        ACCOUNTING: *CuratedAccounting
-        MODULE: *CuratedModule
-        PARAMETERS_REGISTRY: *CuratedParametersRegistry
-        STRIKES: *CuratedValidatorStrikes
+        ACCOUNTING: *curatedAccounting
+        MODULE: *curatedModule
+        PARAMETERS_REGISTRY: *curatedParametersRegistry
+        STRIKES: *curatedValidatorStrikes
         STRIKES_EXIT_TYPE_ID: 1
         VOLUNTARY_EXIT_TYPE_ID: 0
         getExitPenaltyInfo: null
@@ -3184,16 +3163,16 @@ l1:
 
     CuratedFeeOracle:
       name: FeeOracle
-      address: *CuratedFeeOracle
+      address: *curatedFeeOracle
       proxyName: OssifiableProxy
-      implementation: *CuratedFeeOracleImpl
+      implementation: *curatedFeeOracleImpl
       proxyChecks:
         proxy__getAdmin: *aragonAgent
-        proxy__getImplementation: *CuratedFeeOracleImpl
+        proxy__getImplementation: *curatedFeeOracleImpl
         proxy__getIsOssified: false
       checks:
         DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
-        FEE_DISTRIBUTOR: *CuratedFeeDistributor
+        FEE_DISTRIBUTOR: *curatedFeeDistributor
         GENESIS_TIME: *GENESIS_TIME
         MANAGE_CONSENSUS_CONTRACT_ROLE: *ORACLE_MANAGE_CONSENSUS_CONTRACT_ROLE
         MANAGE_CONSENSUS_VERSION_ROLE: *ORACLE_MANAGE_CONSENSUS_VERSION_ROLE
@@ -3202,9 +3181,9 @@ l1:
         RECOVERER_ROLE: *SM_RECOVERER_ROLE
         RESUME_ROLE: *SM_RESUME_ROLE
         SECONDS_PER_SLOT: *SECONDS_PER_SLOT
-        STRIKES: *CuratedValidatorStrikes
+        STRIKES: *curatedValidatorStrikes
         SUBMIT_DATA_ROLE: *ORACLE_SUBMIT_DATA_ROLE
-        getConsensusContract: *CuratedHashConsensus
+        getConsensusContract: *curatedHashConsensus
         getConsensusReport: null
         getConsensusVersion: 4
         getContractVersion: 3
@@ -3241,7 +3220,7 @@ l1:
         *SM_RECOVERER_ROLE : []
       implementationChecks:
         DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
-        FEE_DISTRIBUTOR: *CuratedFeeDistributor
+        FEE_DISTRIBUTOR: *curatedFeeDistributor
         GENESIS_TIME: *GENESIS_TIME
         MANAGE_CONSENSUS_CONTRACT_ROLE: *ORACLE_MANAGE_CONSENSUS_CONTRACT_ROLE
         MANAGE_CONSENSUS_VERSION_ROLE: *ORACLE_MANAGE_CONSENSUS_VERSION_ROLE
@@ -3250,7 +3229,7 @@ l1:
         RECOVERER_ROLE: *SM_RECOVERER_ROLE
         RESUME_ROLE: *SM_RESUME_ROLE
         SECONDS_PER_SLOT: *SECONDS_PER_SLOT
-        STRIKES: *CuratedValidatorStrikes
+        STRIKES: *curatedValidatorStrikes
         SUBMIT_DATA_ROLE: *ORACLE_SUBMIT_DATA_ROLE
         getConsensusContract: *ZERO_ADDRESS
         getConsensusReport: null
@@ -3268,15 +3247,15 @@ l1:
 
     CuratedEjector:
       name: Ejector
-      address: *CuratedEjector
+      address: *curatedEjector
       checks:
         DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
-        MODULE: *CuratedModule
+        MODULE: *curatedModule
         PAUSE_INFINITELY: *MAX_UINT256
         PAUSE_ROLE: *SM_PAUSE_ROLE
         RECOVERER_ROLE: *SM_RECOVERER_ROLE
         RESUME_ROLE: *SM_RESUME_ROLE
-        STRIKES: *CuratedValidatorStrikes
+        STRIKES: *curatedValidatorStrikes
         STRIKES_EXIT_TYPE_ID: 1
         VOLUNTARY_EXIT_TYPE_ID: 0
         getResumeSinceTimestamp: null
@@ -3305,7 +3284,7 @@ l1:
 
     CuratedHashConsensus:
       name: HashConsensus
-      address: *CuratedHashConsensus
+      address: *curatedHashConsensus
       checks:
         DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
         DISABLE_CONSENSUS_ROLE: *DISABLE_CONSENSUS_ROLE
@@ -3330,7 +3309,7 @@ l1:
         getIsMember: null
         getMembers: [*HASH_CONSENSUS_MEMBERS, null]
         getQuorum: *HASH_CONSENSUS_QUORUM
-        getReportProcessor: *CuratedFeeOracle
+        getReportProcessor: *curatedFeeOracle
         getReportVariants: null
         getRoleAdmin:
           - result: *DEFAULT_ADMIN_ROLE
@@ -3360,36 +3339,36 @@ l1:
 
     CuratedMetaRegistry:
       name: MetaRegistry
-      address: *CuratedMetaRegistry
+      address: *curatedMetaRegistry
       proxyName: OssifiableProxy
-      implementation: *CuratedMetaRegistryImpl
+      implementation: *curatedMetaRegistryImpl
       proxyChecks:
         proxy__getAdmin: *aragonAgent
-        proxy__getImplementation: *CuratedMetaRegistryImpl
+        proxy__getImplementation: *curatedMetaRegistryImpl
         proxy__getIsOssified: false
       checks:
-        ACCOUNTING: *CuratedAccounting
+        ACCOUNTING: *curatedAccounting
         DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
         MANAGE_OPERATOR_GROUPS_ROLE: *SM_MANAGE_OPERATOR_GROUPS_ROLE
-        MODULE: *CuratedModule
+        MODULE: *curatedModule
         NO_GROUP_ID: 0
         SET_BOND_CURVE_WEIGHT_ROLE: *SM_SET_BOND_CURVE_WEIGHT_ROLE
         SET_OPERATOR_INFO_ROLE: *SM_SET_OPERATOR_INFO_ROLE
         STAKING_ROUTER: *stakingRouter
         getBondCurveWeight:
-          - result: *curatedUntrustedBondCurveWeight
+          - result: *CURATED_UNTRUSTED_BOND_CURVE_WEIGHT
             args: [0]
-          - result: *curatedTrustedBondCurveWeight
+          - result: *CURATED_TRUSTED_BOND_CURVE_WEIGHT
             args: [1]
-          - result: *curatedTrustedBondCurveWeight
+          - result: *CURATED_TRUSTED_BOND_CURVE_WEIGHT
             args: [2]
-          - result: *curatedTrustedBondCurveWeight
+          - result: *CURATED_TRUSTED_BOND_CURVE_WEIGHT
             args: [3]
-          - result: *curatedTrustedBondCurveWeight
+          - result: *CURATED_TRUSTED_BOND_CURVE_WEIGHT
             args: [4]
-          - result: *curatedTrustedBondCurveWeight
+          - result: *CURATED_TRUSTED_BOND_CURVE_WEIGHT
             args: [5]
-          - result: *curatedTrustedBondCurveWeight
+          - result: *CURATED_TRUSTED_BOND_CURVE_WEIGHT
             args: [6]
         getExternalOperatorGroupId: null
         getInitializedVersion: 1
@@ -3421,19 +3400,19 @@ l1:
         *SM_SET_OPERATOR_INFO_ROLE :
           [
             *curatedModuleCommittee,
-            *ProfessionalOperatorGate,
-            *ProfessionalTrustedOperatorGate,
-            *PublicGoodOperatorGate,
-            *DecentralizationOperatorGate,
-            *ExtraEffortOperatorGate,
-            *IntraOperatorDVTClusterGate,
-            *IntraOperatorDVTClusterPlusGate,
+            *professionalOperatorGate,
+            *professionalTrustedOperatorGate,
+            *publicGoodOperatorGate,
+            *decentralizationOperatorGate,
+            *extraEffortOperatorGate,
+            *intraOperatorDVTClusterGate,
+            *intraOperatorDVTClusterPlusGate,
           ]
       implementationChecks:
-        ACCOUNTING: *CuratedAccounting
+        ACCOUNTING: *curatedAccounting
         DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
         MANAGE_OPERATOR_GROUPS_ROLE: *SM_MANAGE_OPERATOR_GROUPS_ROLE
-        MODULE: *CuratedModule
+        MODULE: *curatedModule
         NO_GROUP_ID: 0
         SET_BOND_CURVE_WEIGHT_ROLE: *SM_SET_BOND_CURVE_WEIGHT_ROLE
         SET_OPERATOR_INFO_ROLE: *SM_SET_OPERATOR_INFO_ROLE
@@ -3457,21 +3436,21 @@ l1:
 
     CuratedValidatorStrikes:
       name: ValidatorStrikes
-      address: *CuratedValidatorStrikes
+      address: *curatedValidatorStrikes
       proxyName: OssifiableProxy
-      implementation: *CuratedValidatorStrikesImpl
+      implementation: *curatedValidatorStrikesImpl
       proxyChecks:
         proxy__getAdmin: *aragonAgent
-        proxy__getImplementation: *CuratedValidatorStrikesImpl
+        proxy__getImplementation: *curatedValidatorStrikesImpl
         proxy__getIsOssified: false
       checks:
-        ACCOUNTING: *CuratedAccounting
+        ACCOUNTING: *curatedAccounting
         DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
-        EXIT_PENALTIES: *CuratedExitPenalties
-        MODULE: *CuratedModule
-        ORACLE: *CuratedFeeOracle
-        PARAMETERS_REGISTRY: *CuratedParametersRegistry
-        ejector: *CuratedEjector
+        EXIT_PENALTIES: *curatedExitPenalties
+        MODULE: *curatedModule
+        ORACLE: *curatedFeeOracle
+        PARAMETERS_REGISTRY: *curatedParametersRegistry
+        ejector: *curatedEjector
         getInitializedVersion: 1
         getRoleAdmin:
           - result: *DEFAULT_ADMIN_ROLE
@@ -3488,12 +3467,12 @@ l1:
       ozAcl:
         *DEFAULT_ADMIN_ROLE : [*aragonAgent]
       implementationChecks:
-        ACCOUNTING: *CuratedAccounting
+        ACCOUNTING: *curatedAccounting
         DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
-        EXIT_PENALTIES: *CuratedExitPenalties
-        MODULE: *CuratedModule
-        ORACLE: *CuratedFeeOracle
-        PARAMETERS_REGISTRY: *CuratedParametersRegistry
+        EXIT_PENALTIES: *curatedExitPenalties
+        MODULE: *curatedModule
+        ORACLE: *curatedFeeOracle
+        PARAMETERS_REGISTRY: *curatedParametersRegistry
         ejector: *ZERO_ADDRESS
         getInitializedVersion: *MAX_UINT64 # Initialization disabled for implementation contract
         getRoleAdmin: null
@@ -3509,9 +3488,9 @@ l1:
 
     CuratedVerifier:
       name: Verifier
-      address: *CuratedVerifier
+      address: *curatedVerifier
       checks:
-        BEACON_ROOTS: *EIP4788_BEACON_ROOTS_CONTRACT
+        BEACON_ROOTS: *eip4788BeaconRootsContract
         CAPELLA_SLOT: *CAPELLA_SLOT
         DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
         FIRST_SUPPORTED_SLOT: *ELECTRA_SLOT
@@ -3524,8 +3503,8 @@ l1:
         GI_FIRST_VALIDATOR_PREV: *GI_FIRST_VALIDATOR_ELECTRA
         GI_FIRST_WITHDRAWAL_CURR: *GI_FIRST_WITHDRAWAL_ELECTRA
         GI_FIRST_WITHDRAWAL_PREV: *GI_FIRST_WITHDRAWAL_ELECTRA
-        MIN_WITHDRAWAL_RATIO: *curatedMinWithdrawalRatio
-        MODULE: *CuratedModule
+        MIN_WITHDRAWAL_RATIO: *CURATED_MIN_WITHDRAWAL_RATIO
+        MODULE: *curatedModule
         PAUSE_INFINITELY: *MAX_UINT256
         PAUSE_ROLE: *SM_PAUSE_ROLE
         PIVOT_SLOT: *ELECTRA_SLOT
@@ -3554,19 +3533,19 @@ l1:
 
     ProfessionalOperatorGate:
       name: CuratedGate
-      address: *ProfessionalOperatorGate
+      address: *professionalOperatorGate
       proxyName: OssifiableProxy
-      implementation: *CuratedGateImpl
+      implementation: *curatedGateImpl
       proxyChecks:
         proxy__getAdmin: *aragonAgent
-        proxy__getImplementation: *CuratedGateImpl
+        proxy__getImplementation: *curatedGateImpl
         proxy__getIsOssified: false
       checks:
-        ACCOUNTING: *CuratedAccounting
+        ACCOUNTING: *curatedAccounting
         DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
         DEFAULT_BOND_CURVE_ID: 0
-        META_REGISTRY: *CuratedMetaRegistry
-        MODULE: *CuratedModule
+        META_REGISTRY: *curatedMetaRegistry
+        MODULE: *curatedModule
         PAUSE_INFINITELY: *MAX_UINT256
         PAUSE_ROLE: *SM_PAUSE_ROLE
         RECOVERER_ROLE: *SM_RECOVERER_ROLE
@@ -3605,11 +3584,11 @@ l1:
         *SM_RECOVERER_ROLE : []
         *SM_SET_TREE_ROLE : [*evmScriptExecutor]
       implementationChecks:
-        ACCOUNTING: *CuratedAccounting
+        ACCOUNTING: *curatedAccounting
         DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
         DEFAULT_BOND_CURVE_ID: 0
-        META_REGISTRY: *CuratedMetaRegistry
-        MODULE: *CuratedModule
+        META_REGISTRY: *curatedMetaRegistry
+        MODULE: *curatedModule
         PAUSE_INFINITELY: *MAX_UINT256
         PAUSE_ROLE: *SM_PAUSE_ROLE
         RECOVERER_ROLE: *SM_RECOVERER_ROLE
@@ -3634,19 +3613,19 @@ l1:
 
     ProfessionalTrustedOperatorGate:
       name: CuratedGate
-      address: *ProfessionalTrustedOperatorGate
+      address: *professionalTrustedOperatorGate
       proxyName: OssifiableProxy
-      implementation: *CuratedGateImpl
+      implementation: *curatedGateImpl
       proxyChecks:
         proxy__getAdmin: *aragonAgent
-        proxy__getImplementation: *CuratedGateImpl
+        proxy__getImplementation: *curatedGateImpl
         proxy__getIsOssified: false
       checks:
-        ACCOUNTING: *CuratedAccounting
+        ACCOUNTING: *curatedAccounting
         DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
         DEFAULT_BOND_CURVE_ID: 0
-        META_REGISTRY: *CuratedMetaRegistry
-        MODULE: *CuratedModule
+        META_REGISTRY: *curatedMetaRegistry
+        MODULE: *curatedModule
         PAUSE_INFINITELY: *MAX_UINT256
         PAUSE_ROLE: *SM_PAUSE_ROLE
         RECOVERER_ROLE: *SM_RECOVERER_ROLE
@@ -3685,11 +3664,11 @@ l1:
         *SM_RECOVERER_ROLE : []
         *SM_SET_TREE_ROLE : [*evmScriptExecutor]
       implementationChecks:
-        ACCOUNTING: *CuratedAccounting
+        ACCOUNTING: *curatedAccounting
         DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
         DEFAULT_BOND_CURVE_ID: 0
-        META_REGISTRY: *CuratedMetaRegistry
-        MODULE: *CuratedModule
+        META_REGISTRY: *curatedMetaRegistry
+        MODULE: *curatedModule
         PAUSE_INFINITELY: *MAX_UINT256
         PAUSE_ROLE: *SM_PAUSE_ROLE
         RECOVERER_ROLE: *SM_RECOVERER_ROLE
@@ -3714,19 +3693,19 @@ l1:
 
     PublicGoodOperatorGate:
       name: CuratedGate
-      address: *PublicGoodOperatorGate
+      address: *publicGoodOperatorGate
       proxyName: OssifiableProxy
-      implementation: *CuratedGateImpl
+      implementation: *curatedGateImpl
       proxyChecks:
         proxy__getAdmin: *aragonAgent
-        proxy__getImplementation: *CuratedGateImpl
+        proxy__getImplementation: *curatedGateImpl
         proxy__getIsOssified: false
       checks:
-        ACCOUNTING: *CuratedAccounting
+        ACCOUNTING: *curatedAccounting
         DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
         DEFAULT_BOND_CURVE_ID: 0
-        META_REGISTRY: *CuratedMetaRegistry
-        MODULE: *CuratedModule
+        META_REGISTRY: *curatedMetaRegistry
+        MODULE: *curatedModule
         PAUSE_INFINITELY: *MAX_UINT256
         PAUSE_ROLE: *SM_PAUSE_ROLE
         RECOVERER_ROLE: *SM_RECOVERER_ROLE
@@ -3765,11 +3744,11 @@ l1:
         *SM_RECOVERER_ROLE : []
         *SM_SET_TREE_ROLE : [*evmScriptExecutor]
       implementationChecks:
-        ACCOUNTING: *CuratedAccounting
+        ACCOUNTING: *curatedAccounting
         DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
         DEFAULT_BOND_CURVE_ID: 0
-        META_REGISTRY: *CuratedMetaRegistry
-        MODULE: *CuratedModule
+        META_REGISTRY: *curatedMetaRegistry
+        MODULE: *curatedModule
         PAUSE_INFINITELY: *MAX_UINT256
         PAUSE_ROLE: *SM_PAUSE_ROLE
         RECOVERER_ROLE: *SM_RECOVERER_ROLE
@@ -3794,19 +3773,19 @@ l1:
 
     DecentralizationOperatorGate:
       name: CuratedGate
-      address: *DecentralizationOperatorGate
+      address: *decentralizationOperatorGate
       proxyName: OssifiableProxy
-      implementation: *CuratedGateImpl
+      implementation: *curatedGateImpl
       proxyChecks:
         proxy__getAdmin: *aragonAgent
-        proxy__getImplementation: *CuratedGateImpl
+        proxy__getImplementation: *curatedGateImpl
         proxy__getIsOssified: false
       checks:
-        ACCOUNTING: *CuratedAccounting
+        ACCOUNTING: *curatedAccounting
         DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
         DEFAULT_BOND_CURVE_ID: 0
-        META_REGISTRY: *CuratedMetaRegistry
-        MODULE: *CuratedModule
+        META_REGISTRY: *curatedMetaRegistry
+        MODULE: *curatedModule
         PAUSE_INFINITELY: *MAX_UINT256
         PAUSE_ROLE: *SM_PAUSE_ROLE
         RECOVERER_ROLE: *SM_RECOVERER_ROLE
@@ -3845,11 +3824,11 @@ l1:
         *SM_RECOVERER_ROLE : []
         *SM_SET_TREE_ROLE : [*evmScriptExecutor]
       implementationChecks:
-        ACCOUNTING: *CuratedAccounting
+        ACCOUNTING: *curatedAccounting
         DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
         DEFAULT_BOND_CURVE_ID: 0
-        META_REGISTRY: *CuratedMetaRegistry
-        MODULE: *CuratedModule
+        META_REGISTRY: *curatedMetaRegistry
+        MODULE: *curatedModule
         PAUSE_INFINITELY: *MAX_UINT256
         PAUSE_ROLE: *SM_PAUSE_ROLE
         RECOVERER_ROLE: *SM_RECOVERER_ROLE
@@ -3874,19 +3853,19 @@ l1:
 
     ExtraEffortOperatorGate:
       name: CuratedGate
-      address: *ExtraEffortOperatorGate
+      address: *extraEffortOperatorGate
       proxyName: OssifiableProxy
-      implementation: *CuratedGateImpl
+      implementation: *curatedGateImpl
       proxyChecks:
         proxy__getAdmin: *aragonAgent
-        proxy__getImplementation: *CuratedGateImpl
+        proxy__getImplementation: *curatedGateImpl
         proxy__getIsOssified: false
       checks:
-        ACCOUNTING: *CuratedAccounting
+        ACCOUNTING: *curatedAccounting
         DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
         DEFAULT_BOND_CURVE_ID: 0
-        META_REGISTRY: *CuratedMetaRegistry
-        MODULE: *CuratedModule
+        META_REGISTRY: *curatedMetaRegistry
+        MODULE: *curatedModule
         PAUSE_INFINITELY: *MAX_UINT256
         PAUSE_ROLE: *SM_PAUSE_ROLE
         RECOVERER_ROLE: *SM_RECOVERER_ROLE
@@ -3925,11 +3904,11 @@ l1:
         *SM_RECOVERER_ROLE : []
         *SM_SET_TREE_ROLE : [*evmScriptExecutor]
       implementationChecks:
-        ACCOUNTING: *CuratedAccounting
+        ACCOUNTING: *curatedAccounting
         DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
         DEFAULT_BOND_CURVE_ID: 0
-        META_REGISTRY: *CuratedMetaRegistry
-        MODULE: *CuratedModule
+        META_REGISTRY: *curatedMetaRegistry
+        MODULE: *curatedModule
         PAUSE_INFINITELY: *MAX_UINT256
         PAUSE_ROLE: *SM_PAUSE_ROLE
         RECOVERER_ROLE: *SM_RECOVERER_ROLE
@@ -3954,19 +3933,19 @@ l1:
 
     IntraOperatorDVTClusterGate:
       name: CuratedGate
-      address: *IntraOperatorDVTClusterGate
+      address: *intraOperatorDVTClusterGate
       proxyName: OssifiableProxy
-      implementation: *CuratedGateImpl
+      implementation: *curatedGateImpl
       proxyChecks:
         proxy__getAdmin: *aragonAgent
-        proxy__getImplementation: *CuratedGateImpl
+        proxy__getImplementation: *curatedGateImpl
         proxy__getIsOssified: false
       checks:
-        ACCOUNTING: *CuratedAccounting
+        ACCOUNTING: *curatedAccounting
         DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
         DEFAULT_BOND_CURVE_ID: 0
-        META_REGISTRY: *CuratedMetaRegistry
-        MODULE: *CuratedModule
+        META_REGISTRY: *curatedMetaRegistry
+        MODULE: *curatedModule
         PAUSE_INFINITELY: *MAX_UINT256
         PAUSE_ROLE: *SM_PAUSE_ROLE
         RECOVERER_ROLE: *SM_RECOVERER_ROLE
@@ -4005,11 +3984,11 @@ l1:
         *SM_RECOVERER_ROLE : []
         *SM_SET_TREE_ROLE : [*evmScriptExecutor]
       implementationChecks:
-        ACCOUNTING: *CuratedAccounting
+        ACCOUNTING: *curatedAccounting
         DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
         DEFAULT_BOND_CURVE_ID: 0
-        META_REGISTRY: *CuratedMetaRegistry
-        MODULE: *CuratedModule
+        META_REGISTRY: *curatedMetaRegistry
+        MODULE: *curatedModule
         PAUSE_INFINITELY: *MAX_UINT256
         PAUSE_ROLE: *SM_PAUSE_ROLE
         RECOVERER_ROLE: *SM_RECOVERER_ROLE
@@ -4034,19 +4013,19 @@ l1:
 
     IntraOperatorDVTClusterPlusGate:
       name: CuratedGate
-      address: *IntraOperatorDVTClusterPlusGate
+      address: *intraOperatorDVTClusterPlusGate
       proxyName: OssifiableProxy
-      implementation: *CuratedGateImpl
+      implementation: *curatedGateImpl
       proxyChecks:
         proxy__getAdmin: *aragonAgent
-        proxy__getImplementation: *CuratedGateImpl
+        proxy__getImplementation: *curatedGateImpl
         proxy__getIsOssified: false
       checks:
-        ACCOUNTING: *CuratedAccounting
+        ACCOUNTING: *curatedAccounting
         DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
         DEFAULT_BOND_CURVE_ID: 0
-        META_REGISTRY: *CuratedMetaRegistry
-        MODULE: *CuratedModule
+        META_REGISTRY: *curatedMetaRegistry
+        MODULE: *curatedModule
         PAUSE_INFINITELY: *MAX_UINT256
         PAUSE_ROLE: *SM_PAUSE_ROLE
         RECOVERER_ROLE: *SM_RECOVERER_ROLE
@@ -4085,11 +4064,11 @@ l1:
         *SM_RECOVERER_ROLE : []
         *SM_SET_TREE_ROLE : [*evmScriptExecutor]
       implementationChecks:
-        ACCOUNTING: *CuratedAccounting
+        ACCOUNTING: *curatedAccounting
         DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
         DEFAULT_BOND_CURVE_ID: 0
-        META_REGISTRY: *CuratedMetaRegistry
-        MODULE: *CuratedModule
+        META_REGISTRY: *curatedMetaRegistry
+        MODULE: *curatedModule
         PAUSE_INFINITELY: *MAX_UINT256
         PAUSE_ROLE: *SM_PAUSE_ROLE
         RECOVERER_ROLE: *SM_RECOVERER_ROLE
@@ -4114,9 +4093,9 @@ l1:
 
     CuratedGateFactory:
       name: MerkleGateFactory
-      address: *CuratedGateFactory
+      address: *curatedGateFactory
       checks:
-        GATE_IMPL: *CuratedGateImpl
+        GATE_IMPL: *curatedGateImpl
     # ------
 
     minFirstAllocationStrategy:
@@ -4137,16 +4116,9 @@ l1:
         TWR_LIMIT_POSITION: null
         TW_EXIT_LIMIT_MANAGER_ROLE: *TW_EXIT_LIMIT_MANAGER_ROLE
         VERSION: *VERSION_1
-        getExitRequestLimitFullInfo:
-          # [maxExitRequestsLimit, exitsPerFrame, frameDurationInSec, prevExitRequestsLimit, currentExitRequestsLimit]
-          # "Set TWG exit request limits" vote item; the last two may transiently dip below max after exit requests
-          [
-            *twMaxExitRequestsLimit,
-            *twExitsPerFrame,
-            *twFrameDurationInSec,
-            *twMaxExitRequestsLimit,
-            *twMaxExitRequestsLimit,
-          ]
+        # [maxExitRequestsLimit, exitsPerFrame, frameDurationInSec, prevExitRequestsLimit, currentExitRequestsLimit]
+        # the last two drain and refill with every exit request, so only they stay unpinned
+        getExitRequestLimitFullInfo: [250, 1, 240, null, null]
         getResumeSinceTimestamp: 0
         getRoleAdmin: null
         getRoleMember: null
@@ -4157,7 +4129,7 @@ l1:
       ozAcl:
         *DEFAULT_ADMIN_ROLE : [*aragonAgent]
         # VEBO (pre-existing) + New CSM Ejector + Curated Ejector, granted in the SRv3 upgrade vote
-        *ADD_FULL_WITHDRAWAL_REQUEST_ROLE : [*CSEjector, *CuratedEjector, *validatorsExitBusOracle]
+        *ADD_FULL_WITHDRAWAL_REQUEST_ROLE : [*csEjector, *curatedEjector, *validatorsExitBusOracle]
         *TWG_PAUSE_ROLE : [*circuitBreaker, *resealManager]
         *TWG_RESUME_ROLE : [*resealManager]
         # "Grant TWG TW_EXIT_LIMIT_MANAGER_ROLE to AGENT" vote item
@@ -4167,7 +4139,7 @@ l1:
       name: ValidatorExitDelayVerifier
       address: *validatorExitDelayVerifier
       checks:
-        BEACON_ROOTS: *EIP4788_BEACON_ROOTS_CONTRACT
+        BEACON_ROOTS: *eip4788BeaconRootsContract
         CAPELLA_SLOT: *CAPELLA_SLOT
         FIRST_SUPPORTED_SLOT: *ELECTRA_SLOT
         GENESIS_TIME: *GENESIS_TIME
@@ -4312,7 +4284,7 @@ l1:
         PREDEPOSIT_AMOUNT: *ONE_ETH_WEI
         ACTIVATION_DEPOSIT_AMOUNT: *ACTIVATION_DEPOSIT_AMOUNT
         MAX_TOPUP_AMOUNT: *MAX_TOPUP_AMOUNT
-        BEACON_ROOTS: *EIP4788_BEACON_ROOTS_CONTRACT
+        BEACON_ROOTS: *eip4788BeaconRootsContract
         DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
         DEPOSIT_DOMAIN: *DEPOSIT_DOMAIN
         GI_FIRST_VALIDATOR_CURR: *GI_FIRST_VALIDATOR_ELECTRA
@@ -4350,7 +4322,7 @@ l1:
         PREDEPOSIT_AMOUNT: *ONE_ETH_WEI
         ACTIVATION_DEPOSIT_AMOUNT: *ACTIVATION_DEPOSIT_AMOUNT
         MAX_TOPUP_AMOUNT: *MAX_TOPUP_AMOUNT
-        BEACON_ROOTS: *EIP4788_BEACON_ROOTS_CONTRACT
+        BEACON_ROOTS: *eip4788BeaconRootsContract
         DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
         DEPOSIT_DOMAIN: *DEPOSIT_DOMAIN
         GI_FIRST_VALIDATOR_CURR: *GI_FIRST_VALIDATOR_ELECTRA
@@ -4457,6 +4429,20 @@ l1:
         tier: null
         vaultInfo: null
 
+    tokenRateNotifier:
+      name: TokenRateNotifier
+      address: *tokenRateNotifier
+      checks:
+        owner: *aragonAgent
+        MAX_OBSERVERS_COUNT: 32
+        TOKEN_RATE_PROVIDER: *accounting
+        INDEX_NOT_FOUND: *MAX_UINT256
+        REQUIRED_INTERFACE: "0xa16ba44d"
+        observersLength: 1
+        observers:
+          - args: [0]
+            result: "0xd54c1c6413caac3477AC14b2a80D5398E3c32FfE"
+
     stakingVaultFactory:
       name: VaultFactory
       address: *stakingVaultFactory
@@ -4478,7 +4464,7 @@ l1:
       name: StakingVault
       address: *stakingVaultImplAddress
       checks:
-        DEPOSIT_CONTRACT: *DEPOSIT_CONTRACT
+        DEPOSIT_CONTRACT: *depositContract
         beaconChainDepositsPaused: false
         depositor: *ZERO_ADDRESS
         getInitializedVersion: *MAX_UINT64
@@ -4707,8 +4693,8 @@ l1:
         GENESIS_TIME: *GENESIS_TIME
         MANAGE_CONSENSUS_CONTRACT_ROLE: *ORACLE_MANAGE_CONSENSUS_CONTRACT_ROLE
         MANAGE_CONSENSUS_VERSION_ROLE: *ORACLE_MANAGE_CONSENSUS_VERSION_ROLE
-        MAX_EFFECTIVE_BALANCE_WEIGHT_WC_TYPE_01: *maxEffectiveBalanceWeightWCType01
-        MAX_EFFECTIVE_BALANCE_WEIGHT_WC_TYPE_02: *maxEffectiveBalanceWeightWCType02
+        MAX_EFFECTIVE_BALANCE_WEIGHT_WC_TYPE_01: *MAX_EFFECTIVE_BALANCE_WEIGHT_WC_TYPE01
+        MAX_EFFECTIVE_BALANCE_WEIGHT_WC_TYPE_02: *MAX_EFFECTIVE_BALANCE_WEIGHT_WC_TYPE02
         PAUSE_INFINITELY: *MAX_UINT256
         PAUSE_ROLE: *ORACLE_PAUSE_ROLE
         RESUME_ROLE: *ORACLE_RESUME_ROLE
@@ -4719,16 +4705,9 @@ l1:
         getConsensusVersion: *VEB_CONSENSUS_VERSION
         getContractVersion: *VERSION_3
         getMaxValidatorsPerReport: 600
-        getExitRequestLimitFullInfo:
-          # [maxExitBalanceEth, balancePerFrameEth, frameDurationInSec, prevExitBalanceEth, currentExitBalanceEth]
-          # the last two may transiently dip below max right after exit requests are submitted
-          [
-            *veboMaxExitBalanceEth,
-            *veboBalancePerFrameEth,
-            *veboFrameDurationInSec,
-            *veboMaxExitBalanceEth,
-            *veboMaxExitBalanceEth,
-          ]
+        # [maxExitBalanceEth, balancePerFrameEth, frameDurationInSec, prevExitBalanceEth, currentExitBalanceEth]
+        # the last two drain and refill with every exit request, so only they stay unpinned
+        getExitRequestLimitFullInfo: [358400, 32, 48, null, null]
         getTotalRequestsProcessed: null
         isPaused: false
         getConsensusReport: null
@@ -4761,8 +4740,8 @@ l1:
         MANAGE_CONSENSUS_CONTRACT_ROLE: *ORACLE_MANAGE_CONSENSUS_CONTRACT_ROLE
         MANAGE_CONSENSUS_VERSION_ROLE: *ORACLE_MANAGE_CONSENSUS_VERSION_ROLE
         # read via the immutable LOCATOR from the sanity checker, so the bare impl returns the live values too
-        MAX_EFFECTIVE_BALANCE_WEIGHT_WC_TYPE_01: *maxEffectiveBalanceWeightWCType01
-        MAX_EFFECTIVE_BALANCE_WEIGHT_WC_TYPE_02: *maxEffectiveBalanceWeightWCType02
+        MAX_EFFECTIVE_BALANCE_WEIGHT_WC_TYPE_01: *MAX_EFFECTIVE_BALANCE_WEIGHT_WC_TYPE01
+        MAX_EFFECTIVE_BALANCE_WEIGHT_WC_TYPE_02: *MAX_EFFECTIVE_BALANCE_WEIGHT_WC_TYPE02
         PAUSE_INFINITELY: *MAX_UINT256
         PAUSE_ROLE: *ORACLE_PAUSE_ROLE
         RESUME_ROLE: *ORACLE_RESUME_ROLE
@@ -4863,30 +4842,30 @@ l1:
         checkSimulatedShareRate: null
         checkWithdrawalQueueOracleReport: null
         getLidoLocator: *lidoLocator
-        getMaxCLBalanceDecreaseBP: *maxCLBalanceDecreaseBP
-        getMaxEffectiveBalanceWeightWCType01: *maxEffectiveBalanceWeightWCType01
-        getMaxEffectiveBalanceWeightWCType02: *maxEffectiveBalanceWeightWCType02
-        getMaxPositiveTokenRebase: *maxPositiveTokenRebase
+        getMaxCLBalanceDecreaseBP: *MAX_CL_BALANCE_DECREASE_BP
+        getMaxEffectiveBalanceWeightWCType01: *MAX_EFFECTIVE_BALANCE_WEIGHT_WC_TYPE01
+        getMaxEffectiveBalanceWeightWCType02: *MAX_EFFECTIVE_BALANCE_WEIGHT_WC_TYPE02
+        getMaxPositiveTokenRebase: *MAX_POSITIVE_TOKEN_REBASE
         getOracleReportLimits:
           [
-            *exitedEthAmountPerDayLimit,
-            *appearedEthAmountPerDayLimit,
-            *annualBalanceIncreaseBPLimit,
-            *simulatedShareRateDeviationBPLimit,
-            *maxBalanceExitRequestedPerReportInEth,
-            *maxEffectiveBalanceWeightWCType01,
-            *maxEffectiveBalanceWeightWCType02,
-            *maxItemsPerExtraDataTransaction,
-            *maxNodeOperatorsPerExtraDataItem,
-            *requestTimestampMargin,
-            *maxPositiveTokenRebase,
-            *maxCLBalanceDecreaseBP,
-            *clBalanceOraclesErrorUpperBPLimit,
-            *consolidationEthAmountPerDayLimit,
-            *exitedValidatorEthAmountLimit,
-            *externalPendingBalanceCapEth,
+            *EXITED_ETH_AMOUNT_PER_DAY_LIMIT,
+            *APPEARED_ETH_AMOUNT_PER_DAY_LIMIT,
+            *ANNUAL_BALANCE_INCREASE_BP_LIMIT,
+            *SIMULATED_SHARE_RATE_DEVIATION_BP_LIMIT,
+            *MAX_BALANCE_EXIT_REQUESTED_PER_REPORT_IN_ETH,
+            *MAX_EFFECTIVE_BALANCE_WEIGHT_WC_TYPE01,
+            *MAX_EFFECTIVE_BALANCE_WEIGHT_WC_TYPE02,
+            *MAX_ITEMS_PER_EXTRA_DATA_TRANSACTION,
+            *MAX_NODE_OPERATORS_PER_EXTRA_DATA_ITEM,
+            *REQUEST_TIMESTAMP_MARGIN,
+            *MAX_POSITIVE_TOKEN_REBASE,
+            *MAX_CL_BALANCE_DECREASE_BP,
+            *CL_BALANCE_ORACLES_ERROR_UPPER_BP_LIMIT,
+            *CONSOLIDATION_ETH_AMOUNT_PER_DAY_LIMIT,
+            *EXITED_VALIDATOR_ETH_AMOUNT_LIMIT,
+            *EXTERNAL_PENDING_BALANCE_CAP_ETH,
           ]
-        getReportDataCount: 2 # 2 migration snapshots
+        getReportDataCount:
         getRoleAdmin:
           - args: [*DEFAULT_ADMIN_ROLE]
             result: *DEFAULT_ADMIN_ROLE
@@ -4925,7 +4904,7 @@ l1:
         getRoleMember: null
         getRoleMemberCount: null
         hasRole: null
-        isPostMigrationFirstReportDone: false # flips to true after the first post-migration AO report
+        isPostMigrationFirstReportDone: true # flipped by the first post-migration AO report
         lastReportTimestamp: null
         lastVaultBalanceAfterTransfer: null
         reportData: null
@@ -5540,57 +5519,6 @@ l1:
         isValidBump: null
         getLatest: null
 
-    gateSealBlueprint:
-      name: GateSeal
-      address: *gateSealBlueprint
-      checks:
-        get_sealing_committee:
-          - mustRevert: true
-        get_seal_duration_seconds:
-          - mustRevert: true
-        get_sealables:
-          - mustRevert: true
-        get_expiry_timestamp:
-          - mustRevert: true
-        is_expired:
-          - mustRevert: true
-
-    gateSealFactory:
-      name: GateSealFactory
-      address: *gateSealFactory
-      checks:
-        get_blueprint: *gateSealBlueprint
-
-    gateSealWithdrawalQueue:
-      name: GateSeal
-      address: *gateSealWithdrawalQueue
-      checks:
-        get_sealing_committee: *sealCommittee
-        get_seal_duration_seconds: *DURATION_2_WEEKS
-        get_sealables: [*withdrawalQueueERC721]
-        get_expiry_timestamp: 1789207187
-        is_expired: false
-
-    gateSealVaulthubAndPredepositGuarantee:
-      name: GateSeal
-      address: *gateSealVaulthubAndPredepositGuarantee
-      checks:
-        get_sealing_committee: *sealCommittee
-        get_seal_duration_seconds: *DURATION_2_WEEKS
-        get_sealables: [*vaultHub, *predepositGuarantee]
-        get_expiry_timestamp: 1796302499 # Thursday, December 3, 2026 12:54:59 PM
-        is_expired: false
-
-    gateSealVEBAndTWG:
-      name: GateSeal
-      address: *gateSealVEBAndTWG
-      checks:
-        get_sealing_committee: *sealCommittee
-        get_seal_duration_seconds: *DURATION_2_WEEKS
-        get_sealables: [*triggerableWithdrawalsGateway, *validatorsExitBusOracle]
-        get_expiry_timestamp: 1789207187
-        is_expired: false
-
     circuitBreaker:
       name: CircuitBreaker
       address: *circuitBreaker
@@ -5609,68 +5537,68 @@ l1:
           - *triggerableWithdrawalsGateway
           - *vaultHub
           - *predepositGuarantee
-          - *CSModule
-          - *CSAccounting
-          - *CSFeeOracle
+          - *csModule
+          - *csAccounting
+          - *csFeeOracle
           - *topUpGateway
-          - *CSIcsGate
+          - *csIcsGate
           - *consolidationGateway
-          - *CSVerifier
-          - *CSEjector
-          - *CSIdentifiedDVTClusterGate
-          - *CuratedModule
-          - *CuratedAccounting
-          - *CuratedFeeOracle
-          - *CuratedVerifier
-          - *CuratedEjector
+          - *csVerifier
+          - *csEjector
+          - *csIdentifiedDVTClusterGate
+          - *curatedModule
+          - *curatedAccounting
+          - *curatedFeeOracle
+          - *curatedVerifier
+          - *curatedEjector
         getPauser:
           - args: [*withdrawalQueueERC721]
-            result: *sealCommittee
+            result: *circuitBreakerCommittee
           - args: [*validatorsExitBusOracle]
-            result: *sealCommittee
+            result: *circuitBreakerCommittee
           - args: [*triggerableWithdrawalsGateway]
-            result: *sealCommittee
+            result: *circuitBreakerCommittee
           - args: [*vaultHub]
-            result: *sealCommittee
+            result: *circuitBreakerCommittee
           - args: [*predepositGuarantee]
-            result: *sealCommittee
+            result: *circuitBreakerCommittee
           - args: [*topUpGateway]
-            result: *sealCommittee
+            result: *circuitBreakerCommittee
           - args: [*consolidationGateway]
-            result: *sealCommittee
-          - args: [*CSModule]
+            result: *circuitBreakerCommittee
+          - args: [*csModule]
             result: *csmCommittee
-          - args: [*CSAccounting]
+          - args: [*csAccounting]
             result: *csmCommittee
-          - args: [*CSFeeOracle]
+          - args: [*csFeeOracle]
             result: *csmCommittee
-          - args: [*CSVerifier]
+          - args: [*csVerifier]
             result: *csmCommittee
-          - args: [*CSIcsGate]
+          - args: [*csIcsGate]
             result: *csmCommittee
-          - args: [*CSEjector]
+          - args: [*csEjector]
             result: *csmCommittee
-          - args: [*CSIdentifiedDVTClusterGate]
+          - args: [*csIdentifiedDVTClusterGate]
             result: *csmCommittee
-          - args: [*CuratedModule]
+          - args: [*curatedModule]
             result: *curatedModuleCommittee
-          - args: [*CuratedAccounting]
+          - args: [*curatedAccounting]
             result: *curatedModuleCommittee
-          - args: [*CuratedFeeOracle]
+          - args: [*curatedFeeOracle]
             result: *curatedModuleCommittee
-          - args: [*CuratedEjector]
+          - args: [*curatedEjector]
             result: *curatedModuleCommittee
-          - args: [*CuratedVerifier]
+          - args: [*curatedVerifier]
             result: *curatedModuleCommittee
         getPausableCount:
-          - args: [*sealCommittee]
+          - args: [*circuitBreakerCommittee]
             result: 7
           - args: [*csmCommittee]
             result: 7
           - args: [*curatedModuleCommittee]
             result: 5
         isPauserLive:
-          - args: [*sealCommittee]
+          - args: [*circuitBreakerCommittee]
             result: true
           - args: [*csmCommittee]
             result: true
@@ -5895,6 +5823,16 @@ l1:
         objections: null
         supportsInterface: null
 
+    vaultsAdapter:
+      name: VaultsAdapter
+      address: *vaultsAdapter
+      checks:
+        WITHDRAWAL_REQUEST_PREDEPLOY_ADDRESS: *withdrawalRequestContract
+        evmScriptExecutor: *evmScriptExecutor
+        lidoLocator: *lidoLocator
+        trustedCaller: *stVaultsCommittee
+        validatorExitFeeLimit: 100000000000000000
+
     lolAllowedRecipientsRegistry:
       name: AllowedRecipientsRegistry
       address: *lolAllowedRecipientsRegistry
@@ -5930,7 +5868,7 @@ l1:
       address: *consolidationGateway
       checks:
         ADD_CONSOLIDATION_REQUEST_ROLE: *ADD_CONSOLIDATION_REQUEST_ROLE
-        BEACON_ROOTS: *EIP4788_BEACON_ROOTS_CONTRACT
+        BEACON_ROOTS: *eip4788BeaconRootsContract
         # cast keccak "lido.ConsolidationGateway.maxConsolidationRequestLimit" — unstructured storage slot
         CONSOLIDATION_LIMIT_POSITION: "0xdbb01bb6dca1179d47b58b17828e02dd61fb4c11ad515bab6e3e9ce25440d797"
         DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
@@ -5945,11 +5883,11 @@ l1:
         RESUME_ROLE: *RESUME_ROLE
         getConsolidationRequestLimitFullInfo:
           [
-            *maxConsolidationRequestsLimit,
-            *consolidationsPerFrame,
-            *frameDurationInSec,
-            *maxConsolidationRequestsLimit,
-            *maxConsolidationRequestsLimit,
+            *MAX_CONSOLIDATION_REQUESTS_LIMIT,
+            *CONSOLIDATIONS_PER_FRAME,
+            *FRAME_DURATION_IN_SEC,
+            *MAX_CONSOLIDATION_REQUESTS_LIMIT,
+            *MAX_CONSOLIDATION_REQUESTS_LIMIT,
           ]
         getResumeSinceTimestamp: 0
         getRoleAdmin:
@@ -5993,7 +5931,7 @@ l1:
           expected: *topUpGatewayImplAddress
           label: implementation
       checks:
-        BEACON_ROOTS: *EIP4788_BEACON_ROOTS_CONTRACT
+        BEACON_ROOTS: *eip4788BeaconRootsContract
         DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
         GI_FIRST_VALIDATOR_CURR: *GI_FIRST_VALIDATOR_ELECTRA
         GI_FIRST_VALIDATOR_PREV: *GI_FIRST_VALIDATOR_ELECTRA
@@ -6037,7 +5975,7 @@ l1:
         *RESUME_ROLE : [*resealManager]
         *TOP_UP_ROLE : [*depositorBot]
       implementationChecks:
-        BEACON_ROOTS: *EIP4788_BEACON_ROOTS_CONTRACT
+        BEACON_ROOTS: *eip4788BeaconRootsContract
         DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
         GI_FIRST_VALIDATOR_CURR: *GI_FIRST_VALIDATOR_ELECTRA
         GI_FIRST_VALIDATOR_PREV: *GI_FIRST_VALIDATOR_ELECTRA
@@ -6243,13 +6181,141 @@ l1:
         _validateReportValidatorBalancesByStakingModule:
 
     # --- Safe instances ---
+    circuitBreakerCommittee:
+      name: GnosisSafe
+      address: *circuitBreakerCommittee
+      proxyName: GnosisSafeProxy
+      implementation: *safeSingleton_1_3_0
+      proxyChecks: {}
+      storage:
+        - slot: "0x0000000000000000000000000000000000000000000000000000000000000000"
+          expected: *safeSingleton_1_3_0
+          label: singleton
+        - slot: "0x6c9a6c4a39284e37ed1cf53d337577d14212a4870fb976a4366c693b939918d5"
+          expected: "0xf48f2B2d2a534e402487b3ee7C18c33Aec0Fe5e4"
+          label: fallbackHandler
+        - slot: "0x4a204f620c8c5ccdca3fd54d003badd85ba500436a431f0cbda4f558c93c34c8"
+          expected: *ZERO_ADDRESS
+          label: guard
+      checks:
+        VERSION: "1.3.0"
+        getThreshold: 3
+        getOwners: [
+            "0x5a409567bCa7459b3aC7e6E5a3F1a3C278071b71", # @ajbeal
+            "0xA39a62304d8d43B35114ad7bd1258B0E50e139b3", # @eboadom
+            "0xC80C089d5151A7456aaeb116174CB5A8EcC94fF9", # @Gusakov_dv
+            "0x59F8D74Fe49d5ebEAc069E3baf07eB4b614BD5A7", # @thedzhon
+            "0x912e21CdA3D7012146da4Df33309d860a9eb0bEb", # @George
+            "0xA4cddAB88F16eA33dA1b0851ee2Beb6d2f5C91e4", # @drdr_zz
+          ]
+        approvedHashes:
+        checkNSignatures:
+        checkSignatures:
+        domainSeparator:
+        encodeTransactionData:
+        getChainId: 1
+        getModulesPaginated:
+          - args: ["0x0000000000000000000000000000000000000001", 10]
+            result: [[], "0x0000000000000000000000000000000000000001"]
+        getStorageAt:
+        getTransactionHash:
+        isModuleEnabled:
+        isOwner:
+        nonce:
+        signedMessages:
+
+    csmCommittee:
+      name: GnosisSafe
+      address: *csmCommittee
+      proxyName: GnosisSafeProxy
+      implementation: *safeSingleton_1_3_0
+      proxyChecks: {}
+      storage:
+        - slot: "0x0000000000000000000000000000000000000000000000000000000000000000"
+          expected: *safeSingleton_1_3_0
+          label: singleton
+        - slot: "0x6c9a6c4a39284e37ed1cf53d337577d14212a4870fb976a4366c693b939918d5"
+          expected: "0xf48f2B2d2a534e402487b3ee7C18c33Aec0Fe5e4"
+          label: fallbackHandler
+        - slot: "0x4a204f620c8c5ccdca3fd54d003badd85ba500436a431f0cbda4f558c93c34c8"
+          expected: *ZERO_ADDRESS
+          label: guard
+      checks:
+        VERSION: "1.3.0"
+        getThreshold: 4
+        getOwners: [
+            "0xdac96e602fbb38De089DaB03f7a37B70C4234221", # @madlabman
+            "0x83EecCAf434AC9Da6132aB1124aFb755A2eA9266", # @Remus
+            "0xfcfbafa0d5f5512C65DbB4C073fE4Ee6Dc3c4779", # @enti
+            "0x6aC2dF117C82F51BfdEF1A249672b9A9cA6b3d86", # @lanski
+            "0x7aFd3C7f16FdBB3AdF331Fcc20A585d768ECf60d", # @Eridian
+            "0xCbC39c37Ee315E4A504Cc1AD0D7956A76e20D90d", # @POSTHUMAN
+          ]
+        approvedHashes:
+        checkNSignatures:
+        checkSignatures:
+        domainSeparator:
+        encodeTransactionData:
+        getChainId: 1
+        getModulesPaginated:
+          - args: ["0x0000000000000000000000000000000000000001", 10]
+            result: [[], "0x0000000000000000000000000000000000000001"]
+        getStorageAt:
+        getTransactionHash:
+        isModuleEnabled:
+        isOwner:
+        nonce:
+        signedMessages:
+
+    stVaultsCommittee:
+      name: Safe
+      address: *stVaultsCommittee
+      proxyName: SafeProxy
+      implementation: *safeSingleton
+      proxyChecks: {}
+      storage:
+        - slot: "0x0000000000000000000000000000000000000000000000000000000000000000"
+          expected: *safeSingleton
+          label: singleton
+        - slot: "0x6c9a6c4a39284e37ed1cf53d337577d14212a4870fb976a4366c693b939918d5"
+          expected: "0xfd0732Dc9E303f09fCEf3a7388Ad10A83459Ec99"
+          label: fallbackHandler
+        - slot: "0x4a204f620c8c5ccdca3fd54d003badd85ba500436a431f0cbda4f558c93c34c8"
+          expected: *ZERO_ADDRESS
+          label: guard
+      checks:
+        VERSION: "1.4.1"
+        getThreshold: 4
+        getOwners: [
+            "0x1555f8A94fC27A06C6610D00157216fa8783EA91", # @AlexDry
+            "0x4D55af0756B43Ee0C1052e585a185A47771b022e", # @snk999
+            "0xDbB7D7941d1340CB3ba862dF3A0f18084b5a69Ad", # @KimonSh
+            "0x28939ef21690Fe8358E93d661d1ce6d7fA9154F3", # @Willem
+            "0x21b82AA7149c8Fd0562E78b740937442FfD43094", # @Mol_Eliza
+            "0x512B58efaef534Af685F7638c177B927650eF995", # @dmitrii_v
+            "0xcD0cDa37f68a6758f86a4e2910E60174af1190B5", # @mikgur
+          ]
+        approvedHashes:
+        checkNSignatures:
+        checkSignatures:
+        domainSeparator:
+        encodeTransactionData:
+        getChainId: 1
+        getModulesPaginated:
+          - args: ["0x0000000000000000000000000000000000000001", 10]
+            result: [[], "0x0000000000000000000000000000000000000001"]
+        getStorageAt:
+        getTransactionHash:
+        isModuleEnabled:
+        isOwner:
+        nonce:
+        signedMessages:
+
     curatedModuleCommittee:
       name: Safe
       address: *curatedModuleCommittee
       proxyName: SafeProxy
       implementation: *safeSingleton
-      # SafeProxy has no view functions (masterCopy() is a fallback trick, absent from the ABI);
-      # slot 0 below pins the singleton without trusting the proxy code
       proxyChecks: {}
       storage:
         # Safe stores the singleton in slot 0 (not EIP-1967); canonical Safe 1.4.1
@@ -6260,7 +6326,6 @@ l1:
         - slot: "0x6c9a6c4a39284e37ed1cf53d337577d14212a4870fb976a4366c693b939918d5"
           expected: "0xfd0732Dc9E303f09fCEf3a7388Ad10A83459Ec99"
           label: fallbackHandler
-        # cast keccak "guard_manager.guard.address" — no transaction guard installed
         - slot: "0x4a204f620c8c5ccdca3fd54d003badd85ba500436a431f0cbda4f558c93c34c8"
           expected: *ZERO_ADDRESS
           label: guard

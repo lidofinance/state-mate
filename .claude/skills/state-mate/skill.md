@@ -1,6 +1,6 @@
 ---
 name: state-mate
-description: Use this skill when writing, debugging, or reviewing state-mate YAML configs that verify on-chain EVM contract state — proxy patterns and their storage, multisig wallets, role-based access control, ABI resolution, generating starter configs, and discovering unknown on-chain values. Also applies when verifying or auditing a deployment against a config: pre-vote state review, role audit, checking that implementations are neutered and constants aren't forged. Applies even when the user just says a check is failing or asks to add a contract to an existing config, without naming state-mate explicitly.
+description: Use this skill when writing, debugging, or reviewing state-mate YAML configs that verify on-chain EVM contract state — proxy patterns and their storage, multisig wallets, role-based access control, ABI resolution, and discovering unknown on-chain values. Also applies when verifying or auditing a deployment against a config: pre-vote state review, role audit, checking that implementations are neutered and constants aren't forged. Applies even when the user just says a check is failing or asks to add a contract to an existing config, without naming state-mate explicitly.
 ---
 
 # State-Mate Skill
@@ -17,7 +17,6 @@ Validate EVM smart-contract state against YAML configs. state-mate calls view fu
 | Role/ACL checks                                         | [Access control](#access-control)                                  |
 | Unknown return values                                   | [REPLACEME discovery](#replaceme-discovery)                        |
 | Overloaded function (two ABI fragments with same name)  | [Function overloads](#function-overloads)                          |
-| Seed config (`--generate`)                              | [Seed configs](#seed-configs)                                      |
 | ABI not found / rate-limit / revert reading             | [Troubleshooting](#troubleshooting)                                |
 | Deployment verification / audit (pre-vote state, roles) | Read `references/verification-playbook.md`                         |
 
@@ -48,7 +47,7 @@ eoa: # named EOAs (deployer, signer addresses); useful for "deployer renounced" 
   - &deployer "0x..."
 
 l1: # per-chain section — literal key name, not the chain's own name
-  rpcUrl: L1_MAINNET_RPC_URL # env-var name, or inline URL
+  rpcUrl: ETH_RPC_URL # env-var name, or inline URL
   explorerHostname: api.etherscan.io/v2/api
   explorerTokenEnv: ETHERSCAN_TOKEN
   chainId: 1 # number or string
@@ -57,7 +56,7 @@ l1: # per-chain section — literal key name, not the chain's own name
       # ...
 
 l2: # present when deployed.l2 exists
-  rpcUrl: L2_MAINNET_RPC_URL
+  rpcUrl: OPTIMISM_RPC_URL
   # ...
 ```
 
@@ -71,7 +70,7 @@ l2: # present when deployed.l2 exists
 
 ```yaml
 contractName:
-  name: ContractName # must match ABI filename
+  name: ContractName # must match the name stored in abis.json.gz for this chain and address
   address: *contractAddress
   checks:
     functionName: expectedValue
@@ -80,7 +79,7 @@ contractName:
 
 ### Proxy patterns
 
-**Transparent Upgradeable Proxy**. `proxyChecks: {}` because the admin/impl live in EIP-1967 slots, which you verify via `storage:`:
+**Transparent Upgradeable Proxy**. `proxyChecks: {}` because the admin/impl live in EIP-1967 slots. The implementation slot is verified for every entry automatically, and `proxyAdminOwner:` covers who controls the ProxyAdmin in the admin slot without a separate `ProxyAdmin` entry. Pin the admin address itself via `storage:` when you want both:
 
 ```yaml
 contractName:
@@ -88,14 +87,12 @@ contractName:
   address: *contractAddress
   proxyName: TransparentUpgradeableProxy
   implementation: *implementationAddress
+  proxyAdminOwner: *ownerOfTheProxyAdmin
   proxyChecks: {}
   storage:
     - slot: *EIP1967_ADMIN_SLOT
       expected: *proxyAdminAddress
       label: admin
-    - slot: *EIP1967_IMPLEMENTATION_SLOT
-      expected: *implementationAddress
-      label: implementation
   checks:
     # against the proxy (implementation logic, proxy state)
     someFunction: expectedValue
@@ -356,18 +353,6 @@ cast call $CONTRACT "getRoleMember(bytes32,uint256)(address)" $ROLE 0 --rpc-url 
 cast call $CONTRACT "hasRole(bytes32,address)(bool)" $ROLE $ADDRESS --rpc-url $RPC
 ```
 
-## Seed configs
-
-A seed config is a thin starter file named `*.seed.yaml`. It contains only address-book and chain-explorer sections (`deployed:`, `l1:` / `l2:` with `rpcUrl` / `explorerHostname`, optional `eoa:` / `roles:` / `misc:`) — **no `contracts:` block**. `yarn start <seed> --generate` walks every anchor under `deployed:`, resolves the ABI for each address, and writes a sibling `*.seed.generated.yaml` with a populated `contracts:` block where each function value is `REPLACEME` (and, for proxies, a commented-out `implementationChecks` stub).
-
-`--generate` on its own does not fetch ABIs — it only uses ABIs already on disk. Combine with `--update-abi-missing` on first run.
-
-```bash
-yarn start configs/proto/mainnet.seed.yaml --generate --update-abi-missing
-# Review *.seed.generated.yaml, replace REPLACEME with real expectations, then:
-yarn start configs/proto/mainnet.seed.generated.yaml
-```
-
 ## Workflow
 
 Adding a new contract to an existing config:
@@ -375,7 +360,7 @@ Adding a new contract to an existing config:
 1. **Resolve addresses** — `cast admin` / `cast implementation` for proxies; EIP-1967 slots for anything non-standard.
 2. **Define anchors** in `deployed:` (and `implementation:` addresses in the same section with a matching name).
 3. **Write the contract stanza** — pick the proxy pattern, seed `checks:` with function names, leave unknowns as `REPLACEME`.
-4. **Download ABIs** — `yarn start config.yml --update-abi-missing`. Resolution depends on mode: consolidated (`abis.json.gz`) tries the `Name-{address}` key first, then `Name`; individual-file mode (`abi/*.json`) tries `Name.json`, then `Name.sol/Name.json`, then `Name-{address}.json`.
+4. **ABIs** — a run downloads whatever is missing, no flag needed. They live in `abis.json.gz` next to the config, keyed by EVM chain ID and lowercase address: `{ "1:0x…": { name, abi } }`. `checks` resolve the ABI at `implementation:` (or `address:` for non-proxies), `proxyChecks` at `address:`; the YAML `name:`/`proxyName:` must equal the stored contract name.
 5. **Run, read actuals, replace** — iterate `yarn start config.yml -o l1/contractName` until green.
 6. **Access control** — probe with `cast call getRoleMemberCount`; choose `ozAcl` / `ozNonEnumerableAcl` / `hasRole`. List every role constant, including empty ones (`[]`).
 
@@ -399,14 +384,15 @@ yarn start config.yml                                     # full config
 yarn start config.yml -o l1                               # specific section
 yarn start config.yml -o l1/contractName                  # specific contract (great for rate-limited RPC)
 yarn start config.yml -o l1/contractName/checks/funcName  # single function
-yarn start config.yml --update-abi-missing                # download only missing ABIs (preferred)
-yarn start config.yml --update-abi                        # overwrite all ABIs (rarely needed)
-yarn start config.seed.yaml --generate                    # expand seed → *.seed.generated.yaml
+yarn start <directory> --update-abi                       # rebuild the store: re-download all, drop unreferenced
+yarn start config.yml --quiet                             # failures and totals only (CI uses this)
 ```
 
 ## Best practices
 
 - **Named anchors for addresses** — define every address in `deployed:` / `eoa:`; don't hardcode `0x…` inside `checks:` values. Inline hex is fine for **data** (bytes32 constants, selectors).
+- **Anchor naming** — addresses are `lowerCamelCase` (`lidoLocator`, `multisigOwner1`; version suffixes keep underscores: `safeSingleton_1_3_0`). Constants are `UPPER_SNAKE`: bytes32 roles and slots, numeric parameters (`MAX_GROUP_SHARE_LIMIT`), hex blobs (`CSM_SET_MERKLE_GATE_TREE_PERMISSIONS`), strings. Sentinel addresses count as constants and stay upper: `ZERO_ADDRESS`, `DEAD_ADDRESS`, `ETH` (`0xEeee…`), `DEFAULT_TIER_OPERATOR` (`0xFFfF…`).
+- **Role hashes live in `roles:`** — every `*_ROLE` bytes32 goes to the `roles:` section, not `misc:`/`parameters:`; `DEFAULT_ADMIN_ROLE` first, the rest grouped per contract under a `# --- Roles: <contract> ---` header.
 - **Deployer renounced** — confirm `deployer` is not a role holder (not in any `ozAcl` list; `hasRole(…, deployer) = false`).
 - **Empty roles are explicit** — list unused roles with `[]` so a future grant is caught.
 - **Comment tuples** — field names aren't derivable from YAML; look up the ABI.
@@ -417,9 +403,25 @@ yarn start config.seed.yaml --generate                    # expand seed → *.se
 
 ### `ABI not found` / `Cannot find ABI file`
 
-- Run `yarn start <config> --update-abi-missing`.
-- Verify `name:` matches the ABI filename (the `{proxyAddr}` / `{implAddr}` suffix is optional).
-- Individual-file resolution order: `Name.json` → `Name.sol/Name.json` → `Name-{address}.json`. Consolidated (`abis.json.gz`) tries `Name-{address}` key first, then `Name`.
+- Missing ABIs download on every run, so this means the explorer served none: check that the contract is verified there.
+- The store is keyed by chain ID and address, so "not found" means that pair has no entry — download it. A "belongs to X, config expects Y" error means the YAML `name:`/`proxyName:` disagrees with the verified contract name at that address — fix the YAML.
+- For proxies, `checks` need the entry at `implementation:` — make sure the field is present and points at the right address.
+
+### `delegates to 0x…, while the config expects 0x…`
+
+The `implementation:` in the config is not what the proxy currently delegates to. state-mate checks this for every entry, with or without `proxyChecks`.
+
+- Read the live address with `cast implementation $PROXY`, or `cast storage $PROXY 0x360894…` for the EIP-1967 slot, or `cast storage $SAFE 0x0` for a Safe.
+- Point `implementation:` at it and re-run: the new ABI downloads by itself. Set `name:` to the verified name at the new address.
+- One anchor serving two values is a frequent cause. A factory's `registryBase` is not the implementation its proxies delegate to, so those need separate anchors.
+- `--skip-implementation-check` disables the check when a config pins an implementation on purpose.
+
+### `delegates to 0x…, but the config describes it as a regular contract`
+
+The entry has no `implementation:`, yet the address holds a non-empty EIP-1967 slot. Every check there runs against the proxy ABI instead of the implementation's.
+
+- Add `proxyName:` and `implementation:` and re-run.
+- Aragon proxies and Safes never trigger this error: they keep the implementation outside the EIP-1967 slot, so declaring them as proxies is on you.
 
 ### `getRoleMemberCount` reverted / `no matching function`
 

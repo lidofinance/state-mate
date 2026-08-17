@@ -1,7 +1,7 @@
 import chalk from "chalk";
 
 import { logErrorAndExit } from "./logger";
-import { Abi, AbiArgumentsLength as AbiArgumentsLength } from "./types";
+import { Abi, AbiArgumentsLength as AbiArgumentsLength, ChainId } from "./types";
 
 // Contract entry fields
 export enum EntryField {
@@ -38,6 +38,14 @@ export function readUrlOrFromEnvironment(urlOrEnvironmentVariableName: string) {
     );
   }
   return valueFromEnvironment;
+}
+
+export function normalizeChainId(chainId: ChainId): string {
+  // BigInt would happily coerce whitespace to 0 or accept a negative; zero is no chain either
+  if (!/^\d+$/.test(String(chainId)) || BigInt(chainId) === 0n) {
+    logErrorAndExit(`Invalid chain ID: ${chalk.yellow(String(chainId))}`);
+  }
+  return BigInt(chainId).toString();
 }
 
 export function getNonMutables(abi: Abi): AbiArgumentsLength {

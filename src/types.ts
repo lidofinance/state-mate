@@ -1,15 +1,11 @@
 import { JsonFragment } from "ethers";
 
-export type MethodCallResults = { methodName: string; staticCallResult: string }[];
+export type ChainId = number | string | bigint;
 
 export type ContractInfo = {
   contractName: string;
   abi: Abi;
   address: string;
-  implementation?: ContractInfo;
-  proxyType?: string;
-  proxy?: string;
-  similarMatch?: string;
 };
 
 export type Abi = AbiEntry[];

@@ -2,13 +2,15 @@ import { AssertionError } from "chai";
 import chalk from "chalk";
 import { Contract, JsonRpcProvider, Result } from "ethers";
 
+import { loadAbiFromFile } from "src/abi-provider";
 import { EntryField, getNonMutables, printError } from "src/common";
+import { context, ErrorDetail, stats } from "src/context";
 import { LogCommand, logError, logErrorAndExit, logMethodSkipped } from "src/logger";
-import { g_Arguments } from "src/state-mate";
 import {
   ArbitraryObject,
   ContractEntry,
   isTypeOfTB,
+  ProxyContractEntryTB,
   StaticCallCheck,
   StaticCallMustRevert,
   StaticCallMustRevertTB,
@@ -16,62 +18,49 @@ import {
   StaticCallResultTB,
   ViewResult,
 } from "src/typebox";
-import { Abi, AbiArgumentsLength } from "src/types";
-
-export interface ErrorDetail {
-  section: string;
-  contract: string;
-  contractAddress: string;
-  checksType: string;
-  method: string;
-  message: string;
-}
-
-export let g_errors: number = 0;
-export let g_total_checks: number = 0;
-export const g_error_details: ErrorDetail[] = [];
+import { Abi, AbiArgumentsLength, ChainId } from "src/types";
 
 // Per-contract counters
-let g_contract_errors: number = 0;
-let g_contract_checks: number = 0;
+let contractErrors: number = 0;
+let contractChecks: number = 0;
 
-let g_current_context: Partial<ErrorDetail> = {};
+let currentErrorContext: Partial<ErrorDetail> = {};
 
-export function setErrorContext(context: Partial<ErrorDetail>): void {
-  g_current_context = { ...g_current_context, ...context };
+export function setErrorContext(update: Partial<ErrorDetail>): void {
+  currentErrorContext = { ...currentErrorContext, ...update };
 }
 
 export function clearErrorContext(): void {
-  g_current_context = {};
+  currentErrorContext = {};
 }
 
 export function resetContractCounters(): void {
-  g_contract_errors = 0;
-  g_contract_checks = 0;
+  contractErrors = 0;
+  contractChecks = 0;
 }
 
 export function getContractStats(): { checks: number; errors: number } {
-  return { checks: g_contract_checks, errors: g_contract_errors };
+  return { checks: contractChecks, errors: contractErrors };
 }
 
 export function incErrors(errorMessage?: string): void {
-  g_errors += 1;
-  g_contract_errors += 1;
-  if (errorMessage && g_current_context) {
-    g_error_details.push({
-      section: g_current_context.section || "unknown",
-      contract: g_current_context.contract || "unknown",
-      contractAddress: g_current_context.contractAddress || "unknown",
-      checksType: g_current_context.checksType || "unknown",
-      method: g_current_context.method || "unknown",
+  stats.errors += 1;
+  contractErrors += 1;
+  if (errorMessage) {
+    stats.errorDetails.push({
+      section: currentErrorContext.section || "unknown",
+      contract: currentErrorContext.contract || "unknown",
+      contractAddress: currentErrorContext.contractAddress || "unknown",
+      checksType: currentErrorContext.checksType || "unknown",
+      method: currentErrorContext.method || "unknown",
       message: errorMessage,
     });
   }
 }
 
 export function incChecks(): void {
-  g_total_checks += 1;
-  g_contract_checks += 1;
+  stats.totalChecks += 1;
+  contractChecks += 1;
 }
 
 export enum CheckLevel {
@@ -82,10 +71,10 @@ export enum CheckLevel {
 }
 
 export function needCheck(level: CheckLevel, name: string) {
-  if (!g_Arguments.checkOnly) {
+  if (!context.checkOnly) {
     return true;
   }
-  const checkOnTheLevel = g_Arguments.checkOnly[level];
+  const checkOnTheLevel = context.checkOnly[level];
   return checkOnTheLevel == null || name === checkOnTheLevel;
 }
 
@@ -93,6 +82,7 @@ export abstract class SectionValidatorBase {
   constructor(
     protected provider: JsonRpcProvider,
     protected sectionName: EntryField,
+    protected chainId: ChainId,
   ) {}
 
   public abstract validateSection(
@@ -100,6 +90,15 @@ export abstract class SectionValidatorBase {
     contractAlias: string,
     basePath?: string,
   ): Promise<void>;
+
+  /**
+   * For proxy contracts, the checks run against the implementation ABI
+   * since the proxy delegates calls to the implementation.
+   */
+  protected _loadContractAbi(contractEntry: ContractEntry): Abi {
+    const implementation = isTypeOfTB(contractEntry, ProxyContractEntryTB) ? contractEntry.implementation : undefined;
+    return loadAbiFromFile(this.chainId, contractEntry.name, implementation ?? contractEntry.address);
+  }
 
   protected async _checkViewFunction(contract: Contract, method: string, staticCallCheck: StaticCallCheck) {
     incChecks();

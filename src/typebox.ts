@@ -25,7 +25,6 @@ const EthereumStringTB = Type.Readonly(
 const EthereumStringArrayTB = Type.Readonly(Type.Array(EthereumStringTB));
 
 export type EntireDocument = Static<typeof EntireDocumentTB>;
-export type SeedDocument = Static<typeof SeedDocumentTB>;
 export type ContractEntry = Static<typeof ContractEntryTB>;
 export type StaticCallCheck = Static<typeof StaticCallCheckTB>;
 export type ArbitraryObject = Static<typeof ArbitraryObjectTB>;
@@ -182,6 +181,7 @@ export const ProxyContractEntryTB = Type.Readonly(
       ...RegularContractEntryTB.properties,
       proxyName: Type.String(),
       implementation: Type.Optional(EthereumStringTB),
+      proxyAdminOwner: Type.Optional(EthereumStringTB),
       proxyChecks: Type.Optional(Type.Union([ProxyChecksTB, Sr2ProxyChecksTB, AragonProxyChecksTB])),
       implementationChecks: ImplementationChecksTB,
     },
@@ -197,7 +197,7 @@ export const ExplorerSectionTB = Type.Readonly(
       rpcUrl: Type.String(),
       explorerHostname: Type.Optional(Type.String()),
       explorerTokenEnv: Type.Optional(Type.String()),
-      chainId: Type.Optional(Type.Union([Type.Number(), Type.String()])),
+      chainId: Type.Union([Type.Integer({ minimum: 1 }), Type.String({ pattern: "^[1-9][0-9]*$" })]),
     },
     { additionalProperties: false },
   ),
@@ -241,20 +241,6 @@ export const EntireDocumentTB = Type.Readonly(
       signers: Type.Optional(PlainValueOrArray),
       selectors: Type.Optional(PlainValueOrArray),
       validators: Type.Optional(PlainValueOrArray),
-    },
-    { additionalProperties: false },
-  ),
-);
-
-export const SeedDocumentTB = Type.Readonly(
-  Type.Object(
-    {
-      deployed: DeployedSectionTB,
-      l1: ExplorerSectionTB,
-      l2: Type.Optional(ExplorerSectionTB),
-      eoa: Type.Optional(EthereumStringArrayTB),
-      roles: Type.Optional(Type.Union([EthereumStringArrayTB, Type.Null()])),
-      misc: Type.Optional(PlainValueOrArray),
     },
     { additionalProperties: false },
   ),

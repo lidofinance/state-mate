@@ -22,7 +22,7 @@ export default [
   includeIgnoreFile(gitignorePath),
   {
     // CommonJS entrypoints: no top-level await, main().catch() is the pattern
-    files: ["src/state-mate.ts", "src/gen-schemas.ts", "src/consolidate-abis.ts", "src/test-util/app.ts"],
+    files: ["src/state-mate.ts", "src/gen-schemas.ts"],
     rules: {
       "unicorn/prefer-top-level-await": "off",
       "unicorn/prefer-await": "off",

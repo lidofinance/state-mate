@@ -3,6 +3,7 @@ import { JsonRpcProvider } from "ethers";
 import { EntryField } from "src/common";
 import { logHeader2, LogCommand } from "src/logger";
 import { ContractEntry } from "src/typebox";
+import { ChainId } from "src/types";
 
 import { incChecks, incErrors, SectionValidatorBase, setErrorContext } from "./base";
 
@@ -32,8 +33,8 @@ function normalizeToBytes32(value: string): string {
 }
 
 export class StorageSectionValidator extends SectionValidatorBase {
-  constructor(provider: JsonRpcProvider) {
-    super(provider, EntryField.storage);
+  constructor(provider: JsonRpcProvider, chainId: ChainId) {
+    super(provider, EntryField.storage, chainId);
   }
 
   override async validateSection(contractEntry: ContractEntry, contractAlias: string, basePath?: string) {
