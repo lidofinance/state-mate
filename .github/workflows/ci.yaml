@@ -51,6 +51,8 @@ jobs:
             network: mantle-mainnet
           - config: configs/earn/plasma/earnusd-vaults.yaml
             network: plasma-mainnet
+          - config: configs/nest/mainnet.yaml
+            network: ethereum-mainnet
 
     env:
       # Explorer API tokens

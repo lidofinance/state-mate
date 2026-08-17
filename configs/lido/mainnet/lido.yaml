@@ -4,7 +4,7 @@ deployed:
   l1:
     # --- Core protocol ---
     - &lidoLocator "0xC1d0b3DE6792Bf6b4b37EccdcC24e45978Cfd2Eb"
-    - &lidoLocatorImplAddress "0x0360002bf51DCae1c0267aE0AFDaBacAF7De686b"
+    - &lidoLocatorImplAddress "0xF2Ffb952e129a63F0614Ff87126E1d4a494A2313"
     - &lido "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84"
     - &lidoImplAddress "0x028271E30a695c0527A0C50cA30603feD004cDb0"
     - &wstETH "0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0"
@@ -65,7 +65,9 @@ deployed:
     - &oracleDaemonConfig "0xbf05A929c3D7885a6aeAd833a992dA6E5ac23b09"
     - &lazyOracle "0x5DB427080200c235F2Ae8Cd17A7be87921f7AD6c"
     - &lazyOracleImplAddress "0x96c9a897D116ef660086d3aA67b3af653324aB37"
-    - &tokenRateNotifier "0x25e35855783bec3E49355a29e110f02Ed8b05ba9"
+    - &tokenRateNotifier "0xbe05d12Fd10919F1881125006523452F6aFF791b"
+    - &l1OpStackTokenRatePusher "0xd54c1c6413caac3477AC14b2a80D5398E3c32FfE"
+    - &stakingRevenueSource "0x6220212a33a87Ed7Cc386B67eB2c393974F28C38"
 
     # --- DAO & Aragon apps ---
     - &aragonRepoBase "0xa8A358E9bbB9fF60D4B89CBE5b2FE88f98b51B9D"
@@ -194,6 +196,12 @@ misc:
   - &ZERO_BYTES32 "0x0000000000000000000000000000000000000000000000000000000000000000"
   # bytes32(0): OZ default admin, not a keccak
   - &DEFAULT_ADMIN_ROLE "0x0000000000000000000000000000000000000000000000000000000000000000"
+
+  # --- Interface ids ---
+  # cast sig "pushTokenRate()"
+  - &ITokenRatePusher "0xa16ba44d"
+  # cast sig "pushTokenRate(uint256,uint256,uint256,uint256,uint256,uint256,uint256)"
+  - &ITokenRatePusherWithArgs "0xbd18bfd6"
 
   # --- General numeric constants ---
   - &MAX_UINT256 "115792089237316195423570985008687907853269984665640564039457584007913129639935"
@@ -1342,6 +1350,26 @@ l1:
         LIDO: *lido
         LIDO_LOCATOR: *lidoLocator
         simulateOracleReport: null
+
+    tokenRateNotifier:
+      name: TokenRateNotifier
+      address: *tokenRateNotifier
+      checks:
+        owner: *aragonAgent
+        TOKEN_RATE_PROVIDER: *accounting
+        INDEX_NOT_FOUND: *MAX_UINT256
+        MAX_OBSERVERS_COUNT: 32
+        REQUIRED_INTERFACE_NO_ARGS: *ITokenRatePusher
+        REQUIRED_INTERFACE_WITH_ARGS: *ITokenRatePusherWithArgs
+        observersLength: 2
+        # [addr, kind], kind: 0 = ITokenRatePusher, 1 = ITokenRatePusherWithArgs
+        observers:
+          - args: [0]
+            result: [*l1OpStackTokenRatePusher, 0]
+          - args: [1]
+            result: [*stakingRevenueSource, 1]
+          - args: [2]
+            mustRevert: true
 
     burner:
       name: Burner
@@ -2726,7 +2754,7 @@ l1:
         isLockExpired: null
         isPaused: false
         supportsInterface: null
-        totalBondShares: 0
+        totalBondShares: null
       ozAcl:
         *DEFAULT_ADMIN_ROLE : [*aragonAgent]
         *SM_PAUSE_ROLE : [*resealManager, *circuitBreaker]
@@ -3835,8 +3863,8 @@ l1:
         isPaused: false
         name: "Decentralization Operator Gate"
         supportsInterface: null
-        treeCid: QmU4cnyaKWgMVCZVLiuQaqu6yGXahjzi4F1Vcnq2SXBBmT
-        treeRoot: 0x1111111111111111111111111111111111111111111111111111111111111111
+        treeCid: bafkreibgefeix6fvg2n6ly2gui3l5gu7oocmufu3canl4ygat6eq2d5j7y
+        treeRoot: 0xf275ac0fc5b70e863eb75eb520ebebfb788c75b92ed0cb105445eb88bc339346
         verifyProof: null
       ozAcl:
         *DEFAULT_ADMIN_ROLE : [*aragonAgent]
@@ -3915,8 +3943,8 @@ l1:
         isPaused: false
         name: "Extra Effort Operator Gate"
         supportsInterface: null
-        treeCid: QmU4cnyaKWgMVCZVLiuQaqu6yGXahjzi4F1Vcnq2SXBBmT
-        treeRoot: 0x1111111111111111111111111111111111111111111111111111111111111111
+        treeCid: bafkreighpv5hakkgns6tdnzpmjymypqx6vb37lhdcf3u43fkt7rv4u3uda
+        treeRoot: 0xc428ac6cdaab09b04d818c27f9b44daa552689640f7a518d76f698c49ce6693a
         verifyProof: null
       ozAcl:
         *DEFAULT_ADMIN_ROLE : [*aragonAgent]
@@ -3995,8 +4023,8 @@ l1:
         isPaused: false
         name: "Intra-Operator DVT Cluster Gate"
         supportsInterface: null
-        treeCid: bafkreigm3mqlqdto2ggxpq22w7tblfbx4p4o4a3gudf2lkfduwxeh2m62e
-        treeRoot: 0xfda6c221ae0f44dfa57c64324ebbd0c468bb402cbcc20326ad65a18e96a3df0c
+        treeCid: bafkreiero7xngbtxupxgriyybvfbh7fe757rwoxbgbqqdklk3td7hbtuxq
+        treeRoot: 0x5b1b7f4a9c652a72cd9e2b5ee0204f2086be317df01a3795fc0b8984775a6331
         verifyProof: null
       ozAcl:
         *DEFAULT_ADMIN_ROLE : [*aragonAgent]
@@ -4075,8 +4103,8 @@ l1:
         isPaused: false
         name: "Intra-Operator DVT Cluster Plus Gate"
         supportsInterface: null
-        treeCid: QmU4cnyaKWgMVCZVLiuQaqu6yGXahjzi4F1Vcnq2SXBBmT
-        treeRoot: 0x1111111111111111111111111111111111111111111111111111111111111111
+        treeCid: bafkreihxtocbyrxvgcxhkm5h6huturheox4yxvhp3md7vvayc3ajirl5oy
+        treeRoot: 0xd34a5ec5c542347c7662f705f0ff761b17c78061c09472c885fa34e9a2172f94
         verifyProof: null
       ozAcl:
         *DEFAULT_ADMIN_ROLE : [*aragonAgent]
@@ -4137,16 +4165,9 @@ l1:
         TWR_LIMIT_POSITION: null
         TW_EXIT_LIMIT_MANAGER_ROLE: *TW_EXIT_LIMIT_MANAGER_ROLE
         VERSION: *VERSION_1
-        getExitRequestLimitFullInfo:
-          # [maxExitRequestsLimit, exitsPerFrame, frameDurationInSec, prevExitRequestsLimit, currentExitRequestsLimit]
-          # "Set TWG exit request limits" vote item; the last two may transiently dip below max after exit requests
-          [
-            *twMaxExitRequestsLimit,
-            *twExitsPerFrame,
-            *twFrameDurationInSec,
-            *twMaxExitRequestsLimit,
-            *twMaxExitRequestsLimit,
-          ]
+        # [maxExitRequestsLimit, exitsPerFrame, frameDurationInSec, prevExitRequestsLimit, currentExitRequestsLimit]
+        # the last two dip below max after exit requests, so the tuple can't be pinned
+        getExitRequestLimitFullInfo: null
         getResumeSinceTimestamp: 0
         getRoleAdmin: null
         getRoleMember: null
@@ -4886,7 +4907,7 @@ l1:
             *exitedValidatorEthAmountLimit,
             *externalPendingBalanceCapEth,
           ]
-        getReportDataCount: 2 # 2 migration snapshots
+        getReportDataCount: null # grows with each AO report
         getRoleAdmin:
           - args: [*DEFAULT_ADMIN_ROLE]
             result: *DEFAULT_ADMIN_ROLE
@@ -4925,7 +4946,7 @@ l1:
         getRoleMember: null
         getRoleMemberCount: null
         hasRole: null
-        isPostMigrationFirstReportDone: false # flips to true after the first post-migration AO report
+        isPostMigrationFirstReportDone: true # flipped by the first post-migration AO report
         lastReportTimestamp: null
         lastVaultBalanceAfterTransfer: null
         reportData: null
