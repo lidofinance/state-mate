@@ -53,10 +53,5 @@ export function getNonMutables(abi: Abi): AbiArgumentsLength {
 }
 
 function isUrl(maybeUrl: string) {
-  try {
-    new URL(maybeUrl);
-    return true;
-  } catch {
-    return false;
-  }
+  return URL.canParse(maybeUrl);
 }

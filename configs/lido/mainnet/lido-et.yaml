@@ -5,6 +5,13 @@ parameters:
   - &initialValidatorExitFeeLimit "100000000000000000"
   - &maxGroupShareLimit "1000000000000000000000000"
   - &maxDefaultTierShareLimit "1000000000000000000000000"
+  - &csmCommittee "0xC52fC3081123073078698F1EAc2f1Dc7Bd71880f"
+  - &curatedModuleCommittee "0x2570e0b22AD904501dfB0d49575991ACB801dD91"
+  # https://research.lido.fi/t/community-staking-module/5917/218
+  - &maxPriorityExitShareThresholdDecrease 600
+  - &maxPriorityExitShareThresholdIncrease 600
+  - &maxStakeShareLimitDecrease 500
+  - &maxStakeShareLimitIncrease 500
 
 misc:
   - &DEFAULT_TIER_OPERATOR "0xFFfFfFffFFfffFFfFFfFFFFFffFFFffffFfFFFfF"
@@ -23,11 +30,29 @@ misc:
   - &NEW_SDVT_SUBMIT_EXIT_HASHES_FACTORY "0x58A59dDC6Aea9b1D5743D024E15DfA4badB56E37"
   - &NEW_CURATED_SUBMIT_EXIT_HASHES_FACTORY "0x4F716AD3Cc7A3A5cdA2359e5B2c84335c171dCde"
   - &EMERGENCY_BRAKES "0x73b047fe6337183A454c5217241D780a932777bD"
+  - &communityStakingModule "0xdA7dE2ECdDfccC6c3AF10108Db212ACBBf9EA83F"
+  - &csmAccounting "0x4d72BFF1BeaC69925F8Bd12526a39BAAb069e5Da"
+  - &curatedModule "0xDa5F930cE326EB5205085D66c72A4E79d60cB8C1"
+  - &curatedAccounting "0x2F91e3A8C5d6593bf4F8403fCfeCcd62dF59f6F6"
+  - &curatedMetaRegistry "0xA64b339eebD3dC3De848298B6a140955932901d8"
+  - &stakingRouter "0xFdDf38947aFB03C621C71b06C9C70bce73f12999"
+  - &consolidationMigrator "0x9Dc70b5A4f4F5E4AF9058C983D560564F031f1D7"
 
   # -- Max fees ---
   - &maxInfraFeeBP "100" # 1%
   - &maxLiquidityFeeBP "1000" # 10%
   - &maxReservationFeeBP "0" # 0%
+
+  # --- Factory permissions ---
+  - &CSMUpdateStakingModuleShareLimitsPermissions "0x0c6703f1d8d9ddfb6c6e5f57b4f7432a6500d6d85adcee90fddf38947afb03c621c71b06c9c70bce73f1299913976a06" # cast concat-hex "0x0C6703F1d8D9DdfB6c6e5F57b4f7432a6500D6D8" $(cast sig "validateParams((uint16,uint16,uint16,uint16))") "0xFdDf38947aFB03C621C71b06C9C70bce73f12999" $(cast sig "updateModuleShares(uint256,uint16,uint16)") | awk '{print tolower($0)}'
+  - &AllowConsolidationPairCMv1CMv2Permissions "0x9dc70b5a4f4f5e4af9058c983d560564f031f1d7b4ecbe1a" # cast concat-hex "0x9Dc70b5A4f4F5E4AF9058C983D560564F031f1D7" $(cast sig "allowPair(uint256,uint256,address)") | awk '{print tolower($0)}'
+  - &CSMSetMerkleGateTreePermissions "0xf3ec30b86c3dc1b8a1c754d885f9be3160e15b4c672c809eb314d4a76c457c93150d308787939063f4cc67e0ed4b1869a12760721a72a7199ab38059da6690b9cd4ed7b8ed4b1869" # cast concat-hex "0xf3ec30B86c3dC1b8a1C754D885F9bE3160e15B4c" $(cast sig "validateInputData(address,bytes32,string,bytes32,string)") "0xB314D4A76C457c93150d308787939063F4Cc67E0" $(cast sig "setTreeParams(bytes32,string)") "0xa12760721A72A7199aB38059DA6690b9Cd4ed7B8" $(cast sig "setTreeParams(bytes32,string)") | awk '{print tolower($0)}'
+  - &CSMReportWithdrawalsForSlashedValidatorsPermissions "0xda7de2ecddfccc6c3af10108db212acbbf9ea83f4412f7aa" # cast concat-hex "0xdA7dE2ECdDfccC6c3AF10108Db212ACBBf9EA83F" $(cast sig "reportSlashedWithdrawnValidators((uint256,uint256,uint256,uint256,bool)[])") | awk '{print tolower($0)}'
+  - &CSMSettleGeneralDelayedPenaltyPermissions "0xda7de2ecddfccc6c3af10108db212acbbf9ea83f187d9f92" # cast concat-hex "0xdA7dE2ECdDfccC6c3AF10108Db212ACBBf9EA83F" $(cast sig "settleGeneralDelayedPenalty(uint256[],uint256[])") | awk '{print tolower($0)}'
+  - &CMSetMerkleGateTreePermissions "0xa121667d1780a1d54eaed67ae17ee13d0f872d60672c809e6093efa6b5e2ff3be54d1c895c9dea932805c49fed4b18698c002c6ee10cf8adb78d1f9eb2e134fdaf8a7c1aed4b1869207798e6fd1aa7ee8a63782a64c959cd6727b78ced4b1869ef273ca4a21ba7b414ae3c9f9b443038cb133f72ed4b18693bbbb175f7f07954de00052b20e1c5572223f24ded4b186986a8d4e0db5938d21d98047544668fccb1a9adc8ed4b1869773933f9db8964a17d62fb808f2ec7a2de4247cced4b1869" # cast concat-hex "0xa121667D1780a1D54EAEd67AE17ee13d0f872D60" $(cast sig "validateInputData(address,bytes32,string,bytes32,string)") "0x6093EFA6B5E2FF3be54d1c895c9deA932805c49F" $(cast sig "setTreeParams(bytes32,string)") "0x8c002c6eE10cf8adb78D1F9EB2e134FdaF8A7C1a" $(cast sig "setTreeParams(bytes32,string)") "0x207798e6fD1aa7Ee8a63782A64c959cD6727b78C" $(cast sig "setTreeParams(bytes32,string)") "0xeF273Ca4A21Ba7B414Ae3C9f9b443038cb133F72" $(cast sig "setTreeParams(bytes32,string)") "0x3BbBb175f7F07954DE00052b20E1c5572223F24D" $(cast sig "setTreeParams(bytes32,string)") "0x86A8d4E0db5938D21d98047544668FCCB1A9ADc8" $(cast sig "setTreeParams(bytes32,string)") "0x773933F9db8964A17d62fb808f2EC7A2de4247CC" $(cast sig "setTreeParams(bytes32,string)") | awk '{print tolower($0)}'
+  - &CMReportWithdrawalsForSlashedValidatorsPermissions "0xda5f930ce326eb5205085d66c72a4e79d60cb8c14412f7aa" # cast concat-hex "0xDa5F930cE326EB5205085D66c72A4E79d60cB8C1" $(cast sig "reportSlashedWithdrawnValidators((uint256,uint256,uint256,uint256,bool)[])") | awk '{print tolower($0)}'
+  - &CMSettleGeneralDelayedPenaltyPermissions "0xda5f930ce326eb5205085d66c72a4e79d60cb8c1187d9f92" # cast concat-hex "0xDa5F930cE326EB5205085D66c72A4E79d60cB8C1" $(cast sig "settleGeneralDelayedPenalty(uint256[],uint256[])") | awk '{print tolower($0)}'
+  - &CMCreateOrUpdateOperatorGroupPermissions "0x2fc78638b77381e9d040163bd6eb1cac967bdbdfc4e88725a64b339eebd3dc3de848298b6a140955932901d852d13274" # cast concat-hex "0x2fC78638b77381e9D040163Bd6EB1cac967bDBdF" $(cast sig "validateInputData(uint256,(string,(uint64,uint16)[],(bytes)[]),(string,(uint64,uint16)[],(bytes)[]))") "0xA64b339eebD3dC3De848298B6a140955932901d8" $(cast sig "createOrUpdateOperatorGroup(uint256,(string,(uint64,uint16)[],(bytes)[]))") | awk '{print tolower($0)}'
 
 deployed:
   l1:
@@ -42,6 +67,15 @@ deployed:
     - &ForceValidatorExitsInVaultHub "0x6F5c0A5a824773E8f8285bC5aA59ea0Aab2A6400"
     - &SocializeBadDebtInVaultHub "0xaf35A63a4114B7481589fDD9FDB3e35Fd65fAed7"
     - &SetLiabilitySharesTargetInVaultHub "0x647DeE7bF33e44829e6430F7A08F63b3319694f0"
+    - &CSMSetMerkleGateTree "0xf3ec30B86c3dC1b8a1C754D885F9bE3160e15B4c"
+    - &CSMReportWithdrawalsForSlashedValidators "0xE330516a03bDdEBA4209b5591112f1aa3dd90F0A"
+    - &CSMSettleGeneralDelayedPenalty "0xB71755bE764abB4Ce26cb4dADf056Be57fB8880F"
+    - &CSMUpdateStakingModuleShareLimits "0x0C6703F1d8D9DdfB6c6e5F57b4f7432a6500D6D8"
+    - &CMSetMerkleGateTree "0xa121667D1780a1D54EAEd67AE17ee13d0f872D60"
+    - &CMReportWithdrawalsForSlashedValidators "0x71862Abd99819597670007bb992A7a7562fE50f2"
+    - &CMSettleGeneralDelayedPenalty "0xfffEFC16231eDC6Dc9C93e364ff4D4E3f787f416"
+    - &CMCreateOrUpdateOperatorGroup "0x2fC78638b77381e9D040163Bd6EB1cac967bDBdF"
+    - &AllowConsolidationPairCMv1CMv2 "0x29e23B1EF0c9fffAc8330F9abaCebDDD827E4b5C"
 
 l1:
   rpcUrl: MAINNET_REMOTE_RPC_URL
@@ -65,6 +99,10 @@ l1:
         evmScriptFactories:
           - args: [0]
             result: *ET_FIRST_FACTORY
+          - args: [3]
+            result: *AlterTiersInOperatorGrid
+          - args: [30]
+            result: *RegisterTiersInOperatorGrid
           - args: [31]
             result: *UpdateVaultsFeesInOperatorGrid
           - args: [32]
@@ -82,18 +120,50 @@ l1:
           - args: [38]
             result: *RegisterGroupsInOperatorGrid
           - args: [39]
-            result: *RegisterTiersInOperatorGrid
+            result: *CSMUpdateStakingModuleShareLimits
           - args: [40]
-            result: *AlterTiersInOperatorGrid
+            result: *AllowConsolidationPairCMv1CMv2
           - args: [41]
+            result: *CSMSetMerkleGateTree
+          - args: [42]
+            result: *CSMReportWithdrawalsForSlashedValidators
+          - args: [43]
+            result: *CSMSettleGeneralDelayedPenalty
+          - args: [44]
+            result: *CMSetMerkleGateTree
+          - args: [45]
+            result: *CMReportWithdrawalsForSlashedValidators
+          - args: [46]
+            result: *CMSettleGeneralDelayedPenalty
+          - args: [47]
+            result: *CMCreateOrUpdateOperatorGroup
+          - args: [48]
             mustRevert: true
-        evmScriptFactoryPermissions: null
+        evmScriptFactoryPermissions:
+          - args: [*CSMUpdateStakingModuleShareLimits]
+            result: *CSMUpdateStakingModuleShareLimitsPermissions
+          - args: [*AllowConsolidationPairCMv1CMv2]
+            result: *AllowConsolidationPairCMv1CMv2Permissions
+          - args: [*CSMSetMerkleGateTree]
+            result: *CSMSetMerkleGateTreePermissions
+          - args: [*CSMReportWithdrawalsForSlashedValidators]
+            result: *CSMReportWithdrawalsForSlashedValidatorsPermissions
+          - args: [*CSMSettleGeneralDelayedPenalty]
+            result: *CSMSettleGeneralDelayedPenaltyPermissions
+          - args: [*CMSetMerkleGateTree]
+            result: *CMSetMerkleGateTreePermissions
+          - args: [*CMReportWithdrawalsForSlashedValidators]
+            result: *CMReportWithdrawalsForSlashedValidatorsPermissions
+          - args: [*CMSettleGeneralDelayedPenalty]
+            result: *CMSettleGeneralDelayedPenaltyPermissions
+          - args: [*CMCreateOrUpdateOperatorGroup]
+            result: *CMCreateOrUpdateOperatorGroupPermissions
         getEVMScriptFactories:
           [
             *ET_FIRST_FACTORY,
             0x7E8eFfAb3083fB26aCE6832bFcA4C377905F97d7,
             0x9721c0f77E3Ea40eD592B9DCf3032DaF269c0306,
-            0xF6B6E7997338C48Ea3a8BCfa4BB64a315fDa76f4,
+            *AlterTiersInOperatorGrid,
             0xBd2b6dC189EefD51B273F5cb2d99BA1ce565fb8C,
             0x48c135Ff690C2Aa7F5B11C539104B5855A4f9252,
             0x200dA0b6a9905A377CF8D469664C65dB267009d1,
@@ -120,7 +190,7 @@ l1:
             0x6e04aED774B7c89BB43721AcDD7D03C872a51B69,
             0x0d2aefA542aFa8d9D1Ec35376068B88042FEF5f6,
             0x161a4552A625844c822954C5AcBac928ee0f399B,
-            0xBc5642bDD6F2a54b01A75605aAe9143525D97308,
+            *RegisterTiersInOperatorGrid,
             *UpdateVaultsFeesInOperatorGrid,
             *SocializeBadDebtInVaultHub,
             *SetJailStatusInOperatorGrid,
@@ -129,8 +199,15 @@ l1:
             *NEW_CURATED_SUBMIT_EXIT_HASHES_FACTORY,
             *UpdateGroupsShareLimitInOperatorGrid,
             *RegisterGroupsInOperatorGrid,
-            *RegisterTiersInOperatorGrid,
-            *AlterTiersInOperatorGrid,
+            *CSMUpdateStakingModuleShareLimits,
+            *AllowConsolidationPairCMv1CMv2,
+            *CSMSetMerkleGateTree,
+            *CSMReportWithdrawalsForSlashedValidators,
+            *CSMSettleGeneralDelayedPenalty,
+            *CMSetMerkleGateTree,
+            *CMReportWithdrawalsForSlashedValidators,
+            *CMSettleGeneralDelayedPenalty,
+            *CMCreateOrUpdateOperatorGroup,
           ]
         getMotion: null
         getMotions: null
@@ -162,6 +239,24 @@ l1:
             result: true
           - args: [*SetLiabilitySharesTargetInVaultHub]
             result: false
+          - args: [*CSMUpdateStakingModuleShareLimits]
+            result: true
+          - args: [*AllowConsolidationPairCMv1CMv2]
+            result: true
+          - args: [*CSMSetMerkleGateTree]
+            result: true
+          - args: [*CSMReportWithdrawalsForSlashedValidators]
+            result: true
+          - args: [*CSMSettleGeneralDelayedPenalty]
+            result: true
+          - args: [*CMSetMerkleGateTree]
+            result: true
+          - args: [*CMReportWithdrawalsForSlashedValidators]
+            result: true
+          - args: [*CMSettleGeneralDelayedPenalty]
+            result: true
+          - args: [*CMCreateOrUpdateOperatorGroup]
+            result: true
         motionDuration: 259200
         motions: null
         motionsCountLimit: 20
@@ -260,3 +355,99 @@ l1:
         decodeEVMScriptCallData: null
         trustedCaller: *trustedCaller
         vaultsAdapter: *VaultsAdapter
+    CSMSetMerkleGateTree:
+      name: SetMerkleGateTree
+      address: *CSMSetMerkleGateTree
+      checks:
+        createEVMScript: null
+        decodeEVMScriptCallData: null
+        name: CSM
+        trustedCaller: *csmCommittee
+        validateInputData: null
+    CSMReportWithdrawalsForSlashedValidators:
+      name: ReportWithdrawalsForSlashedValidators
+      address: *CSMReportWithdrawalsForSlashedValidators
+      checks:
+        createEVMScript: null
+        decodeEVMScriptCallData: null
+        module: *communityStakingModule
+        name: CSM
+        trustedCaller: *csmCommittee
+    CSMSettleGeneralDelayedPenalty:
+      name: SettleGeneralDelayedPenalty
+      address: *CSMSettleGeneralDelayedPenalty
+      checks:
+        accounting: *csmAccounting
+        createEVMScript: null
+        decodeEVMScriptCallData: null
+        module: *communityStakingModule
+        name: CSM
+        trustedCaller: *csmCommittee
+    CSMUpdateStakingModuleShareLimits:
+      name: UpdateStakingModuleShareLimits
+      address: *CSMUpdateStakingModuleShareLimits
+      checks:
+        createEVMScript: null
+        decodeEVMScriptCallData: null
+        maxPriorityExitShareThresholdDecrease: *maxPriorityExitShareThresholdDecrease
+        maxPriorityExitShareThresholdIncrease: *maxPriorityExitShareThresholdIncrease
+        maxStakeShareLimitDecrease: *maxStakeShareLimitDecrease
+        maxStakeShareLimitIncrease: *maxStakeShareLimitIncrease
+        name: CSM
+        stakingModuleId: 3
+        stakingRouter: *stakingRouter
+        trustedCaller: *csmCommittee
+        validateParams: null
+    CMSetMerkleGateTree:
+      name: SetMerkleGateTree
+      address: *CMSetMerkleGateTree
+      checks:
+        createEVMScript: null
+        decodeEVMScriptCallData: null
+        name: CM
+        trustedCaller: *curatedModuleCommittee
+        validateInputData: null
+    CMReportWithdrawalsForSlashedValidators:
+      name: ReportWithdrawalsForSlashedValidators
+      address: *CMReportWithdrawalsForSlashedValidators
+      checks:
+        createEVMScript: null
+        decodeEVMScriptCallData: null
+        module: *curatedModule
+        name: CM
+        trustedCaller: *curatedModuleCommittee
+    CMSettleGeneralDelayedPenalty:
+      name: SettleGeneralDelayedPenalty
+      address: *CMSettleGeneralDelayedPenalty
+      checks:
+        accounting: *curatedAccounting
+        createEVMScript: null
+        decodeEVMScriptCallData: null
+        module: *curatedModule
+        name: CM
+        trustedCaller: *curatedModuleCommittee
+    CMCreateOrUpdateOperatorGroup:
+      name: CreateOrUpdateOperatorGroup
+      address: *CMCreateOrUpdateOperatorGroup
+      checks:
+        allowedExternalModuleId: 1
+        createEVMScript: null
+        decodeEVMScriptCallData: null
+        decodeNORExtOperatorData: null
+        encodeNORExtOperatorData: null
+        metaRegistry: *curatedMetaRegistry
+        module: *curatedModule
+        name: CM
+        stakingRouter: *stakingRouter
+        trustedCaller: *curatedModuleCommittee
+        validateInputData: null
+    AllowConsolidationPairCMv1CMv2:
+      name: AllowConsolidationPair
+      address: *AllowConsolidationPairCMv1CMv2
+      checks:
+        consolidationMigrator: *consolidationMigrator
+        createEVMScript: null
+        decodeEVMScriptCallData: null
+        sourceModuleId: 1
+        stakingRouter: *stakingRouter
+        targetModuleId: 4

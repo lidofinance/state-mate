@@ -18,55 +18,57 @@ export class OzAclSectionValidator extends SectionValidatorBase {
   }
 
   override async validateSection(contractEntry: ContractEntry, contractAlias: string, basePath?: string) {
-    if (contractEntry.ozAcl) {
-      const sectionPath = basePath ? `${basePath}/${this.sectionName}` : this.sectionName;
-      logHeader2(sectionPath);
+    if (!contractEntry.ozAcl) {
+      return;
+    }
 
-      const address = contractEntry.address;
-      const iface = new Interface(ACCESS_CONTROL_ABI);
-      const contract = new Contract(address, iface, this.provider);
+    const sectionPath = basePath ? `${basePath}/${this.sectionName}` : this.sectionName;
+    logHeader2(sectionPath);
 
-      const roles = Object.entries(contractEntry.ozAcl);
-      for (let index = 0; index < roles.length; index++) {
-        const [role, expectedAddrs] = roles[index];
-        const isLastRole = index === roles.length - 1;
-        logSubHeader(`Role: ${role}`, isLastRole);
+    const address = contractEntry.address;
+    const iface = new Interface(ACCESS_CONTROL_ABI);
+    const contract = new Contract(address, iface, this.provider);
 
-        // Get actual role member count
-        const actualCount = await contract.getRoleMemberCount(role);
-        const expectedCount = expectedAddrs.length;
+    const roles = Object.entries(contractEntry.ozAcl);
+    for (let index = 0; index < roles.length; index++) {
+      const [role, expectedAddrs] = roles[index];
+      const isLastRole = index === roles.length - 1;
+      logSubHeader(`Role: ${role}`, isLastRole);
 
-        // Check if counts match
-        const countCheck: StaticCallResult = {
-          signature: "getRoleMemberCount",
-          args: [role],
-          result: expectedCount,
-        };
-        await this._checkViewFunction(contract, "getRoleMemberCount", countCheck);
+      // Get actual role member count
+      const actualCount = await contract.getRoleMemberCount(role);
+      const expectedCount = expectedAddrs.length;
 
-        // If count doesn't match, enumerate actual members for debugging
-        if (Number(actualCount) !== expectedCount) {
-          logError(`Role member count mismatch. Actual members:`);
-          for (let index = 0; index < Number(actualCount); index++) {
-            try {
-              const member = await contract.getRoleMember(role, index);
-              logError(`  [${index}] ${member}`);
-            } catch {
-              // getRoleMember might not be available in all AccessControl implementations
-              break;
-            }
+      // Check if counts match
+      const countCheck: StaticCallResult = {
+        signature: "getRoleMemberCount",
+        args: [role],
+        result: expectedCount,
+      };
+      await this._checkViewFunction(contract, "getRoleMemberCount", countCheck);
+
+      // If count doesn't match, enumerate actual members for debugging
+      if (Number(actualCount) !== expectedCount) {
+        logError(`Role member count mismatch. Actual members:`);
+        for (let index = 0; index < Number(actualCount); index++) {
+          try {
+            const member = await contract.getRoleMember(role, index);
+            logError(`  [${index}] ${member}`);
+          } catch {
+            // getRoleMember might not be available in all AccessControl implementations
+            break;
           }
         }
+      }
 
-        // Check hasRole(role, addr) == true for each expected addr
-        for (const addr of expectedAddrs) {
-          const hasRoleCheck: StaticCallResult = {
-            signature: "hasRole",
-            args: [role, addr],
-            result: true,
-          };
-          await this._checkViewFunction(contract, "hasRole", hasRoleCheck);
-        }
+      // Check hasRole(role, addr) == true for each expected addr
+      for (const addr of expectedAddrs) {
+        const hasRoleCheck: StaticCallResult = {
+          signature: "hasRole",
+          args: [role, addr],
+          result: true,
+        };
+        await this._checkViewFunction(contract, "hasRole", hasRoleCheck);
       }
     }
   }

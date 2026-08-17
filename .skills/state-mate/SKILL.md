@@ -48,7 +48,7 @@ l1:
 
 ```yaml
 contractName:
-  name: ContractName  # Must match ABI filename
+  name: ContractName # Must match ABI filename
   address: *contractAddress
   checks:
     functionName: expectedValue
@@ -63,7 +63,7 @@ contractName:
   address: *contractAddress
   proxyName: TransparentUpgradeableProxy
   implementation: *implementationAddress
-  proxyChecks: {}  # Usually empty for transparent proxies
+  proxyChecks: {} # Usually empty for transparent proxies
   storage:
     - slot: *EIP1967_ADMIN_SLOT
       expected: *proxyAdminAddress
@@ -76,7 +76,7 @@ contractName:
     someFunction: expectedValue
   implementationChecks:
     # Checks run directly against implementation (uninitialized state)
-    someFunction: *ZERO_ADDRESS  # Usually zero/empty values
+    someFunction: *ZERO_ADDRESS # Usually zero/empty values
 ```
 
 ### 3. ProxyAdmin Contract
@@ -131,7 +131,7 @@ checks:
     - args: [0]
       result: *firstItem
     - args: [1]
-      mustRevert: true  # Index out of bounds
+      mustRevert: true # Index out of bounds
 ```
 
 ### Tuple/Array Return Values
@@ -154,7 +154,7 @@ checks:
 ozAcl:
   *DEFAULT_ADMIN_ROLE : [*adminAddress]
   *SOME_ROLE : [*holder1, *holder2]
-  *UNUSED_ROLE : []  # Verify role has 0 members
+  *UNUSED_ROLE : [] # Verify role has 0 members
 ```
 
 ### Standard AccessControl (hasRole checks)
@@ -287,7 +287,7 @@ For comprehensive role verification:
 ```yaml
 deployed:
   l1:
-    - &deployer "0x..."  # Add deployer address for verification
+    - &deployer "0x..." # Add deployer address for verification
 
 ozAcl:
   # Roles with members
