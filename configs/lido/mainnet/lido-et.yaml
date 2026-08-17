@@ -8,10 +8,10 @@ parameters:
   - &csmCommittee "0xC52fC3081123073078698F1EAc2f1Dc7Bd71880f"
   - &curatedModuleCommittee "0x2570e0b22AD904501dfB0d49575991ACB801dD91"
   # https://research.lido.fi/t/community-staking-module/5917/218
-  - &maxPriorityExitShareThresholdDecrease 600
-  - &maxPriorityExitShareThresholdIncrease 600
-  - &maxStakeShareLimitDecrease 500
-  - &maxStakeShareLimitIncrease 500
+  - &maxPriorityExitShareThresholdDecrease 60
+  - &maxPriorityExitShareThresholdIncrease 60
+  - &maxStakeShareLimitDecrease 50
+  - &maxStakeShareLimitIncrease 50
 
 misc:
   - &DEFAULT_TIER_OPERATOR "0xFFfFfFffFFfffFFfFFfFFFFFffFFFffffFfFFFfF"
@@ -44,7 +44,7 @@ misc:
   - &maxReservationFeeBP "0" # 0%
 
   # --- Factory permissions ---
-  - &CSMUpdateStakingModuleShareLimitsPermissions "0x0c6703f1d8d9ddfb6c6e5f57b4f7432a6500d6d85adcee90fddf38947afb03c621c71b06c9c70bce73f1299913976a06" # cast concat-hex "0x0C6703F1d8D9DdfB6c6e5F57b4f7432a6500D6D8" $(cast sig "validateParams((uint16,uint16,uint16,uint16))") "0xFdDf38947aFB03C621C71b06C9C70bce73f12999" $(cast sig "updateModuleShares(uint256,uint16,uint16)") | awk '{print tolower($0)}'
+  - &CSMUpdateStakingModuleShareLimitsPermissions "0xde3e46e3129fa4e4e3f66c9024b0a3ad509b27a15adcee90fddf38947afb03c621c71b06c9c70bce73f1299913976a06" # cast concat-hex "0xde3e46E3129fA4e4e3f66c9024B0A3Ad509b27a1" $(cast sig "validateParams((uint16,uint16,uint16,uint16))") "0xFdDf38947aFB03C621C71b06C9C70bce73f12999" $(cast sig "updateModuleShares(uint256,uint16,uint16)") | awk '{print tolower($0)}'
   - &AllowConsolidationPairCMv1CMv2Permissions "0x9dc70b5a4f4f5e4af9058c983d560564f031f1d7b4ecbe1a" # cast concat-hex "0x9Dc70b5A4f4F5E4AF9058C983D560564F031f1D7" $(cast sig "allowPair(uint256,uint256,address)") | awk '{print tolower($0)}'
   - &CSMSetMerkleGateTreePermissions "0xf3ec30b86c3dc1b8a1c754d885f9be3160e15b4c672c809eb314d4a76c457c93150d308787939063f4cc67e0ed4b1869a12760721a72a7199ab38059da6690b9cd4ed7b8ed4b1869" # cast concat-hex "0xf3ec30B86c3dC1b8a1C754D885F9bE3160e15B4c" $(cast sig "validateInputData(address,bytes32,string,bytes32,string)") "0xB314D4A76C457c93150d308787939063F4Cc67E0" $(cast sig "setTreeParams(bytes32,string)") "0xa12760721A72A7199aB38059DA6690b9Cd4ed7B8" $(cast sig "setTreeParams(bytes32,string)") | awk '{print tolower($0)}'
   - &CSMReportWithdrawalsForSlashedValidatorsPermissions "0xda7de2ecddfccc6c3af10108db212acbbf9ea83f4412f7aa" # cast concat-hex "0xdA7dE2ECdDfccC6c3AF10108Db212ACBBf9EA83F" $(cast sig "reportSlashedWithdrawnValidators((uint256,uint256,uint256,uint256,bool)[])") | awk '{print tolower($0)}'
@@ -53,6 +53,9 @@ misc:
   - &CMReportWithdrawalsForSlashedValidatorsPermissions "0xda5f930ce326eb5205085d66c72a4e79d60cb8c14412f7aa" # cast concat-hex "0xDa5F930cE326EB5205085D66c72A4E79d60cB8C1" $(cast sig "reportSlashedWithdrawnValidators((uint256,uint256,uint256,uint256,bool)[])") | awk '{print tolower($0)}'
   - &CMSettleGeneralDelayedPenaltyPermissions "0xda5f930ce326eb5205085d66c72a4e79d60cb8c1187d9f92" # cast concat-hex "0xDa5F930cE326EB5205085D66c72A4E79d60cB8C1" $(cast sig "settleGeneralDelayedPenalty(uint256[],uint256[])") | awk '{print tolower($0)}'
   - &CMCreateOrUpdateOperatorGroupPermissions "0x2fc78638b77381e9d040163bd6eb1cac967bdbdfc4e88725a64b339eebd3dc3de848298b6a140955932901d852d13274" # cast concat-hex "0x2fC78638b77381e9D040163Bd6EB1cac967bDBdF" $(cast sig "validateInputData(uint256,(string,(uint64,uint16)[],(bytes)[]),(string,(uint64,uint16)[],(bytes)[]))") "0xA64b339eebD3dC3De848298B6a140955932901d8" $(cast sig "createOrUpdateOperatorGroup(uint256,(string,(uint64,uint16)[],(bytes)[]))") | awk '{print tolower($0)}'
+  - &TopUpAllowedRecipientsPermissions "0xb9e5cbb9ca5b0d659238807e84d0176930753d86f63648468d8b35ca51e7808098aff4918c21ce428c943f8966671229" # cast concat-hex "0xB9E5CBB9CA5b0d659238807E84D0176930753d86" $(cast sig "newImmediatePayment(address,address,uint256,string)") "0x8d8b35cA51e7808098afF4918C21Ce428c943F89" $(cast sig "updateSpentAmount(uint256)") | awk '{print tolower($0)}'
+  - &AddAllowedRecipientPermissions "0x8d8b35ca51e7808098aff4918c21ce428c943f89739b5384" # cast concat-hex "0x8d8b35cA51e7808098afF4918C21Ce428c943F89" $(cast sig "addRecipient(address,string)") | awk '{print tolower($0)}'
+  - &RemoveAllowedRecipientPermissions "0x8d8b35ca51e7808098aff4918c21ce428c943f8912a29198" # cast concat-hex "0x8d8b35cA51e7808098afF4918C21Ce428c943F89" $(cast sig "removeRecipient(address)") | awk '{print tolower($0)}'
 
 deployed:
   l1:
@@ -70,12 +73,15 @@ deployed:
     - &CSMSetMerkleGateTree "0xf3ec30B86c3dC1b8a1C754D885F9bE3160e15B4c"
     - &CSMReportWithdrawalsForSlashedValidators "0xE330516a03bDdEBA4209b5591112f1aa3dd90F0A"
     - &CSMSettleGeneralDelayedPenalty "0xB71755bE764abB4Ce26cb4dADf056Be57fB8880F"
-    - &CSMUpdateStakingModuleShareLimits "0x0C6703F1d8D9DdfB6c6e5F57b4f7432a6500D6D8"
+    - &CSMUpdateStakingModuleShareLimits "0xde3e46E3129fA4e4e3f66c9024B0A3Ad509b27a1"
     - &CMSetMerkleGateTree "0xa121667D1780a1D54EAEd67AE17ee13d0f872D60"
     - &CMReportWithdrawalsForSlashedValidators "0x71862Abd99819597670007bb992A7a7562fE50f2"
     - &CMSettleGeneralDelayedPenalty "0xfffEFC16231eDC6Dc9C93e364ff4D4E3f787f416"
     - &CMCreateOrUpdateOperatorGroup "0x2fC78638b77381e9D040163Bd6EB1cac967bDBdF"
     - &AllowConsolidationPairCMv1CMv2 "0x29e23B1EF0c9fffAc8330F9abaCebDDD827E4b5C"
+    - &TopUpAllowedRecipients "0xc72d4C3e86b681D7c9EE306D41193C64D709C303"
+    - &AddAllowedRecipient "0xe24230619e9218C1eed3de3489a22f6BC3ce18FF"
+    - &RemoveAllowedRecipient "0xF4d5D97C85eD18f77F99B57f55E9E11d52992632"
 
 l1:
   rpcUrl: MAINNET_REMOTE_RPC_URL
@@ -120,7 +126,7 @@ l1:
           - args: [38]
             result: *RegisterGroupsInOperatorGrid
           - args: [39]
-            result: *CSMUpdateStakingModuleShareLimits
+            result: *CMCreateOrUpdateOperatorGroup
           - args: [40]
             result: *AllowConsolidationPairCMv1CMv2
           - args: [41]
@@ -136,8 +142,14 @@ l1:
           - args: [46]
             result: *CMSettleGeneralDelayedPenalty
           - args: [47]
-            result: *CMCreateOrUpdateOperatorGroup
+            result: *CSMUpdateStakingModuleShareLimits
           - args: [48]
+            result: *TopUpAllowedRecipients
+          - args: [49]
+            result: *AddAllowedRecipient
+          - args: [50]
+            result: *RemoveAllowedRecipient
+          - args: [51]
             mustRevert: true
         evmScriptFactoryPermissions:
           - args: [*CSMUpdateStakingModuleShareLimits]
@@ -158,6 +170,12 @@ l1:
             result: *CMSettleGeneralDelayedPenaltyPermissions
           - args: [*CMCreateOrUpdateOperatorGroup]
             result: *CMCreateOrUpdateOperatorGroupPermissions
+          - args: [*TopUpAllowedRecipients]
+            result: *TopUpAllowedRecipientsPermissions
+          - args: [*AddAllowedRecipient]
+            result: *AddAllowedRecipientPermissions
+          - args: [*RemoveAllowedRecipient]
+            result: *RemoveAllowedRecipientPermissions
         getEVMScriptFactories:
           [
             *ET_FIRST_FACTORY,
@@ -199,7 +217,7 @@ l1:
             *NEW_CURATED_SUBMIT_EXIT_HASHES_FACTORY,
             *UpdateGroupsShareLimitInOperatorGrid,
             *RegisterGroupsInOperatorGrid,
-            *CSMUpdateStakingModuleShareLimits,
+            *CMCreateOrUpdateOperatorGroup,
             *AllowConsolidationPairCMv1CMv2,
             *CSMSetMerkleGateTree,
             *CSMReportWithdrawalsForSlashedValidators,
@@ -207,7 +225,10 @@ l1:
             *CMSetMerkleGateTree,
             *CMReportWithdrawalsForSlashedValidators,
             *CMSettleGeneralDelayedPenalty,
-            *CMCreateOrUpdateOperatorGroup,
+            *CSMUpdateStakingModuleShareLimits,
+            *TopUpAllowedRecipients,
+            *AddAllowedRecipient,
+            *RemoveAllowedRecipient,
           ]
         getMotion: null
         getMotions: null
@@ -256,6 +277,12 @@ l1:
           - args: [*CMSettleGeneralDelayedPenalty]
             result: true
           - args: [*CMCreateOrUpdateOperatorGroup]
+            result: true
+          - args: [*TopUpAllowedRecipients]
+            result: true
+          - args: [*AddAllowedRecipient]
+            result: true
+          - args: [*RemoveAllowedRecipient]
             result: true
         motionDuration: 259200
         motions: null

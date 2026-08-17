@@ -2754,7 +2754,7 @@ l1:
         isLockExpired: null
         isPaused: false
         supportsInterface: null
-        totalBondShares: 0
+        totalBondShares: null
       ozAcl:
         *DEFAULT_ADMIN_ROLE : [*aragonAgent]
         *SM_PAUSE_ROLE : [*resealManager, *circuitBreaker]
@@ -3863,8 +3863,8 @@ l1:
         isPaused: false
         name: "Decentralization Operator Gate"
         supportsInterface: null
-        treeCid: QmU4cnyaKWgMVCZVLiuQaqu6yGXahjzi4F1Vcnq2SXBBmT
-        treeRoot: 0x1111111111111111111111111111111111111111111111111111111111111111
+        treeCid: bafkreibgefeix6fvg2n6ly2gui3l5gu7oocmufu3canl4ygat6eq2d5j7y
+        treeRoot: 0xf275ac0fc5b70e863eb75eb520ebebfb788c75b92ed0cb105445eb88bc339346
         verifyProof: null
       ozAcl:
         *DEFAULT_ADMIN_ROLE : [*aragonAgent]
@@ -3943,8 +3943,8 @@ l1:
         isPaused: false
         name: "Extra Effort Operator Gate"
         supportsInterface: null
-        treeCid: QmU4cnyaKWgMVCZVLiuQaqu6yGXahjzi4F1Vcnq2SXBBmT
-        treeRoot: 0x1111111111111111111111111111111111111111111111111111111111111111
+        treeCid: bafkreighpv5hakkgns6tdnzpmjymypqx6vb37lhdcf3u43fkt7rv4u3uda
+        treeRoot: 0xc428ac6cdaab09b04d818c27f9b44daa552689640f7a518d76f698c49ce6693a
         verifyProof: null
       ozAcl:
         *DEFAULT_ADMIN_ROLE : [*aragonAgent]
@@ -4023,8 +4023,8 @@ l1:
         isPaused: false
         name: "Intra-Operator DVT Cluster Gate"
         supportsInterface: null
-        treeCid: bafkreigm3mqlqdto2ggxpq22w7tblfbx4p4o4a3gudf2lkfduwxeh2m62e
-        treeRoot: 0xfda6c221ae0f44dfa57c64324ebbd0c468bb402cbcc20326ad65a18e96a3df0c
+        treeCid: bafkreiero7xngbtxupxgriyybvfbh7fe757rwoxbgbqqdklk3td7hbtuxq
+        treeRoot: 0x5b1b7f4a9c652a72cd9e2b5ee0204f2086be317df01a3795fc0b8984775a6331
         verifyProof: null
       ozAcl:
         *DEFAULT_ADMIN_ROLE : [*aragonAgent]
@@ -4103,8 +4103,8 @@ l1:
         isPaused: false
         name: "Intra-Operator DVT Cluster Plus Gate"
         supportsInterface: null
-        treeCid: QmU4cnyaKWgMVCZVLiuQaqu6yGXahjzi4F1Vcnq2SXBBmT
-        treeRoot: 0x1111111111111111111111111111111111111111111111111111111111111111
+        treeCid: bafkreihxtocbyrxvgcxhkm5h6huturheox4yxvhp3md7vvayc3ajirl5oy
+        treeRoot: 0xd34a5ec5c542347c7662f705f0ff761b17c78061c09472c885fa34e9a2172f94
         verifyProof: null
       ozAcl:
         *DEFAULT_ADMIN_ROLE : [*aragonAgent]
@@ -4165,16 +4165,9 @@ l1:
         TWR_LIMIT_POSITION: null
         TW_EXIT_LIMIT_MANAGER_ROLE: *TW_EXIT_LIMIT_MANAGER_ROLE
         VERSION: *VERSION_1
-        getExitRequestLimitFullInfo:
-          # [maxExitRequestsLimit, exitsPerFrame, frameDurationInSec, prevExitRequestsLimit, currentExitRequestsLimit]
-          # "Set TWG exit request limits" vote item; the last two may transiently dip below max after exit requests
-          [
-            *twMaxExitRequestsLimit,
-            *twExitsPerFrame,
-            *twFrameDurationInSec,
-            *twMaxExitRequestsLimit,
-            *twMaxExitRequestsLimit,
-          ]
+        # [maxExitRequestsLimit, exitsPerFrame, frameDurationInSec, prevExitRequestsLimit, currentExitRequestsLimit]
+        # the last two dip below max after exit requests, so the tuple can't be pinned
+        getExitRequestLimitFullInfo: null
         getResumeSinceTimestamp: 0
         getRoleAdmin: null
         getRoleMember: null
@@ -4914,7 +4907,7 @@ l1:
             *exitedValidatorEthAmountLimit,
             *externalPendingBalanceCapEth,
           ]
-        getReportDataCount: 2 # 2 migration snapshots
+        getReportDataCount: null # grows with each AO report
         getRoleAdmin:
           - args: [*DEFAULT_ADMIN_ROLE]
             result: *DEFAULT_ADMIN_ROLE
@@ -4953,7 +4946,7 @@ l1:
         getRoleMember: null
         getRoleMemberCount: null
         hasRole: null
-        isPostMigrationFirstReportDone: false # flips to true after the first post-migration AO report
+        isPostMigrationFirstReportDone: true # flipped by the first post-migration AO report
         lastReportTimestamp: null
         lastVaultBalanceAfterTransfer: null
         reportData: null
