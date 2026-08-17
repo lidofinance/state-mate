@@ -1228,7 +1228,7 @@ l1:
       ozAcl:
         *DEFAULT_ADMIN_ROLE : [*aragonAgent, *csmManager]
         *CS_MANAGE_BOND_CURVES_ROLE : []
-        *CS_SET_BOND_CURVE_ROLE : [*csmManager, *CSVettedGate, *identifiedDvtClusterGate]
+        *CS_SET_BOND_CURVE_ROLE : [*CSVettedGate, *identifiedDvtClusterGate]
         *CS_RECOVERER_ROLE : []
         *CS_RESUME_ROLE : [*resealManager]
         *CS_PAUSE_ROLE : [*resealManager, *circuitBreaker]
