@@ -120,10 +120,11 @@ export class ContractSectionValidator {
     clearErrorContext();
 
     // Show contract status (not last, global status follows)
-    const { checks, errors } = getContractStats();
+    const { errors, passed, skipped } = getContractStats();
+    const successfulChecks = `${passed} passed, ${skipped} skipped`;
     const statusMessage = errors
-      ? `${checks} checks, ${chalk.red(`${errors} ${errors === 1 ? "error" : "errors"}`)}`
-      : `${checks} checks passed`;
+      ? `${successfulChecks}, ${chalk.red(`${errors} ${errors === 1 ? "error" : "errors"}`)}`
+      : successfulChecks;
     logFinalStatus(statusMessage, errors === 0, true);
   }
 }

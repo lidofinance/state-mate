@@ -8,7 +8,7 @@ import { log, LogCommand, logHeader2, WARNING_MARK } from "src/logger";
 import { ContractEntry, isTypeOfTB, ProxyContractEntryTB } from "src/typebox";
 import { Abi } from "src/types";
 
-import { incChecks, incErrors, SectionValidatorBase, setErrorContext } from "./base";
+import { incChecks, incErrors, incPassed, SectionValidatorBase, setErrorContext } from "./base";
 
 export class OzNonEnumerableAclSectionValidator extends SectionValidatorBase {
   constructor(provider: JsonRpcProvider) {
@@ -74,6 +74,7 @@ export class OzNonEnumerableAclSectionValidator extends SectionValidatorBase {
         try {
           const isRoleOnHolder: unknown = await contract.getFunction("hasRole").staticCall(role, holder);
           assert.isTrue(isRoleOnHolder);
+          incPassed();
           logHandle.success(String(isRoleOnHolder));
         } catch (error) {
           const errorMessage = `REVERTED with: ${(error as Error).message}`;
@@ -96,6 +97,7 @@ export class OzNonEnumerableAclSectionValidator extends SectionValidatorBase {
         try {
           const isRoleOnHolder: unknown = await contract.getFunction("hasRole").staticCall(role, holder);
           assert.isFalse(isRoleOnHolder);
+          incPassed();
           logHandle.success(String(isRoleOnHolder));
         } catch (error) {
           const errorMessage = `REVERTED with: ${(error as Error).message}`;

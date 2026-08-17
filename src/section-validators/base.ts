@@ -29,11 +29,15 @@ export interface ErrorDetail {
 
 export let g_errors: number = 0;
 export let g_total_checks: number = 0;
+export let g_passed_checks: number = 0;
+export let g_skipped_checks: number = 0;
 export const g_error_details: ErrorDetail[] = [];
 
 // Per-contract counters
 let g_contract_errors: number = 0;
 let g_contract_checks: number = 0;
+let g_contract_passed: number = 0;
+let g_contract_skipped: number = 0;
 
 let g_current_context: Partial<ErrorDetail> = {};
 
@@ -48,10 +52,17 @@ export function clearErrorContext(): void {
 export function resetContractCounters(): void {
   g_contract_errors = 0;
   g_contract_checks = 0;
+  g_contract_passed = 0;
+  g_contract_skipped = 0;
 }
 
-export function getContractStats(): { checks: number; errors: number } {
-  return { checks: g_contract_checks, errors: g_contract_errors };
+export function getContractStats(): { checks: number; errors: number; passed: number; skipped: number } {
+  return {
+    checks: g_contract_checks,
+    errors: g_contract_errors,
+    passed: g_contract_passed,
+    skipped: g_contract_skipped,
+  };
 }
 
 export function incErrors(errorMessage?: string): void {
@@ -72,6 +83,16 @@ export function incErrors(errorMessage?: string): void {
 export function incChecks(): void {
   g_total_checks += 1;
   g_contract_checks += 1;
+}
+
+export function incPassed(): void {
+  g_passed_checks += 1;
+  g_contract_passed += 1;
+}
+
+export function incSkipped(): void {
+  g_skipped_checks += 1;
+  g_contract_skipped += 1;
 }
 
 export enum CheckLevel {
@@ -113,6 +134,7 @@ export abstract class SectionValidatorBase {
 
   protected async _checkViewResult(contract: Contract, method: string, staticCallResult: StaticCallResult) {
     if (staticCallResult.result === null) {
+      incSkipped();
       logMethodSkipped(method);
       return;
     }
@@ -136,6 +158,7 @@ export abstract class SectionValidatorBase {
     try {
       const actual: unknown = await contractFunction.staticCall(...(args || ""));
       _assertEqual(actual, expected);
+      incPassed();
       logHandle.success(_stringify(actual));
     } catch (error) {
       const errorMessage = `REVERTED with: ${printError(error)}`;
@@ -167,6 +190,7 @@ export abstract class SectionValidatorBase {
       logHandle.failure(errorMessage);
       incErrors(errorMessage);
     } catch (error) {
+      incPassed();
       logHandle.success(`REVERTED with: ${printError(error)}`);
     }
   }

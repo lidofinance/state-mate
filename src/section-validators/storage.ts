@@ -4,7 +4,7 @@ import { EntryField } from "src/common";
 import { logHeader2, LogCommand } from "src/logger";
 import { ContractEntry } from "src/typebox";
 
-import { incChecks, incErrors, SectionValidatorBase, setErrorContext } from "./base";
+import { incChecks, incErrors, incPassed, SectionValidatorBase, setErrorContext } from "./base";
 
 /**
  * Normalizes a hex value to a 32-byte (64 hex chars + 0x prefix = 66 chars) representation.
@@ -58,6 +58,7 @@ export class StorageSectionValidator extends SectionValidatorBase {
         const normalizedExpected = normalizeToBytes32(expectedValue);
 
         if (normalizedActual === normalizedExpected) {
+          incPassed();
           logHandle.success(actual);
         } else {
           const errorMessage = `Expected "${expectedValue}" but got "${actual}"`;

@@ -22,7 +22,7 @@ import { parseCommandLineArguments } from "./cli-parser";
 import { printError, readUrlOrFromEnvironment } from "./common";
 import { loadContractInfoFromExplorer } from "./explorer-provider";
 import { FAILURE_MARK, log, logError, logErrorAndExit, logHeader1, SUCCESS_MARK, WARNING_MARK } from "./logger";
-import { g_error_details, g_errors, g_total_checks } from "./section-validators/base";
+import { g_error_details, g_errors, g_passed_checks, g_skipped_checks } from "./section-validators/base";
 import { ContractSectionValidator } from "./section-validators/contract";
 import {
   EntireDocument,
@@ -126,9 +126,8 @@ async function doChecks(jsonDocument: EntireDocument) {
   // Show final summary (outside the tree)
   log(""); // Separator line
   const statusMark = g_errors ? FAILURE_MARK : SUCCESS_MARK;
-  const statusMessage = g_errors
-    ? `${g_total_checks} checks, ${chalk.red(`${g_errors} errors`)}`
-    : `${g_total_checks} checks passed`;
+  const successfulChecks = `${g_passed_checks} passed, ${g_skipped_checks} skipped`;
+  const statusMessage = g_errors ? `${successfulChecks}, ${chalk.red(`${g_errors} errors`)}` : successfulChecks;
   log(`${statusMark} ${chalk.bold("Total:")} ${statusMessage}`);
 
   if (g_Arguments.checkOnly) {
