@@ -11,8 +11,6 @@ parameters:
   - &emergencyBrakesMultisig "0x73b047fe6337183A454c5217241D780a932777bD" # Emergency Brakes on ETH
   # Core
   - &lidoLocator "0xC1d0b3DE6792Bf6b4b37EccdcC24e45978Cfd2Eb"
-  - &accounting "0x23ED611be0e1a820978875C0122F92260804cdDf"
-  - &l1OpStackTokenRatePusher "0xd54c1c6413caac3477AC14b2a80D5398E3c32FfE"
   # External dependencies
   - &curveAdmin "0x97aA696e37659Fb4f0B53824246d802Df40E980A"
   - &curveTwocryptoFactory "0x98EE851a00abeE0d95D08cF4CA2BdCE32aeaAF7F"
@@ -35,13 +33,10 @@ deployed:
     - &buybackStonksLp "0x8c595aA4AEc6F42B9e7D77F83179768D37CE3042"
     - &buybackStonksTreasury "0xb368586CB980895E51e1D82102E63b3F69d3F151"
     - &buybackAllocator "0xAA568141c051f2D1132b110f8391F18D48E8D889"
-    # Core-side NEST upgrade: new TokenRateNotifier (forwards full rebase payload)
-    - &tokenRateNotifier "0xbe05d12Fd10919F1881125006523452F6aFF791b"
 
 misc:
   - &ZERO_ADDRESS "0x0000000000000000000000000000000000000000"
   - &ZERO_BYTES32 "0x0000000000000000000000000000000000000000000000000000000000000000"
-  - &MAX_UINT256 "115792089237316195423570985008687907853269984665640564039457584007913129639935"
   - &PRICE_UNIT 1000000000000000000 # 1e18
   - &MAX_BASIS_POINTS 10000
   - &MAX_ORACLE_DECIMALS 38
@@ -95,8 +90,6 @@ misc:
   - &IAccessControlEnumerable "0x5a05180f"
   # cast sig "getCumulativeRevenueUSD()"
   - &IRevenueSource "0x87c92437"
-  # cast sig "pushTokenRate()"
-  - &ITokenRatePusher "0xa16ba44d"
   # cast sig "pushTokenRate(uint256,uint256,uint256,uint256,uint256,uint256,uint256)"
   - &ITokenRatePusherWithArgs "0xbd18bfd6"
 
@@ -414,27 +407,6 @@ l1:
       ozAcl:
         *DEFAULT_ADMIN_ROLE : [*aragonVoting]
         *MANAGER_ROLE : [*tmcMultisig]
-
-    # Core-side NEST upgrade: new TokenRateNotifier forwarding the full rebase payload
-    tokenRateNotifier:
-      name: TokenRateNotifier
-      address: *tokenRateNotifier
-      checks:
-        owner: *aragonAgent
-        TOKEN_RATE_PROVIDER: *accounting
-        INDEX_NOT_FOUND: *MAX_UINT256
-        MAX_OBSERVERS_COUNT: 32
-        REQUIRED_INTERFACE_NO_ARGS: *ITokenRatePusher
-        REQUIRED_INTERFACE_WITH_ARGS: *ITokenRatePusherWithArgs
-        observersLength: 2
-        # [addr, kind], kind: 0 = ITokenRatePusher, 1 = ITokenRatePusherWithArgs
-        observers:
-          - args: [0]
-            result: [*l1OpStackTokenRatePusher, 0]
-          - args: [1]
-            result: [*stakingRevenueSource, 1]
-          - args: [2]
-            mustRevert: true
 
     # Committees
     tmcMultisig:
