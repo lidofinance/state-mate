@@ -102,7 +102,6 @@ export abstract class SectionValidatorBase {
   ): Promise<void>;
 
   protected async _checkViewFunction(contract: Contract, method: string, staticCallCheck: StaticCallCheck) {
-    incChecks();
     if (isTypeOfTB(staticCallCheck, StaticCallResultTB)) {
       await this._checkViewResult(contract, method, staticCallCheck);
     } else if (isTypeOfTB(staticCallCheck, StaticCallMustRevertTB)) {
@@ -117,6 +116,7 @@ export abstract class SectionValidatorBase {
       logMethodSkipped(method);
       return;
     }
+    incChecks();
 
     const { args, result: expected, signature = method } = staticCallResult;
 
@@ -145,6 +145,7 @@ export abstract class SectionValidatorBase {
   }
 
   protected async _checkViewMustRevert(contract: Contract, method: string, staticCallMustRevert: StaticCallMustRevert) {
+    incChecks();
     const { args, signature = method } = staticCallMustRevert;
 
     const argumentsString = args ? `(${args.toString()})` : "";
