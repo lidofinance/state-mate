@@ -35,10 +35,10 @@
     ]
   },
   "devDependencies": {
-    "@commitlint/cli": "^21.0.2",
-    "@commitlint/config-conventional": "^21.1.0",
+    "@commitlint/cli": "^21.2.1",
+    "@commitlint/config-conventional": "^21.2.0",
     "@eslint/compat": "^2.0.5",
-    "@sinclair/typebox": "^0.34.49",
+    "@sinclair/typebox": "^0.34.52",
     "@tsconfig/node20": "^20.1.9",
     "@types/node": "^26.0.1",
     "@typescript-eslint/eslint-plugin": "^8.62.0",
@@ -50,7 +50,7 @@
     "eslint-plugin-prettier": "^5.5.5",
     "eslint-plugin-unicorn": "^69.0.0",
     "husky": "^9.0.11",
-    "lint-staged": "^17.0.8",
+    "lint-staged": "^17.2.0",
     "prettier": "^3.9.0",
     "ts-node": ">=8.0.0",
     "typescript": "^6.0.3"
