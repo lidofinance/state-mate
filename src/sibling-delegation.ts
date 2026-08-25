@@ -16,14 +16,12 @@ export const ADDRESS_OR_HASH_RE = /^0x[a-fA-F0-9]{40}$|^0x[a-fA-F0-9]{64}$/;
  * Describes one kind of sibling "delegation" file (e.g. `.deployed`, `.inputs`). The generic engine
  * handles path resolution, document-marker stripping, the concat-then-parse composition, and the
  * cross-file invariants — including that the sibling holds only its owned sections and the main
- * config none of them; each spec supplies the bits that differ: the filename infix, the human and
- * CLI labels, which top-level sections it owns, and how to validate its own per-entry structure/
- * values and collect its `&label` anchors.
+ * config none of them; each spec supplies the bits that differ: the human and CLI labels, which
+ * top-level sections it owns, and how to validate its own per-entry structure/values and collect its
+ * `&label` anchors.
  */
 export type SiblingSpec = {
-  /** Filename infix inserted before the extension, e.g. `.deployed` -> `lido.deployed.yaml`. */
-  infix: string;
-  /** The CLI option that selects an explicit path, e.g. `--deployed` (used in resolution errors). */
+  /** The CLI option that selects the file, e.g. `--deployed` (used in resolution errors). */
   optionName: string;
   /** Human-facing label for this file, e.g. `the .deployed file` (used in error messages). */
   fileLabel: string;
@@ -41,19 +39,6 @@ export type ComposeResult = {
   /** Labels collected from each sibling, parallel to the input `siblings` array. */
   labels: string[][];
 };
-
-/** Derive the conventional sibling path: `lido.yaml` + `.deployed` -> `lido.deployed.yaml`. */
-export function deriveSiblingPath(configPath: string, infix: string): string {
-  const extension = path.extname(configPath);
-  const base = path.basename(configPath, extension);
-  return path.join(path.dirname(configPath), `${base}${infix}${extension}`);
-}
-
-/** True when the file is itself a `*<infix>.<ext>` file (so it must not be given its own sibling). */
-export function isSiblingFileName(filePath: string, infix: string): boolean {
-  const extension = path.extname(filePath);
-  return path.basename(filePath, extension).endsWith(infix);
-}
 
 /** True only when `filePath` exists and is a regular file (not a directory). */
 function isExistingFile(filePath: string): boolean {
@@ -78,24 +63,15 @@ function resolveExplicitFilePath(optionName: string, argument: string): string {
 }
 
 /**
- * Decide which sibling file to apply, or `null` for a standalone run. An explicit `--<spec>` path
- * wins (and must be an existing file); otherwise the conventional sibling is used only when it is a
- * file. Throws on an explicit path that is missing or not a file — including an empty one (an empty
- * string from a hollow shell variable must not silently fall back to convention discovery).
+ * Decide which sibling file to apply, or `null` for a standalone run. Sibling files are
+ * EXPLICIT-ONLY: only the spec's `--<option> <path>` selects one, and a same-named file sitting next
+ * to the main config is never picked up on its own — swapping a deployment's addresses or inputs
+ * changes what is verified, so it must be a deliberate choice. Throws on a path that is missing or
+ * not a file, including an empty one (an empty string from a hollow shell variable must not silently
+ * degrade to a standalone run).
  */
-export function resolveSiblingFilePath(
-  configPath: string,
-  spec: SiblingSpec,
-  explicitArgument?: string,
-): string | null {
-  if (explicitArgument !== undefined) {
-    return resolveExplicitFilePath(spec.optionName, explicitArgument);
-  }
-  if (isSiblingFileName(configPath, spec.infix)) {
-    return null;
-  }
-  const sibling = deriveSiblingPath(path.resolve(configPath), spec.infix);
-  return isExistingFile(sibling) ? sibling : null;
+export function resolveSiblingFilePath(spec: SiblingSpec, explicitArgument?: string): string | null {
+  return explicitArgument === undefined ? null : resolveExplicitFilePath(spec.optionName, explicitArgument);
 }
 
 /**

@@ -2,7 +2,6 @@ import * as YAML from "yaml";
 
 import { ADDRESS_OR_HASH_RE, pairKeyToString, SiblingSpec } from "./sibling-delegation";
 
-const INPUTS_INFIX = ".inputs";
 // The two groups of a `.inputs` file, split by AUTHORSHIP:
 //   `config`    — project-chosen, configurable values (knobs): any scalar or array, no value check.
 //   `externals` — fixed third-party / external facts: addresses (validated) plus `chainId` (numeric).
@@ -68,7 +67,6 @@ function collectInputsLabels(document: YAML.Document, fileLabel: string): Set<st
 
 /** The `.inputs` delegation: project-chosen `config:` values and fixed external `externals:` facts. */
 export const INPUTS_SPEC: SiblingSpec = {
-  infix: INPUTS_INFIX,
   optionName: "--inputs",
   fileLabel: "the .inputs file",
   ownedSectionKeys: [...INPUTS_SECTIONS],

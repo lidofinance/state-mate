@@ -4,11 +4,10 @@ import path from "node:path";
 import { test } from "node:test";
 
 import { DEPLOYED_SPEC } from "../deployed-addresses";
-import { deriveSiblingPath, isSiblingFileName, resolveSiblingFilePath } from "../sibling-delegation";
+import { configDelegatesAnchors, loadStateWithSiblings, resolveSiblingFilePath } from "../sibling-delegation";
 import { composeWithDeployedAddresses, toCrlf, withTemporaryDirectory } from "./delegation-helpers";
 
-const resolveDeployedFilePath = (configPath: string, deployedArgument?: string) =>
-  resolveSiblingFilePath(configPath, DEPLOYED_SPEC, deployedArgument);
+const resolveDeployedFilePath = (deployedArgument?: string) => resolveSiblingFilePath(DEPLOYED_SPEC, deployedArgument);
 
 // Full-delegation model: the main config holds ONLY wiring (`*label` aliases) plus its own constant
 // anchors (e.g. `&ZERO` in `misc:`). It has no `deployed:` section. The .deployed file is the sole
@@ -148,6 +147,50 @@ test("a .deployed file whose sections are all empty is rejected (zero anchors is
   assert.throws(() => composeWithDeployedAddresses(MAIN_CONFIG, "deployed:\n  l1: []\n"), /defines no labeled entries/);
 });
 
+test("a .deployed file that is not a mapping is rejected with a file-targeted error", () => {
+  assert.throws(
+    () => composeWithDeployedAddresses(MAIN_CONFIG, "- just a list\n"),
+    /must be a mapping with `deployed:`/,
+  );
+});
+
+test("a `deployed:` section that is not a mapping of chains is rejected", () => {
+  assert.throws(
+    () => composeWithDeployedAddresses(MAIN_CONFIG, "deployed: []\n"),
+    /must contain a `deployed:` mapping/,
+  );
+});
+
+test("a chain key holding a mapping instead of a list of labeled addresses is rejected", () => {
+  const deployed = `\ndeployed:\n  l1:\n    foo: "0x1111111111111111111111111111111111111111"\n`;
+  assert.throws(
+    () => composeWithDeployedAddresses(MAIN_CONFIG, deployed),
+    /`deployed\.l1` must be a list of labeled addresses/,
+  );
+});
+
+test("a wholly empty file is rejected with a file-targeted error (either side)", () => {
+  // Distinct from the section-less/empty-section cases above: a truncated or placeholder file parses
+  // to zero documents, and the error must still name which of the two files it was.
+  assert.throws(() => composeWithDeployedAddresses(MAIN_CONFIG, ""), /the \.deployed file is empty/);
+  assert.throws(() => composeWithDeployedAddresses("", DEPLOYED), /the main config is empty/);
+});
+
+test("a stray anchor on a .deployed collection is rejected (it would shadow other labels)", () => {
+  // Anchors outside the labeled entries are invisible to the label collection, so they would bypass
+  // the duplicate/collision invariants once the texts are concatenated.
+  const onSection = `\ndeployed: &book\n  l1:\n    - &foo "0x1111111111111111111111111111111111111111"\n`;
+  assert.throws(
+    () => composeWithDeployedAddresses(MAIN_CONFIG, onSection),
+    /defined outside the labeled entries: &book/,
+  );
+  const onList = DEPLOYED.replace("l1:", "l1: &l1List");
+  assert.throws(
+    () => composeWithDeployedAddresses(MAIN_CONFIG, onList),
+    /defined outside the labeled entries: &l1List/,
+  );
+});
+
 test("a syntax error in the main config is reported as a parse error, not an invariant violation", () => {
   // An unclosed quote swallows the rest of the file, so no aliases are visible; before the standalone
   // syntax check this surfaced as a bogus "label(s) never referenced in the main config" error.
@@ -257,51 +300,67 @@ deployed:
 
 test("H2: a directory passed as --deployed is rejected as not a file", () => {
   withTemporaryDirectory("state-mate-deployed-", (directory) => {
-    const mainPath = path.join(directory, "lido.yaml");
     const subdir = path.join(directory, "subdir");
-    fs.writeFileSync(mainPath, MAIN_CONFIG);
     fs.mkdirSync(subdir);
-    assert.throws(() => resolveDeployedFilePath(mainPath, subdir), /is not a file/);
+    assert.throws(() => resolveDeployedFilePath(subdir), /is not a file/);
   });
 });
 
-test("deriveSiblingPath inserts the .deployed infix before the extension", () => {
-  assert.equal(deriveSiblingPath("/a/b/lido.yaml", DEPLOYED_SPEC.infix), path.join("/a/b", "lido.deployed.yaml"));
-  assert.equal(deriveSiblingPath("lido.yml", DEPLOYED_SPEC.infix), "lido.deployed.yml");
-});
-
-test("isSiblingFileName recognises .deployed files only", () => {
-  assert.equal(isSiblingFileName("lido.deployed.yaml", DEPLOYED_SPEC.infix), true);
-  assert.equal(isSiblingFileName("lido.yaml", DEPLOYED_SPEC.infix), false);
-  assert.equal(isSiblingFileName("lido.seed.yaml", DEPLOYED_SPEC.infix), false);
-});
-
-test("resolveDeployedFilePath: flag wins, convention discovers, missing flag throws", () => {
+test("resolveDeployedFilePath: --deployed is the only way in; a neighbouring file is never auto-loaded", () => {
   withTemporaryDirectory("state-mate-deployed-", (directory) => {
-    const mainPath = path.join(directory, "lido.yaml");
     const siblingPath = path.join(directory, "lido.deployed.yaml");
     const variantPath = path.join(directory, "lido.hoodi.deployed.yaml");
-    fs.writeFileSync(mainPath, MAIN_CONFIG);
-
-    // No sibling yet, no flag -> standalone.
-    assert.equal(resolveDeployedFilePath(mainPath), null);
-
-    // Convention sibling is discovered once it exists.
+    fs.writeFileSync(path.join(directory, "lido.yaml"), MAIN_CONFIG);
     fs.writeFileSync(siblingPath, DEPLOYED);
-    assert.equal(resolveDeployedFilePath(mainPath), siblingPath);
-
-    // Explicit flag overrides the convention.
     fs.writeFileSync(variantPath, DEPLOYED);
-    assert.equal(resolveDeployedFilePath(mainPath, variantPath), variantPath);
 
-    // A main config that is itself a .deployed file never gets its own sibling.
-    assert.equal(resolveDeployedFilePath(siblingPath), null);
+    // No flag -> standalone, even with the conventionally named file sitting right next to the config.
+    assert.equal(resolveDeployedFilePath(), null);
+
+    // The flag is the only selector — and it takes any path, the convention name included.
+    assert.equal(resolveDeployedFilePath(siblingPath), siblingPath);
+    assert.equal(resolveDeployedFilePath(variantPath), variantPath);
 
     // An explicit but missing path is a hard error.
-    assert.throws(() => resolveDeployedFilePath(mainPath, path.join(directory, "missing.yaml")), /not found/);
+    assert.throws(() => resolveDeployedFilePath(path.join(directory, "missing.yaml")), /not found/);
 
     // An explicit but EMPTY path (a hollow shell variable) is a hard error too — it must never
-    // silently fall back to convention discovery.
-    assert.throws(() => resolveDeployedFilePath(mainPath, ""), /is not a file|not found/);
+    // silently degrade to a standalone run.
+    assert.throws(() => resolveDeployedFilePath(""), /is not a file|not found/);
+  });
+});
+
+test("configDelegatesAnchors: true only for a config that cannot be parsed standalone", () => {
+  // This is what decides whether a flagless run gets the clear "pass --deployed / --inputs" error
+  // instead of a raw unresolved-alias parse failure, so each verdict matters.
+  withTemporaryDirectory("state-mate-delegates-", (directory) => {
+    const write = (name: string, text: string) => {
+      const filePath = path.join(directory, name);
+      fs.writeFileSync(filePath, text);
+      return filePath;
+    };
+
+    // Wiring only: it references &foo / &bar without defining them.
+    assert.equal(configDelegatesAnchors(write("wiring.yaml", MAIN_CONFIG)), true);
+    // Self-contained: every alias resolves within the file itself.
+    assert.equal(configDelegatesAnchors(write("self.yaml", `${DEPLOYED}${MAIN_CONFIG}`)), false);
+    // Read/parse failures yield `false` — the regular loading path reports those properly.
+    assert.equal(configDelegatesAnchors(write("multi.yaml", `${DEPLOYED}---\n${MAIN_CONFIG}`)), false);
+    assert.equal(configDelegatesAnchors(write("broken.yaml", "l1: [unclosed\n")), false);
+    assert.equal(configDelegatesAnchors(path.join(directory, "missing.yaml")), false);
+  });
+});
+
+test("loadStateWithSiblings reads both files from disk and composes them", () => {
+  withTemporaryDirectory("state-mate-load-", (directory) => {
+    const mainPath = path.join(directory, "lido.yaml");
+    const deployedPath = path.join(directory, "lido.deployed.yaml");
+    fs.writeFileSync(mainPath, MAIN_CONFIG);
+    fs.writeFileSync(deployedPath, DEPLOYED);
+
+    const { document, labels } = loadStateWithSiblings(mainPath, [{ path: deployedPath, spec: DEPLOYED_SPEC }]);
+    const document_ = document as { l1: { contracts: { fooContract: { address: string } } } };
+    assert.deepEqual(labels, [["foo", "bar"]]);
+    assert.equal(document_.l1.contracts.fooContract.address, "0x1111111111111111111111111111111111111111");
   });
 });

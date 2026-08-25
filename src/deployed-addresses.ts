@@ -2,8 +2,6 @@ import * as YAML from "yaml";
 
 import { ADDRESS_OR_HASH_RE, pairKeyToString, SiblingSpec } from "./sibling-delegation";
 
-const DEPLOYED_INFIX = ".deployed";
-
 /**
  * Validate the deployed-addresses entries and collect their labels. The engine has already checked
  * that the file holds only a `deployed:` section; this enforces that every address is a scalar
@@ -45,7 +43,6 @@ function collectDeployedLabels(deployedDocument: YAML.Document, fileLabel: strin
 
 /** The `.deployed` delegation: a single `deployed:` section of labeled (20- or 32-byte) addresses. */
 export const DEPLOYED_SPEC: SiblingSpec = {
-  infix: DEPLOYED_INFIX,
   optionName: "--deployed",
   fileLabel: "the .deployed file",
   ownedSectionKeys: ["deployed"],

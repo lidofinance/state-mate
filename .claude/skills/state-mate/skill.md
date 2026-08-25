@@ -385,8 +385,8 @@ deployed:
 ```
 
 ```bash
-yarn start configs/lido/lido.yaml                                  # auto-loads lido.deployed.yaml if present
-yarn start configs/lido/lido.yaml --deployed configs/lido/lido.hoodi.deployed.yaml
+yarn start configs/lido/lido.yaml --deployed configs/lido/lido.deployed.yaml
+yarn start configs/lido/lido.yaml --deployed configs/lido/lido.hoodi.deployed.yaml   # another variant
 ```
 
 The two files are concatenated (addresses first) and parsed as one YAML document, so `*label`
@@ -399,8 +399,9 @@ aliases resolve to the `&label` anchors natively. Four invariants are enforced �
 
 Notes:
 
-- The sibling `<name>.deployed.<ext>` is auto-loaded when it exists; `--deployed <path>` selects a
-  specific variant and overrides the convention.
+- **Explicit-only**: `--deployed <path>` is the only way in. `<name>.deployed.<ext>` is a naming
+  convention, not a lookup — a file sitting next to the main config is never loaded on its own, so
+  running the wiring-only config without the flag fails with `delegates anchors to sibling file(s)`.
 - The `.deployed` file may contain **only** a `deployed:` section, must be a **single YAML document**
   (no mid-file `---`/`...`), and every value must be a valid `0x` address/hash. RPC/explorer settings
   stay in the main config (they are not deployment addresses).
@@ -425,8 +426,8 @@ externals: # 3rd-party addresses (validated 0x); digit-only ids like chainId are
 ```
 
 The main config holds only the wiring (`*lidoName`, `l1.chainId: *chainId`, …) and **no
-`config:`/`externals:` section**; same full-delegation invariants as `.deployed`. Auto-loaded when
-present; `--inputs <path>` selects a variant; ignored with `--generate`.
+`config:`/`externals:` section**; same full-delegation invariants as `.deployed`. **Explicit-only**
+too — pass `--inputs <path>` (never auto-loaded); ignored with `--generate`.
 
 ## Workflow
 

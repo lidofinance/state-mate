@@ -24,12 +24,12 @@ export function parseCmdLineArguments() {
     .option(
       "--deployed <path>",
       "path to a '.deployed' YAML file that provides the address anchors for a wiring-only main config " +
-        "(defaults to the sibling '<name>.deployed.<ext>' if it exists)",
+        "(applied only when given — never loaded automatically)",
     )
     .option(
       "--inputs <path>",
       "path to a '.inputs' YAML file that provides the config/externals anchors for a wiring-only main " +
-        "config (defaults to the sibling '<name>.inputs.<ext>' if it exists)",
+        "config (applied only when given — never loaded automatically)",
     )
     .option("--update-abi", "download all ABIs replacing existing files")
     .option("--update-abi-missing", "download only missing ABIs (skip existing)")

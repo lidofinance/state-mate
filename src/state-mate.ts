@@ -81,10 +81,9 @@ function loadStateFromYaml(configPath: string): unknown {
 }
 
 // Load the main config, composing it with separate `.deployed` and/or `.inputs` sibling files when
-// selected (an explicit `--deployed`/`--inputs` path or, by convention, the `<name>.<infix>.<ext>`
-// sibling). Both may be in play at once. Sibling files are incompatible with `--generate`, which
-// operates on a seed document.
-type SelectedSibling = { path: string; spec: SiblingSpec; noun: string; explicit: boolean };
+// `--deployed`/`--inputs` names them — they are never loaded automatically. Both may be in play at
+// once. Sibling files are incompatible with `--generate`, which operates on a seed document.
+type SelectedSibling = { path: string; spec: SiblingSpec; noun: string };
 
 // Inline `config:`/`externals:` sections would bypass every `.inputs` invariant (`&label` anchors,
 // the address check on externals). The schema must list those keys for composed documents, so the
@@ -95,8 +94,8 @@ function rejectInlineInputsSections(document: unknown): unknown {
     if (inline.length > 0) {
       logErrorAndExit(
         `${chalk.magenta(g_Arguments.configPath)} holds top-level ${inline.map((key) => `\`${key}:\``).join(" / ")} ` +
-          `section(s) inline; they are only allowed in a \`${INPUTS_SPEC.infix}\` sibling file ` +
-          `(auto-loaded when present, or selected with ${INPUTS_SPEC.optionName})`,
+          `section(s) inline; they are only allowed in ${INPUTS_SPEC.fileLabel}, ` +
+          `selected with \`${INPUTS_SPEC.optionName} <path>\``,
       );
     }
   }
@@ -111,49 +110,39 @@ function loadStateWithOptionalSiblings(): unknown {
   ];
   try {
     for (const { spec, argument, noun } of siblingKinds) {
-      const siblingPath = resolveSiblingFilePath(g_Arguments.configPath, spec, argument);
+      // Explicit-only: a sibling file is applied when — and only when — its flag names it. A
+      // same-named file next to the main config is never picked up on its own.
+      const siblingPath = resolveSiblingFilePath(spec, argument);
       if (siblingPath) {
-        // `!== undefined`, not truthiness: an empty-string path (a hollow shell variable) must
-        // hard-fail in the resolution above, never silently fall back to convention discovery.
-        siblings.push({ path: siblingPath, spec, noun, explicit: argument !== undefined });
+        siblings.push({ path: siblingPath, spec, noun });
       }
     }
   } catch (error) {
     logErrorAndExit(printError(error));
   }
 
-  if (siblings.length === 0) {
-    return rejectInlineInputsSections(loadStateFromYaml(g_Arguments.configPath));
-  }
-
   if (g_Arguments.generate) {
     for (const { path: ignoredPath } of siblings) {
       log(`${WARNING_MARK} Ignoring ${chalk.yellow(path.relative(process.cwd(), ignoredPath))} with --generate`);
     }
-    // A wiring-only main config cannot be parsed without the sibling anchors it delegates to — fail
-    // with a clear message instead of the raw "Unresolved alias" parse error below.
-    if (configDelegatesAnchors(g_Arguments.configPath)) {
-      logErrorAndExit(
-        `${chalk.magenta(g_Arguments.configPath)} delegates anchors to the sibling file(s) ignored above, ` +
-          `so it cannot be parsed standalone — --generate works on self-contained (seed) configs only`,
-      );
-    }
-    // The inline-sections rejection applies on every non-composed load path, this one included.
-    return rejectInlineInputsSections(loadStateFromYaml(g_Arguments.configPath));
   }
 
-  // Mixing an explicit variant of one sibling with the auto-discovered convention file of the other
-  // (e.g. `--deployed lido.hoodi.deployed.yaml` next to a mainnet `lido.inputs.yaml`) is easy to do
-  // by accident — surface the combination.
-  if (siblings.some((sibling) => sibling.explicit)) {
-    for (const { path: siblingPath, spec, explicit } of siblings) {
-      if (!explicit) {
-        log(
-          `${WARNING_MARK} ${chalk.yellow(path.relative(process.cwd(), siblingPath))} is auto-loaded by ` +
-            `convention alongside an explicit sibling path — pass ${spec.optionName} if another variant is intended`,
-        );
-      }
+  if (siblings.length === 0 || g_Arguments.generate) {
+    // A wiring-only main config cannot be parsed without the sibling anchors it delegates to — fail
+    // with a clear message instead of the raw "Unresolved alias" parse error below. With no sibling
+    // in play this is the usual cause: the flag that names it was simply omitted.
+    if (configDelegatesAnchors(g_Arguments.configPath)) {
+      logErrorAndExit(
+        g_Arguments.generate
+          ? `${chalk.magenta(g_Arguments.configPath)} delegates anchors to sibling file(s), so it cannot be ` +
+              `parsed standalone — --generate works on self-contained (seed) configs only`
+          : `${chalk.magenta(g_Arguments.configPath)} delegates anchors to sibling file(s) — pass ` +
+              `${DEPLOYED_SPEC.optionName} / ${INPUTS_SPEC.optionName} with the file(s) defining them ` +
+              `(sibling files are never loaded automatically)`,
+      );
     }
+    // The inline-sections rejection applies on every non-composed load path, these ones included.
+    return rejectInlineInputsSections(loadStateFromYaml(g_Arguments.configPath));
   }
 
   const { document, labels } = loadStateWithSiblings(

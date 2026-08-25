@@ -5,12 +5,7 @@ import { test } from "node:test";
 
 import { DEPLOYED_SPEC } from "../deployed-addresses";
 import { INPUTS_SPEC } from "../inputs";
-import {
-  composeWithSiblings,
-  deriveSiblingPath,
-  isSiblingFileName,
-  resolveSiblingFilePath,
-} from "../sibling-delegation";
+import { composeWithSiblings, resolveSiblingFilePath } from "../sibling-delegation";
 import {
   composeWithDeployedAddresses,
   composeWithInputs,
@@ -20,8 +15,7 @@ import {
   withTemporaryDirectory,
 } from "./delegation-helpers";
 
-const resolveInputsFilePath = (configPath: string, inputsArgument?: string) =>
-  resolveSiblingFilePath(configPath, INPUTS_SPEC, inputsArgument);
+const resolveInputsFilePath = (inputsArgument?: string) => resolveSiblingFilePath(INPUTS_SPEC, inputsArgument);
 
 test("composes cross-file: aliases resolve to .inputs config knobs and externals", () => {
   const { document, labels } = composeWithInputs(MAIN_CONFIG, INPUTS);
@@ -176,6 +170,18 @@ test("the .inputs file must contain at least one of config:/externals:", () => {
   assert.throws(() => composeWithInputs(MAIN_CONFIG, "{}\n"), /must contain `config:` and\/or `externals:`/);
 });
 
+test("an .inputs file that is not a mapping is rejected with a file-targeted error", () => {
+  assert.throws(
+    () => composeWithInputs(MAIN_CONFIG, "- just a list\n"),
+    /must be a mapping with `config:` and\/or `externals:`/,
+  );
+});
+
+test("a section holding a mapping instead of a list of labeled entries is rejected", () => {
+  const inputs = `\nconfig:\n  lidoName: "Liquid staked Ether 2.0"\n`;
+  assert.throws(() => composeWithInputs(MAIN_CONFIG, inputs), /`config` must be a list of labeled entries/);
+});
+
 test("an .inputs file whose sections are all empty is rejected (zero anchors is a mistake)", () => {
   assert.throws(() => composeWithInputs(MAIN_CONFIG, "config: []\nexternals: []\n"), /defines no labeled entries/);
 });
@@ -247,51 +253,32 @@ test("H3: CRLF line endings compose correctly", () => {
   assert.equal(document_.l1.contracts.fooContract.checks.deposit, "0x00000000219ab540356cBB839Cbe05303d7705Fa");
 });
 
-test("resolveInputsFilePath: flag wins, convention discovers, missing flag throws", () => {
+test("resolveInputsFilePath: --inputs is the only way in; a neighbouring file is never auto-loaded", () => {
   withTemporaryDirectory("state-mate-inputs-", (directory) => {
-    const mainPath = path.join(directory, "lido.yaml");
     const siblingPath = path.join(directory, "lido.inputs.yaml");
     const variantPath = path.join(directory, "lido.hoodi.inputs.yaml");
-    fs.writeFileSync(mainPath, MAIN_CONFIG);
-
-    // No sibling yet, no flag -> standalone.
-    assert.equal(resolveInputsFilePath(mainPath), null);
-
-    // Convention sibling is discovered once it exists.
+    fs.writeFileSync(path.join(directory, "lido.yaml"), MAIN_CONFIG);
     fs.writeFileSync(siblingPath, INPUTS);
-    assert.equal(resolveInputsFilePath(mainPath), siblingPath);
-
-    // Explicit flag overrides the convention.
     fs.writeFileSync(variantPath, INPUTS);
-    assert.equal(resolveInputsFilePath(mainPath, variantPath), variantPath);
 
-    // A main config that is itself a .inputs file never gets its own sibling.
-    assert.equal(resolveInputsFilePath(siblingPath), null);
+    // No flag -> standalone, even with the conventionally named file sitting right next to the config.
+    assert.equal(resolveInputsFilePath(), null);
+
+    // The flag is the only selector — and it takes any path, the convention name included.
+    assert.equal(resolveInputsFilePath(siblingPath), siblingPath);
+    assert.equal(resolveInputsFilePath(variantPath), variantPath);
 
     // An explicit but missing path is a hard error.
-    assert.throws(() => resolveInputsFilePath(mainPath, path.join(directory, "missing.yaml")), /not found/);
+    assert.throws(() => resolveInputsFilePath(path.join(directory, "missing.yaml")), /not found/);
   });
 });
 
 test("H2: a directory passed as --inputs is rejected as not a file", () => {
   withTemporaryDirectory("state-mate-inputs-", (directory) => {
-    const mainPath = path.join(directory, "lido.yaml");
     const subdir = path.join(directory, "subdir");
-    fs.writeFileSync(mainPath, MAIN_CONFIG);
     fs.mkdirSync(subdir);
-    assert.throws(() => resolveInputsFilePath(mainPath, subdir), /is not a file/);
+    assert.throws(() => resolveInputsFilePath(subdir), /is not a file/);
   });
-});
-
-test("deriveSiblingPath inserts the .inputs infix before the extension", () => {
-  assert.equal(deriveSiblingPath("/a/b/lido.yaml", INPUTS_SPEC.infix), path.join("/a/b", "lido.inputs.yaml"));
-  assert.equal(deriveSiblingPath("lido.yml", INPUTS_SPEC.infix), "lido.inputs.yml");
-});
-
-test("isSiblingFileName recognises .inputs files only", () => {
-  assert.equal(isSiblingFileName("lido.inputs.yaml", INPUTS_SPEC.infix), true);
-  assert.equal(isSiblingFileName("lido.yaml", INPUTS_SPEC.infix), false);
-  assert.equal(isSiblingFileName("lido.deployed.yaml", INPUTS_SPEC.infix), false);
 });
 
 test("multi-sibling: a .deployed and a .inputs file compose together", () => {
