@@ -1,14 +1,16 @@
 import assert from "node:assert/strict";
 import fs from "node:fs";
-import os from "node:os";
 import path from "node:path";
 import { test } from "node:test";
 
 import { DEPLOYED_SPEC } from "../deployed-addresses";
 import { INPUTS_OVERRIDES_SPEC, INPUTS_SPEC } from "../inputs";
 import { composeWithSiblings, resolveExplicitFilePath } from "../sibling-delegation";
+import { INPUTS, INPUTS_MAIN_CONFIG as MAIN_CONFIG, toCrlf, withTemporaryDirectory } from "./delegation-helpers";
 
 // Convenience over the generic engine: a main config + its `.inputs` file + an overrides overlay.
+// The shared fixtures are the full-delegation pair from delegation-helpers.ts; an overrides file
+// REDEFINES some of those values without introducing new labels.
 const composeWithOverrides = (mainText: string, inputsText: string, overridesText: string) => {
   const { document, labels, overlayLabels } = composeWithSiblings(
     mainText,
@@ -17,33 +19,6 @@ const composeWithOverrides = (mainText: string, inputsText: string, overridesTex
   );
   return { document, labels: labels[0], overlayLabels: overlayLabels[0] };
 };
-
-// Same full-delegation fixtures as inputs.test.ts: the main config is wiring only; the .inputs file
-// is the source of the `config` knobs and the `externals` facts. An overrides file REDEFINES some of
-// those values without introducing new labels.
-const MAIN_CONFIG = `
-misc:
-  - &ZERO "0x0000000000000000000000000000000000000000"
-l1:
-  rpcUrl: MAIN_RPC_URL
-  chainId: *chainId
-  contracts:
-    fooContract:
-      name: Foo
-      address: *ZERO
-      checks:
-        name: *lidoName
-        limits: *oracleReportLimits
-        deposit: *depositContract
-`;
-const INPUTS = `
-config:
-  - &lidoName "Liquid staked Ether 2.0"
-  - &oracleReportLimits [3600, 1800, 1000, 50]
-externals:
-  - &depositContract "0x00000000219ab540356cBB839Cbe05303d7705Fa"
-  - &chainId 560048
-`;
 
 type ComposedDocument = {
   l1: {
@@ -221,6 +196,12 @@ test("per-file: an empty/section-less overrides file is rejected", () => {
   assert.throws(() => composeWithOverrides(MAIN_CONFIG, INPUTS, "{}\n"), /the overrides file must contain/);
 });
 
+test("per-file: an overrides file whose sections are all empty is rejected (zero overrides)", () => {
+  // `config: []` (e.g. every entry commented out while debugging) would otherwise 'apply' zero
+  // overrides silently while the user believes the redefined values are in effect.
+  assert.throws(() => composeWithOverrides(MAIN_CONFIG, INPUTS, "config: []\n"), /defines no overrides/);
+});
+
 test("base presence: an overrides file with no .inputs in play is rejected", () => {
   // A `.deployed` sibling satisfies the main aliases (so the alias-resolution check passes); the
   // overlay then has no `.inputs` base to override.
@@ -274,7 +255,6 @@ more: stuff
 });
 
 test("markers: CRLF line endings in the overrides file compose", () => {
-  const toCrlf = (text: string) => text.replaceAll("\n", "\r\n");
   const overrides = `
 config:
   - &lidoName "stETH"
@@ -425,14 +405,11 @@ test("non-regression: composeWithSiblings without overlays still composes (overl
 });
 
 test("resolveExplicitFilePath: returns the resolved path, errors on missing or non-file", () => {
-  const directory = fs.mkdtempSync(path.join(os.tmpdir(), "state-mate-overrides-"));
-  try {
+  withTemporaryDirectory("state-mate-overrides-", (directory) => {
     const file = path.join(directory, "lido.overrides.yaml");
     fs.writeFileSync(file, 'config:\n  - &lidoName "stETH"\n');
     assert.equal(resolveExplicitFilePath("--overrides", file), file);
     assert.throws(() => resolveExplicitFilePath("--overrides", path.join(directory, "missing.yaml")), /not found/);
     assert.throws(() => resolveExplicitFilePath("--overrides", directory), /is not a file/);
-  } finally {
-    fs.rmSync(directory, { recursive: true, force: true });
-  }
+  });
 });

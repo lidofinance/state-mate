@@ -1,22 +1,12 @@
 import assert from "node:assert/strict";
 import fs from "node:fs";
-import os from "node:os";
 import path from "node:path";
 import { test } from "node:test";
 
 import { DEPLOYED_SPEC } from "../deployed-addresses";
-import {
-  composeWithSiblings,
-  deriveSiblingPath,
-  isSiblingFileName,
-  resolveSiblingFilePath,
-} from "../sibling-delegation";
+import { deriveSiblingPath, isSiblingFileName, resolveSiblingFilePath } from "../sibling-delegation";
+import { composeWithDeployedAddresses, toCrlf, withTemporaryDirectory } from "./delegation-helpers";
 
-// Local conveniences over the generic engine (production goes through the engine directly).
-const composeWithDeployedAddresses = (mainText: string, deployedText: string) => {
-  const { document, labels } = composeWithSiblings(mainText, [{ text: deployedText, spec: DEPLOYED_SPEC }]);
-  return { document, labels: labels[0] };
-};
 const resolveDeployedFilePath = (configPath: string, deployedArgument?: string) =>
   resolveSiblingFilePath(configPath, DEPLOYED_SPEC, deployedArgument);
 
@@ -50,7 +40,7 @@ test("composes cross-file: aliases resolve to .deployed addresses and the deploy
     deployed: { l1: string[] };
     l1: { contracts: { fooContract: { address: string; checks: { bar: string; zero: string } } } };
   };
-  assert.deepEqual(labels.sort(), ["bar", "foo"]);
+  assert.deepEqual(labels.toSorted(), ["bar", "foo"]);
   assert.equal(document_.deployed.l1[0], "0x1111111111111111111111111111111111111111");
   assert.equal(document_.l1.contracts.fooContract.address, "0x1111111111111111111111111111111111111111");
   assert.equal(document_.l1.contracts.fooContract.checks.bar, "0x2222222222222222222222222222222222222222");
@@ -154,6 +144,10 @@ roles:
   assert.throws(() => composeWithDeployedAddresses(MAIN_CONFIG, deployed), /may only contain/);
 });
 
+test("a .deployed file whose sections are all empty is rejected (zero anchors is a mistake)", () => {
+  assert.throws(() => composeWithDeployedAddresses(MAIN_CONFIG, "deployed:\n  l1: []\n"), /defines no labeled entries/);
+});
+
 test("a syntax error in the main config is reported as a parse error, not an invariant violation", () => {
   // An unclosed quote swallows the rest of the file, so no aliases are visible; before the standalone
   // syntax check this surfaced as a bogus "label(s) never referenced in the main config" error.
@@ -169,6 +163,13 @@ test("a one-line flow main config after the --- marker is not silently dropped",
   assert.throws(() => composeWithDeployedAddresses(main, DEPLOYED), /Failed to parse the combined config/);
 });
 
+test("a combined-parse error is attributed to the source file and its own line numbers", () => {
+  // The marker stripping preserves per-file line counts, so the error must point into the main
+  // config at ITS line 1 — not at a line of the concatenated text (which would land in .deployed).
+  const main = `--- {l1: {contracts: {fooContract: {address: *foo, checks: {bar: *bar}}}}}`;
+  assert.throws(() => composeWithDeployedAddresses(main, DEPLOYED), /in the main config at line 1, column \d+/);
+});
+
 test("a leading --- document marker in the main config is handled (still composes)", () => {
   const main = `---\n${MAIN_CONFIG}`;
   const { document } = composeWithDeployedAddresses(main, DEPLOYED);
@@ -181,6 +182,48 @@ test("a leading '--- # comment' document marker in the main config is handled (s
   const { document } = composeWithDeployedAddresses(main, DEPLOYED);
   const document_ = document as { l1: { contracts: { fooContract: { address: string } } } };
   assert.equal(document_.l1.contracts.fooContract.address, "0x1111111111111111111111111111111111111111");
+});
+
+test("a %YAML directive in the main config is rejected with a targeted error", () => {
+  // A directive line cannot survive concatenation into the combined stream; without the targeted
+  // rejection the run fails with a baffling combined-parse error.
+  const main = `%YAML 1.2\n---\n${MAIN_CONFIG}`;
+  assert.throws(() => composeWithDeployedAddresses(main, DEPLOYED), /main config uses %YAML\/%TAG directives/);
+});
+
+test("a %TAG directive in the .deployed file is rejected with a targeted error", () => {
+  const deployed = `%TAG !e! tag:example.com,2000:\n---\n${DEPLOYED}`;
+  assert.throws(
+    () => composeWithDeployedAddresses(MAIN_CONFIG, deployed),
+    /\.deployed file uses %YAML\/%TAG directives/,
+  );
+});
+
+test("a UTF-8 BOM on either file is stripped before concatenation (still composes)", () => {
+  // A BOM is legal at the start of a file but is content mid-stream: un-stripped, the main config's
+  // first key would become "\uFEFFmisc" and schema validation would fail with invisible-cause errors.
+  const { document } = composeWithDeployedAddresses(`\uFEFF${MAIN_CONFIG}`, `\uFEFF${DEPLOYED}`);
+  const document_ = document as { misc: string[]; l1: { contracts: { fooContract: { address: string } } } };
+  assert.ok(Array.isArray(document_.misc));
+  assert.equal(document_.l1.contracts.fooContract.address, "0x1111111111111111111111111111111111111111");
+});
+
+test("an indented '...' inside a block scalar is content, not a document-end marker (survives)", () => {
+  // Only a column-0 `...` is a document marker; an indented one is scalar content. The old
+  // trim-based stripper deleted it, silently corrupting the checked value.
+  const main = `${MAIN_CONFIG}notes: |
+  line1
+  ...
+`;
+  const { document } = composeWithDeployedAddresses(main, DEPLOYED);
+  assert.equal((document as { notes: string }).notes, "line1\n...\n");
+});
+
+test("a main config using the reserved overlay key is rejected even without overlays", () => {
+  // The synthetic wrapper key is always stripped from the composed document, so allowing it as a
+  // real key would silently drop that section in sibling-only runs.
+  const main = `${MAIN_CONFIG}__state_mate_overrides__: 1\n`;
+  assert.throws(() => composeWithDeployedAddresses(main, DEPLOYED), /reserved top-level key/);
 });
 
 test("H3: a mid-file document marker in .deployed is rejected with a file-targeted error", () => {
@@ -204,7 +247,6 @@ test("H3: a trailing '... # comment' document-end marker in .deployed still comp
 });
 
 test("H3: CRLF line endings compose correctly", () => {
-  const toCrlf = (text: string) => text.replaceAll("\n", "\r\n");
   const { document } = composeWithDeployedAddresses(toCrlf(MAIN_CONFIG), toCrlf(DEPLOYED));
   const document_ = document as { l1: { contracts: { fooContract: { address: string } } } };
   assert.equal(document_.l1.contracts.fooContract.address, "0x1111111111111111111111111111111111111111");
@@ -221,16 +263,13 @@ deployed:
 });
 
 test("H2: a directory passed as --deployed is rejected as not a file", () => {
-  const directory = fs.mkdtempSync(path.join(os.tmpdir(), "state-mate-deployed-"));
-  try {
+  withTemporaryDirectory("state-mate-deployed-", (directory) => {
     const mainPath = path.join(directory, "lido.yaml");
     const subdir = path.join(directory, "subdir");
     fs.writeFileSync(mainPath, MAIN_CONFIG);
     fs.mkdirSync(subdir);
     assert.throws(() => resolveDeployedFilePath(mainPath, subdir), /is not a file/);
-  } finally {
-    fs.rmSync(directory, { recursive: true, force: true });
-  }
+  });
 });
 
 test("deriveSiblingPath inserts the .deployed infix before the extension", () => {
@@ -245,8 +284,7 @@ test("isSiblingFileName recognises .deployed files only", () => {
 });
 
 test("resolveDeployedFilePath: flag wins, convention discovers, missing flag throws", () => {
-  const directory = fs.mkdtempSync(path.join(os.tmpdir(), "state-mate-deployed-"));
-  try {
+  withTemporaryDirectory("state-mate-deployed-", (directory) => {
     const mainPath = path.join(directory, "lido.yaml");
     const siblingPath = path.join(directory, "lido.deployed.yaml");
     const variantPath = path.join(directory, "lido.hoodi.deployed.yaml");
@@ -268,7 +306,9 @@ test("resolveDeployedFilePath: flag wins, convention discovers, missing flag thr
 
     // An explicit but missing path is a hard error.
     assert.throws(() => resolveDeployedFilePath(mainPath, path.join(directory, "missing.yaml")), /not found/);
-  } finally {
-    fs.rmSync(directory, { recursive: true, force: true });
-  }
+
+    // An explicit but EMPTY path (a hollow shell variable) is a hard error too — it must never
+    // silently fall back to convention discovery.
+    assert.throws(() => resolveDeployedFilePath(mainPath, ""), /is not a file|not found/);
+  });
 });

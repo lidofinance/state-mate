@@ -419,7 +419,7 @@ sibling `<name>.inputs.<ext>` externalizes its _inputs_, in two sections (one `&
 config: # any anchored scalar OR array; NO address check
   - &lidoName "Liquid staked Ether 2.0"
   - &oracleReportLimits [3600, 1800, 1000, 50]
-externals: # 3rd-party addresses (validated 0x) plus chainId (numeric, exempt)
+externals: # 3rd-party addresses (validated 0x); digit-only ids like chainId are exempt
   - &depositContract "0x00000000219ab540356cBB839Cbe05303d7705Fa"
   - &chainId 560048
 ```

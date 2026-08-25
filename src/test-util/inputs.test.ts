@@ -1,6 +1,5 @@
 import assert from "node:assert/strict";
 import fs from "node:fs";
-import os from "node:os";
 import path from "node:path";
 import { test } from "node:test";
 
@@ -12,45 +11,17 @@ import {
   isSiblingFileName,
   resolveSiblingFilePath,
 } from "../sibling-delegation";
+import {
+  composeWithDeployedAddresses,
+  composeWithInputs,
+  INPUTS,
+  INPUTS_MAIN_CONFIG as MAIN_CONFIG,
+  toCrlf,
+  withTemporaryDirectory,
+} from "./delegation-helpers";
 
-// Local conveniences over the generic engine (production goes through the engine directly).
-const composeWithInputs = (mainText: string, inputsText: string) => {
-  const { document, labels } = composeWithSiblings(mainText, [{ text: inputsText, spec: INPUTS_SPEC }]);
-  return { document, labels: labels[0] };
-};
-const composeWithDeployedAddresses = (mainText: string, deployedText: string) => {
-  const { document, labels } = composeWithSiblings(mainText, [{ text: deployedText, spec: DEPLOYED_SPEC }]);
-  return { document, labels: labels[0] };
-};
 const resolveInputsFilePath = (configPath: string, inputsArgument?: string) =>
   resolveSiblingFilePath(configPath, INPUTS_SPEC, inputsArgument);
-
-// Full-delegation model: the main config holds ONLY wiring (`*label` aliases) plus its own constant
-// anchors (e.g. `&ZERO` in `misc:`). It has no `config:`/`externals:` sections. The .inputs file is
-// the sole source of the project-chosen `config` knobs and the fixed `externals` facts.
-const MAIN_CONFIG = `
-misc:
-  - &ZERO "0x0000000000000000000000000000000000000000"
-l1:
-  rpcUrl: MAIN_RPC_URL
-  chainId: *chainId
-  contracts:
-    fooContract:
-      name: Foo
-      address: *ZERO
-      checks:
-        name: *lidoName
-        limits: *oracleReportLimits
-        deposit: *depositContract
-`;
-const INPUTS = `
-config:
-  - &lidoName "Liquid staked Ether 2.0"
-  - &oracleReportLimits [3600, 1800, 1000, 50]
-externals:
-  - &depositContract "0x00000000219ab540356cBB839Cbe05303d7705Fa"
-  - &chainId 560048
-`;
 
 test("composes cross-file: aliases resolve to .inputs config knobs and externals", () => {
   const { document, labels } = composeWithInputs(MAIN_CONFIG, INPUTS);
@@ -62,7 +33,7 @@ test("composes cross-file: aliases resolve to .inputs config knobs and externals
       contracts: { fooContract: { checks: { name: string; limits: string[]; deposit: string } } };
     };
   };
-  assert.deepEqual(labels.sort(), ["chainId", "depositContract", "lidoName", "oracleReportLimits"]);
+  assert.deepEqual(labels.toSorted(), ["chainId", "depositContract", "lidoName", "oracleReportLimits"]);
   const checks = document_.l1.contracts.fooContract.checks;
   assert.equal(checks.name, "Liquid staked Ether 2.0");
   // Numeric YAML values are stringified by the shared bigint reviver (as chainId is below).
@@ -205,6 +176,10 @@ test("the .inputs file must contain at least one of config:/externals:", () => {
   assert.throws(() => composeWithInputs(MAIN_CONFIG, "{}\n"), /must contain `config:` and\/or `externals:`/);
 });
 
+test("an .inputs file whose sections are all empty is rejected (zero anchors is a mistake)", () => {
+  assert.throws(() => composeWithInputs(MAIN_CONFIG, "config: []\nexternals: []\n"), /defines no labeled entries/);
+});
+
 test("externals: a digit-only QUOTED string is still accepted (long CCIP-style chain selectors)", () => {
   const inputs = INPUTS.replace("&chainId 560048", '&chainId "16015286601757825753"');
   const { document } = composeWithInputs(MAIN_CONFIG, inputs);
@@ -267,15 +242,13 @@ test("H3: a trailing ... document-end marker in .inputs still composes", () => {
 });
 
 test("H3: CRLF line endings compose correctly", () => {
-  const toCrlf = (text: string) => text.replaceAll("\n", "\r\n");
   const { document } = composeWithInputs(toCrlf(MAIN_CONFIG), toCrlf(INPUTS));
   const document_ = document as { l1: { contracts: { fooContract: { checks: { deposit: string } } } } };
   assert.equal(document_.l1.contracts.fooContract.checks.deposit, "0x00000000219ab540356cBB839Cbe05303d7705Fa");
 });
 
 test("resolveInputsFilePath: flag wins, convention discovers, missing flag throws", () => {
-  const directory = fs.mkdtempSync(path.join(os.tmpdir(), "state-mate-inputs-"));
-  try {
+  withTemporaryDirectory("state-mate-inputs-", (directory) => {
     const mainPath = path.join(directory, "lido.yaml");
     const siblingPath = path.join(directory, "lido.inputs.yaml");
     const variantPath = path.join(directory, "lido.hoodi.inputs.yaml");
@@ -297,22 +270,17 @@ test("resolveInputsFilePath: flag wins, convention discovers, missing flag throw
 
     // An explicit but missing path is a hard error.
     assert.throws(() => resolveInputsFilePath(mainPath, path.join(directory, "missing.yaml")), /not found/);
-  } finally {
-    fs.rmSync(directory, { recursive: true, force: true });
-  }
+  });
 });
 
 test("H2: a directory passed as --inputs is rejected as not a file", () => {
-  const directory = fs.mkdtempSync(path.join(os.tmpdir(), "state-mate-inputs-"));
-  try {
+  withTemporaryDirectory("state-mate-inputs-", (directory) => {
     const mainPath = path.join(directory, "lido.yaml");
     const subdir = path.join(directory, "subdir");
     fs.writeFileSync(mainPath, MAIN_CONFIG);
     fs.mkdirSync(subdir);
     assert.throws(() => resolveInputsFilePath(mainPath, subdir), /is not a file/);
-  } finally {
-    fs.rmSync(directory, { recursive: true, force: true });
-  }
+  });
 });
 
 test("deriveSiblingPath inserts the .inputs infix before the extension", () => {
@@ -358,8 +326,8 @@ externals:
   const document_ = document as {
     l1: { chainId: string; contracts: { fooContract: { address: string; checks: { name: string; deposit: string } } } };
   };
-  assert.deepEqual(labels[0].sort(), ["foo"]);
-  assert.deepEqual(labels[1].sort(), ["chainId", "depositContract", "lidoName"]);
+  assert.deepEqual(labels[0].toSorted(), ["foo"]);
+  assert.deepEqual(labels[1].toSorted(), ["chainId", "depositContract", "lidoName"]);
   assert.equal(document_.l1.contracts.fooContract.address, "0x1111111111111111111111111111111111111111");
   assert.equal(document_.l1.contracts.fooContract.checks.name, "stETH");
   assert.equal(document_.l1.chainId, "560048");

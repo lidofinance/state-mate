@@ -108,28 +108,22 @@ function rejectInlineInputsSections(document: unknown): unknown {
 function loadStateWithOptionalSiblings(): unknown {
   const siblings: SelectedSibling[] = [];
   const overlays: { path: string; spec: OverlaySpec }[] = [];
+  const siblingKinds: { spec: SiblingSpec; argument: string | undefined; noun: string }[] = [
+    { spec: DEPLOYED_SPEC, argument: g_Arguments.deployed, noun: "deployed address(es)" },
+    { spec: INPUTS_SPEC, argument: g_Arguments.inputs, noun: "input anchor(s)" },
+  ];
   try {
-    const deployedPath = resolveSiblingFilePath(g_Arguments.configPath, DEPLOYED_SPEC, g_Arguments.deployed);
-    if (deployedPath) {
-      siblings.push({
-        path: deployedPath,
-        spec: DEPLOYED_SPEC,
-        noun: "deployed address(es)",
-        explicit: Boolean(g_Arguments.deployed),
-      });
-    }
-    const inputsPath = resolveSiblingFilePath(g_Arguments.configPath, INPUTS_SPEC, g_Arguments.inputs);
-    if (inputsPath) {
-      siblings.push({
-        path: inputsPath,
-        spec: INPUTS_SPEC,
-        noun: "input anchor(s)",
-        explicit: Boolean(g_Arguments.inputs),
-      });
+    for (const { spec, argument, noun } of siblingKinds) {
+      const siblingPath = resolveSiblingFilePath(g_Arguments.configPath, spec, argument);
+      if (siblingPath) {
+        // `!== undefined`, not truthiness: an empty-string path (a hollow shell variable) must
+        // hard-fail in the resolution above, never silently fall back to convention discovery.
+        siblings.push({ path: siblingPath, spec, noun, explicit: argument !== undefined });
+      }
     }
     // The overrides file is explicit-only — never auto-discovered — so applying it (which changes
     // the effective input values) is always a deliberate choice.
-    if (g_Arguments.overrides) {
+    if (g_Arguments.overrides !== undefined) {
       overlays.push({
         path: resolveExplicitFilePath(INPUTS_OVERRIDES_SPEC.optionName, g_Arguments.overrides),
         spec: INPUTS_OVERRIDES_SPEC,
@@ -155,7 +149,8 @@ function loadStateWithOptionalSiblings(): unknown {
           `so it cannot be parsed standalone — --generate works on self-contained (seed) configs only`,
       );
     }
-    return loadStateFromYaml(g_Arguments.configPath);
+    // The inline-sections rejection applies on every non-composed load path, this one included.
+    return rejectInlineInputsSections(loadStateFromYaml(g_Arguments.configPath));
   }
 
   // An overrides file redefines `.inputs` values, so a `.inputs` file must be in play to override.
