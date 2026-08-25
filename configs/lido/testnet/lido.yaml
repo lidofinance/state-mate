@@ -310,6 +310,7 @@ eoa:
   - &superManager "0xE28f573b732632fdE03BD5507A7d475383e8512E"
   - &oracleManager "0x4022E0754d0cB6905B54306105D3346d1547988b"
   - &csmManager "0x4AF43Ee34a6fcD1fEcA1e1F832124C763561dA53"
+  - &curatedModuleManager "0xF865A1d43D36c713B4DA085f32b7d1e9739B9275"
   - &circuitBreakerCommittee "0x83BCE68B4e8b7071b2a664a26e6D3Bc17eEe3102"
   - &topUpGatewayTopUpper "0x9b186cE78Ddd6fF098b4a533Dd17a139e1FFeD76"
 
@@ -1923,7 +1924,7 @@ l1:
         *CS_REPORT_SLASHED_WITHDRAWN_VALIDATORS_ROLE : [*evmScriptExecutor]
         *CS_RESUME_ROLE : [*resealManager]
         *CS_SETTLE_GENERAL_DELAYED_PENALTY_ROLE : [*evmScriptExecutor]
-        *CS_STAKING_ROUTER_ROLE : [*stakingRouter]
+        *CS_STAKING_ROUTER_ROLE : [*stakingRouter, *curatedModuleManager]
         *CS_VERIFIER_ROLE : [*curatedVerifier]
       implementationChecks:
         ACCOUNTING: *curatedAccounting
