@@ -20,9 +20,9 @@ deployed:
     - &lidoLocator "0xC1d0b3DE6792Bf6b4b37EccdcC24e45978Cfd2Eb"
     - &l1TokenBridge "0x76943C0D61395d8F2edF9060e1533529cAe05dE6"
     - &l1TokenBridgeImpl "0x168Cfea1Ad879d7032B3936eF3b0E90790b6B6D4"
-    - &l1TokenRateNotifier "0x25e35855783bec3E49355a29e110f02Ed8b05ba9"
+    - &l1TokenRateNotifier "0xbe05d12Fd10919F1881125006523452F6aFF791b"
     - &l1OpStackTokenRatePusher "0xd54c1c6413caac3477AC14b2a80D5398E3c32FfE"
-    - &lidoLocatorImpl "0x0360002bf51DCae1c0267aE0AFDaBacAF7De686b"
+    - &lidoLocatorImpl "0xF2Ffb952e129a63F0614Ff87126E1d4a494A2313"
 
   l2:
     - &l2GovernanceExecutor "0xEfa0dB536d2c8089685630fafe88CF7805966FC3"
@@ -56,6 +56,7 @@ misc:
   - &validatorExitDelayVerifier "0xbDb567672c867DB533119C2dcD4FB9d8b44EC82f"
   - &vaultFactory "0x02Ca7772FF14a9F6c1a08aF385aA96bb1b34175A"
   - &vaultHub "0x1d201BE093d847f6446530Efb0E8Fb426d176709"
+  - &stakingRevenueSource "0x6220212a33a87Ed7Cc386B67eB2c393974F28C38"
 
 roles:
   - &DEFAULT_ADMIN_ROLE "0x0000000000000000000000000000000000000000000000000000000000000000"
@@ -116,11 +117,15 @@ l1:
         MAX_OBSERVERS_COUNT: 32
         TOKEN_RATE_PROVIDER: *accounting
         INDEX_NOT_FOUND: *MAX_INT
-        REQUIRED_INTERFACE: "0xa16ba44d"
-        observersLength: 1
+        REQUIRED_INTERFACE_NO_ARGS: "0xa16ba44d"
+        REQUIRED_INTERFACE_WITH_ARGS: "0xbd18bfd6"
+        observersLength: 2
+        # [addr, kind] — ObserverKind enum
         observers:
-          args: [0]
-          result: *l1OpStackTokenRatePusher
+          - args: [0]
+            result: [*l1OpStackTokenRatePusher, 0]
+          - args: [1]
+            result: [*stakingRevenueSource, 1]
     opStackTokenRatePusher:
       name: OpStackTokenRatePusher
       address: *l1OpStackTokenRatePusher

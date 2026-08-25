@@ -53,6 +53,7 @@ deployed:
     - &earnUSD_syncRedeemQueueUSDC "0xE0eee7e956A94BD00546d9CA07e5012F11A5059d"
     - &earnUSD_depositQueueUSDT "0xEeC5041c47Cba1e31321AC6941Bf09Ad60645B73"
     - &earnUSD_syncDepositQueueUSDT "0x534d0bEb82C47cf703BFb9E959297658b65Ec8E9"
+    - &earnUSD_redeemQueueUSDT "0x95092A7a86715246Be6395b8D514B3d60A270Cd3"
     - &earnUSD_depositQueueUSDe "0xeEc37568b01e0C4d5028501A49E024B475E2D7cA"
     - &earnUSD_oracle "0x827044735c9708a2cf850e7Ea37EBa43bc786028"
     - &earnUSD_shareManager "0x4Ce1ac8F43E0E5BD7A346A98aF777bF8fbeA1981"
@@ -69,7 +70,9 @@ deployed:
     - &earnUSDc_vault "0xDF0fb76Df2c21F79798949A4E886cd22D1C085d7"
     - &earnUSDc_syncDepositQueueUSDC "0xEdcd9C257719799435B05C28ff9a8a34e6872bE0"
     - &earnUSDc_redeemQueueUSDC "0x59fC26AFFF725eBb77Db8E1de14572e5eA9e87EB"
+    - &earnUSDc_syncRedeemQueueUSDC "0x395d3230B47c8EAd7b4152c670945f6545efe3c9"
     - &earnUSDc_syncDepositQueueUSDT "0xeC3EE7F7669b7ce0aC91c4638e4b89c9F40E179F"
+    - &earnUSDc_syncRedeemQueueUSDT "0xe04A1c2D63e6964f5629B3c08BF08D2472faaB09"
     - &earnUSDc_oracle "0x8d229B565A0c6Bf2d693C343bea0Ec96103dEF5f"
     - &earnUSDc_shareManager "0xd9543AfF8A859F6B34f80A9A230B277c89ACdda4"
     - &earnUSDc_feeManager "0x31325D52B763B1a43d5564114FA4A4ce62148716"
@@ -84,7 +87,9 @@ deployed:
     - &earnUSDe_vault "0x0cC65147BF7F615A8dD9E78e2c53158F8E01754d"
     - &earnUSDe_syncDepositQueueUSDC "0xBb647898e0CF0aE81Ac480d04A8a9973763eBD2D"
     - &earnUSDe_redeemQueueUSDC "0x8B857170F2a6C10Ce64ec8b920428ca977fb7710"
+    - &earnUSDe_syncRedeemQueueUSDC "0xaFd38D9a5F48f6953c0d110c4e0ecBA2381f7Fc5"
     - &earnUSDe_syncDepositQueueUSDT "0xa01aEfeC7A3384C8440e99084458030BDbdD7404"
+    - &earnUSDe_syncRedeemQueueUSDT "0x978f41aF86E14901C77ebaB799c307886e7C2c54"
     - &earnUSDe_syncDepositQueueUSDe "0xAcb2E510e8FcdaB3808cC5B9d206374cAB527947"
     - &earnUSDe_oracle "0xBcdFaf92783B2C391A1c80682e75Bb6EF47B9c3C"
     - &earnUSDe_shareManager "0x3D561e1E0204d47b45C23B65356a4536c36d1AF6"
@@ -322,9 +327,11 @@ l1:
             result: *redirectingDepositHook
           - args: [*earnUSD_syncDepositQueueUSDT]
             result: *redirectingDepositHook
+          - args: [*earnUSD_redeemQueueUSDT]
+            result: *basicRedeemHook
           - args: [*earnUSD_depositQueueUSDe]
             result: *redirectingDepositHook
-        getQueueCount: 7
+        getQueueCount: 8
         getLiquidAssets:
         getRoleAdmin:
         getRoleMember:
@@ -351,6 +358,8 @@ l1:
             result: true
           - args: [*earnUSD_syncDepositQueueUSDT]
             result: true
+          - args: [*earnUSD_redeemQueueUSDT]
+            result: true
           - args: [*earnUSD_depositQueueUSDe]
             result: true
         hasRole:
@@ -373,6 +382,8 @@ l1:
             result: true
           - args: [*earnUSD_syncDepositQueueUSDT]
             result: true
+          - args: [*earnUSD_redeemQueueUSDT]
+            result: false
           - args: [*earnUSD_depositQueueUSDe]
             result: true
         isPausedQueue:
@@ -388,6 +399,8 @@ l1:
             result: false
           - args: [*earnUSD_syncDepositQueueUSDT]
             result: false
+          - args: [*earnUSD_redeemQueueUSDT]
+            result: false
           - args: [*earnUSD_depositQueueUSDe]
             result: false
         onERC721Received:
@@ -402,15 +415,17 @@ l1:
             result: *earnUSD_redeemQueueUSDC
           - args: [*usdc, 3]
             result: *earnUSD_syncRedeemQueueUSDC
-          # USDT - depositQueue + syncDepositQueue
+          # USDT - depositQueue + syncDepositQueue + redeemQueue
           - args: [*usdt, 0]
             result: *earnUSD_depositQueueUSDT
           - args: [*usdt, 1]
             result: *earnUSD_syncDepositQueueUSDT
+          - args: [*usdt, 2]
+            result: *earnUSD_redeemQueueUSDT
           # USDe - depositQueue
           - args: [*usDe, 0]
             result: *earnUSD_depositQueueUSDe
-        queueLimit: 7
+        queueLimit: 8
         redeemQueueFactory: *redeemQueueFactory
         riskManager: *earnUSD_riskManager
         shareManager: *earnUSD_shareManager
@@ -566,7 +581,7 @@ l1:
         getVerificationResult:
         hashCall:
         isAllowedCall:
-        merkleRoot: "0x3d1503344580ab876cd12a28c6a2322b5dd90253d354a8d6666476ed011923d8"
+        merkleRoot: "0x55bf5e57ca0a5e0617a150f6b77434cbb034d8005325c2a733d35bb60082ca46"
         vault: *earnUSD_vault
         verifyCall:
       implementationChecks:
@@ -626,7 +641,7 @@ l1:
         getVerificationResult:
         hashCall:
         isAllowedCall:
-        merkleRoot: "0x3b7a7dc82cb5a678f0a369510d9dab0cab2b30660a4cf56ef6171accf2ea0afa"
+        merkleRoot: "0x0102d740ae91f0c3444a6252ccd84bfd304e8939e2dcb842f58c8a43c01903bb"
         vault: *earnUSD_vault
         verifyCall:
       implementationChecks:
@@ -814,6 +829,35 @@ l1:
         claimableOf:
         name: "SyncDepositQueue"
         syncDepositParams:
+        vault: *ZERO_ADDRESS
+
+    earnUSD_redeemQueueUSDT:
+      name: RedeemQueue
+      address: *earnUSD_redeemQueueUSDT
+      proxyName: TransparentUpgradeableProxy
+      implementation: *redeemQueueImplementation
+      proxyAdminOwner: *proxyAdmin
+      proxyChecks: {}
+      storage:
+        - slot: *EIP1967_IMPLEMENTATION_SLOT
+          expected: *redeemQueueImplementation
+          label: implementation
+      checks:
+        asset: *usdt
+        batchAt:
+        canBeRemoved:
+        claimableOf:
+        # getState: [batchIterator, batchCount, totalDemandAssets, totalPendingShares]
+        getState:
+        requestsOf:
+        vault: *earnUSD_vault
+      implementationChecks:
+        asset: *ZERO_ADDRESS
+        batchAt:
+        canBeRemoved:
+        claimableOf:
+        getState:
+        requestsOf:
         vault: *ZERO_ADDRESS
 
     earnUSD_depositQueueUSDe:
@@ -1179,9 +1223,13 @@ l1:
             result: *redirectingDepositHook
           - args: [*earnUSDc_redeemQueueUSDC]
             result: *basicRedeemHook
+          - args: [*earnUSDc_syncRedeemQueueUSDC]
+            result: *basicRedeemHook
           - args: [*earnUSDc_syncDepositQueueUSDT]
             result: *redirectingDepositHook
-        getQueueCount: 3
+          - args: [*earnUSDc_syncRedeemQueueUSDT]
+            result: *basicRedeemHook
+        getQueueCount: 5
         getLiquidAssets:
         getRoleAdmin:
         getRoleMember:
@@ -1198,7 +1246,11 @@ l1:
             result: true
           - args: [*earnUSDc_redeemQueueUSDC]
             result: true
+          - args: [*earnUSDc_syncRedeemQueueUSDC]
+            result: true
           - args: [*earnUSDc_syncDepositQueueUSDT]
+            result: true
+          - args: [*earnUSDc_syncRedeemQueueUSDT]
             result: true
         hasRole:
         hasSubvault:
@@ -1210,27 +1262,39 @@ l1:
             result: true
           - args: [*earnUSDc_redeemQueueUSDC]
             result: false
+          - args: [*earnUSDc_syncRedeemQueueUSDC]
+            result: false
           - args: [*earnUSDc_syncDepositQueueUSDT]
             result: true
+          - args: [*earnUSDc_syncRedeemQueueUSDT]
+            result: false
         isPausedQueue:
           - args: [*earnUSDc_syncDepositQueueUSDC]
             result: false
           - args: [*earnUSDc_redeemQueueUSDC]
             result: false
+          - args: [*earnUSDc_syncRedeemQueueUSDC]
+            result: false
           - args: [*earnUSDc_syncDepositQueueUSDT]
+            result: false
+          - args: [*earnUSDc_syncRedeemQueueUSDT]
             result: false
         onERC721Received:
         oracle: *earnUSDc_oracle
         queueAt:
-          # USDC - syncDepositQueue + redeemQueue
+          # USDC - syncDepositQueue + redeemQueue + syncRedeemQueue
           - args: [*usdc, 0]
             result: *earnUSDc_syncDepositQueueUSDC
           - args: [*usdc, 1]
             result: *earnUSDc_redeemQueueUSDC
-          # USDT - syncDepositQueue
+          - args: [*usdc, 2]
+            result: *earnUSDc_syncRedeemQueueUSDC
+          # USDT - syncDepositQueue + syncRedeemQueue
           - args: [*usdt, 0]
             result: *earnUSDc_syncDepositQueueUSDT
-        queueLimit: 3
+          - args: [*usdt, 1]
+            result: *earnUSDc_syncRedeemQueueUSDT
+        queueLimit: 5
         redeemQueueFactory: *redeemQueueFactory
         riskManager: *earnUSDc_riskManager
         shareManager: *earnUSDc_shareManager
@@ -1380,7 +1444,7 @@ l1:
         getVerificationResult:
         hashCall:
         isAllowedCall:
-        merkleRoot: "0x44fe43cb38d25b6e86316daa05f2cca9cf77c8878172c58bb89404635478ce63"
+        merkleRoot: "0x96fa8812de8095a59158650e84eb67ae38e24b366d902ff29530e93b66c65a4d"
         vault: *earnUSDc_vault
         verifyCall:
       implementationChecks:
@@ -1456,6 +1520,38 @@ l1:
         requestsOf:
         vault: *ZERO_ADDRESS
 
+    earnUSDc_syncRedeemQueueUSDC:
+      name: SyncRedeemQueue
+      address: *earnUSDc_syncRedeemQueueUSDC
+      proxyName: TransparentUpgradeableProxy
+      implementation: *syncRedeemQueueImplementation
+      proxyAdminOwner: *proxyAdmin
+      proxyChecks: {}
+      storage:
+        - slot: *EIP1967_IMPLEMENTATION_SLOT
+          expected: *syncRedeemQueueImplementation
+          label: implementation
+      checks:
+        SET_SYNC_REDEEM_PARAMS_ROLE: *SET_SYNC_REDEEM_PARAMS_ROLE
+        asset: *usdc
+        canBeRemoved: true
+        getLiquidAssets:
+        name: "SyncRedeemQueue"
+        # [usage, remainingDailyLimit] — both move with every redeem
+        remainingDailyLimit:
+        # [penaltyD6, maxAge, usage, dailyLimit, latestRequestTimestamp]
+        syncRedeemParams: [0, 115200, null, 86400000000000000000000000000, null]
+        vault: *earnUSDc_vault
+      implementationChecks:
+        SET_SYNC_REDEEM_PARAMS_ROLE: *SET_SYNC_REDEEM_PARAMS_ROLE
+        asset: *ZERO_ADDRESS
+        canBeRemoved: true
+        getLiquidAssets:
+        name: "SyncRedeemQueue"
+        remainingDailyLimit: [0, 0]
+        syncRedeemParams: [0, 0, 0, 0, 0]
+        vault: *ZERO_ADDRESS
+
     earnUSDc_syncDepositQueueUSDT:
       name: SyncDepositQueue
       address: *earnUSDc_syncDepositQueueUSDT
@@ -1484,6 +1580,38 @@ l1:
         claimableOf:
         name: "SyncDepositQueue"
         syncDepositParams:
+        vault: *ZERO_ADDRESS
+
+    earnUSDc_syncRedeemQueueUSDT:
+      name: SyncRedeemQueue
+      address: *earnUSDc_syncRedeemQueueUSDT
+      proxyName: TransparentUpgradeableProxy
+      implementation: *syncRedeemQueueImplementation
+      proxyAdminOwner: *proxyAdmin
+      proxyChecks: {}
+      storage:
+        - slot: *EIP1967_IMPLEMENTATION_SLOT
+          expected: *syncRedeemQueueImplementation
+          label: implementation
+      checks:
+        SET_SYNC_REDEEM_PARAMS_ROLE: *SET_SYNC_REDEEM_PARAMS_ROLE
+        asset: *usdt
+        canBeRemoved: true
+        getLiquidAssets:
+        name: "SyncRedeemQueue"
+        # [usage, remainingDailyLimit] — both move with every redeem
+        remainingDailyLimit:
+        # [penaltyD6, maxAge, usage, dailyLimit, latestRequestTimestamp]
+        syncRedeemParams: [0, 115200, null, 86400000000000000000000000000, null]
+        vault: *earnUSDc_vault
+      implementationChecks:
+        SET_SYNC_REDEEM_PARAMS_ROLE: *SET_SYNC_REDEEM_PARAMS_ROLE
+        asset: *ZERO_ADDRESS
+        canBeRemoved: true
+        getLiquidAssets:
+        name: "SyncRedeemQueue"
+        remainingDailyLimit: [0, 0]
+        syncRedeemParams: [0, 0, 0, 0, 0]
         vault: *ZERO_ADDRESS
 
     earnUSDc_oracle:
@@ -1886,11 +2014,15 @@ l1:
             result: *redirectingDepositHook
           - args: [*earnUSDe_redeemQueueUSDC]
             result: *basicRedeemHook
+          - args: [*earnUSDe_syncRedeemQueueUSDC]
+            result: *basicRedeemHook
           - args: [*earnUSDe_syncDepositQueueUSDT]
             result: *redirectingDepositHook
+          - args: [*earnUSDe_syncRedeemQueueUSDT]
+            result: *basicRedeemHook
           - args: [*earnUSDe_syncDepositQueueUSDe]
             result: *redirectingDepositHook
-        getQueueCount: 4
+        getQueueCount: 6
         getLiquidAssets:
         getRoleAdmin:
         getRoleMember:
@@ -1909,7 +2041,11 @@ l1:
             result: true
           - args: [*earnUSDe_redeemQueueUSDC]
             result: true
+          - args: [*earnUSDe_syncRedeemQueueUSDC]
+            result: true
           - args: [*earnUSDe_syncDepositQueueUSDT]
+            result: true
+          - args: [*earnUSDe_syncRedeemQueueUSDT]
             result: true
           - args: [*earnUSDe_syncDepositQueueUSDe]
             result: true
@@ -1923,8 +2059,12 @@ l1:
             result: true
           - args: [*earnUSDe_redeemQueueUSDC]
             result: false
+          - args: [*earnUSDe_syncRedeemQueueUSDC]
+            result: false
           - args: [*earnUSDe_syncDepositQueueUSDT]
             result: true
+          - args: [*earnUSDe_syncRedeemQueueUSDT]
+            result: false
           - args: [*earnUSDe_syncDepositQueueUSDe]
             result: true
         isPausedQueue:
@@ -1932,25 +2072,33 @@ l1:
             result: false
           - args: [*earnUSDe_redeemQueueUSDC]
             result: false
+          - args: [*earnUSDe_syncRedeemQueueUSDC]
+            result: false
           - args: [*earnUSDe_syncDepositQueueUSDT]
+            result: false
+          - args: [*earnUSDe_syncRedeemQueueUSDT]
             result: false
           - args: [*earnUSDe_syncDepositQueueUSDe]
             result: false
         onERC721Received:
         oracle: *earnUSDe_oracle
         queueAt:
-          # USDC - syncDepositQueue + redeemQueue
+          # USDC - syncDepositQueue + redeemQueue + syncRedeemQueue
           - args: [*usdc, 0]
             result: *earnUSDe_syncDepositQueueUSDC
           - args: [*usdc, 1]
             result: *earnUSDe_redeemQueueUSDC
-          # USDT - syncDepositQueue
+          - args: [*usdc, 2]
+            result: *earnUSDe_syncRedeemQueueUSDC
+          # USDT - syncDepositQueue + syncRedeemQueue
           - args: [*usdt, 0]
             result: *earnUSDe_syncDepositQueueUSDT
+          - args: [*usdt, 1]
+            result: *earnUSDe_syncRedeemQueueUSDT
           # USDe - syncDepositQueue
           - args: [*usDe, 0]
             result: *earnUSDe_syncDepositQueueUSDe
-        queueLimit: 4
+        queueLimit: 6
         redeemQueueFactory: *redeemQueueFactory
         riskManager: *earnUSDe_riskManager
         shareManager: *earnUSDe_shareManager
@@ -2098,7 +2246,7 @@ l1:
         getVerificationResult:
         hashCall:
         isAllowedCall:
-        merkleRoot: "0xa7d646454fc6e5fcf583cdf670e706742228a43beed2253acfa253caab327170"
+        merkleRoot: "0x91d88b2bf915c1914e4ad0bffdc3710e2c65630c634aa80d348a0fbc14e97921"
         vault: *earnUSDe_vault
         verifyCall:
       implementationChecks:
@@ -2174,6 +2322,38 @@ l1:
         requestsOf:
         vault: *ZERO_ADDRESS
 
+    earnUSDe_syncRedeemQueueUSDC:
+      name: SyncRedeemQueue
+      address: *earnUSDe_syncRedeemQueueUSDC
+      proxyName: TransparentUpgradeableProxy
+      implementation: *syncRedeemQueueImplementation
+      proxyAdminOwner: *proxyAdmin
+      proxyChecks: {}
+      storage:
+        - slot: *EIP1967_IMPLEMENTATION_SLOT
+          expected: *syncRedeemQueueImplementation
+          label: implementation
+      checks:
+        SET_SYNC_REDEEM_PARAMS_ROLE: *SET_SYNC_REDEEM_PARAMS_ROLE
+        asset: *usdc
+        canBeRemoved: true
+        getLiquidAssets:
+        name: "SyncRedeemQueue"
+        # [usage, remainingDailyLimit] — both move with every redeem
+        remainingDailyLimit:
+        # [penaltyD6, maxAge, usage, dailyLimit, latestRequestTimestamp]
+        syncRedeemParams: [0, 115200, null, 86400000000000000000000000000, null]
+        vault: *earnUSDe_vault
+      implementationChecks:
+        SET_SYNC_REDEEM_PARAMS_ROLE: *SET_SYNC_REDEEM_PARAMS_ROLE
+        asset: *ZERO_ADDRESS
+        canBeRemoved: true
+        getLiquidAssets:
+        name: "SyncRedeemQueue"
+        remainingDailyLimit: [0, 0]
+        syncRedeemParams: [0, 0, 0, 0, 0]
+        vault: *ZERO_ADDRESS
+
     earnUSDe_syncDepositQueueUSDT:
       name: SyncDepositQueue
       address: *earnUSDe_syncDepositQueueUSDT
@@ -2202,6 +2382,38 @@ l1:
         claimableOf:
         name: "SyncDepositQueue"
         syncDepositParams:
+        vault: *ZERO_ADDRESS
+
+    earnUSDe_syncRedeemQueueUSDT:
+      name: SyncRedeemQueue
+      address: *earnUSDe_syncRedeemQueueUSDT
+      proxyName: TransparentUpgradeableProxy
+      implementation: *syncRedeemQueueImplementation
+      proxyAdminOwner: *proxyAdmin
+      proxyChecks: {}
+      storage:
+        - slot: *EIP1967_IMPLEMENTATION_SLOT
+          expected: *syncRedeemQueueImplementation
+          label: implementation
+      checks:
+        SET_SYNC_REDEEM_PARAMS_ROLE: *SET_SYNC_REDEEM_PARAMS_ROLE
+        asset: *usdt
+        canBeRemoved: true
+        getLiquidAssets:
+        name: "SyncRedeemQueue"
+        # [usage, remainingDailyLimit] — both move with every redeem
+        remainingDailyLimit:
+        # [penaltyD6, maxAge, usage, dailyLimit, latestRequestTimestamp]
+        syncRedeemParams: [0, 115200, null, 86400000000000000000000000000, null]
+        vault: *earnUSDe_vault
+      implementationChecks:
+        SET_SYNC_REDEEM_PARAMS_ROLE: *SET_SYNC_REDEEM_PARAMS_ROLE
+        asset: *ZERO_ADDRESS
+        canBeRemoved: true
+        getLiquidAssets:
+        name: "SyncRedeemQueue"
+        remainingDailyLimit: [0, 0]
+        syncRedeemParams: [0, 0, 0, 0, 0]
         vault: *ZERO_ADDRESS
 
     earnUSDe_syncDepositQueueUSDe:

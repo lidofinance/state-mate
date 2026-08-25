@@ -547,7 +547,7 @@ l1:
         *PULL_LIQUIDITY_ROLE : [*curator]
         *PUSH_LIQUIDITY_ROLE : [*curator]
         *SET_FLAGS_ROLE : [*timelockController]
-        *SET_MERKLE_ROOT_ROLE : [*timelockController, *lazyVaultAdmin]
+        *SET_MERKLE_ROOT_ROLE : [*timelockController]
         *SET_QUEUE_STATUS_ROLE : [*timelockController, *lazyVaultAdmin]
         *SUBMIT_REPORTS_ROLE : [*oracleSubmitter]
         *ACCEPT_REPORT_ROLE : [*oracleSubmitter]
@@ -1239,7 +1239,7 @@ l1:
         getVerificationResult:
         hashCall:
         isAllowedCall:
-        merkleRoot: "0xb571a376806e1571536b0b02ee191ec771c5ca4e908a8891eeaae3d82633dadb"
+        merkleRoot: "0x38f016b3a4be53ae2a0ae3d99dada4e46cb508fb066cdaed6c102e4749d2bb9f"
         vault: *vault
         verifyCall:
       implementationChecks:
