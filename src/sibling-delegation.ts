@@ -3,7 +3,7 @@ import path from "node:path";
 
 import * as YAML from "yaml";
 
-import { printError, YAML_PARSE_OPTIONS, yamlBigintReviver } from "./common";
+import { printError, YAML_PARSE_OPTIONS, YAML_TO_JS_OPTIONS } from "./common";
 import { logErrorAndExit } from "./logger";
 
 // A contract/implementation address (20-byte) or a 32-byte hash (forward-compatibility). Shared by
@@ -126,7 +126,7 @@ function rejectLabels(candidates: Iterable<string>, isViolation: (label: string)
  * keeps its line number in the combined text — `describeCombinedParseError` relies on this.
  */
 function stripDocumentMarkers(text: string): string {
-  const lines = text.replace(/^\uFEFF/, "").split("\n");
+  const lines = text.replace(/^\u{FEFF}/u, "").split("\n");
 
   const startIndex = lines.findIndex((line) => /^---(\s|$)/.test(line));
   if (startIndex !== -1) {
@@ -189,7 +189,7 @@ function assertNoStrayAnchors(document: YAML.Document, labels: Set<string>, file
   if (stray.size > 0) {
     throw new Error(
       `anchor(s) in ${fileLabel} defined outside the labeled entries: ` +
-        `${[...stray].map((anchor) => `&${anchor}`).join(", ")}`,
+        [...stray].map((anchor) => `&${anchor}`).join(", "),
     );
   }
 }
@@ -339,7 +339,7 @@ export function composeWithSiblings(mainText: string, siblings: { text: string; 
   }
 
   return {
-    document: combinedDocument.toJS({ reviver: yamlBigintReviver }),
+    document: combinedDocument.toJS(YAML_TO_JS_OPTIONS),
     labels: collected.map(({ labels }) => [...labels]),
   };
 }

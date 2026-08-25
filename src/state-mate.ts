@@ -18,8 +18,8 @@ import {
   resetAbiModeCache,
 } from "./abi-provider";
 import { doGenerateBoilerplate } from "./boilerplate-generator";
-import { parseCmdLineArguments } from "./cli-parser";
-import { printError, readUrlOrFromEnvironment, YAML_PARSE_OPTIONS, yamlBigintReviver } from "./common";
+import { parseCommandLineArguments } from "./cli-parser";
+import { printError, readUrlOrFromEnvironment, YAML_PARSE_OPTIONS, YAML_TO_JS_OPTIONS } from "./common";
 import { DEPLOYED_SPEC } from "./deployed-addresses";
 import { loadContractInfoFromExplorer } from "./explorer-provider";
 import { INPUTS_SPEC } from "./inputs";
@@ -46,12 +46,18 @@ import {
 } from "./typebox";
 import { ContractInfo } from "./types";
 
-export let g_Arguments: ReturnType<typeof parseCmdLineArguments>;
+export let g_Arguments: ReturnType<typeof parseCommandLineArguments>;
 
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore: Unreachable code error
-BigInt.prototype.toJSON = function (): number {
-  return Number(this);
+declare global {
+  interface BigInt {
+    toJSON(): string;
+  }
+}
+
+// eslint-disable-next-line unicorn/no-nonstandard-builtin-properties -- deliberate polyfill for JSON.stringify of bigints
+BigInt.prototype.toJSON = function (): string {
+  // eslint-disable-next-line unicorn/no-this-outside-of-class -- prototype method
+  return this.toString();
 };
 
 function formatAjvErrors(errors: ValidateFunction["errors"]) {
@@ -74,7 +80,7 @@ function loadStateFromYaml(configPath: string): unknown {
   try {
     const configContent = fs.readFileSync(file, "utf8");
 
-    return YAML.parse(configContent, yamlBigintReviver, YAML_PARSE_OPTIONS);
+    return YAML.parse(configContent, { ...YAML_PARSE_OPTIONS, ...YAML_TO_JS_OPTIONS });
   } catch (error) {
     logErrorAndExit(`Failed to convert the YAML file ${chalk.magenta(configPath)} to JSON:\n${printError(error)}`);
   }
@@ -90,7 +96,7 @@ type SelectedSibling = { path: string; spec: SiblingSpec; noun: string };
 // rejection lives here: they are legal only when delegated from a `.inputs` file.
 function rejectInlineInputsSections(document: unknown): unknown {
   if (typeof document === "object" && document !== null) {
-    const inline = INPUTS_SPEC.ownedSectionKeys.filter((key) => key in document);
+    const inline = INPUTS_SPEC.ownedSectionKeys.filter((key) => Object.hasOwn(document, key));
     if (inline.length > 0) {
       logErrorAndExit(
         `${chalk.magenta(g_Arguments.configPath)} holds top-level ${inline.map((key) => `\`${key}:\``).join(" / ")} ` +
@@ -217,7 +223,7 @@ async function doChecks(jsonDocument: EntireDocument) {
           `\n${chalk.red(`[${index + 1}/${g_error_details.length}]`)} ` +
             `${chalk.cyan("Section:")} ${chalk.yellow(error.section)} | ` +
             `${chalk.cyan("Contract:")} ${chalk.yellow(error.contract)} ` +
-            `${chalk.gray(`(${error.contractAddress})`)}` +
+            chalk.gray(`(${error.contractAddress})`) +
             `\n    ${chalk.cyan("Check Type:")} ${chalk.yellow(error.checksType)} | ` +
             `${chalk.cyan("Method:")} ${chalk.yellow(error.method)}` +
             `\n    ${chalk.cyan("Error:")} ${chalk.red(error.message)}`,
@@ -309,7 +315,7 @@ async function checkNetworkSection(sectionTitle: string, section: NetworkSection
 }
 
 async function main() {
-  g_Arguments = parseCmdLineArguments();
+  g_Arguments = parseCommandLineArguments();
 
   if (g_Arguments.updateAbi) {
     renameAllAbiToLowerCase();
@@ -348,7 +354,6 @@ async function main() {
   }
 }
 
-// eslint-disable-next-line unicorn/prefer-top-level-await
 main().catch((error) => {
   logError(error);
   process.exitCode = 1;

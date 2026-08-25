@@ -39,7 +39,10 @@ test("composes cross-file: aliases resolve to .deployed addresses and the deploy
     deployed: { l1: string[] };
     l1: { contracts: { fooContract: { address: string; checks: { bar: string; zero: string } } } };
   };
-  assert.deepEqual(labels.toSorted(), ["bar", "foo"]);
+  assert.deepEqual(
+    labels.toSorted((a, b) => a.localeCompare(b)),
+    ["bar", "foo"],
+  );
   assert.equal(document_.deployed.l1[0], "0x1111111111111111111111111111111111111111");
   assert.equal(document_.l1.contracts.fooContract.address, "0x1111111111111111111111111111111111111111");
   assert.equal(document_.l1.contracts.fooContract.checks.bar, "0x2222222222222222222222222222222222222222");
@@ -244,8 +247,9 @@ test("a %TAG directive in the .deployed file is rejected with a targeted error",
 
 test("a UTF-8 BOM on either file is stripped before concatenation (still composes)", () => {
   // A BOM is legal at the start of a file but is content mid-stream: un-stripped, the main config's
-  // first key would become "\uFEFFmisc" and schema validation would fail with invisible-cause errors.
-  const { document } = composeWithDeployedAddresses(`\uFEFF${MAIN_CONFIG}`, `\uFEFF${DEPLOYED}`);
+  // first key would become "<BOM>misc" and schema validation would fail with invisible-cause errors.
+  const BOM = "\u{FEFF}";
+  const { document } = composeWithDeployedAddresses(`${BOM}${MAIN_CONFIG}`, `${BOM}${DEPLOYED}`);
   const document_ = document as { misc: string[]; l1: { contracts: { fooContract: { address: string } } } };
   assert.ok(Array.isArray(document_.misc));
   assert.equal(document_.l1.contracts.fooContract.address, "0x1111111111111111111111111111111111111111");
@@ -328,6 +332,26 @@ test("resolveDeployedFilePath: --deployed is the only way in; a neighbouring fil
     // silently degrade to a standalone run.
     assert.throws(() => resolveDeployedFilePath(""), /is not a file|not found/);
   });
+});
+
+test("a config with more aliases than the default budget still composes", () => {
+  // Aliases are expanded by toJS(), where the yaml default budget is 100 — and a wiring-only config
+  // is made of aliases. Without YAML_TO_JS_OPTIONS lifting the budget this throws "Excessive alias
+  // count", which is why maxAliasCount must ride with the toJS options, not the parse options.
+  const checks = Array.from({ length: 150 }, (_, index) => `        check${index}: *foo`).join("\n");
+  const main = `
+l1:
+  contracts:
+    fooContract:
+      address: *bar
+      checks:
+${checks}
+`;
+  const { document } = composeWithDeployedAddresses(main, DEPLOYED);
+  const checksObject = (document as { l1: { contracts: { fooContract: { checks: Record<string, string> } } } }).l1
+    .contracts.fooContract.checks;
+  assert.equal(Object.keys(checksObject).length, 150);
+  assert.equal(checksObject.check149, "0x1111111111111111111111111111111111111111");
 });
 
 test("configDelegatesAnchors: true only for a config that cannot be parsed standalone", () => {

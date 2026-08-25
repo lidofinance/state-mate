@@ -86,7 +86,7 @@ export function needCheck(level: CheckLevel, name: string) {
     return true;
   }
   const checkOnTheLevel = g_Arguments.checkOnly[level];
-  return checkOnTheLevel === null || checkOnTheLevel === undefined || name === checkOnTheLevel;
+  return checkOnTheLevel == null || name === checkOnTheLevel;
 }
 
 export abstract class SectionValidatorBase {
@@ -184,7 +184,7 @@ export abstract class SectionValidatorBase {
 }
 
 function _stringify(value: unknown) {
-  return value instanceof Object ? JSON.stringify(value) : `${String(value)}`;
+  return value instanceof Object ? JSON.stringify(value) : String(value);
 }
 
 function _assertEqual(actual: unknown, expected: ViewResult, errorMessage?: string) {
@@ -242,10 +242,12 @@ function toBigIntIfPossible(value: unknown): bigint | unknown {
 }
 
 function _equalOrThrow(actual: unknown, expected: unknown, errorMessage?: string) {
-  if (toBigIntIfPossible(actual) !== toBigIntIfPossible(expected)) {
-    if (!errorMessage) {
-      errorMessage = `Expected "${_stringify(expected)}" to equal actual "${_stringify(actual)}"`;
-    }
-    throw new AssertionError(errorMessage);
+  if (toBigIntIfPossible(actual) === toBigIntIfPossible(expected)) {
+    return;
   }
+
+  if (!errorMessage) {
+    errorMessage = `Expected "${_stringify(expected)}" to equal actual "${_stringify(actual)}"`;
+  }
+  throw new AssertionError(errorMessage);
 }

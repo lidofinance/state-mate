@@ -10,7 +10,7 @@ export const WARNING_MARK = chalk.yellow("⚠");
 const TREE_BRANCH = chalk.gray("├──");
 const TREE_LAST = chalk.gray("└──");
 const TREE_PIPE = chalk.gray("│  ");
-const TREE_SPACE = "   ";
+const TREE_SPACE = " ".repeat(3);
 
 // Track current item prefix for tree structure
 let itemPrefix = "";
@@ -25,6 +25,11 @@ export class LogCommand {
   constructor(description: string) {
     this.description = description;
     this.initialPrint();
+  }
+
+  private initialPrint(): void {
+    const prefix = getItemPrefix();
+    process.stdout.write(`${prefix}  ${this.description}: ...`);
   }
 
   public printResult(statusSymbol: string, result: string): void {
@@ -44,11 +49,6 @@ export class LogCommand {
 
   public warning(result: string): void {
     this.printResult(WARNING_MARK, result);
-  }
-
-  private initialPrint(): void {
-    const prefix = getItemPrefix();
-    process.stdout.write(`${prefix}  ${this.description}: ...`);
   }
 }
 
@@ -91,7 +91,7 @@ export function log(argument: unknown) {
 export function logReplaceLine(argument: unknown) {
   process.stdout.clearLine(0);
   process.stdout.cursorTo(0);
-  process.stdout.write(`${String(argument)}`);
+  process.stdout.write(String(argument));
 }
 
 export function logError(argument: unknown) {

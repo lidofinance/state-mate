@@ -22,6 +22,24 @@ export class ChecksSectionValidator extends SectionValidatorBase {
     super(provider, sectionName);
   }
 
+  private async _validateSubsection(contract: Contract, method: string, checkEntryValue: ChecksEntryValue) {
+    if (isTypeOfTB(checkEntryValue, ArrayOfStaticCallCheckTB)) {
+      if (checkEntryValue.length === 0) {
+        await this._checkViewFunction(contract, method, { result: [] });
+      } else {
+        for (const argumentsResult of checkEntryValue) {
+          await this._checkViewFunction(contract, method, argumentsResult);
+        }
+      }
+    } else if (isTypeOfTB(checkEntryValue, StaticCallCheckTB)) {
+      await this._checkViewFunction(contract, method, checkEntryValue);
+    } else if (isTypeOfTB(checkEntryValue, ViewResultTB)) {
+      await this._checkViewFunction(contract, method, { result: checkEntryValue });
+    } else {
+      logErrorAndExit(`Unknown check type: ${JSON.stringify(checkEntryValue)}`);
+    }
+  }
+
   override async validateSection(contractEntry: ContractEntry, contractAlias: string, basePath?: string) {
     void basePath; // Used for interface compatibility - header printed by contract.ts
     const { address, checks } = contractEntry;
@@ -60,23 +78,5 @@ export class ChecksSectionValidator extends SectionValidatorBase {
     }
 
     return loadAbiFromFile(name, address);
-  }
-
-  private async _validateSubsection(contract: Contract, method: string, checkEntryValue: ChecksEntryValue) {
-    if (isTypeOfTB(checkEntryValue, ArrayOfStaticCallCheckTB)) {
-      if (checkEntryValue.length === 0) {
-        await this._checkViewFunction(contract, method, { result: [] });
-      } else {
-        for (const argumentsResult of checkEntryValue) {
-          await this._checkViewFunction(contract, method, argumentsResult);
-        }
-      }
-    } else if (isTypeOfTB(checkEntryValue, StaticCallCheckTB)) {
-      await this._checkViewFunction(contract, method, checkEntryValue);
-    } else if (isTypeOfTB(checkEntryValue, ViewResultTB)) {
-      await this._checkViewFunction(contract, method, { result: checkEntryValue });
-    } else {
-      logErrorAndExit(`Unknown check type: ${JSON.stringify(checkEntryValue)}`);
-    }
   }
 }

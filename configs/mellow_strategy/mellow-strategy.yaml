@@ -2020,7 +2020,7 @@ l1:
         getVerificationResult:
         hashCall:
         isAllowedCall:
-        merkleRoot: "0x0defb6ee7a9988e2247999be4b92bbcfff0ef4bcaf98a4e1f7e665e805c129a5"
+        merkleRoot: "0xa61ed3d1075e5942cc35956b9efd3bb1b67059785115a7cb6728ae77f42c7b10"
         vault: *vault
         verifyCall:
       implementationChecks:

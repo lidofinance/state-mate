@@ -997,7 +997,7 @@ l1:
           - *EXT_MELLOW_SIGNER_2
           - *MELLOW_SIGNER_2
           - *MELLOW_SIGNER_3
-          - *MELLOW_SIGNER_1
+          - *EXT_MELLOW_SIGNER_1
           - *MELLOW_SIGNER_4
           - *EXT_MELLOW_SIGNER_4
         getStorageAt:

@@ -140,7 +140,7 @@ export async function loadContractInfo(
 
     return contractInfo;
   } catch {
-    const logHandler = new LogCommand(`ABI ${chalk.magenta(`${address}`)}`);
+    const logHandler = new LogCommand(`ABI ${chalk.magenta(address)}`);
     logHandler.failure(
       `Failed to parse contract source code (${chalk.yellow(sourcesResponse.result[0].ABI)}). Maybe EOF?`,
     );
@@ -183,7 +183,7 @@ function _getExplorerApiUrl(
   }
 
   if (explorerKey) {
-    url = `${url}&apikey=${explorerKey}`;
+    url += `&apikey=${explorerKey}`;
   }
 
   return url;

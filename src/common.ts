@@ -12,6 +12,11 @@ export const YAML_PARSE_OPTIONS: YAML.ParseOptions & YAML.DocumentOptions & YAML
   intAsBigInt: true,
 };
 export const yamlBigintReviver = (_: unknown, value: unknown) => (typeof value === "bigint" ? String(value) : value);
+// Aliases are expanded when a document is turned into JS, not while parsing, so the alias budget
+// belongs here rather than in YAML_PARSE_OPTIONS. maxAliasCount guards against alias-based resource
+// exhaustion in untrusted input; our configs are first-party and the large ones legitimately exceed
+// the default budget of 100 — a wiring-only config delegating to a sibling file is made of aliases.
+export const YAML_TO_JS_OPTIONS: YAML.ToJSOptions = { reviver: yamlBigintReviver, maxAliasCount: -1 };
 
 /**
  * The scalar items under `deployed.<sectionKey>` (in document order), or `[]` when that section is
@@ -76,10 +81,5 @@ export function getNonMutables(abi: Abi): AbiArgumentsLength {
 }
 
 function isUrl(maybeUrl: string) {
-  try {
-    new URL(maybeUrl);
-    return true;
-  } catch {
-    return false;
-  }
+  return URL.canParse(maybeUrl);
 }

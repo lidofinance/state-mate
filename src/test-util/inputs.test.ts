@@ -27,7 +27,10 @@ test("composes cross-file: aliases resolve to .inputs config knobs and externals
       contracts: { fooContract: { checks: { name: string; limits: string[]; deposit: string } } };
     };
   };
-  assert.deepEqual(labels.toSorted(), ["chainId", "depositContract", "lidoName", "oracleReportLimits"]);
+  assert.deepEqual(
+    labels.toSorted((a, b) => a.localeCompare(b)),
+    ["chainId", "depositContract", "lidoName", "oracleReportLimits"],
+  );
   const checks = document_.l1.contracts.fooContract.checks;
   assert.equal(checks.name, "Liquid staked Ether 2.0");
   // Numeric YAML values are stringified by the shared bigint reviver (as chainId is below).
@@ -313,8 +316,14 @@ externals:
   const document_ = document as {
     l1: { chainId: string; contracts: { fooContract: { address: string; checks: { name: string; deposit: string } } } };
   };
-  assert.deepEqual(labels[0].toSorted(), ["foo"]);
-  assert.deepEqual(labels[1].toSorted(), ["chainId", "depositContract", "lidoName"]);
+  assert.deepEqual(
+    labels[0].toSorted((a, b) => a.localeCompare(b)),
+    ["foo"],
+  );
+  assert.deepEqual(
+    labels[1].toSorted((a, b) => a.localeCompare(b)),
+    ["chainId", "depositContract", "lidoName"],
+  );
   assert.equal(document_.l1.contracts.fooContract.address, "0x1111111111111111111111111111111111111111");
   assert.equal(document_.l1.contracts.fooContract.checks.name, "stETH");
   assert.equal(document_.l1.chainId, "560048");

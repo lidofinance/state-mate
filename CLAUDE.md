@@ -13,7 +13,7 @@ Validates EVM smart-contract state against YAML configs. Calls view functions on
 
 ## Layout
 
-`configs/<protocol>/` per deployment — e.g. `lido/mainnet`, `lido/hoodi`, `meta/ethereum`, `meta/base`, plus many L2s. `src/` is TypeScript; entry is `src/state-mate.ts`. Requires Node ≥20, yarn 4.3.1.
+`configs/<protocol>/` per deployment — e.g. `lido/mainnet`, `lido/hoodi`, `meta/ethereum`, `meta/base`, plus many L2s. `src/` is TypeScript; entry is `src/state-mate.ts`. Requires Node ≥22, yarn 4.17.0.
 
 ## Scripts (package.json)
 
