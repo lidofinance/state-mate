@@ -219,13 +219,6 @@ test("an indented '...' inside a block scalar is content, not a document-end mar
   assert.equal((document as { notes: string }).notes, "line1\n...\n");
 });
 
-test("a main config using the reserved overlay key is rejected even without overlays", () => {
-  // The synthetic wrapper key is always stripped from the composed document, so allowing it as a
-  // real key would silently drop that section in sibling-only runs.
-  const main = `${MAIN_CONFIG}__state_mate_overrides__: 1\n`;
-  assert.throws(() => composeWithDeployedAddresses(main, DEPLOYED), /reserved top-level key/);
-});
-
 test("H3: a mid-file document marker in .deployed is rejected with a file-targeted error", () => {
   const deployed = `${DEPLOYED}---\nmore: stuff\n`;
   assert.throws(

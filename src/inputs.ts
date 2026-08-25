@@ -1,7 +1,6 @@
 import * as YAML from "yaml";
 
-import { yamlBigintReviver } from "./common";
-import { ADDRESS_OR_HASH_RE, CollectedEntries, OverlaySpec, pairKeyToString, SiblingSpec } from "./sibling-delegation";
+import { ADDRESS_OR_HASH_RE, pairKeyToString, SiblingSpec } from "./sibling-delegation";
 
 const INPUTS_INFIX = ".inputs";
 // The two groups of a `.inputs` file, split by AUTHORSHIP:
@@ -10,19 +9,17 @@ const INPUTS_INFIX = ".inputs";
 const INPUTS_SECTIONS = ["config", "externals"] as const;
 
 /**
- * Validate the `.inputs`-shaped entries of `document` and, in one pass, return per `&label` the
- * (reviver-normalized) value and the owning section. Used both for the `.inputs` file itself and for
- * an `--overrides` file over it, so `fileLabel` targets the duplicate-label error at the right file.
- * The engine has already checked that the file holds only `config:`/`externals:` sections; this
- * enforces that every entry carries an `&label` anchor and that no label is duplicated. `config`
+ * Validate the `.inputs` entries and collect their labels. The engine has already checked that the
+ * file holds only `config:`/`externals:` sections; this enforces that every entry carries an `&label`
+ * anchor and that no label is duplicated (`fileLabel` targets that error at the file). `config`
  * entries may be any anchored scalar or array (no value check); `externals` entries must be anchored
  * scalars whose string values are valid addresses/hashes — a chainId-style non-negative integer
  * (e.g. `&chainId 560048`) is exempt.
  */
-function collectInputsEntries(document: YAML.Document, fileLabel: string): CollectedEntries {
-  const entries: CollectedEntries = new Map();
+function collectInputsLabels(document: YAML.Document, fileLabel: string): Set<string> {
+  const labels = new Set<string>();
   if (!YAML.isMap(document.contents)) {
-    return entries; // unreachable: the engine has already rejected non-mapping files
+    return labels; // unreachable: the engine has already rejected non-mapping files
   }
   for (const pair of document.contents.items) {
     const sectionKey = pairKeyToString(pair.key);
@@ -60,18 +57,13 @@ function collectInputsEntries(document: YAML.Document, fileLabel: string): Colle
           throw new Error(`label &${node.anchor} is not a valid address: ${String(value)}`);
         }
       }
-      if (entries.has(node.anchor)) {
+      if (labels.has(node.anchor)) {
         throw new Error(`duplicate label &${node.anchor} in ${fileLabel}`);
       }
-      entries.set(node.anchor, {
-        // Normalize through the same reviver the composed document uses, so an overrides no-op check
-        // compares like-for-like (bigints -> strings, arrays of ints -> arrays of strings).
-        value: node.toJS(document, { reviver: yamlBigintReviver }),
-        section: sectionKey,
-      });
+      labels.add(node.anchor);
     }
   }
-  return entries;
+  return labels;
 }
 
 /** The `.inputs` delegation: project-chosen `config:` values and fixed external `externals:` facts. */
@@ -80,18 +72,5 @@ export const INPUTS_SPEC: SiblingSpec = {
   optionName: "--inputs",
   fileLabel: "the .inputs file",
   ownedSectionKeys: [...INPUTS_SECTIONS],
-  // The same collector also validates the `--overrides` overlay (the engine reuses it via `baseSpec`).
-  collect: collectInputsEntries,
-};
-
-/**
- * The `--overrides` overlay over `.inputs`: an inputs-shaped file that redefines the values of labels
- * already defined in `.inputs`. The engine validates it with the base's own sections and collector —
- * identical shape by construction — and additionally enforces that it introduces no new label, keeps
- * each label's section, and changes every value.
- */
-export const INPUTS_OVERRIDES_SPEC: OverlaySpec = {
-  optionName: "--overrides",
-  fileLabel: "the overrides file",
-  baseSpec: INPUTS_SPEC,
+  collectLabels: collectInputsLabels,
 };

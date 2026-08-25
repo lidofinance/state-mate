@@ -7,7 +7,7 @@ import { INPUTS_SPEC } from "../inputs";
 import { composeWithSiblings } from "../sibling-delegation";
 
 // Shared helpers/fixtures for the sibling-delegation test suites (deployed-addresses.test.ts,
-// inputs.test.ts, overrides.test.ts). Not a test file itself — keep the name outside `*.test.ts`.
+// inputs.test.ts). Not a test file itself — keep the name outside `*.test.ts`.
 
 // Local conveniences over the generic engine (production goes through the engine directly).
 export const composeWithDeployedAddresses = (mainText: string, deployedText: string) => {
@@ -32,7 +32,7 @@ export function withTemporaryDirectory<T>(prefix: string, function_: (directory:
   }
 }
 
-// Full-delegation fixtures shared by the .inputs and overrides suites: the main config holds ONLY
+// Full-delegation fixtures for the .inputs suite: the main config holds ONLY
 // wiring (`*label` aliases) plus its own constant anchors (e.g. `&ZERO` in `misc:`). It has no
 // `config:`/`externals:` sections. The .inputs file is the sole source of the project-chosen
 // `config` knobs and the fixed `externals` facts.

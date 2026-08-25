@@ -13,14 +13,6 @@ import { logErrorAndExit } from "./logger";
 export const ADDRESS_OR_HASH_RE = /^0x[a-fA-F0-9]{40}$|^0x[a-fA-F0-9]{64}$/;
 
 /**
- * The result of validating a delegation/overlay file's labeled entries: per `&label`, the
- * (reviver-normalized) value and the owning section. One shape for both roles — a sibling that
- * DEFINES anchors and an overlay that REDEFINES them — so the base's entries are collected once and
- * reused (the overlay compares against them without a second traversal).
- */
-export type CollectedEntries = Map<string, { value: unknown; section: string }>;
-
-/**
  * Describes one kind of sibling "delegation" file (e.g. `.deployed`, `.inputs`). The generic engine
  * handles path resolution, document-marker stripping, the concat-then-parse composition, and the
  * cross-file invariants — including that the sibling holds only its owned sections and the main
@@ -38,37 +30,16 @@ export type SiblingSpec = {
   /** Top-level section keys this sibling owns; it holds only these, the main config none of them. */
   ownedSectionKeys: string[];
   /**
-   * Validate the sibling's sections/values and return its labeled entries. Throws on any violation;
-   * `fileLabel` targets those errors at this file. The same collector also validates an overlay over
-   * this sibling, so overlay and base are normalized identically by construction.
+   * Validate the sibling's sections/values and return its entry `&label` anchors. Throws on any
+   * violation; `fileLabel` targets those errors at this file.
    */
-  collect: (document: YAML.Document, fileLabel: string) => CollectedEntries;
-};
-
-/**
- * Describes an "overlay" file that REDEFINES values already defined by a base sibling (e.g. an
- * `--overrides` file over the `.inputs` file) rather than defining new ones. It shares the base's
- * method — the engine validates it with `baseSpec`'s own sections and collector — but plays a
- * different role: it deliberately reuses the base's anchors (so it is exempt from the no-duplicate
- * invariant), and must instead satisfy rules of its own — every label already exists in the base (it
- * may not introduce one), every label keeps the section the base used, and every value differs from
- * the base (a no-op restatement is a mistake).
- */
-export type OverlaySpec = {
-  /** The CLI option that selects this file, e.g. `--overrides` (used in messages). */
-  optionName: string;
-  /** Human-facing label for this file, e.g. `the overrides file` (used in error messages). */
-  fileLabel: string;
-  /** The base sibling whose labels this file may redefine; located among the siblings by identity. */
-  baseSpec: SiblingSpec;
+  collectLabels: (document: YAML.Document, fileLabel: string) => Set<string>;
 };
 
 export type ComposeResult = {
   document: unknown;
   /** Labels collected from each sibling, parallel to the input `siblings` array. */
   labels: string[][];
-  /** Labels applied by each overlay (e.g. an overrides file), parallel to the input `overlays` array. */
-  overlayLabels: string[][];
 };
 
 /** Derive the conventional sibling path: `lido.yaml` + `.deployed` -> `lido.deployed.yaml`. */
@@ -94,7 +65,7 @@ function isExistingFile(filePath: string): boolean {
 }
 
 /** Resolve an explicit `--option <path>`, throwing if it is missing or not a regular file. */
-export function resolveExplicitFilePath(optionName: string, argument: string): string {
+function resolveExplicitFilePath(optionName: string, argument: string): string {
   const resolved = path.resolve(argument);
   if (!isExistingFile(resolved)) {
     throw new Error(
@@ -197,7 +168,7 @@ function stripDocumentMarkers(text: string): string {
   return lines.join("\n");
 }
 
-/** Reject a delegated/overlay document that is not a mapping of exactly the given owned sections. */
+/** Reject a delegated document that is not a mapping of exactly the given owned sections. */
 function assertOnlyOwnedSections(document: YAML.Document, ownedSectionKeys: string[], fileLabel: string) {
   const sections = ownedSectionKeys.map((key) => `\`${key}:\``).join(" and/or ");
   if (!YAML.isMap(document.contents)) {
@@ -216,39 +187,6 @@ function assertOnlyOwnedSections(document: YAML.Document, ownedSectionKeys: stri
   }
 }
 
-/**
- * A wrapper key — not a real config section — under which an overlay's redefined anchors are emitted
- * into the combined text, so they sit after their base's anchors (and win by most-recent-preceding
- * resolution) without colliding with the base's top-level section keys (a duplicate top-level key is
- * a hard parse error). Stripped from the composed result so the document equals a sibling-only one.
- */
-const SYNTHETIC_OVERLAY_KEY = "__state_mate_overrides__";
-
-/**
- * Re-emit one or more overlays' labeled entries as ONE synthetic-key block, reusing the parsed nodes
- * so every `&label` and its exact value representation survive serialization. The original section
- * keys are dropped (a label's section is validated separately); only the anchor bindings drive
- * resolution. A single shared block is used for all overlays so they never collide on a duplicate
- * top-level key — cross-overlay label clashes are rejected before this point.
- */
-function buildOverlaySyntheticText(documents: YAML.Document[]): string {
-  const seq = new YAML.YAMLSeq();
-  for (const document of documents) {
-    if (YAML.isMap(document.contents)) {
-      for (const pair of document.contents.items) {
-        if (YAML.isSeq(pair.value)) {
-          for (const item of pair.value.items) seq.items.push(item);
-        }
-      }
-    }
-  }
-  const synthetic = new YAML.Document();
-  const map = new YAML.YAMLMap();
-  map.set(SYNTHETIC_OVERLAY_KEY, seq);
-  synthetic.contents = map;
-  return String(synthetic);
-}
-
 /** Every anchor name defined in `document`, in visit order (duplicates preserved). */
 function collectAnchorNames(document: YAML.Document): string[] {
   const anchors: string[] = [];
@@ -265,11 +203,11 @@ function collectAnchorNames(document: YAML.Document): string[] {
  * so it would bypass the duplicate/collision invariants and silently shadow a same-named label from
  * another file once the texts are concatenated.
  */
-function assertNoStrayAnchors(document: YAML.Document, entries: CollectedEntries, fileLabel: string) {
+function assertNoStrayAnchors(document: YAML.Document, labels: Set<string>, fileLabel: string) {
   const stray = new Set<string>();
   const seen = new Set<string>();
   for (const anchor of collectAnchorNames(document)) {
-    if (!entries.has(anchor) || seen.has(anchor)) stray.add(anchor);
+    if (!labels.has(anchor) || seen.has(anchor)) stray.add(anchor);
     seen.add(anchor);
   }
   if (stray.size > 0) {
@@ -347,28 +285,19 @@ function describeCombinedParseError(error: YAML.YAMLError, parts: CombinedPart[]
  * entry labels; every label referenced by the main config; no duplicate label) and across files (the
  * main config has none of the delegated sections; no label collides with a main anchor or with
  * another sibling's label; every main alias resolves).
- *
- * Optional `overlays` REDEFINE existing sibling values rather than defining new ones (e.g. an
- * `--overrides` file over `.inputs`): each is validated like its base, must only redefine existing
- * base labels (keeping their sections) with changed values, and is emitted after its base so the main
- * aliases resolve to the override.
  */
-export function composeWithSiblings(
-  mainText: string,
-  siblings: { text: string; spec: SiblingSpec }[],
-  overlays: { text: string; spec: OverlaySpec }[] = [],
-): ComposeResult {
+export function composeWithSiblings(mainText: string, siblings: { text: string; spec: SiblingSpec }[]): ComposeResult {
   const collected = siblings.map(({ text, spec }) => {
     const document = parseSingleDocument(text, spec.fileLabel);
     assertOnlyOwnedSections(document, spec.ownedSectionKeys, spec.fileLabel);
-    const entries = spec.collect(document, spec.fileLabel);
-    // The owned sections exist (checked above), so zero entries means they are all empty — a
+    const labels = spec.collectLabels(document, spec.fileLabel);
+    // The owned sections exist (checked above), so zero labels means they are all empty — a
     // mistake, not a no-op, same as a section-less file.
-    if (entries.size === 0) {
+    if (labels.size === 0) {
       throw new Error(`${spec.fileLabel} defines no labeled entries`);
     }
-    assertNoStrayAnchors(document, entries, spec.fileLabel);
-    return { spec, entries, document };
+    assertNoStrayAnchors(document, labels, spec.fileLabel);
+    return { spec, labels };
   });
 
   // Unresolved aliases are not parse errors (they only surface at `toJS`), so the wiring-only main
@@ -377,13 +306,6 @@ export function composeWithSiblings(
   // violation.
   const mainDocument = parseSingleDocument(mainText, "the main config");
   const { anchors: mainAnchors, aliases: mainAliases, presentKeys } = inspectMainDocument(mainDocument);
-
-  // The synthetic overlay key is reserved whenever composition is in play: the strip at the end
-  // always removes it, so a main config using it as a real top-level key would lose that section
-  // silently. Fail clearly instead.
-  if (presentKeys.has(SYNTHETIC_OVERLAY_KEY)) {
-    throw new Error(`the main config uses the reserved top-level key \`${SYNTHETIC_OVERLAY_KEY}:\``);
-  }
 
   // Full delegation: the main config must hold none of the delegated sections.
   for (const { spec } of siblings) {
@@ -399,16 +321,16 @@ export function composeWithSiblings(
   // Per-sibling: no label collides with a main anchor or with another sibling's label; every label is
   // referenced by the main config.
   const seenLabels = new Set<string>();
-  for (const { spec, entries } of collected) {
+  for (const { spec, labels } of collected) {
     rejectLabels(
-      entries.keys(),
+      labels,
       (label) => mainAnchors.has(label),
       `label(s) defined in both the main config and ${spec.fileLabel}`,
     );
-    rejectLabels(entries.keys(), (label) => seenLabels.has(label), `label(s) defined in more than one delegated file`);
-    for (const label of entries.keys()) seenLabels.add(label);
+    rejectLabels(labels, (label) => seenLabels.has(label), `label(s) defined in more than one delegated file`);
+    for (const label of labels) seenLabels.add(label);
     rejectLabels(
-      entries.keys(),
+      labels,
       (label) => !mainAliases.has(label),
       `label(s) in ${spec.fileLabel} are never referenced in the main config`,
     );
@@ -422,88 +344,10 @@ export function composeWithSiblings(
     `the main config references label(s) defined neither in it nor in ${fileLabels}`,
   );
 
-  // Overlays REDEFINE existing sibling values (e.g. an `--overrides` file over `.inputs`). An overlay
-  // deliberately reuses its base's `&label` anchors — so it is exempt from the no-duplicate /
-  // referenced-in-main invariants above — but must instead only redefine labels the base defines,
-  // keep each label's section, and change every value. Their anchors are emitted (in one synthetic
-  // block) after every sibling, so the main aliases resolve to the override by most-recent-preceding.
-  const overlayDocuments: YAML.Document[] = [];
-  const overlayLabels: string[][] = [];
-  const overlaySeen = new Set<string>();
-  for (const { text, spec } of overlays) {
-    const document = parseSingleDocument(text, spec.fileLabel);
-    // The overlay shares its base's shape, so the base's sections and collector validate it —
-    // `fileLabel` still targets any error at this file.
-    assertOnlyOwnedSections(document, spec.baseSpec.ownedSectionKeys, spec.fileLabel);
-    const entries = spec.baseSpec.collect(document, spec.fileLabel);
-    // An overlay whose sections are all empty applies zero overrides — a mistake, not a no-op: the
-    // caller passed it explicitly to change values.
-    if (entries.size === 0) {
-      throw new Error(`${spec.fileLabel} defines no overrides`);
-    }
-    assertNoStrayAnchors(document, entries, spec.fileLabel);
-    const overlayLabelList = [...entries.keys()];
-
-    const base = collected.find(({ spec: siblingSpec }) => siblingSpec === spec.baseSpec);
-    if (!base) {
-      throw new Error(`${spec.fileLabel} needs ${spec.baseSpec.fileLabel} to override, but it is not present`);
-    }
-    // The base sibling was already validated and collected above with the same collector, so reuse
-    // those entries rather than traversing the base document a second time.
-    const baseEntries = base.entries;
-
-    // An override may neither introduce a new label nor redefine one already taken by another overlay.
-    rejectLabels(
-      entries.keys(),
-      (label) => !baseEntries.has(label),
-      `label(s) in ${spec.fileLabel} are not defined in ${spec.baseSpec.fileLabel} (overrides cannot introduce new labels)`,
-    );
-    rejectLabels(
-      entries.keys(),
-      (label) => overlaySeen.has(label),
-      `label(s) overridden by more than one overrides file`,
-    );
-    for (const label of entries.keys()) overlaySeen.add(label);
-
-    // A label must keep the section its base used: a move would change its kind and (for an
-    // `externals` address moved to `config`) silently drop the address check.
-    const moved = overlayLabelList.filter((label) => entries.get(label)?.section !== baseEntries.get(label)?.section);
-    if (moved.length > 0) {
-      throw new Error(
-        `override(s) in ${spec.fileLabel} placed under a different section than ${spec.baseSpec.fileLabel}: ` +
-          moved
-            .map(
-              (label) => `&${label} (\`${entries.get(label)?.section}:\` vs \`${baseEntries.get(label)?.section}:\`)`,
-            )
-            .join(", "),
-      );
-    }
-
-    // An override must CHANGE the value (a no-op is a mistake). Compare the reviver-normalized value
-    // so a format-only change (`560048` vs `"560048"`) and a same-order array are caught, while a
-    // genuine reorder (`[1,2]` -> `[2,1]`) is allowed.
-    const canonical = (value: unknown) => JSON.stringify(value ?? null);
-    const noop = overlayLabelList.filter(
-      (label) => canonical(entries.get(label)?.value) === canonical(baseEntries.get(label)?.value),
-    );
-    if (noop.length > 0) {
-      throw new Error(
-        `no-op override(s) in ${spec.fileLabel} — value unchanged from ${spec.baseSpec.fileLabel}: ` +
-          noop.map((label) => `&${label}`).join(", "),
-      );
-    }
-
-    overlayDocuments.push(document);
-    overlayLabels.push(overlayLabelList);
-  }
-
   // No trimming beyond a guaranteed line break between files: stripping trailing whitespace would
-  // corrupt a keep-chomped block scalar (`|+`) whose trailing newlines are significant. All overlay
-  // anchors go in one block after every sibling (hence after their base) and before the main aliases.
-  const overlayText = overlayDocuments.length > 0 ? buildOverlaySyntheticText(overlayDocuments) : null;
+  // corrupt a keep-chomped block scalar (`|+`) whose trailing newlines are significant.
   const parts: CombinedPart[] = [
     ...siblings.map(({ text, spec }) => ({ label: spec.fileLabel, text: stripDocumentMarkers(text) })),
-    ...(overlayText === null ? [] : [{ label: "the overrides anchor block", text: overlayText }]),
     { label: "the main config", text: stripDocumentMarkers(mainText) },
   ].map(({ label, text }) => ({ label, text: text.endsWith("\n") ? text : `${text}\n` }));
   const combinedText = parts.map(({ text }) => text).join("");
@@ -518,19 +362,9 @@ export function composeWithSiblings(
     );
   }
 
-  // Drop the synthetic overlay wrapper so the composed document is identical to a sibling-only one.
-  // (The base sections keep their original values in the composed document — anchor re-binding is
-  // positional, not retroactive; only the alias sites resolve to the overrides. Nothing reads those
-  // sections' values after composition.)
-  const document = combinedDocument.toJS({ reviver: yamlBigintReviver });
-  if (document && typeof document === "object") {
-    delete (document as Record<string, unknown>)[SYNTHETIC_OVERLAY_KEY];
-  }
-
   return {
-    document,
-    labels: collected.map(({ entries }) => [...entries.keys()]),
-    overlayLabels,
+    document: combinedDocument.toJS({ reviver: yamlBigintReviver }),
+    labels: collected.map(({ labels }) => [...labels]),
   };
 }
 
@@ -554,30 +388,24 @@ export function configDelegatesAnchors(configPath: string): boolean {
   return [...aliases].some((alias) => !anchors.has(alias));
 }
 
-/** Read the main config, each sibling, and each overlay, then compose them, exiting on any failure. */
+/** Read the main config and each sibling, then compose them, exiting on any failure. */
 export function loadStateWithSiblings(
   configPath: string,
   siblings: { path: string; spec: SiblingSpec }[],
-  overlays: { path: string; spec: OverlaySpec }[] = [],
 ): ComposeResult {
   let mainText: string;
   let siblingTexts: { text: string; spec: SiblingSpec }[];
-  let overlayTexts: { text: string; spec: OverlaySpec }[];
   try {
     mainText = fs.readFileSync(path.resolve(configPath), "utf8");
     siblingTexts = siblings.map(({ path: siblingPath, spec }) => ({
       text: fs.readFileSync(path.resolve(siblingPath), "utf8"),
       spec,
     }));
-    overlayTexts = overlays.map(({ path: overlayPath, spec }) => ({
-      text: fs.readFileSync(path.resolve(overlayPath), "utf8"),
-      spec,
-    }));
   } catch (error) {
     return logErrorAndExit(`Failed to read config files:\n${printError(error)}`);
   }
   try {
-    return composeWithSiblings(mainText, siblingTexts, overlayTexts);
+    return composeWithSiblings(mainText, siblingTexts);
   } catch (error) {
     return logErrorAndExit(printError(error));
   }
