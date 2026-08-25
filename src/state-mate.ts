@@ -19,11 +19,19 @@ import {
 } from "./abi-provider";
 import { doGenerateBoilerplate } from "./boilerplate-generator";
 import { parseCommandLineArguments } from "./cli-parser";
-import { printError, readUrlOrFromEnvironment } from "./common";
+import { printError, readUrlOrFromEnvironment, YAML_PARSE_OPTIONS, YAML_TO_JS_OPTIONS } from "./common";
+import { DEPLOYED_SPEC } from "./deployed-addresses";
 import { loadContractInfoFromExplorer } from "./explorer-provider";
+import { INPUTS_SPEC } from "./inputs";
 import { FAILURE_MARK, log, logError, logErrorAndExit, logHeader1, SUCCESS_MARK, WARNING_MARK } from "./logger";
 import { g_error_details, g_errors, g_total_checks } from "./section-validators/base";
 import { ContractSectionValidator } from "./section-validators/contract";
+import {
+  configDelegatesAnchors,
+  loadStateWithSiblings,
+  resolveSiblingFilePath,
+  SiblingSpec,
+} from "./sibling-delegation";
 import {
   EntireDocument,
   EntireDocumentTB,
@@ -68,19 +76,89 @@ function formatAjvErrors(errors: ValidateFunction["errors"]) {
 }
 
 function loadStateFromYaml(configPath: string): unknown {
-  const reviver = (_: unknown, v: unknown) => {
-    return typeof v === "bigint" ? String(v) : v;
-  };
   const file = path.resolve(configPath);
   try {
     const configContent = fs.readFileSync(file, "utf8");
 
-    // maxAliasCount guards against alias-based resource exhaustion in untrusted input;
-    // our configs are first-party and the large ones legitimately exceed the default budget
-    return YAML.parse(configContent, reviver, { schema: "core", intAsBigInt: true, maxAliasCount: -1 });
+    return YAML.parse(configContent, { ...YAML_PARSE_OPTIONS, ...YAML_TO_JS_OPTIONS });
   } catch (error) {
     logErrorAndExit(`Failed to convert the YAML file ${chalk.magenta(configPath)} to JSON:\n${printError(error)}`);
   }
+}
+
+// Load the main config, composing it with separate `.deployed` and/or `.inputs` sibling files when
+// `--deployed`/`--inputs` names them — they are never loaded automatically. Both may be in play at
+// once. Sibling files are incompatible with `--generate`, which operates on a seed document.
+type SelectedSibling = { path: string; spec: SiblingSpec; noun: string };
+
+// Inline `config:`/`externals:` sections would bypass every `.inputs` invariant (`&label` anchors,
+// the address check on externals). The schema must list those keys for composed documents, so the
+// rejection lives here: they are legal only when delegated from a `.inputs` file.
+function rejectInlineInputsSections(document: unknown): unknown {
+  if (typeof document === "object" && document !== null) {
+    const inline = INPUTS_SPEC.ownedSectionKeys.filter((key) => Object.hasOwn(document, key));
+    if (inline.length > 0) {
+      logErrorAndExit(
+        `${chalk.magenta(g_Arguments.configPath)} holds top-level ${inline.map((key) => `\`${key}:\``).join(" / ")} ` +
+          `section(s) inline; they are only allowed in ${INPUTS_SPEC.fileLabel}, ` +
+          `selected with \`${INPUTS_SPEC.optionName} <path>\``,
+      );
+    }
+  }
+  return document;
+}
+
+function loadStateWithOptionalSiblings(): unknown {
+  const siblings: SelectedSibling[] = [];
+  const siblingKinds: { spec: SiblingSpec; argument: string | undefined; noun: string }[] = [
+    { spec: DEPLOYED_SPEC, argument: g_Arguments.deployed, noun: "deployed address(es)" },
+    { spec: INPUTS_SPEC, argument: g_Arguments.inputs, noun: "input anchor(s)" },
+  ];
+  try {
+    for (const { spec, argument, noun } of siblingKinds) {
+      // Explicit-only: a sibling file is applied when — and only when — its flag names it. A
+      // same-named file next to the main config is never picked up on its own.
+      const siblingPath = resolveSiblingFilePath(spec, argument);
+      if (siblingPath) {
+        siblings.push({ path: siblingPath, spec, noun });
+      }
+    }
+  } catch (error) {
+    logErrorAndExit(printError(error));
+  }
+
+  if (g_Arguments.generate) {
+    for (const { path: ignoredPath } of siblings) {
+      log(`${WARNING_MARK} Ignoring ${chalk.yellow(path.relative(process.cwd(), ignoredPath))} with --generate`);
+    }
+  }
+
+  if (siblings.length === 0 || g_Arguments.generate) {
+    // A wiring-only main config cannot be parsed without the sibling anchors it delegates to — fail
+    // with a clear message instead of the raw "Unresolved alias" parse error below. With no sibling
+    // in play this is the usual cause: the flag that names it was simply omitted.
+    if (configDelegatesAnchors(g_Arguments.configPath)) {
+      logErrorAndExit(
+        g_Arguments.generate
+          ? `${chalk.magenta(g_Arguments.configPath)} delegates anchors to sibling file(s), so it cannot be ` +
+              `parsed standalone — --generate works on self-contained (seed) configs only`
+          : `${chalk.magenta(g_Arguments.configPath)} delegates anchors to sibling file(s) — pass ` +
+              `${DEPLOYED_SPEC.optionName} / ${INPUTS_SPEC.optionName} with the file(s) defining them ` +
+              `(sibling files are never loaded automatically)`,
+      );
+    }
+    // The inline-sections rejection applies on every non-composed load path, these ones included.
+    return rejectInlineInputsSections(loadStateFromYaml(g_Arguments.configPath));
+  }
+
+  const { document, labels } = loadStateWithSiblings(
+    g_Arguments.configPath,
+    siblings.map(({ path: siblingPath, spec }) => ({ path: siblingPath, spec })),
+  );
+  for (const [index, { path: siblingPath, noun }] of siblings.entries()) {
+    log(`Loaded ${labels[index].length} ${noun} from ${chalk.yellow(path.relative(process.cwd(), siblingPath))}`);
+  }
+  return siblings.some(({ spec }) => spec === INPUTS_SPEC) ? document : rejectInlineInputsSections(document);
 }
 
 function validateJsonWithSchema<T extends TSchema>(
@@ -243,7 +321,7 @@ async function main() {
     renameAllAbiToLowerCase();
   }
 
-  const jsonDocument = loadStateFromYaml(g_Arguments.configPath);
+  const jsonDocument = loadStateWithOptionalSiblings();
 
   if (g_Arguments.generate) {
     if (validateJsonWithSchema(jsonDocument, EntireDocumentTB, { silent: true })) {

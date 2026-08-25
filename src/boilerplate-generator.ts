@@ -8,7 +8,7 @@ import { Contract, JsonRpcProvider } from "ethers";
 import * as YAML from "yaml";
 
 import { loadAbiFromFile } from "./abi-provider";
-import { getNonMutables, readUrlOrFromEnvironment, EntryField, printError } from "./common";
+import { getNonMutables, readUrlOrFromEnvironment, EntryField, printError, getDeployedSectionScalars } from "./common";
 import { collectStaticCallResults, loadContract, loadContractInfoFromExplorer } from "./explorer-provider";
 import { logErrorAndExit, log, logError } from "./logger";
 import { g_Arguments as g_Arguments } from "./state-mate";
@@ -146,7 +146,7 @@ async function _iterateDeployedAddresses<T extends EntireDocument | SeedDocument
       const { explorerHostname, explorerTokenEnv } = explorerSection;
       const rpcUrl = readUrlOrFromEnvironment(explorerSection.rpcUrl);
       const explorerKey = explorerTokenEnv ? process.env[explorerTokenEnv] : "";
-      const scalars: YAML.Scalar[] = _getScalarsWithAnchors(seedDocument, explorerSectionKey);
+      const scalars: YAML.Scalar[] = getDeployedSectionScalars(seedDocument, explorerSectionKey);
       for (const address of addresses) {
         const deployedNode = scalars.find((scalar) => {
           return (scalar.value as string) === address;
@@ -167,16 +167,6 @@ async function _iterateDeployedAddresses<T extends EntireDocument | SeedDocument
       }
     }
   }
-}
-
-function _getScalarsWithAnchors(document: YAML.Document, explorerSectionKey: string): YAML.Scalar[] {
-  const section = document.getIn(["deployed", explorerSectionKey]);
-
-  if (YAML.isSeq(section) && section.items.every((element) => YAML.isScalar(element))) {
-    return section.items;
-  }
-
-  return [];
 }
 
 async function _makeBoilerplateForAllNonMutableFunctions(abi: Abi, contract: Contract) {

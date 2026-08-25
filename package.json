@@ -23,6 +23,7 @@
     "format:fix": "prettier . --ignore-path .gitignore --ignore-path .prettierignore --write",
     "postinstall": "husky",
     "test": "ts-node src/test-util/app.ts",
+    "test:unit": "node --test --require ts-node/register src/test-util/*.test.ts",
     "schemas": "ts-node src/gen-schemas.ts"
   },
   "lint-staged": {
