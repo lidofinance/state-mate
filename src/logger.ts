@@ -88,10 +88,6 @@ export function logFinalStatus(message: string, isSuccess: boolean, isLast: bool
   itemPrefix = "";
 }
 
-export function logWarningStatus(message: string) {
-  log(`${TREE_LAST} ${WARNING_MARK} ${message}`);
-}
-
 export function log(argument: unknown) {
   console.log(argument);
 }

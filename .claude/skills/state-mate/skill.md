@@ -48,7 +48,7 @@ eoa: # named EOAs (deployer, signer addresses); useful for "deployer renounced" 
 
 l1: # per-chain section — literal key name, not the chain's own name
   rpcUrl: ETH_RPC_URL # env-var name, or inline URL
-  explorerHostname: api.etherscan.io/v2/api
+  explorerHostname: api.etherscan.io
   explorerTokenEnv: ETHERSCAN_TOKEN
   chainId: 1 # number or string
   contracts:
@@ -391,7 +391,7 @@ yarn start config.yml --quiet                             # failures and totals 
 ## Best practices
 
 - **Named anchors for addresses** — define every address in `deployed:` / `eoa:`; don't hardcode `0x…` inside `checks:` values. Inline hex is fine for **data** (bytes32 constants, selectors).
-- **Anchor naming** — addresses are `lowerCamelCase` (`lidoLocator`, `multisigOwner1`; version suffixes keep underscores: `safeSingleton_1_3_0`). Constants are `UPPER_SNAKE`: bytes32 roles and slots, numeric parameters (`MAX_GROUP_SHARE_LIMIT`), hex blobs (`CSM_SET_MERKLE_GATE_TREE_PERMISSIONS`), strings. Sentinel addresses count as constants and stay upper: `ZERO_ADDRESS`, `DEAD_ADDRESS`, `ETH` (`0xEeee…`), `DEFAULT_TIER_OPERATOR` (`0xFFfF…`).
+- **Anchor naming** — addresses are `lowerCamelCase` (`protocolLocator`, `multisigOwner1`; version suffixes keep underscores: `safeSingleton_1_3_0`). Constants are `UPPER_SNAKE`: bytes32 roles and slots, numeric parameters (`MAX_GROUP_SHARE_LIMIT`), hex blobs (`MERKLE_TREE_PERMISSIONS`), strings. Sentinel addresses count as constants and stay upper: `ZERO_ADDRESS`, `DEAD_ADDRESS`, `ETH` (`0xEeee…`), `DEFAULT_TIER_OPERATOR` (`0xFFfF…`).
 - **Role hashes live in `roles:`** — every `*_ROLE` bytes32 goes to the `roles:` section, not `misc:`/`parameters:`; `DEFAULT_ADMIN_ROLE` first, the rest grouped per contract under a `# --- Roles: <contract> ---` header.
 - **Deployer renounced** — confirm `deployer` is not a role holder (not in any `ozAcl` list; `hasRole(…, deployer) = false`).
 - **Empty roles are explicit** — list unused roles with `[]` so a future grant is caught.
