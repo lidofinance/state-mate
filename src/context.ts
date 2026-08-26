@@ -30,6 +30,8 @@ export const context = {
 
 export const stats = {
   totalChecks: 0,
+  // Methods the config left as null: counted apart from totalChecks, which must mean "verified"
+  skipped: 0,
   errors: 0,
   errorDetails: [] as ErrorDetail[],
 };
@@ -37,6 +39,7 @@ export const stats = {
 // Needed when running multiple configs in one process (directory mode)
 export function resetStats(): void {
   stats.totalChecks = 0;
+  stats.skipped = 0;
   stats.errors = 0;
   stats.errorDetails.length = 0;
 }

@@ -217,6 +217,14 @@ export async function checkProxyAdminOwner(provider: JsonRpcProvider, contractEn
   const logHandle = new LogCommand("proxyAdminOwner");
 
   const adminSlot = await readSlotWord(provider, address, EIP1967_ADMIN_SLOT);
+  // An unanswered read proves nothing about the proxy: a throttled or failing provider must not
+  // be reported as a proxy that keeps no admin
+  if (adminSlot.failed) {
+    const message = `the admin slot of ${address} could not be read, so nothing was verified; retry`;
+    logHandle.failure(message);
+    incErrors(message);
+    return;
+  }
   const admin = addressFromWord(adminSlot.word);
   if (!admin) {
     const message = `${address} keeps no admin in the EIP-1967 slot, so it has no ProxyAdmin to own`;

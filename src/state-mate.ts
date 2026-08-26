@@ -128,9 +128,12 @@ async function doChecks(jsonDocument: EntireDocument) {
   // Show final summary (outside the tree)
   log(""); // Separator line
   const statusMark = stats.errors ? FAILURE_MARK : SUCCESS_MARK;
+  // The skip count rides on the summary line so that --quiet, which hides the per-method notes,
+  // still says how much of the config went unverified
+  const skippedNote = stats.skipped ? `, ${chalk.yellow(`${stats.skipped} skipped`)}` : "";
   const statusMessage = stats.errors
-    ? `${stats.totalChecks} checks, ${chalk.red(`${stats.errors} errors`)}`
-    : `${stats.totalChecks} checks passed`;
+    ? `${stats.totalChecks} checks, ${chalk.red(`${stats.errors} errors`)}${skippedNote}`
+    : `${stats.totalChecks} checks passed${skippedNote}`;
   log(`${statusMark} ${chalk.bold("Total:")} ${statusMessage}`);
 
   if (context.checkOnly) {

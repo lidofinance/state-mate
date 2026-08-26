@@ -44,6 +44,19 @@ async function captureExit(callback: () => Promise<unknown>): Promise<string | u
   return undefined;
 }
 
+// The explorer failures these tests provoke are meant to warn; capturing the warning both asserts
+// it and keeps the raw bytes out of the stdout stream the runner frames its own events on
+async function captureLog<T>(callback: () => Promise<T>): Promise<{ lines: string[]; result: T }> {
+  const originalLog = console.log;
+  const lines: string[] = [];
+  console.log = (...parts: unknown[]) => void lines.push(parts.map(String).join(" "));
+  try {
+    return { lines, result: await callback() };
+  } finally {
+    console.log = originalLog;
+  }
+}
+
 function mockExplorerResponse(body: unknown) {
   return mock.method(globalThis, "fetch", async () => {
     return { ok: true, json: async () => body } as Response;
@@ -77,9 +90,15 @@ describe("verifyChainIdWithExplorer", () => {
     // would hit the memo and prove nothing
     const fetchMock = mockExplorerResponse({ status: "0", message: "NOTOK", result: "Invalid API URL" });
     try {
-      const message = await captureExit(() => verifyChainIdWithExplorer("api.unanswered.blockscout.example", "56"));
+      const { lines, result: message } = await captureLog(() =>
+        captureExit(() => verifyChainIdWithExplorer("api.unanswered.blockscout.example", "56")),
+      );
       assert.equal(message, undefined);
       assert.ok(fetchMock.mock.calls.length > 0, "the probe must actually run");
+      assert.ok(
+        lines.some((line) => line.includes("api.unanswered.blockscout.example")),
+        "the unverified chain must be reported",
+      );
     } finally {
       fetchMock.mock.restore();
     }
@@ -280,11 +299,17 @@ describe("loadContractInfo", () => {
       } as Response;
     });
     try {
-      assert.equal(await loadContractInfo(ADDRESS, "api.etherscan.io", "", 1), undefined);
+      const skipped = await captureLog(() => loadContractInfo(ADDRESS, "api.etherscan.io", "", 1));
+      assert.equal(skipped.result, undefined);
       assert.equal(calls, 2, "the retry is bounded to one extra attempt");
-      const retried = await loadContractInfo(ADDRESS, "api.etherscan.io", "", 1);
-      assert.equal(retried?.contractName, "Lido");
+      assert.ok(
+        skipped.lines.some((line) => line.includes(ADDRESS)),
+        "the skipped address must be named",
+      );
+      const retried = await captureLog(() => loadContractInfo(ADDRESS, "api.etherscan.io", "", 1));
+      assert.equal(retried.result?.contractName, "Lido");
       assert.equal(calls, 3);
+      assert.deepEqual(retried.lines, [], "a recovered address must not warn");
     } finally {
       fetchMock.mock.restore();
     }
@@ -366,14 +391,22 @@ describe("loadContractInfo", () => {
       });
       mock.timers.enable({ apis: ["setTimeout"] });
       try {
-        const pending = loadContractInfo(ADDRESS, "api.etherscan.io", "", 1);
-        for (let round = 0; round < 8; round++) {
-          await new Promise((resolve) => setImmediate(resolve));
-          mock.timers.tick(7000);
-        }
-        const info = await pending;
+        const { lines, result: info } = await captureLog(async () => {
+          const pending = loadContractInfo(ADDRESS, "api.etherscan.io", "", 1);
+          for (let round = 0; round < 8; round++) {
+            await new Promise((resolve) => setImmediate(resolve));
+            mock.timers.tick(7000);
+          }
+          return pending;
+        });
         assert.ok(calls <= 2, `${scenario.name}: ${calls} fetches`);
         assert.equal(info?.contractName, scenario.recovers ? "Lido" : undefined, scenario.name);
+        // every scenario opens with a failure, so silence would mean the warning was lost
+        assert.ok(lines.length > 0, scenario.name);
+        assert.ok(
+          lines.every((line) => line.includes(ADDRESS)),
+          scenario.name,
+        );
       } finally {
         mock.timers.reset();
         fetchMock.mock.restore();
@@ -391,13 +424,20 @@ describe("loadContractInfo", () => {
     });
     mock.timers.enable({ apis: ["setTimeout"] });
     try {
-      const pending = loadContractInfo(ADDRESS, "api.etherscan.io", "", 1);
-      for (let round = 0; round < 8; round++) {
-        await new Promise((resolve) => setImmediate(resolve));
-        mock.timers.tick(7000);
-      }
-      assert.equal(await pending, undefined);
+      const { lines, result } = await captureLog(async () => {
+        const pending = loadContractInfo(ADDRESS, "api.etherscan.io", "", 1);
+        for (let round = 0; round < 8; round++) {
+          await new Promise((resolve) => setImmediate(resolve));
+          mock.timers.tick(7000);
+        }
+        return pending;
+      });
+      assert.equal(result, undefined);
       assert.equal(calls, 2);
+      assert.ok(
+        lines.some((line) => line.includes("429")),
+        "the rate limit must be reported",
+      );
     } finally {
       mock.timers.reset();
       fetchMock.mock.restore();
@@ -415,8 +455,10 @@ describe("loadContractInfo", () => {
       } as Response;
     });
     try {
-      assert.equal(await loadContractInfo(ADDRESS, "api.etherscan.io", "", 1), undefined);
+      const { lines, result } = await captureLog(() => loadContractInfo(ADDRESS, "api.etherscan.io", "", 1));
+      assert.equal(result, undefined);
       assert.equal(calls, 1);
+      assert.equal(lines.length, 1, "one final answer deserves one warning");
     } finally {
       fetchMock.mock.restore();
     }
@@ -440,15 +482,21 @@ describe("loadContractInfo", () => {
     });
     mock.timers.enable({ apis: ["setTimeout"] });
     try {
-      const pending = loadContractInfo(ADDRESS, "api.etherscan.io", "", 1);
-      // fire the retry back-off and the paced request slots as they get scheduled
-      for (let round = 0; round < 8; round++) {
-        await new Promise((resolve) => setImmediate(resolve));
-        mock.timers.tick(7000);
-      }
-      const info = await pending;
+      const { lines, result: info } = await captureLog(async () => {
+        const pending = loadContractInfo(ADDRESS, "api.etherscan.io", "", 1);
+        // fire the retry back-off and the paced request slots as they get scheduled
+        for (let round = 0; round < 8; round++) {
+          await new Promise((resolve) => setImmediate(resolve));
+          mock.timers.tick(7000);
+        }
+        return pending;
+      });
       assert.equal(info?.contractName, "Lido");
       assert.equal(calls, 2);
+      assert.ok(
+        lines.some((line) => line.includes("429")),
+        "the retried rate limit must still be reported",
+      );
     } finally {
       mock.timers.reset();
       fetchMock.mock.restore();

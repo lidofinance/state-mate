@@ -23,6 +23,7 @@ import { Abi, AbiArgumentsLength, ChainId } from "src/types";
 // Per-contract counters
 let contractErrors: number = 0;
 let contractChecks: number = 0;
+let contractSkipped: number = 0;
 
 let currentErrorContext: Partial<ErrorDetail> = {};
 
@@ -37,10 +38,11 @@ export function clearErrorContext(): void {
 export function resetContractCounters(): void {
   contractErrors = 0;
   contractChecks = 0;
+  contractSkipped = 0;
 }
 
-export function getContractStats(): { checks: number; errors: number } {
-  return { checks: contractChecks, errors: contractErrors };
+export function getContractStats(): { checks: number; errors: number; skipped: number } {
+  return { checks: contractChecks, errors: contractErrors, skipped: contractSkipped };
 }
 
 export function incErrors(errorMessage?: string): void {
@@ -61,6 +63,11 @@ export function incErrors(errorMessage?: string): void {
 export function incChecks(): void {
   stats.totalChecks += 1;
   contractChecks += 1;
+}
+
+export function incSkipped(): void {
+  stats.skipped += 1;
+  contractSkipped += 1;
 }
 
 export enum CheckLevel {
@@ -101,7 +108,6 @@ export abstract class SectionValidatorBase {
   }
 
   protected async _checkViewFunction(contract: Contract, method: string, staticCallCheck: StaticCallCheck) {
-    incChecks();
     if (isTypeOfTB(staticCallCheck, StaticCallResultTB)) {
       await this._checkViewResult(contract, method, staticCallCheck);
     } else if (isTypeOfTB(staticCallCheck, StaticCallMustRevertTB)) {
@@ -113,9 +119,11 @@ export abstract class SectionValidatorBase {
 
   protected async _checkViewResult(contract: Contract, method: string, staticCallResult: StaticCallResult) {
     if (staticCallResult.result === null) {
+      incSkipped();
       logMethodSkipped(method);
       return;
     }
+    incChecks();
 
     const { args, result: expected, signature = method } = staticCallResult;
 
@@ -144,6 +152,7 @@ export abstract class SectionValidatorBase {
   }
 
   protected async _checkViewMustRevert(contract: Contract, method: string, staticCallMustRevert: StaticCallMustRevert) {
+    incChecks();
     const { args, signature = method } = staticCallMustRevert;
 
     const argumentsString = args ? `(${args.toString()})` : "";

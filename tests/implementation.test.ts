@@ -420,6 +420,17 @@ describe("checkProxyAdminOwner", () => {
     assert.match(stats.errorDetails[0].message, /no admin in the EIP-1967 slot/);
   });
 
+  it("separates an unreadable admin slot from a proxy that keeps no admin", async () => {
+    const { provider } = stubProvider({ slotErrors: { [ADMIN_SLOT]: new Error("missing revert data") } });
+
+    await checkProxyAdminOwner(provider, adminOwnerEntry(OWNER_ADDRESS));
+
+    assert.equal(stats.errors, 1);
+    const { message } = stats.errorDetails[0];
+    assert.match(message, /could not be read/);
+    assert.doesNotMatch(message, /no admin in the EIP-1967 slot/);
+  });
+
   it("points at a storage check when the admin does not answer owner()", async () => {
     const { provider } = stubProvider({
       calls: { [PROXY_ADMIN_ADDRESS.toLowerCase()]: new Error("execution reverted") },
