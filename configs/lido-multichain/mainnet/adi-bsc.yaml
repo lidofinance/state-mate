@@ -78,6 +78,7 @@ l1:
       address: *ethCCC
       proxyName: TransparentUpgradeableProxy
       implementation: *ethCCCImp
+      proxyAdmin: "0xADD673dC6A655AFD6f38fB88301028fA31A6fDeE"
       proxyAdminOwner: *ethDaoAgent
       proxyChecks: {}
       checks:
@@ -252,6 +253,7 @@ l2:
       address: *bnbCCC
       proxyName: TransparentUpgradeableProxy
       implementation: *bnbCCCImp
+      proxyAdmin: "0x29E6817db339795766244B96aEf5Dc534a98518d"
       proxyAdminOwner: *bnbCCE
       proxyChecks: {}
       checks:

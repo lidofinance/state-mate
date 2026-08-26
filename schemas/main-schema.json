@@ -1498,6 +1498,11 @@
                       "pattern": "^(0x[a-fA-F0-9]{40}|0x[a-fA-F0-9]{64}|.+)$",
                       "type": "string"
                     },
+                    "proxyAdmin": {
+                      "format": "ethereum-string",
+                      "pattern": "^(0x[a-fA-F0-9]{40}|0x[a-fA-F0-9]{64}|.+)$",
+                      "type": "string"
+                    },
                     "proxyAdminOwner": {
                       "format": "ethereum-string",
                       "pattern": "^(0x[a-fA-F0-9]{40}|0x[a-fA-F0-9]{64}|.+)$",
@@ -3681,6 +3686,11 @@
                       "type": "string"
                     },
                     "implementation": {
+                      "format": "ethereum-string",
+                      "pattern": "^(0x[a-fA-F0-9]{40}|0x[a-fA-F0-9]{64}|.+)$",
+                      "type": "string"
+                    },
+                    "proxyAdmin": {
                       "format": "ethereum-string",
                       "pattern": "^(0x[a-fA-F0-9]{40}|0x[a-fA-F0-9]{64}|.+)$",
                       "type": "string"

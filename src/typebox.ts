@@ -181,6 +181,7 @@ export const ProxyContractEntryTB = Type.Readonly(
       ...RegularContractEntryTB.properties,
       proxyName: Type.String(),
       implementation: Type.Optional(EthereumStringTB),
+      proxyAdmin: Type.Optional(EthereumStringTB),
       proxyAdminOwner: Type.Optional(EthereumStringTB),
       proxyChecks: Type.Optional(Type.Union([ProxyChecksTB, Sr2ProxyChecksTB, AragonProxyChecksTB])),
       implementationChecks: ImplementationChecksTB,
