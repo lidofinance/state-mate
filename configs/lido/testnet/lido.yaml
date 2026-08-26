@@ -149,6 +149,11 @@ deployed:
     - &lidoTemplate "0xEC39F7ea18BC1c1bf3C0617fb6110dfC62d1e888"
 
 misc:
+  - &cs02Module "0xbb7dd81FAC80f3Effa10eA8b973c15AE65a4CAf9"
+  - &cs02Accounting "0x04A0294bF3306532309D7DD776D4A7eF502313e0"
+  - &cs02FeeOracle "0x9B8bBA11bbE1a351CC8dD1CFCa6719FF7274A208"
+  - &cs02Verifier "0xFdE0FD9aDa4E898D3b34Dd4EA3433b75f0B6dd30"
+  - &cs02Ejector "0xf8a71C08DBe7D2efaD76D3951a3065B8cE20e4f0"
   - &topUpGatewayDelegationOwner "0xff513731aAc4ceaa1239Cf6fEe824b7536B6D25c"
   - &pinnedBeaconProxy "0x3e144aEd003b5AE6953A99B78dD34154CF3F8c76"
   - &apmRegistryFactoryRegistryBase "0x13f43DCe264695D4118Cbc8Adb8691ABaEa0562d"
@@ -290,7 +295,7 @@ misc:
 
   # --- Contract versions/counts ---
   - &STAKING_ROUTER_VERSION 4
-  - &STAKING_MODULES_COUNT 5
+  - &STAKING_MODULES_COUNT 6
   - &BURNER_VERSION 1
 
   # --- Misc Limits ---
@@ -1131,7 +1136,7 @@ l1:
         supportsInterface: null
       ozAcl:
         *DEFAULT_ADMIN_ROLE : [*aragonAgent]
-        *REQUEST_BURN_MY_STETH_ROLE : [*csAccounting, *curatedAccounting]
+        *REQUEST_BURN_MY_STETH_ROLE : [*csAccounting, *curatedAccounting, *cs02Accounting]
         *REQUEST_BURN_SHARES_ROLE : [*accounting]
       implementationChecks:
         DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
@@ -3953,6 +3958,11 @@ l1:
           - *curatedFeeOracle
           - *curatedVerifier
           - *curatedEjector
+          - *cs02Module
+          - *cs02Accounting
+          - *cs02FeeOracle
+          - *cs02Verifier
+          - *cs02Ejector
         getPauser:
           - args: [*withdrawalQueueERC721]
             result: *circuitBreakerCommittee
@@ -3998,7 +4008,7 @@ l1:
           - args: [*circuitBreakerCommittee]
             result: 6
           - args: [*csmManager]
-            result: 9
+            result: 14
           - args: [*curatedCircuitBreakerPauser]
             result: 5
         isPauserLive:
