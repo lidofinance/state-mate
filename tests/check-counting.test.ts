@@ -7,7 +7,7 @@ import { EntryField } from "../src/common";
 import { resetStats, stats } from "../src/context";
 import { resetContractCounters } from "../src/section-validators/base";
 import { ChecksSectionValidator } from "../src/section-validators/checks";
-import { StaticCallCheck } from "../src/typebox";
+import type { StaticCallCheck } from "../src/typebox";
 
 // A null result never reaches the chain; a mustRevert entry needs a function that reverts
 const CONTRACT = {

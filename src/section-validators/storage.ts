@@ -1,9 +1,9 @@
-import { JsonRpcProvider } from "ethers";
+import type { JsonRpcProvider } from "ethers";
 
 import { EntryField } from "src/common";
-import { logHeader2, LogCommand } from "src/logger";
-import { ContractEntry } from "src/typebox";
-import { ChainId } from "src/types";
+import { LogCommand, logHeader2 } from "src/logger";
+import type { ContractEntry } from "src/typebox";
+import type { ChainId } from "src/types";
 
 import { incChecks, incErrors, SectionValidatorBase, setErrorContext } from "./base";
 
@@ -25,7 +25,7 @@ function normalizeToBytes32(value: string): string {
 
   // For any hex value shorter than 32 bytes, left-pad with zeros
   if (lower.startsWith("0x") && lower.length < 66) {
-    return "0x" + lower.slice(2).padStart(64, "0");
+    return `0x${lower.slice(2).padStart(64, "0")}`;
   }
 
   // Return as-is for non-hex values or unexpected formats

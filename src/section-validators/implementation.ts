@@ -1,9 +1,9 @@
 import chalk from "chalk";
-import { getAddress, JsonRpcProvider } from "ethers";
+import { getAddress, type JsonRpcProvider } from "ethers";
 
 import { context } from "src/context";
 import { LogCommand } from "src/logger";
-import { ContractEntry, isTypeOfTB, ProxyContractEntryTB } from "src/typebox";
+import { type ContractEntry, isTypeOfTB, ProxyContractEntryTB } from "src/typebox";
 
 import { incChecks, incErrors, setErrorContext } from "./base";
 

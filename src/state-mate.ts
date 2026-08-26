@@ -3,8 +3,8 @@ import path from "node:path";
 
 import "dotenv/config";
 
-import { Static, TSchema } from "@sinclair/typebox";
-import Ajv, { ValidateFunction } from "ajv";
+import type { Static, TSchema } from "@sinclair/typebox";
+import Ajv, { type ValidateFunction } from "ajv";
 import addFormats from "ajv-formats";
 import chalk from "chalk";
 import * as YAML from "yaml";
@@ -31,16 +31,16 @@ import {
 import { FAILURE_MARK, log, logError, logErrorAndExit, logHeader1, SUCCESS_MARK, WARNING_MARK } from "./logger";
 import { ContractSectionValidator } from "./section-validators/contract";
 import {
-  EntireDocument,
+  type EntireDocument,
   EntireDocumentTB,
   EthereumStringFormat,
   ExplorerSectionTB,
   isTypeOfTB,
   MaxIntFormat,
-  NetworkSection,
+  type NetworkSection,
   NetworkSectionTB,
 } from "./typebox";
-import { ContractInfo } from "./types";
+import type { ContractInfo } from "./types";
 
 declare global {
   interface BigInt {

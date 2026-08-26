@@ -73,11 +73,16 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: ./.github/actions/setup
 
+      # biome lints and formats the TypeScript and JSON; prettier keeps the YAML and Markdown
       - name: Run linter
         run: yarn lint
 
       - name: Check formatting
         run: yarn format
+
+      # biome has no type-aware rules, so types need their own gate
+      - name: Typecheck
+        run: yarn typecheck
 
   schemas:
     name: Validate Schemas

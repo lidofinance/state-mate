@@ -1,24 +1,24 @@
 import { AssertionError } from "chai";
 import chalk from "chalk";
-import { Contract, JsonRpcProvider, Result } from "ethers";
+import { type Contract, type JsonRpcProvider, Result } from "ethers";
 
 import { loadAbiFromFile } from "src/abi-provider";
-import { EntryField, getNonMutables, printError } from "src/common";
-import { context, ErrorDetail, stats } from "src/context";
+import { type EntryField, getNonMutables, printError } from "src/common";
+import { context, type ErrorDetail, stats } from "src/context";
 import { LogCommand, logError, logErrorAndExit, logMethodSkipped } from "src/logger";
 import {
-  ArbitraryObject,
-  ContractEntry,
+  type ArbitraryObject,
+  type ContractEntry,
   isTypeOfTB,
   ProxyContractEntryTB,
-  StaticCallCheck,
-  StaticCallMustRevert,
+  type StaticCallCheck,
+  type StaticCallMustRevert,
   StaticCallMustRevertTB,
-  StaticCallResult,
+  type StaticCallResult,
   StaticCallResultTB,
-  ViewResult,
+  type ViewResult,
 } from "src/typebox";
-import { Abi, AbiArgumentsLength, ChainId } from "src/types";
+import type { Abi, AbiArgumentsLength, ChainId } from "src/types";
 
 // Per-contract counters
 let contractErrors: number = 0;
@@ -230,7 +230,7 @@ function _assertEqualStruct(expected: null | ArbitraryObject, actual: Result) {
       continue;
     }
     let actualValue: unknown = actualAsObject[field];
-    const errorMessageDetailed = errorMessage + ` but fields "${field}" differ`;
+    const errorMessageDetailed = `${errorMessage} but fields "${field}" differ`;
     if (actualValue instanceof Result && Array.isArray(expectedValue as unknown)) {
       actualValue = actualValue.toArray();
     }

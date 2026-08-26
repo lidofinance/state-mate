@@ -1,12 +1,12 @@
 import assert from "node:assert/strict";
 import { afterEach, beforeEach, describe, it } from "node:test";
 
-import { JsonRpcProvider } from "ethers";
+import type { JsonRpcProvider } from "ethers";
 
 import { context, resetStats, stats } from "../src/context";
 import { resetContractCounters } from "../src/section-validators/base";
 import { checkImplementation, checkProxyAdminOwner } from "../src/section-validators/implementation";
-import { ContractEntry } from "../src/typebox";
+import type { ContractEntry } from "../src/typebox";
 
 const PROXY_ADDRESS = "0xAaAaAAaaAaAAAaaAAaAaaaAAaAAAaaaAaaaaaaa1";
 const IMPL_ADDRESS = "0xBbbBBBbbbBBbbbBbbBbbbbBBbBBbbBbBbbbbbbb2";
@@ -40,7 +40,7 @@ function stubProvider(stub: ProviderStub): { provider: JsonRpcProvider; reads: s
       if (answer instanceof Error) throw answer;
       return answer ?? ZERO_WORD;
     },
-    async getStorage(address: string, slot: string) {
+    async getStorage(_address: string, slot: string) {
       reads.push(`slot:${slot}`);
       const failure = stub.slotErrors?.[slot];
       if (failure) throw failure;

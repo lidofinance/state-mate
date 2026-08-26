@@ -1,7 +1,7 @@
 import chalk from "chalk";
 
 import { logErrorAndExit } from "./logger";
-import { Abi, AbiArgumentsLength as AbiArgumentsLength, ChainId } from "./types";
+import type { Abi, AbiArgumentsLength, ChainId } from "./types";
 
 // Contract entry fields
 export enum EntryField {

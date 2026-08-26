@@ -1,11 +1,11 @@
 import { assert } from "chai";
-import { JsonRpcProvider } from "ethers";
+import type { JsonRpcProvider } from "ethers";
 
 import { EntryField } from "src/common";
 import { loadContract } from "src/explorer";
-import { log, LogCommand, logHeader2, WARNING_MARK } from "src/logger";
-import { ContractEntry } from "src/typebox";
-import { ChainId } from "src/types";
+import { LogCommand, log, logHeader2, WARNING_MARK } from "src/logger";
+import type { ContractEntry } from "src/typebox";
+import type { ChainId } from "src/types";
 
 import { incChecks, incErrors, SectionValidatorBase, setErrorContext } from "./base";
 

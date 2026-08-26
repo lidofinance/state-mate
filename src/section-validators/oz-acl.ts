@@ -1,9 +1,9 @@
-import { JsonRpcProvider, Interface, Contract } from "ethers";
+import { Contract, Interface, type JsonRpcProvider } from "ethers";
 
 import { EntryField } from "src/common";
 import { logError, logHeader2, logSubHeader } from "src/logger";
-import { ContractEntry, StaticCallResult } from "src/typebox";
-import { ChainId } from "src/types";
+import type { ContractEntry, StaticCallResult } from "src/typebox";
+import type { ChainId } from "src/types";
 
 import { SectionValidatorBase } from "./base";
 
@@ -18,7 +18,7 @@ export class OzAclSectionValidator extends SectionValidatorBase {
     super(provider, sectionName, chainId);
   }
 
-  override async validateSection(contractEntry: ContractEntry, contractAlias: string, basePath?: string) {
+  override async validateSection(contractEntry: ContractEntry, _contractAlias: string, basePath?: string) {
     if (!contractEntry.ozAcl) {
       return;
     }

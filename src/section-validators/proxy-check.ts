@@ -1,11 +1,11 @@
-import { Contract, JsonRpcProvider } from "ethers";
+import type { Contract, JsonRpcProvider } from "ethers";
 
 import { loadAbiFromFile } from "src/abi-provider";
 import { EntryField } from "src/common";
 import { loadContract } from "src/explorer";
 import { logErrorAndExit, logHeader2 } from "src/logger";
-import { ChecksEntryValue, ContractEntry, isTypeOfTB, ProxyContractEntryTB, ViewResultTB } from "src/typebox";
-import { ChainId } from "src/types";
+import { type ChecksEntryValue, type ContractEntry, isTypeOfTB, ProxyContractEntryTB, ViewResultTB } from "src/typebox";
+import type { ChainId } from "src/types";
 
 import { CheckLevel, needCheck, SectionValidatorBase } from "./base";
 

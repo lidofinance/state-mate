@@ -1,4 +1,4 @@
-import { JsonFragment } from "ethers";
+import type { JsonFragment } from "ethers";
 
 export type ChainId = number | string | bigint;
 

@@ -22,8 +22,8 @@ import { context, resetStats, stats } from "../src/context";
 import { fetchExplorerChainId } from "../src/explorer";
 import { SectionValidatorBase } from "../src/section-validators/base";
 import * as stateMate from "../src/state-mate";
-import { ContractEntry, EntireDocument } from "../src/typebox";
-import { Abi, ContractInfo } from "../src/types";
+import type { ContractEntry, EntireDocument } from "../src/typebox";
+import type { Abi, ContractInfo } from "../src/types";
 
 const PROXY_ADDRESS = "0xAaAaAAaaAaAAAaaAAaAaaaAAaAAAaaaAaaaaaaa1";
 const IMPL_ADDRESS = "0xBbbBBBbbbBBbbbBbbBbbbbBBbBBbbBbBbbbbbbb2";

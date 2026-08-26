@@ -6,8 +6,8 @@ import chalk from "chalk";
 
 import { normalizeChainId, printError } from "./common";
 import { context } from "./context";
-import { log, LogCommand, logErrorAndExit, WARNING_MARK } from "./logger";
-import { Abi, ChainId, ContractInfo, isValidAbi } from "./types";
+import { LogCommand, log, logErrorAndExit, WARNING_MARK } from "./logger";
+import { type Abi, type ChainId, type ContractInfo, isValidAbi } from "./types";
 
 type StoredAbi = { name: string; abi: Abi };
 

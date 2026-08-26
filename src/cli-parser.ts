@@ -1,7 +1,7 @@
 import { program } from "commander";
 
 import { EntryField } from "./common";
-import { CheckOnly } from "./context";
+import type { CheckOnly } from "./context";
 import { logErrorAndExit } from "./logger";
 
 type CheckOnlyOptionType = null | CheckOnly;

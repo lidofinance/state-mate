@@ -1,17 +1,17 @@
-import { Contract, JsonRpcProvider } from "ethers";
+import type { Contract, JsonRpcProvider } from "ethers";
 
 import { EntryField } from "src/common";
 import { loadContract } from "src/explorer";
 import { logErrorAndExit } from "src/logger";
 import {
   ArrayOfStaticCallCheckTB,
-  ChecksEntryValue,
-  ContractEntry,
+  type ChecksEntryValue,
+  type ContractEntry,
   isTypeOfTB,
   StaticCallCheckTB,
   ViewResultTB,
 } from "src/typebox";
-import { ChainId } from "src/types";
+import type { ChainId } from "src/types";
 
 import { CheckLevel, needCheck, SectionValidatorBase } from "./base";
 

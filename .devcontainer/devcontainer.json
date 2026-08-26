@@ -8,7 +8,7 @@
   "postCreateCommand": "bash .devcontainer/post-create.sh",
   "customizations": {
     "vscode": {
-      "extensions": ["esbenp.prettier-vscode", "dbaeumer.vscode-eslint", "redhat.vscode-yaml"]
+      "extensions": ["biomejs.biome", "esbenp.prettier-vscode", "redhat.vscode-yaml"]
     }
   }
 }

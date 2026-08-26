@@ -1,10 +1,10 @@
-import { JsonRpcProvider } from "ethers";
+import type { JsonRpcProvider } from "ethers";
 
 import { loadAbiFromFile } from "src/abi-provider";
 import { EntryField, getNonMutables } from "src/common";
 import { logHeader2 } from "src/logger";
-import { ContractEntry, isTypeOfTB, ProxyContractEntryTB, RegularChecks } from "src/typebox";
-import { ChainId } from "src/types";
+import { type ContractEntry, isTypeOfTB, ProxyContractEntryTB, type RegularChecks } from "src/typebox";
+import type { ChainId } from "src/types";
 
 import { ChecksSectionValidator } from "./checks";
 
@@ -14,11 +14,13 @@ export class ImplementationChecksSectionValidator extends ChecksSectionValidator
   }
 
   override async validateSection(contractEntry: ContractEntry, contractAlias: string, basePath?: string) {
-    if (!(
-      isTypeOfTB(contractEntry, ProxyContractEntryTB) &&
-      contractEntry.implementation &&
-      contractEntry.implementationChecks
-    )) {
+    if (
+      !(
+        isTypeOfTB(contractEntry, ProxyContractEntryTB) &&
+        contractEntry.implementation &&
+        contractEntry.implementationChecks
+      )
+    ) {
       return;
     }
 

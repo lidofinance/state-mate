@@ -3,7 +3,14 @@ import { Contract, JsonRpcProvider } from "ethers";
 
 import { printError } from "./common";
 import { log, logErrorAndExit, WARNING_MARK } from "./logger";
-import { Abi, ContractInfo, isCommonResponseOkResult, isResponseBad, isResponseOk, isValidAbi } from "./types";
+import {
+  type Abi,
+  type ContractInfo,
+  isCommonResponseOkResult,
+  isResponseBad,
+  isResponseOk,
+  isValidAbi,
+} from "./types";
 
 /** Blockscout instances serve ABIs without a key; etherscan does not. */
 export function explorerNeedsApiKey(explorerHostname: string): boolean {

@@ -3,7 +3,7 @@ import path from "node:path";
 
 import "dotenv/config";
 
-import { TObject } from "@sinclair/typebox";
+import type { TObject } from "@sinclair/typebox";
 import chalk from "chalk";
 
 import { printError } from "./common";

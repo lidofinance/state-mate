@@ -1,4 +1,4 @@
-import { FormatRegistry, Static, TSchema, Type } from "@sinclair/typebox";
+import { FormatRegistry, type Static, type TSchema, Type } from "@sinclair/typebox";
 import { Value } from "@sinclair/typebox/value";
 
 export const EthereumStringFormat = {

@@ -1,10 +1,10 @@
 import chalk from "chalk";
-import { JsonRpcProvider } from "ethers";
+import type { JsonRpcProvider } from "ethers";
 
 import { EntryField } from "src/common";
 import { logFinalStatus, logHeader1, logHeader2 } from "src/logger";
-import { ContractEntry } from "src/typebox";
-import { ChainId } from "src/types";
+import type { ContractEntry } from "src/typebox";
+import type { ChainId } from "src/types";
 
 import {
   CheckLevel,
@@ -12,7 +12,7 @@ import {
   getContractStats,
   needCheck,
   resetContractCounters,
-  SectionValidatorBase,
+  type SectionValidatorBase,
   setErrorContext,
 } from "./base";
 import { ChecksSectionValidator } from "./checks";
