@@ -61,8 +61,8 @@ misc:
 
   # --- Multisig thresholds ---
   - &PROXY_ADMIN_THRESHOLD 5
-  - &LAZY_VAULT_ADMIN_THRESHOLD 1
-  - &TREASURY_THRESHOLD 1
+  - &LAZY_VAULT_ADMIN_THRESHOLD 5
+  - &TREASURY_THRESHOLD 4
   - &LIDO_PAUSER_THRESHOLD 3
   - &ACTIVE_VAULT_ADMIN_THRESHOLD 3
   - &CURATOR_THRESHOLD 3
@@ -74,9 +74,13 @@ misc:
   - &lidoSigner2 "0x9777AF8c6727D57F74f7d381AD47eB4A65f042Ff"
   - &lidoSigner3 "0xEA685f0AF4A0BF5E7D6729b2C63eDF574D3EE27f"
   - &lidoSigner4 "0xFB864C1127ff77215d0A8e652bB632F526A4A89f"
+  - &lidoSigner5 "0x912e21CdA3D7012146da4Df33309d860a9eb0bEb"
+  - &lidoSigner6 "0x73B254db9cb71a129C4E73aF087D71Ac7d34a8d7"
   - &lidoSigner7 "0x59d07dc34B135B17b87840a86BFF7302039E7EDf"
-  - &lidoSigner8 "0x8ecd93982FfbB2f937ADa6c6e50d1950974081C0"
   - &lidoSigner9 "0x75D95fF8D48E2Ca5c4235322A8AC8e52A76124cD"
+  - &lidoSigner10 "0xE6CD29BF19769E44534099d241abAa07aa8c8E9a"
+  - &lidoSigner11 "0x8aA493BcD7f989caD67dd3CB48A4c2E6b40FeDB0"
+  - &lidoSigner12 "0xf2374BCb265505002055942D070459a4d2011012"
   - &lidoPauserSigner2 "0x04e7C0350241b818eE5c92cc260008C9898F41cf"
   - &lidoPauserSigner3 "0xc7a8DE05264442A318189f2bd160d2830902C8CD"
 
@@ -724,10 +728,14 @@ l1:
         getChainId: 4663
         getModulesPaginated:
         getOwners:
+          - *lidoSigner12
+          - *lidoSigner4
+          - *lidoSigner6
+          - *lidoSigner9
           - *lidoSigner2
           - *lidoSigner1
           - *lidoSigner7
-          - *lidoSigner8
+          - *lidoSigner5
         getStorageAt:
         getThreshold: *LAZY_VAULT_ADMIN_THRESHOLD
         getTransactionHash:
@@ -752,10 +760,12 @@ l1:
         getChainId: 4663
         getModulesPaginated:
         getOwners:
-          - *lidoSigner2
-          - *lidoSigner1
+          - *lidoSigner9
+          - *lidoSigner12
+          - *lidoSigner10
+          - *lidoSigner11
           - *lidoSigner7
-          - *lidoSigner8
+          - *lidoSigner6
         getStorageAt:
         getThreshold: *TREASURY_THRESHOLD
         getTransactionHash:
