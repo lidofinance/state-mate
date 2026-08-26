@@ -49,7 +49,7 @@ yarn install
 
 ```sh
 export ETH_RPC_URL=%YOUR_RPC_URL%
-export MODE_RPC_URL=%YOUR_RPC_URL%
+export OPTIMISM_RPC_URL=%YOUR_RPC_URL%
 ```
 
 4. Run a config, or every config in a directory

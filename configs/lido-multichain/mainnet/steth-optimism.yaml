@@ -193,7 +193,7 @@ l1:
 
 l2:
   rpcUrl: OPTIMISM_RPC_URL
-  explorerHostname: optimism.blockscout.com
+  explorerHostname: api.etherscan.io
   explorerTokenEnv: ETHERSCAN_TOKEN
   chainId: 10
   contracts:
