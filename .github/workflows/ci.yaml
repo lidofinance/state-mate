@@ -6,6 +6,8 @@ on:
       - main
       - develop
   pull_request:
+  schedule:
+    - cron: "0 6 * * *"
   workflow_dispatch:
 
 permissions:
