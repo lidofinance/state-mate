@@ -455,12 +455,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:^26.0.1":
-  version: 26.0.1
-  resolution: "@types/node@npm:26.0.1"
+"@types/node@npm:^26.2.0":
+  version: 26.2.0
+  resolution: "@types/node@npm:26.2.0"
   dependencies:
     undici-types: "npm:~8.3.0"
-  checksum: 10c0/31d204333c70124da6bcac7d1f27d8980149fe3f95a8419bfcd19c3e5823705c0e370d71ac34399352e1263b2d5fc41c87af964ec81e5a05a32224d65d8d224e
+  checksum: 10c0/f8566d88162241eb55a46f7e4ea097188eab0aaafefea7a58e63adab8c4144eb98c08b7911452c846104c339a0f82282f5e1ed4b26b578d60709614fe2843f4d
   languageName: node
   linkType: hard
 
@@ -1090,7 +1090,7 @@ __metadata:
     "@sinclair/typebox": "npm:^0.34.52"
     "@tsconfig/node20": "npm:^20.1.9"
     "@types/chai": "npm:^4.3.16"
-    "@types/node": "npm:^26.0.1"
+    "@types/node": "npm:^26.2.0"
     ajv: "npm:^8.20.0"
     ajv-formats: "npm:^3.0.1"
     chai: "npm:^4.4.1"
