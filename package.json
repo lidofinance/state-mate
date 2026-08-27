@@ -16,40 +16,31 @@
   "scripts": {
     "build": "tsc",
     "start": "ts-node -r tsconfig-paths/register src/state-mate.ts",
-    "consolidate-abi": "sh -c 'ts-node src/consolidate-abis.ts \"$1\" --compress' --",
-    "lint": "eslint . --max-warnings=0",
-    "lint:fix": "yarn lint --fix",
-    "format": "prettier . --ignore-path .gitignore --ignore-path .prettierignore --check",
-    "format:fix": "prettier . --ignore-path .gitignore --ignore-path .prettierignore --write",
+    "lint": "biome check .",
+    "lint:fix": "biome check --write .",
+    "format": "prettier \"**/*.{yaml,yml,md}\" --ignore-path .gitignore --ignore-path .prettierignore --check",
+    "format:fix": "prettier \"**/*.{yaml,yml,md}\" --ignore-path .gitignore --ignore-path .prettierignore --write",
     "postinstall": "husky",
-    "test": "ts-node src/test-util/app.ts",
-    "schemas": "ts-node src/gen-schemas.ts"
+    "test": "node --require ts-node/register --require tsconfig-paths/register --test \"tests/**/*.test.ts\"",
+    "schemas": "ts-node src/gen-schemas.ts",
+    "test:coverage": "node --require ts-node/register --require tsconfig-paths/register --test --experimental-test-coverage \"tests/**/*.test.ts\"",
+    "typecheck": "tsc --noEmit"
   },
   "lint-staged": {
-    "./**.{ts,md,json}": [
-      "prettier --write"
+    "*.{ts,mjs,json}": [
+      "biome check --write --no-errors-on-unmatched"
     ],
-    "./**/*.ts": [
-      "prettier --write",
-      "eslint --max-warnings=0"
+    "*.{yaml,yml,md}": [
+      "prettier --write"
     ]
   },
   "devDependencies": {
+    "@biomejs/biome": "^2.5.10",
     "@commitlint/cli": "^21.2.1",
     "@commitlint/config-conventional": "^21.2.0",
-    "@eslint/compat": "^2.0.5",
     "@sinclair/typebox": "^0.34.52",
     "@tsconfig/node20": "^20.1.9",
-    "@types/json-diff": "^1.0.3",
     "@types/node": "^26.0.1",
-    "@typescript-eslint/eslint-plugin": "^8.62.0",
-    "@typescript-eslint/parser": "^8.62.0",
-    "eslint": "^10.5.0",
-    "eslint-config-prettier": "^10.1.8",
-    "eslint-import-resolver-typescript": "^4.4.4",
-    "eslint-plugin-import": "^2.32.0",
-    "eslint-plugin-prettier": "^5.5.5",
-    "eslint-plugin-unicorn": "^69.0.0",
     "husky": "^9.0.11",
     "lint-staged": "^17.2.0",
     "prettier": "^3.9.0",
@@ -65,7 +56,6 @@
     "commander": "^15.0.0",
     "dotenv": "^17.4.2",
     "ethers": "^6.17.0",
-    "json-diff": "^1.0.6",
     "tsconfig-paths": "^4.2.0",
     "yaml": "^2.9.0"
   }
