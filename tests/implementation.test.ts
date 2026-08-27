@@ -5,7 +5,7 @@ import type { JsonRpcProvider } from "ethers";
 
 import { context, resetStats, stats } from "../src/context";
 import { resetContractCounters } from "../src/section-validators/base";
-import { checkImplementation, checkProxyAdminOwner } from "../src/section-validators/implementation";
+import { checkImplementation, checkProxyAdmin } from "../src/section-validators/implementation";
 import type { ContractEntry } from "../src/typebox";
 
 const PROXY_ADDRESS = "0xAaAaAAaaAaAAAaaAAaAaaaAAaAAAaaaAaaaaaaa1";
@@ -13,6 +13,7 @@ const IMPL_ADDRESS = "0xBbbBBBbbbBBbbbBbbBbbbbBBbBBbbBbBbbbbbbb2";
 const OTHER_IMPL_ADDRESS = "0xcCCcccCcCCcCcCCCcCcccCcCcCcCcCCcCcccCcC3";
 const PROXY_ADMIN_ADDRESS = "0xDdDDDddDdDddDDddDDddDDDDdDdDDdDDdDDDDDD4";
 const OWNER_ADDRESS = "0xEeeEEEeeeEEEeeeEEEeeeeEeeeeEEEEeeEEeEeE5";
+const OTHER_ADMIN_ADDRESS = "0x9999999999999999999999999999999999999999";
 const EIP1967_SLOT = "0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc";
 const ADMIN_SLOT = "0xb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d6103";
 const SAFE_SLOT = "0x0";
@@ -75,6 +76,10 @@ function safePinnedEntry(singleton: string): ContractEntry {
 
 function adminOwnerEntry(proxyAdminOwner?: string): ContractEntry {
   return { ...proxyEntry(IMPL_ADDRESS), proxyAdminOwner } as ContractEntry;
+}
+
+function adminEntry(fields: { proxyAdmin?: string; proxyAdminOwner?: string }): ContractEntry {
+  return { ...proxyEntry(IMPL_ADDRESS), ...fields } as ContractEntry;
 }
 
 const originalWrite = process.stdout.write.bind(process.stdout);
@@ -386,14 +391,14 @@ describe("checkImplementation", () => {
   });
 });
 
-describe("checkProxyAdminOwner", () => {
+describe("checkProxyAdmin", () => {
   it("passes when the ProxyAdmin behind the proxy is owned by the expected address", async () => {
     const { provider, reads } = stubProvider({
       calls: { [PROXY_ADMIN_ADDRESS.toLowerCase()]: word(OWNER_ADDRESS) },
       slots: { [ADMIN_SLOT]: word(PROXY_ADMIN_ADDRESS) },
     });
 
-    await checkProxyAdminOwner(provider, adminOwnerEntry(OWNER_ADDRESS));
+    await checkProxyAdmin(provider, adminOwnerEntry(OWNER_ADDRESS));
 
     assert.equal(stats.errors, 0);
     assert.equal(stats.totalChecks, 1);
@@ -406,7 +411,7 @@ describe("checkProxyAdminOwner", () => {
       slots: { [ADMIN_SLOT]: word(PROXY_ADMIN_ADDRESS) },
     });
 
-    await checkProxyAdminOwner(provider, adminOwnerEntry(OWNER_ADDRESS));
+    await checkProxyAdmin(provider, adminOwnerEntry(OWNER_ADDRESS));
 
     assert.equal(stats.errors, 1);
     const { message } = stats.errorDetails[0];
@@ -418,7 +423,7 @@ describe("checkProxyAdminOwner", () => {
   it("fails when the proxy keeps no admin in the EIP-1967 slot", async () => {
     const { provider } = stubProvider({});
 
-    await checkProxyAdminOwner(provider, adminOwnerEntry(OWNER_ADDRESS));
+    await checkProxyAdmin(provider, adminOwnerEntry(OWNER_ADDRESS));
 
     assert.equal(stats.errors, 1);
     assert.match(stats.errorDetails[0].message, /no admin in the EIP-1967 slot/);
@@ -427,7 +432,7 @@ describe("checkProxyAdminOwner", () => {
   it("separates an unreadable admin slot from a proxy that keeps no admin", async () => {
     const { provider } = stubProvider({ slotErrors: { [ADMIN_SLOT]: new Error("missing revert data") } });
 
-    await checkProxyAdminOwner(provider, adminOwnerEntry(OWNER_ADDRESS));
+    await checkProxyAdmin(provider, adminOwnerEntry(OWNER_ADDRESS));
 
     assert.equal(stats.errors, 1);
     const { message } = stats.errorDetails[0];
@@ -435,18 +440,18 @@ describe("checkProxyAdminOwner", () => {
     assert.doesNotMatch(message, /no admin in the EIP-1967 slot/);
   });
 
-  it("points at a storage check when the admin does not answer owner()", async () => {
+  it("points at the admin pin when the admin does not answer owner()", async () => {
     const { provider } = stubProvider({
       calls: { [PROXY_ADMIN_ADDRESS.toLowerCase()]: new Error("execution reverted") },
       slots: { [ADMIN_SLOT]: word(PROXY_ADMIN_ADDRESS) },
     });
 
-    await checkProxyAdminOwner(provider, adminOwnerEntry(OWNER_ADDRESS));
+    await checkProxyAdmin(provider, adminOwnerEntry(OWNER_ADDRESS));
 
     assert.equal(stats.errors, 1);
     const { message } = stats.errorDetails[0];
     assert.match(message, /does not answer owner\(\)/);
-    assert.match(message, /storage:/);
+    assert.match(message, /proxyAdmin:/);
   });
 
   it("accepts a renounced ProxyAdmin when the config expects the zero owner", async () => {
@@ -455,7 +460,7 @@ describe("checkProxyAdminOwner", () => {
       slots: { [ADMIN_SLOT]: word(PROXY_ADMIN_ADDRESS) },
     });
 
-    await checkProxyAdminOwner(provider, adminOwnerEntry(`0x${"0".repeat(40)}`));
+    await checkProxyAdmin(provider, adminOwnerEntry(`0x${"0".repeat(40)}`));
 
     assert.equal(stats.errors, 0);
   });
@@ -466,7 +471,7 @@ describe("checkProxyAdminOwner", () => {
       slots: { [ADMIN_SLOT]: word(PROXY_ADMIN_ADDRESS) },
     });
 
-    await checkProxyAdminOwner(provider, adminOwnerEntry(OWNER_ADDRESS));
+    await checkProxyAdmin(provider, adminOwnerEntry(OWNER_ADDRESS));
 
     assert.equal(stats.errors, 1);
     const { message } = stats.errorDetails[0];
@@ -481,7 +486,7 @@ describe("checkProxyAdminOwner", () => {
     });
     context.checkOnly = { section: "l1", checksType: "checks" };
 
-    await checkProxyAdminOwner(provider, adminOwnerEntry(OWNER_ADDRESS));
+    await checkProxyAdmin(provider, adminOwnerEntry(OWNER_ADDRESS));
 
     assert.equal(stats.totalChecks, 1);
     assert.equal(stats.errors, 0);
@@ -490,9 +495,75 @@ describe("checkProxyAdminOwner", () => {
   it("reads nothing for an entry without the field", async () => {
     const { provider, reads } = stubProvider({ slots: { [ADMIN_SLOT]: word(PROXY_ADMIN_ADDRESS) } });
 
-    await checkProxyAdminOwner(provider, adminOwnerEntry());
+    await checkProxyAdmin(provider, adminOwnerEntry());
 
     assert.deepEqual(reads, []);
     assert.equal(stats.totalChecks, 0);
+  });
+
+  it("passes when the EIP-1967 admin slot holds the declared ProxyAdmin", async () => {
+    const { provider, reads } = stubProvider({ slots: { [ADMIN_SLOT]: word(PROXY_ADMIN_ADDRESS) } });
+
+    await checkProxyAdmin(provider, adminEntry({ proxyAdmin: PROXY_ADMIN_ADDRESS }));
+
+    assert.equal(stats.errors, 0);
+    assert.equal(stats.totalChecks, 1);
+    // no owner() call: pinning the admin address asks nothing about who controls it
+    assert.deepEqual(reads, [`slot:${ADMIN_SLOT}`]);
+  });
+
+  it("names the administering contract and the expectation when they differ", async () => {
+    const { provider } = stubProvider({ slots: { [ADMIN_SLOT]: word(OTHER_ADMIN_ADDRESS) } });
+
+    await checkProxyAdmin(provider, adminEntry({ proxyAdmin: PROXY_ADMIN_ADDRESS }));
+
+    assert.equal(stats.errors, 1);
+    const { message } = stats.errorDetails[0];
+    assert.match(message, new RegExp(OTHER_ADMIN_ADDRESS, "i"));
+    assert.match(message, new RegExp(PROXY_ADMIN_ADDRESS, "i"));
+  });
+
+  it("fails the admin pin when the slot holds no address", async () => {
+    const { provider } = stubProvider({});
+
+    await checkProxyAdmin(provider, adminEntry({ proxyAdmin: PROXY_ADMIN_ADDRESS }));
+
+    assert.equal(stats.errors, 1);
+    assert.match(stats.errorDetails[0].message, /no admin in the EIP-1967 slot/);
+  });
+
+  it("catches an unexpected ProxyAdmin that answers the expected owner", async () => {
+    const { provider } = stubProvider({
+      calls: { [OTHER_ADMIN_ADDRESS.toLowerCase()]: word(OWNER_ADDRESS) },
+      slots: { [ADMIN_SLOT]: word(OTHER_ADMIN_ADDRESS) },
+    });
+
+    await checkProxyAdmin(provider, adminEntry({ proxyAdmin: PROXY_ADMIN_ADDRESS, proxyAdminOwner: OWNER_ADDRESS }));
+
+    assert.equal(stats.totalChecks, 2);
+    assert.equal(stats.errors, 1);
+    assert.equal(stats.errorDetails[0].checksType, "proxyAdmin");
+  });
+
+  it("reads the admin slot once for both fields", async () => {
+    const { provider, reads } = stubProvider({
+      calls: { [PROXY_ADMIN_ADDRESS.toLowerCase()]: word(OWNER_ADDRESS) },
+      slots: { [ADMIN_SLOT]: word(PROXY_ADMIN_ADDRESS) },
+    });
+
+    await checkProxyAdmin(provider, adminEntry({ proxyAdmin: PROXY_ADMIN_ADDRESS, proxyAdminOwner: OWNER_ADDRESS }));
+
+    assert.equal(stats.totalChecks, 2);
+    assert.equal(stats.errors, 0);
+    assert.deepEqual(reads, [`slot:${ADMIN_SLOT}`, `call:${PROXY_ADMIN_ADDRESS.toLowerCase()}`]);
+  });
+
+  it("reports an unreadable admin slot against every declared field", async () => {
+    const { provider } = stubProvider({ slotErrors: { [ADMIN_SLOT]: new Error("missing revert data") } });
+
+    await checkProxyAdmin(provider, adminEntry({ proxyAdmin: PROXY_ADMIN_ADDRESS, proxyAdminOwner: OWNER_ADDRESS }));
+
+    assert.equal(stats.errors, 2);
+    for (const detail of stats.errorDetails) assert.match(detail.message, /could not be read/);
   });
 });

@@ -185,6 +185,7 @@ l1:
       address: *earnUSDe_vault
       proxyName: TransparentUpgradeableProxy
       implementation: *vaultImplementation
+      proxyAdmin: "0xc9F42CFcFdF17479114e8dbF3607954080d38653"
       proxyAdminOwner: *proxyAdmin
       proxyChecks: {}
       storage:
@@ -354,6 +355,7 @@ l1:
       address: *earnUSDe_subvault0
       proxyName: TransparentUpgradeableProxy
       implementation: *subvaultImplementation
+      proxyAdmin: "0xFF5124787C2aDB77c064497dc20de0d022229930"
       proxyAdminOwner: *proxyAdmin
       proxyChecks: {}
       storage:
@@ -376,6 +378,7 @@ l1:
       address: *earnUSDe_verifier0
       proxyName: TransparentUpgradeableProxy
       implementation: *verifierImplementation
+      proxyAdmin: "0x252F43BF2863830a33D8865046183EAf795767C7"
       proxyAdminOwner: *proxyAdmin
       proxyChecks: {}
       storage:
@@ -414,6 +417,7 @@ l1:
       address: *earnUSDe_subvault1
       proxyName: TransparentUpgradeableProxy
       implementation: *subvaultImplementation
+      proxyAdmin: "0xC7F37769657D4ef023bd180376F4C37b786a445E"
       proxyAdminOwner: *proxyAdmin
       proxyChecks: {}
       storage:
@@ -436,6 +440,7 @@ l1:
       address: *earnUSDe_verifier1
       proxyName: TransparentUpgradeableProxy
       implementation: *verifierImplementation
+      proxyAdmin: "0xeDDC9e0Cca1A039688d2Ac008657841F7D173c5d"
       proxyAdminOwner: *proxyAdmin
       proxyChecks: {}
       storage:
@@ -474,6 +479,7 @@ l1:
       address: *earnUSDe_swapModule0
       proxyName: TransparentUpgradeableProxy
       implementation: *swapModuleImplementation
+      proxyAdmin: "0x4ce3095A7BEfd4bbEC27025D39E7eF680d86Da20"
       proxyAdminOwner: *proxyAdmin
       proxyChecks: {}
       storage:
@@ -540,6 +546,7 @@ l1:
       address: *earnUSDe_oracle
       proxyName: TransparentUpgradeableProxy
       implementation: *oracleImplementation
+      proxyAdmin: "0x145e195b5d3072c5a5dA923c70e84Fc7E63de2ca"
       proxyAdminOwner: *proxyAdmin
       proxyChecks: {}
       storage:
@@ -608,6 +615,7 @@ l1:
       address: *earnUSDe_shareManager
       proxyName: TransparentUpgradeableProxy
       implementation: *earnUSDe_shareManagerImplementation
+      proxyAdmin: "0xe91F985fA14ca024c5880BA7910A97b134E1D47f"
       proxyAdminOwner: *proxyAdmin
       proxyChecks: {}
       storage:
@@ -665,6 +673,7 @@ l1:
       address: *earnUSDe_feeManager
       proxyName: TransparentUpgradeableProxy
       implementation: *feeManagerImplementation
+      proxyAdmin: "0x6A21Beb45CB3d3a7265C97Ebaa0AdC9f39fA4724"
       proxyAdminOwner: *proxyAdmin
       proxyChecks: {}
       storage:
@@ -703,6 +712,7 @@ l1:
       address: *earnUSDe_riskManager
       proxyName: TransparentUpgradeableProxy
       implementation: *riskManagerImplementation
+      proxyAdmin: "0x6bc2b37cBd611bC27223E4DBd01F245f6F46d4C1"
       proxyAdminOwner: *proxyAdmin
       proxyChecks: {}
       storage:

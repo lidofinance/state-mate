@@ -79,7 +79,7 @@ contractName:
 
 ### Proxy patterns
 
-**Transparent Upgradeable Proxy**. `proxyChecks: {}` because the admin/impl live in EIP-1967 slots. The implementation slot is verified for every entry automatically, and `proxyAdminOwner:` covers who controls the ProxyAdmin in the admin slot without a separate `ProxyAdmin` entry. Pin the admin address itself via `storage:` when you want both:
+**Transparent Upgradeable Proxy**. `proxyChecks: {}` because the admin/impl live in EIP-1967 slots. The implementation slot is verified for every entry automatically. `proxyAdmin:` pins the contract the admin slot holds, `proxyAdminOwner:` pins the address that controls it one hop further, and neither needs a separate `ProxyAdmin` entry or its ABI. Declare both: an unexpected ProxyAdmin owned by the expected owner passes the owner check alone.
 
 ```yaml
 contractName:
@@ -87,12 +87,9 @@ contractName:
   address: *contractAddress
   proxyName: TransparentUpgradeableProxy
   implementation: *implementationAddress
+  proxyAdmin: "0x0000000000000000000000000000000000000000" # the ProxyAdmin in the EIP-1967 admin slot
   proxyAdminOwner: *ownerOfTheProxyAdmin
   proxyChecks: {}
-  storage:
-    - slot: *EIP1967_ADMIN_SLOT
-      expected: *proxyAdminAddress
-      label: admin
   checks:
     # against the proxy (implementation logic, proxy state)
     someFunction: expectedValue
