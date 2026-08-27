@@ -57,7 +57,6 @@ delays:
 
 misc:
   - &EIP1967_IMPLEMENTATION_SLOT "0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc" # keccak256("eip1967.proxy.implementation") - 1
-  - &EIP1967_ADMIN_SLOT "0xb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d6103" # keccak256("eip1967.proxy.admin") - 1
 
   # L1 LidoCustomReceiver encoded as bytes32 (CustomSender.getReceiver(selector))
   - &l1LidoCustomReceiverBytes32 "0x0000000000000000000000006f357d53d6be3238180316ba5f8f11467e164588"
@@ -91,14 +90,13 @@ l1:
       address: *l2CustomSender
       proxyName: TransparentUpgradeableProxy
       implementation: *l2CustomSenderImpl
+      proxyAdmin: *l2ProxyAdmin
+      proxyAdminOwner: *l2GovernanceExecutor
       proxyChecks: {}
       storage:
         - slot: *EIP1967_IMPLEMENTATION_SLOT
           expected: *l2CustomSenderImpl
           label: implementation
-        - slot: *EIP1967_ADMIN_SLOT
-          expected: *l2ProxyAdmin
-          label: admin
       checks:
         CCIP_ROUTER: *l2CcipRouter
         DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE

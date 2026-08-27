@@ -19,6 +19,9 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
+      # The explorer pacer is per-process and the jobs share one key, so the nightly
+      # --update-abi sweep must run one job at a time to stay within the account limit
+      max-parallel: ${{ github.event_name == 'schedule' && 1 || 99 }}
       matrix:
         include:
           - config: configs/lido/mainnet
