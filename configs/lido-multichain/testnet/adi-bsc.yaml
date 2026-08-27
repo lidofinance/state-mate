@@ -67,6 +67,7 @@ l1:
       address: *sepCCC
       proxyName: TransparentUpgradeableProxy
       implementation: *sepCCCImp
+      proxyAdmin: "0x7BE89331452883D335C2556d1863CD2925E76afc"
       proxyAdminOwner: *sepDaoAgent
       proxyChecks: {}
       checks:
@@ -291,6 +292,7 @@ l2:
       address: *bnbtCCC
       proxyName: TransparentUpgradeableProxy
       implementation: *bnbtCCCImp
+      proxyAdmin: "0x490E441352635aacA64224c8205636FD9d2e3362"
       proxyAdminOwner: *bnbtCCE
       proxyChecks: {}
       checks:

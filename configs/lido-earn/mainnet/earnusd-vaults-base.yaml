@@ -162,6 +162,7 @@ l1:
       address: *earnUSDc_vault
       proxyName: TransparentUpgradeableProxy
       implementation: *vaultImplementation
+      proxyAdmin: "0x821248FE1C1CEFace02D87936b89C49D95eC4E41"
       proxyAdminOwner: *proxyAdmin
       proxyChecks: {}
       storage:
@@ -328,6 +329,7 @@ l1:
       address: *earnUSDc_subvault0
       proxyName: TransparentUpgradeableProxy
       implementation: *subvaultImplementation
+      proxyAdmin: "0x193afe84E9ED5F6E8aC98A382117955d3B584f5f"
       proxyAdminOwner: *proxyAdmin
       proxyChecks: {}
       storage:
@@ -350,6 +352,7 @@ l1:
       address: *earnUSDc_verifier0
       proxyName: TransparentUpgradeableProxy
       implementation: *verifierImplementation
+      proxyAdmin: "0x6061E0bb12947cCD8F3D0dE9B002846dE15873C1"
       proxyAdminOwner: *proxyAdmin
       proxyChecks: {}
       storage:
@@ -388,6 +391,7 @@ l1:
       address: *earnUSDc_oracle
       proxyName: TransparentUpgradeableProxy
       implementation: *oracleImplementation
+      proxyAdmin: "0xAaC1448680A5BAc7b6Fc16F40D02eBad9434De31"
       proxyAdminOwner: *proxyAdmin
       proxyChecks: {}
       storage:
@@ -462,6 +466,7 @@ l1:
       address: *earnUSDc_shareManager
       proxyName: TransparentUpgradeableProxy
       implementation: *shareManagerImplementation
+      proxyAdmin: "0x36f015103e7146865468C8E2FeECBe74b431Cb65"
       proxyAdminOwner: *proxyAdmin
       proxyChecks: {}
       storage:
@@ -519,6 +524,7 @@ l1:
       address: *earnUSDc_feeManager
       proxyName: TransparentUpgradeableProxy
       implementation: *feeManagerImplementation
+      proxyAdmin: "0xF6f69692F6fB2dAb40eF262612A63Ffb2F1BbBac"
       proxyAdminOwner: *proxyAdmin
       proxyChecks: {}
       storage:
@@ -557,6 +563,7 @@ l1:
       address: *earnUSDc_riskManager
       proxyName: TransparentUpgradeableProxy
       implementation: *riskManagerImplementation
+      proxyAdmin: "0x51644274Bb3E514637A4EF3b25eF6D67CB8D08C9"
       proxyAdminOwner: *proxyAdmin
       proxyChecks: {}
       storage:

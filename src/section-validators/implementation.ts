@@ -208,33 +208,64 @@ export async function checkImplementation(provider: JsonRpcProvider, contractEnt
   logHandle.success(actual);
 }
 
-/**
- * Verifies who owns the ProxyAdmin a transparent proxy delegates upgrades to. The ProxyAdmin
- * address itself is a `storage:` check away, but its owner is one hop further, and that owner is
- * what actually controls the upgrade. Opt-in per entry, so no bypass flag.
- */
-export async function checkProxyAdminOwner(provider: JsonRpcProvider, contractEntry: ContractEntry): Promise<void> {
-  if (!isTypeOfTB(contractEntry, ProxyContractEntryTB) || !contractEntry.proxyAdminOwner) return;
-
-  const { address, proxyAdminOwner: expected } = contractEntry;
-  setErrorContext({ checksType: "proxyAdminOwner", method: "proxyAdminOwner" });
+/** Each declared field is a check of its own: one log line, one counter, at most one error. */
+function openAdminCheck(label: string): { fail: (message: string) => void; pass: (message: string) => void } {
+  setErrorContext({ checksType: label, method: label });
   incChecks();
-  const logHandle = new LogCommand("proxyAdminOwner");
+  const logHandle = new LogCommand(label);
+  return {
+    fail(message: string) {
+      logHandle.failure(message);
+      incErrors(message);
+    },
+    pass(message: string) {
+      logHandle.success(message);
+    },
+  };
+}
+
+/**
+ * Verifies the ProxyAdmin a transparent proxy delegates upgrades to. `proxyAdmin:` pins the
+ * contract the EIP-1967 admin slot holds, `proxyAdminOwner:` pins the address that controls it one
+ * hop further. Owning the expected owner says nothing about which contract holds the upgrade
+ * rights, so the two answer different questions. Opt-in per entry, so no bypass flag.
+ */
+export async function checkProxyAdmin(provider: JsonRpcProvider, contractEntry: ContractEntry): Promise<void> {
+  if (!isTypeOfTB(contractEntry, ProxyContractEntryTB)) return;
+
+  const { address, proxyAdmin: expectedAdmin, proxyAdminOwner: expectedOwner } = contractEntry;
+  if (!expectedAdmin && !expectedOwner) return;
 
   const adminSlot = await readSlotWord(provider, address, EIP1967_ADMIN_SLOT);
   // An unanswered read proves nothing about the proxy: a throttled or failing provider must not
   // be reported as a proxy that keeps no admin
-  if (adminSlot.failed) {
-    const message = `the admin slot of ${address} could not be read, so nothing was verified; retry`;
-    logHandle.failure(message);
-    incErrors(message);
+  const unreadable = adminSlot.failed
+    ? `the admin slot of ${address} could not be read, so nothing was verified; retry`
+    : undefined;
+  const admin = addressFromWord(adminSlot.word);
+
+  if (expectedAdmin) {
+    const check = openAdminCheck("proxyAdmin");
+    if (unreadable) {
+      check.fail(unreadable);
+    } else if (!admin) {
+      check.fail(`${address} keeps no admin in the EIP-1967 slot, while the config expects ${expectedAdmin}`);
+    } else if (admin.toLowerCase() === expectedAdmin.toLowerCase()) {
+      check.pass(admin);
+    } else {
+      check.fail(`${address} is administered by ${admin}, while the config expects ${expectedAdmin}`);
+    }
+  }
+
+  if (!expectedOwner) return;
+
+  const check = openAdminCheck("proxyAdminOwner");
+  if (unreadable) {
+    check.fail(unreadable);
     return;
   }
-  const admin = addressFromWord(adminSlot.word);
   if (!admin) {
-    const message = `${address} keeps no admin in the EIP-1967 slot, so it has no ProxyAdmin to own`;
-    logHandle.failure(message);
-    incErrors(message);
+    check.fail(`${address} keeps no admin in the EIP-1967 slot, so it has no ProxyAdmin to own`);
     return;
   }
 
@@ -243,20 +274,17 @@ export async function checkProxyAdminOwner(provider: JsonRpcProvider, contractEn
   const ownerWord = await callWord(provider, admin, OWNER_SELECTOR);
   const owner = /^0x0{64}$/.test(ownerWord ?? "") ? ZERO_ADDRESS : addressFromWord(ownerWord);
   if (!owner) {
-    const message =
+    check.fail(
       `the admin of ${address}, ${admin}, does not answer owner(). ` +
-      `Assert the admin address itself with a ${chalk.yellow("storage:")} check on the EIP-1967 admin slot`;
-    logHandle.failure(message);
-    incErrors(message);
+        `Assert the admin address itself with ${chalk.yellow("proxyAdmin:")}`,
+    );
     return;
   }
 
-  if (owner.toLowerCase() !== expected.toLowerCase()) {
-    const message = `${admin} administers ${address} and is owned by ${owner}, while the config expects ${expected}`;
-    logHandle.failure(message);
-    incErrors(message);
+  if (owner.toLowerCase() !== expectedOwner.toLowerCase()) {
+    check.fail(`${admin} administers ${address} and is owned by ${owner}, while the config expects ${expectedOwner}`);
     return;
   }
 
-  logHandle.success(`${owner} owns ${admin}`);
+  check.pass(`${owner} owns ${admin}`);
 }

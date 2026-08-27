@@ -229,6 +229,7 @@ l1:
       address: *factoryFactory
       proxyName: TransparentUpgradeableProxy
       implementation: *factoryImplementation
+      proxyAdmin: "0xf004f5876D352533fB8b244f1f6227caA8efF867"
       proxyAdminOwner: *proxyAdmin
       proxyChecks: {}
       checks:
@@ -316,6 +317,7 @@ l1:
       address: *consensusFactory
       proxyName: TransparentUpgradeableProxy
       implementation: *factoryImplementation
+      proxyAdmin: "0x50104e78C849B94D9D895e7888Bc464cc1811F89"
       proxyAdminOwner: *proxyAdmin
       proxyChecks: {}
       checks:
@@ -349,6 +351,7 @@ l1:
       address: *depositQueueFactory
       proxyName: TransparentUpgradeableProxy
       implementation: *factoryImplementation
+      proxyAdmin: "0x77da14F966385b19c6e2D99a4448dcFc6FC53985"
       proxyAdminOwner: *proxyAdmin
       proxyChecks: {}
       checks:
@@ -442,6 +445,7 @@ l1:
       address: *feeManagerFactory
       proxyName: TransparentUpgradeableProxy
       implementation: *factoryImplementation
+      proxyAdmin: "0x34BE100C59e7214Ac3382CD5d3E143e8D5107692"
       proxyAdminOwner: *proxyAdmin
       proxyChecks: {}
       checks:
@@ -491,6 +495,7 @@ l1:
       address: *oracleFactory
       proxyName: TransparentUpgradeableProxy
       implementation: *factoryImplementation
+      proxyAdmin: "0x03B10BC6ccaa3e7e894f7d0Bac1003BB843F14BF"
       proxyAdminOwner: *proxyAdmin
       proxyChecks: {}
       checks:
@@ -540,6 +545,7 @@ l1:
       address: *redeemQueueFactory
       proxyName: TransparentUpgradeableProxy
       implementation: *factoryImplementation
+      proxyAdmin: "0xFce5f4F214288248F827390223F825dFb8c452be"
       proxyAdminOwner: *proxyAdmin
       proxyChecks: {}
       checks:
@@ -625,6 +631,7 @@ l1:
       address: *riskManagerFactory
       proxyName: TransparentUpgradeableProxy
       implementation: *factoryImplementation
+      proxyAdmin: "0x2eBD4375F9DEd72ed36D49973AeBf182e0e4482c"
       proxyAdminOwner: *proxyAdmin
       proxyChecks: {}
       checks:
@@ -674,6 +681,7 @@ l1:
       address: *shareManagerFactory
       proxyName: TransparentUpgradeableProxy
       implementation: *factoryImplementation
+      proxyAdmin: "0x93Ef6F26BFDCe31CA6D12cCf51e5bE9a95586B08"
       proxyAdminOwner: *proxyAdmin
       proxyChecks: {}
       checks:
@@ -773,6 +781,7 @@ l1:
       address: *subvaultFactory
       proxyName: TransparentUpgradeableProxy
       implementation: *factoryImplementation
+      proxyAdmin: "0xc70e0E18dd7e6239E2808f48Ea9BE4cD77b405af"
       proxyAdminOwner: *proxyAdmin
       proxyChecks: {}
       checks:
@@ -844,6 +853,7 @@ l1:
       address: *verifierFactory
       proxyName: TransparentUpgradeableProxy
       implementation: *factoryImplementation
+      proxyAdmin: "0xc5e76f98C8B6D3f536C2Ea77DE170de34A259341"
       proxyAdminOwner: *proxyAdmin
       proxyChecks: {}
       checks:
@@ -915,6 +925,7 @@ l1:
       address: *vaultFactory
       proxyName: TransparentUpgradeableProxy
       implementation: *factoryImplementation
+      proxyAdmin: "0xe7AfA247103BDc7dE9054241669741A425Fa5A26"
       proxyAdminOwner: *proxyAdmin
       proxyChecks: {}
       checks:
@@ -1045,6 +1056,7 @@ l1:
       address: *eigenLayerVerifierFactory
       proxyName: TransparentUpgradeableProxy
       implementation: *factoryImplementation
+      proxyAdmin: "0xd9d37156529646743B990973a2C3Bad98ceB70a9"
       proxyAdminOwner: *proxyAdmin
       proxyChecks: {}
       checks:
@@ -1104,6 +1116,7 @@ l1:
       address: *ERC20VerifierFactory
       proxyName: TransparentUpgradeableProxy
       implementation: *factoryImplementation
+      proxyAdmin: "0x8283eeB88ff09bD49CdCe79887C9b7854eCa0697"
       proxyAdminOwner: *proxyAdmin
       proxyChecks: {}
       checks:
@@ -1157,6 +1170,7 @@ l1:
       address: *symbioticVerifierFactory
       proxyName: TransparentUpgradeableProxy
       implementation: *factoryImplementation
+      proxyAdmin: "0xC885556d679e959Da6331F0590D8c8d4a9302848"
       proxyAdminOwner: *proxyAdmin
       proxyChecks: {}
       checks:
@@ -1247,6 +1261,7 @@ l1:
       address: *vault
       proxyName: TransparentUpgradeableProxy
       implementation: *vaultImplementation
+      proxyAdmin: "0x94abDF2b59c6495071f32EB8fb4A0f4d2465A2f2"
       proxyAdminOwner: *proxyAdmin
       proxyChecks: {}
       checks:
@@ -1684,6 +1699,7 @@ l1:
       address: *depositQueueETH
       proxyName: TransparentUpgradeableProxy
       implementation: *depositQueueImplementation
+      proxyAdmin: "0x0BF025f014C18b1cA3d789b3068FDed929108F37"
       proxyAdminOwner: *proxyAdmin
       proxyChecks: {}
       checks:
@@ -1705,6 +1721,7 @@ l1:
       address: *depositQueueWETH
       proxyName: TransparentUpgradeableProxy
       implementation: *depositQueueImplementation
+      proxyAdmin: "0x05D96ad320cE2a2a6d3FE0e4eA9A3042D1f40115"
       proxyAdminOwner: *proxyAdmin
       proxyChecks: {}
       checks:
@@ -1726,6 +1743,7 @@ l1:
       address: *depositQueueWSTETH
       proxyName: TransparentUpgradeableProxy
       implementation: *depositQueueImplementation
+      proxyAdmin: "0x80Cf01bBE8C126144EE97b49a17d2b9656186b70"
       proxyAdminOwner: *proxyAdmin
       proxyChecks: {}
       checks:
@@ -1747,6 +1765,7 @@ l1:
       address: *depositQueueDVV
       proxyName: TransparentUpgradeableProxy
       implementation: *depositQueueImplementation
+      proxyAdmin: "0x1289B56acBC8a341910027D3EB6E19139fDF3c4b"
       proxyAdminOwner: *proxyAdmin
       proxyChecks: {}
       checks:
@@ -1768,6 +1787,7 @@ l1:
       address: *redeemQueueWSTETH
       proxyName: TransparentUpgradeableProxy
       implementation: *redeemQueueImplementation
+      proxyAdmin: "0x1FD8098e9f43D94B3604D1Db4bCAaCBDaa8994a6"
       proxyAdminOwner: *proxyAdmin
       proxyChecks: {}
       checks:
@@ -1789,6 +1809,7 @@ l1:
       address: *syncDepositQueueETH
       proxyName: TransparentUpgradeableProxy
       implementation: *syncDepositQueueImplementation
+      proxyAdmin: "0xAA3f650a7dEd291bb7ba2Ab5bB9DE7F610999754"
       proxyAdminOwner: *proxyAdmin
       proxyChecks: {}
       checks:
@@ -1814,6 +1835,7 @@ l1:
       address: *syncDepositQueueWETH
       proxyName: TransparentUpgradeableProxy
       implementation: *syncDepositQueueImplementation
+      proxyAdmin: "0xFB41DC7961a3c26E0CB90d00aFE7EC5a2fE2FCdd"
       proxyAdminOwner: *proxyAdmin
       proxyChecks: {}
       checks:
@@ -1839,6 +1861,7 @@ l1:
       address: *syncDepositQueueWSTETH
       proxyName: TransparentUpgradeableProxy
       implementation: *syncDepositQueueImplementation
+      proxyAdmin: "0x19DAd35c42f9AB8AB5628Fd1ed77f6fa1B530A4b"
       proxyAdminOwner: *proxyAdmin
       proxyChecks: {}
       checks:
@@ -1864,6 +1887,7 @@ l1:
       address: *syncRedeemQueueWSTETH
       proxyName: TransparentUpgradeableProxy
       implementation: *syncRedeemQueueImplementation
+      proxyAdmin: "0xF635663D4AF08b982185779a9BEaa3eA72c47629"
       proxyAdminOwner: *proxyAdmin
       proxyChecks: {}
       checks:
@@ -1891,6 +1915,7 @@ l1:
       address: *syncDepositQueueDVV
       proxyName: TransparentUpgradeableProxy
       implementation: *syncDepositQueueImplementation
+      proxyAdmin: "0xa1480148C57eAE198195b53F5954e5887c1339a8"
       proxyAdminOwner: *proxyAdmin
       proxyChecks: {}
       checks:
@@ -1916,6 +1941,7 @@ l1:
       address: *oracle
       proxyName: TransparentUpgradeableProxy
       implementation: *oracleImplementation
+      proxyAdmin: "0x6Ce7C72d54E9BdFb97101bd5C4988B61EB4Fa156"
       proxyAdminOwner: *proxyAdmin
       proxyChecks: {}
       checks:
@@ -1989,6 +2015,7 @@ l1:
       address: *shareManager
       proxyName: TransparentUpgradeableProxy
       implementation: *tokenizedShareManagerImplementation
+      proxyAdmin: "0x222F62d278D939BDD718569637E32Df45fAd973B"
       proxyAdminOwner: *proxyAdmin
       proxyChecks: {}
       checks:
@@ -2040,6 +2067,7 @@ l1:
       address: *feeManager
       proxyName: TransparentUpgradeableProxy
       implementation: *feeManagerImplementation
+      proxyAdmin: "0x152BB5820Af60De9005453FF58cb1a764bEA2E0F"
       proxyAdminOwner: *proxyAdmin
       proxyChecks: {}
       checks:
@@ -2073,6 +2101,7 @@ l1:
       address: *riskManager
       proxyName: TransparentUpgradeableProxy
       implementation: *riskManagerImplementation
+      proxyAdmin: "0xec949eCEb63F47853551dFAB8BF5BbaC4fc61F86"
       proxyAdminOwner: *proxyAdmin
       proxyChecks: {}
       checks:
@@ -2120,6 +2149,7 @@ l1:
       address: *subvault0
       proxyName: TransparentUpgradeableProxy
       implementation: *subvaultImplementation
+      proxyAdmin: "0x19005b32D422037F2F68D521F6792fA86B5Ba057"
       proxyAdminOwner: *proxyAdmin
       proxyChecks: {}
       checks:
@@ -2137,6 +2167,7 @@ l1:
       address: *verifier0
       proxyName: TransparentUpgradeableProxy
       implementation: *verifierImplementation
+      proxyAdmin: "0x69C2ca76cd6114C28088Eb3F8eE4a8b872ADefD6"
       proxyAdminOwner: *proxyAdmin
       proxyChecks: {}
       checks:
@@ -2170,6 +2201,7 @@ l1:
       address: *subvault1
       proxyName: TransparentUpgradeableProxy
       implementation: *subvaultImplementation
+      proxyAdmin: "0xD0A5294798b9d75062022535683AFA06D13399AF"
       proxyAdminOwner: *proxyAdmin
       proxyChecks: {}
       checks:
@@ -2187,6 +2219,7 @@ l1:
       address: *verifier1
       proxyName: TransparentUpgradeableProxy
       implementation: *verifierImplementation
+      proxyAdmin: "0xe895181721DeDC443c55956afdABeE1Cd4356BE4"
       proxyAdminOwner: *proxyAdmin
       proxyChecks: {}
       checks:
@@ -2220,6 +2253,7 @@ l1:
       address: *subvault2
       proxyName: TransparentUpgradeableProxy
       implementation: *subvaultImplementation
+      proxyAdmin: "0xB9CD765B44A687aC2047f0B07B198200EDBaa323"
       proxyAdminOwner: *proxyAdmin
       proxyChecks: {}
       checks:
@@ -2237,6 +2271,7 @@ l1:
       address: *verifier2
       proxyName: TransparentUpgradeableProxy
       implementation: *verifierImplementation
+      proxyAdmin: "0xAb290b791b1047b23548663d6c6e38cA6174b0Ba"
       proxyAdminOwner: *proxyAdmin
       proxyChecks: {}
       checks:
@@ -2270,6 +2305,7 @@ l1:
       address: *subvault3
       proxyName: TransparentUpgradeableProxy
       implementation: *subvaultImplementation
+      proxyAdmin: "0x6554efef987ABFE2BA11824f7E5B2AE2547B8E47"
       proxyAdminOwner: *proxyAdmin
       proxyChecks: {}
       checks:
@@ -2287,6 +2323,7 @@ l1:
       address: *verifier3
       proxyName: TransparentUpgradeableProxy
       implementation: *verifierImplementation
+      proxyAdmin: "0xabB8a65C206F428B4597d777c861Ffd17a90B881"
       proxyAdminOwner: *proxyAdmin
       proxyChecks: {}
       checks:
@@ -2320,6 +2357,7 @@ l1:
       address: *subvault4
       proxyName: TransparentUpgradeableProxy
       implementation: *subvaultImplementation
+      proxyAdmin: "0xBC1f01e06E774CADCE32BFbc901f89F3f99De7C7"
       proxyAdminOwner: *proxyAdmin
       proxyChecks: {}
       checks:
@@ -2337,6 +2375,7 @@ l1:
       address: *verifier4
       proxyName: TransparentUpgradeableProxy
       implementation: *verifierImplementation
+      proxyAdmin: "0x4176e5d2324ca00d7e0537a893FE7Fc19faA9A92"
       proxyAdminOwner: *proxyAdmin
       proxyChecks: {}
       checks:
@@ -2370,6 +2409,7 @@ l1:
       address: *subvault5
       proxyName: TransparentUpgradeableProxy
       implementation: *subvaultImplementation
+      proxyAdmin: "0x2F986591292f8f1bff3C13886F6386410044D8c5"
       proxyAdminOwner: *proxyAdmin
       proxyChecks: {}
       checks:
@@ -2387,6 +2427,7 @@ l1:
       address: *verifier5
       proxyName: TransparentUpgradeableProxy
       implementation: *verifierImplementation
+      proxyAdmin: "0xdC97A9762277C1d69A051A903C0d87584C4629c1"
       proxyAdminOwner: *proxyAdmin
       proxyChecks: {}
       checks:
@@ -2420,6 +2461,7 @@ l1:
       address: *subvault6
       proxyName: TransparentUpgradeableProxy
       implementation: *subvaultImplementation
+      proxyAdmin: "0x140E4B385ff8943CcEB5eFfA62fd0735b2375FDE"
       proxyAdminOwner: *proxyAdmin
       proxyChecks: {}
       checks:
@@ -2437,6 +2479,7 @@ l1:
       address: *verifier6
       proxyName: TransparentUpgradeableProxy
       implementation: *verifierImplementation
+      proxyAdmin: "0x75E6a92C96bE2050918E4279A08d4976d711e12d"
       proxyAdminOwner: *proxyAdmin
       proxyChecks: {}
       checks:
@@ -2470,6 +2513,7 @@ l1:
       address: *subvault7
       proxyName: TransparentUpgradeableProxy
       implementation: *subvaultImplementation
+      proxyAdmin: "0x677E325F711Dc6AF0720C57acdBfEB4b4891b814"
       proxyAdminOwner: *proxyAdmin
       proxyChecks: {}
       checks:
@@ -2487,6 +2531,7 @@ l1:
       address: *verifier7
       proxyName: TransparentUpgradeableProxy
       implementation: *verifierImplementation
+      proxyAdmin: "0x98C7797B545Cd3F272C9B96eFa0f80C112080f26"
       proxyAdminOwner: *proxyAdmin
       proxyChecks: {}
       checks:

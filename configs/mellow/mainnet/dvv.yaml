@@ -65,6 +65,7 @@ l1:
       address: *vault
       proxyName: TransparentUpgradeableProxy
       implementation: *vaultImplementation
+      proxyAdmin: "0x8E6C80c41450D3fA7B1Fd0196676b99Bfb34bF48"
       proxyAdminOwner: *proxyAdmin
       proxyChecks: {}
       checks:

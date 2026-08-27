@@ -11,7 +11,7 @@ Validates EVM smart-contract state against YAML configs. Calls view functions on
 
 ## Layout
 
-`configs/<project>/<mainnet|testnet>/` per deployment, one project directory per product family — run `ls configs/` for the current set. Filenames carry the product and network when a directory spans several (`<product>-<network>.yaml`); ABI stores are chainId-scoped so one `abis.json.gz` per directory covers all chains. `src/` is TypeScript; entry is `src/state-mate.ts`. Requires Node ≥22, yarn 4.17.0.
+`configs/<project>/<mainnet|testnet>/` per deployment, one project directory per product family — run `ls configs/` for the current set. Filenames carry the product and network when a directory spans several (`<product>-<network>.yaml`); ABI stores are chainId-scoped so one `abis.json.gz` per directory covers all chains. `src/` is TypeScript; entry is `src/state-mate.ts`. Requires Node ≥24, yarn 4.17.0.
 
 ## Scripts (package.json)
 
