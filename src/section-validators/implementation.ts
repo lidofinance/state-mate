@@ -2,10 +2,10 @@ import chalk from "chalk";
 import { getAddress, type JsonRpcProvider } from "ethers";
 
 import { context } from "src/context";
-import { LogCommand } from "src/logger";
+import { LogCommand, logMethodSkipped } from "src/logger";
 import { type ContractEntry, isTypeOfTB, ProxyContractEntryTB } from "src/typebox";
 
-import { incChecks, incErrors, setErrorContext } from "./base";
+import { incChecks, incErrors, incSkipped, setErrorContext } from "./base";
 
 // keccak256("eip1967.proxy.implementation") - 1. Read first, every EIP-1967 proxy keeps the
 // address here
@@ -88,7 +88,12 @@ function pinsStorageWord(contractEntry: ContractEntry, slot: string, expected: s
  */
 export async function checkImplementation(provider: JsonRpcProvider, contractEntry: ContractEntry): Promise<void> {
   // `-o <section>/<contract>/checks` asks for one checks type, so keep an unrelated failure out
-  if (context.skipImplementationCheck || context.checkOnly?.checksType) return;
+  if (context.checkOnly?.checksType) return;
+  if (context.skipImplementationCheck) {
+    incSkipped();
+    logMethodSkipped("implementation");
+    return;
+  }
 
   const { address } = contractEntry;
   const proxyEntry = isTypeOfTB(contractEntry, ProxyContractEntryTB) ? contractEntry : undefined;

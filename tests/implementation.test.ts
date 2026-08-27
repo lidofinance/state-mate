@@ -360,15 +360,18 @@ describe("checkImplementation", () => {
     assert.match(message, /pins no implementation/);
   });
 
-  it("touches the chain for nothing when --skip-implementation-check is set", async () => {
+  it("touches the chain for nothing but counts the skip when --skip-implementation-check is set", async () => {
     const { provider, reads } = stubProvider({ slots: { [EIP1967_SLOT]: word(OTHER_IMPL_ADDRESS) } });
     context.skipImplementationCheck = true;
+    const { output } = captureOutput();
 
     await checkImplementation(provider, proxyEntry(IMPL_ADDRESS));
 
     assert.deepEqual(reads, []);
     assert.equal(stats.errors, 0);
     assert.equal(stats.totalChecks, 0);
+    assert.equal(stats.skipped, 1);
+    assert.match(output(), /implementation.*skipped/);
   });
 
   it("stays out of a run narrowed to a single checks type", async () => {
@@ -379,6 +382,7 @@ describe("checkImplementation", () => {
 
     assert.deepEqual(reads, []);
     assert.equal(stats.errors, 0);
+    assert.equal(stats.skipped, 0);
   });
 });
 
