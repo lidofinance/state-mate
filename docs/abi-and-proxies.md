@@ -29,8 +29,8 @@ For each declared `implementation`, state-mate reads the EIP-1967 implementation
 
 An entry without `implementation` must have an empty EIP-1967 implementation slot. This prevents a proxy from being described as a regular contract and checked with the wrong ABI. An unreadable implementation fails the check; `--skip-implementation-check` is the explicit bypass.
 
-## ProxyAdmin ownership
+## ProxyAdmin verification
 
-A declared `proxyAdminOwner` check is independent of the implementation bypass. state-mate reads the EIP-1967 admin slot, calls `owner()` on that address, and compares the result with the config.
+The `proxyAdmin` and `proxyAdminOwner` checks are independent of the implementation bypass and share one read of the EIP-1967 admin slot. `proxyAdmin` pins the contract the slot holds; `proxyAdminOwner` calls `owner()` on that contract and compares the answer. They answer different questions — an unexpected ProxyAdmin owned by the expected owner passes `proxyAdminOwner` alone — so pin both when the admin contract itself matters.
 
-The ProxyAdmin address needs no ABI entry. Use a `storage` check when the config must also pin the admin address itself. An admin that does not implement `owner()`, such as a Safe, fails this check and should be asserted through `storage` instead.
+Neither field needs an ABI entry. An admin that does not implement `owner()`, such as a Safe, fails `proxyAdminOwner` and should be pinned with `proxyAdmin` instead.

@@ -11,6 +11,7 @@ parameters:
   - &vault "0x0000000000000000000000000000000000000001"
   - &vaultImplementation "0x0000000000000000000000000000000000000002"
   - &admin "0x0000000000000000000000000000000000000003"
+  - &vaultProxyAdmin "0x0000000000000000000000000000000000000004"
 
 roles:
   - &DEFAULT_ADMIN_ROLE "0x0000000000000000000000000000000000000000000000000000000000000000"
@@ -31,6 +32,7 @@ l1:
       address: *vault
       proxyName: TransparentUpgradeableProxy
       implementation: *vaultImplementation
+      proxyAdmin: *vaultProxyAdmin
       proxyAdminOwner: *admin
       checks:
         owner: *admin
@@ -65,6 +67,7 @@ The addresses under `deployed` determine which ABIs state-mate stores. Include i
 | `ozAcl`                | Exact role counts and members for enumerable OpenZeppelin access control                |
 | `ozNonEnumerableAcl`   | Declared memberships across the roles and holders listed in the config                  |
 | `implementation`       | The implementation address reported by the chain                                        |
+| `proxyAdmin`           | The contract held in the EIP-1967 admin slot                                            |
 | `proxyAdminOwner`      | The owner of the `ProxyAdmin` in the EIP-1967 admin slot                                |
 
 Every `view` and `pure` function in the selected ABI must appear in `checks`. A `null` result marks a function as deliberately skipped and reports it in the totals.
