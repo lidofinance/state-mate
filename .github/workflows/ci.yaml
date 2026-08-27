@@ -42,10 +42,16 @@ jobs:
           ETHERSCAN_TOKEN: ${{ secrets.ETHERSCAN_TOKEN }}
           ETH_RPC_URL: ${{ secrets.MAINNET_REMOTE_RPC_URL || 'https://eth.drpc.org' }}
           ETH_HOODI_RPC_URL: ${{ secrets.HOODI_REMOTE_RPC_URL || 'https://hoodi.drpc.org' }}
+          ETH_SEPOLIA_RPC_URL: ${{ secrets.ETH_SEPOLIA_RPC_URL || 'https://ethereum-sepolia-rpc.publicnode.com' }}
           ARBITRUM_RPC_URL: ${{ secrets.ARBITRUM_RPC_URL || 'https://arbitrum.drpc.org' }}
           BASE_RPC_URL: ${{ secrets.BASE_RPC_URL || 'https://base.drpc.org' }}
+          BNB_RPC_URL: ${{ secrets.BNB_RPC_URL || 'https://bsc-rpc.publicnode.com' }}
+          BNB_TESTNET_RPC_URL: ${{ secrets.BNB_TESTNET_RPC_URL || 'https://bsc-testnet-rpc.publicnode.com' }}
           MANTLE_RPC_URL: ${{ secrets.MANTLE_RPC_URL || 'https://mantle.drpc.org' }}
+          OPTIMISM_RPC_URL: ${{ secrets.OPTIMISM_RPC_URL || 'https://optimism.drpc.org' }}
+          OPTIMISM_SEPOLIA_RPC_URL: ${{ secrets.OPTIMISM_SEPOLIA_RPC_URL || 'https://optimism-sepolia.drpc.org' }}
           PLASMA_RPC_URL: ${{ secrets.PLASMA_RPC_URL || 'https://plasma.drpc.org' }}
+          UNICHAIN_RPC_URL: ${{ secrets.UNICHAIN_RPC_URL || 'https://unichain.drpc.org' }}
         run: yarn start ${{ matrix.config }} --quiet ${{ github.event_name == 'schedule' && '--update-abi' || '' }}
 
       - name: Check ABI provenance
