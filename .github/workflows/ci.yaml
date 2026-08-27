@@ -55,8 +55,18 @@ jobs:
             fi
           done
 
+      # The nightly run rebuilds every ABI from the explorer, so a store that drifted from the
+      # canonical source fails the job instead of being silently trusted
       - name: Run state-mate
-        run: yarn start ${{ matrix.config }} --quiet
+        run: yarn start ${{ matrix.config }} --quiet ${{ github.event_name == 'schedule' && '--update-abi' || '' }}
+
+      - name: Check ABI provenance
+        if: github.event_name == 'schedule'
+        run: |
+          if ! git diff --exit-code -- ${{ matrix.config }}; then
+            echo "Error: the committed ABI store differs from what the explorer serves."
+            exit 1
+          fi
 
   unit:
     name: Unit Tests
