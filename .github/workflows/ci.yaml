@@ -48,6 +48,7 @@ jobs:
           BASE_RPC_URL: ${{ secrets.BASE_RPC_URL || 'https://base.drpc.org' }}
           BNB_RPC_URL: ${{ secrets.BNB_RPC_URL || 'https://bsc-rpc.publicnode.com' }}
           BNB_TESTNET_RPC_URL: ${{ secrets.BNB_TESTNET_RPC_URL || 'https://bsc-testnet-rpc.publicnode.com' }}
+          LINEA_RPC_URL: ${{ secrets.LINEA_RPC_URL || 'https://linea.drpc.org' }}
           MANTLE_RPC_URL: ${{ secrets.MANTLE_RPC_URL || 'https://mantle.drpc.org' }}
           OPTIMISM_RPC_URL: ${{ secrets.OPTIMISM_RPC_URL || 'https://optimism.drpc.org' }}
           OPTIMISM_SEPOLIA_RPC_URL: ${{ secrets.OPTIMISM_SEPOLIA_RPC_URL || 'https://optimism-sepolia.drpc.org' }}
