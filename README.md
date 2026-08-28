@@ -43,7 +43,8 @@ yarn start path/to/config.yaml
 
 - view-function results and expected reverts
 - raw storage slots
-- enumerable and non-enumerable OpenZeppelin access control
+- enumerable and non-enumerable OpenZeppelin access control, optionally enumerating every role
+  holder from `RoleGranted`/`RoleRevoked` rather than only the ones the config names
 - proxy implementations and ProxyAdmin ownership
 - coverage of every `view` and `pure` function in the selected ABI
 
