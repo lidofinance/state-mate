@@ -41,6 +41,11 @@ class ExplorerHttpError extends Error {
   }
 }
 
+/** Keeps the HTTP error type private while letting a caller own one bounded retry budget. */
+export function isTransientExplorerHttpError(error: unknown): boolean {
+  return error instanceof ExplorerHttpError && error.transient;
+}
+
 export async function loadContractInfo(
   address: string,
   explorerHostname: string,

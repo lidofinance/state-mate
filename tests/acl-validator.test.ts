@@ -65,11 +65,15 @@ class ExposedAcl extends OzNonEnumerableAclSectionValidator {
   public compare(contractEntry: ContractEntry, events: RoleEvent[], known: RoleAnswers = declaredTrue()) {
     return this._compareWithConfig(contractEntry, foldRoleEvents(events), V5_LAYOUT, known);
   }
+
+  public declared(contractEntry: ContractEntry) {
+    return this._validate(contractEntry, false);
+  }
 }
 
 const V5_LAYOUT: StorageLayout = { base: OZ_V5_ACCESS_CONTROL_BASE, name: "openzeppelin v5" };
 
-type RoleAnswers = Map<string, { held: boolean; holder: string; role: string }>;
+type RoleAnswers = Map<string, { held: boolean | undefined; holder: string; role: string }>;
 
 /** What the declared pass would have recorded for a config whose holders all check out. */
 function declaredTrue(): RoleAnswers {
@@ -141,6 +145,23 @@ describe("exhaustive ACL checks", () => {
 
     assert.ok(stats.errors >= 1);
     assert.ok(stats.errorDetails.some((detail) => detail.method.includes(TRIGGER)));
+  });
+
+  it("does not turn a failed hasRole call into a false answer", async () => {
+    const { provider } = stub({});
+    const contract = {
+      getFunction: () => ({
+        staticCall: async () => {
+          throw new Error("RPC unavailable");
+        },
+      }),
+    } as unknown as Contract;
+    const single = entry({ ozNonEnumerableAcl: { [ADMIN]: [GOV] } } as Partial<ContractEntry>);
+
+    const known = await new ExposedAcl(provider, "56", contract).declared(single);
+
+    assert.equal(known.get(key(ADMIN, GOV))?.held, undefined);
+    assert.equal(stats.errors, 1);
   });
 });
 

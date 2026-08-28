@@ -4,6 +4,7 @@ import { foldRoleEvents, type RoleHolders, sortedHolders, sortedRoles } from "sr
 import {
   collectRoleEvents,
   hasLogSource,
+  makeSettledScanRange,
   resolveDeploymentBlock,
   resolveScanHead,
   type ScanRange,
@@ -26,7 +27,7 @@ type CheckOutcome = { detail: string; ok: true } | { message: string; ok: false 
 
 /** hasRole answers from the declared pass, so the exhaustive pass does not ask the chain twice. */
 interface RoleAnswer {
-  held: boolean;
+  held: boolean | undefined;
   holder: string;
   role: string;
 }
@@ -123,8 +124,13 @@ export class OzNonEnumerableAclSectionValidator extends SectionValidatorBase {
   }
 
   /** Runs the declared check and reports what the chain actually said, error or not. */
-  private async _assertRole(contract: Contract, role: string, holder: string, expected: boolean): Promise<boolean> {
-    let held = false;
+  private async _assertRole(
+    contract: Contract,
+    role: string,
+    holder: string,
+    expected: boolean,
+  ): Promise<boolean | undefined> {
+    let held: boolean | undefined;
     await this._check(`.hasRole(${role}, ${holder})`, async () => {
       held = Boolean(await contract.getFunction("hasRole").staticCall(role, holder));
       return held === expected
@@ -182,7 +188,7 @@ export class OzNonEnumerableAclSectionValidator extends SectionValidatorBase {
   private async _scanRange(chainId: string, address: string): Promise<ScanRange> {
     const deployed = await resolveDeploymentBlock(chainId, address);
     if (deployed === undefined) throw new Error(`the explorer would not give a deployment block for ${address}`);
-    return { fromBlock: deployed, toBlock: await resolveScanHead(chainId, this.provider) };
+    return makeSettledScanRange(deployed, await resolveScanHead(chainId, this.provider));
   }
 
   protected async _compareWithConfig(

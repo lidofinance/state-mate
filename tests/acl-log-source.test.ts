@@ -1,15 +1,19 @@
 import assert from "node:assert/strict";
-import { describe, it } from "node:test";
+import { describe, it, mock } from "node:test";
 
 import { ROLE_GRANTED_TOPIC } from "../src/acl/fold";
 import {
   CHAIN_LOG_SOURCES,
+  collectRoleEvents,
   describeSource,
   fetchWindow,
   isRateLimitAnswer,
+  makeSettledScanRange,
   parseQuantity,
   type ScanRange,
+  setRateLimitPause,
 } from "../src/acl/log-source";
+import { resetRequestSlots } from "../src/explorer";
 
 const CONTRACT = "0xccccccccccccccccccccccccccccccccccccccc3";
 
@@ -52,6 +56,58 @@ describe("rate-limit detection", () => {
   it("does not mistake a real answer for a rate limit", () => {
     assert.equal(isRateLimitAnswer({ message: "No records found", result: [] as never }), false);
     assert.equal(isRateLimitAnswer({ message: "OK", result: [] as never }), false);
+  });
+
+  it("retries an HTTP 429 within the same bounded request budget", async () => {
+    let requests = 0;
+    setRateLimitPause(0);
+    resetRequestSlots();
+    const fetchMock = mock.method(globalThis, "fetch", async () => {
+      requests++;
+      if (requests === 1) return new Response("rate limited", { status: 429, statusText: "Too Many Requests" });
+      return Response.json({ message: "No records found", result: "No records found", status: "0" });
+    });
+
+    try {
+      const outcome = await collectRoleEvents("10", CONTRACT, { fromBlock: 1, toBlock: 2 });
+      assert.equal(outcome.ok, true);
+      // First topic: 429 then success. Second topic: success.
+      assert.equal(requests, 3);
+    } finally {
+      fetchMock.mock.restore();
+      setRateLimitPause(6000);
+      resetRequestSlots();
+    }
+  });
+
+  it("stops after the bounded budget when HTTP 429 persists", async () => {
+    setRateLimitPause(0);
+    resetRequestSlots();
+    const fetchMock = mock.method(
+      globalThis,
+      "fetch",
+      async () => new Response("rate limited", { status: 429, statusText: "Too Many Requests" }),
+    );
+
+    try {
+      const outcome = await collectRoleEvents("10", CONTRACT, { fromBlock: 1, toBlock: 2 });
+      assert.equal(outcome.ok, false);
+      assert.equal(fetchMock.mock.calls.length, 4);
+    } finally {
+      fetchMock.mock.restore();
+      setRateLimitPause(6000);
+      resetRequestSlots();
+    }
+  });
+});
+
+describe("settled scan range", () => {
+  it("accepts a contract deployed at the settled head", () => {
+    assert.deepEqual(makeSettledScanRange(100, 100), { fromBlock: 100, toBlock: 100 });
+  });
+
+  it("rejects a deployment newer than the settled head before querying logs", () => {
+    assert.throws(() => makeSettledScanRange(101, 100), /deployment is not yet settled/);
   });
 });
 

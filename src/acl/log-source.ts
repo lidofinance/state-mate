@@ -1,7 +1,7 @@
 import type { JsonRpcProvider } from "ethers";
 
 import { printError } from "../common";
-import { httpGetAsync } from "../explorer";
+import { httpGetAsync, isTransientExplorerHttpError } from "../explorer";
 import { log } from "../logger";
 import { parseRoleLog, type RawLog, ROLE_GRANTED_TOPIC, ROLE_REVOKED_TOPIC, type RoleEvent } from "./fold";
 
@@ -44,6 +44,16 @@ const EXPLORER_RESULT_CAP = 1000;
 export interface ScanRange {
   fromBlock: number;
   toBlock: number;
+}
+
+/** A deployment newer than the settled head has no settled history to scan yet. */
+export function makeSettledScanRange(fromBlock: number, toBlock: number): ScanRange {
+  if (fromBlock > toBlock) {
+    throw new Error(
+      `deployment block ${fromBlock} is newer than settled scan head ${toBlock}; deployment is not yet settled`,
+    );
+  }
+  return { fromBlock, toBlock };
 }
 
 type ScanOutcome = { events: RoleEvent[]; ok: true; source: string } | { ok: false; reason: string };
@@ -106,7 +116,14 @@ export function isRateLimitAnswer(response: ExplorerLogsResponse): boolean {
 
 async function explorerGet(url: string): Promise<ExplorerLogsResponse> {
   for (let attempt = 0; ; attempt++) {
-    const response = await httpGetAsync<ExplorerLogsResponse>(url);
+    let response: ExplorerLogsResponse;
+    try {
+      response = await httpGetAsync<ExplorerLogsResponse>(url);
+    } catch (error) {
+      if (!isTransientExplorerHttpError(error) || attempt >= RATE_LIMIT_ATTEMPTS) throw error;
+      await new Promise((resolve) => setTimeout(resolve, rateLimitPauseMs));
+      continue;
+    }
     if (!isRateLimitAnswer(response) || attempt >= RATE_LIMIT_ATTEMPTS) return response;
     await new Promise((resolve) => setTimeout(resolve, rateLimitPauseMs));
   }

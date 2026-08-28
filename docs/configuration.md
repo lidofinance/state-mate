@@ -65,7 +65,7 @@ The addresses under `deployed` determine which ABIs state-mate stores. Include i
 | `proxyChecks`          | View-function results defined by the proxy ABI                                          |
 | `storage`              | Raw storage slot values                                                                 |
 | `ozAcl`                | Exact role counts and members for enumerable OpenZeppelin access control                |
-| `ozNonEnumerableAcl`   | Declared memberships, plus an event-based enumeration of all actual holders (below)     |
+| `ozNonEnumerableAcl`   | Declared memberships, plus event-based holder discovery through a settled head (below)  |
 | `implementation`       | The implementation address reported by the chain                                        |
 | `proxyAdmin`           | The contract held in the EIP-1967 admin slot                                            |
 | `proxyAdminOwner`      | The owner of the `ProxyAdmin` in the EIP-1967 admin slot                                |
@@ -75,9 +75,11 @@ Every `view` and `pure` function in the selected ABI must appear in `checks`. A 
 ## Exhaustive non-enumerable ACL
 
 A holder nobody wrote down is invisible to checks that only ask about the config's own list. So
-for every contract carrying `ozNonEnumerableAcl`, state-mate also enumerates the actual holders by
-replaying `RoleGranted`/`RoleRevoked` events from the contract's deployment, and reports any live
-holder the config does not declare. There is nothing to configure and no way to opt out; a
+for every contract carrying `ozNonEnumerableAcl`, state-mate also discovers holders by replaying
+`RoleGranted`/`RoleRevoked` events from the contract's deployment through a settled scan head. It
+re-asks every discovered pair against current chain state and reports any current holder the
+config does not declare. Role changes newer than the settled scan head are outside that run and
+may remain undiscovered until a later run. There is nothing to configure and no way to opt out; a
 contract whose access control cannot be checked this way should express its expectations as
 `hasRole` entries under `checks` instead.
 
@@ -97,11 +99,11 @@ passed. The chain-to-source registry lives in `src/acl/log-source.ts`; etherscan
 need `ETHERSCAN_TOKEN`, blockscout-served ones need no key.
 
 Two assumptions carry the result, and the scan checks neither directly. Every membership change
-must have emitted a standard event: the storage calibration is the evidence for that, since a
-contract keeping roles where AccessControl keeps them is one whose grants emit. And the explorer
-must not omit records — truncation is detected, but a source that silently drops one is believed.
-A holder an explorer invents is harmless, since nothing is reported without an on-chain
-confirmation.
+must have emitted a standard event. Storage calibration establishes that the membership layout is
+compatible with a known AccessControl layout; it does not prove that every mutation used the
+standard event-emitting path. The explorer must not omit records — truncation is detected, but a
+source that silently drops one is believed. A holder an explorer invents is harmless, since
+nothing is reported without an on-chain confirmation.
 
 ## Check values
 
