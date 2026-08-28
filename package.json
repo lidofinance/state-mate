@@ -1,6 +1,6 @@
 {
   "name": "state-mate",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Ethereum + L2s smart contract state checker",
   "main": "state-checker.ts",
   "license": "MIT",
