@@ -65,6 +65,7 @@ The addresses under `deployed` determine which ABIs state-mate stores. Include i
 | `proxyChecks`          | View-function results defined by the proxy ABI                                          |
 | `storage`              | Raw storage slot values                                                                 |
 | `ozAcl`                | Exact role counts and members for enumerable OpenZeppelin access control                |
+| `aragonAcl`            | The whole Aragon DAO permission map, discovered from the ACL's events (below)           |
 | `ozNonEnumerableAcl`   | Declared memberships, plus event-based holder discovery through a settled head (below)  |
 | `implementation`       | The implementation address reported by the chain                                        |
 | `proxyAdmin`           | The contract held in the EIP-1967 admin slot                                            |
@@ -106,6 +107,45 @@ known AccessControl layout, not that every mutation used the event-emitting path
 must not omit grants; that is the whole of the trust placed in it. Anything else it could serve
 wrongly is either refuted by the chain (an invented grant costs one refuted lookup) or fails
 loudly (truncation is detected by range-halving).
+
+## Aragon ACL
+
+Aragon permissions live in the ACL app, not in the contracts they guard, so the map is declared in
+one place: an `aragonAcl` section on the ACL's own entry, keyed app → role → expectations. Like
+the OpenZeppelin scan it is exhaustive by construction — the section is compared against every
+`SetPermission`, `SetPermissionParams` and `ChangePermissionManager` event since deployment, so a
+live grant nobody declared is an error, as is a declared grant the chain does not hold.
+
+```yaml
+aragonAcl:
+  *lido:
+    "0x3396…b921": # BUFFER_RESERVE_MANAGER_ROLE
+      manager: *aragonAgent
+      granted: [*aragonAgent]
+  *simpleDvt:
+    "0x75ab…21ee": # MANAGE_SIGNING_KEYS
+      manager: *evmScriptExecutor
+      granted: [*evmScriptExecutor]
+      paramsDigest: "0x…" # one pin for all parameterized grants of the role
+```
+
+| Field          | Meaning                                                                                  |
+| -------------- | ---------------------------------------------------------------------------------------- |
+| `manager`      | Who can grant and revoke the role — verified against events, the view, and ACL storage   |
+| `granted`      | Unconditional grantees: events, `hasPermission`, and the permission slot must all agree  |
+| `paramsDigest` | keccak256 over the role's parameterized grants as (entity ‖ paramsHash) sorted by entity |
+
+Parameterized grants are the reason for the digest: `hasPermission(entity, app, role)` answers
+**false** for a live conditional grant (measured on mainnet), so the view cannot vouch for them.
+Instead the params hash must agree three ways — the event history, the raw permission slot, and
+the pinned digest — and any change to the set, including a params change for an existing entity,
+breaks the pin. On mismatch the tool prints the live set, so re-pinning is one reviewed
+copy-paste. The digest is reproducible by hand: sort, concatenate, `cast keccak`.
+
+A role with a manager and no grantees is declared with `manager` alone; managers on apps outside
+the declared map are not checked. `ANY_ENTITY` (the aragonOS wildcard) holding anything is an
+error. The same log-source registry, skip semantics, and fail-closed rules apply as for the
+OpenZeppelin scan above.
 
 ## Check values
 

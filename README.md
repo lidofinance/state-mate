@@ -45,6 +45,8 @@ yarn start path/to/config.yaml
 - raw storage slots
 - enumerable and non-enumerable OpenZeppelin access control; non-enumerable checks automatically
   discover candidate holders from `RoleGranted` events and let the chain decide who still holds
+- the full Aragon DAO permission map — grants, parameterized grants, and permission managers —
+  discovered from the ACL's event history and reconciled against its raw storage
 - proxy implementations and ProxyAdmin ownership
 - coverage of every `view` and `pure` function in the selected ABI
 
