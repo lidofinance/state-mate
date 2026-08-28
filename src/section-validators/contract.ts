@@ -5,7 +5,7 @@ import { EntryField } from "src/common";
 import { logFinalStatus, logHeader1, logHeader2 } from "src/logger";
 import type { ContractEntry } from "src/typebox";
 import type { ChainId } from "src/types";
-
+import { AragonAclSectionValidator } from "./aragon-acl";
 import {
   CheckLevel,
   clearErrorContext,
@@ -37,6 +37,7 @@ export class ContractSectionValidator {
       EntryField.ozNonEnumerableAcl,
       EntryField.implementationChecks,
       EntryField.ozAcl,
+      EntryField.aragonAcl,
     ];
     for (const section of sections) {
       switch (section) {
@@ -62,6 +63,10 @@ export class ContractSectionValidator {
         }
         case EntryField.ozAcl: {
           this.map.set(section, new OzAclSectionValidator(provider, chainId));
+          break;
+        }
+        case EntryField.aragonAcl: {
+          this.map.set(section, new AragonAclSectionValidator(provider, chainId));
           break;
         }
         default: {
@@ -122,6 +127,11 @@ export class ContractSectionValidator {
     if (needCheck(CheckLevel.checksType, EntryField.ozAcl)) {
       setErrorContext({ checksType: EntryField.ozAcl });
       await this.map.get(EntryField.ozAcl)!.validateSection(contractEntry, contractAlias, basePath);
+    }
+
+    if (needCheck(CheckLevel.checksType, EntryField.aragonAcl)) {
+      setErrorContext({ checksType: EntryField.aragonAcl });
+      await this.map.get(EntryField.aragonAcl)!.validateSection(contractEntry, contractAlias, basePath);
     }
 
     // Clear error context after contract validation

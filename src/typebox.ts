@@ -41,6 +41,21 @@ export function isTypeOfTB<T extends TSchema>(value: unknown, schema: T): value 
 
 const OzNonEnumerableAclTB = Type.Readonly(Type.Record(EthereumStringTB, EthereumStringArrayTB));
 
+// Aragon: the whole DAO permission map, declared on the ACL entry that owns the storage.
+// app -> role -> { manager, unconditional grantees, digest over parameterized grants }
+const AragonRoleEntryTB = Type.Readonly(
+  Type.Object(
+    {
+      manager: EthereumStringTB,
+      granted: Type.Optional(EthereumStringArrayTB),
+      paramsDigest: Type.Optional(Type.String({ pattern: "^0x[a-fA-F0-9]{64}$" })),
+    },
+    { additionalProperties: false },
+  ),
+);
+const AragonAclTB = Type.Readonly(Type.Record(EthereumStringTB, Type.Record(EthereumStringTB, AragonRoleEntryTB)));
+export type AragonAclSection = Static<typeof AragonAclTB>;
+
 export const PlainValueTB = Type.Readonly(Type.Union([Type.Null(), Type.String(), Type.Boolean(), Type.Number()]));
 export const PlainValueArrayTB = Type.Readonly(Type.Array(PlainValueTB));
 // Support deeper nesting for complex tuple returns (e.g., Safe Harbor Agreement details)
@@ -170,6 +185,7 @@ const RegularContractEntryTB = Type.Readonly(
       storage: Type.Optional(StorageChecksTB),
       ozNonEnumerableAcl: Type.Optional(OzNonEnumerableAclTB),
       ozAcl: Type.Optional(OzAclChecksTB),
+      aragonAcl: Type.Optional(AragonAclTB),
     },
     { additionalProperties: false },
   ),
