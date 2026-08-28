@@ -65,12 +65,47 @@ The addresses under `deployed` determine which ABIs state-mate stores. Include i
 | `proxyChecks`          | View-function results defined by the proxy ABI                                          |
 | `storage`              | Raw storage slot values                                                                 |
 | `ozAcl`                | Exact role counts and members for enumerable OpenZeppelin access control                |
-| `ozNonEnumerableAcl`   | Declared memberships across the roles and holders listed in the config                  |
+| `ozNonEnumerableAcl`   | Declared memberships, plus event-based holder discovery through a settled head (below)  |
 | `implementation`       | The implementation address reported by the chain                                        |
 | `proxyAdmin`           | The contract held in the EIP-1967 admin slot                                            |
 | `proxyAdminOwner`      | The owner of the `ProxyAdmin` in the EIP-1967 admin slot                                |
 
 Every `view` and `pure` function in the selected ABI must appear in `checks`. A `null` result marks a function as deliberately skipped and reports it in the totals.
+
+## Exhaustive non-enumerable ACL
+
+A holder nobody wrote down is invisible to checks that only ask about the config's own list. So
+for every contract carrying `ozNonEnumerableAcl`, state-mate also collects every address a
+`RoleGranted` event was ever emitted for, from the contract's deployment through a settled scan
+head, and asks the chain which of them still hold the role. The log source only nominates
+candidates — it never decides membership, so revocation events are not even fetched: a fabricated
+`RoleRevoked` cannot hide a holder, and event ordering cannot matter. Grants newer than the
+settled scan head are outside that run and may remain undiscovered until a later run. There is
+nothing to configure and no way to opt out; a
+contract whose access control cannot be checked this way should express its expectations as
+`hasRole` entries under `checks` instead.
+
+Every holder the scan finds is re-asked on chain before being reported, and every pair the check
+forms an opinion about — declared as well as discovered — is read from the raw membership slot
+too. `hasRole` is dispatched through the proxy to whatever is deployed, using an ABI an explorer
+served; the slot is derived from the storage layout and touches neither, so it is the one
+independent witness. Explorers cap a logs response at a thousand records without saying so, so a
+full response is treated as possibly truncated and the block range is halved until every window
+comes back short.
+
+The scan refuses to report less than it claims. An explorer that will not answer, a response that
+cannot be narrowed, or a contract whose storage matches no known AccessControl layout are errors,
+not a quiet fall back to the declared-only checks. A chain with no log source at all is different
+and counts as **skipped** — a structural limit, printed in the run's totals, never counted as
+passed. The chain-to-source registry lives in `src/acl/log-source.ts`; etherscan-served chains
+need `ETHERSCAN_TOKEN`, blockscout-served ones need no key.
+
+Two assumptions carry the result, and the scan checks neither directly. Every grant must have
+emitted a standard event — storage calibration establishes that the membership layout matches a
+known AccessControl layout, not that every mutation used the event-emitting path. And the explorer
+must not omit grants; that is the whole of the trust placed in it. Anything else it could serve
+wrongly is either refuted by the chain (an invented grant costs one refuted lookup) or fails
+loudly (truncation is detected by range-halving).
 
 ## Check values
 
