@@ -766,7 +766,7 @@ l1:
       checks:
         SET_SYNC_REDEEM_PARAMS_ROLE: *SET_SYNC_REDEEM_PARAMS_ROLE
         asset: *usdc
-        canBeRemoved: true
+        canBeRemoved:
         getLiquidAssets:
         name: "SyncRedeemQueue"
         # [usage, remainingDailyLimit] — both move with every redeem
@@ -777,7 +777,7 @@ l1:
       implementationChecks:
         SET_SYNC_REDEEM_PARAMS_ROLE: *SET_SYNC_REDEEM_PARAMS_ROLE
         asset: *ZERO_ADDRESS
-        canBeRemoved: true
+        canBeRemoved:
         getLiquidAssets:
         name: "SyncRedeemQueue"
         remainingDailyLimit: [0, 0]
@@ -1557,7 +1557,7 @@ l1:
       checks:
         SET_SYNC_REDEEM_PARAMS_ROLE: *SET_SYNC_REDEEM_PARAMS_ROLE
         asset: *usdc
-        canBeRemoved: true
+        canBeRemoved:
         getLiquidAssets:
         name: "SyncRedeemQueue"
         # [usage, remainingDailyLimit] — both move with every redeem
@@ -1568,7 +1568,7 @@ l1:
       implementationChecks:
         SET_SYNC_REDEEM_PARAMS_ROLE: *SET_SYNC_REDEEM_PARAMS_ROLE
         asset: *ZERO_ADDRESS
-        canBeRemoved: true
+        canBeRemoved:
         getLiquidAssets:
         name: "SyncRedeemQueue"
         remainingDailyLimit: [0, 0]
@@ -1621,7 +1621,7 @@ l1:
       checks:
         SET_SYNC_REDEEM_PARAMS_ROLE: *SET_SYNC_REDEEM_PARAMS_ROLE
         asset: *usdt
-        canBeRemoved: true
+        canBeRemoved:
         getLiquidAssets:
         name: "SyncRedeemQueue"
         # [usage, remainingDailyLimit] — both move with every redeem
@@ -1632,7 +1632,7 @@ l1:
       implementationChecks:
         SET_SYNC_REDEEM_PARAMS_ROLE: *SET_SYNC_REDEEM_PARAMS_ROLE
         asset: *ZERO_ADDRESS
-        canBeRemoved: true
+        canBeRemoved:
         getLiquidAssets:
         name: "SyncRedeemQueue"
         remainingDailyLimit: [0, 0]
@@ -2372,7 +2372,7 @@ l1:
       checks:
         SET_SYNC_REDEEM_PARAMS_ROLE: *SET_SYNC_REDEEM_PARAMS_ROLE
         asset: *usdc
-        canBeRemoved: true
+        canBeRemoved:
         getLiquidAssets:
         name: "SyncRedeemQueue"
         # [usage, remainingDailyLimit] — both move with every redeem
@@ -2383,7 +2383,7 @@ l1:
       implementationChecks:
         SET_SYNC_REDEEM_PARAMS_ROLE: *SET_SYNC_REDEEM_PARAMS_ROLE
         asset: *ZERO_ADDRESS
-        canBeRemoved: true
+        canBeRemoved:
         getLiquidAssets:
         name: "SyncRedeemQueue"
         remainingDailyLimit: [0, 0]
@@ -2436,7 +2436,7 @@ l1:
       checks:
         SET_SYNC_REDEEM_PARAMS_ROLE: *SET_SYNC_REDEEM_PARAMS_ROLE
         asset: *usdt
-        canBeRemoved: true
+        canBeRemoved:
         getLiquidAssets:
         name: "SyncRedeemQueue"
         # [usage, remainingDailyLimit] — both move with every redeem
@@ -2447,7 +2447,7 @@ l1:
       implementationChecks:
         SET_SYNC_REDEEM_PARAMS_ROLE: *SET_SYNC_REDEEM_PARAMS_ROLE
         asset: *ZERO_ADDRESS
-        canBeRemoved: true
+        canBeRemoved:
         getLiquidAssets:
         name: "SyncRedeemQueue"
         remainingDailyLimit: [0, 0]

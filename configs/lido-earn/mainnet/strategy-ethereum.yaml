@@ -428,7 +428,7 @@ l1:
       checks:
         ORDER_TYPEHASH: "0xb367c53189b3057a91923801116b5f9c4e7211a314d1961f94770747512a1b68"
         asset: *ZERO_ADDRESS
-        canBeRemoved: true
+        canBeRemoved:
         claimableOf: # this queue doesn't have claimableOf shares
         consensus: *ZERO_ADDRESS
         consensusFactory: *consensusFactory
@@ -612,7 +612,7 @@ l1:
       checks:
         ORDER_TYPEHASH: "0xb367c53189b3057a91923801116b5f9c4e7211a314d1961f94770747512a1b68"
         asset: *ZERO_ADDRESS
-        canBeRemoved: true
+        canBeRemoved:
         claimableOf:
           - args: [*ZERO_ADDRESS]
             result: 0
@@ -1800,7 +1800,7 @@ l1:
       implementationChecks:
         asset: *ZERO_ADDRESS
         batchAt:
-        canBeRemoved: true
+        canBeRemoved:
         getState:
         requestsOf:
         vault: *ZERO_ADDRESS
@@ -1893,7 +1893,7 @@ l1:
       checks:
         SET_SYNC_REDEEM_PARAMS_ROLE: *SET_SYNC_REDEEM_PARAMS_ROLE
         asset: *lidoWsteth
-        canBeRemoved: true
+        canBeRemoved:
         getLiquidAssets:
         name: "SyncRedeemQueue"
         # [usage, remainingDailyLimit] — both move with every redeem
@@ -1904,7 +1904,7 @@ l1:
       implementationChecks:
         SET_SYNC_REDEEM_PARAMS_ROLE: *SET_SYNC_REDEEM_PARAMS_ROLE
         asset: *ZERO_ADDRESS
-        canBeRemoved: true
+        canBeRemoved:
         getLiquidAssets:
         name: "SyncRedeemQueue"
         remainingDailyLimit: [0, 0]
