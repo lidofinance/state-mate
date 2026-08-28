@@ -5459,6 +5459,137 @@ l1:
         canPerform: null
         getEVMScriptRegistry: null
         getPermissionManager: null
+      # The DAO permission map, verified against SetPermission/SetPermissionParams/
+      # ChangePermissionManager events, hasPermission, and the raw ACL storage. Roles are
+      # keyed by hash; the name is in the comment. paramsDigest = keccak256 over the
+      # (entity . paramsHash) pairs of a role's parameterized grants, sorted by entity.
+      aragonAcl:
+        *aragonVoting :
+          "0xe7dcd7275292e064d090fbc5f3bd7995be23b502c1fed5cd94cfddbbdcd32bbc": # CREATE_VOTES_ROLE
+            manager: *aragonVoting
+            granted: [*aragonTokenManager]
+          "0xad15e7261800b4bb73f1b69d3864565ffb1fd00cb93cf14fe48da8f1f2149f39": # MODIFY_QUORUM_ROLE
+            manager: *aragonVoting
+            granted: [*aragonVoting]
+          "0xda3972983e62bdf826c4b807c4c9c2b8a941e1f83dfa76d53d6aeac11e1be650": # MODIFY_SUPPORT_ROLE
+            manager: *aragonVoting
+            granted: [*aragonVoting]
+          "0x068ca51c9d69625c7add396c98ca4f3b27d894c3b973051ad3ee53017d7094ea": # UNSAFELY_MODIFY_VOTE_TIME_ROLE
+            manager: *aragonVoting
+        *aragonAgent :
+          "0xcebf517aa4440d1d125e0355aae64401211d0848a23c02cc5d29a14822580ba4": # EXECUTE_ROLE
+            manager: *aragonAgent
+            granted: ["0x23e0b465633ff5178808f4a75186e2f2f9537021"] # dual governance admin executor
+          "0xb421f7ad7646747f3051c50c0b8e2377839296cd4973e27f63821d73e390338f": # RUN_SCRIPT_ROLE
+            manager: *aragonAgent
+            granted: ["0x23e0b465633ff5178808f4a75186e2f2f9537021"] # dual governance admin executor
+          "0x8502233096d909befbda0999bb8ea2f3a6be3c138b9fbf003752a4c8bce86f6c": # TRANSFER_ROLE
+            manager: *aragonVoting
+            granted: [*aragonFinance]
+        *nodeOperatorsRegistry :
+          "0xe9367af2d321a2fc8d9c8f1e67f0fc1e2adf2f9844fb89ffa212619c713685b2": # ADD_NODE_OPERATOR_ROLE
+            manager: *aragonVoting
+          "0x78523850fdd761612f46e844cf5a16bda6b3151d6ae961fd7e8e7b92bfbca7f8": # MANAGE_NODE_OPERATOR_ROLE
+            manager: *aragonAgent
+            granted: [*aragonAgent]
+          "0x75abc64490e17b40ea1e66691c3eb493647b24430b358bd87ec3e5127f1621ee": # MANAGE_SIGNING_KEYS
+            manager: *aragonAgent
+            paramsDigest: "0xce7227f047dc5c0af37a1d1f8e23bc54e9d12dd206d1a53d15b21c7e83cf875c" # 1 parameterized grant(s)
+          "0x18ad851afd4930ecc8d243c8869bd91583210624f3f1572e99ee8b450315c80f": # REPORT_STOPPED_VALIDATORS_ROLE
+            manager: *aragonVoting
+          "0xd856e115ac9805c675a51831fa7d8ce01c333d666b0e34b3fc29833b7c68936a": # SET_NODE_OPERATOR_ACTIVE_ROLE
+            manager: *aragonVoting
+          "0xbf4b1c236312ab76e456c7a8cca624bd2f86c74a4f8e09b3a26d60b1ce492183": # SET_NODE_OPERATOR_ADDRESS_ROLE
+            manager: *aragonVoting
+          "0x07b39e0faf2521001ae4e58cb9ffd3840a63e205d288dc9c93c3774f0d794754": # SET_NODE_OPERATOR_LIMIT_ROLE
+            manager: *aragonAgent
+            granted: [*evmScriptExecutor]
+          "0x58412970477f41493548d908d4307dfca38391d6bc001d56ffef86bd4f4a72e8": # SET_NODE_OPERATOR_NAME_ROLE
+            manager: *aragonVoting
+          "0xbb75b874360e0bfd87f964eadd8276d8efb7c942134fc329b513032d0803e0c6": # STAKING_ROUTER_ROLE
+            manager: *aragonAgent
+            granted: [*stakingRouter]
+        *aragonAcl :
+          "0x0b719b33c83b8e5d300c521cb8b54ae9bd933996a14bef8c2f4e0285d2d2400a": # CREATE_PERMISSIONS_ROLE
+            manager: *aragonAgent
+            granted: [*aragonAgent]
+        *lido :
+          "0x33969636f1fbf3d7d062d4de4a08e7bd3c46606ec28b3a4398d2665be559b921": # BUFFER_RESERVE_MANAGER_ROLE
+            manager: *aragonAgent
+            granted: [*aragonAgent]
+          "0xe97b137254058bd94f28d2f3eb79e2d34074ffb488d042e3bc958e0a57d2fa22": # BURN_ROLE
+            manager: *aragonVoting
+          "0x2561bf26f818282a3be40719542054d2173eb0d38539e8a8d3cff22f29fd2384": # DEPOSIT_ROLE
+            manager: *aragonVoting
+          "0x46b8504718b48a11e89304b407879435528b3cd3af96afde67dfe598e4683bd8": # MANAGE_FEE
+            manager: *aragonVoting
+          "0xeb7bfce47948ec1179e2358171d5ee7c821994c911519349b95313b685109031": # MANAGE_PROTOCOL_CONTRACTS_ROLE
+            manager: *aragonVoting
+          "0x96088a8483023eb2f67b12aabbaf17d1d055e6ef387e563902adc1bba1e4028b": # MANAGE_WITHDRAWAL_KEY
+            manager: *aragonVoting
+          "0x139c2898040ef16910dc9f44dc697df79363da767d8bc92f2e310312b816e46d": # PAUSE_ROLE
+            manager: *aragonAgent
+          "0x2fc10cc8ae19568712f7a176fb4978616a610650813c9d05326c34abb62749c7": # RESUME_ROLE
+            manager: *aragonAgent
+          "0x9d68ad53a92b6f44b2e8fb18d211bf8ccb1114f6fafd56aa364515dfdf23c44f": # SET_EL_REWARDS_VAULT_ROLE
+            manager: *aragonVoting
+          "0xca7d176c2da2028ed06be7e3b9457e6419ae0744dc311989e9b29f6a1ceb1003": # SET_EL_REWARDS_WITHDRAWAL_LIMIT_ROLE
+            manager: *aragonVoting
+          "0xd6c7fda17708c7d91354c17ac044fde6f58fb548a5ded80960beba862b1f1d7d": # SET_INSURANCE_FUND
+            manager: *aragonVoting
+          "0x11eba3f259e2be865238d718fd308257e3874ad4b3a642ea3af386a4eea190bd": # SET_ORACLE
+            manager: *aragonVoting
+          "0x9f6f8058e4bcbf364e89c9e8da7eb7cada9d21b7aea6e2fd355b4669842c5795": # SET_TREASURY
+            manager: *aragonVoting
+          "0xa42eee1333c0758ba72be38e728b6dadb32ea767de5b4ddbaea1dae85b1b051f": # STAKING_CONTROL_ROLE
+            manager: *aragonAgent
+          "0x84ea57490227bc2be925c684e2a367071d69890b629590198f4125a018eb1de8": # STAKING_PAUSE_ROLE
+            manager: *aragonAgent
+        *simpleDvt :
+          "0x78523850fdd761612f46e844cf5a16bda6b3151d6ae961fd7e8e7b92bfbca7f8": # MANAGE_NODE_OPERATOR_ROLE
+            manager: *aragonAgent
+            granted: [*evmScriptExecutor]
+          "0x75abc64490e17b40ea1e66691c3eb493647b24430b358bd87ec3e5127f1621ee": # MANAGE_SIGNING_KEYS
+            manager: *evmScriptExecutor
+            granted: [*evmScriptExecutor]
+            paramsDigest: "0xc1b2509eca8bed99ef92f955838d8d046c209f785018917336364450bf652f76" # 82 parameterized grant(s)
+          "0x07b39e0faf2521001ae4e58cb9ffd3840a63e205d288dc9c93c3774f0d794754": # SET_NODE_OPERATOR_LIMIT_ROLE
+            manager: *aragonAgent
+            granted: [*evmScriptExecutor]
+          "0xbb75b874360e0bfd87f964eadd8276d8efb7c942134fc329b513032d0803e0c6": # STAKING_ROUTER_ROLE
+            manager: *aragonAgent
+            granted: [*stakingRouter, *evmScriptExecutor]
+        *aragonFinance :
+          "0xd79730e82bfef7d2f9639b9d10bf37ebb662b22ae2211502a00bdf7b2cc3a23a": # CHANGE_BUDGETS_ROLE
+            manager: *aragonVoting
+            granted: [*aragonVoting]
+          "0xd35e458bacdd5343c2f050f574554b2f417a8ea38d6a9a65ce2225dbe8bb9a9d": # CHANGE_PERIOD_ROLE
+            manager: *aragonVoting
+            granted: [*aragonVoting]
+          "0x5de467a460382d13defdc02aacddc9c7d6605d6d4e0b8bd2f70732cae8ea17bc": # CREATE_PAYMENTS_ROLE
+            manager: *aragonVoting
+            granted: [*aragonVoting]
+            paramsDigest: "0x312b4cd6a8bfedbac4664e2fa4daafb8df11ecfb396e3cf8796a64512e15f61e" # 1 parameterized grant(s)
+          "0x563165d3eae48bcb0a092543ca070d989169c98357e9a1b324ec5da44bab75fd": # EXECUTE_PAYMENTS_ROLE
+            manager: *aragonVoting
+            granted: [*aragonVoting]
+          "0x30597dd103acfaef0649675953d9cb22faadab7e9d9ed57acc1c429d04b80777": # MANAGE_PAYMENTS_ROLE
+            manager: *aragonVoting
+            granted: [*aragonVoting]
+        *aragonTokenManager :
+          "0xf5a08927c847d7a29dc35e105208dbde5ce951392105d712761cc5d17440e2ff": # ASSIGN_ROLE
+            manager: *aragonVoting
+            granted: [*aragonVoting]
+          "0xe97b137254058bd94f28d2f3eb79e2d34074ffb488d042e3bc958e0a57d2fa22": # BURN_ROLE
+            manager: *aragonVoting
+          "0x2406f1e99f79cea012fb88c5c36566feaeefee0f4b98d3a376b49310222b53c4": # ISSUE_ROLE
+            manager: *aragonVoting
+          "0x154c00819833dac601ee5ddded6fda79d9d8b506b911b3dbd54cdb95fe6c3686": # MINT_ROLE
+            manager: *aragonVoting
+            granted: [*aragonVoting]
+          "0x95ffc68daedf1eb334cfcd22ee24a5eeb5a8e58aa40679f2ad247a84140f8d6e": # REVOKE_VESTINGS_ROLE
+            manager: *aragonVoting
+            granted: [*aragonVoting]
 
     aragon-evm-script-registry:
       name: EVMScriptRegistry
