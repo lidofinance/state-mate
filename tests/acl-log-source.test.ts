@@ -71,8 +71,8 @@ describe("rate-limit detection", () => {
     try {
       const outcome = await collectRoleEvents("10", CONTRACT, { fromBlock: 1, toBlock: 2 });
       assert.equal(outcome.ok, true);
-      // First topic: 429 then success. Second topic: success.
-      assert.equal(requests, 3);
+      // The grants topic: a 429, then success. Revocations are no longer fetched at all.
+      assert.equal(requests, 2);
     } finally {
       fetchMock.mock.restore();
       setRateLimitPause(6000);

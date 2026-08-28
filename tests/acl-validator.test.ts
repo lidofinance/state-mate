@@ -3,7 +3,7 @@ import { beforeEach, describe, it } from "node:test";
 
 import type { Contract, JsonRpcProvider } from "ethers";
 
-import { foldRoleEvents, type RoleEvent } from "../src/acl/fold";
+import { grantedCandidates, type RoleEvent } from "../src/acl/fold";
 import { memberSlot, OZ_V5_ACCESS_CONTROL_BASE, type StorageLayout } from "../src/acl/storage";
 import { context, resetStats, stats } from "../src/context";
 import { resetContractCounters } from "../src/section-validators/base";
@@ -63,7 +63,7 @@ class ExposedAcl extends OzNonEnumerableAclSectionValidator {
   }
 
   public compare(contractEntry: ContractEntry, events: RoleEvent[], known: RoleAnswers = declaredTrue()) {
-    return this._compareWithConfig(contractEntry, foldRoleEvents(events), V5_LAYOUT, known);
+    return this._compareWithConfig(contractEntry, grantedCandidates(events), V5_LAYOUT, known);
   }
 
   public declared(contractEntry: ContractEntry) {

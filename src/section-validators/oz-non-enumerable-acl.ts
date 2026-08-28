@@ -1,6 +1,6 @@
 import type { Contract, JsonRpcProvider } from "ethers";
 
-import { foldRoleEvents, type RoleHolders, sortedHolders, sortedRoles } from "src/acl/fold";
+import { grantedCandidates, type RoleHolders, sortedHolders, sortedRoles } from "src/acl/fold";
 import {
   collectRoleEvents,
   hasLogSource,
@@ -141,8 +141,10 @@ export class OzNonEnumerableAclSectionValidator extends SectionValidatorBase {
   }
 
   /**
-   * Enumerates every holder the chain ever granted, by replaying RoleGranted/RoleRevoked from
-   * deployment, and reports the ones the config does not declare.
+   * Enumerates every address RoleGranted was ever emitted for, asks the chain which of them still
+   * hold the role, and reports the holders the config does not declare. The log source only
+   * nominates candidates; it never decides membership, so a fabricated revocation cannot hide a
+   * holder and event ordering cannot matter.
    *
    * Every step that cannot be completed is an error rather than a downgrade to the declared-only
    * check. A config that asks for an exhaustive scan and quietly gets a weaker one is worse than a
@@ -181,8 +183,8 @@ export class OzNonEnumerableAclSectionValidator extends SectionValidatorBase {
     // Anything after the settled head is outside this run; saying so beats implying it was covered
     log(`  role changes after block ${range.toBlock} are not covered by this scan`);
 
-    const holders = foldRoleEvents(outcome.events.filter((event) => event.address === address.toLowerCase()));
-    await this._compareWithConfig(contractEntry, holders, calibration.layout, known);
+    const candidates = grantedCandidates(outcome.events.filter((event) => event.address === address.toLowerCase()));
+    await this._compareWithConfig(contractEntry, candidates, calibration.layout, known);
   }
 
   private async _scanRange(chainId: string, address: string): Promise<ScanRange> {
@@ -235,7 +237,7 @@ export class OzNonEnumerableAclSectionValidator extends SectionValidatorBase {
           held = Boolean(await contract.getFunction("hasRole").staticCall(role, holder));
           return held
             ? { message: `undeclared role holder: ${holder} holds ${role}`, ok: false }
-            : { detail: "false (granted, then revoked)", ok: true };
+            : { detail: "false (not currently held)", ok: true };
         });
         await this._reconcileSlot(contractEntry.address, layout, role, holder, held);
       }

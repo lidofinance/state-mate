@@ -75,11 +75,13 @@ Every `view` and `pure` function in the selected ABI must appear in `checks`. A 
 ## Exhaustive non-enumerable ACL
 
 A holder nobody wrote down is invisible to checks that only ask about the config's own list. So
-for every contract carrying `ozNonEnumerableAcl`, state-mate also discovers holders by replaying
-`RoleGranted`/`RoleRevoked` events from the contract's deployment through a settled scan head. It
-re-asks every discovered pair against current chain state and reports any current holder the
-config does not declare. Role changes newer than the settled scan head are outside that run and
-may remain undiscovered until a later run. There is nothing to configure and no way to opt out; a
+for every contract carrying `ozNonEnumerableAcl`, state-mate also collects every address a
+`RoleGranted` event was ever emitted for, from the contract's deployment through a settled scan
+head, and asks the chain which of them still hold the role. The log source only nominates
+candidates — it never decides membership, so revocation events are not even fetched: a fabricated
+`RoleRevoked` cannot hide a holder, and event ordering cannot matter. Grants newer than the
+settled scan head are outside that run and may remain undiscovered until a later run. There is
+nothing to configure and no way to opt out; a
 contract whose access control cannot be checked this way should express its expectations as
 `hasRole` entries under `checks` instead.
 
@@ -98,12 +100,12 @@ and counts as **skipped** — a structural limit, printed in the run's totals, n
 passed. The chain-to-source registry lives in `src/acl/log-source.ts`; etherscan-served chains
 need `ETHERSCAN_TOKEN`, blockscout-served ones need no key.
 
-Two assumptions carry the result, and the scan checks neither directly. Every membership change
-must have emitted a standard event. Storage calibration establishes that the membership layout is
-compatible with a known AccessControl layout; it does not prove that every mutation used the
-standard event-emitting path. The explorer must not omit records — truncation is detected, but a
-source that silently drops one is believed. A holder an explorer invents is harmless, since
-nothing is reported without an on-chain confirmation.
+Two assumptions carry the result, and the scan checks neither directly. Every grant must have
+emitted a standard event — storage calibration establishes that the membership layout matches a
+known AccessControl layout, not that every mutation used the event-emitting path. And the explorer
+must not omit grants; that is the whole of the trust placed in it. Anything else it could serve
+wrongly is either refuted by the chain (an invented grant costs one refuted lookup) or fails
+loudly (truncation is detected by range-halving).
 
 ## Check values
 

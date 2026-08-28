@@ -3,7 +3,7 @@ import type { JsonRpcProvider } from "ethers";
 import { printError } from "../common";
 import { httpGetAsync, isTransientExplorerHttpError } from "../explorer";
 import { log } from "../logger";
-import { parseRoleLog, type RawLog, ROLE_GRANTED_TOPIC, ROLE_REVOKED_TOPIC, type RoleEvent } from "./fold";
+import { parseRoleLog, type RawLog, ROLE_GRANTED_TOPIC, type RoleEvent } from "./fold";
 
 /**
  * Where a chain's role logs are read from. Hardcoded rather than configured: which explorer serves
@@ -37,7 +37,9 @@ export const CHAIN_LOG_SOURCES: Readonly<Record<string, ChainLogSource>> = {
   "11155420": { confirmationLag: 60, source: { kind: "etherscan" } },
 };
 
-const ROLE_TOPICS = [ROLE_GRANTED_TOPIC, ROLE_REVOKED_TOPIC];
+// Only grants are fetched: candidacy is a union of grants, and membership is the chain's answer,
+// so revocation events would add requests without adding evidence
+const ROLE_TOPICS = [ROLE_GRANTED_TOPIC];
 // Both explorer families cap a logs response at 1000 records, and neither says so when it happens
 const EXPLORER_RESULT_CAP = 1000;
 

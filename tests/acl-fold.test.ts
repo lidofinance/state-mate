@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
 import {
-  foldRoleEvents,
+  grantedCandidates,
   parseRoleLog,
   type RawLog,
   ROLE_GRANTED_TOPIC,
@@ -97,67 +97,47 @@ describe("role event parsing", () => {
   });
 });
 
-describe("role event folding", () => {
-  it("folds the live Arbitrum history to exactly the two configured holders", () => {
-    const holders = foldRoleEvents(ARBITRUM_HISTORY);
+describe("grant candidacy", () => {
+  // The live history of CustomSenderReferral on Arbitrum: six grants, four of which were later
+  // revoked. All six stay candidates -- the chain, not the log source, decides who still holds
+  it("keeps every address ever granted as a candidate, revocations notwithstanding", () => {
+    const candidates = grantedCandidates(ARBITRUM_HISTORY);
 
-    assert.deepEqual(sortedRoles(holders), [ADMIN, SYNC]);
-    assert.deepEqual(sortedHolders(holders, ADMIN), ["0x1dca41859cd23b526cbe74da8f48ac96e14b1a29"]);
-    assert.deepEqual(sortedHolders(holders, SYNC), ["0x871a5cdde9813627ff37a2895a0c9b117a664622"]);
+    assert.deepEqual(sortedRoles(candidates), [ADMIN, SYNC]);
+    assert.equal(sortedHolders(candidates, ADMIN).length, 2);
+    assert.equal(sortedHolders(candidates, SYNC).length, 4);
+  });
+
+  // a fabricated RoleRevoked from the log source must not remove a real holder before the chain
+  // is asked; candidacy therefore ignores revocations entirely
+  it("keeps a candidate whose revocation the source may have invented", () => {
+    const honest = grantedCandidates([event(SYNC, ALICE, true, 1)]);
+    const attacked = grantedCandidates([event(SYNC, ALICE, true, 1), event(SYNC, ALICE, false, 2)]);
+
+    assert.deepEqual(sortedHolders(attacked, SYNC), sortedHolders(honest, SYNC));
   });
 
   it("does not depend on the order the events arrived in", () => {
     const shuffled = [...ARBITRUM_HISTORY].toReversed();
     const rotated = [...ARBITRUM_HISTORY.slice(4), ...ARBITRUM_HISTORY.slice(0, 4)];
-    const expected = sortedHolders(foldRoleEvents(ARBITRUM_HISTORY), SYNC);
+    const expected = sortedHolders(grantedCandidates(ARBITRUM_HISTORY), SYNC);
 
-    assert.deepEqual(sortedHolders(foldRoleEvents(shuffled), SYNC), expected);
-    assert.deepEqual(sortedHolders(foldRoleEvents(rotated), SYNC), expected);
+    assert.deepEqual(sortedHolders(grantedCandidates(shuffled), SYNC), expected);
+    assert.deepEqual(sortedHolders(grantedCandidates(rotated), SYNC), expected);
   });
 
   it("is unchanged by replaying the same events twice", () => {
-    const once = foldRoleEvents(ARBITRUM_HISTORY);
-    const twice = foldRoleEvents([...ARBITRUM_HISTORY, ...ARBITRUM_HISTORY]);
+    const once = grantedCandidates(ARBITRUM_HISTORY);
+    const twice = grantedCandidates([...ARBITRUM_HISTORY, ...ARBITRUM_HISTORY]);
 
-    assert.deepEqual(sortedRoles(twice), sortedRoles(once));
     for (const role of sortedRoles(once)) {
       assert.deepEqual(sortedHolders(twice, role), sortedHolders(once, role));
     }
   });
 
-  it("gives the same answer however the history is split and rejoined", () => {
-    const whole = foldRoleEvents(ARBITRUM_HISTORY);
-    for (let cut = 0; cut <= ARBITRUM_HISTORY.length; cut++) {
-      const rejoined = foldRoleEvents([...ARBITRUM_HISTORY.slice(0, cut), ...ARBITRUM_HISTORY.slice(cut)]);
-      for (const role of sortedRoles(whole)) {
-        assert.deepEqual(sortedHolders(rejoined, role), sortedHolders(whole, role), `split at ${cut}`);
-      }
-    }
-  });
+  it("never turns a revocation into a candidate", () => {
+    const candidates = grantedCandidates([event(SYNC, ALICE, false, 5)]);
 
-  it("orders same-block events by log index", () => {
-    const granted = foldRoleEvents([
-      event(SYNC, ALICE, true, 10, 0),
-      event(SYNC, ALICE, false, 10, 1),
-      event(SYNC, ALICE, true, 10, 2),
-    ]);
-    const revoked = foldRoleEvents([event(SYNC, ALICE, true, 10, 2), event(SYNC, ALICE, false, 10, 3)]);
-
-    assert.deepEqual(sortedHolders(granted, SYNC), [ALICE]);
-    assert.deepEqual(sortedHolders(revoked, SYNC), []);
-  });
-
-  it("treats a revocation of a role nobody held as a no-op", () => {
-    const holders = foldRoleEvents([event(SYNC, ALICE, false, 5)]);
-
-    assert.deepEqual(sortedRoles(holders), [SYNC]);
-    assert.deepEqual(sortedHolders(holders, SYNC), []);
-  });
-
-  it("keeps a fully revoked role as an empty set rather than dropping the key", () => {
-    const holders = foldRoleEvents([event(SYNC, ALICE, true, 1), event(SYNC, ALICE, false, 2)]);
-
-    assert.equal(holders.has(SYNC), true);
-    assert.deepEqual(sortedHolders(holders, SYNC), []);
+    assert.deepEqual(sortedRoles(candidates), []);
   });
 });

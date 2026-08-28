@@ -71,43 +71,27 @@ export function parseRoleLog(log: RawLog): ParsedLog {
   };
 }
 
-/** Chain order, which is the only order in which grant/revoke pairs mean anything. */
-function sortRoleEvents(events: readonly RoleEvent[]): RoleEvent[] {
-  return [...events].sort((a, b) => a.blockNumber - b.blockNumber || a.logIndex - b.logIndex);
-}
-
-function roleEventKey(event: RoleEvent): string {
-  return `${event.blockNumber}:${event.logIndex}`;
-}
-
 /**
- * One scan covers several contracts and two topics, so the same record can arrive twice.
- * (blockNumber, logIndex) is unique within a chain, which makes the fold's tally honest as well as
- * its result.
+ * Candidates are every (role, account) pair a grant was ever emitted for, revocations ignored.
+ *
+ * Revocations must not decide candidacy: a fabricated RoleRevoked from the log source would
+ * remove a real holder before the chain is ever asked about it, silently hiding exactly the
+ * holder this scan exists to find. Membership is the chain's answer -- hasRole and the raw
+ * membership slot -- so a stale candidate costs one refuted lookup, while a dropped one costs
+ * the finding. This also makes event ordering irrelevant: a set union has no order.
  */
-function dedupeRoleEvents(events: readonly RoleEvent[]): RoleEvent[] {
-  const seen = new Map<string, RoleEvent>();
-  for (const event of events) seen.set(roleEventKey(event), event);
-  return sortRoleEvents([...seen.values()]);
-}
-
-export function foldRoleEvents(events: readonly RoleEvent[]): RoleHolders {
-  const holders: RoleHolders = new Map();
-
-  for (const event of dedupeRoleEvents(events)) {
-    let members = holders.get(event.role);
-    if (!members) {
-      members = new Set<string>();
-      holders.set(event.role, members);
+export function grantedCandidates(events: readonly RoleEvent[]): RoleHolders {
+  const candidates: RoleHolders = new Map();
+  for (const event of events) {
+    if (!event.granted) continue;
+    let accounts = candidates.get(event.role);
+    if (!accounts) {
+      accounts = new Set<string>();
+      candidates.set(event.role, accounts);
     }
-    if (event.granted) {
-      members.add(event.account);
-    } else {
-      members.delete(event.account);
-    }
+    accounts.add(event.account);
   }
-
-  return holders;
+  return candidates;
 }
 
 /** Sorted, so that two runs over the same chain state print the same report. */
