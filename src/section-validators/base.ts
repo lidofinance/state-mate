@@ -85,6 +85,8 @@ export function needCheck(level: CheckLevel, name: string) {
   return checkOnTheLevel == null || name === checkOnTheLevel;
 }
 
+export type CheckOutcome = { detail: string; ok: true } | { message: string; ok: false };
+
 export abstract class SectionValidatorBase {
   constructor(
     protected provider: JsonRpcProvider,
@@ -97,6 +99,31 @@ export abstract class SectionValidatorBase {
     contractAlias: string,
     basePath?: string,
   ): Promise<void>;
+
+  /**
+   * One check: counted once, logged once, and any failure attributed to this contract. A section
+   * that routes everything through here cannot drift its tally from what actually ran, and a
+   * check that could not be made fails by default instead of passing by silence.
+   */
+  protected async _check(label: string, run: () => Promise<CheckOutcome>): Promise<void> {
+    incChecks();
+    const logHandle = new LogCommand(label);
+    setErrorContext({ method: label });
+
+    let outcome: CheckOutcome;
+    try {
+      outcome = await run();
+    } catch (error) {
+      outcome = { message: `REVERTED with: ${printError(error)}`, ok: false };
+    }
+
+    if (outcome.ok) {
+      logHandle.success(outcome.detail);
+      return;
+    }
+    logHandle.failure(outcome.message);
+    incErrors(outcome.message);
+  }
 
   /**
    * For proxy contracts, the checks run against the implementation ABI

@@ -33,6 +33,7 @@ export const CHAIN_LOG_SOURCES: Readonly<Record<string, ChainLogSource>> = {
   "8453": { confirmationLag: 60, source: { hostname: "base.blockscout.com", kind: "blockscout" } },
   "42161": { confirmationLag: 240, source: { kind: "etherscan" } },
   "59144": { confirmationLag: 30, source: { kind: "etherscan" } },
+  "560048": { confirmationLag: 8, source: { kind: "etherscan" } },
   "11155111": { confirmationLag: 8, source: { kind: "etherscan" } },
   "11155420": { confirmationLag: 60, source: { kind: "etherscan" } },
 };
@@ -163,6 +164,7 @@ function normalizeLog(raw: Record<string, unknown>): RawLog | undefined {
   return {
     address,
     blockNumber,
+    data: typeof raw.data === "string" ? raw.data : undefined,
     logIndex,
     topics: topics.filter((topic): topic is string => typeof topic === "string"),
   };
@@ -209,41 +211,46 @@ function collect(raw: readonly RawLog[]): { events: RoleEvent[]; rejected: strin
   return { events, rejected };
 }
 
-async function readLogSource(
-  source: LogSource,
-  chainId: string,
-  address: string,
-  range: ScanRange,
-): Promise<{ events: RoleEvent[]; rejected: string[] }> {
-  const raw: RawLog[] = [];
-  for (const topic0 of ROLE_TOPICS) {
-    raw.push(
-      ...(await fetchWindow(range, EXPLORER_RESULT_CAP, (window) =>
-        fetchLogs(source, chainId, address, topic0, window),
-      )),
-    );
-  }
-  return collect(raw);
-}
-
 export function hasLogSource(chainId: string): boolean {
   return CHAIN_LOG_SOURCES[chainId] !== undefined;
 }
 
-export async function collectRoleEvents(chainId: string, address: string, range: ScanRange): Promise<ScanOutcome> {
+export type RawLogsOutcome = { logs: RawLog[]; ok: true; source: string } | { ok: false; reason: string };
+
+/** The transport every ACL flavour shares: capped-window fetching per topic0, nothing parsed. */
+export async function collectTopicLogs(
+  chainId: string,
+  address: string,
+  topics0: readonly string[],
+  range: ScanRange,
+): Promise<RawLogsOutcome> {
   const chain = CHAIN_LOG_SOURCES[chainId];
   if (!chain) return { ok: false, reason: `no log source is known for chainId ${chainId}` };
 
   const name = describeSource(chain.source, chainId);
   try {
-    const { events, rejected } = await readLogSource(chain.source, chainId, address.toLowerCase(), range);
-    if (rejected.length > 0) {
-      return { ok: false, reason: `${name} served ${rejected.length} unreadable log(s): ${rejected[0]}` };
+    const raw: RawLog[] = [];
+    for (const topic0 of topics0) {
+      raw.push(
+        ...(await fetchWindow(range, EXPLORER_RESULT_CAP, (window) =>
+          fetchLogs(chain.source, chainId, address.toLowerCase(), topic0, window),
+        )),
+      );
     }
-    return { events, ok: true, source: name };
+    return { logs: raw, ok: true, source: name };
   } catch (error) {
     return { ok: false, reason: `${name} failed: ${printError(error)}` };
   }
+}
+
+export async function collectRoleEvents(chainId: string, address: string, range: ScanRange): Promise<ScanOutcome> {
+  const outcome = await collectTopicLogs(chainId, address, ROLE_TOPICS, range);
+  if (!outcome.ok) return outcome;
+  const { events, rejected } = collect(outcome.logs);
+  if (rejected.length > 0) {
+    return { ok: false, reason: `${outcome.source} served ${rejected.length} unreadable log(s): ${rejected[0]}` };
+  }
+  return { events, ok: true, source: outcome.source };
 }
 
 /**

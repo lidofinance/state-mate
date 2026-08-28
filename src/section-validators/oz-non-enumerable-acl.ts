@@ -16,14 +16,12 @@ import { LogCommand, log, logHeader2, WARNING_MARK } from "src/logger";
 import type { ContractEntry } from "src/typebox";
 import type { ChainId } from "src/types";
 
-import { incChecks, incErrors, incSkipped, SectionValidatorBase, setErrorContext } from "./base";
+import { incSkipped, SectionValidatorBase } from "./base";
 
 const NON_EXHAUSTIVE_NOTE =
   `${WARNING_MARK}: Non-enumerable OZ Acl means it is impossible to check absence of an arbitrary role holder ` +
   `only by means of calling view function. Current version of state-mate does what it can at most: for all the ` +
   `role holders specified checks they do not hold roles they are not described to have among all the roles mentioned.`;
-
-type CheckOutcome = { detail: string; ok: true } | { message: string; ok: false };
 
 /** hasRole answers from the declared pass, so the exhaustive pass does not ask the chain twice. */
 interface RoleAnswer {
@@ -64,31 +62,6 @@ export class OzNonEnumerableAclSectionValidator extends SectionValidatorBase {
         `no log source is known for chainId ${normalizeChainId(this.chainId)}; holders cannot be enumerated`,
       );
     }
-  }
-
-  /**
-   * One check: counted once, logged once, and any failure attributed to this contract. Everything
-   * the section reports goes through here, so the tally cannot drift from what actually ran.
-   */
-  private async _check(label: string, run: () => Promise<CheckOutcome>): Promise<void> {
-    incChecks();
-    const logHandle = new LogCommand(label);
-    setErrorContext({ method: label });
-
-    let outcome: CheckOutcome;
-    try {
-      outcome = await run();
-    } catch (error) {
-      // A check that could not be made is a failure, never a pass by default
-      outcome = { message: `REVERTED with: ${printError(error)}`, ok: false };
-    }
-
-    if (outcome.ok) {
-      logHandle.success(outcome.detail);
-      return;
-    }
-    logHandle.failure(outcome.message);
-    incErrors(outcome.message);
   }
 
   /** The bound contract every check in this section calls through. */

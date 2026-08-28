@@ -183,7 +183,7 @@ describe("chain log sources", () => {
 
   // every chain a config declares an ozNonEnumerableAcl on, since the scan always runs
   it("covers every chain the ACL configs actually use", () => {
-    for (const chainId of ["1", "10", "130", "8453", "42161", "59144", "11155111", "11155420"]) {
+    for (const chainId of ["1", "10", "130", "8453", "42161", "59144", "560048", "11155111", "11155420"]) {
       assert.ok(CHAIN_LOG_SOURCES[chainId], `chainId ${chainId} has no log source`);
     }
   });
