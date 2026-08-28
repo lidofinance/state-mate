@@ -97,21 +97,36 @@ export function appRoleKey(app: string, role: string): string {
 }
 
 export interface AragonState {
-  /** app|role -> live entity set. A fully revoked role keeps its key with an empty set. */
+  /** app|role -> live entity set per the events. A fully revoked role keeps its key, emptied. */
   granted: Map<string, Set<string>>;
+  /**
+   * app|role -> every entity a grant was EVER emitted for, revocations ignored. Candidacy for
+   * discovery comes from here: a fabricated revocation must not remove a real holder before the
+   * chain is asked, so only the ACL's storage may clear a candidate.
+   */
+  everGranted: Map<string, Set<string>>;
   /** app|role|entity -> params hash, for live grants that carry one. */
   paramsHash: Map<string, string>;
-  /** app|role -> current manager. A manager set to zero is removed. */
+  /** app|role -> current manager per the events. A manager set to zero is removed. */
   managers: Map<string, string>;
+  /** Every app|role a manager change was EVER emitted for; candidacy for manager discovery. */
+  everManagedRoles: Set<string>;
 }
 
 export function foldAragonEvents(events: readonly AragonEvent[]): AragonState {
   const sorted = [...events].sort((a, b) => a.blockNumber - b.blockNumber || a.logIndex - b.logIndex);
-  const state: AragonState = { granted: new Map(), managers: new Map(), paramsHash: new Map() };
+  const state: AragonState = {
+    everGranted: new Map(),
+    everManagedRoles: new Set(),
+    granted: new Map(),
+    managers: new Map(),
+    paramsHash: new Map(),
+  };
 
   for (const event of sorted) {
     const roleKey = appRoleKey(event.app, event.role);
     if (event.kind === "manager") {
+      state.everManagedRoles.add(roleKey);
       if (event.manager === ZERO_ADDRESS) {
         state.managers.delete(roleKey);
       } else {
@@ -131,6 +146,12 @@ export function foldAragonEvents(events: readonly AragonEvent[]): AragonState {
     }
     if (event.allowed) {
       entities.add(event.entity);
+      let ever = state.everGranted.get(roleKey);
+      if (!ever) {
+        ever = new Set<string>();
+        state.everGranted.set(roleKey, ever);
+      }
+      ever.add(event.entity);
     } else {
       // A revocation clears the params too: a later plain grant is unconditional, and the stale
       // hash must not resurrect a condition the chain no longer holds

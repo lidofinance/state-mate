@@ -114,7 +114,10 @@ Aragon permissions live in the ACL app, not in the contracts they guard, so the 
 one place: an `aragonAcl` section on the ACL's own entry, keyed app → role → expectations. Like
 the OpenZeppelin scan it is exhaustive by construction — the section is compared against every
 `SetPermission`, `SetPermissionParams` and `ChangePermissionManager` event since deployment, so a
-live grant nobody declared is an error, as is a declared grant the chain does not hold.
+live grant nobody declared is an error, as is a declared grant the chain does not hold. Events
+only nominate: candidacy comes from every grant or manager change ever emitted, revocations and
+removals ignored, and the ACL's storage decides what is live — a fabricated revocation cannot
+hide a holder, and a stale event costs one refuted lookup.
 
 ```yaml
 aragonAcl:

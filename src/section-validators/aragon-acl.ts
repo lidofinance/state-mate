@@ -148,9 +148,10 @@ export class AragonAclSectionValidator extends SectionValidatorBase {
     }
 
     // DAO-wide completeness for grants: a live grant on an app or role nobody declared is exactly
-    // the holder this section exists to find
-    for (const [roleKey, entities] of [...state.granted.entries()].sort(([a], [b]) => a.localeCompare(b))) {
-      if (entities.size === 0 || declaredRoleKeys.has(roleKey)) continue;
+    // the holder this section exists to find. Candidates are every entity EVER granted -- the
+    // events only nominate, the storage decides -- so a fabricated revocation cannot hide one
+    for (const [roleKey, entities] of [...state.everGranted.entries()].sort(([a], [b]) => a.localeCompare(b))) {
+      if (declaredRoleKeys.has(roleKey)) continue;
       const [app, role] = roleKey.split("|");
       for (const entity of [...entities].toSorted((a, b) => a.localeCompare(b))) {
         await this._check(`undeclared permission ${role} on ${app}`, async () => {
@@ -164,14 +165,22 @@ export class AragonAclSectionValidator extends SectionValidatorBase {
     }
 
     // Managers are scoped to the declared apps (the rest are a documented deferral), but within
-    // a declared app every live manager must be declared: the manager IS the power to grant
-    for (const [roleKey, manager] of [...state.managers.entries()].sort(([a], [b]) => a.localeCompare(b))) {
+    // a declared app every live manager must be declared: the manager IS the power to grant.
+    // Candidacy comes from every role a manager change was ever emitted for, and the manager
+    // mapping at slot 2 decides -- a fabricated removal cannot hide a live manager
+    for (const roleKey of [...state.everManagedRoles].toSorted((a, b) => a.localeCompare(b))) {
       const [app, role] = roleKey.split("|");
       if (!declaredApps.has(app) || declaredRoleKeys.has(roleKey)) continue;
-      await this._check(`undeclared manager for ${role} on ${app}`, async () => ({
-        message: `role ${role} on declared app ${app} has manager ${manager} but is not declared`,
-        ok: false,
-      }));
+      await this._check(`undeclared manager for ${role} on ${app}`, async () => {
+        const slotManager = `0x${(await this.provider.getStorage(aclAddress, managerSlot(app, role))).slice(-40)}`;
+        if (slotManager === `0x${"0".repeat(40)}`) {
+          return { detail: "no live manager (stale event)", ok: true };
+        }
+        return {
+          message: `role ${role} on declared app ${app} has manager ${slotManager} but is not declared`,
+          ok: false,
+        };
+      });
     }
   }
 

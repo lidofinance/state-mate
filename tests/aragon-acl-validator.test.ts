@@ -157,9 +157,48 @@ describe("aragon ACL validator", () => {
   it("reports a live manager on a declared app for an undeclared role", async () => {
     const stub = healthyStub();
     stub.events.push(manager(LIDO, MSK, VOTING, 6));
+    stub.slots![managerSlot(LIDO, MSK)] = word(VOTING);
     await new ExposedAragon("1", stub).validateSection(entry(DECLARED), "acl");
 
     assert.ok(stats.errorDetails.some((d) => /has manager .* but is not declared/.test(d.message)));
+  });
+
+  it("clears an undeclared manager event the manager slot does not corroborate", async () => {
+    const stub = healthyStub();
+    stub.events.push(manager(LIDO, MSK, VOTING, 6)); // no slot backing: stale or fabricated
+    await new ExposedAragon("1", stub).validateSection(entry(DECLARED), "acl");
+
+    assert.equal(stats.errors, 0);
+  });
+
+  // the review finding on the OZ scan, applied here: events nominate, storage decides, so a
+  // fabricated revocation cannot pull a live holder out of the candidate set
+  it("still reports an undeclared holder whose revocation the source invented", async () => {
+    const stub = healthyStub();
+    stub.events.push(grant(STRANGER, SDVT, MSK, 5), {
+      allowed: false,
+      app: SDVT,
+      blockNumber: 6,
+      entity: STRANGER,
+      kind: "permission",
+      logIndex: 0,
+      role: MSK,
+    });
+    stub.slots![permissionSlot(STRANGER, SDVT, MSK)] = EMPTY_PARAM_HASH; // the chain still holds it
+    await new ExposedAragon("1", stub).validateSection(entry(DECLARED), "acl");
+
+    assert.equal(stats.errors, 1);
+    assert.match(stats.errorDetails[0].message, /undeclared unconditional permission/);
+  });
+
+  it("still reports an undeclared live manager whose removal the source invented", async () => {
+    const stub = healthyStub();
+    stub.events.push(manager(LIDO, MSK, VOTING, 6), manager(LIDO, MSK, `0x${"0".repeat(40)}`, 7));
+    stub.slots![managerSlot(LIDO, MSK)] = word(VOTING); // slot 2 still holds the manager
+    await new ExposedAragon("1", stub).validateSection(entry(DECLARED), "acl");
+
+    assert.equal(stats.errors, 1);
+    assert.match(stats.errorDetails[0].message, /has manager .* but is not declared/);
   });
 
   describe("parameterized grants", () => {
