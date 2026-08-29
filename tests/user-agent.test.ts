@@ -17,6 +17,9 @@ type Recorded = { url: string; init: RequestInit | undefined };
 
 const originalFetch = globalThis.fetch;
 
+// the invoking shell may carry the override; default-value tests must not depend on it
+delete process.env.STATE_MATE_USER_AGENT;
+
 function recordFetch(body: unknown): Recorded[] {
   const calls: Recorded[] = [];
   globalThis.fetch = (async (url: unknown, init?: RequestInit) => {
@@ -88,7 +91,7 @@ describe("explorer request headers", () => {
     assert.equal(headerValue(probe?.init, "Content-Type"), "application/json");
   });
 
-  it("reports a Cloudflare challenge as a short non-transient error naming the override", async () => {
+  it("reports a challenge as a short non-transient error naming the override", async () => {
     globalThis.fetch = (async () =>
       ({
         ok: false,
@@ -102,6 +105,30 @@ describe("explorer request headers", () => {
       assert.equal(isTransientExplorerHttpError(error), false);
       return true;
     });
+  });
+
+  it("propagates a challenge from the chain-id probe", async () => {
+    globalThis.fetch = (async () =>
+      ({
+        ok: false,
+        status: 403,
+        statusText: "Forbidden",
+        headers: new Headers({ "cf-mitigated": "challenge" }),
+      }) as unknown as Response) as typeof globalThis.fetch;
+
+    await assert.rejects(fetchExplorerChainId("robinhoodchain.blockscout.com"), /STATE_MATE_USER_AGENT/);
+  });
+
+  it("propagates a challenge from the chain-id fallback route", async () => {
+    globalThis.fetch = (async (url: unknown) =>
+      ({
+        ok: false,
+        status: String(url).endsWith("/api/eth-rpc") ? 400 : 403,
+        statusText: "Bad Request",
+        headers: new Headers(String(url).endsWith("/api/eth-rpc") ? {} : { "cf-mitigated": "challenge" }),
+      }) as unknown as Response) as typeof globalThis.fetch;
+
+    await assert.rejects(fetchExplorerChainId("robinhoodchain.blockscout.com"), /STATE_MATE_USER_AGENT/);
   });
 });
 

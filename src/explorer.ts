@@ -48,9 +48,27 @@ class ExplorerHttpError extends Error {
     message: string,
     readonly transient: boolean,
     readonly retryDelayMs = 0,
+    readonly challenge = false,
   ) {
     super(message);
   }
+}
+
+function isChallenged(response: Response): boolean {
+  return response.headers?.get("cf-mitigated") === "challenge";
+}
+
+function challengeError(status: number): ExplorerHttpError {
+  return new ExplorerHttpError(
+    `The explorer challenged the request (HTTP ${status}); set STATE_MATE_USER_AGENT to override the User-Agent`,
+    false,
+    0,
+    true,
+  );
+}
+
+function isChallengeError(error: unknown): boolean {
+  return error instanceof ExplorerHttpError && error.challenge;
 }
 
 /** Keeps the HTTP error type private while letting a caller own one bounded retry budget. */
@@ -158,12 +176,7 @@ export async function httpGetAsync<T>(url: string): Promise<T> {
     throw new ExplorerHttpError(`Failed to fetch contract source code: ${printError(error)}`, true);
   }
   if (!response.ok) {
-    if (response.headers?.get("cf-mitigated") === "challenge") {
-      throw new ExplorerHttpError(
-        `Cloudflare challenged the request (HTTP ${response.status}); set STATE_MATE_USER_AGENT to override the User-Agent`,
-        false,
-      );
-    }
+    if (isChallenged(response)) throw challengeError(response.status);
     throw new ExplorerHttpError(
       `Failed to fetch contract source code: HTTP status code ${response.status}: ${response.statusText}`,
       isTransientHttpStatus(response.status),
@@ -197,6 +210,8 @@ export async function fetchExplorerChainId(
         body: JSON.stringify({ jsonrpc: "2.0", method: "eth_chainId", params: [], id: 1 }),
       });
       if (!response.ok) {
+        // the fallback route on the same host would meet the same challenge
+        if (isChallenged(response)) throw challengeError(response.status);
         if (!isTransientHttpStatus(response.status) || attempt > 0) break;
         if (response.status === 429) await sleep(RATE_LIMIT_RETRY_MS);
         continue;
@@ -205,7 +220,8 @@ export async function fetchExplorerChainId(
       if (decimal !== undefined) return decimal;
       // the host answered without a chainId: it does not serve this route
       break;
-    } catch {
+    } catch (error) {
+      if (isChallengeError(error)) throw error;
       if (attempt > 0) break;
       /* a network flake: one more try, then the etherscan-compatible endpoint */
     }
@@ -225,6 +241,7 @@ export async function fetchExplorerChainId(
       if (!/rate limit/i.test(answer) || attempt > 0) return undefined;
       await sleep(RATE_LIMIT_RETRY_MS);
     } catch (error) {
+      if (isChallengeError(error)) throw error;
       if (!(error instanceof ExplorerHttpError) || !error.transient || attempt > 0) return undefined;
       if (error.retryDelayMs) await sleep(error.retryDelayMs);
     }
@@ -299,7 +316,16 @@ export async function verifyChainIdWithExplorer(
   const memoKey = `${explorerHostname}|${chainId}`;
   if (verifiedExplorerChains.has(memoKey)) return true;
 
-  const explorerChainId = await fetchExplorerChainId(explorerHostname, explorerKey);
+  let explorerChainId: string | undefined;
+  try {
+    explorerChainId = await fetchExplorerChainId(explorerHostname, explorerKey);
+  } catch (error) {
+    // only a challenge escapes fetchExplorerChainId; the hint names the override
+    log(
+      `${WARNING_MARK} ${chalk.yellow(`could not verify chainId ${chainId} against explorer ${explorerHostname}: ${printError(error)}`)}`,
+    );
+    return false;
+  }
   if (explorerChainId === undefined) {
     log(`${WARNING_MARK} ${chalk.yellow(`could not verify chainId ${chainId} against explorer ${explorerHostname}`)}`);
     return false;
