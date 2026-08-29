@@ -1,6 +1,7 @@
 import chalk from "chalk";
-import { Contract, JsonRpcProvider } from "ethers";
+import { Contract, FetchRequest, JsonRpcProvider } from "ethers";
 
+import packageJson from "../package.json";
 import { printError } from "./common";
 import { log, logErrorAndExit, WARNING_MARK } from "./logger";
 import {
@@ -11,6 +12,17 @@ import {
   isResponseOk,
   isValidAbi,
 } from "./types";
+
+// a bare `state-mate/<version>` UA gets the same Cloudflare 403 as the undici default
+export const DEFAULT_USER_AGENT = `Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36 state-mate/${packageJson.version}`;
+
+export function userAgent(): string {
+  return process.env.STATE_MATE_USER_AGENT?.trim() || DEFAULT_USER_AGENT;
+}
+
+function requestHeaders(extra: Record<string, string> = {}): Record<string, string> {
+  return { "User-Agent": userAgent(), ...extra };
+}
 
 /** Blockscout instances serve ABIs without a key; etherscan does not. */
 export function explorerNeedsApiKey(explorerHostname: string): boolean {
@@ -141,11 +153,17 @@ export async function httpGetAsync<T>(url: string): Promise<T> {
   if (delay > 0) await sleep(delay);
   let response: Response;
   try {
-    response = await fetch(url, { method: "GET" });
+    response = await fetch(url, { method: "GET", headers: requestHeaders() });
   } catch (error) {
     throw new ExplorerHttpError(`Failed to fetch contract source code: ${printError(error)}`, true);
   }
   if (!response.ok) {
+    if (response.headers?.get("cf-mitigated") === "challenge") {
+      throw new ExplorerHttpError(
+        `Cloudflare challenged the request (HTTP ${response.status}); set STATE_MATE_USER_AGENT to override the User-Agent`,
+        false,
+      );
+    }
     throw new ExplorerHttpError(
       `Failed to fetch contract source code: HTTP status code ${response.status}: ${response.statusText}`,
       isTransientHttpStatus(response.status),
@@ -175,7 +193,7 @@ export async function fetchExplorerChainId(
     try {
       const response = await fetch(`https://${explorerHostname}/api/eth-rpc`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: requestHeaders({ "Content-Type": "application/json" }),
         body: JSON.stringify({ jsonrpc: "2.0", method: "eth_chainId", params: [], id: 1 }),
       });
       if (!response.ok) {
@@ -241,9 +259,11 @@ class RetryingJsonRpcProvider extends JsonRpcProvider {
 }
 
 export function createProvider(rpcUrl: string): JsonRpcProvider {
+  const request = new FetchRequest(rpcUrl);
+  request.setHeader("User-Agent", userAgent());
   // staticNetwork stops ethers from re-sending eth_chainId with every call, which otherwise
   // doubles traffic and trips rate limits on public RPCs
-  return new RetryingJsonRpcProvider(rpcUrl, undefined, { staticNetwork: true });
+  return new RetryingJsonRpcProvider(request, undefined, { staticNetwork: true });
 }
 
 /**
