@@ -435,6 +435,10 @@ The entry has no `implementation:`, yet the address holds a non-empty EIP-1967 s
 - Retry with `-o l1/contractName` scope; or switch RPC provider.
 - `drpc.org` public endpoints are decent for ad-hoc queries.
 
+### `The explorer challenged the request (HTTP 403)`
+
+- The explorer's anti-bot layer rejected the built-in User-Agent. Set `STATE_MATE_USER_AGENT` in `.env` to another string — every explorer and RPC request carries it.
+
 ### `Invalid address` in `deployed:`
 
 - `REPLACEME` is invalid in `deployed:` — resolve the address via `cast storage` / `cast admin` first, then add a real anchor.
