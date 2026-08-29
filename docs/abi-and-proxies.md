@@ -21,8 +21,6 @@ Etherscan V2 receives the configured chain ID with each request. Before a downlo
 
 During `--update-abi`, an explorer that no longer serves a stored contract does not erase the existing ABI. A section without `explorerHostname` also keeps its stored entries.
 
-Every outgoing request — explorer and RPC — carries a browser-like User-Agent ending in a `state-mate/<version>` token. `STATE_MATE_USER_AGENT` overrides the whole string; a request rejected by an explorer's anti-bot challenge fails with an error naming that variable.
-
 ## Proxy and implementation safety
 
 Proxy calls execute at the proxy address but use the implementation interface. state-mate resolves `checks` with the ABI at `implementation` and resolves `proxyChecks` with the ABI at `address`.

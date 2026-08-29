@@ -41,6 +41,10 @@ yarn start path/to/configs --update-abi
 
 A single-file refresh leaves entries used by sibling configs untouched.
 
+## Get past an explorer's anti-bot challenge
+
+An explorer behind anti-bot protection may reject the default User-Agent; the run fails with an error naming `STATE_MATE_USER_AGENT`. Set that variable in `.env` to another string and re-run — every explorer and RPC request carries it.
+
 ## Keep CI output concise
 
 ```sh
