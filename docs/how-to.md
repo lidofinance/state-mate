@@ -45,9 +45,9 @@ A single-file refresh leaves entries used by sibling configs untouched.
 
 An explorer behind anti-bot protection may reject the default User-Agent; the run fails with an error naming `STATE_MATE_USER_AGENT`. Set that variable in `.env` to another string and re-run — every explorer and RPC request carries it.
 
-## Download ABIs from a Blockscout host
+## Download ABIs when the explorer cannot confirm its chain
 
-ABI downloads on Blockscout hosts use the native v2 API (`/api/v2/smart-contracts/<address>`). The chain-id probe still goes through the etherscan-compatible v1 routes, and some instances no longer serve those — the probe then warns `could not verify chainId`, and a run with missing ABIs exits. Pass the flag to proceed:
+Before downloading missing ABIs from a fixed-chain explorer, the run probes the host for its chain id. A host that leaves the probe unanswered — rate-limited, or not serving the probe routes at all — draws the warning `could not verify chainId`, and a run with missing ABIs exits. Pass the flag to proceed:
 
 ```sh
 yarn start path/to/config.yaml --update-abi --allow-unverified-explorer

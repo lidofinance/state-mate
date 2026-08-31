@@ -29,22 +29,41 @@ export function explorerNeedsApiKey(explorerHostname: string): boolean {
   return explorerHostname.includes("etherscan.io");
 }
 
-// Hosts that serve the Blockscout REST API, matched by DNS suffix (the list diffyscan trusts).
-// The etherscan-compatible /api on these instances runs on a separate, much smaller quota that
-// dies mid-run, while /api/v2 keeps answering
-const BLOCKSCOUT_HOST_SUFFIXES = [
-  "mode.network",
-  "blockscout.com",
-  "swellnetwork.io",
-  "lisk.com",
-  "inkonchain.com",
-  "routescan.io",
-  "monadvision.com",
-];
+// One probe per host decides whether it serves the Blockscout REST API: the etherscan-compatible
+// /api on such instances runs on a separate quota that dies mid-run, while /api/v2 keeps
+// answering. Downloads all start at once, so the memo holds the promise, not the answer
+const blockscoutHostProbes = new Map<string, Promise<boolean>>();
 
-export function isBlockscoutHost(explorerHostname: string): boolean {
+export function isBlockscoutHost(explorerHostname: string): Promise<boolean> {
   const hostname = explorerHostname.toLowerCase();
-  return BLOCKSCOUT_HOST_SUFFIXES.some((suffix) => hostname === suffix || hostname.endsWith(`.${suffix}`));
+  let probe = blockscoutHostProbes.get(hostname);
+  if (!probe) {
+    probe = _probeBlockscoutHost(hostname);
+    blockscoutHostProbes.set(hostname, probe);
+  }
+  return probe;
+}
+
+async function _probeBlockscoutHost(hostname: string, attempt = 0): Promise<boolean> {
+  try {
+    const response = await httpGetAsync<{ backend_version?: unknown }>(
+      `https://${hostname}/api/v2/config/backend-version`,
+    );
+    return typeof response.backend_version === "string";
+  } catch (error) {
+    // a challenge dooms every request to the host; a flake gets one more try, because a
+    // memoized false would misroute the run to the wrong API
+    if (error instanceof ExplorerChallengeError) throw error;
+    if (error instanceof ExplorerHttpError && error.transient && attempt === 0) {
+      if (error.retryDelayMs) await sleep(error.retryDelayMs);
+      return _probeBlockscoutHost(hostname, 1);
+    }
+    return false;
+  }
+}
+
+export function resetBlockscoutHostProbes(): void {
+  blockscoutHostProbes.clear();
 }
 
 export function loadContract(address: string, abi: Abi, provider: JsonRpcProvider) {
@@ -114,8 +133,6 @@ async function _fetchContractInfo(
   explorerKey?: string,
   chainId?: number | string,
 ): Promise<FetchOutcome> {
-  const sourcesUrl = _getExplorerApiUrl(explorerHostname, address, explorerKey, chainId);
-
   // One address the explorer cannot serve, an unverified contract or a dead host for instance, must
   // not take the whole run down: the caller skips it and the ABIs downloaded so far reach the store.
   // `transient` marks the failures worth one more fetch, against the definitive answers
@@ -125,7 +142,10 @@ async function _fetchContractInfo(
   };
 
   let sourcesResponse: unknown;
+  let blockscout = false;
   try {
+    blockscout = !explorerHostname.includes("etherscan.io") && (await isBlockscoutHost(explorerHostname));
+    const sourcesUrl = _getExplorerApiUrl(explorerHostname, address, explorerKey, chainId, blockscout);
     sourcesResponse = await httpGetAsync(sourcesUrl);
   } catch (error) {
     // a challenge dooms every request to the host: fail the run instead of skipping address by address
@@ -135,7 +155,7 @@ async function _fetchContractInfo(
     return skip(`${explorerHostname} is unreachable: ${printError(error)}`, transient, retryDelayMs);
   }
 
-  if (isBlockscoutHost(explorerHostname)) {
+  if (blockscout) {
     return _parseBlockscoutV2(sourcesResponse, address, skip);
   }
 
@@ -392,6 +412,7 @@ function _getExplorerApiUrl(
   address: string,
   explorerKey?: string,
   chainId?: number | string,
+  blockscout = false,
 ) {
   const isEtherscan = explorerHostname.includes("etherscan.io");
   let url: string;
@@ -405,15 +426,15 @@ function _getExplorerApiUrl(
     }
     // Use Etherscan v2 aggregator regardless of subdomain
     url = `https://api.etherscan.io/v2/api?chainId=${chainIdNumber}&module=contract&action=getsourcecode&address=${address}`;
-  } else if (isBlockscoutHost(explorerHostname)) {
+  } else if (blockscout) {
     url = `https://${explorerHostname}/api/v2/smart-contracts/${address}`;
   } else {
     if (explorerHostname.toLowerCase().includes("blockscout") && !warnedLegacyBlockscoutHosts.has(explorerHostname)) {
       warnedLegacyBlockscoutHosts.add(explorerHostname);
       log(
         `${WARNING_MARK} ${chalk.yellow(
-          `${explorerHostname} looks like a blockscout instance but is not a known REST host; ` +
-            `falling back to the etherscan-compatible /api (add its suffix to BLOCKSCOUT_HOST_SUFFIXES in src/explorer.ts)`,
+          `${explorerHostname} looks like a blockscout instance but did not answer the /api/v2 probe; ` +
+            `falling back to the etherscan-compatible /api`,
         )}`,
       );
     }

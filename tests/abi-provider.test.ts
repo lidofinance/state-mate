@@ -19,7 +19,7 @@ import {
 } from "../src/abi-provider";
 import { EntryField } from "../src/common";
 import { context, resetStats, stats } from "../src/context";
-import { fetchExplorerChainId } from "../src/explorer";
+import { fetchExplorerChainId, resetBlockscoutHostProbes } from "../src/explorer";
 import { SectionValidatorBase } from "../src/section-validators/base";
 import * as stateMate from "../src/state-mate";
 import type { ContractEntry, EntireDocument } from "../src/typebox";
@@ -100,6 +100,7 @@ afterEach(() => {
   context.updateAbi = false;
   context.allowUnverifiedExplorer = false;
   resetAbiRebuildState();
+  resetBlockscoutHostProbes();
   for (const directory of temporaryDirectories) {
     fs.rmSync(directory, { recursive: true, force: true });
   }
@@ -333,11 +334,11 @@ describe("downloadAndCheckAllAbi", () => {
   it("reaches the blockscout v2 download when the flag bypasses a dead chain-id probe", async () => {
     // mirrors a live blockscout host: both v1 probe routes are gone while /api/v2 answers
     const directory = setupConfigDirectory();
-    const fetchMock = mockFetch((url) =>
-      /eth-rpc|eth_chainId/.test(url)
-        ? { status: 400 }
-        : { body: { name: "OssifiableProxy", is_verified: true, abi: PROXY_ABI } },
-    );
+    const fetchMock = mockFetch((url) => {
+      if (/eth-rpc|eth_chainId/.test(url)) return { status: 400 };
+      if (url.endsWith("/api/v2/config/backend-version")) return { body: { backend_version: "v11.2.8" } };
+      return { body: { name: "OssifiableProxy", is_verified: true, abi: PROXY_ABI } };
+    });
     context.allowUnverifiedExplorer = true;
     try {
       await stateMate.downloadAndCheckAllAbi({

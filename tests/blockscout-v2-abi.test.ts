@@ -1,29 +1,36 @@
 import assert from "node:assert/strict";
 import { beforeEach, describe, it, mock } from "node:test";
 
-import { DEFAULT_USER_AGENT, loadContractInfo, resetRequestSlots } from "../src/explorer";
+import { DEFAULT_USER_AGENT, loadContractInfo, resetBlockscoutHostProbes, resetRequestSlots } from "../src/explorer";
 import type { Abi } from "../src/types";
 import { mockFetch } from "./helpers/fetch-mock";
 
 const ADDRESS = "0x2bd3d5965b26b51814ac95127b2b80dd6ccc0fa1";
 const BLOCKSCOUT_HOST = "robinhoodchain.blockscout.com";
 const IRM_ABI: Abi = [{ type: "function", name: "borrowRateView", inputs: [], stateMutability: "view" }];
+const PROBE_SUFFIX = "/api/v2/config/backend-version";
+const PROBE_ANSWER = { body: { backend_version: "v11.2.8" } };
 
 // the invoking shell may carry the override; the header test asserts the default
 delete process.env.STATE_MATE_USER_AGENT;
 
 beforeEach(() => {
   resetRequestSlots();
+  resetBlockscoutHostProbes();
 });
 
 describe("blockscout v2 ABI download", () => {
-  it("asks a blockscout host through /api/v2/smart-contracts and reads the ABI array", async () => {
-    const fetchMock = mockFetch(() => ({ body: { name: "AdaptiveCurveIrm", is_verified: true, abi: IRM_ABI } }));
+  it("detects a blockscout host by probing /api/v2 and downloads through /api/v2/smart-contracts", async () => {
+    const fetchMock = mockFetch((url) =>
+      url.endsWith(PROBE_SUFFIX)
+        ? PROBE_ANSWER
+        : { body: { name: "AdaptiveCurveIrm", is_verified: true, abi: IRM_ABI } },
+    );
     try {
       const contract = await loadContractInfo(ADDRESS, BLOCKSCOUT_HOST);
-      assert.equal(
-        String(fetchMock.mock.calls[0].arguments[0]),
-        `https://${BLOCKSCOUT_HOST}/api/v2/smart-contracts/${ADDRESS}`,
+      assert.deepEqual(
+        fetchMock.mock.calls.map((call) => String(call.arguments[0])),
+        [`https://${BLOCKSCOUT_HOST}${PROBE_SUFFIX}`, `https://${BLOCKSCOUT_HOST}/api/v2/smart-contracts/${ADDRESS}`],
       );
       assert.deepEqual(contract, { abi: IRM_ABI, address: ADDRESS, contractName: "AdaptiveCurveIrm" });
     } finally {
@@ -31,10 +38,28 @@ describe("blockscout v2 ABI download", () => {
     }
   });
 
+  it("probes a host once and reuses the verdict", async () => {
+    const fetchMock = mockFetch((url) =>
+      url.endsWith(PROBE_SUFFIX)
+        ? PROBE_ANSWER
+        : { body: { name: "AdaptiveCurveIrm", is_verified: true, abi: IRM_ABI } },
+    );
+    try {
+      await loadContractInfo(ADDRESS, BLOCKSCOUT_HOST);
+      await loadContractInfo(ADDRESS, BLOCKSCOUT_HOST);
+      const probes = fetchMock.mock.calls.filter((call) => String(call.arguments[0]).endsWith(PROBE_SUFFIX));
+      assert.equal(probes.length, 1);
+    } finally {
+      fetchMock.mock.restore();
+    }
+  });
+
   it("accepts the documented form where the ABI arrives as a JSON string", async () => {
-    const fetchMock = mockFetch(() => ({
-      body: { name: "AdaptiveCurveIrm", is_verified: true, abi: JSON.stringify(IRM_ABI) },
-    }));
+    const fetchMock = mockFetch((url) =>
+      url.endsWith(PROBE_SUFFIX)
+        ? PROBE_ANSWER
+        : { body: { name: "AdaptiveCurveIrm", is_verified: true, abi: JSON.stringify(IRM_ABI) } },
+    );
     try {
       const contract = await loadContractInfo(ADDRESS, BLOCKSCOUT_HOST);
       assert.deepEqual(contract, { abi: IRM_ABI, address: ADDRESS, contractName: "AdaptiveCurveIrm" });
@@ -51,10 +76,11 @@ describe("blockscout v2 ABI download", () => {
       "an ABI of the wrong shape": { name: "AdaptiveCurveIrm", is_verified: true, abi: [42] },
     };
     for (const [label, body] of Object.entries(rejected)) {
-      const fetchMock = mockFetch(() => ({ body }));
+      const fetchMock = mockFetch((url) => (url.endsWith(PROBE_SUFFIX) ? PROBE_ANSWER : { body }));
       try {
         assert.equal(await loadContractInfo(ADDRESS, BLOCKSCOUT_HOST), undefined, `${label} must yield no contract`);
-        assert.equal(fetchMock.mock.calls.length, 1, `${label} must not be retried`);
+        const abiCalls = fetchMock.mock.calls.filter((call) => !String(call.arguments[0]).endsWith(PROBE_SUFFIX));
+        assert.equal(abiCalls.length, 1, `${label} must not be retried`);
       } finally {
         fetchMock.mock.restore();
       }
@@ -62,10 +88,11 @@ describe("blockscout v2 ABI download", () => {
   });
 
   it("treats HTTP 404 as the final answer, with no second request", async () => {
-    const fetchMock = mockFetch(() => ({ status: 404 }));
+    const fetchMock = mockFetch((url) => (url.endsWith(PROBE_SUFFIX) ? PROBE_ANSWER : { status: 404 }));
     try {
       assert.equal(await loadContractInfo(ADDRESS, BLOCKSCOUT_HOST), undefined);
-      assert.equal(fetchMock.mock.calls.length, 1);
+      const abiCalls = fetchMock.mock.calls.filter((call) => !String(call.arguments[0]).endsWith(PROBE_SUFFIX));
+      assert.equal(abiCalls.length, 1);
     } finally {
       fetchMock.mock.restore();
     }
@@ -73,8 +100,12 @@ describe("blockscout v2 ABI download", () => {
 
   it("retries HTTP 429 once and settles for what the retry serves", async () => {
     let calls = 0;
-    const fetchMock = mockFetch(() =>
-      ++calls === 1 ? { status: 429 } : { body: { name: "AdaptiveCurveIrm", is_verified: true, abi: IRM_ABI } },
+    const fetchMock = mockFetch((url) =>
+      url.endsWith(PROBE_SUFFIX)
+        ? PROBE_ANSWER
+        : ++calls === 1
+          ? { status: 429 }
+          : { body: { name: "AdaptiveCurveIrm", is_verified: true, abi: IRM_ABI } },
     );
     mock.timers.enable({ apis: ["setTimeout"] });
     try {
@@ -93,14 +124,17 @@ describe("blockscout v2 ABI download", () => {
   });
 
   it("sends the browser User-Agent to the v2 endpoint", async () => {
-    const fetchMock = mockFetch(() => ({ body: { name: "AdaptiveCurveIrm", is_verified: true, abi: IRM_ABI } }));
+    const fetchMock = mockFetch((url) =>
+      url.endsWith(PROBE_SUFFIX)
+        ? PROBE_ANSWER
+        : { body: { name: "AdaptiveCurveIrm", is_verified: true, abi: IRM_ABI } },
+    );
     try {
       await loadContractInfo(ADDRESS, BLOCKSCOUT_HOST);
-      const headers = (fetchMock.mock.calls[0].arguments[1] as RequestInit | undefined)?.headers as Record<
-        string,
-        string
-      >;
-      assert.equal(headers["User-Agent"], DEFAULT_USER_AGENT);
+      for (const call of fetchMock.mock.calls) {
+        const headers = (call.arguments[1] as RequestInit | undefined)?.headers as Record<string, string>;
+        assert.equal(headers["User-Agent"], DEFAULT_USER_AGENT, String(call.arguments[0]));
+      }
     } finally {
       fetchMock.mock.restore();
     }
@@ -116,9 +150,10 @@ describe("blockscout v2 ABI download", () => {
     }));
     try {
       const contract = await loadContractInfo(ADDRESS, "api.etherscan.io", undefined, 1);
-      assert.equal(
-        String(fetchMock.mock.calls[0].arguments[0]),
-        `https://api.etherscan.io/v2/api?chainId=1&module=contract&action=getsourcecode&address=${ADDRESS}`,
+      assert.deepEqual(
+        fetchMock.mock.calls.map((call) => String(call.arguments[0])),
+        [`https://api.etherscan.io/v2/api?chainId=1&module=contract&action=getsourcecode&address=${ADDRESS}`],
+        "an etherscan host must not be probed",
       );
       assert.equal(contract?.contractName, "AdaptiveCurveIrm");
     } finally {
@@ -126,19 +161,26 @@ describe("blockscout v2 ABI download", () => {
     }
   });
 
-  it("keeps other etherscan-compatible hosts on the legacy getsourcecode URL", async () => {
-    const fetchMock = mockFetch(() => ({
-      body: {
-        status: "1",
-        message: "OK",
-        result: [{ ABI: JSON.stringify(IRM_ABI), ContractName: "AdaptiveCurveIrm" }],
-      },
-    }));
+  it("keeps a host that fails the probe on the legacy getsourcecode URL", async () => {
+    const fetchMock = mockFetch((url) =>
+      url.endsWith(PROBE_SUFFIX)
+        ? { status: 404 }
+        : {
+            body: {
+              status: "1",
+              message: "OK",
+              result: [{ ABI: JSON.stringify(IRM_ABI), ContractName: "AdaptiveCurveIrm" }],
+            },
+          },
+    );
     try {
       const contract = await loadContractInfo(ADDRESS, "api.bscscan.com");
-      assert.equal(
-        String(fetchMock.mock.calls[0].arguments[0]),
-        `https://api.bscscan.com/api?module=contract&action=getsourcecode&address=${ADDRESS}`,
+      assert.deepEqual(
+        fetchMock.mock.calls.map((call) => String(call.arguments[0])),
+        [
+          `https://api.bscscan.com${PROBE_SUFFIX}`,
+          `https://api.bscscan.com/api?module=contract&action=getsourcecode&address=${ADDRESS}`,
+        ],
       );
       assert.equal(contract?.contractName, "AdaptiveCurveIrm");
     } finally {

@@ -441,7 +441,7 @@ The entry has no `implementation:`, yet the address holds a non-empty EIP-1967 s
 
 ### `did not confirm chainId ... --allow-unverified-explorer`
 
-- The chain-id probe uses the etherscan-compatible v1 routes, which some Blockscout instances no longer serve. Re-run with `--allow-unverified-explorer` — the RPC chain assertion and the stored-name match still guard the ABI store.
+- The explorer left the chain-id probe unanswered — rate-limited, or not serving the probe routes. Re-run with `--allow-unverified-explorer`; the RPC chain assertion and the stored-name match still guard the ABI store.
 
 ### `Invalid address` in `deployed:`
 
