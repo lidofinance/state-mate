@@ -291,11 +291,7 @@ describe("downloadAndCheckAllAbi", () => {
       }
       return {
         ok: true,
-        json: async () => ({
-          status: "1",
-          message: "OK",
-          result: [{ ABI: JSON.stringify(WORMHOLE_ABI), ContractName: "ForeignChainContract" }],
-        }),
+        json: async () => ({ name: "ForeignChainContract", abi: WORMHOLE_ABI }),
       } as Response;
     });
     const jsonDocument = {

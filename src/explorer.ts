@@ -117,6 +117,24 @@ async function _fetchContractInfo(
     return skip(`${explorerHostname} is unreachable: ${printError(error)}`, transient, retryDelayMs);
   }
 
+  if (explorerHostname.includes("blockscout")) {
+    if (
+      typeof sourcesResponse !== "object" ||
+      sourcesResponse === null ||
+      !("name" in sourcesResponse) ||
+      typeof sourcesResponse.name !== "string" ||
+      !("abi" in sourcesResponse)
+    ) {
+      return skip(`explorer served no ABI: ${JSON.stringify(sourcesResponse)}`);
+    }
+    if (!isValidAbi(sourcesResponse.abi)) {
+      return skip(`ABI is not valid (type mismatch): ${JSON.stringify(sourcesResponse.abi)}`);
+    }
+    return {
+      contract: { abi: sourcesResponse.abi, address, contractName: sourcesResponse.name },
+    };
+  }
+
   if (isResponseBad(sourcesResponse)) {
     const answer = `${sourcesResponse.message} ${JSON.stringify(sourcesResponse.result)}`;
     // "not verified" is the explorer's final word; a rate limit deserves the retry after the
@@ -348,7 +366,9 @@ function _getExplorerApiUrl(
   const isEtherscan = explorerHostname.includes("etherscan.io");
   let url: string;
 
-  if (isEtherscan) {
+  if (explorerHostname.includes("blockscout")) {
+    return `https://${explorerHostname}/api/v2/smart-contracts/${address}`;
+  } else if (isEtherscan) {
     const chainIdNumber = typeof chainId === "string" ? Number(chainId) : chainId;
     if (typeof chainIdNumber !== "number" || Number.isNaN(chainIdNumber)) {
       logErrorAndExit(
