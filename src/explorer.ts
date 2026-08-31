@@ -13,7 +13,7 @@ import {
   isValidAbi,
 } from "./types";
 
-// a bare `state-mate/<version>` UA gets the same Cloudflare 403 as the undici default
+// a bare `state-mate/<version>` UA gets challenged by anti-bot layers the same way as the undici default
 export const DEFAULT_USER_AGENT = `Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36 state-mate/${packageJson.version}`;
 
 export function userAgent(): string {
@@ -27,6 +27,24 @@ function requestHeaders(extra: Record<string, string> = {}): Record<string, stri
 /** Blockscout instances serve ABIs without a key; etherscan does not. */
 export function explorerNeedsApiKey(explorerHostname: string): boolean {
   return explorerHostname.includes("etherscan.io");
+}
+
+// Hosts that serve the Blockscout REST API, matched by DNS suffix (the list diffyscan trusts).
+// The etherscan-compatible /api on these instances runs on a separate, much smaller quota that
+// dies mid-run, while /api/v2 keeps answering
+const BLOCKSCOUT_HOST_SUFFIXES = [
+  "mode.network",
+  "blockscout.com",
+  "swellnetwork.io",
+  "lisk.com",
+  "inkonchain.com",
+  "routescan.io",
+  "monadvision.com",
+];
+
+export function isBlockscoutHost(explorerHostname: string): boolean {
+  const hostname = explorerHostname.toLowerCase();
+  return BLOCKSCOUT_HOST_SUFFIXES.some((suffix) => hostname === suffix || hostname.endsWith(`.${suffix}`));
 }
 
 export function loadContract(address: string, abi: Abi, provider: JsonRpcProvider) {
@@ -48,27 +66,25 @@ class ExplorerHttpError extends Error {
     message: string,
     readonly transient: boolean,
     readonly retryDelayMs = 0,
-    readonly challenge = false,
   ) {
     super(message);
   }
 }
 
+// An anti-bot layer answered instead of the API; retrying with the same User-Agent cannot help
+class ExplorerChallengeError extends ExplorerHttpError {
+  constructor(status: number) {
+    super(
+      `The explorer challenged the request (HTTP ${status}); set STATE_MATE_USER_AGENT to override the User-Agent`,
+      false,
+    );
+  }
+}
+
+// explorer APIs express their own refusals in-band as HTTP 200, so a bare 403 means a wall
+// in front of them even without the challenge marker
 function isChallenged(response: Response): boolean {
-  return response.headers?.get("cf-mitigated") === "challenge";
-}
-
-function challengeError(status: number): ExplorerHttpError {
-  return new ExplorerHttpError(
-    `The explorer challenged the request (HTTP ${status}); set STATE_MATE_USER_AGENT to override the User-Agent`,
-    false,
-    0,
-    true,
-  );
-}
-
-function isChallengeError(error: unknown): boolean {
-  return error instanceof ExplorerHttpError && error.challenge;
+  return response.headers?.get("cf-mitigated") === "challenge" || response.status === 403;
 }
 
 /** Keeps the HTTP error type private while letting a caller own one bounded retry budget. */
@@ -112,27 +128,15 @@ async function _fetchContractInfo(
   try {
     sourcesResponse = await httpGetAsync(sourcesUrl);
   } catch (error) {
+    // a challenge dooms every request to the host: fail the run instead of skipping address by address
+    if (error instanceof ExplorerChallengeError) throw error;
     const transient = error instanceof ExplorerHttpError && error.transient;
     const retryDelayMs = error instanceof ExplorerHttpError ? error.retryDelayMs : 0;
     return skip(`${explorerHostname} is unreachable: ${printError(error)}`, transient, retryDelayMs);
   }
 
-  if (explorerHostname.includes("blockscout")) {
-    if (
-      typeof sourcesResponse !== "object" ||
-      sourcesResponse === null ||
-      !("name" in sourcesResponse) ||
-      typeof sourcesResponse.name !== "string" ||
-      !("abi" in sourcesResponse)
-    ) {
-      return skip(`explorer served no ABI: ${JSON.stringify(sourcesResponse)}`);
-    }
-    if (!isValidAbi(sourcesResponse.abi)) {
-      return skip(`ABI is not valid (type mismatch): ${JSON.stringify(sourcesResponse.abi)}`);
-    }
-    return {
-      contract: { abi: sourcesResponse.abi, address, contractName: sourcesResponse.name },
-    };
+  if (isBlockscoutHost(explorerHostname)) {
+    return _parseBlockscoutV2(sourcesResponse, address, skip);
   }
 
   if (isResponseBad(sourcesResponse)) {
@@ -150,19 +154,43 @@ async function _fetchContractInfo(
     return skip(`explorer served no ABI: ${JSON.stringify(result)}`);
   }
 
-  let abi: unknown;
-  try {
-    abi = JSON.parse(result.ABI);
-  } catch (error) {
-    return skip(`could not be read: ${printError(error)}`);
-  }
-  if (!isValidAbi(abi)) {
-    return skip(`ABI is not valid (type mismatch): ${JSON.stringify(abi)}`);
-  }
+  const parsed = _parseAbiField(result.ABI, skip);
+  if ("failure" in parsed) return parsed.failure;
 
   return {
-    contract: { abi, address, contractName: result.ContractName },
+    contract: { abi: parsed.abi, address, contractName: result.ContractName },
   };
+}
+
+type SkipFn = (reason: string, transient?: boolean, retryDelayMs?: number) => FetchOutcome;
+
+// etherscan serves the ABI as a JSON string; blockscout v2 documents a string too, while the
+// live instances serve the array itself, so both forms have to be read
+function _parseAbiField(raw: unknown, skip: SkipFn): { abi: Abi } | { failure: FetchOutcome } {
+  let abi: unknown = raw;
+  if (typeof abi === "string") {
+    try {
+      abi = JSON.parse(abi);
+    } catch (error) {
+      return { failure: skip(`could not be read: ${printError(error)}`) };
+    }
+  }
+  if (!isValidAbi(abi)) {
+    return { failure: skip(`ABI is not valid (type mismatch): ${JSON.stringify(abi)}`) };
+  }
+  return { abi };
+}
+
+type BlockscoutV2Response = { name?: unknown; abi?: unknown; is_verified?: unknown };
+
+function _parseBlockscoutV2(response: unknown, address: string, skip: SkipFn): FetchOutcome {
+  const source = (typeof response === "object" && response !== null ? response : {}) as BlockscoutV2Response;
+  if (typeof source.name !== "string" || source.abi === undefined || source.abi === null) {
+    return skip(`explorer served no ABI: ${JSON.stringify({ name: source.name, is_verified: source.is_verified })}`);
+  }
+  const parsed = _parseAbiField(source.abi, skip);
+  if ("failure" in parsed) return parsed.failure;
+  return { contract: { abi: parsed.abi, address, contractName: source.name } };
 }
 
 // The free etherscan tier answers 3 calls per second and charges a multi-second penalty for
@@ -194,7 +222,7 @@ export async function httpGetAsync<T>(url: string): Promise<T> {
     throw new ExplorerHttpError(`Failed to fetch contract source code: ${printError(error)}`, true);
   }
   if (!response.ok) {
-    if (isChallenged(response)) throw challengeError(response.status);
+    if (isChallenged(response)) throw new ExplorerChallengeError(response.status);
     throw new ExplorerHttpError(
       `Failed to fetch contract source code: HTTP status code ${response.status}: ${response.statusText}`,
       isTransientHttpStatus(response.status),
@@ -229,7 +257,7 @@ export async function fetchExplorerChainId(
       });
       if (!response.ok) {
         // the fallback route on the same host would meet the same challenge
-        if (isChallenged(response)) throw challengeError(response.status);
+        if (isChallenged(response)) throw new ExplorerChallengeError(response.status);
         if (!isTransientHttpStatus(response.status) || attempt > 0) break;
         if (response.status === 429) await sleep(RATE_LIMIT_RETRY_MS);
         continue;
@@ -239,7 +267,7 @@ export async function fetchExplorerChainId(
       // the host answered without a chainId: it does not serve this route
       break;
     } catch (error) {
-      if (isChallengeError(error)) throw error;
+      if (error instanceof ExplorerChallengeError) throw error;
       if (attempt > 0) break;
       /* a network flake: one more try, then the etherscan-compatible endpoint */
     }
@@ -259,7 +287,7 @@ export async function fetchExplorerChainId(
       if (!/rate limit/i.test(answer) || attempt > 0) return undefined;
       await sleep(RATE_LIMIT_RETRY_MS);
     } catch (error) {
-      if (isChallengeError(error)) throw error;
+      if (error instanceof ExplorerChallengeError) throw error;
       if (!(error instanceof ExplorerHttpError) || !error.transient || attempt > 0) return undefined;
       if (error.retryDelayMs) await sleep(error.retryDelayMs);
     }
@@ -335,17 +363,17 @@ export async function verifyChainIdWithExplorer(
   if (verifiedExplorerChains.has(memoKey)) return true;
 
   let explorerChainId: string | undefined;
+  let detail = "";
   try {
     explorerChainId = await fetchExplorerChainId(explorerHostname, explorerKey);
   } catch (error) {
     // only a challenge escapes fetchExplorerChainId; the hint names the override
-    log(
-      `${WARNING_MARK} ${chalk.yellow(`could not verify chainId ${chainId} against explorer ${explorerHostname}: ${printError(error)}`)}`,
-    );
-    return false;
+    detail = `: ${printError(error)}`;
   }
   if (explorerChainId === undefined) {
-    log(`${WARNING_MARK} ${chalk.yellow(`could not verify chainId ${chainId} against explorer ${explorerHostname}`)}`);
+    log(
+      `${WARNING_MARK} ${chalk.yellow(`could not verify chainId ${chainId} against explorer ${explorerHostname}${detail}`)}`,
+    );
     return false;
   }
   if (explorerChainId !== chainId) {
@@ -357,6 +385,8 @@ export async function verifyChainIdWithExplorer(
   return true;
 }
 
+const warnedLegacyBlockscoutHosts = new Set<string>();
+
 function _getExplorerApiUrl(
   explorerHostname: string,
   address: string,
@@ -366,9 +396,7 @@ function _getExplorerApiUrl(
   const isEtherscan = explorerHostname.includes("etherscan.io");
   let url: string;
 
-  if (explorerHostname.includes("blockscout")) {
-    return `https://${explorerHostname}/api/v2/smart-contracts/${address}`;
-  } else if (isEtherscan) {
+  if (isEtherscan) {
     const chainIdNumber = typeof chainId === "string" ? Number(chainId) : chainId;
     if (typeof chainIdNumber !== "number" || Number.isNaN(chainIdNumber)) {
       logErrorAndExit(
@@ -377,12 +405,23 @@ function _getExplorerApiUrl(
     }
     // Use Etherscan v2 aggregator regardless of subdomain
     url = `https://api.etherscan.io/v2/api?chainId=${chainIdNumber}&module=contract&action=getsourcecode&address=${address}`;
+  } else if (isBlockscoutHost(explorerHostname)) {
+    url = `https://${explorerHostname}/api/v2/smart-contracts/${address}`;
   } else {
+    if (explorerHostname.toLowerCase().includes("blockscout") && !warnedLegacyBlockscoutHosts.has(explorerHostname)) {
+      warnedLegacyBlockscoutHosts.add(explorerHostname);
+      log(
+        `${WARNING_MARK} ${chalk.yellow(
+          `${explorerHostname} looks like a blockscout instance but is not a known REST host; ` +
+            `falling back to the etherscan-compatible /api (add its suffix to BLOCKSCOUT_HOST_SUFFIXES in src/explorer.ts)`,
+        )}`,
+      );
+    }
     url = `https://${explorerHostname}/api?module=contract&action=getsourcecode&address=${address}`;
   }
 
   if (explorerKey) {
-    url += `&apikey=${explorerKey}`;
+    url += `${url.includes("?") ? "&" : "?"}apikey=${explorerKey}`;
   }
 
   return url;

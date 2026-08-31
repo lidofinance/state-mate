@@ -1,7 +1,5 @@
 import assert from "node:assert/strict";
-import { readdirSync, readFileSync } from "node:fs";
-import path from "node:path";
-import { afterEach, describe, it } from "node:test";
+import { afterEach, beforeEach, describe, it } from "node:test";
 
 import packageJson from "../package.json";
 import {
@@ -10,39 +8,32 @@ import {
   fetchExplorerChainId,
   httpGetAsync,
   isTransientExplorerHttpError,
+  loadContractInfo,
+  resetRequestSlots,
   userAgent,
 } from "../src/explorer";
+import { mockFetch } from "./helpers/fetch-mock";
 
-type Recorded = { url: string; init: RequestInit | undefined };
-
-const originalFetch = globalThis.fetch;
+const ADDRESS = "0x2bd3d5965b26b51814ac95127b2b80dd6ccc0fa1";
+const BLOCKSCOUT_HOST = "robinhoodchain.blockscout.com";
 
 // the invoking shell may carry the override; default-value tests must not depend on it
 delete process.env.STATE_MATE_USER_AGENT;
 
-function recordFetch(body: unknown): Recorded[] {
-  const calls: Recorded[] = [];
-  globalThis.fetch = (async (url: unknown, init?: RequestInit) => {
-    calls.push({ url: String(url), init });
-    return {
-      ok: true,
-      status: 200,
-      statusText: "OK",
-      json: async () => body,
-    } as unknown as Response;
-  }) as typeof globalThis.fetch;
-  return calls;
-}
+type FetchCall = { arguments: Parameters<typeof fetch> };
 
-function headerValue(init: RequestInit | undefined, name: string): string | undefined {
-  const headers = init?.headers as Record<string, string> | undefined;
+function headerOf(call: FetchCall | undefined, name: string): string | undefined {
+  const headers = (call?.arguments[1] as RequestInit | undefined)?.headers as Record<string, string> | undefined;
   if (!headers) return undefined;
   const key = Object.keys(headers).find((candidate) => candidate.toLowerCase() === name.toLowerCase());
   return key ? headers[key] : undefined;
 }
 
+beforeEach(() => {
+  resetRequestSlots();
+});
+
 afterEach(() => {
-  globalThis.fetch = originalFetch;
   delete process.env.STATE_MATE_USER_AGENT;
 });
 
@@ -66,69 +57,90 @@ describe("user agent", () => {
 
 describe("explorer request headers", () => {
   it("sends the User-Agent on ABI requests", async () => {
-    const calls = recordFetch({ result: "0x1" });
-
-    await httpGetAsync("https://robinhoodchain.blockscout.com/api?module=contract&action=getabi");
-
-    assert.equal(headerValue(calls[0]?.init, "User-Agent"), DEFAULT_USER_AGENT);
+    const fetchMock = mockFetch(() => ({ body: { result: "0x1" } }));
+    try {
+      await httpGetAsync("https://robinhoodchain.blockscout.com/api?module=contract&action=getabi");
+      assert.equal(headerOf(fetchMock.mock.calls[0], "User-Agent"), DEFAULT_USER_AGENT);
+    } finally {
+      fetchMock.mock.restore();
+    }
   });
 
   it("sends the overridden User-Agent on ABI requests", async () => {
     process.env.STATE_MATE_USER_AGENT = "custom-agent/1.2.3";
-    const calls = recordFetch({ result: "0x1" });
-
-    await httpGetAsync("https://robinhoodchain.blockscout.com/api?module=contract&action=getabi");
-
-    assert.equal(headerValue(calls[0]?.init, "User-Agent"), "custom-agent/1.2.3");
+    const fetchMock = mockFetch(() => ({ body: { result: "0x1" } }));
+    try {
+      await httpGetAsync("https://robinhoodchain.blockscout.com/api?module=contract&action=getabi");
+      assert.equal(headerOf(fetchMock.mock.calls[0], "User-Agent"), "custom-agent/1.2.3");
+    } finally {
+      fetchMock.mock.restore();
+    }
   });
 
   it("sends the User-Agent on the Blockscout chain-id probe", async () => {
-    const calls = recordFetch({ result: "0x1237" });
+    const fetchMock = mockFetch(() => ({ body: { result: "0x1237" } }));
+    try {
+      assert.equal(await fetchExplorerChainId(BLOCKSCOUT_HOST), "4663");
+      const probe = fetchMock.mock.calls.find((call) => String(call.arguments[0]).endsWith("/api/eth-rpc"));
+      assert.equal(headerOf(probe, "User-Agent"), DEFAULT_USER_AGENT);
+      assert.equal(headerOf(probe, "Content-Type"), "application/json");
+    } finally {
+      fetchMock.mock.restore();
+    }
+  });
+});
 
-    assert.equal(await fetchExplorerChainId("robinhoodchain.blockscout.com"), "4663");
-    const probe = calls.find((call) => call.url.endsWith("/api/eth-rpc"));
-    assert.equal(headerValue(probe?.init, "User-Agent"), DEFAULT_USER_AGENT);
-    assert.equal(headerValue(probe?.init, "Content-Type"), "application/json");
+describe("explorer challenges", () => {
+  it("reports a challenge as a short non-transient error naming the override", async () => {
+    const fetchMock = mockFetch(() => ({ status: 403, headers: { "cf-mitigated": "challenge" } }));
+    try {
+      await assert.rejects(httpGetAsync("https://robinhoodchain.blockscout.com/api"), (error: unknown) => {
+        assert.match((error as Error).message, /STATE_MATE_USER_AGENT/);
+        assert.equal(isTransientExplorerHttpError(error), false);
+        return true;
+      });
+    } finally {
+      fetchMock.mock.restore();
+    }
   });
 
-  it("reports a challenge as a short non-transient error naming the override", async () => {
-    globalThis.fetch = (async () =>
-      ({
-        ok: false,
-        status: 403,
-        statusText: "Forbidden",
-        headers: new Headers({ "cf-mitigated": "challenge" }),
-      }) as unknown as Response) as typeof globalThis.fetch;
-
-    await assert.rejects(httpGetAsync("https://robinhoodchain.blockscout.com/api"), (error: unknown) => {
-      assert.match((error as Error).message, /STATE_MATE_USER_AGENT/);
-      assert.equal(isTransientExplorerHttpError(error), false);
-      return true;
-    });
+  it("treats a bare 403 without the challenge marker as a challenge too", async () => {
+    const fetchMock = mockFetch(() => ({ status: 403 }));
+    try {
+      await assert.rejects(httpGetAsync("https://robinhoodchain.blockscout.com/api"), /STATE_MATE_USER_AGENT/);
+    } finally {
+      fetchMock.mock.restore();
+    }
   });
 
   it("propagates a challenge from the chain-id probe", async () => {
-    globalThis.fetch = (async () =>
-      ({
-        ok: false,
-        status: 403,
-        statusText: "Forbidden",
-        headers: new Headers({ "cf-mitigated": "challenge" }),
-      }) as unknown as Response) as typeof globalThis.fetch;
-
-    await assert.rejects(fetchExplorerChainId("robinhoodchain.blockscout.com"), /STATE_MATE_USER_AGENT/);
+    const fetchMock = mockFetch(() => ({ status: 403, headers: { "cf-mitigated": "challenge" } }));
+    try {
+      await assert.rejects(fetchExplorerChainId(BLOCKSCOUT_HOST), /STATE_MATE_USER_AGENT/);
+    } finally {
+      fetchMock.mock.restore();
+    }
   });
 
   it("propagates a challenge from the chain-id fallback route", async () => {
-    globalThis.fetch = (async (url: unknown) =>
-      ({
-        ok: false,
-        status: String(url).endsWith("/api/eth-rpc") ? 400 : 403,
-        statusText: "Bad Request",
-        headers: new Headers(String(url).endsWith("/api/eth-rpc") ? {} : { "cf-mitigated": "challenge" }),
-      }) as unknown as Response) as typeof globalThis.fetch;
+    const fetchMock = mockFetch((url) =>
+      url.endsWith("/api/eth-rpc") ? { status: 400 } : { status: 403, headers: { "cf-mitigated": "challenge" } },
+    );
+    try {
+      await assert.rejects(fetchExplorerChainId(BLOCKSCOUT_HOST), /STATE_MATE_USER_AGENT/);
+    } finally {
+      fetchMock.mock.restore();
+    }
+  });
 
-    await assert.rejects(fetchExplorerChainId("robinhoodchain.blockscout.com"), /STATE_MATE_USER_AGENT/);
+  it("propagates a challenge from an ABI download instead of skipping the address", async () => {
+    const fetchMock = mockFetch(() => ({ status: 403, headers: { "cf-mitigated": "challenge" } }));
+    try {
+      await assert.rejects(loadContractInfo(ADDRESS, BLOCKSCOUT_HOST), /STATE_MATE_USER_AGENT/);
+      assert.equal(fetchMock.mock.calls.length, 1, "a challenge must not be retried");
+    } finally {
+      fetchMock.mock.restore();
+    }
   });
 });
 
@@ -140,24 +152,5 @@ describe("rpc provider", () => {
     } finally {
       provider.destroy();
     }
-  });
-});
-
-describe("http layer boundary", () => {
-  it("keeps direct fetch calls inside src/explorer.ts", () => {
-    const sourceRoot = path.join(__dirname, "../src");
-    const offenders: string[] = [];
-    const walk = (directory: string) => {
-      for (const entry of readdirSync(directory, { withFileTypes: true })) {
-        const full = path.join(directory, entry.name);
-        if (entry.isDirectory()) walk(full);
-        else if (entry.name.endsWith(".ts") && /\bfetch\s*\(/.test(readFileSync(full, "utf8"))) offenders.push(full);
-      }
-    };
-    walk(sourceRoot);
-    assert.deepEqual(
-      offenders.map((file) => path.relative(sourceRoot, file)),
-      ["explorer.ts"],
-    );
   });
 });

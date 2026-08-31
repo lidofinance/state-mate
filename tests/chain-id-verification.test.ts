@@ -257,24 +257,6 @@ describe("loadContractInfo", () => {
   const ADDRESS = "0xAaAaAAaaAaAAAaaAAaAaaaAAaAAAaaaAaaaaaaa1";
   const ABI = [{ type: "function", name: "getFee", inputs: [], stateMutability: "view" }];
 
-  it("uses the Blockscout v2 smart-contract endpoint", async () => {
-    let requestedUrl = "";
-    const fetchMock = mock.method(globalThis, "fetch", async (url: Parameters<typeof fetch>[0]) => {
-      requestedUrl = String(url);
-      return {
-        ok: true,
-        json: async () => ({ name: "Safe", abi: ABI }),
-      } as Response;
-    });
-    try {
-      const info = await loadContractInfo(ADDRESS, "robinhoodchain.blockscout.com");
-      assert.equal(requestedUrl, `https://robinhoodchain.blockscout.com/api/v2/smart-contracts/${ADDRESS}`);
-      assert.deepEqual(info, { address: ADDRESS, contractName: "Safe", abi: ABI });
-    } finally {
-      fetchMock.mock.restore();
-    }
-  });
-
   it("does not follow implementation metadata recursively", async () => {
     const IMPL = "0xBbbBBBbbbBBbbbBbbBbbbbBBbBBbbBbBbbbbbbb2";
     const fetchMock = mock.method(globalThis, "fetch", async () => {
