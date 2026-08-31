@@ -3,7 +3,14 @@ import { beforeEach, describe, it } from "node:test";
 
 import type { Contract, JsonRpcProvider } from "ethers";
 
-import { type AragonEvent, EMPTY_PARAM_HASH, managerSlot, paramsDigest, permissionSlot } from "../src/acl/aragon";
+import {
+  ANY_ENTITY,
+  type AragonEvent,
+  EMPTY_PARAM_HASH,
+  managerSlot,
+  paramsDigest,
+  permissionSlot,
+} from "../src/acl/aragon";
 import { context, resetStats, stats } from "../src/context";
 import { AragonAclSectionValidator } from "../src/section-validators/aragon-acl";
 import { resetContractCounters } from "../src/section-validators/base";
@@ -201,6 +208,73 @@ describe("aragon ACL validator", () => {
     assert.match(stats.errorDetails[0].message, /has manager .* but is not declared/);
   });
 
+  // granted means exactly these, not at least these: an extra live grantee on a role the config
+  // does declare is the highest-privilege thing this section can miss (review finding on this PR)
+  it("reports a live unconditional grantee a declared role's granted list does not include", async () => {
+    const stub = healthyStub();
+    stub.events.push(grant(VOTING, LIDO, ROLE, 5));
+    stub.slots![permissionSlot(VOTING, LIDO, ROLE)] = EMPTY_PARAM_HASH;
+    await new ExposedAragon("1", stub).validateSection(entry(DECLARED), "acl");
+
+    assert.equal(stats.errors, 1);
+    assert.match(stats.errorDetails[0].message, /live unconditional grant to .* is not declared/);
+  });
+
+  it("still reports the extra grantee on a declared role when its revocation was fabricated", async () => {
+    const stub = healthyStub();
+    stub.events.push(grant(VOTING, LIDO, ROLE, 5), {
+      allowed: false,
+      app: LIDO,
+      blockNumber: 6,
+      entity: VOTING,
+      kind: "permission",
+      logIndex: 0,
+      role: ROLE,
+    });
+    stub.slots![permissionSlot(VOTING, LIDO, ROLE)] = EMPTY_PARAM_HASH; // the chain still holds it
+    await new ExposedAragon("1", stub).validateSection(entry(DECLARED), "acl");
+
+    assert.equal(stats.errors, 1);
+    assert.match(stats.errorDetails[0].message, /live unconditional grant to .* is not declared/);
+  });
+
+  it("clears an extra grantee on a declared role that storage does not corroborate", async () => {
+    const stub = healthyStub();
+    stub.events.push(grant(VOTING, LIDO, ROLE, 5)); // no slot backing: stale or fabricated
+    await new ExposedAragon("1", stub).validateSection(entry(DECLARED), "acl");
+
+    assert.equal(stats.errors, 0);
+  });
+
+  it("reports a live ANY_ENTITY grant on a declared role", async () => {
+    const stub = healthyStub();
+    stub.events.push(grant(ANY_ENTITY, LIDO, ROLE, 5));
+    stub.slots![permissionSlot(ANY_ENTITY, LIDO, ROLE)] = EMPTY_PARAM_HASH;
+    await new ExposedAragon("1", stub).validateSection(entry(DECLARED), "acl");
+
+    assert.equal(stats.errors, 1);
+    assert.match(stats.errorDetails[0].message, /granted to everyone/);
+  });
+
+  it("reports a live ANY_ENTITY grant on an undeclared role as the wildcard, not a plain extra", async () => {
+    const stub = healthyStub();
+    stub.events.push(grant(ANY_ENTITY, SDVT, MSK, 5));
+    stub.slots![permissionSlot(ANY_ENTITY, SDVT, MSK)] = EMPTY_PARAM_HASH;
+    await new ExposedAragon("1", stub).validateSection(entry(DECLARED), "acl");
+
+    assert.equal(stats.errors, 1);
+    assert.match(stats.errorDetails[0].message, /granted to everyone/);
+  });
+
+  it("refuses a config that declares ANY_ENTITY as a grantee", async () => {
+    const stub = healthyStub();
+    const declared = { [LIDO]: { [ROLE]: { granted: [AGENT, ANY_ENTITY], manager: AGENT } } };
+    await new ExposedAragon("1", stub).validateSection(entry(declared), "acl");
+
+    assert.equal(stats.errors, 1);
+    assert.match(stats.errorDetails[0].message, /wildcard may not be declared/);
+  });
+
   describe("parameterized grants", () => {
     const pinned = paramsDigest([{ entity: STRANGER, paramsHash: HASH_A }]);
     const withParams = (): Stub => {
@@ -236,6 +310,25 @@ describe("aragon ACL validator", () => {
       await new ExposedAragon("1", stub).validateSection(entry(declared), "acl");
 
       assert.ok(stats.errorDetails.some((d) => /events fold to|slots to/.test(d.message)));
+    });
+
+    // the digest's live set is decided by the slots, not the events, so a fabricated revocation
+    // cannot thin it: the hidden holder still reads back and breaks the slots-side fold
+    it("reports a live parameterized holder the pin does not cover when its revocation was fabricated", async () => {
+      const stub = withParams();
+      stub.events.push(grant(VOTING, LIDO, MSK, 6), params(VOTING, LIDO, MSK, HASH_A, 6), {
+        allowed: false,
+        app: LIDO,
+        blockNumber: 7,
+        entity: VOTING,
+        kind: "permission",
+        logIndex: 0,
+        role: MSK,
+      });
+      stub.slots![permissionSlot(VOTING, LIDO, MSK)] = HASH_A; // the chain still holds it
+      await new ExposedAragon("1", stub).validateSection(entry(declared), "acl");
+
+      assert.ok(stats.errorDetails.some((d) => /slots to/.test(d.message)));
     });
 
     it("fails parameterized grants that exist with no digest pinned", async () => {

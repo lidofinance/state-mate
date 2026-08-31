@@ -8,6 +8,7 @@ import {
   decodePermissionWord,
   foldAragonEvents,
   managerSlot,
+  type ParamsPair,
   paramsDigest,
   parseAragonLog,
   permissionSlot,
@@ -44,6 +45,8 @@ interface DeclaredRole {
 /**
  * Verifies the whole DAO permission map against the ACL that owns it: every declared grant and
  * manager, and -- because the map is declared in one place -- every live grant nobody declared.
+ * `granted` means exactly these, not at least these: a live unconditional grantee outside the
+ * list is an error whether or not the role itself is declared.
  *
  * Three answers must agree for everything reported: the event history, the view functions, and
  * the raw ACL storage. The one wrinkle Aragon adds over OpenZeppelin is parameterized grants:
@@ -144,12 +147,14 @@ export class AragonAclSectionValidator extends SectionValidatorBase {
       for (const entity of entry.granted) {
         await this._verifyUnconditional(acl, aclAddress, entry, entity, state);
       }
-      await this._verifyParams(acl, aclAddress, entry, state);
+      const paramsLive = await this._discoverLiveGrants(aclAddress, entry, state);
+      await this._verifyParams(acl, entry, paramsLive, state);
     }
 
-    // DAO-wide completeness for grants: a live grant on an app or role nobody declared is exactly
-    // the holder this section exists to find. Candidates are every entity EVER granted -- the
-    // events only nominate, the storage decides -- so a fabricated revocation cannot hide one
+    // DAO-wide completeness for grants on roles nobody declared (declared roles get the same
+    // sweep in _discoverLiveGrants): a live grant here is exactly the holder this section exists
+    // to find. Candidates are every entity EVER granted -- the events only nominate, the storage
+    // decides -- so a fabricated revocation cannot hide one
     for (const [roleKey, entities] of [...state.everGranted.entries()].sort(([a], [b]) => a.localeCompare(b))) {
       if (declaredRoleKeys.has(roleKey)) continue;
       const [app, role] = roleKey.split("|");
@@ -159,6 +164,9 @@ export class AragonAclSectionValidator extends SectionValidatorBase {
             await this.provider.getStorage(aclAddress, permissionSlot(entity, app, role)),
           );
           if (word.kind === "absent") return { detail: "not present in storage (stale event)", ok: true };
+          if (entity === ANY_ENTITY) {
+            return { message: `ANY_ENTITY holds ${role} on ${app}: the permission is granted to everyone`, ok: false };
+          }
           return { message: `undeclared ${word.kind} permission: ${entity} on app ${app} role ${role}`, ok: false };
         });
       }
@@ -199,9 +207,19 @@ export class AragonAclSectionValidator extends SectionValidatorBase {
           return undefined;
         }
         seen.add(key);
+        const granted = (entry.granted ?? []).map((entity) => entity.toLowerCase());
+        // the wildcard is never a legitimate grantee; declaring it would make the checks below
+        // vouch for a permission that is in fact granted to everyone
+        if (granted.includes(ANY_ENTITY)) {
+          void this._check(`role ${role}`, async () => ({
+            message: `ANY_ENTITY is declared as a grantee of ${role} on ${app}; the wildcard may not be declared`,
+            ok: false,
+          }));
+          return undefined;
+        }
         declared.push({
           app: app.toLowerCase(),
-          granted: (entry.granted ?? []).map((entity) => entity.toLowerCase()),
+          granted,
           manager: entry.manager.toLowerCase(),
           paramsDigest: entry.paramsDigest?.toLowerCase(),
           role: role.toLowerCase(),
@@ -278,65 +296,93 @@ export class AragonAclSectionValidator extends SectionValidatorBase {
     });
   }
 
-  private async _verifyParams(acl: Contract, aclAddress: string, entry: DeclaredRole, state: AragonState) {
-    const roleKey = appRoleKey(entry.app, entry.role);
-    const live = [...(state.granted.get(roleKey) ?? [])]
-      .filter((entity) => state.paramsHash.has(`${roleKey}|${entity}`))
+  /**
+   * Walks every entity a grant was ever emitted for on a declared role and lets the slot decide,
+   * the same rule the undeclared sweep applies. `granted` means exactly these: a live
+   * unconditional grantee outside the list is an error, and a live params-carrying word is
+   * collected for the digest comparison -- so a fabricated revocation can hide neither, and a
+   * live wildcard is rejected whatever kind of word it carries.
+   */
+  private async _discoverLiveGrants(
+    aclAddress: string,
+    entry: DeclaredRole,
+    state: AragonState,
+  ): Promise<ParamsPair[]> {
+    const declaredEntities = new Set(entry.granted);
+    const candidates = [...(state.everGranted.get(appRoleKey(entry.app, entry.role)) ?? [])]
+      .filter((entity) => !declaredEntities.has(entity))
       .toSorted((a, b) => a.localeCompare(b));
 
+    const paramsLive: ParamsPair[] = [];
+    for (const entity of candidates) {
+      await this._check(`undeclared grantee of ${entry.role} on ${entry.app}: ${entity}`, async () => {
+        const word = decodePermissionWord(
+          await this.provider.getStorage(aclAddress, permissionSlot(entity, entry.app, entry.role)),
+        );
+        if (word.kind === "absent") return { detail: "not present in storage (stale event)", ok: true };
+        if (entity === ANY_ENTITY) {
+          return {
+            message: `ANY_ENTITY holds ${entry.role} on ${entry.app}: the permission is granted to everyone`,
+            ok: false,
+          };
+        }
+        if (word.kind === "params") {
+          paramsLive.push({ entity, paramsHash: word.paramsHash });
+          return { detail: "carries params; verified against the paramsDigest", ok: true };
+        }
+        return { message: `live unconditional grant to ${entity} is not declared in granted`, ok: false };
+      });
+    }
+    return paramsLive;
+  }
+
+  private async _verifyParams(
+    acl: Contract,
+    entry: DeclaredRole,
+    paramsLive: readonly ParamsPair[],
+    state: AragonState,
+  ) {
+    const roleKey = appRoleKey(entry.app, entry.role);
+    // The events' own claim of the live parameterized set, kept beside the slot-decided one from
+    // _discoverLiveGrants: both must fold to the pin, so neither source can be wrong alone
+    const fromEvents = [...(state.granted.get(roleKey) ?? [])]
+      .filter((entity) => state.paramsHash.has(`${roleKey}|${entity}`))
+      .toSorted((a, b) => a.localeCompare(b))
+      .map((entity) => ({ entity, paramsHash: state.paramsHash.get(`${roleKey}|${entity}`) ?? "" }));
+
     if (entry.paramsDigest === undefined) {
-      if (live.length === 0) return;
+      // the slot decides existence too: params events whose words read absent are stale, not live
+      if (paramsLive.length === 0) return;
       await this._check(`parameterized grants of ${entry.role} on ${entry.app}`, async () => ({
-        message: `${live.length} live parameterized grant(s) exist but no paramsDigest is pinned`,
+        message: `${paramsLive.length} live parameterized grant(s) exist but no paramsDigest is pinned`,
         ok: false,
       }));
       return;
     }
 
     await this._check(`paramsDigest of ${entry.role} on ${entry.app}`, async () => {
-      const fromEvents = live.map((entity) => ({
-        entity,
-        paramsHash: state.paramsHash.get(`${roleKey}|${entity}`) ?? "",
-      }));
-      const fromSlots = [];
-      for (const entity of live) {
-        const word = decodePermissionWord(
-          await this.provider.getStorage(aclAddress, permissionSlot(entity, entry.app, entry.role)),
-        );
-        if (word.kind !== "params") {
-          return { message: `slot for ${entity} reads ${word.kind}, but events say it carries params`, ok: false };
-        }
-        fromSlots.push({ entity, paramsHash: word.paramsHash });
-      }
-      const digests = { events: paramsDigest(fromEvents), slots: paramsDigest(fromSlots) };
+      const digests = { events: paramsDigest(fromEvents), slots: paramsDigest(paramsLive) };
       if (digests.events !== entry.paramsDigest || digests.slots !== entry.paramsDigest) {
-        // the full live set is the fix: re-pinning is one reviewed copy-paste
-        log(`  live parameterized grants of ${entry.role} on ${entry.app}:`);
-        for (const pair of fromEvents) log(`    ${pair.entity} ${pair.paramsHash}`);
+        // the slot-decided live set is the fix: re-pinning is one reviewed copy-paste
+        log(`  live parameterized grants of ${entry.role} on ${entry.app} (slot-decided):`);
+        for (const pair of paramsLive) log(`    ${pair.entity} ${pair.paramsHash}`);
         return {
           message: `pinned ${entry.paramsDigest}, events fold to ${digests.events}, slots to ${digests.slots}`,
           ok: false,
         };
       }
+      if (paramsLive.length === 0) return { detail: "no live parameterized grants, digest of the empty set", ok: true };
       // the view cannot vouch for conditional grants; params length is the view-side proof they exist
       const paramsLength = Number(
-        await acl.getFunction("getPermissionParamsLength").staticCall(live[0], entry.app, entry.role),
+        await acl.getFunction("getPermissionParamsLength").staticCall(paramsLive[0].entity, entry.app, entry.role),
       );
       if (paramsLength === 0) {
         return {
-          message: `getPermissionParamsLength is 0 for ${live[0]}, yet the slot carries a params hash`,
+          message: `getPermissionParamsLength is 0 for ${paramsLive[0].entity}, yet the slot carries a params hash`,
           ok: false,
         };
       }
-      return { detail: `${live.length} grant(s), digest ${entry.paramsDigest.slice(0, 18)}…`, ok: true };
+      return { detail: `${paramsLive.length} grant(s), digest ${entry.paramsDigest.slice(0, 18)}…`, ok: true };
     });
-
-    // A live wildcard would hide inside the digest; it is never legitimate here
-    if (live.includes(ANY_ENTITY) || (state.granted.get(roleKey)?.has(ANY_ENTITY) ?? false)) {
-      await this._check(`ANY_ENTITY on ${entry.role}`, async () => ({
-        message: `ANY_ENTITY holds ${entry.role} on ${entry.app}: the permission is granted to everyone`,
-        ok: false,
-      }));
-    }
   }
 }

@@ -135,7 +135,7 @@ aragonAcl:
 | Field          | Meaning                                                                                  |
 | -------------- | ---------------------------------------------------------------------------------------- |
 | `manager`      | Who can grant and revoke the role — verified against events, the view, and ACL storage   |
-| `granted`      | Unconditional grantees: events, `hasPermission`, and the permission slot must all agree  |
+| `granted`      | Exactly the unconditional grantees — a live grantee outside the list is an error         |
 | `paramsDigest` | keccak256 over the role's parameterized grants as (entity ‖ paramsHash) sorted by entity |
 
 Parameterized grants are the reason for the digest: `hasPermission(entity, app, role)` answers
@@ -145,10 +145,14 @@ the pinned digest — and any change to the set, including a params change for a
 breaks the pin. On mismatch the tool prints the live set, so re-pinning is one reviewed
 copy-paste. The digest is reproducible by hand: sort, concatenate, `cast keccak`.
 
-A role with a manager and no grantees is declared with `manager` alone; managers on apps outside
-the declared map are not checked. `ANY_ENTITY` (the aragonOS wildcard) holding anything is an
-error. The same log-source registry, skip semantics, and fail-closed rules apply as for the
-OpenZeppelin scan above.
+Declared grantees are verified three ways — events, `hasPermission`, and the permission slot must
+all agree — and the list is exact: every entity a grant was ever emitted for is read back from
+storage, so an extra live grantee is an error whether or not its role is declared, and a
+fabricated revocation cannot hide it. A role with a manager and no grantees is declared with
+`manager` alone; managers on apps outside the declared map are not checked. `ANY_ENTITY` (the
+aragonOS wildcard) holding anything is an error, and it may not be declared as a grantee. The
+same log-source registry, skip semantics, and fail-closed rules apply as for the OpenZeppelin
+scan above.
 
 ## Check values
 
