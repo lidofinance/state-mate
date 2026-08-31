@@ -38,6 +38,47 @@ describe("blockscout v2 ABI download", () => {
     }
   });
 
+  it("treats a challenged probe as not-blockscout and lets the legacy route report the challenge", async () => {
+    const fetchMock = mockFetch(() => ({ status: 403, headers: { "cf-mitigated": "challenge" } }));
+    try {
+      await assert.rejects(loadContractInfo(ADDRESS, BLOCKSCOUT_HOST), /STATE_MATE_USER_AGENT/);
+      assert.deepEqual(
+        fetchMock.mock.calls.map((call) => String(call.arguments[0])),
+        [
+          `https://${BLOCKSCOUT_HOST}${PROBE_SUFFIX}`,
+          `https://${BLOCKSCOUT_HOST}/api?module=contract&action=getsourcecode&address=${ADDRESS}`,
+        ],
+        "a 403 on the probe alone must not outrank the legacy route",
+      );
+    } finally {
+      fetchMock.mock.restore();
+    }
+  });
+
+  it("re-probes after a verdict built from flakes instead of pinning the legacy route", async () => {
+    let probeCalls = 0;
+    const fetchMock = mockFetch((url) => {
+      if (url.endsWith(PROBE_SUFFIX)) return ++probeCalls <= 2 ? { status: 429 } : PROBE_ANSWER;
+      if (url.includes("/api/v2/smart-contracts/"))
+        return { body: { name: "AdaptiveCurveIrm", is_verified: true, abi: IRM_ABI } };
+      return { body: { status: "0", message: "NOTOK", result: "legacy quota exhausted" } };
+    });
+    mock.timers.enable({ apis: ["setTimeout"] });
+    try {
+      const pending = loadContractInfo(ADDRESS, BLOCKSCOUT_HOST);
+      for (let round = 0; round < 12; round++) {
+        await new Promise((resolve) => setImmediate(resolve));
+        mock.timers.tick(7000);
+      }
+      const contract = await pending;
+      assert.equal(probeCalls, 3, "the flaked verdict must not be memoized");
+      assert.equal(contract?.contractName, "AdaptiveCurveIrm");
+    } finally {
+      mock.timers.reset();
+      fetchMock.mock.restore();
+    }
+  });
+
   it("probes a host once and reuses the verdict", async () => {
     const fetchMock = mockFetch((url) =>
       url.endsWith(PROBE_SUFFIX)

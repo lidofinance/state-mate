@@ -9,6 +9,7 @@ import {
   httpGetAsync,
   isTransientExplorerHttpError,
   loadContractInfo,
+  resetBlockscoutHostProbes,
   resetRequestSlots,
   userAgent,
 } from "../src/explorer";
@@ -31,6 +32,7 @@ function headerOf(call: FetchCall | undefined, name: string): string | undefined
 
 beforeEach(() => {
   resetRequestSlots();
+  resetBlockscoutHostProbes();
 });
 
 afterEach(() => {
@@ -137,7 +139,10 @@ describe("explorer challenges", () => {
     const fetchMock = mockFetch(() => ({ status: 403, headers: { "cf-mitigated": "challenge" } }));
     try {
       await assert.rejects(loadContractInfo(ADDRESS, BLOCKSCOUT_HOST), /STATE_MATE_USER_AGENT/);
-      assert.equal(fetchMock.mock.calls.length, 1, "a challenge must not be retried");
+      const abiCalls = fetchMock.mock.calls.filter(
+        (call) => !String(call.arguments[0]).endsWith("/api/v2/config/backend-version"),
+      );
+      assert.equal(abiCalls.length, 1, "a challenge must not be retried");
     } finally {
       fetchMock.mock.restore();
     }

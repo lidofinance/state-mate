@@ -51,12 +51,16 @@ async function _probeBlockscoutHost(hostname: string, attempt = 0): Promise<bool
     );
     return typeof response.backend_version === "string";
   } catch (error) {
-    // a challenge dooms every request to the host; a flake gets one more try, because a
-    // memoized false would misroute the run to the wrong API
-    if (error instanceof ExplorerChallengeError) throw error;
-    if (error instanceof ExplorerHttpError && error.transient && attempt === 0) {
-      if (error.retryDelayMs) await sleep(error.retryDelayMs);
-      return _probeBlockscoutHost(hostname, 1);
+    // a 403 here may be a WAF guarding an unknown path, not an anti-bot wall; the follow-up
+    // request settles it — a genuinely challenged host fails there with the same diagnostic
+    if (error instanceof ExplorerChallengeError) return false;
+    if (error instanceof ExplorerHttpError && error.transient) {
+      if (attempt === 0) {
+        if (error.retryDelayMs) await sleep(error.retryDelayMs);
+        return _probeBlockscoutHost(hostname, 1);
+      }
+      // a verdict built from flakes must not pin the route for the rest of the process
+      blockscoutHostProbes.delete(hostname);
     }
     return false;
   }
@@ -64,6 +68,7 @@ async function _probeBlockscoutHost(hostname: string, attempt = 0): Promise<bool
 
 export function resetBlockscoutHostProbes(): void {
   blockscoutHostProbes.clear();
+  warnedLegacyBlockscoutHosts.clear();
 }
 
 export function loadContract(address: string, abi: Abi, provider: JsonRpcProvider) {
@@ -144,8 +149,8 @@ async function _fetchContractInfo(
   let sourcesResponse: unknown;
   let blockscout = false;
   try {
-    blockscout = !explorerHostname.includes("etherscan.io") && (await isBlockscoutHost(explorerHostname));
-    const sourcesUrl = _getExplorerApiUrl(explorerHostname, address, explorerKey, chainId, blockscout);
+    blockscout = !explorerNeedsApiKey(explorerHostname) && (await isBlockscoutHost(explorerHostname));
+    const sourcesUrl = _getExplorerApiUrl(explorerHostname, address, blockscout, explorerKey, chainId);
     sourcesResponse = await httpGetAsync(sourcesUrl);
   } catch (error) {
     // a challenge dooms every request to the host: fail the run instead of skipping address by address
@@ -410,9 +415,9 @@ const warnedLegacyBlockscoutHosts = new Set<string>();
 function _getExplorerApiUrl(
   explorerHostname: string,
   address: string,
+  blockscout: boolean,
   explorerKey?: string,
   chainId?: number | string,
-  blockscout = false,
 ) {
   const isEtherscan = explorerHostname.includes("etherscan.io");
   let url: string;
