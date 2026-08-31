@@ -439,6 +439,10 @@ The entry has no `implementation:`, yet the address holds a non-empty EIP-1967 s
 
 - The explorer's anti-bot layer rejected the built-in User-Agent. Set `STATE_MATE_USER_AGENT` in `.env` to another string — every explorer and RPC request carries it.
 
+### `did not confirm chainId ... --allow-unverified-explorer`
+
+- The chain-id probe uses the etherscan-compatible v1 routes, which some Blockscout instances no longer serve. Re-run with `--allow-unverified-explorer` — the RPC chain assertion and the stored-name match still guard the ABI store.
+
 ### `Invalid address` in `deployed:`
 
 - `REPLACEME` is invalid in `deployed:` — resolve the address via `cast storage` / `cast admin` first, then add a real anchor.
