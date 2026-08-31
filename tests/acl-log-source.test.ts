@@ -1,15 +1,20 @@
 import assert from "node:assert/strict";
 import { describe, it, mock } from "node:test";
 
+import type { JsonRpcProvider } from "ethers";
+
 import { ROLE_GRANTED_TOPIC } from "../src/acl/fold";
 import {
   CHAIN_LOG_SOURCES,
   collectRoleEvents,
+  collectTailLogs,
+  collectTailRoleEvents,
   describeSource,
   fetchWindow,
   isRateLimitAnswer,
   makeSettledScanRange,
   parseQuantity,
+  resolveScanBounds,
   type ScanRange,
   setRateLimitPause,
 } from "../src/acl/log-source";
@@ -108,6 +113,90 @@ describe("settled scan range", () => {
 
   it("rejects a deployment newer than the settled head before querying logs", () => {
     assert.throws(() => makeSettledScanRange(101, 100), /deployment is not yet settled/);
+  });
+});
+
+describe("the unsettled tail", () => {
+  const ROLE = `0x${"1".repeat(64)}`;
+  const padded = (address: string) => `0x${"0".repeat(24)}${address.slice(2)}`;
+  const HOLDER = "0x00000000000000000000000000000000deadbeef";
+  const grantLog = (blockNumber: number, topic0 = ROLE_GRANTED_TOPIC) => ({
+    address: CONTRACT,
+    blockNumber,
+    data: "0x",
+    index: 0,
+    topics: [topic0, ROLE, padded(HOLDER), padded(HOLDER)],
+  });
+
+  it("captures the head once and settles it by the chain's confirmation lag", async () => {
+    const provider = { getBlockNumber: async () => 1000 } as unknown as JsonRpcProvider;
+    assert.deepEqual(await resolveScanBounds("1", provider), { captured: 1000, settled: 992 });
+  });
+
+  it("asks the RPC for exactly the tail window, with every topic as an alternative", async () => {
+    const asked: unknown[] = [];
+    const provider = {
+      getLogs: async (filter: unknown) => {
+        asked.push(filter);
+        return [grantLog(996)];
+      },
+    } as unknown as JsonRpcProvider;
+
+    const logs = await collectTailLogs(provider, CONTRACT, ["0xaa", "0xbb"], { fromBlock: 993, toBlock: 1000 });
+
+    assert.deepEqual(asked, [{ address: CONTRACT, fromBlock: 993, toBlock: 1000, topics: [["0xaa", "0xbb"]] }]);
+    // ethers calls the position `index`; the fold expects `logIndex`
+    assert.deepEqual(logs, [
+      { address: CONTRACT, blockNumber: 996, data: "0x", logIndex: 0, topics: grantLog(996).topics },
+    ]);
+  });
+
+  it("returns nothing without asking when there is no tail to fetch", async () => {
+    const provider = {
+      getLogs: async () => {
+        throw new Error("must not be called");
+      },
+    } as unknown as JsonRpcProvider;
+
+    assert.deepEqual(await collectTailLogs(provider, CONTRACT, [ROLE_GRANTED_TOPIC], { fromBlock: 5, toBlock: 4 }), []);
+  });
+
+  it("folds a tail grant like any other candidate", async () => {
+    const provider = { getLogs: async () => [grantLog(996)] } as unknown as JsonRpcProvider;
+
+    const outcome = await collectTailRoleEvents(provider, CONTRACT, { fromBlock: 993, toBlock: 1000 });
+
+    assert.equal(outcome.ok, true);
+    if (outcome.ok) {
+      assert.equal(outcome.events.length, 1);
+      assert.deepEqual(
+        { account: outcome.events[0].account, granted: outcome.events[0].granted },
+        { account: HOLDER, granted: true },
+      );
+    }
+  });
+
+  it("fails on a tail log it cannot read rather than dropping it", async () => {
+    const truncated = { ...grantLog(996), topics: [ROLE_GRANTED_TOPIC, ROLE] };
+    const provider = { getLogs: async () => [truncated] } as unknown as JsonRpcProvider;
+
+    const outcome = await collectTailRoleEvents(provider, CONTRACT, { fromBlock: 993, toBlock: 1000 });
+
+    assert.equal(outcome.ok, false);
+    if (!outcome.ok) assert.match(outcome.reason, /unreadable/);
+  });
+
+  it("reports an RPC that will not serve the tail instead of shrinking coverage", async () => {
+    const provider = {
+      getLogs: async () => {
+        throw new Error("free plan says no");
+      },
+    } as unknown as JsonRpcProvider;
+
+    const outcome = await collectTailRoleEvents(provider, CONTRACT, { fromBlock: 993, toBlock: 1000 });
+
+    assert.equal(outcome.ok, false);
+    if (!outcome.ok) assert.match(outcome.reason, /would not serve the tail 993-1000/);
   });
 });
 

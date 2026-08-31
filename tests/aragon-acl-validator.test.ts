@@ -1,17 +1,20 @@
 import assert from "node:assert/strict";
-import { beforeEach, describe, it } from "node:test";
+import { beforeEach, describe, it, mock } from "node:test";
 
 import type { Contract, JsonRpcProvider } from "ethers";
 
 import {
   ANY_ENTITY,
   type AragonEvent,
+  CHANGE_PERMISSION_MANAGER_TOPIC,
   EMPTY_PARAM_HASH,
   managerSlot,
   paramsDigest,
   permissionSlot,
+  SET_PERMISSION_TOPIC,
 } from "../src/acl/aragon";
 import { context, resetStats, stats } from "../src/context";
+import { resetRequestSlots } from "../src/explorer";
 import { AragonAclSectionValidator } from "../src/section-validators/aragon-acl";
 import { resetContractCounters } from "../src/section-validators/base";
 import type { ContractEntry } from "../src/typebox";
@@ -346,5 +349,113 @@ describe("aragon ACL validator", () => {
 
       assert.ok(stats.errorDetails.some((d) => /getPermissionParamsLength is 0/.test(d.message)));
     });
+  });
+});
+
+describe("the RPC tail in the real scan", () => {
+  beforeEach(() => {
+    resetStats();
+    resetContractCounters();
+    context.quiet = true;
+  });
+
+  /** Only the view surface is stubbed; _scan runs for real against the mocked explorer and RPC. */
+  class TailAragon extends AragonAclSectionValidator {
+    protected override _aclContract(): Contract {
+      return {
+        getFunction: (name: string) => ({
+          staticCall: (...args: string[]) => {
+            if (name === "hasPermission")
+              return Promise.resolve(args.join("|").toLowerCase() === `${AGENT}|${LIDO}|${ROLE}`);
+            if (name === "getPermissionManager") return Promise.resolve(AGENT);
+            return Promise.resolve(1);
+          },
+        }),
+      } as unknown as Contract;
+    }
+  }
+
+  // the review finding: the scan stopped at the settled head while views and storage read the
+  // latest block, so a grant landed in the confirmation-lag window passed with zero errors --
+  // a blind spot on exactly the schedule an attacker gets to pick
+  it("discovers and reports a grant that exists only in the unsettled tail", async () => {
+    const TRUE_WORD = `0x${"0".repeat(63)}1`;
+    const padded = (address: string) => `0x${"0".repeat(24)}${address.slice(2)}`;
+    const slots: Record<string, string> = {
+      [permissionSlot(AGENT, LIDO, ROLE)]: EMPTY_PARAM_HASH,
+      [managerSlot(LIDO, ROLE)]: word(AGENT),
+      [permissionSlot(VOTING, LIDO, ROLE)]: EMPTY_PARAM_HASH, // live, but only the tail saw it
+    };
+    const explorerAsked: number[] = [];
+    const tailAsked: unknown[] = [];
+
+    const provider = {
+      getBlockNumber: async () => 1000,
+      getLogs: async (filter: { fromBlock: number; toBlock: number }) => {
+        tailAsked.push({ fromBlock: filter.fromBlock, toBlock: filter.toBlock });
+        return [
+          {
+            address: ACL,
+            blockNumber: 997,
+            data: TRUE_WORD,
+            index: 0,
+            topics: [SET_PERMISSION_TOPIC, padded(VOTING), padded(LIDO), ROLE],
+          },
+        ];
+      },
+      getStorage: async (_a: string, slot: string) => slots[slot.toLowerCase()] ?? ZERO_WORD,
+    } as unknown as JsonRpcProvider;
+
+    resetRequestSlots();
+    const fetchMock = mock.method(globalThis, "fetch", async (input: unknown) => {
+      const url = String(input);
+      if (url.includes("getcontractcreation")) {
+        return Response.json({ result: [{ blockNumber: "1", contractAddress: ACL }], status: "1" });
+      }
+      explorerAsked.push(Number(/toBlock=(\d+)/.exec(url)?.[1]));
+      if (url.includes(`topic0=${SET_PERMISSION_TOPIC}`)) {
+        return Response.json({
+          result: [
+            {
+              address: ACL,
+              blockNumber: "0x5",
+              data: TRUE_WORD,
+              logIndex: "0x0",
+              topics: [SET_PERMISSION_TOPIC, padded(AGENT), padded(LIDO), ROLE],
+            },
+          ],
+          status: "1",
+        });
+      }
+      if (url.includes(`topic0=${CHANGE_PERMISSION_MANAGER_TOPIC}`)) {
+        return Response.json({
+          result: [
+            {
+              address: ACL,
+              blockNumber: "0x5",
+              data: "0x",
+              logIndex: "0x1",
+              topics: [CHANGE_PERMISSION_MANAGER_TOPIC, padded(LIDO), ROLE, padded(AGENT)],
+            },
+          ],
+          status: "1",
+        });
+      }
+      return Response.json({ message: "No records found", result: "No records found", status: "0" });
+    });
+
+    try {
+      await new TailAragon(provider, "1").validateSection(entry(DECLARED), "acl");
+    } finally {
+      fetchMock.mock.restore();
+      resetRequestSlots();
+    }
+
+    // the explorer covers only the settled range; the RPC is asked for exactly the tail
+    assert.ok(explorerAsked.every((toBlock) => toBlock === 992));
+    assert.deepEqual(tailAsked, [{ fromBlock: 993, toBlock: 1000 }]);
+    // the grant at block 997 was invisible before the tail fill; now it is found and reported
+    assert.equal(stats.errors, 1);
+    assert.match(stats.errorDetails[0].message, /live unconditional grant to .* is not declared/);
   });
 });

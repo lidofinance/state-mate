@@ -287,11 +287,67 @@ export async function resolveDeploymentBlock(chainId: string, address: string): 
 }
 
 /**
- * Where the scan stops. Holding short of the head keeps the answer to a settled range, past the
- * explorer's indexing lag and any shallow reorg, rather than describing the last few seconds of
- * the chain and calling it the state.
+ * Where the scan's two ranges meet. The explorer serves the settled history -- holding short of
+ * the head keeps its answer past the indexing lag and any shallow reorg -- and the RPC fills the
+ * tail from there to the head captured when the scan started. Without the tail, the last minutes
+ * before every run would be a standing blind spot on exactly the schedule an attacker gets to
+ * pick; with it, the only changes a run can miss are the ones made after it began, which no
+ * terminating check can cover. The RPC already decides membership through views and storage
+ * reads, so letting it nominate tail candidates adds no new trust root.
  */
-export async function resolveScanHead(chainId: string, provider: JsonRpcProvider): Promise<number> {
+export interface ScanBounds {
+  /** The chain head at the moment the scan started; candidacy is complete through here. */
+  captured: number;
+  /** Where the explorer's settled range ends and the RPC tail begins. */
+  settled: number;
+}
+
+export async function resolveScanBounds(chainId: string, provider: JsonRpcProvider): Promise<ScanBounds> {
   const lag = CHAIN_LOG_SOURCES[chainId]?.confirmationLag ?? 0;
-  return Math.max(0, (await provider.getBlockNumber()) - lag);
+  const captured = await provider.getBlockNumber();
+  return { captured, settled: Math.max(0, captured - lag) };
+}
+
+/** The unsettled tail, straight from the RPC: one bounded request, no windowing needed. */
+export async function collectTailLogs(
+  provider: JsonRpcProvider,
+  address: string,
+  topics0: readonly string[],
+  range: ScanRange,
+): Promise<RawLog[]> {
+  if (range.fromBlock > range.toBlock) return [];
+  const logs = await provider.getLogs({
+    address,
+    fromBlock: range.fromBlock,
+    toBlock: range.toBlock,
+    topics: [[...topics0]],
+  });
+  return logs.map((entry) => ({
+    address: entry.address,
+    blockNumber: entry.blockNumber,
+    data: entry.data,
+    logIndex: entry.index,
+    topics: [...entry.topics],
+  }));
+}
+
+export async function collectTailRoleEvents(
+  provider: JsonRpcProvider,
+  address: string,
+  range: ScanRange,
+): Promise<ScanOutcome> {
+  let raw: RawLog[];
+  try {
+    raw = await collectTailLogs(provider, address, ROLE_TOPICS, range);
+  } catch (error) {
+    return {
+      ok: false,
+      reason: `the RPC would not serve the tail ${range.fromBlock}-${range.toBlock}: ${printError(error)}`,
+    };
+  }
+  const { events, rejected } = collect(raw);
+  if (rejected.length > 0) {
+    return { ok: false, reason: `the RPC served ${rejected.length} unreadable log(s): ${rejected[0]}` };
+  }
+  return { events, ok: true, source: "rpc" };
 }

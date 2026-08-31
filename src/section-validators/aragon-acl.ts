@@ -13,12 +13,14 @@ import {
   parseAragonLog,
   permissionSlot,
 } from "src/acl/aragon";
+import type { RawLog } from "src/acl/fold";
 import {
+  collectTailLogs,
   collectTopicLogs,
   hasLogSource,
   makeSettledScanRange,
   resolveDeploymentBlock,
-  resolveScanHead,
+  resolveScanBounds,
 } from "src/acl/log-source";
 import { EntryField, normalizeChainId, printError } from "src/common";
 import { LogCommand, log, logHeader2 } from "src/logger";
@@ -101,25 +103,51 @@ export class AragonAclSectionValidator extends SectionValidatorBase {
     if (fromBlock === undefined) {
       return { ok: false, reason: `the explorer would not give a deployment block for ${address}` };
     }
+    const bounds = await resolveScanBounds(chainId, this.provider);
     let range: { fromBlock: number; toBlock: number };
     try {
       // an ACL deployed above the settled head has no settled history yet, same rule as the OZ scan
-      range = makeSettledScanRange(fromBlock, await resolveScanHead(chainId, this.provider));
+      range = makeSettledScanRange(fromBlock, bounds.settled);
     } catch (error) {
       return { ok: false, reason: printError(error) };
     }
-    const { fromBlock: from, toBlock } = range;
 
     const raw = await collectTopicLogs(chainId, address, ARAGON_ACL_TOPICS, range);
     if (!raw.ok) return raw;
 
-    const events: AragonEvent[] = [];
-    for (const entry of raw.logs) {
-      const parsed = parseAragonLog(entry);
-      if (!parsed.ok) return { ok: false, reason: `${raw.source} served an unreadable log: ${parsed.reason}` };
-      events.push(parsed.event);
+    // the RPC fills the unsettled tail, so candidacy is complete through the captured head rather
+    // than stopping minutes short of it on a schedule an attacker could rely on
+    let tail: RawLog[];
+    try {
+      tail = await collectTailLogs(this.provider, address, ARAGON_ACL_TOPICS, {
+        fromBlock: range.toBlock + 1,
+        toBlock: bounds.captured,
+      });
+    } catch (error) {
+      return {
+        ok: false,
+        reason: `the RPC would not serve the tail ${range.toBlock + 1}-${bounds.captured}: ${printError(error)}`,
+      };
     }
-    return { events, fromBlock: from, ok: true, source: raw.source, toBlock };
+
+    const events: AragonEvent[] = [];
+    for (const [sourceName, entries] of [
+      [raw.source, raw.logs],
+      ["the RPC tail", tail],
+    ] as const) {
+      for (const entry of entries) {
+        const parsed = parseAragonLog(entry);
+        if (!parsed.ok) return { ok: false, reason: `${sourceName} served an unreadable log: ${parsed.reason}` };
+        events.push(parsed.event);
+      }
+    }
+    return {
+      events,
+      fromBlock: range.fromBlock,
+      ok: true,
+      source: `${raw.source} + rpc tail`,
+      toBlock: bounds.captured,
+    };
   }
 
   /** The bound ACL every view confirmation calls through. */

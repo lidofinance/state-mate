@@ -3,10 +3,11 @@ import type { Contract, JsonRpcProvider } from "ethers";
 import { grantedCandidates, type RoleHolders, sortedHolders, sortedRoles } from "src/acl/fold";
 import {
   collectRoleEvents,
+  collectTailRoleEvents,
   hasLogSource,
   makeSettledScanRange,
   resolveDeploymentBlock,
-  resolveScanHead,
+  resolveScanBounds,
   type ScanRange,
 } from "src/acl/log-source";
 import { type CalibrationInput, calibrateStorageLayout, readMembership, type StorageLayout } from "src/acl/storage";
@@ -143,27 +144,39 @@ export class OzNonEnumerableAclSectionValidator extends SectionValidatorBase {
     if (!calibration.ok) return fail(calibration.reason);
     log(`  storage layout: ${calibration.layout.name}`);
 
-    let range: ScanRange;
+    let range: { captured: number; explorer: ScanRange };
     try {
       range = await this._scanRange(chainId, address);
     } catch (error) {
       return fail(printError(error));
     }
 
-    const outcome = await collectRoleEvents(chainId, address, range);
+    const outcome = await collectRoleEvents(chainId, address, range.explorer);
     if (!outcome.ok) return fail(outcome.reason);
-    log(`  ${outcome.source}: ${outcome.events.length} role events in blocks ${range.fromBlock}-${range.toBlock}`);
-    // Anything after the settled head is outside this run; saying so beats implying it was covered
-    log(`  role changes after block ${range.toBlock} are not covered by this scan`);
+    // the RPC fills the unsettled tail, so candidacy is complete through the captured head rather
+    // than stopping minutes short of it on a schedule an attacker could rely on
+    const tail = await collectTailRoleEvents(this.provider, address, {
+      fromBlock: range.explorer.toBlock + 1,
+      toBlock: range.captured,
+    });
+    if (!tail.ok) return fail(tail.reason);
+    log(
+      `  ${outcome.source}: ${outcome.events.length} role events in blocks ` +
+        `${range.explorer.fromBlock}-${range.explorer.toBlock}, rpc tail: ${tail.events.length} through ${range.captured}`,
+    );
+    // Anything after the captured head is outside this run; saying so beats implying it was covered
+    log(`  role changes after block ${range.captured} are not covered by this scan`);
 
-    const candidates = grantedCandidates(outcome.events.filter((event) => event.address === address.toLowerCase()));
+    const events = [...outcome.events, ...tail.events];
+    const candidates = grantedCandidates(events.filter((event) => event.address === address.toLowerCase()));
     await this._compareWithConfig(contractEntry, candidates, calibration.layout, known);
   }
 
-  private async _scanRange(chainId: string, address: string): Promise<ScanRange> {
+  private async _scanRange(chainId: string, address: string): Promise<{ captured: number; explorer: ScanRange }> {
     const deployed = await resolveDeploymentBlock(chainId, address);
     if (deployed === undefined) throw new Error(`the explorer would not give a deployment block for ${address}`);
-    return makeSettledScanRange(deployed, await resolveScanHead(chainId, this.provider));
+    const bounds = await resolveScanBounds(chainId, this.provider);
+    return { captured: bounds.captured, explorer: makeSettledScanRange(deployed, bounds.settled) };
   }
 
   protected async _compareWithConfig(

@@ -66,7 +66,7 @@ The addresses under `deployed` determine which ABIs state-mate stores. Include i
 | `storage`              | Raw storage slot values                                                                 |
 | `ozAcl`                | Exact role counts and members for enumerable OpenZeppelin access control                |
 | `aragonAcl`            | The whole Aragon DAO permission map, discovered from the ACL's events (below)           |
-| `ozNonEnumerableAcl`   | Declared memberships, plus event-based holder discovery through a settled head (below)  |
+| `ozNonEnumerableAcl`   | Declared memberships, plus event-based holder discovery through the chain head (below)  |
 | `implementation`       | The implementation address reported by the chain                                        |
 | `proxyAdmin`           | The contract held in the EIP-1967 admin slot                                            |
 | `proxyAdminOwner`      | The owner of the `ProxyAdmin` in the EIP-1967 admin slot                                |
@@ -77,12 +77,15 @@ Every `view` and `pure` function in the selected ABI must appear in `checks`. A 
 
 A holder nobody wrote down is invisible to checks that only ask about the config's own list. So
 for every contract carrying `ozNonEnumerableAcl`, state-mate also collects every address a
-`RoleGranted` event was ever emitted for, from the contract's deployment through a settled scan
-head, and asks the chain which of them still hold the role. The log source only nominates
-candidates — it never decides membership, so revocation events are not even fetched: a fabricated
-`RoleRevoked` cannot hide a holder, and event ordering cannot matter. Grants newer than the
-settled scan head are outside that run and may remain undiscovered until a later run. There is
-nothing to configure and no way to opt out; a
+`RoleGranted` event was ever emitted for, from the contract's deployment through the chain head
+captured when the scan starts, and asks the chain which of them still hold the role. The explorer
+serves the settled history — stopping short of the head keeps its answer past its own indexing
+lag and any shallow reorg — and the RPC fills the remaining tail, so the minutes before a run are
+not a standing blind spot a grant could be scheduled into. The log sources only nominate
+candidates — they never decide membership, so revocation events are not even fetched: a
+fabricated `RoleRevoked` cannot hide a holder, and event ordering cannot matter. Grants newer
+than the captured head are made while the run is already underway and may remain undiscovered
+until a later run. There is nothing to configure and no way to opt out; a
 contract whose access control cannot be checked this way should express its expectations as
 `hasRole` entries under `checks` instead.
 
@@ -103,10 +106,12 @@ need `ETHERSCAN_TOKEN`, blockscout-served ones need no key.
 
 Two assumptions carry the result, and the scan checks neither directly. Every grant must have
 emitted a standard event — storage calibration establishes that the membership layout matches a
-known AccessControl layout, not that every mutation used the event-emitting path. And the explorer
-must not omit grants; that is the whole of the trust placed in it. Anything else it could serve
-wrongly is either refuted by the chain (an invented grant costs one refuted lookup) or fails
-loudly (truncation is detected by range-halving).
+known AccessControl layout, not that every mutation used the event-emitting path. And the log
+sources must not omit grants — the explorer over the settled range, the RPC over the tail; the
+RPC already decides membership through views and storage reads, so trusting it to nominate tail
+candidates adds no new trust root. Anything else either source could serve wrongly is refuted by
+the chain (an invented grant costs one refuted lookup) or fails loudly (truncation is detected by
+range-halving).
 
 ## Aragon ACL
 
