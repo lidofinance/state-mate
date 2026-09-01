@@ -33,6 +33,7 @@ export const CHAIN_LOG_SOURCES: Readonly<Record<string, ChainLogSource>> = {
   "8453": { confirmationLag: 60, source: { hostname: "base.blockscout.com", kind: "blockscout" } },
   "42161": { confirmationLag: 240, source: { kind: "etherscan" } },
   "59144": { confirmationLag: 30, source: { kind: "etherscan" } },
+  "560048": { confirmationLag: 8, source: { kind: "etherscan" } },
   "11155111": { confirmationLag: 8, source: { kind: "etherscan" } },
   "11155420": { confirmationLag: 60, source: { kind: "etherscan" } },
 };
@@ -163,6 +164,7 @@ function normalizeLog(raw: Record<string, unknown>): RawLog | undefined {
   return {
     address,
     blockNumber,
+    data: typeof raw.data === "string" ? raw.data : undefined,
     logIndex,
     topics: topics.filter((topic): topic is string => typeof topic === "string"),
   };
@@ -209,41 +211,46 @@ function collect(raw: readonly RawLog[]): { events: RoleEvent[]; rejected: strin
   return { events, rejected };
 }
 
-async function readLogSource(
-  source: LogSource,
-  chainId: string,
-  address: string,
-  range: ScanRange,
-): Promise<{ events: RoleEvent[]; rejected: string[] }> {
-  const raw: RawLog[] = [];
-  for (const topic0 of ROLE_TOPICS) {
-    raw.push(
-      ...(await fetchWindow(range, EXPLORER_RESULT_CAP, (window) =>
-        fetchLogs(source, chainId, address, topic0, window),
-      )),
-    );
-  }
-  return collect(raw);
-}
-
 export function hasLogSource(chainId: string): boolean {
   return CHAIN_LOG_SOURCES[chainId] !== undefined;
 }
 
-export async function collectRoleEvents(chainId: string, address: string, range: ScanRange): Promise<ScanOutcome> {
+export type RawLogsOutcome = { logs: RawLog[]; ok: true; source: string } | { ok: false; reason: string };
+
+/** The transport every ACL flavour shares: capped-window fetching per topic0, nothing parsed. */
+export async function collectTopicLogs(
+  chainId: string,
+  address: string,
+  topics0: readonly string[],
+  range: ScanRange,
+): Promise<RawLogsOutcome> {
   const chain = CHAIN_LOG_SOURCES[chainId];
   if (!chain) return { ok: false, reason: `no log source is known for chainId ${chainId}` };
 
   const name = describeSource(chain.source, chainId);
   try {
-    const { events, rejected } = await readLogSource(chain.source, chainId, address.toLowerCase(), range);
-    if (rejected.length > 0) {
-      return { ok: false, reason: `${name} served ${rejected.length} unreadable log(s): ${rejected[0]}` };
+    const raw: RawLog[] = [];
+    for (const topic0 of topics0) {
+      raw.push(
+        ...(await fetchWindow(range, EXPLORER_RESULT_CAP, (window) =>
+          fetchLogs(chain.source, chainId, address.toLowerCase(), topic0, window),
+        )),
+      );
     }
-    return { events, ok: true, source: name };
+    return { logs: raw, ok: true, source: name };
   } catch (error) {
     return { ok: false, reason: `${name} failed: ${printError(error)}` };
   }
+}
+
+export async function collectRoleEvents(chainId: string, address: string, range: ScanRange): Promise<ScanOutcome> {
+  const outcome = await collectTopicLogs(chainId, address, ROLE_TOPICS, range);
+  if (!outcome.ok) return outcome;
+  const { events, rejected } = collect(outcome.logs);
+  if (rejected.length > 0) {
+    return { ok: false, reason: `${outcome.source} served ${rejected.length} unreadable log(s): ${rejected[0]}` };
+  }
+  return { events, ok: true, source: outcome.source };
 }
 
 /**
@@ -280,11 +287,77 @@ export async function resolveDeploymentBlock(chainId: string, address: string): 
 }
 
 /**
- * Where the scan stops. Holding short of the head keeps the answer to a settled range, past the
- * explorer's indexing lag and any shallow reorg, rather than describing the last few seconds of
- * the chain and calling it the state.
+ * Where the scan's two ranges meet. The explorer serves the settled history -- holding short of
+ * the head keeps its answer past the indexing lag and any shallow reorg -- and the RPC fills the
+ * tail from there to the head captured when the scan started. Without the tail, the last minutes
+ * before every run would be a standing blind spot on exactly the schedule an attacker gets to
+ * pick; with it, the only changes a run can miss are the ones made after it began, which no
+ * terminating check can cover. The RPC already decides membership through views and storage
+ * reads, so letting it nominate tail candidates adds no new trust root.
+ *
+ * Views and storage reads are deliberately NOT pinned to the captured block. Answers describe
+ * the state at read time: a permission that moves mid-run either fails a check closed -- one
+ * cheap re-run on a chain that has stopped moving -- or moved after the run began, which no
+ * terminating check covers pinned or not, because events through the captured head cannot
+ * nominate it either way. Pinning every read to one historical block would buy per-section
+ * snapshot consistency at the price of a hard archive-state dependency: a non-archive node keeps
+ * roughly the last 128 states, under a minute of blocks on the fastest supported chains, which
+ * an ordinary run outlives in its happy path. And a config is many sections, each capturing its
+ * own head, so the run as a whole still would not describe one block.
  */
-export async function resolveScanHead(chainId: string, provider: JsonRpcProvider): Promise<number> {
+export interface ScanBounds {
+  /** The chain head at the moment the scan started; candidacy is complete through here. */
+  captured: number;
+  /** Where the explorer's settled range ends and the RPC tail begins. */
+  settled: number;
+}
+
+export async function resolveScanBounds(chainId: string, provider: JsonRpcProvider): Promise<ScanBounds> {
   const lag = CHAIN_LOG_SOURCES[chainId]?.confirmationLag ?? 0;
-  return Math.max(0, (await provider.getBlockNumber()) - lag);
+  const captured = await provider.getBlockNumber();
+  return { captured, settled: Math.max(0, captured - lag) };
+}
+
+/** The unsettled tail, straight from the RPC: one bounded request, no windowing needed. */
+export async function collectTailLogs(
+  provider: JsonRpcProvider,
+  address: string,
+  topics0: readonly string[],
+  range: ScanRange,
+): Promise<RawLog[]> {
+  if (range.fromBlock > range.toBlock) return [];
+  const logs = await provider.getLogs({
+    address,
+    fromBlock: range.fromBlock,
+    toBlock: range.toBlock,
+    topics: [[...topics0]],
+  });
+  return logs.map((entry) => ({
+    address: entry.address,
+    blockNumber: entry.blockNumber,
+    data: entry.data,
+    logIndex: entry.index,
+    topics: [...entry.topics],
+  }));
+}
+
+export async function collectTailRoleEvents(
+  provider: JsonRpcProvider,
+  address: string,
+  range: ScanRange,
+): Promise<ScanOutcome> {
+  let raw: RawLog[];
+  try {
+    raw = await collectTailLogs(provider, address, ROLE_TOPICS, range);
+  } catch (error) {
+    return {
+      ok: false,
+      reason: `the RPC would not serve the tail ${range.fromBlock}-${range.toBlock}: ${printError(error)}`,
+    };
+  }
+  const { events, rejected } = collect(raw);
+  if (rejected.length > 0) {
+    return { ok: false, reason: `the RPC served ${rejected.length} unreadable log(s): ${rejected[0]}` };
+  }
+  return { events, ok: true, source: "rpc" };
 }

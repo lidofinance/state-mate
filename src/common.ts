@@ -13,6 +13,7 @@ export enum EntryField {
   implementationChecks = "implementationChecks",
   ozNonEnumerableAcl = "ozNonEnumerableAcl",
   ozAcl = "ozAcl",
+  aragonAcl = "aragonAcl",
   result = "result",
   contracts = "contracts",
   explorerHostname = "explorerHostname",
