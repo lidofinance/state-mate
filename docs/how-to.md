@@ -41,6 +41,20 @@ yarn start path/to/configs --update-abi
 
 A single-file refresh leaves entries used by sibling configs untouched.
 
+## Get past an explorer's anti-bot challenge
+
+An explorer behind anti-bot protection may reject the default User-Agent; the run fails with an error naming `STATE_MATE_USER_AGENT`. Set that variable in `.env` to another string and re-run — every explorer and RPC request carries it.
+
+## Download ABIs when the explorer cannot confirm its chain
+
+Before downloading missing ABIs from a fixed-chain explorer, the run probes the host for its chain id. A host that leaves the probe unanswered — rate-limited, or not serving the probe routes at all — draws the warning `could not verify chainId`, and a run with missing ABIs exits. Pass the flag to proceed:
+
+```sh
+yarn start path/to/config.yaml --update-abi --allow-unverified-explorer
+```
+
+The flag skips only the explorer probe. The RPC's chain is still asserted, the stored contract name must match the config's `name:`, and every check diffs on-chain values through that verified RPC — an ABI taken from the wrong chain fails loudly instead of passing.
+
 ## Keep CI output concise
 
 ```sh

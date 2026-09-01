@@ -19,11 +19,12 @@ import {
 } from "../src/abi-provider";
 import { EntryField } from "../src/common";
 import { context, resetStats, stats } from "../src/context";
-import { fetchExplorerChainId } from "../src/explorer";
+import { fetchExplorerChainId, resetBlockscoutHostProbes } from "../src/explorer";
 import { SectionValidatorBase } from "../src/section-validators/base";
 import * as stateMate from "../src/state-mate";
 import type { ContractEntry, EntireDocument } from "../src/typebox";
 import type { Abi, ContractInfo } from "../src/types";
+import { mockFetch } from "./helpers/fetch-mock";
 
 const PROXY_ADDRESS = "0xAaAaAAaaAaAAAaaAAaAaaaAAaAAAaaaAaaaaaaa1";
 const IMPL_ADDRESS = "0xBbbBBBbbbBBbbbBbbBbbbbBBbBBbbBbBbbbbbbb2";
@@ -99,6 +100,7 @@ afterEach(() => {
   context.updateAbi = false;
   context.allowUnverifiedExplorer = false;
   resetAbiRebuildState();
+  resetBlockscoutHostProbes();
   for (const directory of temporaryDirectories) {
     fs.rmSync(directory, { recursive: true, force: true });
   }
@@ -327,6 +329,30 @@ describe("downloadAndCheckAllAbi", () => {
       fetchMock.mock.restore();
     }
     assert.equal(readStore(directory)[scopedKey(ETH_CHAIN_ID, PROXY_ADDRESS)].name, "ForeignChainContract");
+  });
+
+  it("reaches the blockscout v2 download when the flag bypasses a dead chain-id probe", async () => {
+    // mirrors a live blockscout host: both v1 probe routes are gone while /api/v2 answers
+    const directory = setupConfigDirectory();
+    const fetchMock = mockFetch((url) => {
+      if (/eth-rpc|eth_chainId/.test(url)) return { status: 400 };
+      if (url.endsWith("/api/v2/config/backend-version")) return { body: { backend_version: "v11.2.8" } };
+      return { body: { name: "OssifiableProxy", is_verified: true, abi: PROXY_ABI } };
+    });
+    context.allowUnverifiedExplorer = true;
+    try {
+      await stateMate.downloadAndCheckAllAbi({
+        deployed: { l1: [PROXY_ADDRESS] },
+        l1: { rpcUrl: "http://localhost:1", explorerHostname: "chain.blockscout.com", chainId: ETH_CHAIN_ID },
+      } as EntireDocument);
+    } finally {
+      fetchMock.mock.restore();
+    }
+    const abiRequests = fetchMock.mock.calls
+      .map((call) => String(call.arguments[0]))
+      .filter((url) => url.includes("/api/v2/smart-contracts/"));
+    assert.equal(abiRequests.length, 1, "the ABI must come from the v2 route");
+    assert.equal(readStore(directory)[scopedKey(ETH_CHAIN_ID, PROXY_ADDRESS)].name, "OssifiableProxy");
   });
 
   it("downloads the ABI pinned at implementation: even when the proxy itself is stored", async () => {
