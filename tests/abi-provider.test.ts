@@ -755,6 +755,27 @@ describe("checkAllAbi + flushAbiUpdates", () => {
     assert.deepEqual(store[scopedKey(ETH_CHAIN_ID, IMPL_ADDRESS)], { name: "Lido", abi: LIDO_ABI });
   });
 
+  // gzip bytes are not portable across platform builds of zlib, so a store written on another
+  // machine must survive a no-change rebuild byte-identical: CI compares the compressed file
+  it("leaves the store bytes untouched when a rebuild changes nothing", async () => {
+    const directory = setupConfigDirectory();
+    const seeded = zlib.gzipSync(
+      JSON.stringify(
+        { [scopedKey(ETH_CHAIN_ID, PROXY_ADDRESS)]: { name: "OssifiableProxy", abi: PROXY_ABI } },
+        null,
+        2,
+      ),
+      { level: 1 },
+    );
+    fs.writeFileSync(path.join(directory, "abis.json.gz"), seeded);
+    context.updateAbi = true;
+
+    await checkAllAbi(ETH_CHAIN_ID, proxyInfo);
+    flushAbiUpdates();
+
+    assert.deepEqual(fs.readFileSync(path.join(directory, "abis.json.gz")), seeded);
+  });
+
   it("re-downloads an existing entry with --update-abi", async () => {
     const directory = setupConfigDirectory({
       [scopedKey(ETH_CHAIN_ID, PROXY_ADDRESS)]: { name: "OssifiableProxy", abi: PROXY_ABI },
