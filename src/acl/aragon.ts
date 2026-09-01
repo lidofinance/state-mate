@@ -139,6 +139,12 @@ export function foldAragonEvents(events: readonly AragonEvent[]): AragonState {
       state.paramsHash.set(tripleKey, event.paramsHash);
       continue;
     }
+    // Every SetPermission overwrites the whole permission slot (aragonOS _setPermission), so any
+    // earlier params hash is stale the moment one arrives: grantPermission() replaces a
+    // conditional grant with an unconditional one and emits no params event at all. A conditional
+    // grant's own SetPermissionParams follows its SetPermission within the transaction, so
+    // clearing here and letting the params event repopulate is order-correct
+    state.paramsHash.delete(tripleKey);
     let entities = state.granted.get(roleKey);
     if (!entities) {
       entities = new Set<string>();
@@ -153,10 +159,7 @@ export function foldAragonEvents(events: readonly AragonEvent[]): AragonState {
       }
       ever.add(event.entity);
     } else {
-      // A revocation clears the params too: a later plain grant is unconditional, and the stale
-      // hash must not resurrect a condition the chain no longer holds
       entities.delete(event.entity);
-      state.paramsHash.delete(tripleKey);
     }
   }
 

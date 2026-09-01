@@ -130,15 +130,40 @@ describe("aragon event folding", () => {
   });
 
   it("clears the params hash on revocation, so a later plain grant is unconditional", () => {
+    // aragonOS emits SetPermission before SetPermissionParams within _setPermission
     const state = foldAragonEvents([
-      params(AGENT, LIDO, BUFFER_ROLE, HASH_A, 1, 0),
-      grant(AGENT, LIDO, BUFFER_ROLE, 1, 1),
+      grant(AGENT, LIDO, BUFFER_ROLE, 1, 0),
+      params(AGENT, LIDO, BUFFER_ROLE, HASH_A, 1, 1),
       revoke(AGENT, LIDO, BUFFER_ROLE, 2, 0),
       grant(AGENT, LIDO, BUFFER_ROLE, 3, 0),
     ]);
 
     assert.equal(state.granted.get(appRoleKey(LIDO, BUFFER_ROLE))?.has(AGENT), true);
     assert.equal(state.paramsHash.has(`${appRoleKey(LIDO, BUFFER_ROLE)}|${AGENT}`), false);
+  });
+
+  // grantPermission() overwrites a conditional grant with an unconditional one and emits
+  // SetPermission(true) with no params event (aragonOS _setPermission), so a retained hash
+  // would be stale and break the events-side digest against a chain that is in fact correct
+  it("clears a stale params hash when a plain grant overwrites a conditional one", () => {
+    const state = foldAragonEvents([
+      grant(AGENT, LIDO, BUFFER_ROLE, 1, 0),
+      params(AGENT, LIDO, BUFFER_ROLE, HASH_A, 1, 1),
+      grant(AGENT, LIDO, BUFFER_ROLE, 2, 0),
+    ]);
+
+    assert.equal(state.granted.get(appRoleKey(LIDO, BUFFER_ROLE))?.has(AGENT), true);
+    assert.equal(state.paramsHash.has(`${appRoleKey(LIDO, BUFFER_ROLE)}|${AGENT}`), false);
+  });
+
+  it("keeps the params hash of a conditional grant that replaces an unconditional one", () => {
+    const state = foldAragonEvents([
+      grant(AGENT, LIDO, BUFFER_ROLE, 1, 0),
+      grant(AGENT, LIDO, BUFFER_ROLE, 2, 0),
+      params(AGENT, LIDO, BUFFER_ROLE, HASH_A, 2, 1),
+    ]);
+
+    assert.equal(state.paramsHash.get(`${appRoleKey(LIDO, BUFFER_ROLE)}|${AGENT}`), HASH_A);
   });
 
   it("removes a manager set to the zero address", () => {

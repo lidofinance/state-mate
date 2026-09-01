@@ -315,6 +315,29 @@ describe("aragon ACL validator", () => {
       assert.ok(stats.errorDetails.some((d) => /events fold to|slots to/.test(d.message)));
     });
 
+    // grantPermission() overwrites a conditional grant with an unconditional one and emits no
+    // params event (aragonOS _setPermission); the stale hash must not make the events-side
+    // digest disagree with a chain that is in fact correct
+    it("passes a declared grantee whose conditional grant was replaced by an unconditional one", async () => {
+      const stub = withParams();
+      stub.events.push(
+        grant(VOTING, LIDO, MSK, 6),
+        params(VOTING, LIDO, MSK, HASH_A, 6),
+        grant(VOTING, LIDO, MSK, 7), // the replacement: SetPermission(true), no params event
+      );
+      stub.hasPermission![`${VOTING}|${LIDO}|${MSK}`] = true;
+      stub.slots![permissionSlot(VOTING, LIDO, MSK)] = EMPTY_PARAM_HASH;
+      const withGrantee = {
+        [LIDO]: {
+          [ROLE]: { granted: [AGENT], manager: AGENT },
+          [MSK]: { granted: [VOTING], manager: AGENT, paramsDigest: pinned },
+        },
+      };
+      await new ExposedAragon("1", stub).validateSection(entry(withGrantee), "acl");
+
+      assert.equal(stats.errors, 0);
+    });
+
     // the digest's live set is decided by the slots, not the events, so a fabricated revocation
     // cannot thin it: the hidden holder still reads back and breaks the slots-side fold
     it("reports a live parameterized holder the pin does not cover when its revocation was fabricated", async () => {

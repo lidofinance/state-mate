@@ -85,7 +85,11 @@ not a standing blind spot a grant could be scheduled into. The log sources only 
 candidates — they never decide membership, so revocation events are not even fetched: a
 fabricated `RoleRevoked` cannot hide a holder, and event ordering cannot matter. Grants newer
 than the captured head are made while the run is already underway and may remain undiscovered
-until a later run. There is nothing to configure and no way to opt out; a
+until a later run. Views and storage answer at read time rather than being pinned to the captured
+block: a permission that moves mid-run fails closed and a re-run reads the settled truth, while
+pinning would demand archive state for the whole run — a non-archive node keeps roughly the last
+128 states, under a minute on the fastest supported chains — and a multi-section run would still
+mix each section's capture block. There is nothing to configure and no way to opt out; a
 contract whose access control cannot be checked this way should express its expectations as
 `hasRole` entries under `checks` instead.
 
