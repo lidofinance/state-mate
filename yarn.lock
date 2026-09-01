@@ -432,10 +432,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tsconfig/node20@npm:^20.1.9":
-  version: 20.1.9
-  resolution: "@tsconfig/node20@npm:20.1.9"
-  checksum: 10c0/04e4e515dc6ce9386af74accb565884c3771b355208acc3d3dee32f0ce4c1d12e59319e05200fb2b87a8655ed4d8eb9910e36667a91e4683879feea9938d90d1
+"@tsconfig/node20@npm:^20.1.10":
+  version: 20.1.10
+  resolution: "@tsconfig/node20@npm:20.1.10"
+  checksum: 10c0/8ae050b55fceec0aaf3233f7ac41647ec7fc1af0d919c74323c35393fc3c036da7a961ab2391de929467d734d677d6e066c9206ac8adbf0a0bc314f527ef7b4a
   languageName: node
   linkType: hard
 
@@ -1088,7 +1088,7 @@ __metadata:
     "@commitlint/cli": "npm:^21.2.2"
     "@commitlint/config-conventional": "npm:^21.2.2"
     "@sinclair/typebox": "npm:^0.34.52"
-    "@tsconfig/node20": "npm:^20.1.9"
+    "@tsconfig/node20": "npm:^20.1.10"
     "@types/chai": "npm:^4.3.16"
     "@types/node": "npm:^26.2.0"
     ajv: "npm:^8.20.0"
