@@ -63,6 +63,12 @@ jobs:
         if: github.event_name == 'schedule'
         run: |
           if ! git diff --exit-code -- ${{ matrix.config }}; then
+            # the store is gzipped, so show the content diff the binary one cannot
+            for f in $(git diff --name-only -- ${{ matrix.config }}); do
+              case "$f" in
+                *.json.gz) diff <(git show "HEAD:$f" | gunzip) <(gunzip -c "$f") || true ;;
+              esac
+            done
             echo "Error: the committed ABI store differs from what the explorer serves."
             exit 1
           fi

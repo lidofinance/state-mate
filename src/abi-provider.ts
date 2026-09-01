@@ -247,6 +247,15 @@ export function pruneAbiStores(): void {
   }
 }
 
+/** An unreadable store is not a match: the write below replaces it, as it always has. */
+function _storeHolds(storePath: string, serialized: string): boolean {
+  try {
+    return zlib.gunzipSync(fs.readFileSync(storePath)).toString("utf8") === serialized;
+  } catch {
+    return false;
+  }
+}
+
 /**
  * Flushes all pending ABI updates to disk.
  * This should be called after all ABI updates are complete to write once.
@@ -256,7 +265,15 @@ export function flushAbiUpdates(): void {
 
   const outputPath = getConsolidatedAbiPath();
   try {
-    const compressed = zlib.gzipSync(JSON.stringify(pendingAbiUpdates, null, 2));
+    const serialized = JSON.stringify(pendingAbiUpdates, null, 2);
+    // gzip bytes are not portable: zlib emits different streams per platform build for the same
+    // input, so rewriting an unchanged store breaks any byte-level comparison of the file
+    if (fs.existsSync(outputPath) && _storeHolds(outputPath, serialized)) {
+      consolidatedAbisCache = pendingAbiUpdates;
+      pendingAbiUpdates = null;
+      return;
+    }
+    const compressed = zlib.gzipSync(serialized);
     // temp + rename keeps the store whole if the process dies mid-write
     fs.writeFileSync(`${outputPath}.tmp`, compressed);
     fs.renameSync(`${outputPath}.tmp`, outputPath);
