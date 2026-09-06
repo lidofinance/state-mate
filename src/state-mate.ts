@@ -331,7 +331,11 @@ async function main() {
   // No prune here: a single-file run has walked only its own addresses, and sweeping the shared
   // store now would drop the sibling configs' ABIs
   await runConfig();
-  if (stats.errors) process.exit(stats.errors);
+  if (stats.errors) process.exit(checkFailureExitCode(stats.errors));
+}
+
+export function checkFailureExitCode(errors: number): 0 | 1 {
+  return errors === 0 ? 0 : 1;
 }
 
 async function runConfig() {
