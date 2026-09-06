@@ -23,6 +23,7 @@ const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 // slot holds an ordinary variable, and an address-shaped one would fake a mismatch
 const SAFE_SINGLETON_SLOT = "0x0";
 const SAFE_PROXY_NAMES = new Set(["SafeProxy", "GnosisSafeProxy"]);
+const EIP1167_RUNTIME = /^0x363d3d373d3d3d363d73([0-9a-fA-F]{40})5af43d82803e903d91602b57fd5bf3$/;
 
 const BYPASS_HINT = `pass ${chalk.yellow("--skip-implementation-check")} to skip this check`;
 
@@ -64,6 +65,15 @@ async function callAsAddress(
   selector: string,
 ): Promise<string | undefined> {
   return addressFromWord(await callWord(provider, address, selector));
+}
+
+async function readEip1167Implementation(provider: JsonRpcProvider, address: string): Promise<string | undefined> {
+  try {
+    const match = EIP1167_RUNTIME.exec(await provider.getCode(address));
+    return match ? getAddress(`0x${match[1]}`) : undefined;
+  } catch {
+    return undefined;
+  }
 }
 
 /** Numeric comparison, so hex case, word width and leading zeros do not matter. */
@@ -189,6 +199,7 @@ export async function checkImplementation(provider: JsonRpcProvider, contractEnt
     // The config declares this one a proxy, so the riskier reads are safe to try
     actual = slotImplementation ?? (await callAsAddress(provider, address, IMPLEMENTATION_SELECTOR));
     actual ??= await callAsAddress(provider, address, PROXY_GET_IMPLEMENTATION_SELECTOR);
+    actual ??= await readEip1167Implementation(provider, address);
   }
 
   if (!actual) {

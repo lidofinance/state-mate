@@ -26,6 +26,7 @@ function word(address: string): string {
 type ProviderStub = {
   callResult?: Error | string;
   calls?: Record<string, Error | string>;
+  code?: string;
   selectors?: Record<string, Error | string>;
   slotErrors?: Record<string, Error>;
   slots?: Record<string, string>;
@@ -46,6 +47,10 @@ function stubProvider(stub: ProviderStub): { provider: JsonRpcProvider; reads: s
       const failure = stub.slotErrors?.[slot];
       if (failure) throw failure;
       return stub.slots?.[slot] ?? ZERO_WORD;
+    },
+    async getCode(address: string) {
+      reads.push(`code:${address.toLowerCase()}`);
+      return stub.code ?? "0x";
     },
   } as unknown as JsonRpcProvider;
   return { provider, reads };
@@ -217,6 +222,17 @@ describe("checkImplementation", () => {
 
     assert.equal(stats.errors, 0);
     assert.equal(stats.totalChecks, 1);
+  });
+
+  it("resolves an EIP-1167 implementation from the clone runtime", async () => {
+    const runtime = `0x363d3d373d3d3d363d73${IMPL_ADDRESS.slice(2).toLowerCase()}5af43d82803e903d91602b57fd5bf3`;
+    const { provider, reads } = stubProvider({ code: runtime });
+
+    await checkImplementation(provider, proxyEntry(IMPL_ADDRESS, "ERC1167Proxy"));
+
+    assert.equal(stats.errors, 0);
+    assert.equal(stats.totalChecks, 1);
+    assert.ok(reads.includes(`code:${PROXY_ADDRESS.toLowerCase()}`));
   });
 
   it("prints the pins-no-implementation warning even under --quiet", async () => {
