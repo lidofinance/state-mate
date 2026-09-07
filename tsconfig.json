@@ -4,6 +4,7 @@
     "outDir": "dist",
     // tsconfig-paths resolves the `src/...` imports through baseUrl; TypeScript 7 drops the option
     "baseUrl": ".",
+    "resolveJsonModule": true,
     "ignoreDeprecations": "6.0"
   },
   "exclude": ["node_modules", "tests", "dist"]

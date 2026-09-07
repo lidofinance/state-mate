@@ -435,6 +435,14 @@ The entry has no `implementation:`, yet the address holds a non-empty EIP-1967 s
 - Retry with `-o l1/contractName` scope; or switch RPC provider.
 - `drpc.org` public endpoints are decent for ad-hoc queries.
 
+### `The explorer challenged the request (HTTP 403)`
+
+- The explorer's anti-bot layer rejected the built-in User-Agent. Set `STATE_MATE_USER_AGENT` in `.env` to another string — every explorer and RPC request carries it.
+
+### `did not confirm chainId ... --allow-unverified-explorer`
+
+- The explorer left the chain-id probe unanswered — rate-limited, or not serving the probe routes. Re-run with `--allow-unverified-explorer`; the RPC chain assertion and the stored-name match still guard the ABI store.
+
 ### `Invalid address` in `deployed:`
 
 - `REPLACEME` is invalid in `deployed:` — resolve the address via `cast storage` / `cast admin` first, then add a real anchor.
