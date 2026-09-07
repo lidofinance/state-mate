@@ -23,7 +23,7 @@ yarn start path/to/config.yaml --only l1/vault/checks
 yarn start path/to/config.yaml --only l1/vault/checks/owner
 ```
 
-Filtering to a check type skips automatic implementation verification. A declared `proxyAdminOwner` check still runs.
+Filtering to a check type skips automatic implementation verification. A declared `proxyAdminOwner` check still runs, but does not count as a match: a filter that selects no check of its own is an error.
 
 ## Refresh stored ABIs
 

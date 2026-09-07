@@ -48,6 +48,9 @@ export const stats = {
   totalChecks: 0,
   // Methods the config left as null: counted apart from totalChecks, which must mean "verified"
   skipped: 0,
+  // Checks and skips the -o filter selected; automatic checks do not count towards a filter
+  // that names a checks type, so that one cannot pass for a method that matched nothing
+  selected: 0,
   errors: 0,
   errorDetails: [] as ErrorDetail[],
 };
@@ -56,6 +59,7 @@ export const stats = {
 export function resetStats(): void {
   stats.totalChecks = 0;
   stats.skipped = 0;
+  stats.selected = 0;
   stats.errors = 0;
   stats.errorDetails.length = 0;
 }

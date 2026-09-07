@@ -28,6 +28,7 @@ export function printError(error: unknown): string {
 
 export function readUrlOrFromEnvironment(urlOrEnvironmentVariableName: string) {
   if (isUrl(urlOrEnvironmentVariableName)) {
+    registerSecret(urlOrEnvironmentVariableName, "<rpcUrl>");
     return urlOrEnvironmentVariableName;
   }
   const valueFromEnvironment = process.env[urlOrEnvironmentVariableName];

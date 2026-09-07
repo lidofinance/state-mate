@@ -63,11 +63,21 @@ export function incErrors(errorMessage?: string): void {
 export function incChecks(): void {
   stats.totalChecks += 1;
   contractChecks += 1;
+  countSelected();
 }
 
 export function incSkipped(): void {
   stats.skipped += 1;
   contractSkipped += 1;
+  countSelected();
+}
+
+// The checks that run without being declared under a checks type
+const AUTOMATIC_CHECKS = new Set(["implementation", "proxyAdmin", "proxyAdminOwner"]);
+
+function countSelected(): void {
+  if (context.checkOnly?.checksType && AUTOMATIC_CHECKS.has(currentErrorContext.checksType ?? "")) return;
+  stats.selected += 1;
 }
 
 export enum CheckLevel {

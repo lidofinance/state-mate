@@ -136,7 +136,7 @@ async function doChecks(jsonDocument: EntireDocument) {
     if (isTypeOfTB(section, NetworkSectionTB)) await checkNetworkSection(sectionTitle, section);
   }
   // A filter that selects nothing verified nothing, and "passed" would say otherwise
-  if (context.checkOnly && stats.totalChecks + stats.skipped === 0) {
+  if (context.checkOnly && stats.selected === 0) {
     logErrorAndExit(
       `${chalk.yellow(`-o "${context.checkOnlyCmdArg}"`)} matched nothing in ${chalk.magenta(context.configPath)}`,
     );

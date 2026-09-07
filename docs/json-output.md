@@ -27,8 +27,9 @@ code is 130. Only an unexpected exception adds its stack to stderr.
   checks, a directory run with 1.
 - Addresses appear as written in the config, checksummed or not. Compare them
   case-insensitively.
-- RPC URLs and explorer keys read from the environment are replaced by the variable name,
-  `$ETH_RPC_URL` for instance, wherever a message quotes them.
+- RPC URLs and explorer keys are replaced wherever a message quotes them: a value read from
+  the environment by the variable name, `$ETH_RPC_URL` for instance, a URL written in the
+  config by `<rpcUrl>`.
 - Later versions may add keys. Ignore unknown keys.
 
 ## Top level
