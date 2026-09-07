@@ -20,7 +20,7 @@ import {
 } from "./abi-provider";
 import { parseCommandLineArguments } from "./cli-parser";
 import { normalizeChainId, printError, readUrlOrFromEnvironment } from "./common";
-import { context, resetStats, stats } from "./context";
+import { context, registerSecret, resetStats, stats } from "./context";
 import {
   assertProviderChain,
   createProvider,
@@ -135,6 +135,12 @@ async function doChecks(jsonDocument: EntireDocument) {
   for (const [sectionTitle, section] of Object.entries(jsonDocument)) {
     if (isTypeOfTB(section, NetworkSectionTB)) await checkNetworkSection(sectionTitle, section);
   }
+  // A filter that selects nothing verified nothing, and "passed" would say otherwise
+  if (context.checkOnly && stats.totalChecks + stats.skipped === 0) {
+    logErrorAndExit(
+      `${chalk.yellow(`-o "${context.checkOnlyCmdArg}"`)} matched nothing in ${chalk.magenta(context.configPath)}`,
+    );
+  }
   // Show final summary (outside the tree)
   log(""); // Separator line
   const statusMark = stats.errors ? FAILURE_MARK : SUCCESS_MARK;
@@ -212,6 +218,7 @@ async function iterateLoadedContracts(
         continue;
       }
       const explorerKey = explorerTokenEnv ? process.env[explorerTokenEnv] : "";
+      if (explorerKey) registerSecret(explorerKey, `$${explorerTokenEnv}`);
 
       if (!explorerTokenEnv && explorerNeedsApiKey(explorerHostname)) {
         log(
@@ -304,6 +311,10 @@ export function collectYamlConfigs(directory: string): string[] {
 
 async function main() {
   Object.assign(context, parseCommandLineArguments());
+  if (context.json) {
+    // Ctrl+C must still leave one parseable report, carrying whatever ran before it
+    process.once("SIGINT", () => emitReport(130, "interrupted by SIGINT", () => process.exit(130)));
+  }
 
   if (!fs.existsSync(context.configPath)) {
     logErrorAndExit(`No such file or directory: ${chalk.magenta(context.configPath)}`);

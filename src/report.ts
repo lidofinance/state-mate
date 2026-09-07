@@ -1,6 +1,6 @@
 import { stripVTControlCharacters } from "node:util";
 
-import { context, stats } from "./context";
+import { context, redactSecrets, stats } from "./context";
 
 // The --json report: the verdict, the counters and nothing that passed. Collected on every
 // run and written only when the flag asks for it, so the validators never branch on the mode.
@@ -54,12 +54,15 @@ let contract: ContractReport | undefined;
 // Failures are read back from stats.errorDetails, which every error path already feeds
 let failuresBefore = 0;
 
-const plain = (text: string) => stripVTControlCharacters(text);
+let emitted = false;
+
+const plain = (text: string) => redactSecrets(stripVTControlCharacters(text));
 
 export function resetReport(): void {
   configs = [];
   config = undefined;
   contract = undefined;
+  emitted = false;
 }
 
 export function beginConfig(configPath: string): void {
@@ -132,11 +135,13 @@ export function buildReport(exitCode: number, error?: string): Report {
 }
 
 /**
- * Sets the exit code instead of exiting: a pipe takes a large report in several writes, and
- * process.exit would cut it after the first one.
+ * Writes the report once. Sets the exit code instead of exiting: a pipe takes a large report in
+ * several writes, and process.exit would cut it after the first one; a caller that must exit
+ * on the spot does so from onFlushed.
  */
-export function emitReport(exitCode: number, error?: string): void {
-  if (!context.json) return;
-  process.stdout.write(`${JSON.stringify(buildReport(exitCode, error), null, 2)}\n`);
+export function emitReport(exitCode: number, error?: string, onFlushed?: () => void): void {
+  if (!context.json || emitted) return;
+  emitted = true;
+  process.stdout.write(`${JSON.stringify(buildReport(exitCode, error), null, 2)}\n`, onFlushed);
   process.exitCode = exitCode;
 }

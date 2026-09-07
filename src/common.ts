@@ -1,5 +1,6 @@
 import chalk from "chalk";
 
+import { registerSecret } from "./context";
 import { logErrorAndExit } from "./logger";
 import type { Abi, AbiArgumentsLength, ChainId } from "./types";
 
@@ -38,6 +39,7 @@ export function readUrlOrFromEnvironment(urlOrEnvironmentVariableName: string) {
       `Env var ${chalk.yellow(urlOrEnvironmentVariableName)} is not a valid RPC url: ${chalk.yellow(valueFromEnvironment)}`,
     );
   }
+  registerSecret(valueFromEnvironment, `$${urlOrEnvironmentVariableName}`);
   return valueFromEnvironment;
 }
 

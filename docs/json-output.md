@@ -14,9 +14,10 @@ The report carries the verdict, the counters of every config, and the checks tha
 attention: failed checks with their message, and checks that could not run. A contract
 whose checks all passed is not listed.
 
-A run that aborts, on a missing config, an unset env var, or an ABI the store lacks for
-instance, still produces a report with `status: "error"`. Only an unexpected exception adds
-its stack to stderr.
+A run that aborts, on a missing config, an unset env var, an ABI the store lacks, or an
+`--only` filter that selects nothing, still produces a report with `status: "error"`. So does
+Ctrl+C: the report carries what ran before it, `error` reads `interrupted by SIGINT`, the exit
+code is 130. Only an unexpected exception adds its stack to stderr.
 
 ## Rules for parsers
 
@@ -26,6 +27,8 @@ its stack to stderr.
   checks, a directory run with 1.
 - Addresses appear as written in the config, checksummed or not. Compare them
   case-insensitively.
+- RPC URLs and explorer keys read from the environment are replaced by the variable name,
+  `$ETH_RPC_URL` for instance, wherever a message quotes them.
 - Later versions may add keys. Ignore unknown keys.
 
 ## Top level

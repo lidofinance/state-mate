@@ -1,13 +1,23 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
+import fs from "node:fs";
+import os from "node:os";
 import path from "node:path";
 import { afterEach, beforeEach, describe, it } from "node:test";
 
 import chalk from "chalk";
 
-import { context, resetStats, stats } from "../src/context";
+import { context, registerSecret, resetStats, stats } from "../src/context";
 import { FatalError, LogCommand, logErrorAndExit } from "../src/logger";
-import { beginConfig, beginContract, buildReport, endConfig, endContract, resetReport } from "../src/report";
+import {
+  beginConfig,
+  beginContract,
+  buildReport,
+  emitReport,
+  endConfig,
+  endContract,
+  resetReport,
+} from "../src/report";
 import { incChecks, incErrors, resetContractCounters, setErrorContext } from "../src/section-validators/base";
 
 const ADDRESS = "0x7305bB45aF91893B7BCaF0Ad8Eae37cb16820Bb8";
@@ -110,6 +120,42 @@ describe("--json report", () => {
     ]);
   });
 
+  it("replaces an RPC URL read from the environment wherever an error quotes it", () => {
+    registerSecret("https://rpc.example/v1/KEY123", "$ETH_RPC_URL");
+    beginConfig("cfg.yaml");
+    beginContract("l1/vault", "Vault", ADDRESS);
+    setErrorContext({ checksType: "checks", method: "owner" });
+    incErrors(`server response 403 (info={ "requestUrl": "https://rpc.example/v1/KEY123" })`);
+
+    const report = rendered(1, "https://rpc.example/v1/KEY123 answered 403");
+    assert.equal(report.error, "$ETH_RPC_URL answered 403");
+    assert.equal(
+      report.configs[0].contracts[0].failures[0].message,
+      `server response 403 (info={ "requestUrl": "$ETH_RPC_URL" })`,
+    );
+  });
+
+  it("writes the report once, however many times the run tries to finish", () => {
+    const writes: string[] = [];
+    const originalWrite = process.stdout.write;
+    const originalExitCode = process.exitCode;
+    process.stdout.write = ((chunk: string, callback?: () => void) => {
+      writes.push(String(chunk));
+      callback?.();
+      return true;
+    }) as typeof process.stdout.write;
+    try {
+      emitReport(130, "interrupted by SIGINT");
+      emitReport(0);
+    } finally {
+      process.stdout.write = originalWrite;
+      process.exitCode = originalExitCode;
+    }
+
+    assert.equal(writes.length, 1);
+    assert.equal(JSON.parse(writes[0]).error, "interrupted by SIGINT");
+  });
+
   it("turns a run-ending error into an exception instead of exiting the process", () => {
     assert.throws(() => logErrorAndExit("boom"), FatalError);
   });
@@ -138,6 +184,24 @@ describe("--json report", () => {
     assert.equal(JSON.parse(run.stdout).status, "error");
     assert.match(JSON.parse(run.stdout).error, /checkOnly/);
     assert.equal(JSON.parse(run.stdout).filter, "a/b/c/d/e");
+  });
+
+  it("rejects a filter that selects nothing instead of passing an empty run", () => {
+    const directory = fs.mkdtempSync(path.join(os.tmpdir(), "state-mate-json-"));
+    const config = path.join(directory, "cfg.yaml");
+    fs.writeFileSync(config, "deployed:\n  l1: []\nl1:\n  rpcUrl: ETH_RPC_URL\n  chainId: 1\n  contracts: {}\n");
+    try {
+      const run = runCli(config, "--json", "-o", "l2");
+
+      assert.equal(run.status, 1);
+      assert.equal(run.stderr, "");
+      const report = JSON.parse(run.stdout);
+      assert.equal(report.status, "error");
+      assert.match(report.error, /matched nothing/);
+      assert.equal(report.summary.checks, 0);
+    } finally {
+      fs.rmSync(directory, { recursive: true, force: true });
+    }
   });
 
   it("writes nothing but the report to stdout when the run aborts before any config", () => {
