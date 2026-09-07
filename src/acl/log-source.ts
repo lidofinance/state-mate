@@ -1,6 +1,7 @@
 import type { JsonRpcProvider } from "ethers";
 
 import { printError } from "../common";
+import { registerSecret } from "../context";
 import { httpGetAsync, isTransientExplorerHttpError } from "../explorer";
 import { log } from "../logger";
 import { parseRoleLog, type RawLog, ROLE_GRANTED_TOPIC, type RoleEvent } from "./fold";
@@ -135,6 +136,7 @@ async function explorerGet(url: string): Promise<ExplorerLogsResponse> {
 function explorerUrl(source: LogSource, chainId: string, query: string): string {
   if (source.kind === "blockscout") return `https://${source.hostname}/api?${query}`;
   const key = process.env.ETHERSCAN_TOKEN;
+  if (key) registerSecret(key, "$ETHERSCAN_TOKEN");
   return `https://api.etherscan.io/v2/api?chainid=${chainId}&${query}${key ? `&apikey=${key}` : ""}`;
 }
 

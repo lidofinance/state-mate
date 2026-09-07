@@ -383,6 +383,7 @@ yarn start config.yml -o l1/contractName                  # specific contract (g
 yarn start config.yml -o l1/contractName/checks/funcName  # single function
 yarn start <directory> --update-abi                       # rebuild the store: re-download all, drop unreferenced
 yarn start config.yml --quiet                             # failures and totals only (CI uses this)
+yarn start config.yml --json                              # one JSON report on stdout: verdict, counters, failed checks (docs/json-output.md)
 ```
 
 ## Best practices

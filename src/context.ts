@@ -26,12 +26,31 @@ export const context = {
   skipImplementationCheck: false,
   allowUnverifiedExplorer: false,
   quiet: false,
+  // --json: one report on stdout instead of the log; see docs/json-output.md
+  json: false,
 };
+
+// Values read from the environment that no report may echo back: RPC URLs carry keys, and
+// ethers quotes the request URL in its error text. Value → the placeholder that replaces it
+const secrets = new Map<string, string>();
+
+export function registerSecret(value: string, placeholder: string): void {
+  if (value) secrets.set(value, placeholder);
+}
+
+export function redactSecrets(text: string): string {
+  let redacted = text;
+  for (const [value, placeholder] of secrets) redacted = redacted.split(value).join(placeholder);
+  return redacted;
+}
 
 export const stats = {
   totalChecks: 0,
   // Methods the config left as null: counted apart from totalChecks, which must mean "verified"
   skipped: 0,
+  // Checks and skips the -o filter selected; automatic checks do not count towards a filter
+  // that names a checks type, so that one cannot pass for a method that matched nothing
+  selected: 0,
   errors: 0,
   errorDetails: [] as ErrorDetail[],
 };
@@ -40,6 +59,7 @@ export const stats = {
 export function resetStats(): void {
   stats.totalChecks = 0;
   stats.skipped = 0;
+  stats.selected = 0;
   stats.errors = 0;
   stats.errorDetails.length = 0;
 }

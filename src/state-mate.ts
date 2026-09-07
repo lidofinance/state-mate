@@ -20,7 +20,7 @@ import {
 } from "./abi-provider";
 import { parseCommandLineArguments } from "./cli-parser";
 import { normalizeChainId, printError, readUrlOrFromEnvironment } from "./common";
-import { context, resetStats, stats } from "./context";
+import { context, registerSecret, resetStats, stats } from "./context";
 import {
   assertProviderChain,
   createProvider,
@@ -28,7 +28,17 @@ import {
   loadContractInfo,
   verifyChainIdWithExplorer,
 } from "./explorer";
-import { FAILURE_MARK, log, logError, logErrorAndExit, logHeader1, SUCCESS_MARK, WARNING_MARK } from "./logger";
+import {
+  FAILURE_MARK,
+  FatalError,
+  log,
+  logError,
+  logErrorAndExit,
+  logHeader1,
+  SUCCESS_MARK,
+  WARNING_MARK,
+} from "./logger";
+import { beginConfig, emitReport, endConfig } from "./report";
 import { ContractSectionValidator } from "./section-validators/contract";
 import {
   type EntireDocument,
@@ -125,6 +135,12 @@ async function doChecks(jsonDocument: EntireDocument) {
   for (const [sectionTitle, section] of Object.entries(jsonDocument)) {
     if (isTypeOfTB(section, NetworkSectionTB)) await checkNetworkSection(sectionTitle, section);
   }
+  // A filter that selects nothing verified nothing, and "passed" would say otherwise
+  if (context.checkOnly && stats.selected === 0) {
+    logErrorAndExit(
+      `${chalk.yellow(`-o "${context.checkOnlyCmdArg}"`)} matched nothing in ${chalk.magenta(context.configPath)}`,
+    );
+  }
   // Show final summary (outside the tree)
   log(""); // Separator line
   const statusMark = stats.errors ? FAILURE_MARK : SUCCESS_MARK;
@@ -202,6 +218,7 @@ async function iterateLoadedContracts(
         continue;
       }
       const explorerKey = explorerTokenEnv ? process.env[explorerTokenEnv] : "";
+      if (explorerKey) registerSecret(explorerKey, `$${explorerTokenEnv}`);
 
       if (!explorerTokenEnv && explorerNeedsApiKey(explorerHostname)) {
         log(
@@ -294,6 +311,10 @@ export function collectYamlConfigs(directory: string): string[] {
 
 async function main() {
   Object.assign(context, parseCommandLineArguments());
+  if (context.json) {
+    // Ctrl+C must still leave one parseable report, carrying whatever ran before it
+    process.once("SIGINT", () => emitReport(130, "interrupted by SIGINT", () => process.exit(130)));
+  }
 
   if (!fs.existsSync(context.configPath)) {
     logErrorAndExit(`No such file or directory: ${chalk.magenta(context.configPath)}`);
@@ -313,7 +334,9 @@ async function main() {
       resetAbiCache();
       resetStats();
       logHeader1(configPath);
+      beginConfig(configPath);
       await runConfig();
+      endConfig();
       if (stats.errors) failed.push(`${configPath} (${stats.errors} errors)`);
     }
     pruneAbiStores();
@@ -322,16 +345,29 @@ async function main() {
       logError(
         `${FAILURE_MARK} ${chalk.bold(`${failed.length}/${configs.length} configs failed:`)}\n${failed.join("\n")}`,
       );
-      process.exit(1);
+      exit(1);
+      return;
     }
     log(`${SUCCESS_MARK} ${chalk.bold(`All ${configs.length} configs passed`)}`);
+    exit(0);
     return;
   }
 
   // No prune here: a single-file run has walked only its own addresses, and sweeping the shared
   // store now would drop the sibling configs' ABIs
+  beginConfig(context.configPath);
   await runConfig();
-  if (stats.errors) process.exit(stats.errors);
+  endConfig();
+  exit(stats.errors);
+}
+
+// Under --json the report owns the exit code; the log mode keeps exiting on the spot
+function exit(code: number): void {
+  if (context.json) {
+    emitReport(code);
+  } else if (code) {
+    process.exit(code);
+  }
 }
 
 async function runConfig() {
@@ -346,7 +382,13 @@ async function runConfig() {
 // Do not run when imported (e.g. by unit tests) — only as the CLI entrypoint
 if (require.main === module) {
   main().catch((error) => {
-    logError(error);
+    if (context.json) {
+      emitReport(1, printError(error));
+      // A FatalError is fully told by the report; anything else is a bug worth its stack
+      if (!(error instanceof FatalError)) console.error(error);
+    } else {
+      logError(error);
+    }
     process.exitCode = 1;
   });
 }

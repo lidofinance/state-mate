@@ -1,5 +1,6 @@
 import chalk from "chalk";
 
+import { registerSecret } from "./context";
 import { logErrorAndExit } from "./logger";
 import type { Abi, AbiArgumentsLength, ChainId } from "./types";
 
@@ -27,12 +28,14 @@ export function printError(error: unknown): string {
 
 export function readUrlOrFromEnvironment(urlOrEnvironmentVariableName: string) {
   if (isUrl(urlOrEnvironmentVariableName)) {
+    registerSecret(urlOrEnvironmentVariableName, "<rpcUrl>");
     return urlOrEnvironmentVariableName;
   }
   const valueFromEnvironment = process.env[urlOrEnvironmentVariableName];
   if (!valueFromEnvironment) {
     logErrorAndExit(`Env var ${chalk.yellow(urlOrEnvironmentVariableName)} is not set`);
   }
+  registerSecret(valueFromEnvironment, `$${urlOrEnvironmentVariableName}`);
   if (!isUrl(valueFromEnvironment)) {
     logErrorAndExit(
       `Env var ${chalk.yellow(urlOrEnvironmentVariableName)} is not a valid RPC url: ${chalk.yellow(valueFromEnvironment)}`,

@@ -23,7 +23,7 @@ yarn start path/to/config.yaml --only l1/vault/checks
 yarn start path/to/config.yaml --only l1/vault/checks/owner
 ```
 
-Filtering to a check type skips automatic implementation verification. A declared `proxyAdminOwner` check still runs.
+Filtering to a check type skips automatic implementation verification. A declared `proxyAdminOwner` check still runs, but does not count as a match: a filter that selects no check of its own is an error.
 
 ## Refresh stored ABIs
 
@@ -48,3 +48,11 @@ yarn start path/to/configs --quiet
 ```
 
 Quiet mode keeps contract headers, per-contract totals, warnings, and errors.
+
+## Read the results from a script
+
+```sh
+yarn start path/to/config.yaml --json | jq -r .status
+```
+
+`--json` replaces the log with one JSON report on stdout: the verdict, per-config counters, and every failed check with its location. Contracts whose checks all passed are not listed. The format is documented in [json-output.md](json-output.md).

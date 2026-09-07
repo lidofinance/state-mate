@@ -63,11 +63,21 @@ export function incErrors(errorMessage?: string): void {
 export function incChecks(): void {
   stats.totalChecks += 1;
   contractChecks += 1;
+  countSelected();
 }
 
 export function incSkipped(): void {
   stats.skipped += 1;
   contractSkipped += 1;
+  countSelected();
+}
+
+// The checks that run without being declared under a checks type
+const AUTOMATIC_CHECKS = new Set(["implementation", "proxyAdmin", "proxyAdminOwner"]);
+
+function countSelected(): void {
+  if (context.checkOnly?.checksType && AUTOMATIC_CHECKS.has(currentErrorContext.checksType ?? "")) return;
+  stats.selected += 1;
 }
 
 export enum CheckLevel {
@@ -167,12 +177,20 @@ export abstract class SectionValidatorBase {
       incErrors(errorMessage);
       return;
     }
+    let actual: unknown;
     try {
-      const actual: unknown = await contractFunction.staticCall(...(args || ""));
+      actual = await contractFunction.staticCall(...(args || ""));
+    } catch (error) {
+      const errorMessage = `REVERTED with: ${printError(error)}`;
+      logHandle.failure(errorMessage);
+      incErrors(errorMessage);
+      return;
+    }
+    try {
       _assertEqual(actual, expected);
       logHandle.success(_stringify(actual));
     } catch (error) {
-      const errorMessage = `REVERTED with: ${printError(error)}`;
+      const errorMessage = printError(error);
       logHandle.failure(errorMessage);
       incErrors(errorMessage);
     }
