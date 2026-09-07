@@ -7,7 +7,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/lidofinance/state-mate/actions/workflows/ci.yaml"><img alt="CI" src="https://img.shields.io/github/actions/workflow/status/lidofinance/state-mate/ci.yaml?branch=main&style=flat-square&label=CI" /></a>
+  <a href="https://github.com/lidofinance/state-mate/actions/workflows/ci.yaml?query=branch%3Amain"><img alt="CI" src="https://img.shields.io/github/actions/workflow/status/lidofinance/state-mate/ci.yaml?branch=main&style=flat-square&label=CI" /></a>
   <a href="package.json"><img alt="Node.js 24 or newer" src="https://img.shields.io/badge/Node.js-24%2B-339933?style=flat-square&logo=nodedotjs&logoColor=white" /></a>
   <a href="package.json"><img alt="Yarn 4.17.0" src="https://img.shields.io/badge/Yarn-4.17.0-2C8EBB?style=flat-square&logo=yarn&logoColor=white" /></a>
   <a href="LICENSE"><img alt="MIT license" src="https://img.shields.io/github/license/lidofinance/state-mate?style=flat-square" /></a>

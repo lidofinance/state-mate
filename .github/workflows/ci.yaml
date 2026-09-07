@@ -59,13 +59,17 @@ jobs:
           UNICHAIN_RPC_URL: ${{ secrets.UNICHAIN_RPC_URL || 'https://unichain.drpc.org' }}
         run: yarn start ${{ matrix.config }} --quiet ${{ github.event_name == 'schedule' && '--update-abi' || '' }}
 
+      # gzip stamps the writer's OS into its header, so a store committed from macOS never matches
+      # its Linux rebuild byte for byte even when every ABI does: compare the decompressed JSON
       - name: Check ABI provenance
         if: github.event_name == 'schedule'
         run: |
-          if ! git diff --exit-code -- ${{ matrix.config }}; then
-            echo "Error: the committed ABI store differs from what the explorer serves."
-            exit 1
-          fi
+          for store in $(git diff --name-only -- ${{ matrix.config }}); do
+            if ! diff <(git show "HEAD:$store" | gunzip) <(gunzip -c "$store"); then
+              echo "Error: the committed ABI store $store differs from what the explorer serves."
+              exit 1
+            fi
+          done
 
   unit:
     name: Unit Tests
