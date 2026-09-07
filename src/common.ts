@@ -34,12 +34,12 @@ export function readUrlOrFromEnvironment(urlOrEnvironmentVariableName: string) {
   if (!valueFromEnvironment) {
     logErrorAndExit(`Env var ${chalk.yellow(urlOrEnvironmentVariableName)} is not set`);
   }
+  registerSecret(valueFromEnvironment, `$${urlOrEnvironmentVariableName}`);
   if (!isUrl(valueFromEnvironment)) {
     logErrorAndExit(
       `Env var ${chalk.yellow(urlOrEnvironmentVariableName)} is not a valid RPC url: ${chalk.yellow(valueFromEnvironment)}`,
     );
   }
-  registerSecret(valueFromEnvironment, `$${urlOrEnvironmentVariableName}`);
   return valueFromEnvironment;
 }
 
