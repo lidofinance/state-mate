@@ -3,6 +3,7 @@ import type { JsonRpcProvider } from "ethers";
 
 import { EntryField } from "src/common";
 import { logFinalStatus, logHeader1, logHeader2 } from "src/logger";
+import { beginContract, endContract } from "src/report";
 import type { ContractEntry } from "src/typebox";
 import type { ChainId } from "src/types";
 import { AragonAclSectionValidator } from "./aragon-acl";
@@ -85,6 +86,7 @@ export class ContractSectionValidator {
     resetContractCounters();
 
     logHeader1(`Contract: ${sectionTitle}/${contractAlias} (${contractEntry.name}, ${contractEntry.address})`);
+    beginContract(`${sectionTitle}/${contractAlias}`, contractEntry.name, contractEntry.address);
 
     // Set base error context for this contract
     setErrorContext({
@@ -139,6 +141,7 @@ export class ContractSectionValidator {
 
     // Show contract status (not last, global status follows)
     const { checks, errors, skipped } = getContractStats();
+    endContract();
     const skippedNote = skipped ? `, ${chalk.yellow(`${skipped} skipped`)}` : "";
     const statusMessage = errors
       ? `${checks} checks, ${chalk.red(`${errors} ${errors === 1 ? "error" : "errors"}`)}${skippedNote}`

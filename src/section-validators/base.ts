@@ -167,12 +167,20 @@ export abstract class SectionValidatorBase {
       incErrors(errorMessage);
       return;
     }
+    let actual: unknown;
     try {
-      const actual: unknown = await contractFunction.staticCall(...(args || ""));
+      actual = await contractFunction.staticCall(...(args || ""));
+    } catch (error) {
+      const errorMessage = `REVERTED with: ${printError(error)}`;
+      logHandle.failure(errorMessage);
+      incErrors(errorMessage);
+      return;
+    }
+    try {
       _assertEqual(actual, expected);
       logHandle.success(_stringify(actual));
     } catch (error) {
-      const errorMessage = `REVERTED with: ${printError(error)}`;
+      const errorMessage = printError(error);
       logHandle.failure(errorMessage);
       incErrors(errorMessage);
     }

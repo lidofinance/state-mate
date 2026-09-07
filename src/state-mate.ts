@@ -28,7 +28,17 @@ import {
   loadContractInfo,
   verifyChainIdWithExplorer,
 } from "./explorer";
-import { FAILURE_MARK, log, logError, logErrorAndExit, logHeader1, SUCCESS_MARK, WARNING_MARK } from "./logger";
+import {
+  FAILURE_MARK,
+  FatalError,
+  log,
+  logError,
+  logErrorAndExit,
+  logHeader1,
+  SUCCESS_MARK,
+  WARNING_MARK,
+} from "./logger";
+import { beginConfig, emitReport, endConfig } from "./report";
 import { ContractSectionValidator } from "./section-validators/contract";
 import {
   type EntireDocument,
@@ -313,7 +323,9 @@ async function main() {
       resetAbiCache();
       resetStats();
       logHeader1(configPath);
+      beginConfig(configPath);
       await runConfig();
+      endConfig();
       if (stats.errors) failed.push(`${configPath} (${stats.errors} errors)`);
     }
     pruneAbiStores();
@@ -322,16 +334,29 @@ async function main() {
       logError(
         `${FAILURE_MARK} ${chalk.bold(`${failed.length}/${configs.length} configs failed:`)}\n${failed.join("\n")}`,
       );
-      process.exit(1);
+      exit(1);
+      return;
     }
     log(`${SUCCESS_MARK} ${chalk.bold(`All ${configs.length} configs passed`)}`);
+    exit(0);
     return;
   }
 
   // No prune here: a single-file run has walked only its own addresses, and sweeping the shared
   // store now would drop the sibling configs' ABIs
+  beginConfig(context.configPath);
   await runConfig();
-  if (stats.errors) process.exit(stats.errors);
+  endConfig();
+  exit(stats.errors);
+}
+
+// Under --json the report owns the exit code; the log mode keeps exiting on the spot
+function exit(code: number): void {
+  if (context.json) {
+    emitReport(code);
+  } else if (code) {
+    process.exit(code);
+  }
 }
 
 async function runConfig() {
@@ -346,7 +371,13 @@ async function runConfig() {
 // Do not run when imported (e.g. by unit tests) — only as the CLI entrypoint
 if (require.main === module) {
   main().catch((error) => {
-    logError(error);
+    if (context.json) {
+      emitReport(1, printError(error));
+      // A FatalError is fully told by the report; anything else is a bug worth its stack
+      if (!(error instanceof FatalError)) console.error(error);
+    } else {
+      logError(error);
+    }
     process.exitCode = 1;
   });
 }

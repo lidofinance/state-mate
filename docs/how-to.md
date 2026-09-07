@@ -48,3 +48,11 @@ yarn start path/to/configs --quiet
 ```
 
 Quiet mode keeps contract headers, per-contract totals, warnings, and errors.
+
+## Read the results from a script
+
+```sh
+yarn start path/to/config.yaml --json | jq -r .status
+```
+
+`--json` replaces the log with one JSON report on stdout: the verdict, per-config counters, and every failed check with its location. Contracts whose checks all passed are not listed. The format is documented in [json-output.md](json-output.md).

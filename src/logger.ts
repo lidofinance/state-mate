@@ -3,6 +3,7 @@ import * as readline from "node:readline";
 import chalk from "chalk";
 
 import { context } from "./context";
+import { recordWarning } from "./report";
 
 export const SUCCESS_MARK = chalk.green("✔");
 export const FAILURE_MARK = chalk.red("✘");
@@ -30,12 +31,13 @@ export class LogCommand {
   }
 
   private initialPrint(): void {
-    if (context.quiet) return;
+    if (context.quiet || context.json) return;
     const prefix = getItemPrefix();
     process.stdout.write(`${prefix}  ${this.description}: ...`);
   }
 
   public printResult(statusSymbol: string, result: string): void {
+    if (context.json) return;
     const prefix = getItemPrefix();
     if (!context.quiet) {
       readline.cursorTo(process.stdout, 0);
@@ -55,6 +57,7 @@ export class LogCommand {
 
   public warning(result: string): void {
     // A warning is a check that did not happen; --quiet must not hide that from CI logs
+    recordWarning(this.description, result);
     this.printResult(WARNING_MARK, result);
   }
 }
@@ -76,7 +79,7 @@ export function logSubHeader(path: string, isLast: boolean = false) {
 }
 
 export function logMethodSkipped(methodName: string) {
-  if (context.quiet) return;
+  if (context.quiet || context.json) return;
   const prefix = getItemPrefix();
   log(`${prefix}${WARNING_MARK} .${methodName}: ${chalk.yellow("skipped")}`);
 }
@@ -89,15 +92,21 @@ export function logFinalStatus(message: string, isSuccess: boolean, isLast: bool
 }
 
 export function log(argument: unknown) {
+  if (context.json) return;
   console.log(argument);
 }
 
 export function logError(argument: unknown) {
+  if (context.json) return;
   const prefix = getItemPrefix();
   console.error(`${prefix}ERROR: ${String(argument)}`);
 }
 
+/** A run-ending error under --json: the entrypoint turns it into the report instead of exiting here. */
+export class FatalError extends Error {}
+
 export function logErrorAndExit(argument: unknown): never {
+  if (context.json) throw new FatalError(String(argument));
   logError(argument);
   console.trace();
   process.exit(1);

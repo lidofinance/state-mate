@@ -26,6 +26,8 @@ export const context = {
   skipImplementationCheck: false,
   allowUnverifiedExplorer: false,
   quiet: false,
+  // --json: one report on stdout instead of the log; see docs/json-output.md
+  json: false,
 };
 
 export const stats = {

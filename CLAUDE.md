@@ -17,7 +17,7 @@ Validates EVM smart-contract state against YAML configs. Calls view functions on
 
 ## Scripts (package.json)
 
-- `yarn start <config|directory>` — run a config, or every config in a directory (add `-o …` for scope, `--update-abi` to rebuild the ABI store; `-o` is file-only).
+- `yarn start <config|directory>` — run a config, or every config in a directory (add `-o …` for scope, `--update-abi` to rebuild the ABI store, `--json` for one machine-readable report on stdout, format in `docs/json-output.md`; `-o` is file-only).
 - `yarn schemas` — regenerate JSON schemas after touching `src/typebox.ts`.
 - `yarn lint` (biome: TS/JSON lint, format and import order) / `yarn format` (prettier: YAML and Markdown only) / `yarn typecheck` (`tsc --noEmit`, since biome has no type-aware rules) — all three are CI-gated; `yarn lint:fix` and `yarn format:fix` write.
 - `yarn test` — unit tests on `node:test` (`tests/**/*.test.ts`); `yarn test:coverage` adds the coverage report. Note `tsconfig.json` excludes `tests/`, so a type error in a test only shows up when the suite runs, not under `yarn typecheck`.
