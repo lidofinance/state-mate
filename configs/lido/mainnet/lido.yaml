@@ -5,6 +5,7 @@ deployed:
     # --- Core protocol ---
     - &lidoLocator "0xC1d0b3DE6792Bf6b4b37EccdcC24e45978Cfd2Eb"
     - &lidoLocatorImplAddress "0xF2Ffb952e129a63F0614Ff87126E1d4a494A2313"
+    - &lidoLocatorEdfImplAddress "0x60E09F1791F1168d0450E4F100616B4a3F95119C"
     - &lido "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84"
     - &lidoImplAddress "0x028271E30a695c0527A0C50cA30603feD004cDb0"
     - &wstETH "0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0"
@@ -13,6 +14,7 @@ deployed:
     - &stakingRouter "0xFdDf38947aFB03C621C71b06C9C70bce73f12999"
     - &stakingRouterImplAddress "0xDD76927045435C7605cf6f5F978cfb8CABDb5F80"
     - &depositSecurityModule "0xF573E9E3de1f86B085417ab294f56E7920B4e9Be"
+    - &depositSecurityModuleV5 "0x39BB5d491e98A44D1bfe8047A737a81E296a63E0"
     - &executionLayerRewardsVault "0x388C818CA8B9251b393131C08a736A67ccB19297"
     - &withdrawalQueueERC721 "0x889edC2eDab5f40e902b864aD4d7AdE8E412F9B1"
     - &withdrawalQueueERC721ImplAddress "0xE42C659Dc09109566720EA8b2De186c2Be7D94D9"
@@ -159,6 +161,15 @@ deployed:
     - &csmCommittee "0xC52fC3081123073078698F1EAc2f1Dc7Bd71880f"
     - &stVaultsCommittee "0x18A1065c81b0Cc356F1b1C843ddd5E14e4AefffF"
     - &curatedModuleCommittee "0x2570e0b22AD904501dfB0d49575991ACB801dD91"
+
+deployed-aux:
+  # DSM v5 guardian DelegationContracts.
+  - &dsmGuardianLidoDevTeam "0x915F0Fa50E1af761B113b41c79ab33Bf4734C36E"
+  - &dsmGuardianP2p "0xe387Ba1d5C9f6306eCe9ac949C7fB6233dD5411E"
+  - &dsmGuardianStakingFacilities "0x35506190Ca6df385aA6Bc4a970646dd4f49426c1"
+  - &dsmGuardianBlockscape "0xDc1579636686C082fc3b00B9EB25259A110D0C44"
+  - &dsmGuardianStakefish "0x031E597BcF680f1f2293b119b4b2B14096B15497"
+  - &dsmGuardianStakely "0x6A22d74a816662078f2371A7138E7614874cd61d"
 
 misc:
   - &resealManager "0x7914b5a1539b97Bd0bbd155757F25FD79A522d24"
@@ -795,6 +806,51 @@ l1:
         withdrawalVault: *withdrawalVault
         wstETH: *wstETH
 
+    # EDF candidate implementation; the active proxy above remains unchanged until governance.
+    lidoLocatorEdf:
+      name: LidoLocator
+      address: *lidoLocatorEdfImplAddress
+      checks:
+        accounting: *accounting
+        accountingOracle: *accountingOracle
+        burner: *burner
+        consolidationGateway: *consolidationGateway
+        coreComponents:
+          - *executionLayerRewardsVault
+          - *oracleReportSanityChecker
+          - *stakingRouter
+          - *aragonAgent
+          - *withdrawalQueueERC721
+          - *withdrawalVault
+        depositSecurityModule: *depositSecurityModuleV5
+        elRewardsVault: *executionLayerRewardsVault
+        lido: *lido
+        operatorGrid: *operatorGrid
+        oracleDaemonConfig: *oracleDaemonConfig
+        oracleReportComponents:
+          - *accountingOracle
+          - *oracleReportSanityChecker
+          - *burner
+          - *withdrawalQueueERC721
+          - *tokenRateNotifier
+          - *stakingRouter
+          - *vaultHub
+        oracleReportSanityChecker: *oracleReportSanityChecker
+        postTokenRebaseReceiver: *tokenRateNotifier
+        predepositGuarantee: *predepositGuarantee
+        lazyOracle: *lazyOracle
+        topUpGateway: *topUpGateway
+        triggerableWithdrawalsGateway: *triggerableWithdrawalsGateway
+        validatorExitDelayVerifier: *validatorExitDelayVerifier
+        vaultFactory: *stakingVaultFactory
+        stakingRouter: *stakingRouter
+        treasury: *aragonAgent
+        validatorsExitBusOracle: *validatorsExitBusOracle
+        vaultHub: *vaultHub
+        withdrawalQueue: *withdrawalQueueERC721
+        withdrawalVault: *withdrawalVault
+        wstETH: *wstETH
+
     lido:
       name: Lido
       address: *lido
@@ -1160,6 +1216,35 @@ l1:
             "0xa56b128Ea2Ea237052b0fA2a96a387C0E43157d8", # P2P
             "0x4B87F16B8d32cb5a859a4C48a88edB5adBe3498E", # Stakefish
           ]
+        getLastDepositBlock: null
+        getMaxOperatorsPerUnvetting: 200
+        getOwner: *aragonAgent
+        getPauseIntentValidityPeriodBlocks: 6646
+        isDepositsPaused: false
+        isGuardian: null
+        isMinDepositDistancePassed: null
+
+    depositSecurityModuleV5:
+      name: DepositSecurityModule
+      address: *depositSecurityModuleV5
+      checks:
+        # keccak256(keccak256("lido.DepositSecurityModule.<TAG>_MESSAGE") ++ uint256(1) ++ dsmAddress).
+        ATTEST_MESSAGE_PREFIX: "0x3348689a23b894997fda00331dfedcb1c416ef8624150ccef065758e2cc043b2"
+        DEPOSIT_CONTRACT: *depositContract
+        PAUSE_MESSAGE_PREFIX: "0xa6a4eb10689f3fe113d10e7c766fd9a028fff96deed9529406ed39bf0cdfebf6"
+        STAKING_ROUTER: *stakingRouter
+        UNVET_MESSAGE_PREFIX: "0x99bd4a87e9bc0c178ba39911d31c6bdf380c5e3cbb4c97fdb7c51bfa2ce63ee5"
+        VERSION: 5
+        getGuardianIndex: null
+        getGuardianQuorum: 4
+        getGuardians:
+          - *dsmGuardianLidoDevTeam
+          - *dsmGuardianP2p
+          - *dsmGuardianStakingFacilities
+          - *dsmGuardianBlockscape
+          - *dsmGuardianStakefish
+          - *dsmGuardianStakely
+        # Changes after deposits.
         getLastDepositBlock: null
         getMaxOperatorsPerUnvetting: 200
         getOwner: *aragonAgent
