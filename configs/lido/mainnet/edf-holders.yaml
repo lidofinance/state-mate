@@ -36,6 +36,7 @@ deployed-aux:
   - &oracleCaliberOwner "0x84225B558e224dc6C38f4eda1d3591fE6b5E34aa"
   - &oracleStakingFacilitiesOwner "0x035AcCF7E230f32028a1134134A035dda567C86e"
   - &oracleChorusOneOwner "0x6057526Da2Dc9Bd23a3C6F1b15C74De2D7593378"
+  - &oracleP2pOwner "0x1E8518cd5835B6775F902e1451a3Dd7b02EB3e8A"
   - &oracleChainlayerOwner "0x48D10eaec45e330003E62115e56d2A05F29eca70"
   - &oracleBloxrouteOwner "0x9462A9FfF5646d0b6517D8eac49de49277e89dB9"
   - &oracleMatrixedLinkOwner "0x60D78785B763374bd552F5cE270da77781C6066C"
@@ -217,7 +218,7 @@ l1:
         getPendingDelegate: [*ZERO_ADDRESS, 0]
         isTerminated: false
         isValidSignature: *INVALID_SIGNATURE_CHECK
-        owner: *dsmGuardianP2pOwner
+        owner: *oracleP2pOwner
         supportsInterface: *EDF_INTERFACE_CHECKS
 
     oracleChainlayer:
