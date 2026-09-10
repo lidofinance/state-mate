@@ -164,6 +164,7 @@ deployed:
 
 deployed-aux:
   # DSM v5 guardian DelegationContracts.
+  # https://research.lido.fi/t/lip-37-execution-delegation-framework-edf
   - &dsmGuardianLidoDevTeam "0x915F0Fa50E1af761B113b41c79ab33Bf4734C36E"
   - &dsmGuardianP2p "0xe387Ba1d5C9f6306eCe9ac949C7fB6233dD5411E"
   - &dsmGuardianStakingFacilities "0x35506190Ca6df385aA6Bc4a970646dd4f49426c1"
@@ -1244,7 +1245,6 @@ l1:
           - *dsmGuardianBlockscape
           - *dsmGuardianStakefish
           - *dsmGuardianStakely
-        # Changes after deposits.
         getLastDepositBlock: null
         getMaxOperatorsPerUnvetting: 200
         getOwner: *aragonAgent
