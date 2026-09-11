@@ -18,6 +18,7 @@ import {
   type ScanRange,
   setRateLimitPause,
 } from "../src/acl/log-source";
+import { redactSecrets } from "../src/context";
 import { resetRequestSlots } from "../src/explorer";
 
 const CONTRACT = "0xccccccccccccccccccccccccccccccccccccccc3";
@@ -263,6 +264,35 @@ describe("truncation defence", () => {
 });
 
 describe("chain log sources", () => {
+  it("uses the Blockscout PRO endpoint and redacts its key", async () => {
+    const previous = process.env.BLOCKSCOUT_API_KEY;
+    process.env.BLOCKSCOUT_API_KEY = "proapi_test_secret";
+    const urls: string[] = [];
+    resetRequestSlots();
+    const fetchMock = mock.method(globalThis, "fetch", async (input: string | URL | Request) => {
+      urls.push(String(input));
+      return Response.json({ status: "1", message: "OK", result: [] });
+    });
+    try {
+      const result = await collectRoleEvents("8453", CONTRACT, { fromBlock: 1, toBlock: 2 });
+      assert.equal(result.ok, true);
+      const url = new URL(urls[0]);
+      assert.equal(url.origin + url.pathname, "https://api.blockscout.com/v2/api");
+      assert.equal(url.searchParams.get("chain_id"), "8453");
+      assert.equal(url.searchParams.get("apikey"), "proapi_test_secret");
+      assert.ok(!redactSecrets(urls[0]).includes("proapi_test_secret"));
+    } finally {
+      fetchMock.mock.restore();
+      if (previous === undefined) delete process.env.BLOCKSCOUT_API_KEY;
+      else process.env.BLOCKSCOUT_API_KEY = previous;
+      resetRequestSlots();
+    }
+  });
+
+  it("uses etherscan for Plasma", () => {
+    assert.equal(CHAIN_LOG_SOURCES["9745"].source.kind, "etherscan");
+  });
+
   it("gives every supported chain a source and a confirmation lag", () => {
     for (const [chainId, chain] of Object.entries(CHAIN_LOG_SOURCES)) {
       assert.ok(chain.source.kind, `chainId ${chainId} has no source`);

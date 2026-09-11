@@ -106,7 +106,9 @@ cannot be narrowed, or a contract whose storage matches no known AccessControl l
 not a quiet fall back to the declared-only checks. A chain with no log source at all is different
 and counts as **skipped** — a structural limit, printed in the run's totals, never counted as
 passed. The chain-to-source registry lives in `src/acl/log-source.ts`; etherscan-served chains
-need `ETHERSCAN_TOKEN`, blockscout-served ones need no key.
+need `ETHERSCAN_TOKEN`. Blockscout-served chains need `BLOCKSCOUT_API_KEY`
+from the Blockscout PRO API portal; the old per-instance API keys no longer work.
+Requests use `api.blockscout.com/v2/api` with `chain_id` and `apikey`.
 
 Two assumptions carry the result, and the scan checks neither directly. Every grant must have
 emitted a standard event — storage calibration establishes that the membership layout matches a

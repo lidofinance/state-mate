@@ -32,6 +32,7 @@ export const CHAIN_LOG_SOURCES: Readonly<Record<string, ChainLogSource>> = {
   "10": { confirmationLag: 60, source: { hostname: "explorer.optimism.io", kind: "blockscout" } },
   "130": { confirmationLag: 120, source: { kind: "etherscan" } },
   "8453": { confirmationLag: 60, source: { hostname: "base.blockscout.com", kind: "blockscout" } },
+  "9745": { confirmationLag: 120, source: { kind: "etherscan" } },
   "42161": { confirmationLag: 240, source: { kind: "etherscan" } },
   "59144": { confirmationLag: 30, source: { kind: "etherscan" } },
   "560048": { confirmationLag: 8, source: { kind: "etherscan" } },
@@ -134,7 +135,11 @@ async function explorerGet(url: string): Promise<ExplorerLogsResponse> {
 }
 
 function explorerUrl(source: LogSource, chainId: string, query: string): string {
-  if (source.kind === "blockscout") return `https://${source.hostname}/api?${query}`;
+  if (source.kind === "blockscout") {
+    const key = process.env.BLOCKSCOUT_API_KEY;
+    if (key) registerSecret(key, "$BLOCKSCOUT_API_KEY");
+    return `https://api.blockscout.com/v2/api?chain_id=${chainId}&${query}${key ? `&apikey=${encodeURIComponent(key)}` : ""}`;
+  }
   const key = process.env.ETHERSCAN_TOKEN;
   if (key) registerSecret(key, "$ETHERSCAN_TOKEN");
   return `https://api.etherscan.io/v2/api?chainid=${chainId}&${query}${key ? `&apikey=${key}` : ""}`;
