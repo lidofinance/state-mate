@@ -1,4 +1,5 @@
 # yaml-language-server: $schema=../../../schemas/main-schema.json
+# Expected state after Voting and DG execution of lidofinance/scripts PR #682.
 
 parameters:
   - &trustedCaller "0x18A1065c81b0Cc356F1b1C843ddd5E14e4AefffF"
@@ -42,7 +43,12 @@ misc:
   - &MAX_LIQUIDITY_FEE_BP "1000" # 10%
   - &MAX_RESERVATION_FEE_BP "0" # 0%
 
+  - &lido "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84"
+  - &MAX_DEPOSITS_RESERVE_TARGET "9600000000000000000000"
+
   # --- Factory permissions ---
+  # Lido address ++ bytes4(keccak256("setDepositsReserveTarget(uint256)")).
+  - &SET_DEPOSITS_RESERVE_TARGET_PERMISSIONS "0xae7ab96520de3a18e5e111b5eaab095312d7fe8414457a32"
   - &CSM_UPDATE_STAKING_MODULE_SHARE_LIMITS_PERMISSIONS "0xde3e46e3129fa4e4e3f66c9024b0a3ad509b27a15adcee90fddf38947afb03c621c71b06c9c70bce73f1299913976a06" # cast concat-hex "0xde3e46E3129fA4e4e3f66c9024B0A3Ad509b27a1" $(cast sig "validateParams((uint16,uint16,uint16,uint16))") "0xFdDf38947aFB03C621C71b06C9C70bce73f12999" $(cast sig "updateModuleShares(uint256,uint16,uint16)") | awk '{print tolower($0)}'
   - &ALLOW_CONSOLIDATION_PAIR_CMV1_CMV2_PERMISSIONS "0x9dc70b5a4f4f5e4af9058c983d560564f031f1d7b4ecbe1a" # cast concat-hex "0x9Dc70b5A4f4F5E4AF9058C983D560564F031f1D7" $(cast sig "allowPair(uint256,uint256,address)") | awk '{print tolower($0)}'
   - &CSM_SET_MERKLE_GATE_TREE_PERMISSIONS "0xf3ec30b86c3dc1b8a1c754d885f9be3160e15b4c672c809eb314d4a76c457c93150d308787939063f4cc67e0ed4b1869a12760721a72a7199ab38059da6690b9cd4ed7b8ed4b1869" # cast concat-hex "0xf3ec30B86c3dC1b8a1C754D885F9bE3160e15B4c" $(cast sig "validateInputData(address,bytes32,string,bytes32,string)") "0xB314D4A76C457c93150d308787939063F4Cc67E0" $(cast sig "setTreeParams(bytes32,string)") "0xa12760721A72A7199aB38059DA6690b9Cd4ed7B8" $(cast sig "setTreeParams(bytes32,string)") | awk '{print tolower($0)}'
@@ -63,6 +69,7 @@ roles:
 
 deployed:
   l1:
+    - &setDepositsReserveTarget "0x62E9Dc68BDCBC46362f40e0bb9c154C9a42E62b0"
     - &easyTrack "0xF0211b7660680B49De1A7E9f25C65660F0a13Fea"
     - &registerGroupsInOperatorGrid "0x17305dB55c908e84C58BbDCa57258A7D1f7eEa7c"
     - &updateGroupsShareLimitInOperatorGrid "0xf23559De8ab37fF7a154384B0822dA867Cfa7Eac"
@@ -95,6 +102,16 @@ l1:
   explorerTokenEnv: ETHERSCAN_TOKEN
   chainId: 1
   contracts:
+    SetDepositsReserveTarget:
+      name: SetDepositsReserveTarget
+      address: *setDepositsReserveTarget
+      checks:
+        MAX_DEPOSITS_RESERVE_TARGET: *MAX_DEPOSITS_RESERVE_TARGET
+        lido: *lido
+        trustedCaller: *curatedModuleCommittee
+        createEVMScript: null
+        decodeEVMScriptCallData: null
+
     EasyTrack:
       name: EasyTrack
       address: *easyTrack
@@ -156,8 +173,12 @@ l1:
           - args: [50]
             result: *removeAllowedRecipient
           - args: [51]
+            result: *setDepositsReserveTarget
+          - args: [52]
             mustRevert: true
         evmScriptFactoryPermissions:
+          - args: [*setDepositsReserveTarget]
+            result: *SET_DEPOSITS_RESERVE_TARGET_PERMISSIONS
           - args: [*csmUpdateStakingModuleShareLimits]
             result: *CSM_UPDATE_STAKING_MODULE_SHARE_LIMITS_PERMISSIONS
           - args: [*allowConsolidationPairCMv1CMv2]
@@ -235,6 +256,7 @@ l1:
             *topUpAllowedRecipients,
             *addAllowedRecipient,
             *removeAllowedRecipient,
+            *setDepositsReserveTarget,
           ]
         getMotion: null
         getMotions: null
@@ -244,6 +266,8 @@ l1:
           - args: [*ET_PAUSE_ROLE, *emergencyBrakes]
             result: true
         isEVMScriptFactory:
+          - args: [*setDepositsReserveTarget]
+            result: true
           - args: [*etFirstFactory]
             result: true
           - args: [*registerGroupsInOperatorGrid]
