@@ -19,8 +19,8 @@ import {
   collectTopicLogs,
   hasLogSource,
   makeSettledScanRange,
-  resolveDeploymentBlock,
   resolveScanBounds,
+  resolveScanStartBlock,
 } from "src/acl/log-source";
 import { EntryField, normalizeChainId, printError } from "src/common";
 import { LogCommand, log, logHeader2 } from "src/logger";
@@ -99,7 +99,7 @@ export class AragonAclSectionValidator extends SectionValidatorBase {
     | { events: AragonEvent[]; fromBlock: number; ok: true; source: string; toBlock: number }
     | { ok: false; reason: string }
   > {
-    const fromBlock = await resolveDeploymentBlock(chainId, address);
+    const fromBlock = await resolveScanStartBlock(chainId, address);
     if (fromBlock === undefined) {
       return { ok: false, reason: `the explorer would not give a deployment block for ${address}` };
     }

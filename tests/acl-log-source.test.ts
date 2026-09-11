@@ -15,6 +15,7 @@ import {
   makeSettledScanRange,
   parseQuantity,
   resolveScanBounds,
+  resolveScanStartBlock,
   type ScanRange,
   setRateLimitPause,
 } from "../src/acl/log-source";
@@ -264,6 +265,28 @@ describe("truncation defence", () => {
 });
 
 describe("chain log sources", () => {
+  it("scans Blockscout from genesis when creation metadata is unavailable", async () => {
+    resetRequestSlots();
+    const urls: URL[] = [];
+    const fetchMock = mock.method(globalThis, "fetch", async (input: string | URL | Request) => {
+      const url = new URL(String(input));
+      urls.push(url);
+      assert.equal(url.searchParams.get("action"), "getLogs");
+      assert.equal(url.searchParams.get("fromBlock"), "0");
+      return Response.json({ status: "1", message: "OK", result: [] });
+    });
+    try {
+      const fromBlock = await resolveScanStartBlock("8453", CONTRACT);
+      assert.equal(fromBlock, 0);
+      const result = await collectRoleEvents("8453", CONTRACT, { fromBlock: fromBlock!, toBlock: 100 });
+      assert.equal(result.ok, true);
+      assert.ok(urls.length > 0);
+    } finally {
+      fetchMock.mock.restore();
+      resetRequestSlots();
+    }
+  });
+
   it("uses the Blockscout PRO endpoint and redacts its key", async () => {
     const previous = process.env.BLOCKSCOUT_API_KEY;
     process.env.BLOCKSCOUT_API_KEY = "proapi_test_secret";

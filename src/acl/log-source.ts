@@ -261,7 +261,8 @@ export async function collectRoleEvents(chainId: string, address: string, range:
 }
 
 /**
- * The block the scan starts from, taken from the explorer's record of the deployment transaction.
+ * The block the scan starts from. Blockscout can omit creation metadata for live contracts,
+ * so scan its complete history from genesis. Etherscan supplies the deployment transaction.
  *
  * Deliberately not probed from the chain. A load-balanced public RPC sends historical
  * `eth_getCode` to whichever backend answers, and a pruned one reports an empty account for a
@@ -269,9 +270,10 @@ export async function collectRoleEvents(chainId: string, address: string, range:
  * A bound that came back too high would silently cut the front off the history, the one error this
  * scan cannot afford; the explorer's record is a transaction, not prunable state.
  */
-export async function resolveDeploymentBlock(chainId: string, address: string): Promise<number | undefined> {
+export async function resolveScanStartBlock(chainId: string, address: string): Promise<number | undefined> {
   const source = CHAIN_LOG_SOURCES[chainId]?.source;
   if (!source) return undefined;
+  if (source.kind === "blockscout") return 0;
 
   const url = explorerUrl(source, chainId, `module=contract&action=getcontractcreation&contractaddresses=${address}`);
   let response: ExplorerLogsResponse;
