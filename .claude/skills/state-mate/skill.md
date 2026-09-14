@@ -383,8 +383,8 @@ yarn start configs/lido/lido.yaml --deployed configs/lido/lido.deployed.yaml
 yarn start configs/lido/lido.yaml --deployed configs/lido/lido.hoodi.deployed.yaml   # another variant
 ```
 
-The two files are concatenated (addresses first) and parsed as one YAML document, so `*label`
-aliases resolve to the `&label` anchors natively. Four invariants are enforced — each a hard error:
+Each file is parsed once, then its root mapping entries are assembled into one YAML document
+(addresses first), so `*label` aliases resolve to the `&label` anchors natively. Four invariants are enforced — each a hard error:
 
 - **every address has an `&label`** — a bare address in `.deployed` is rejected;
 - **every label is referenced** by a `*alias` in the main config — unused labels are rejected;
@@ -399,6 +399,11 @@ Notes:
 - The `.deployed` file may contain **only** a `deployed:` section, must be a **single YAML document**
   (no mid-file `---`/`...`), and every value must be a valid `0x` address/hash. RPC/explorer settings
   stay in the main config (they are not deployment addresses).
+- Block and flow root mappings can be mixed; document markers and block scalar values are preserved.
+  Composed roots require string keys and cannot carry anchors or explicit tags. `%YAML`/`%TAG`
+  directives remain unsupported; all sources use shared parsing semantics. Anchors must precede
+  aliases in sibling order followed by main. Cyclic aliases are rejected before value conversion.
+  Alias errors are reported together with their original source positions.
 - Existing single-file configs (inline `deployed:`, no sibling) are unaffected.
 
 The `--deployed` and `--inputs` options require a single config file. Directory runs skip

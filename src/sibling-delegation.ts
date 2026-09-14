@@ -55,12 +55,12 @@ export function resolveSiblingFilePath(spec: SiblingSpec, explicitArgument?: str
   return explicitArgument === undefined ? null : resolveExplicitFilePath(spec.optionName, explicitArgument);
 }
 
-/**
- * Validate each file before concatenation so syntax errors retain their source positions.
- * Directives cannot survive concatenation; unresolved aliases are allowed until `toJS`.
- */
-function parseSingleDocument(text: string, label: string): YAML.Document {
-  const documents = YAML.parseAllDocuments(text, YAML_PARSE_OPTIONS);
+type ParsedSource = { document: YAML.Document; label: string; lineCounter: YAML.LineCounter };
+
+/** Parse each source once with shared semantics; unresolved aliases are allowed until assembly. */
+function parseSingleDocument(text: string, label: string): ParsedSource {
+  const lineCounter = new YAML.LineCounter();
+  const documents = YAML.parseAllDocuments(text, { ...YAML_PARSE_OPTIONS, lineCounter });
   if (documents.length === 0) {
     throw new Error(`${label} is empty`);
   }
@@ -78,7 +78,7 @@ function parseSingleDocument(text: string, label: string): YAML.Document {
   if (yaml.explicit || hasCustomTags) {
     throw new Error(`${label} uses %YAML/%TAG directives, which cannot be composed with sibling files — remove them`);
   }
-  return document;
+  return { document, label, lineCounter };
 }
 
 /** The string form of a YAML mapping key (scalar keys only), or `fallback` for anything else. */
@@ -91,31 +91,6 @@ function rejectLabels(candidates: Iterable<string>, isViolation: (label: string)
   if (violating.length > 0) {
     throw new Error(`${description}: ${violating.map((label) => `&${label}`).join(", ")}`);
   }
-}
-
-/**
- * Remove the BOM and document markers after single-document validation. Only column-0 markers
- * qualify; indented markers may be scalar content. Preserve line counts for error attribution.
- */
-function stripDocumentMarkers(text: string): string {
-  const lines = text.replace(/^\u{FEFF}/u, "").split("\n");
-
-  const startIndex = lines.findIndex((line) => /^---(\s|$)/.test(line));
-  if (startIndex !== -1) {
-    // `--- {flow: doc}` carries document content on the marker line — keep everything after the marker.
-    lines[startIndex] = lines[startIndex].slice("---".length).trimStart();
-  }
-
-  for (let index = lines.length - 1; index >= 0; index--) {
-    if (/^\.\.\.(\s|$)/.test(lines[index])) {
-      // A column-0 comment still terminates a preceding block scalar; a blank line would become
-      // part of its value with keep chomping (`|+` / `>+`).
-      lines[index] = `# ${lines[index]}`;
-      break;
-    }
-  }
-
-  return lines.join("\n");
 }
 
 function assertOnlyOwnedSections(document: YAML.Document, ownedSectionKeys: string[], fileLabel: string) {
@@ -183,51 +158,47 @@ function inspectMainDocument(mainDocument: YAML.Document): {
   return { anchors, aliases, presentKeys };
 }
 
-type CombinedPart = { label: string; text: string };
-
-function countNewlines(text: string): number {
-  let count = 0;
-  for (const character of text) {
-    if (character === "\n") count++;
-  }
-  return count;
+function sourcePosition(source: ParsedSource, node: unknown): string {
+  const offset = YAML.isNode(node) ? node.range?.[0] : undefined;
+  const { line, col } = source.lineCounter.linePos(offset ?? 0);
+  return `in ${source.label} at line ${line}, column ${col}`;
 }
 
-/** Map combined-text positions back to source files using the preserved per-file line counts. */
-function describeCombinedParseError(error: YAML.YAMLError, parts: CombinedPart[], combinedText: string): string {
-  const offset = Math.min(error.pos[0] ?? 0, Math.max(combinedText.length - 1, 0));
-  const prefix = combinedText.slice(0, offset);
-  const line = countNewlines(prefix) + 1;
-  const column = offset - prefix.lastIndexOf("\n");
-  let startLine = 1;
-  for (const part of parts) {
-    const lineCount = countNewlines(part.text); // every part ends with a newline
-    if (line < startLine + lineCount || part === parts.at(-1)) {
-      return `${error.message} (in ${part.label} at line ${line - startLine + 1}, column ${column})`;
-    }
-    startLine += lineCount;
+function requireMappingRoot(source: ParsedSource): YAML.YAMLMap {
+  const root = source.document.contents;
+  if (!YAML.isMap(root)) {
+    throw new Error(`${source.label} must contain a mapping (${sourcePosition(source, root)})`);
   }
-  return error.message;
+  // The root container is replaced during assembly; its anchor/tag cannot be transferred to
+  // the combined root without changing what it describes.
+  if (root.anchor || root.tag) {
+    throw new Error(`Root anchors and tags are unsupported in composed files (${sourcePosition(source, root)})`);
+  }
+  return root;
 }
 
 /**
- * Validate section ownership and anchor references, then concatenate siblings before the main
- * config so YAML resolves cross-file aliases. Throws on invalid input.
+ * Validate section ownership and anchor references, then assemble sibling mapping entries before
+ * main's entries. Parsed nodes are consumed locally; YAML expands aliases in the assembled document.
  */
 export function composeWithSiblings(mainText: string, siblings: { text: string; spec: SiblingSpec }[]): ComposeResult {
   const collected = siblings.map(({ text, spec }) => {
-    const document = parseSingleDocument(text, spec.fileLabel);
+    const source = parseSingleDocument(text, spec.fileLabel);
+    const { document } = source;
     assertOnlyOwnedSections(document, spec.ownedSectionKeys, spec.fileLabel);
+    requireMappingRoot(source);
     const labels = spec.collectLabels(document, spec.fileLabel);
     if (labels.size === 0) {
       throw new Error(`${spec.fileLabel} defines no labeled entries`);
     }
     assertNoStrayAnchors(document, labels, spec.fileLabel);
-    return { spec, labels };
+    return { spec, labels, source };
   });
 
   // Check syntax before references: malformed YAML can hide aliases and produce misleading label errors.
-  const mainDocument = parseSingleDocument(mainText, "the main config");
+  const mainSource = parseSingleDocument(mainText, "the main config");
+  const mainDocument = mainSource.document;
+  requireMappingRoot(mainSource);
   const { anchors: mainAnchors, aliases: mainAliases, presentKeys } = inspectMainDocument(mainDocument);
 
   for (const { spec } of siblings) {
@@ -256,37 +227,73 @@ export function composeWithSiblings(mainText: string, siblings: { text: string; 
     );
   }
 
-  const fileLabels = siblings.map(({ spec }) => spec.fileLabel).join(" / ");
-  rejectLabels(
-    mainAliases,
-    (alias) => !seenLabels.has(alias) && !mainAnchors.has(alias),
-    `the main config references label(s) defined neither in it nor in ${fileLabels}`,
-  );
+  const combinedDocument = new YAML.Document(undefined, YAML_PARSE_OPTIONS);
+  const root = new YAML.YAMLMap(combinedDocument.schema);
+  const sources = [...collected.map(({ source }) => source), mainSource];
+  const nodeSources = new WeakMap<YAML.Node, ParsedSource>();
+  const definitions = new Map<string, string>();
+  for (const source of sources) {
+    YAML.visit(source.document, {
+      Node: (_key, node) => {
+        nodeSources.set(node, source);
+      },
+    });
+    for (const pair of requireMappingRoot(source).items) {
+      const position = sourcePosition(source, pair.key);
+      if (!YAML.isScalar(pair.key) || typeof pair.key.value !== "string") {
+        throw new Error(`Top-level keys must be strings (${position})`);
+      }
+      const firstPosition = definitions.get(pair.key.value);
+      if (firstPosition) {
+        throw new Error(`Duplicate top-level key '${pair.key.value}' (${position}; first defined ${firstPosition})`);
+      }
+      definitions.set(pair.key.value, position);
+      root.add(pair);
+    }
+  }
+  combinedDocument.contents = root;
 
-  // Preserve original trailing whitespace, then terminate any block scalar with a column-0 comment
-  // so blank lines at the start of the next file cannot extend its value. Keep the separator in its
-  // preceding part so error attribution accounts for the extra line without shifting source lines.
-  const parts: CombinedPart[] = [
-    ...siblings.map(({ text, spec }) => ({ label: spec.fileLabel, text: stripDocumentMarkers(text) })),
-    { label: "the main config", text: stripDocumentMarkers(mainText) },
-  ].map(({ label, text }) => ({
-    label,
-    text: `${text.endsWith("\n") ? text : `${text}\n`}# End of config file\n`,
-  }));
-  const combinedText = parts.map(({ text }) => text).join("");
-  // prettyErrors would decorate messages with positions in the concatenated text; positions are
-  // re-derived per source file instead.
-  const combinedDocument = YAML.parseDocument(combinedText, { ...YAML_PARSE_OPTIONS, prettyErrors: false });
-  if (combinedDocument.errors.length > 0) {
-    throw new Error(
-      `Failed to parse the combined config:\n${combinedDocument.errors
-        .map((error) => describeCombinedParseError(error, parts, combinedText))
-        .join("\n")}`,
-    );
+  // Match YAML's nearest-preceding-anchor rule by node identity. An ancestor target forms
+  // a cycle that our bigint reviver cannot convert. Collect diagnostics before conversion.
+  const precedingAnchors = new Map<string, YAML.Node>();
+  const aliasErrors: string[] = [];
+  const fileLabels = siblings.map(({ spec }) => spec.fileLabel).join(" / ");
+  YAML.visit(combinedDocument, {
+    Node: (_key, node, ancestors) => {
+      if (YAML.isAlias(node)) {
+        const target = precedingAnchors.get(node.source);
+        const position = sourcePosition(nodeSources.get(node)!, node);
+        if (!target) {
+          if (!seenLabels.has(node.source) && !mainAnchors.has(node.source)) {
+            const description =
+              nodeSources.get(node) === mainSource
+                ? `the main config references label(s) ${fileLabels ? `defined neither in it nor in ${fileLabels}` : "not defined in it"}: &${node.source}`
+                : `Unresolved alias *${node.source}: anchor is not defined in any composed source`;
+            aliasErrors.push(`${description} (${position})`);
+          } else {
+            aliasErrors.push(`Unresolved alias *${node.source}: the anchor must be set before the alias (${position})`);
+          }
+        } else if (ancestors.includes(target)) {
+          aliasErrors.push(`Cyclic alias *${node.source}: references an ancestor collection (${position})`);
+        }
+      } else if (node.anchor) {
+        precedingAnchors.set(node.anchor, node);
+      }
+    },
+  });
+  if (aliasErrors.length > 0) {
+    throw new Error(aliasErrors.join("\n"));
+  }
+
+  let document: unknown;
+  try {
+    document = combinedDocument.toJS(YAML_TO_JS_OPTIONS);
+  } catch (error) {
+    throw new Error(`Failed to convert the composed config: ${printError(error)}`);
   }
 
   return {
-    document: combinedDocument.toJS(YAML_TO_JS_OPTIONS),
+    document,
     labels: collected.map(({ labels }) => [...labels]),
   };
 }

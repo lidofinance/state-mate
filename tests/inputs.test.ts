@@ -19,12 +19,17 @@ import {
 
 const resolveInputsFilePath = (inputsArgument?: string) => resolveSiblingFilePath(INPUTS_SPEC, inputsArgument);
 
-for (const style of ["|+", ">+"]) {
-  for (const boundary of ["end marker", "leading blank lines", "start marker"]) {
+for (const style of ["|-", "|", "|+", ">-", ">", ">+"]) {
+  for (const boundary of ["end marker", "leading blank lines", "start marker", "no final newline"]) {
     test(`composition preserves ${style} input values across ${boundary}`, () => {
       // Keep two intentional trailing newlines; file boundaries must neither add nor remove any.
       const scalarText = `config:\n  - &message ${style}\n      hello\n      world\n\n`;
-      const inputs = boundary === "end marker" ? `${scalarText}...\n` : scalarText;
+      const inputs =
+        boundary === "end marker"
+          ? `${scalarText}...\n`
+          : boundary === "no final newline"
+            ? scalarText.trimEnd()
+            : scalarText;
       const prefix = boundary === "leading blank lines" ? "\n\n" : boundary === "start marker" ? "---\n" : "";
       const main = `${prefix}l1:\n  contracts:\n    example:\n      checks:\n        message: *message\n`;
       const expected = YAML.parse(inputs).config[0];
@@ -233,7 +238,7 @@ test("config: an anchored map entry is rejected early (the schema has no object 
 
 test("a nested anchor inside a config array entry is rejected (it would shadow other labels)", () => {
   // Without this invariant, `&shadow` inside the array would silently override a same-named label
-  // from a .deployed file (or main anchor) when the texts are concatenated.
+  // from a .deployed file (or main anchor) when the documents are composed.
   const inputs = INPUTS.replace("[3600, 1800, 1000, 50]", "[3600, &shadow 1800, 1000, 50]");
   assert.throws(() => composeWithInputs(MAIN_CONFIG, inputs), /anchor\(s\) in the .inputs file defined outside/);
 });

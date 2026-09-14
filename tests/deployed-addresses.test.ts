@@ -179,7 +179,7 @@ test("a wholly empty file is rejected with a file-targeted error (either side)",
 
 test("a stray anchor on a .deployed collection is rejected (it would shadow other labels)", () => {
   // Anchors outside the labeled entries are invisible to the label collection, so they would bypass
-  // the duplicate/collision invariants once the texts are concatenated.
+  // the duplicate/collision invariants once the documents are composed.
   const onSection = `\ndeployed: &book\n  l1:\n    - &foo "0x1111111111111111111111111111111111111111"\n`;
   assert.throws(
     () => composeWithDeployedAddresses(MAIN_CONFIG, onSection),
@@ -199,19 +199,20 @@ test("a syntax error in the main config is reported as a parse error, not an inv
   assert.throws(() => composeWithDeployedAddresses(main, DEPLOYED), /Failed to parse the main config/);
 });
 
-test("a one-line flow main config after the --- marker is not silently dropped", () => {
-  // A flow-style document cannot merge with the sibling's block mapping by concatenation, so it must
-  // fail loudly at the combined parse — previously the marker stripper deleted the whole line and the
-  // run could 'succeed' with the main config's content silently gone.
+test("a one-line flow main config after the --- marker composes with a block sibling", () => {
   const main = `--- {l1: {contracts: {fooContract: {address: *foo, checks: {bar: *bar}}}}}`;
-  assert.throws(() => composeWithDeployedAddresses(main, DEPLOYED), /Failed to parse the combined config/);
+  const { document } = composeWithDeployedAddresses(main, DEPLOYED);
+  const result = document as { l1: { contracts: { fooContract: { address: string; checks: { bar: string } } } } };
+  assert.equal(result.l1.contracts.fooContract.address, "0x1111111111111111111111111111111111111111");
+  assert.equal(result.l1.contracts.fooContract.checks.bar, "0x2222222222222222222222222222222222222222");
 });
 
-test("a combined-parse error is attributed to the source file and its own line numbers", () => {
-  // The marker stripping preserves per-file line counts, so the error must point into the main
-  // config at ITS line 1 — not at a line of the concatenated text (which would land in .deployed).
-  const main = `--- {l1: {contracts: {fooContract: {address: *foo, checks: {bar: *bar}}}}}`;
-  assert.throws(() => composeWithDeployedAddresses(main, DEPLOYED), /in the main config at line 1, column \d+/);
+test("a forward alias error retains the main file's own line and column", () => {
+  const main = `refs: [*foo, *bar, *later]\nlocal: &later value\n`;
+  assert.throws(
+    () => composeWithDeployedAddresses(main, DEPLOYED),
+    /Unresolved alias \*later:.*in the main config at line 1, column 20/,
+  );
 });
 
 test("a leading --- document marker in the main config is handled (still composes)", () => {
@@ -229,8 +230,7 @@ test("a leading '--- # comment' document marker in the main config is handled (s
 });
 
 test("a %YAML directive in the main config is rejected with a targeted error", () => {
-  // A directive line cannot survive concatenation into the combined stream; without the targeted
-  // rejection the run fails with a baffling combined-parse error.
+  // Composed sources must use the shared parsing semantics.
   const main = `%YAML 1.2\n---\n${MAIN_CONFIG}`;
   assert.throws(() => composeWithDeployedAddresses(main, DEPLOYED), /main config uses %YAML\/%TAG directives/);
 });
@@ -243,7 +243,7 @@ test("a %TAG directive in the .deployed file is rejected with a targeted error",
   );
 });
 
-test("a UTF-8 BOM on either file is stripped before concatenation (still composes)", () => {
+test("a UTF-8 BOM on either file is accepted during parsing (still composes)", () => {
   // A BOM is legal at the start of a file but is content mid-stream: un-stripped, the main config's
   // first key would become "<BOM>misc" and schema validation would fail with invisible-cause errors.
   const BOM = "\u{FEFF}";
