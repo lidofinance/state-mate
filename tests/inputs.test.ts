@@ -3,6 +3,8 @@ import fs from "node:fs";
 import path from "node:path";
 import { test } from "node:test";
 
+import * as YAML from "yaml";
+
 import { DEPLOYED_SPEC } from "../src/deployed-addresses";
 import { INPUTS_SPEC } from "../src/inputs";
 import { composeWithSiblings, resolveSiblingFilePath } from "../src/sibling-delegation";
@@ -16,6 +18,30 @@ import {
 } from "./delegation-helpers";
 
 const resolveInputsFilePath = (inputsArgument?: string) => resolveSiblingFilePath(INPUTS_SPEC, inputsArgument);
+
+for (const style of ["|+", ">+"]) {
+  for (const boundary of ["end marker", "leading blank lines", "start marker"]) {
+    test(`composition preserves ${style} input values across ${boundary}`, () => {
+      // Keep two intentional trailing newlines; file boundaries must neither add nor remove any.
+      const scalarText = `config:\n  - &message ${style}\n      hello\n      world\n\n`;
+      const inputs = boundary === "end marker" ? `${scalarText}...\n` : scalarText;
+      const prefix = boundary === "leading blank lines" ? "\n\n" : boundary === "start marker" ? "---\n" : "";
+      const main = `${prefix}l1:\n  contracts:\n    example:\n      checks:\n        message: *message\n`;
+      const expected = YAML.parse(inputs).config[0];
+
+      for (const lineEnding of ["LF", "CRLF"]) {
+        const convert = (text: string) => (lineEnding === "CRLF" ? toCrlf(text) : text);
+        const { document } = composeWithInputs(convert(main), convert(inputs));
+        const result = document as {
+          config: string[];
+          l1: { contracts: { example: { checks: { message: string } } } };
+        };
+        assert.equal(result.config[0], expected, `${lineEnding}: delegated value`);
+        assert.equal(result.l1.contracts.example.checks.message, expected, `${lineEnding}: resolved alias`);
+      }
+    });
+  }
+}
 
 test("composes cross-file: aliases resolve to .inputs config knobs and externals", () => {
   const { document, labels } = composeWithInputs(MAIN_CONFIG, INPUTS);

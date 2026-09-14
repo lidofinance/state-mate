@@ -118,11 +118,11 @@ function rejectLabels(candidates: Iterable<string>, isViolation: (label: string)
 
 /**
  * Prepare one file's text for concatenation into a single YAML stream: drop a UTF-8 BOM (legal at
- * the start of a file, content mid-stream), blank a leading `---` document-start marker and a
- * trailing `...` document-end marker. Only column-0 markers are document markers — an indented `...`
- * is scalar content and must survive — and `parseSingleDocument` has already guaranteed a single
+ * the start of a file, content mid-stream), blank a leading `---` document-start marker and
+ * replace a trailing `...` document-end marker with a comment. Only column-0 markers are document
+ * markers — an indented `...` is scalar content and must survive. `parseSingleDocument` guarantees a single
  * document with no directives, so at most one of each marker can exist and any column-0 match IS
- * that marker. Marker lines are blanked in place (not removed) so every line of the original file
+ * that marker. Marker lines are replaced in place (not removed) so every line of the original file
  * keeps its line number in the combined text — `describeCombinedParseError` relies on this.
  */
 function stripDocumentMarkers(text: string): string {
@@ -136,7 +136,9 @@ function stripDocumentMarkers(text: string): string {
 
   for (let index = lines.length - 1; index >= 0; index--) {
     if (/^\.\.\.(\s|$)/.test(lines[index])) {
-      lines[index] = "";
+      // A column-0 comment still terminates a preceding block scalar; a blank line would become
+      // part of its value with keep chomping (`|+` / `>+`).
+      lines[index] = `# ${lines[index]}`;
       break;
     }
   }
@@ -228,7 +230,7 @@ function countNewlines(text: string): number {
 }
 
 /**
- * Attribute a combined-parse error to the source file it came from: the marker-blanking in
+ * Attribute a combined-parse error to the source file it came from: the marker replacement in
  * `stripDocumentMarkers` preserves per-file line numbers, so a line of the combined text maps 1:1
  * onto a (file, line) pair. Without this the yaml library's positions would point into the
  * concatenated text — the wrong line of, usually, the wrong file.
@@ -320,12 +322,16 @@ export function composeWithSiblings(mainText: string, siblings: { text: string; 
     `the main config references label(s) defined neither in it nor in ${fileLabels}`,
   );
 
-  // No trimming beyond a guaranteed line break between files: stripping trailing whitespace would
-  // corrupt a keep-chomped block scalar (`|+`) whose trailing newlines are significant.
+  // Preserve original trailing whitespace, then terminate any block scalar with a column-0 comment
+  // so blank lines at the start of the next file cannot extend its value. Keep the separator in its
+  // preceding part so error attribution accounts for the extra line without shifting source lines.
   const parts: CombinedPart[] = [
     ...siblings.map(({ text, spec }) => ({ label: spec.fileLabel, text: stripDocumentMarkers(text) })),
     { label: "the main config", text: stripDocumentMarkers(mainText) },
-  ].map(({ label, text }) => ({ label, text: text.endsWith("\n") ? text : `${text}\n` }));
+  ].map(({ label, text }) => ({
+    label,
+    text: `${text.endsWith("\n") ? text : `${text}\n`}# End of config file\n`,
+  }));
   const combinedText = parts.map(({ text }) => text).join("");
   // prettyErrors would decorate messages with positions in the concatenated text; positions are
   // re-derived per source file instead. (Parsing semantics still come from YAML_PARSE_OPTIONS.)
