@@ -104,9 +104,6 @@ function loadStateFromYaml(configPath: string): unknown {
   }
 }
 
-// Load the main config, composing it with separate `.deployed` and/or `.inputs` sibling files when
-// `--deployed`/`--inputs` names them — they are never loaded automatically. Both may be in play at
-// once.
 type SelectedSibling = { path: string; spec: SiblingSpec; noun: string };
 
 // Inline `config:`/`externals:` sections would bypass every `.inputs` invariant (`&label` anchors,
@@ -134,8 +131,6 @@ function loadStateWithOptionalSiblings(): unknown {
   ];
   try {
     for (const { spec, argument, noun } of siblingKinds) {
-      // Explicit-only: a sibling file is applied when — and only when — its flag names it. A
-      // same-named file next to the main config is never picked up on its own.
       const siblingPath = resolveSiblingFilePath(spec, argument);
       if (siblingPath) {
         siblings.push({ path: siblingPath, spec, noun });
@@ -146,9 +141,7 @@ function loadStateWithOptionalSiblings(): unknown {
   }
 
   if (siblings.length === 0) {
-    // A wiring-only main config cannot be parsed without the sibling anchors it delegates to — fail
-    // with a clear message instead of the raw "Unresolved alias" parse error below. With no sibling
-    // in play this is the usual cause: the flag that names it was simply omitted.
+    // Explain how to supply missing sibling anchors before alias expansion fails.
     if (configDelegatesAnchors(context.configPath)) {
       logErrorAndExit(
         `${chalk.magenta(context.configPath)} delegates anchors to sibling file(s) — pass ` +
@@ -156,7 +149,6 @@ function loadStateWithOptionalSiblings(): unknown {
           `(sibling files are never loaded automatically)`,
       );
     }
-    // The inline-sections rejection applies on every non-composed load path, these ones included.
     return rejectInlineInputsSections(loadStateFromYaml(context.configPath));
   }
 

@@ -2,16 +2,9 @@ import * as YAML from "yaml";
 
 import { ADDRESS_OR_HASH_RE, pairKeyToString, type SiblingSpec } from "./sibling-delegation";
 
-/**
- * Validate the deployed-addresses entries and collect their labels. The engine has already checked
- * that the file holds only a `deployed:` section; this enforces that every address is a scalar
- * carrying an `&label` anchor, is a valid address/hash, and that no label is duplicated (`fileLabel`
- * targets that error at the file).
- */
 function collectDeployedLabels(deployedDocument: YAML.Document, fileLabel: string): Set<string> {
   const deployedNode = deployedDocument.get("deployed");
   if (!YAML.isMap(deployedNode)) {
-    // eslint-disable-next-line unicorn/prefer-type-error -- user-facing config-validation error, not a programmer TypeError
     throw new Error("the .deployed file must contain a `deployed:` mapping");
   }
 

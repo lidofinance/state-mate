@@ -9,9 +9,7 @@ import { composeWithDeployedAddresses, toCrlf, withTemporaryDirectory } from "./
 
 const resolveDeployedFilePath = (deployedArgument?: string) => resolveSiblingFilePath(DEPLOYED_SPEC, deployedArgument);
 
-// Full-delegation model: the main config holds ONLY wiring (`*label` aliases) plus its own constant
-// anchors (e.g. `&ZERO` in `misc:`). It has no `deployed:` section. The .deployed file is the sole
-// source of the address anchors `&foo` / `&bar`.
+// Include a main-file anchor alongside delegated addresses to exercise both alias sources.
 const MAIN_CONFIG = `
 misc:
   - &ZERO "0x0000000000000000000000000000000000000000"
@@ -318,14 +316,11 @@ test("resolveDeployedFilePath: --deployed is the only way in; a neighbouring fil
     fs.writeFileSync(siblingPath, DEPLOYED);
     fs.writeFileSync(variantPath, DEPLOYED);
 
-    // No flag -> standalone, even with the conventionally named file sitting right next to the config.
     assert.equal(resolveDeployedFilePath(), null);
 
-    // The flag is the only selector — and it takes any path, the convention name included.
     assert.equal(resolveDeployedFilePath(siblingPath), siblingPath);
     assert.equal(resolveDeployedFilePath(variantPath), variantPath);
 
-    // An explicit but missing path is a hard error.
     assert.throws(() => resolveDeployedFilePath(path.join(directory, "missing.yaml")), /not found/);
 
     // An explicit but EMPTY path (a hollow shell variable) is a hard error too — it must never
@@ -355,8 +350,6 @@ ${checks}
 });
 
 test("configDelegatesAnchors: true only for a config that cannot be parsed standalone", () => {
-  // This is what decides whether a flagless run gets the clear "pass --deployed / --inputs" error
-  // instead of a raw unresolved-alias parse failure, so each verdict matters.
   withTemporaryDirectory("state-mate-delegates-", (directory) => {
     const write = (name: string, text: string) => {
       const filePath = path.join(directory, name);
@@ -368,7 +361,7 @@ test("configDelegatesAnchors: true only for a config that cannot be parsed stand
     assert.equal(configDelegatesAnchors(write("wiring.yaml", MAIN_CONFIG)), true);
     // Self-contained: every alias resolves within the file itself.
     assert.equal(configDelegatesAnchors(write("self.yaml", `${DEPLOYED}${MAIN_CONFIG}`)), false);
-    // Read/parse failures yield `false` — the regular loading path reports those properly.
+    // These unreadable, multi-document, or alias-free inputs do not signal delegation.
     assert.equal(configDelegatesAnchors(write("multi.yaml", `${DEPLOYED}---\n${MAIN_CONFIG}`)), false);
     assert.equal(configDelegatesAnchors(write("broken.yaml", "l1: [unclosed\n")), false);
     assert.equal(configDelegatesAnchors(path.join(directory, "missing.yaml")), false);

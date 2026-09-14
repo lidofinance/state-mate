@@ -5,11 +5,6 @@ import path from "node:path";
 import { DEPLOYED_SPEC } from "../src/deployed-addresses";
 import { INPUTS_SPEC } from "../src/inputs";
 import { composeWithSiblings } from "../src/sibling-delegation";
-
-// Shared helpers/fixtures for the sibling-delegation test suites (deployed-addresses.test.ts,
-// inputs.test.ts). Not a test file itself — keep the name outside `*.test.ts`.
-
-// Local conveniences over the generic engine (production goes through the engine directly).
 export const composeWithDeployedAddresses = (mainText: string, deployedText: string) => {
   const { document, labels } = composeWithSiblings(mainText, [{ text: deployedText, spec: DEPLOYED_SPEC }]);
   return { document, labels: labels[0] };
@@ -22,7 +17,6 @@ export const composeWithInputs = (mainText: string, inputsText: string) => {
 
 export const toCrlf = (text: string) => text.replaceAll("\n", "\r\n");
 
-/** Run `fn` with a fresh temp directory, removing it afterwards. */
 export function withTemporaryDirectory<T>(prefix: string, function_: (directory: string) => T): T {
   const directory = fs.mkdtempSync(path.join(os.tmpdir(), prefix));
   try {
@@ -32,10 +26,7 @@ export function withTemporaryDirectory<T>(prefix: string, function_: (directory:
   }
 }
 
-// Full-delegation fixtures for the .inputs suite: the main config holds ONLY
-// wiring (`*label` aliases) plus its own constant anchors (e.g. `&ZERO` in `misc:`). It has no
-// `config:`/`externals:` sections. The .inputs file is the sole source of the project-chosen
-// `config` knobs and the fixed `externals` facts.
+// Include a main-file anchor alongside delegated inputs to exercise both alias sources.
 export const INPUTS_MAIN_CONFIG = `
 misc:
   - &ZERO "0x0000000000000000000000000000000000000000"

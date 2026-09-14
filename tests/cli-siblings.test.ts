@@ -6,17 +6,12 @@ import { test } from "node:test";
 
 import { withTemporaryDirectory } from "./delegation-helpers";
 
-// End-to-end coverage of the CLI's sibling wiring (`loadStateWithOptionalSiblings`), which the
-// engine-level suites cannot reach: it reads `context` and exits the process on any violation.
-// Each case runs the real entry point and asserts on what it printed before the run stops at the
-// unset RPC env var — so the assertions cover the loading phase only, with no network access.
+// Exercise CLI loading in a subprocess because validation failures exit the process.
 const REPOSITORY_ROOT = path.resolve(__dirname, "..");
 const ENTRY = path.join(REPOSITORY_ROOT, "src/state-mate.ts");
-// A deliberately unset env var: the run must always stop here, never reach an RPC endpoint. It is
-// removed from the child's environment so a stray value in the developer's `.env` cannot change that.
+// Leave RPC unconfigured so successful loading stops before network calls.
 const RPC_ENV_VAR = "STATE_MATE_TEST_RPC_URL_UNSET";
 
-/** Run the CLI on `configPath` and return its combined output (stdout + stderr). */
 function runStateMate(configPath: string, ...cliArguments: string[]): string {
   const environment = { ...process.env };
   delete environment[RPC_ENV_VAR];
@@ -68,7 +63,6 @@ test("a conventionally named sibling next to the config is NOT loaded without it
     const { mainPath } = writeConfigSet(directory);
     const output = runStateMate(mainPath);
 
-    // The whole point of explicit-only: the files are right there, and still nothing is loaded.
     assert.match(output, /delegates anchors to sibling file\(s\)/);
     assert.match(output, /pass --deployed \/ --inputs/);
     assert.match(output, /never loaded automatically/);
@@ -85,7 +79,6 @@ test("both flags compose the config and it passes schema validation", () => {
     assert.match(output, /Loaded 1 deployed address\(es\)/);
     assert.match(output, /Loaded 2 input anchor\(s\)/);
     assert.match(output, /Schema validation passed/);
-    // The run gets past loading and stops only at the unset RPC env var — no network access.
     assert.match(output, new RegExp(`Env var ${RPC_ENV_VAR} is not set`));
   });
 });

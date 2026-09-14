@@ -5,25 +5,16 @@ import { registerSecret } from "./context";
 import { logErrorAndExit } from "./logger";
 import type { Abi, AbiArgumentsLength, ChainId } from "./types";
 
-// Shared YAML parsing semantics. Every loader (the flat parse in state-mate.ts and the
-// sibling-delegation composition) MUST use these so a sibling-composed config is indistinguishable
-// from a standalone one. Keep the two in sync by importing rather than re-declaring.
+// Keep scalar parsing consistent between standalone and sibling-composed configs.
 export const YAML_PARSE_OPTIONS: YAML.ParseOptions & YAML.DocumentOptions & YAML.SchemaOptions = {
   schema: "core",
   intAsBigInt: true,
 };
 export const yamlBigintReviver = (_: unknown, value: unknown) => (typeof value === "bigint" ? String(value) : value);
-// Aliases are expanded when a document is turned into JS, not while parsing, so the alias budget
-// belongs here rather than in YAML_PARSE_OPTIONS. maxAliasCount guards against alias-based resource
-// exhaustion in untrusted input; our configs are first-party and the large ones legitimately exceed
-// the default budget of 100 — a wiring-only config delegating to a sibling file is made of aliases.
+// Alias expansion happens at toJS time. Trusted first-party configs exceed the default budget of 100.
 export const YAML_TO_JS_OPTIONS: YAML.ToJSOptions = { reviver: yamlBigintReviver, maxAliasCount: -1 };
 
-/**
- * The scalar items under `deployed.<sectionKey>` (in document order), or `[]` when that section is
- * absent or is not a list of scalars. Used by the seed/boilerplate generator when walking the
- * `deployed:` anchor book.
- */
+/** Return deployed section scalars in document order, or an empty array for absent/non-scalar sections. */
 export function getDeployedSectionScalars(document: YAML.Document, sectionKey: string): YAML.Scalar[] {
   const section = document.getIn(["deployed", sectionKey]);
   if (YAML.isSeq(section) && section.items.every((element) => YAML.isScalar(element))) {

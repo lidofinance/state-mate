@@ -62,14 +62,11 @@ test("composes cross-file: aliases resolve to .inputs config knobs and externals
   // Numeric YAML values are stringified by the shared bigint reviver (as chainId is below).
   assert.deepEqual(checks.limits, ["3600", "1800", "1000", "50"]);
   assert.equal(checks.deposit, "0x00000000219ab540356cBB839Cbe05303d7705Fa");
-  // chainId is a numeric external; it composes and resolves at l1.chainId (stringified by the reviver).
   assert.equal(document_.l1.chainId, "560048");
-  // Both delegated sections are present in the composed document.
   assert.ok(Array.isArray(document_.config) && Array.isArray(document_.externals));
 });
 
 test("config: allows an anchored array and scalar, with no address-format check", () => {
-  // `oracleReportLimits` is an anchored array and `lidoName` is a non-address string — both fine in config.
   const { labels } = composeWithInputs(MAIN_CONFIG, INPUTS);
   assert.ok(labels.includes("oracleReportLimits"));
   assert.ok(labels.includes("lidoName"));
@@ -94,7 +91,6 @@ test("externals: a numeric chainId is accepted (exempt from the address check) a
 });
 
 test("externals: a QUOTED chainId (the existing config convention) is accepted", () => {
-  // Existing configs write chainId quoted, e.g. `&CHAIN_ID "560048"`. Must not be rejected as a non-address.
   const inputs = INPUTS.replace("&chainId 560048", '&chainId "560048"');
   const { document } = composeWithInputs(MAIN_CONFIG, inputs);
   const document_ = document as { l1: { chainId: string } };
@@ -115,7 +111,6 @@ test("externals: a null/empty value is rejected", () => {
 });
 
 test("externals: a non-scalar (nested) entry is rejected", () => {
-  // Mirrors the `.deployed` non-scalar guard: an external must be a single labeled scalar, not a map.
   const inputs = `
 config:
   - &lidoName "Liquid staked Ether 2.0"
@@ -195,7 +190,6 @@ roles:
 });
 
 test("the .inputs file must contain at least one of config:/externals:", () => {
-  // Parity with `.deployed` requiring its `deployed:` section: a section-less file is a mistake.
   assert.throws(() => composeWithInputs(MAIN_CONFIG, "{}\n"), /must contain `config:` and\/or `externals:`/);
 });
 
@@ -290,14 +284,11 @@ test("resolveInputsFilePath: --inputs is the only way in; a neighbouring file is
     fs.writeFileSync(siblingPath, INPUTS);
     fs.writeFileSync(variantPath, INPUTS);
 
-    // No flag -> standalone, even with the conventionally named file sitting right next to the config.
     assert.equal(resolveInputsFilePath(), null);
 
-    // The flag is the only selector — and it takes any path, the convention name included.
     assert.equal(resolveInputsFilePath(siblingPath), siblingPath);
     assert.equal(resolveInputsFilePath(variantPath), variantPath);
 
-    // An explicit but missing path is a hard error.
     assert.throws(() => resolveInputsFilePath(path.join(directory, "missing.yaml")), /not found/);
   });
 });
@@ -382,7 +373,6 @@ externals:
   );
 });
 
-// Sanity: the existing .deployed wrapper still works through the shared engine.
 test("the .deployed wrapper composes via the shared engine", () => {
   const main = `
 l1:
