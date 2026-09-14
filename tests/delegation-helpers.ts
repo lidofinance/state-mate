@@ -50,3 +50,15 @@ externals:
   - &depositContract "0x00000000219ab540356cBB839Cbe05303d7705Fa"
   - &chainId 560048
 `;
+
+// Different source lengths make concatenated-text positions visibly incorrect.
+export const CROSS_SOURCE_ERRORS = {
+  inputs: "config:\n  - &values [*absentInput, *later]\n  - &later true\n",
+  main: "# Main wiring\n\nrefs: [*values, *later]\nmissing: [*absentMain, *alsoAbsent]\n",
+  diagnostics: [
+    "Unresolved alias *absentInput: anchor is not defined in any composed source (in the .inputs file at line 2, column 14)",
+    "Unresolved alias *later: the anchor must be set before the alias (in the .inputs file at line 2, column 28)",
+    "&absentMain (in the main config at line 4, column 11)",
+    "&alsoAbsent (in the main config at line 4, column 24)",
+  ],
+};

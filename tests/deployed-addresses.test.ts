@@ -381,3 +381,46 @@ test("loadStateWithSiblings reads both files from disk and composes them", () =>
     assert.equal(document_.l1.contracts.fooContract.address, "0x1111111111111111111111111111111111111111");
   });
 });
+
+for (const digits of [40, 64]) {
+  test(`quoted ${digits / 2}-byte mixed-case hex preserves definitions and consumers`, () => {
+    const value = `0x${"aB".repeat(digits / 2)}`;
+    const { document, labels } = composeWithDeployedAddresses(
+      "consumer: *boundary\n",
+      `deployed:\n  l1: [ &boundary "${value}" ]\n`,
+    );
+    assert.deepEqual(labels, ["boundary"]);
+    assert.deepEqual(document, { deployed: { l1: [value] }, consumer: value });
+  });
+}
+
+for (const hex of [...[39, 41, 63, 65].map((length) => "a".repeat(length)), `${"a".repeat(39)}g`]) {
+  test(`rejects quoted invalid hex boundary ${hex.length} digits ending ${hex.at(-1)}`, () => {
+    assert.throws(
+      () => composeWithDeployedAddresses("consumer: *boundary\n", `deployed:\n  l1: [&boundary "0x${hex}"]\n`),
+      /label &boundary is not a valid address/,
+    );
+  });
+}
+
+test("disk loading switches deployed A to B to A without state or conventional fallback", () => {
+  withTemporaryDirectory("state-mate-switch-", (directory) => {
+    const mainPath = path.join(directory, "wiring.yaml");
+    fs.writeFileSync(mainPath, "l1: {contracts: {foo: {address: *selected}}}\n");
+    const variants = ["a", "b", "c"].map((hex, index) => {
+      const value = `0x${hex.repeat(40)}`;
+      const siblingPath = path.join(directory, index === 2 ? "wiring.deployed.yaml" : `${hex}.yaml`);
+      fs.writeFileSync(siblingPath, `deployed: {l1: [&selected "${value}"]}\n`);
+      return { path: siblingPath, value };
+    });
+    for (const index of [0, 1, 0]) {
+      const selected = variants[index];
+      const { document, labels } = loadStateWithSiblings(mainPath, [{ path: selected.path, spec: DEPLOYED_SPEC }]);
+      assert.deepEqual(labels, [["selected"]]);
+      assert.deepEqual(document, {
+        deployed: { l1: [selected.value] },
+        l1: { contracts: { foo: { address: selected.value } } },
+      });
+    }
+  });
+});

@@ -7,7 +7,7 @@ import { YAML_PARSE_OPTIONS, YAML_TO_JS_OPTIONS } from "../src/common";
 import { DEPLOYED_SPEC } from "../src/deployed-addresses";
 import { INPUTS_SPEC } from "../src/inputs";
 import { composeWithSiblings } from "../src/sibling-delegation";
-import { composeWithInputs } from "./delegation-helpers";
+import { CROSS_SOURCE_ERRORS, composeWithInputs } from "./delegation-helpers";
 
 const INPUT = "config: [&value true]\n";
 
@@ -170,4 +170,32 @@ test("composition without siblings gives a complete missing-label diagnostic", (
     document: { local: true, ref: true },
     labels: [],
   });
+});
+
+test("alias diagnostics aggregate missing and forward references across sibling and main", () => {
+  assert.throws(
+    () => composeWithInputs(CROSS_SOURCE_ERRORS.main, CROSS_SOURCE_ERRORS.inputs),
+    (error: unknown) => {
+      assert.ok(error instanceof Error);
+      for (const diagnostic of CROSS_SOURCE_ERRORS.diagnostics)
+        assert.ok(error.message.includes(diagnostic), error.message);
+      return true;
+    },
+  );
+});
+
+test("a sibling cycle does not hide subsequent missing aliases in either source", () => {
+  assert.throws(
+    () => composeWithInputs("refs: [*values, *mainMissing]\n", "config: [&values [*values, *inputMissing]]\n"),
+    (error: unknown) => {
+      assert.ok(error instanceof Error);
+      for (const diagnostic of [
+        "Cyclic alias *values: references an ancestor collection (in the .inputs file at line 1, column 19)",
+        "Unresolved alias *inputMissing: anchor is not defined in any composed source (in the .inputs file at line 1, column 28)",
+        "&mainMissing (in the main config at line 1, column 17)",
+      ])
+        assert.ok(error.message.includes(diagnostic), error.message);
+      return true;
+    },
+  );
 });

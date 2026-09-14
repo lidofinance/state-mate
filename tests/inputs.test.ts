@@ -7,7 +7,7 @@ import * as YAML from "yaml";
 
 import { DEPLOYED_SPEC } from "../src/deployed-addresses";
 import { INPUTS_SPEC } from "../src/inputs";
-import { composeWithSiblings, resolveSiblingFilePath } from "../src/sibling-delegation";
+import { composeWithSiblings, loadStateWithSiblings, resolveSiblingFilePath } from "../src/sibling-delegation";
 import {
   composeWithDeployedAddresses,
   composeWithInputs,
@@ -394,4 +394,45 @@ deployed:
   const { document } = composeWithDeployedAddresses(main, deployed);
   const document_ = document as { l1: { contracts: { fooContract: { address: string } } } };
   assert.equal(document_.l1.contracts.fooContract.address, "0x1111111111111111111111111111111111111111");
+});
+
+for (const digits of [40, 64]) {
+  test(`quoted ${digits / 2}-byte mixed-case hex preserves definitions and consumers`, () => {
+    const value = `0x${"aB".repeat(digits / 2)}`;
+    const { document, labels } = composeWithInputs("consumer: *boundary\n", `externals: [ &boundary "${value}" ]\n`);
+    assert.deepEqual(labels, ["boundary"]);
+    assert.deepEqual(document, { externals: [value], consumer: value });
+  });
+}
+
+for (const hex of [...[39, 41, 63, 65].map((length) => "a".repeat(length)), `${"a".repeat(39)}g`]) {
+  test(`rejects quoted invalid hex boundary ${hex.length} digits ending ${hex.at(-1)}`, () => {
+    assert.throws(
+      () => composeWithInputs("consumer: *boundary\n", `externals: [&boundary "0x${hex}"]\n`),
+      /label &boundary is not a valid address/,
+    );
+  });
+}
+
+test("disk loading switches inputs A to B to A with revived types and no fallback", () => {
+  withTemporaryDirectory("state-mate-switch-", (directory) => {
+    const mainPath = path.join(directory, "wiring.yaml");
+    fs.writeFileSync(mainPath, "l1: {chainId: *id, contracts: {foo: {checks: {name: *name, limits: *limits}}}}\n");
+    const variants = ["alpha", "beta", "unselected"].map((name, index) => {
+      const id = `1601528660175782575${index}`;
+      const siblingPath = path.join(directory, index === 2 ? "wiring.inputs.yaml" : `${name}.yaml`);
+      fs.writeFileSync(siblingPath, `config: [&name "${name}", &limits [${index}, true]]\nexternals: [&id ${id}]\n`);
+      return { path: siblingPath, name, id, limits: [String(index), true] };
+    });
+    for (const index of [0, 1, 0]) {
+      const selected = variants[index];
+      const { document, labels } = loadStateWithSiblings(mainPath, [{ path: selected.path, spec: INPUTS_SPEC }]);
+      assert.deepEqual(labels, [["name", "limits", "id"]]);
+      assert.deepEqual(document, {
+        config: [selected.name, selected.limits],
+        externals: [selected.id],
+        l1: { chainId: selected.id, contracts: { foo: { checks: { name: selected.name, limits: selected.limits } } } },
+      });
+    }
+  });
 });
