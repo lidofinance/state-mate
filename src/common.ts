@@ -1,8 +1,9 @@
 import chalk from "chalk";
 import * as YAML from "yaml";
 
+import { registerSecret } from "./context";
 import { logErrorAndExit } from "./logger";
-import { Abi, AbiArgumentsLength as AbiArgumentsLength } from "./types";
+import type { Abi, AbiArgumentsLength, ChainId } from "./types";
 
 // Shared YAML parsing semantics. Every loader (the flat parse in state-mate.ts and the
 // sibling-delegation composition) MUST use these so a sibling-composed config is indistinguishable
@@ -41,6 +42,7 @@ export enum EntryField {
   implementationChecks = "implementationChecks",
   ozNonEnumerableAcl = "ozNonEnumerableAcl",
   ozAcl = "ozAcl",
+  aragonAcl = "aragonAcl",
   result = "result",
   contracts = "contracts",
   explorerHostname = "explorerHostname",
@@ -54,18 +56,28 @@ export function printError(error: unknown): string {
 
 export function readUrlOrFromEnvironment(urlOrEnvironmentVariableName: string) {
   if (isUrl(urlOrEnvironmentVariableName)) {
+    registerSecret(urlOrEnvironmentVariableName, "<rpcUrl>");
     return urlOrEnvironmentVariableName;
   }
   const valueFromEnvironment = process.env[urlOrEnvironmentVariableName];
   if (!valueFromEnvironment) {
     logErrorAndExit(`Env var ${chalk.yellow(urlOrEnvironmentVariableName)} is not set`);
   }
+  registerSecret(valueFromEnvironment, `$${urlOrEnvironmentVariableName}`);
   if (!isUrl(valueFromEnvironment)) {
     logErrorAndExit(
       `Env var ${chalk.yellow(urlOrEnvironmentVariableName)} is not a valid RPC url: ${chalk.yellow(valueFromEnvironment)}`,
     );
   }
   return valueFromEnvironment;
+}
+
+export function normalizeChainId(chainId: ChainId): string {
+  // BigInt would happily coerce whitespace to 0 or accept a negative; zero is no chain either
+  if (!/^\d+$/.test(String(chainId)) || BigInt(chainId) === 0n) {
+    logErrorAndExit(`Invalid chain ID: ${chalk.yellow(String(chainId))}`);
+  }
+  return BigInt(chainId).toString();
 }
 
 export function getNonMutables(abi: Abi): AbiArgumentsLength {

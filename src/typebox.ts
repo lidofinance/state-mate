@@ -1,4 +1,4 @@
-import { FormatRegistry, Static, TSchema, Type } from "@sinclair/typebox";
+import { FormatRegistry, type Static, type TSchema, Type } from "@sinclair/typebox";
 import { Value } from "@sinclair/typebox/value";
 
 export const EthereumStringFormat = {
@@ -25,7 +25,6 @@ const EthereumStringTB = Type.Readonly(
 const EthereumStringArrayTB = Type.Readonly(Type.Array(EthereumStringTB));
 
 export type EntireDocument = Static<typeof EntireDocumentTB>;
-export type SeedDocument = Static<typeof SeedDocumentTB>;
 export type ContractEntry = Static<typeof ContractEntryTB>;
 export type StaticCallCheck = Static<typeof StaticCallCheckTB>;
 export type ArbitraryObject = Static<typeof ArbitraryObjectTB>;
@@ -41,6 +40,21 @@ export function isTypeOfTB<T extends TSchema>(value: unknown, schema: T): value 
 }
 
 const OzNonEnumerableAclTB = Type.Readonly(Type.Record(EthereumStringTB, EthereumStringArrayTB));
+
+// Aragon: the whole DAO permission map, declared on the ACL entry that owns the storage.
+// app -> role -> { manager, unconditional grantees, digest over parameterized grants }
+const AragonRoleEntryTB = Type.Readonly(
+  Type.Object(
+    {
+      manager: EthereumStringTB,
+      granted: Type.Optional(EthereumStringArrayTB),
+      paramsDigest: Type.Optional(Type.String({ pattern: "^0x[a-fA-F0-9]{64}$" })),
+    },
+    { additionalProperties: false },
+  ),
+);
+const AragonAclTB = Type.Readonly(Type.Record(EthereumStringTB, Type.Record(EthereumStringTB, AragonRoleEntryTB)));
+export type AragonAclSection = Static<typeof AragonAclTB>;
 
 export const PlainValueTB = Type.Readonly(Type.Union([Type.Null(), Type.String(), Type.Boolean(), Type.Number()]));
 export const PlainValueArrayTB = Type.Readonly(Type.Array(PlainValueTB));
@@ -171,6 +185,7 @@ const RegularContractEntryTB = Type.Readonly(
       storage: Type.Optional(StorageChecksTB),
       ozNonEnumerableAcl: Type.Optional(OzNonEnumerableAclTB),
       ozAcl: Type.Optional(OzAclChecksTB),
+      aragonAcl: Type.Optional(AragonAclTB),
     },
     { additionalProperties: false },
   ),
@@ -182,6 +197,8 @@ export const ProxyContractEntryTB = Type.Readonly(
       ...RegularContractEntryTB.properties,
       proxyName: Type.String(),
       implementation: Type.Optional(EthereumStringTB),
+      proxyAdmin: Type.Optional(EthereumStringTB),
+      proxyAdminOwner: Type.Optional(EthereumStringTB),
       proxyChecks: Type.Optional(Type.Union([ProxyChecksTB, Sr2ProxyChecksTB, AragonProxyChecksTB])),
       implementationChecks: ImplementationChecksTB,
     },
@@ -197,7 +214,7 @@ export const ExplorerSectionTB = Type.Readonly(
       rpcUrl: Type.String(),
       explorerHostname: Type.Optional(Type.String()),
       explorerTokenEnv: Type.Optional(Type.String()),
-      chainId: Type.Optional(Type.Union([Type.Number(), Type.String()])),
+      chainId: Type.Union([Type.Integer({ minimum: 1 }), Type.String({ pattern: "^[1-9][0-9]*$" })]),
     },
     { additionalProperties: false },
   ),
@@ -245,20 +262,6 @@ export const EntireDocumentTB = Type.Readonly(
       signers: Type.Optional(PlainValueOrArray),
       selectors: Type.Optional(PlainValueOrArray),
       validators: Type.Optional(PlainValueOrArray),
-    },
-    { additionalProperties: false },
-  ),
-);
-
-export const SeedDocumentTB = Type.Readonly(
-  Type.Object(
-    {
-      deployed: DeployedSectionTB,
-      l1: ExplorerSectionTB,
-      l2: Type.Optional(ExplorerSectionTB),
-      eoa: Type.Optional(EthereumStringArrayTB),
-      roles: Type.Optional(Type.Union([EthereumStringArrayTB, Type.Null()])),
-      misc: Type.Optional(PlainValueOrArray),
     },
     { additionalProperties: false },
   ),

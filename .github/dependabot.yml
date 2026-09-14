@@ -19,13 +19,6 @@ updates:
       interval: "monthly"
     cooldown:
       default-days: 7
-    groups:
-      eslint:
-        patterns:
-          - "eslint"
-          - "@eslint/*"
-          - "@typescript-eslint/*"
-          - "eslint-*"
     ignore:
       # ESM-only since the next major, the project is CommonJS;
       # chalk and chai (section-validators/base.ts) are runtime imports

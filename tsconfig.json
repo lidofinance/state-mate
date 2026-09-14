@@ -2,7 +2,9 @@
   "extends": "@tsconfig/node20/tsconfig.json",
   "compilerOptions": {
     "outDir": "dist",
-    "baseUrl": "."
+    // tsconfig-paths resolves the `src/...` imports through baseUrl; TypeScript 7 drops the option
+    "baseUrl": ".",
+    "ignoreDeprecations": "6.0"
   },
-  "exclude": ["node_modules", "tests", "dist", "**/*spec.ts", "**/*mock.ts"]
+  "exclude": ["node_modules", "tests", "dist"]
 }

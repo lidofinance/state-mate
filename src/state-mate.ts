@@ -3,50 +3,68 @@ import path from "node:path";
 
 import "dotenv/config";
 
-import { Static, TSchema } from "@sinclair/typebox";
-import Ajv, { ValidateFunction } from "ajv";
+import type { Static, TSchema } from "@sinclair/typebox";
+import Ajv, { type ValidateFunction } from "ajv";
 import addFormats from "ajv-formats";
 import chalk from "chalk";
-import { JsonRpcProvider } from "ethers";
 import * as YAML from "yaml";
 
 import {
-  abiExistsForAddress,
   checkAllAbi,
   flushAbiUpdates,
-  renameAllAbiToLowerCase,
-  resetAbiModeCache,
+  getAbiNameForAddress,
+  keepStoredAbi,
+  pruneAbiStores,
+  resetAbiCache,
+  wasFetchedThisRun,
 } from "./abi-provider";
-import { doGenerateBoilerplate } from "./boilerplate-generator";
 import { parseCommandLineArguments } from "./cli-parser";
-import { printError, readUrlOrFromEnvironment, YAML_PARSE_OPTIONS, YAML_TO_JS_OPTIONS } from "./common";
+import {
+  normalizeChainId,
+  printError,
+  readUrlOrFromEnvironment,
+  YAML_PARSE_OPTIONS,
+  YAML_TO_JS_OPTIONS,
+} from "./common";
+import { context, registerSecret, resetStats, stats } from "./context";
 import { DEPLOYED_SPEC } from "./deployed-addresses";
-import { loadContractInfoFromExplorer } from "./explorer-provider";
+import {
+  assertProviderChain,
+  createProvider,
+  explorerNeedsApiKey,
+  loadContractInfo,
+  verifyChainIdWithExplorer,
+} from "./explorer";
 import { INPUTS_SPEC } from "./inputs";
-import { FAILURE_MARK, log, logError, logErrorAndExit, logHeader1, SUCCESS_MARK, WARNING_MARK } from "./logger";
-import { g_error_details, g_errors, g_total_checks } from "./section-validators/base";
+import {
+  FAILURE_MARK,
+  FatalError,
+  log,
+  logError,
+  logErrorAndExit,
+  logHeader1,
+  SUCCESS_MARK,
+  WARNING_MARK,
+} from "./logger";
+import { beginConfig, emitReport, endConfig } from "./report";
 import { ContractSectionValidator } from "./section-validators/contract";
 import {
   configDelegatesAnchors,
   loadStateWithSiblings,
   resolveSiblingFilePath,
-  SiblingSpec,
+  type SiblingSpec,
 } from "./sibling-delegation";
 import {
-  EntireDocument,
+  type EntireDocument,
   EntireDocumentTB,
   EthereumStringFormat,
   ExplorerSectionTB,
   isTypeOfTB,
   MaxIntFormat,
-  NetworkSection,
+  type NetworkSection,
   NetworkSectionTB,
-  SeedDocument,
-  SeedDocumentTB,
 } from "./typebox";
-import { ContractInfo } from "./types";
-
-export let g_Arguments: ReturnType<typeof parseCommandLineArguments>;
+import type { ContractInfo } from "./types";
 
 declare global {
   interface BigInt {
@@ -88,7 +106,7 @@ function loadStateFromYaml(configPath: string): unknown {
 
 // Load the main config, composing it with separate `.deployed` and/or `.inputs` sibling files when
 // `--deployed`/`--inputs` names them — they are never loaded automatically. Both may be in play at
-// once. Sibling files are incompatible with `--generate`, which operates on a seed document.
+// once.
 type SelectedSibling = { path: string; spec: SiblingSpec; noun: string };
 
 // Inline `config:`/`externals:` sections would bypass every `.inputs` invariant (`&label` anchors,
@@ -99,7 +117,7 @@ function rejectInlineInputsSections(document: unknown): unknown {
     const inline = INPUTS_SPEC.ownedSectionKeys.filter((key) => Object.hasOwn(document, key));
     if (inline.length > 0) {
       logErrorAndExit(
-        `${chalk.magenta(g_Arguments.configPath)} holds top-level ${inline.map((key) => `\`${key}:\``).join(" / ")} ` +
+        `${chalk.magenta(context.configPath)} holds top-level ${inline.map((key) => `\`${key}:\``).join(" / ")} ` +
           `section(s) inline; they are only allowed in ${INPUTS_SPEC.fileLabel}, ` +
           `selected with \`${INPUTS_SPEC.optionName} <path>\``,
       );
@@ -111,8 +129,8 @@ function rejectInlineInputsSections(document: unknown): unknown {
 function loadStateWithOptionalSiblings(): unknown {
   const siblings: SelectedSibling[] = [];
   const siblingKinds: { spec: SiblingSpec; argument: string | undefined; noun: string }[] = [
-    { spec: DEPLOYED_SPEC, argument: g_Arguments.deployed, noun: "deployed address(es)" },
-    { spec: INPUTS_SPEC, argument: g_Arguments.inputs, noun: "input anchor(s)" },
+    { spec: DEPLOYED_SPEC, argument: context.deployed, noun: "deployed address(es)" },
+    { spec: INPUTS_SPEC, argument: context.inputs, noun: "input anchor(s)" },
   ];
   try {
     for (const { spec, argument, noun } of siblingKinds) {
@@ -127,32 +145,23 @@ function loadStateWithOptionalSiblings(): unknown {
     logErrorAndExit(printError(error));
   }
 
-  if (g_Arguments.generate) {
-    for (const { path: ignoredPath } of siblings) {
-      log(`${WARNING_MARK} Ignoring ${chalk.yellow(path.relative(process.cwd(), ignoredPath))} with --generate`);
-    }
-  }
-
-  if (siblings.length === 0 || g_Arguments.generate) {
+  if (siblings.length === 0) {
     // A wiring-only main config cannot be parsed without the sibling anchors it delegates to — fail
     // with a clear message instead of the raw "Unresolved alias" parse error below. With no sibling
     // in play this is the usual cause: the flag that names it was simply omitted.
-    if (configDelegatesAnchors(g_Arguments.configPath)) {
+    if (configDelegatesAnchors(context.configPath)) {
       logErrorAndExit(
-        g_Arguments.generate
-          ? `${chalk.magenta(g_Arguments.configPath)} delegates anchors to sibling file(s), so it cannot be ` +
-              `parsed standalone — --generate works on self-contained (seed) configs only`
-          : `${chalk.magenta(g_Arguments.configPath)} delegates anchors to sibling file(s) — pass ` +
-              `${DEPLOYED_SPEC.optionName} / ${INPUTS_SPEC.optionName} with the file(s) defining them ` +
-              `(sibling files are never loaded automatically)`,
+        `${chalk.magenta(context.configPath)} delegates anchors to sibling file(s) — pass ` +
+          `${DEPLOYED_SPEC.optionName} / ${INPUTS_SPEC.optionName} with the file(s) defining them ` +
+          `(sibling files are never loaded automatically)`,
       );
     }
     // The inline-sections rejection applies on every non-composed load path, these ones included.
-    return rejectInlineInputsSections(loadStateFromYaml(g_Arguments.configPath));
+    return rejectInlineInputsSections(loadStateFromYaml(context.configPath));
   }
 
   const { document, labels } = loadStateWithSiblings(
-    g_Arguments.configPath,
+    context.configPath,
     siblings.map(({ path: siblingPath, spec }) => ({ path: siblingPath, spec })),
   );
   for (const [index, { path: siblingPath, noun }] of siblings.entries()) {
@@ -166,7 +175,7 @@ function validateJsonWithSchema<T extends TSchema>(
   schemaPrototype: T,
   { silent }: { silent: boolean } = { silent: false },
 ): jsonDocument is Static<T> {
-  if (!silent) log(`Validating ${chalk.yellow(g_Arguments.configPath)} against schema...`);
+  if (!silent) log(`Validating ${chalk.yellow(context.configPath)} against schema...`);
 
   const ajv = new Ajv({ verbose: true, allErrors: true });
   addFormats(ajv);
@@ -189,7 +198,7 @@ function validateJsonWithSchema<T extends TSchema>(
   if (!valid) {
     if (silent) return false;
     logErrorAndExit(
-      `The YAML file ${chalk.magenta(g_Arguments!.configPath)} contains errors that do not comply with the JSON schema. ` +
+      `The YAML file ${chalk.magenta(context.configPath)} contains errors that do not comply with the JSON schema. ` +
         `Please correct them and try again\n\n${formatAjvErrors(validate.errors)} `,
     );
   }
@@ -201,112 +210,158 @@ async function doChecks(jsonDocument: EntireDocument) {
   for (const [sectionTitle, section] of Object.entries(jsonDocument)) {
     if (isTypeOfTB(section, NetworkSectionTB)) await checkNetworkSection(sectionTitle, section);
   }
+  // A filter that selects nothing verified nothing, and "passed" would say otherwise
+  if (context.checkOnly && stats.selected === 0) {
+    logErrorAndExit(
+      `${chalk.yellow(`-o "${context.checkOnlyCmdArg}"`)} matched nothing in ${chalk.magenta(context.configPath)}`,
+    );
+  }
   // Show final summary (outside the tree)
   log(""); // Separator line
-  const statusMark = g_errors ? FAILURE_MARK : SUCCESS_MARK;
-  const statusMessage = g_errors
-    ? `${g_total_checks} checks, ${chalk.red(`${g_errors} errors`)}`
-    : `${g_total_checks} checks passed`;
+  const statusMark = stats.errors ? FAILURE_MARK : SUCCESS_MARK;
+  // The skip count rides on the summary line so that --quiet, which hides the per-method notes,
+  // still says how much of the config went unverified
+  const skippedNote = stats.skipped ? `, ${chalk.yellow(`${stats.skipped} skipped`)}` : "";
+  const statusMessage = stats.errors
+    ? `${stats.totalChecks} checks, ${chalk.red(`${stats.errors} errors`)}${skippedNote}`
+    : `${stats.totalChecks} checks passed${skippedNote}`;
   log(`${statusMark} ${chalk.bold("Total:")} ${statusMessage}`);
 
-  if (g_Arguments.checkOnly) {
-    log(`${WARNING_MARK} filtered: ${chalk.yellow(`"${g_Arguments.checkOnlyCmdArg}"`)}`);
+  if (context.checkOnly) {
+    log(`${WARNING_MARK} filtered: ${chalk.yellow(`"${context.checkOnlyCmdArg}"`)}`);
   }
 
-  if (g_errors) {
-    // Display detailed error summary
-    if (g_error_details.length > 0) {
-      logHeader1("Error Summary");
-      for (let index = 0; index < g_error_details.length; index++) {
-        const error = g_error_details[index];
-        log(
-          `\n${chalk.red(`[${index + 1}/${g_error_details.length}]`)} ` +
-            `${chalk.cyan("Section:")} ${chalk.yellow(error.section)} | ` +
-            `${chalk.cyan("Contract:")} ${chalk.yellow(error.contract)} ` +
-            chalk.gray(`(${error.contractAddress})`) +
-            `\n    ${chalk.cyan("Check Type:")} ${chalk.yellow(error.checksType)} | ` +
-            `${chalk.cyan("Method:")} ${chalk.yellow(error.method)}` +
-            `\n    ${chalk.cyan("Error:")} ${chalk.red(error.message)}`,
-        );
-      }
-      log(""); // Empty line at the end
+  // Display detailed error summary
+  if (stats.errors && stats.errorDetails.length > 0) {
+    logHeader1("Error Summary");
+    for (let index = 0; index < stats.errorDetails.length; index++) {
+      const error = stats.errorDetails[index];
+      log(
+        `\n${chalk.red(`[${index + 1}/${stats.errorDetails.length}]`)} ` +
+          `${chalk.cyan("Section:")} ${chalk.yellow(error.section)} | ` +
+          `${chalk.cyan("Contract:")} ${chalk.yellow(error.contract)} ` +
+          chalk.gray(`(${error.contractAddress})`) +
+          `\n    ${chalk.cyan("Check Type:")} ${chalk.yellow(error.checksType)} | ` +
+          `${chalk.cyan("Method:")} ${chalk.yellow(error.method)}` +
+          `\n    ${chalk.cyan("Error:")} ${chalk.red(error.message)}`,
+      );
     }
-
-    process.exit(g_errors);
+    log(""); // Empty line at the end
   }
 }
 
-async function downloadAndCheckAllAbi<T extends EntireDocument | SeedDocument>(jsonDocument: T) {
-  const abiDirectoryPath = path.resolve(path.dirname(g_Arguments.configPath), "abi");
-  fs.mkdirSync(abiDirectoryPath, { recursive: true });
+export async function downloadAndCheckAllAbi(jsonDocument: EntireDocument) {
   logHeader1("ABI checking");
   await iterateLoadedContracts(jsonDocument, checkAllAbi);
-  // Flush any pending ABI updates in consolidated mode
   flushAbiUpdates();
-  // Reset ABI mode cache so newly downloaded ABIs are detected in subsequent checks
-  resetAbiModeCache();
-
-  log(
-    `\n💡 To consolidate individual ABI files into a single compressed file, run:\n` +
-      `   ${chalk.cyan(`yarn consolidate-abi ${path.relative(process.cwd(), abiDirectoryPath)}`)}\n`,
-  );
 }
 
-async function iterateLoadedContracts<T extends EntireDocument | SeedDocument>(
-  jsonDocument: T,
-  callback: (contractInfo: ContractInfo) => Promise<void> | void,
+async function iterateLoadedContracts(
+  jsonDocument: EntireDocument,
+  callback: (chainId: string, contractInfo: ContractInfo) => Promise<void> | void,
 ) {
-  const abiDirectoryPath = path.resolve(path.dirname(g_Arguments.configPath), "abi");
-  fs.mkdirSync(abiDirectoryPath, { recursive: true });
-
   for (const [explorerSectionKey, addresses] of Object.entries(jsonDocument.deployed)) {
-    const explorerSection = jsonDocument[explorerSectionKey as keyof T];
+    const explorerSection = jsonDocument[explorerSectionKey as keyof EntireDocument];
 
     if (isTypeOfTB(explorerSection, ExplorerSectionTB) || isTypeOfTB(explorerSection, NetworkSectionTB)) {
       const { explorerHostname, explorerTokenEnv } = explorerSection;
+      const chainId = normalizeChainId(explorerSection.chainId);
+      // `checks` resolve their ABI at `implementation:`, so the walk covers those addresses even
+      // when the config lists only the proxy in deployed; Safe singletons are pinned exactly so.
+      // Deduplicated by case: a duplicated address must not spend two download slots
+      const implementations = Object.values("contracts" in explorerSection ? explorerSection.contracts : {})
+        .map((entry) => (entry as { implementation?: string }).implementation)
+        .filter((value): value is string => typeof value === "string");
+      const seen = new Set<string>();
+      const uniqueAddresses = [...addresses, ...implementations].filter((address) => {
+        if (seen.has(address.toLowerCase())) return false;
+        seen.add(address.toLowerCase());
+        return true;
+      });
       if (!explorerHostname) {
-        logErrorAndExit(
-          `The field ${chalk.magenta(`explorerHostname`)} is required in the ${chalk.magenta(g_Arguments.configPath)}`,
+        log(
+          `${WARNING_MARK} ${chalk.yellow(`No ${chalk.magenta("explorerHostname")} in the ${chalk.magenta(context.configPath)}, ABIs cannot be downloaded for ${explorerSectionKey}`)}`,
         );
+        if (context.updateAbi) {
+          // A chain with no explorer cannot re-download, so the rebuild keeps what the store
+          // already holds for it
+          for (const address of uniqueAddresses) {
+            const keptName = keepStoredAbi(chainId, address);
+            if (keptName) log(`ABI ${chalk.magenta(`${keptName} @ ${address}`)} ${chalk.green("Kept (no explorer)")}`);
+          }
+        }
+        continue;
       }
       const explorerKey = explorerTokenEnv ? process.env[explorerTokenEnv] : "";
+      if (explorerKey) registerSecret(explorerKey, `$${explorerTokenEnv}`);
 
-      if (!explorerTokenEnv) {
+      if (!explorerTokenEnv && explorerNeedsApiKey(explorerHostname)) {
         log(
-          `${WARNING_MARK} ${chalk.yellow("explorerTokenEnv")} is not set in the ${chalk.magenta(g_Arguments.configPath)}, the section ${chalk.magenta(explorerSectionKey)}`,
+          `${WARNING_MARK} ${chalk.yellow("explorerTokenEnv")} is not set in the ${chalk.magenta(context.configPath)}, the section ${chalk.magenta(explorerSectionKey)}`,
         );
-      } else if (!explorerKey) {
+      } else if (explorerTokenEnv && !explorerKey) {
         log(`\n${WARNING_MARK} ${chalk.yellow(`The env var ${explorerTokenEnv} is not set`)}\n`);
       }
-      for (const address of addresses) {
-        // Skip explorer call if ABI already exists and we only want to update missing
-        if (g_Arguments.updateAbiMissingOnly && abiExistsForAddress(address)) {
-          log(`ABI ${chalk.magenta(address)} ${chalk.green("Skipped (exists)")}`);
+      const toDownload: string[] = [];
+      for (const address of uniqueAddresses) {
+        const existingAbiName = getAbiNameForAddress(chainId, address);
+        // Bytecode at an address never changes, so a stored ABI can only be refreshed on demand;
+        // a rebuild re-downloads each address once, sibling configs of the run reuse the result
+        const fresh = context.updateAbi && !wasFetchedThisRun(chainId, address);
+        if (existingAbiName !== undefined && !fresh) {
+          log(`ABI ${chalk.magenta(`${existingAbiName} @ ${address}`)} ${chalk.green("Skipped (exists)")}`);
           continue;
         }
-        const contractInfo = await loadContractInfoFromExplorer(
+        toDownload.push(address);
+      }
+
+      // The probe matters only when something will be downloaded: a fresh ABI from an explorer
+      // of another network would be stored under the config's chainId regardless. A full store
+      // must not depend on the explorer being awake, so nothing is asked otherwise
+      if (toDownload.length > 0) {
+        const explorerVerified = await verifyChainIdWithExplorer(explorerHostname, chainId, explorerKey);
+        if (!explorerVerified && !context.allowUnverifiedExplorer) {
+          logErrorAndExit(
+            `${chalk.magenta(explorerHostname)} did not confirm chainId ${chalk.yellow(chainId)}, and ${chalk.yellow(toDownload.length)} ABIs are missing. ` +
+              `Retry when the explorer answers, or pass ${chalk.yellow("--allow-unverified-explorer")}`,
+          );
+        }
+      }
+
+      // All requests start at once and the pacer spaces them to the explorer's per-second budget,
+      // so a slow response never stalls the rest; the callbacks stay sequential to keep the log
+      // readable and the store writes ordered
+      const downloads = await Promise.all(
+        toDownload.map(async (address) => ({
           address,
-          explorerHostname,
-          explorerKey,
-          // chainId is optional in schema; only relevant for etherscan v2
-          (explorerSection as { chainId?: number | string }).chainId,
-        );
-        if (!contractInfo) {
+          info: await loadContractInfo(address, explorerHostname, explorerKey, chainId),
+        })),
+      );
+      for (const { address, info } of downloads) {
+        if (info) {
+          await callback(chainId, info);
           continue;
         }
-        await callback(contractInfo);
+        const keptName = keepStoredAbi(chainId, address);
+        if (keptName) {
+          log(`ABI ${chalk.magenta(`${keptName} @ ${address}`)} ${chalk.green("Kept (explorer served none)")}`);
+        }
       }
     }
   }
 }
 
 async function checkNetworkSection(sectionTitle: string, section: NetworkSection) {
-  if (g_Arguments.checkOnly && g_Arguments.checkOnly.section !== sectionTitle) {
+  if (context.checkOnly && context.checkOnly.section !== sectionTitle) {
     return;
   }
   const rpcUrl = readUrlOrFromEnvironment(section.rpcUrl);
-  const provider = new JsonRpcProvider(rpcUrl);
-  const contractSectionChecker = new ContractSectionValidator(provider);
+  const provider = createProvider(rpcUrl);
+  const chainId = normalizeChainId(section.chainId);
+  // assertProviderChain vouches for the RPC; the explorer is probed by the ABI pass, and only
+  // when it has something to download
+  await assertProviderChain(provider, chainId);
+  const contractSectionChecker = new ContractSectionValidator(provider, chainId);
 
   for (const contractAlias in section.contracts) {
     const contractEntry = section.contracts[contractAlias];
@@ -314,47 +369,108 @@ async function checkNetworkSection(sectionTitle: string, section: NetworkSection
   }
 }
 
-async function main() {
-  g_Arguments = parseCommandLineArguments();
+export function collectYamlConfigs(directory: string): string[] {
+  const files: string[] = [];
+  const entries = fs.readdirSync(directory, { withFileTypes: true });
+  for (const entry of entries) {
+    const fullPath = path.join(directory, entry.name);
+    if (entry.isDirectory()) {
+      files.push(...collectYamlConfigs(fullPath));
+    } else if (
+      /\.ya?ml$/.test(entry.name) &&
+      !entry.name.includes(".seed.") &&
+      !/\.(deployed|inputs)\.ya?ml$/.test(entry.name)
+    ) {
+      // Skip old seed files and anchor-only siblings, which are not standalone configs.
+      files.push(fullPath);
+    }
+  }
+  return files.toSorted((a, b) => a.localeCompare(b));
+}
 
-  if (g_Arguments.updateAbi) {
-    renameAllAbiToLowerCase();
+async function main() {
+  Object.assign(context, parseCommandLineArguments());
+  if (context.json) {
+    // Ctrl+C must still leave one parseable report, carrying whatever ran before it
+    process.once("SIGINT", () => emitReport(130, "interrupted by SIGINT", () => process.exit(130)));
   }
 
-  const jsonDocument = loadStateWithOptionalSiblings();
+  if (!fs.existsSync(context.configPath)) {
+    logErrorAndExit(`No such file or directory: ${chalk.magenta(context.configPath)}`);
+  }
 
-  if (g_Arguments.generate) {
-    if (validateJsonWithSchema(jsonDocument, EntireDocumentTB, { silent: true })) {
-      logErrorAndExit(
-        chalk.yellow(
-          `A main YAML was specified, but a seed YAML was expected: ${g_Arguments.configPath}\n` +
-            chalk.yellow("Alternatively, the `--generate` parameter was specified for the main YAML"),
-        ),
+  if (fs.statSync(context.configPath).isDirectory()) {
+    if (context.deployed || context.inputs) {
+      logErrorAndExit("The --deployed and --inputs options require a single config file, not a directory");
+    }
+    if (context.checkOnly) {
+      logErrorAndExit(`The ${chalk.yellow("-o")} option requires a single config file, not a directory`);
+    }
+    const configs = collectYamlConfigs(context.configPath);
+    if (configs.length === 0) {
+      logErrorAndExit(`No YAML configs found in ${chalk.magenta(context.configPath)}`);
+    }
+    const failed: string[] = [];
+    for (const configPath of configs) {
+      context.configPath = configPath;
+      resetAbiCache();
+      resetStats();
+      logHeader1(configPath);
+      beginConfig(configPath);
+      await runConfig();
+      endConfig();
+      if (stats.errors) failed.push(`${configPath} (${stats.errors} errors)`);
+    }
+    pruneAbiStores();
+    log("");
+    if (failed.length > 0) {
+      logError(
+        `${FAILURE_MARK} ${chalk.bold(`${failed.length}/${configs.length} configs failed:`)}\n${failed.join("\n")}`,
       );
+      exit(1);
+      return;
     }
-    if (validateJsonWithSchema(jsonDocument, SeedDocumentTB)) {
-      if (g_Arguments.updateAbi) {
-        await downloadAndCheckAllAbi(jsonDocument);
-      }
-      await doGenerateBoilerplate(g_Arguments.configPath, jsonDocument);
-    }
-  } else {
-    if (validateJsonWithSchema(jsonDocument, SeedDocumentTB, { silent: true })) {
-      logErrorAndExit(
-        chalk.yellow(`A seed YAML was specified, but a main YAML was expected: ${g_Arguments.configPath}\n`) +
-          chalk.yellow("Alternatively, the `--generate` parameter was not specified for the seed YAML"),
-      );
-    }
-    if (validateJsonWithSchema(jsonDocument, EntireDocumentTB)) {
-      if (g_Arguments.updateAbi) {
-        await downloadAndCheckAllAbi(jsonDocument);
-      }
-      await doChecks(jsonDocument);
-    }
+    log(`${SUCCESS_MARK} ${chalk.bold(`All ${configs.length} configs passed`)}`);
+    exit(0);
+    return;
+  }
+
+  // No prune here: a single-file run has walked only its own addresses, and sweeping the shared
+  // store now would drop the sibling configs' ABIs
+  beginConfig(context.configPath);
+  await runConfig();
+  endConfig();
+  exit(stats.errors);
+}
+
+// Under --json the report owns the exit code; the log mode keeps exiting on the spot
+function exit(code: number): void {
+  if (context.json) {
+    emitReport(code);
+  } else if (code) {
+    process.exit(code);
   }
 }
 
-main().catch((error) => {
-  logError(error);
-  process.exitCode = 1;
-});
+async function runConfig() {
+  const jsonDocument = loadStateWithOptionalSiblings();
+
+  if (validateJsonWithSchema(jsonDocument, EntireDocumentTB)) {
+    await downloadAndCheckAllAbi(jsonDocument);
+    await doChecks(jsonDocument);
+  }
+}
+
+// Do not run when imported (e.g. by unit tests) — only as the CLI entrypoint
+if (require.main === module) {
+  main().catch((error) => {
+    if (context.json) {
+      emitReport(1, printError(error));
+      // A FatalError is fully told by the report; anything else is a bug worth its stack
+      if (!(error instanceof FatalError)) console.error(error);
+    } else {
+      logError(error);
+    }
+    process.exitCode = 1;
+  });
+}

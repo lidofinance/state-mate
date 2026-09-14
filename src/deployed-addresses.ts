@@ -1,6 +1,6 @@
 import * as YAML from "yaml";
 
-import { ADDRESS_OR_HASH_RE, pairKeyToString, SiblingSpec } from "./sibling-delegation";
+import { ADDRESS_OR_HASH_RE, pairKeyToString, type SiblingSpec } from "./sibling-delegation";
 
 /**
  * Validate the deployed-addresses entries and collect their labels. The engine has already checked

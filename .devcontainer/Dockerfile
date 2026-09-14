@@ -1,3 +1,3 @@
-FROM mcr.microsoft.com/devcontainers/typescript-node:1-20-bookworm
+FROM mcr.microsoft.com/devcontainers/typescript-node:24-bookworm
 
-RUN corepack enable && corepack prepare yarn@4.3.1 --activate
+RUN corepack enable && corepack prepare yarn@4.17.0 --activate

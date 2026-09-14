@@ -4,7 +4,7 @@ How to verify that a deployment is correct and honest: constants recompute from 
 
 A config passing against the chain only proves "config == chain". The steps below prove "chain == what was intended".
 
-**Re-running the config is the primary instrument.** Anything provable as a config check must become one: a check re-runs on every change and in CI, while a one-off `cast` call proves nothing after the session ends. Read on-chain values with REPLACEME runs. The strongest single re-run: delete the ABI archive, re-fetch with `--update-abi-missing`, full run. That verifies the config against freshly verified source in one shot. Reserve `cast` for what a config run cannot express (section A).
+**Re-running the config is the primary instrument.** Anything provable as a config check must become one: a check re-runs on every change and in CI, while a one-off `cast` call proves nothing after the session ends. Read on-chain values with REPLACEME runs. The strongest single re-run: delete the ABI archive, re-fetch with `--update-abi`, full run. That verifies the config against freshly verified source in one shot. Reserve `cast` for what a config run cannot express (section A).
 
 ## A. What a config run cannot express (once per review)
 

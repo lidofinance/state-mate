@@ -251,6 +251,7 @@
       "type": "object",
       "required": [
         "rpcUrl",
+        "chainId",
         "contracts"
       ],
       "properties": {
@@ -266,9 +267,11 @@
         "chainId": {
           "anyOf": [
             {
-              "type": "number"
+              "minimum": 1,
+              "type": "integer"
             },
             {
+              "pattern": "^[1-9][0-9]*$",
               "type": "string"
             }
           ]
@@ -926,6 +929,42 @@
                           }
                         }
                       }
+                    },
+                    "aragonAcl": {
+                      "type": "object",
+                      "patternProperties": {
+                        "^(0x[a-fA-F0-9]{40}|0x[a-fA-F0-9]{64}|.+)$": {
+                          "type": "object",
+                          "patternProperties": {
+                            "^(0x[a-fA-F0-9]{40}|0x[a-fA-F0-9]{64}|.+)$": {
+                              "additionalProperties": false,
+                              "type": "object",
+                              "required": [
+                                "manager"
+                              ],
+                              "properties": {
+                                "manager": {
+                                  "format": "ethereum-string",
+                                  "pattern": "^(0x[a-fA-F0-9]{40}|0x[a-fA-F0-9]{64}|.+)$",
+                                  "type": "string"
+                                },
+                                "granted": {
+                                  "type": "array",
+                                  "items": {
+                                    "format": "ethereum-string",
+                                    "pattern": "^(0x[a-fA-F0-9]{40}|0x[a-fA-F0-9]{64}|.+)$",
+                                    "type": "string"
+                                  }
+                                },
+                                "paramsDigest": {
+                                  "pattern": "^0x[a-fA-F0-9]{64}$",
+                                  "type": "string"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
                     }
                   }
                 },
@@ -1579,10 +1618,56 @@
                         }
                       }
                     },
+                    "aragonAcl": {
+                      "type": "object",
+                      "patternProperties": {
+                        "^(0x[a-fA-F0-9]{40}|0x[a-fA-F0-9]{64}|.+)$": {
+                          "type": "object",
+                          "patternProperties": {
+                            "^(0x[a-fA-F0-9]{40}|0x[a-fA-F0-9]{64}|.+)$": {
+                              "additionalProperties": false,
+                              "type": "object",
+                              "required": [
+                                "manager"
+                              ],
+                              "properties": {
+                                "manager": {
+                                  "format": "ethereum-string",
+                                  "pattern": "^(0x[a-fA-F0-9]{40}|0x[a-fA-F0-9]{64}|.+)$",
+                                  "type": "string"
+                                },
+                                "granted": {
+                                  "type": "array",
+                                  "items": {
+                                    "format": "ethereum-string",
+                                    "pattern": "^(0x[a-fA-F0-9]{40}|0x[a-fA-F0-9]{64}|.+)$",
+                                    "type": "string"
+                                  }
+                                },
+                                "paramsDigest": {
+                                  "pattern": "^0x[a-fA-F0-9]{64}$",
+                                  "type": "string"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
                     "proxyName": {
                       "type": "string"
                     },
                     "implementation": {
+                      "format": "ethereum-string",
+                      "pattern": "^(0x[a-fA-F0-9]{40}|0x[a-fA-F0-9]{64}|.+)$",
+                      "type": "string"
+                    },
+                    "proxyAdmin": {
+                      "format": "ethereum-string",
+                      "pattern": "^(0x[a-fA-F0-9]{40}|0x[a-fA-F0-9]{64}|.+)$",
+                      "type": "string"
+                    },
+                    "proxyAdminOwner": {
                       "format": "ethereum-string",
                       "pattern": "^(0x[a-fA-F0-9]{40}|0x[a-fA-F0-9]{64}|.+)$",
                       "type": "string"
@@ -2430,6 +2515,7 @@
       "type": "object",
       "required": [
         "rpcUrl",
+        "chainId",
         "contracts"
       ],
       "properties": {
@@ -2445,9 +2531,11 @@
         "chainId": {
           "anyOf": [
             {
-              "type": "number"
+              "minimum": 1,
+              "type": "integer"
             },
             {
+              "pattern": "^[1-9][0-9]*$",
               "type": "string"
             }
           ]
@@ -3105,6 +3193,42 @@
                           }
                         }
                       }
+                    },
+                    "aragonAcl": {
+                      "type": "object",
+                      "patternProperties": {
+                        "^(0x[a-fA-F0-9]{40}|0x[a-fA-F0-9]{64}|.+)$": {
+                          "type": "object",
+                          "patternProperties": {
+                            "^(0x[a-fA-F0-9]{40}|0x[a-fA-F0-9]{64}|.+)$": {
+                              "additionalProperties": false,
+                              "type": "object",
+                              "required": [
+                                "manager"
+                              ],
+                              "properties": {
+                                "manager": {
+                                  "format": "ethereum-string",
+                                  "pattern": "^(0x[a-fA-F0-9]{40}|0x[a-fA-F0-9]{64}|.+)$",
+                                  "type": "string"
+                                },
+                                "granted": {
+                                  "type": "array",
+                                  "items": {
+                                    "format": "ethereum-string",
+                                    "pattern": "^(0x[a-fA-F0-9]{40}|0x[a-fA-F0-9]{64}|.+)$",
+                                    "type": "string"
+                                  }
+                                },
+                                "paramsDigest": {
+                                  "pattern": "^0x[a-fA-F0-9]{64}$",
+                                  "type": "string"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
                     }
                   }
                 },
@@ -3758,10 +3882,56 @@
                         }
                       }
                     },
+                    "aragonAcl": {
+                      "type": "object",
+                      "patternProperties": {
+                        "^(0x[a-fA-F0-9]{40}|0x[a-fA-F0-9]{64}|.+)$": {
+                          "type": "object",
+                          "patternProperties": {
+                            "^(0x[a-fA-F0-9]{40}|0x[a-fA-F0-9]{64}|.+)$": {
+                              "additionalProperties": false,
+                              "type": "object",
+                              "required": [
+                                "manager"
+                              ],
+                              "properties": {
+                                "manager": {
+                                  "format": "ethereum-string",
+                                  "pattern": "^(0x[a-fA-F0-9]{40}|0x[a-fA-F0-9]{64}|.+)$",
+                                  "type": "string"
+                                },
+                                "granted": {
+                                  "type": "array",
+                                  "items": {
+                                    "format": "ethereum-string",
+                                    "pattern": "^(0x[a-fA-F0-9]{40}|0x[a-fA-F0-9]{64}|.+)$",
+                                    "type": "string"
+                                  }
+                                },
+                                "paramsDigest": {
+                                  "pattern": "^0x[a-fA-F0-9]{64}$",
+                                  "type": "string"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
                     "proxyName": {
                       "type": "string"
                     },
                     "implementation": {
+                      "format": "ethereum-string",
+                      "pattern": "^(0x[a-fA-F0-9]{40}|0x[a-fA-F0-9]{64}|.+)$",
+                      "type": "string"
+                    },
+                    "proxyAdmin": {
+                      "format": "ethereum-string",
+                      "pattern": "^(0x[a-fA-F0-9]{40}|0x[a-fA-F0-9]{64}|.+)$",
+                      "type": "string"
+                    },
+                    "proxyAdminOwner": {
                       "format": "ethereum-string",
                       "pattern": "^(0x[a-fA-F0-9]{40}|0x[a-fA-F0-9]{64}|.+)$",
                       "type": "string"

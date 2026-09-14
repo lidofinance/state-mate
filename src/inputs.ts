@@ -1,6 +1,6 @@
 import * as YAML from "yaml";
 
-import { ADDRESS_OR_HASH_RE, pairKeyToString, SiblingSpec } from "./sibling-delegation";
+import { ADDRESS_OR_HASH_RE, pairKeyToString, type SiblingSpec } from "./sibling-delegation";
 
 // The two groups of a `.inputs` file, split by AUTHORSHIP:
 //   `config`    — project-chosen, configurable values (knobs): any scalar or array, no value check.

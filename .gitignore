@@ -8,7 +8,7 @@ cache
 artifacts
 
 # IDE
-.vscode
+.vscode/*
 !.vscode/settings.json
 !.vscode/extensions.json
 
@@ -17,7 +17,6 @@ artifacts
 
 #
 .env
-reports
 
 # pycharm
 .idea

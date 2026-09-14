@@ -6,6 +6,8 @@ on:
       - main
       - develop
   pull_request:
+  schedule:
+    - cron: "0 6 * * *"
   workflow_dispatch:
 
 permissions:
@@ -17,61 +19,67 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
+      # The explorer pacer is per-process and the jobs share one key, so the nightly
+      # --update-abi sweep must run one job at a time to stay within the account limit
+      max-parallel: ${{ github.event_name == 'schedule' && 1 || 99 }}
       matrix:
         include:
-          # Lido configs - Mainnet
-          - config: configs/lido/mainnet/lido.yaml
-            network: ethereum-mainnet
-          - config: configs/lido/mainnet/lido-et.yaml
-            network: ethereum-mainnet
-          # Lido configs - Hoodi
-          - config: configs/lido/hoodi/lido-testnet.yaml
-            network: hoodi-testnet
-          - config: configs/lido/hoodi/lido-et-testnet.yaml
-            network: hoodi-testnet
-          # SafeHarbor configs
-          - config: configs/safeharbor/mainnet.yaml
-            network: ethereum-mainnet
-          # Mellow stRATEGY configs - Mainnet
-          - config: configs/mellow_strategy/mellow-strategy.yaml
-            network: ethereum-mainnet
-          # DeFiWrapper configs
-          - config: configs/defiwrapper/mainnet.seed.generated.yaml
-            network: ethereum-mainnet
-          # Earn configs
-          - config: configs/earn/atoken-wsteth-swap.yaml
-            network: ethereum-mainnet
-          - config: configs/earn/ethereum/earneth-vaults.yaml
-            network: ethereum-mainnet
-          - config: configs/earn/ethereum/earnusd-vaults.yaml
-            network: ethereum-mainnet
-          - config: configs/earn/base/earnusd-vaults.yaml
-            network: base-mainnet
-          - config: configs/earn/mantle/earnusd-vaults.yaml
-            network: mantle-mainnet
-          - config: configs/earn/plasma/earnusd-vaults.yaml
-            network: plasma-mainnet
-          - config: configs/nest/mainnet.yaml
-            network: ethereum-mainnet
-
-    env:
-      # Explorer API tokens
-      ETHERSCAN_TOKEN: ${{ secrets.ETHERSCAN_TOKEN }}
-
-      # Ethereum + L2 RPC URLs
-      MAINNET_REMOTE_RPC_URL: ${{ secrets.MAINNET_REMOTE_RPC_URL }}
-      HOODI_REMOTE_RPC_URL: ${{ secrets.HOODI_REMOTE_RPC_URL }}
-      L1_MAINNET_RPC_URL: ${{ secrets.MAINNET_REMOTE_RPC_URL }}
-      BASE_RPC_URL: ${{ secrets.BASE_RPC_URL }}
-      MANTLE_RPC_URL: ${{ secrets.MANTLE_RPC_URL }}
-      PLASMA_RPC_URL: ${{ secrets.PLASMA_RPC_URL }}
+          - config: configs/lido/mainnet
+          - config: configs/lido/testnet
+          - config: configs/lido-direct-staking/mainnet
+          - config: configs/lido-earn/mainnet
+          - config: configs/lido-multichain/mainnet
+          - config: configs/lido-multichain/testnet
+          - config: configs/mellow/mainnet
+          - config: configs/defiwrapper/mainnet
+          - config: configs/hypernative-guard/mainnet
 
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: ./.github/actions/setup
 
+      # A missing secret is an empty string, so `||` falls back to the .env.sample default;
+      # keep the two in sync. The nightly run rebuilds every ABI from the explorer, so a store
+      # that drifted from the canonical source fails the job instead of being silently trusted
       - name: Run state-mate
-        run: yarn start ${{ matrix.config }}
+        env:
+          ETHERSCAN_TOKEN: ${{ secrets.ETHERSCAN_TOKEN }}
+          ETH_RPC_URL: ${{ secrets.MAINNET_REMOTE_RPC_URL || 'https://eth.drpc.org' }}
+          ETH_HOODI_RPC_URL: ${{ secrets.HOODI_REMOTE_RPC_URL || 'https://hoodi.drpc.org' }}
+          ETH_SEPOLIA_RPC_URL: ${{ secrets.ETH_SEPOLIA_RPC_URL || 'https://ethereum-sepolia-rpc.publicnode.com' }}
+          ARBITRUM_RPC_URL: ${{ secrets.ARBITRUM_RPC_URL || 'https://arbitrum.drpc.org' }}
+          BASE_RPC_URL: ${{ secrets.BASE_RPC_URL || 'https://base.drpc.org' }}
+          BNB_RPC_URL: ${{ secrets.BNB_RPC_URL || 'https://bsc-rpc.publicnode.com' }}
+          BNB_TESTNET_RPC_URL: ${{ secrets.BNB_TESTNET_RPC_URL || 'https://bsc-testnet-rpc.publicnode.com' }}
+          LINEA_RPC_URL: ${{ secrets.LINEA_RPC_URL || 'https://linea.drpc.org' }}
+          MANTLE_RPC_URL: ${{ secrets.MANTLE_RPC_URL || 'https://mantle.drpc.org' }}
+          OPTIMISM_RPC_URL: ${{ secrets.OPTIMISM_RPC_URL || 'https://optimism.drpc.org' }}
+          OPTIMISM_SEPOLIA_RPC_URL: ${{ secrets.OPTIMISM_SEPOLIA_RPC_URL || 'https://optimism-sepolia.drpc.org' }}
+          PLASMA_RPC_URL: ${{ secrets.PLASMA_RPC_URL || 'https://plasma.drpc.org' }}
+          UNICHAIN_RPC_URL: ${{ secrets.UNICHAIN_RPC_URL || 'https://unichain.drpc.org' }}
+        run: yarn start ${{ matrix.config }} --quiet ${{ github.event_name == 'schedule' && '--update-abi' || '' }}
+
+      # gzip stamps the writer's OS into its header, so a store committed from macOS never matches
+      # its Linux rebuild byte for byte even when every ABI does: compare the decompressed JSON
+      - name: Check ABI provenance
+        if: github.event_name == 'schedule'
+        run: |
+          for store in $(git diff --name-only -- ${{ matrix.config }}); do
+            if ! diff <(git show "HEAD:$store" | gunzip) <(gunzip -c "$store"); then
+              echo "Error: the committed ABI store $store differs from what the explorer serves."
+              exit 1
+            fi
+          done
+
+  unit:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: ./.github/actions/setup
+
+      - name: Run unit tests
+        run: yarn test:coverage
 
   lint:
     name: Lint and Format Check
@@ -80,11 +88,16 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: ./.github/actions/setup
 
+      # biome lints and formats the TypeScript and JSON; prettier keeps the YAML and Markdown
       - name: Run linter
         run: yarn lint
 
       - name: Check formatting
         run: yarn format
+
+      # biome has no type-aware rules, so types need their own gate
+      - name: Typecheck
+        run: yarn typecheck
 
   schemas:
     name: Validate Schemas

@@ -3,7 +3,6 @@
 .git
 .github
 .idea
-.skills
 .vscode
 .yarn/install-state.gz
 .DS_Store
