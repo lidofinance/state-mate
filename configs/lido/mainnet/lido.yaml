@@ -1,11 +1,11 @@
 # yaml-language-server: $schema=../../../schemas/main-schema.json
+# Expected state after Voting and DG execution of lidofinance/scripts PR #682.
 ---
 deployed:
   l1:
     # --- Core protocol ---
     - &lidoLocator "0xC1d0b3DE6792Bf6b4b37EccdcC24e45978Cfd2Eb"
-    - &lidoLocatorImplAddress "0xF2Ffb952e129a63F0614Ff87126E1d4a494A2313"
-    - &lidoLocatorEdfImplAddress "0x60E09F1791F1168d0450E4F100616B4a3F95119C"
+    - &lidoLocatorImplAddress "0x60E09F1791F1168d0450E4F100616B4a3F95119C"
     - &lido "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84"
     - &lidoImplAddress "0x028271E30a695c0527A0C50cA30603feD004cDb0"
     - &wstETH "0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0"
@@ -13,8 +13,7 @@ deployed:
     - &eip712StETH "0x8F73e4C2A6D852bb4ab2A45E6a9CF5715b3228B7"
     - &stakingRouter "0xFdDf38947aFB03C621C71b06C9C70bce73f12999"
     - &stakingRouterImplAddress "0xDD76927045435C7605cf6f5F978cfb8CABDb5F80"
-    - &depositSecurityModule "0xF573E9E3de1f86B085417ab294f56E7920B4e9Be"
-    - &depositSecurityModuleV5 "0x39BB5d491e98A44D1bfe8047A737a81E296a63E0"
+    - &depositSecurityModule "0x39BB5d491e98A44D1bfe8047A737a81E296a63E0"
     - &executionLayerRewardsVault "0x388C818CA8B9251b393131C08a736A67ccB19297"
     - &withdrawalQueueERC721 "0x889edC2eDab5f40e902b864aD4d7AdE8E412F9B1"
     - &withdrawalQueueERC721ImplAddress "0xE42C659Dc09109566720EA8b2De186c2Be7D94D9"
@@ -163,6 +162,9 @@ deployed:
     - &curatedModuleCommittee "0x2570e0b22AD904501dfB0d49575991ACB801dD91"
 
 deployed-aux:
+  # Former DSM; used only to assert that its unvetting role was revoked.
+  - &depositSecurityModuleV4 "0xF573E9E3de1f86B085417ab294f56E7920B4e9Be"
+
   # DSM v5 guardian DelegationContracts.
   # https://research.lido.fi/t/lip-37-execution-delegation-framework-edf
   - &dsmGuardianLidoDevTeam "0x915F0Fa50E1af761B113b41c79ab33Bf4734C36E"
@@ -171,6 +173,7 @@ deployed-aux:
   - &dsmGuardianBlockscape "0xDc1579636686C082fc3b00B9EB25259A110D0C44"
   - &dsmGuardianStakefish "0x031E597BcF680f1f2293b119b4b2B14096B15497"
   - &dsmGuardianStakely "0x6A22d74a816662078f2371A7138E7614874cd61d"
+  - &depositorDelegation "0x6Aa249bA53A3abcaC52F91146583B3eE2Ee4C7F5"
 
 misc:
   - &resealManager "0x7914b5a1539b97Bd0bbd155757F25FD79A522d24"
@@ -292,16 +295,17 @@ misc:
   - &HC_CM_FAST_LANE 300 # https://github.com/lidofinance/staking-modules/blob/4d3de6658499e1c1774951780a97d7ae25ca18b8/script/curated/DeployMainnet.s.sol#L21
   - &HC_CM_FRAME_EPOCHS 3150 # https://github.com/lidofinance/staking-modules/blob/4d3de6658499e1c1774951780a97d7ae25ca18b8/script/curated/DeployMainnet.s.sol#L22
   - &HASH_CONSENSUS_QUORUM 5
+  # PR #682 replaces each EOA with its EDF holder, using swap-and-pop removal.
   - &HASH_CONSENSUS_MEMBERS [
-      "0x73181107c8D9ED4ce0bbeF7A0b4ccf3320C41d12", # Instadapp
-      "0x4118DAD7f348A4063bD15786c299De2f3B1333F3", # Caliber
-      "0x404335BcE530400a5814375E7Ec1FB55fAff3eA2", # Staking Facilities
-      "0x8dB977C13CAA938BC58464bFD622DF0570564b78", # Chorus One
-      "0x007DE4a5F7bc37E2F26c0cb2E8A95006EE9B89b5", # P2P
-      "0xc79F702202E3A6B0B6310B537E786B9ACAA19BAf", # Chainlayer
-      "0x61c91ECd902EB56e314bB2D5c5C07785444Ea1c8", # bloXroute
-      "0xe57B3792aDCc5da47EF4fF588883F0ee0c9835C9", # MatrixedLink
-      "0x042a9e5acCfa17e28300F1b5967f20891E973922", # Stakefish
+      "0xC4f2704273598d51A0ec76A31C12553ec8f5A891", # MatrixedLink
+      "0xE75A431A98487DC69A14Bdd13d858E3238e9C1b3", # Instadapp
+      "0xc77d0Bf3AA4778E36a89CDC8bbc9c34d8060637d", # Caliber
+      "0xc7442d4d8F3FfEa0fA4a18Ad3062c8137cE21749", # Staking Facilities
+      "0x56B3eA8016Da18C6E8CD8135492d242F0dE0DBBC", # Chorus One
+      "0x4E3F2DEeb59eB9a205D82D17647b3e56422e0FEe", # P2P
+      "0xd524101C3c40f71Fce7B9312D299603880a06Bdb", # Chainlayer
+      "0x99Cd2EF33040879D40BBC77Df81863D97f13C64d", # bloXroute
+      "0x5e8Ed9f10307eD6FA793A347e4D0f407D00B9C6f", # Stakefish
     ]
 
   # --- Node/operator limits ---
@@ -473,7 +477,7 @@ misc:
   - &safeSingleton_1_3_0 "0xd9Db270c1B5E3Bd161E8c8503c55cEABeE709552"
 
 eoa:
-  # Lido depositor bot; holds TOP_UP_ROLE on the TopUpGateway
+  # Former direct TOP_UP_ROLE holder; the role now belongs to depositorDelegation.
   # https://research.lido.fi/t/proposal-to-refund-money-spent-on-deposits-on-ethereum-to-the-dev-team/1882
   - &depositorBot "0xF82aC5937A20dC862F9bc0668779031E06000f17"
 
@@ -807,51 +811,6 @@ l1:
         withdrawalVault: *withdrawalVault
         wstETH: *wstETH
 
-    # EDF candidate implementation; the active proxy above remains unchanged until governance.
-    lidoLocatorEdf:
-      name: LidoLocator
-      address: *lidoLocatorEdfImplAddress
-      checks:
-        accounting: *accounting
-        accountingOracle: *accountingOracle
-        burner: *burner
-        consolidationGateway: *consolidationGateway
-        coreComponents:
-          - *executionLayerRewardsVault
-          - *oracleReportSanityChecker
-          - *stakingRouter
-          - *aragonAgent
-          - *withdrawalQueueERC721
-          - *withdrawalVault
-        depositSecurityModule: *depositSecurityModuleV5
-        elRewardsVault: *executionLayerRewardsVault
-        lido: *lido
-        operatorGrid: *operatorGrid
-        oracleDaemonConfig: *oracleDaemonConfig
-        oracleReportComponents:
-          - *accountingOracle
-          - *oracleReportSanityChecker
-          - *burner
-          - *withdrawalQueueERC721
-          - *tokenRateNotifier
-          - *stakingRouter
-          - *vaultHub
-        oracleReportSanityChecker: *oracleReportSanityChecker
-        postTokenRebaseReceiver: *tokenRateNotifier
-        predepositGuarantee: *predepositGuarantee
-        lazyOracle: *lazyOracle
-        topUpGateway: *topUpGateway
-        triggerableWithdrawalsGateway: *triggerableWithdrawalsGateway
-        validatorExitDelayVerifier: *validatorExitDelayVerifier
-        vaultFactory: *stakingVaultFactory
-        stakingRouter: *stakingRouter
-        treasury: *aragonAgent
-        validatorsExitBusOracle: *validatorsExitBusOracle
-        vaultHub: *vaultHub
-        withdrawalQueue: *withdrawalQueueERC721
-        withdrawalVault: *withdrawalVault
-        wstETH: *wstETH
-
     lido:
       name: Lido
       address: *lido
@@ -1108,7 +1067,9 @@ l1:
         getStakingRewardsDistribution: null
         getTotalFeeE4Precision: null
         getTotalModulesValidatorsBalance: null
-        hasRole: null
+        hasRole:
+          - args: [*STAKING_MODULE_UNVETTING_ROLE, *depositSecurityModuleV4]
+            result: false
         hasStakingModule: null
         supportsInterface: null
         validateReportValidatorBalancesByStakingModule: null
@@ -1196,38 +1157,6 @@ l1:
     depositSecurityModule:
       name: DepositSecurityModule
       address: *depositSecurityModule
-      checks:
-        # Prefixes = keccak256(keccak256("lido.DepositSecurityModule.<TAG>") ++ uint256(chainId) ++ dsmAddress),
-        # verified for chainId 1 and this DSM address
-        ATTEST_MESSAGE_PREFIX: "0x683df20ff74dc438e214ff44087d5e4b6ccf03b21e7f1ba074459a5212abd912"
-        DEPOSIT_CONTRACT: *depositContract
-        PAUSE_MESSAGE_PREFIX: "0xe3fb87228adf6fbdd12dc1496751f0251453f29ac84ebbd3a699461b51f1de7b"
-        STAKING_ROUTER: *stakingRouter
-        UNVET_MESSAGE_PREFIX: "0x90b2d3a4cbdc8a60c14ccf87f2bd90a9881cef5bd52d5bf4b3ec48497f97d06e"
-        VERSION: 4
-        getGuardianIndex: null
-        getGuardianQuorum: 4
-        getGuardians:
-          # https://docs.lido.fi/holders/lido-council-daemon#mainnet-members
-          [
-            "0x5fd0dDbC3351d009eb3f88DE7Cd081a614C519F1", # Lido dev team
-            "0x7912Fa976BcDe9c2cf728e213e892AD7588E6AaF", # Blockscape
-            "0x6d22aE126eB2c37F67a1391B37FF4f2863e61389", # Kiln
-            "0xf82D88217C249297C6037BA77CE34b3d8a90ab43", # Staking Facilities
-            "0xa56b128Ea2Ea237052b0fA2a96a387C0E43157d8", # P2P
-            "0x4B87F16B8d32cb5a859a4C48a88edB5adBe3498E", # Stakefish
-          ]
-        getLastDepositBlock: null
-        getMaxOperatorsPerUnvetting: 200
-        getOwner: *aragonAgent
-        getPauseIntentValidityPeriodBlocks: 6646
-        isDepositsPaused: false
-        isGuardian: null
-        isMinDepositDistancePassed: null
-
-    depositSecurityModuleV5:
-      name: DepositSecurityModule
-      address: *depositSecurityModuleV5
       checks:
         # keccak256(keccak256("lido.DepositSecurityModule.<TAG>_MESSAGE") ++ uint256(1) ++ dsmAddress).
         ATTEST_MESSAGE_PREFIX: "0x3348689a23b894997fda00331dfedcb1c416ef8624150ccef065758e2cc043b2"
@@ -5601,7 +5530,7 @@ l1:
         *lido :
           "0x33969636f1fbf3d7d062d4de4a08e7bd3c46606ec28b3a4398d2665be559b921": # BUFFER_RESERVE_MANAGER_ROLE
             manager: *aragonAgent
-            granted: [*aragonAgent]
+            granted: [*aragonAgent, *evmScriptExecutor]
           "0xe97b137254058bd94f28d2f3eb79e2d34074ffb488d042e3bc958e0a57d2fa22": # BURN_ROLE
             manager: *aragonVoting
           "0x2561bf26f818282a3be40719542054d2173eb0d38539e8a8d3cff22f29fd2384": # DEPOSIT_ROLE
@@ -6194,7 +6123,9 @@ l1:
         getRoleMemberCount:
         getRoleMembers:
         getTargetBalanceGwei: 2046750000000
-        hasRole: null
+        hasRole:
+          - args: [*TOP_UP_ROLE, *depositorBot]
+            result: false
         isBlockDistancePassed: true
         isPaused: false
         supportsInterface:
@@ -6203,7 +6134,7 @@ l1:
         *MANAGE_LIMITS_ROLE : []
         *PAUSE_ROLE : [*circuitBreaker, *resealManager]
         *RESUME_ROLE : [*resealManager]
-        *TOP_UP_ROLE : [*depositorBot]
+        *TOP_UP_ROLE : [*depositorDelegation]
       implementationChecks:
         BEACON_ROOTS: *eip4788BeaconRootsContract
         DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
