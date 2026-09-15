@@ -1,0 +1,43 @@
+import * as YAML from "yaml";
+
+import { ADDRESS_OR_HASH_RE, pairKeyToString, type SiblingSpec } from "./sibling-delegation";
+
+function collectDeployedLabels(deployedDocument: YAML.Document, fileLabel: string): Set<string> {
+  const deployedNode = deployedDocument.get("deployed");
+  if (!YAML.isMap(deployedNode)) {
+    throw new Error("the .deployed file must contain a `deployed:` mapping");
+  }
+
+  const labels = new Set<string>();
+  for (const pair of deployedNode.items) {
+    const sectionKey = pairKeyToString(pair.key, "?");
+    if (!YAML.isSeq(pair.value)) {
+      throw new Error(`\`deployed.${sectionKey}\` must be a list of labeled addresses`);
+    }
+    for (const item of pair.value.items) {
+      if (!YAML.isScalar(item)) {
+        throw new Error(`every entry under \`deployed.${sectionKey}\` must be a scalar address with an &label`);
+      }
+      const value = String(item.value);
+      if (!item.anchor) {
+        throw new Error(`address ${value} under \`deployed.${sectionKey}\` has no &label anchor`);
+      }
+      if (!ADDRESS_OR_HASH_RE.test(value)) {
+        throw new Error(`label &${item.anchor} is not a valid address: ${value}`);
+      }
+      if (labels.has(item.anchor)) {
+        throw new Error(`duplicate label &${item.anchor} in ${fileLabel}`);
+      }
+      labels.add(item.anchor);
+    }
+  }
+  return labels;
+}
+
+/** The `.deployed` delegation: a single `deployed:` section of labeled (20- or 32-byte) addresses. */
+export const DEPLOYED_SPEC: SiblingSpec = {
+  optionName: "--deployed",
+  fileLabel: "the .deployed file",
+  ownedSectionKeys: ["deployed"],
+  collectLabels: collectDeployedLabels,
+};

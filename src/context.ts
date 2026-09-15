@@ -19,6 +19,8 @@ export interface ErrorDetail {
 
 export const context = {
   configPath: "",
+  deployed: undefined as string | undefined,
+  inputs: undefined as string | undefined,
   checkOnly: null as CheckOnly | null,
   checkOnlyCmdArg: undefined as string | undefined,
   // --update-abi: rebuild the store from scratch instead of only downloading what is missing

@@ -14,6 +14,16 @@ export function parseCommandLineArguments() {
       "-o, --only <check-path>",
       `only checks to do, e.g. 'l2/proxyAdmin/${EntryField.checks}/owner', 'l1', 'l1/controller'`,
     )
+    .option(
+      "--deployed <path>",
+      "path to a '.deployed' YAML file that provides the address anchors for a wiring-only main config " +
+        "(applied only when given — never loaded automatically)",
+    )
+    .option(
+      "--inputs <path>",
+      "path to a '.inputs' YAML file that provides the config/externals anchors for a wiring-only main " +
+        "config (applied only when given — never loaded automatically)",
+    )
     .option("--update-abi", "re-download every ABI; missing ones are downloaded without the flag too")
     .option("--skip-implementation-check", "do not verify implementation addresses against the chain")
     .option("--allow-unverified-explorer", "download ABIs even when the explorer does not confirm the config's chainId")
@@ -66,6 +76,8 @@ export function parseCommandLineArguments() {
     configPath,
     checkOnly,
     checkOnlyCmdArg: options.only,
+    deployed: options.deployed as string | undefined,
+    inputs: options.inputs as string | undefined,
     updateAbi: options.updateAbi,
     skipImplementationCheck: Boolean(options.skipImplementationCheck),
     allowUnverifiedExplorer: Boolean(options.allowUnverifiedExplorer),

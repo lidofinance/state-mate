@@ -1,8 +1,27 @@
 import chalk from "chalk";
+import * as YAML from "yaml";
 
 import { registerSecret } from "./context";
 import { logErrorAndExit } from "./logger";
 import type { Abi, AbiArgumentsLength, ChainId } from "./types";
+
+// Keep scalar parsing consistent between standalone and sibling-composed configs.
+export const YAML_PARSE_OPTIONS: YAML.ParseOptions & YAML.DocumentOptions & YAML.SchemaOptions = {
+  schema: "core",
+  intAsBigInt: true,
+};
+export const yamlBigintReviver = (_: unknown, value: unknown) => (typeof value === "bigint" ? String(value) : value);
+// Alias expansion happens at toJS time. Trusted first-party configs exceed the default budget of 100.
+export const YAML_TO_JS_OPTIONS: YAML.ToJSOptions = { reviver: yamlBigintReviver, maxAliasCount: -1 };
+
+/** Return deployed section scalars in document order, or an empty array for absent/non-scalar sections. */
+export function getDeployedSectionScalars(document: YAML.Document, sectionKey: string): YAML.Scalar[] {
+  const section = document.getIn(["deployed", sectionKey]);
+  if (YAML.isSeq(section) && section.items.every((element) => YAML.isScalar(element))) {
+    return section.items as YAML.Scalar[];
+  }
+  return [];
+}
 
 // Contract entry fields
 export enum EntryField {

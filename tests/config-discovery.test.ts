@@ -19,6 +19,8 @@ describe("collectYamlConfigs", () => {
     fs.writeFileSync(path.join(directory, "b.yaml"), "");
     fs.writeFileSync(path.join(directory, "a.yml"), "");
     fs.writeFileSync(path.join(directory, "abis.json.gz"), "");
+    fs.writeFileSync(path.join(directory, "a.deployed.yaml"), "");
+    fs.writeFileSync(path.join(directory, "a.inputs.yml"), "");
     fs.writeFileSync(path.join(directory, "testnet", "c.yaml"), "");
 
     assert.deepEqual(collectYamlConfigs(directory), [
