@@ -48,7 +48,7 @@ The addresses under `deployed` determine which ABIs state-mate stores. Include i
 
 ## Separate address and input files
 
-Use `--deployed <path>` and/or `--inputs <path>` to supply anchors from separate YAML files. They are loaded only when explicitly selected for a single config file. See the [how-to examples](how-to.md#separate-deployed-addresses).
+Use `--deployed <path>` and/or `--inputs <path>` to supply anchors from separate YAML files. For a single config file, they are loaded only when explicitly selected. Directory runs can opt into matching sibling files with [`--auto-load-deployed-and-inputs`](cli.md). See the [how-to examples](how-to.md#separate-deployed-addresses).
 
 | File option  | Allowed top-level sections                    | Entry values                                                                                      |
 | ------------ | --------------------------------------------- | ------------------------------------------------------------------------------------------------- |

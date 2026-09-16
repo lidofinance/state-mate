@@ -190,6 +190,47 @@ test("sibling flags require a single config file", () => {
   });
 });
 
+test("auto-loading requires a directory and cannot be mixed with explicit siblings", () => {
+  withTemporaryDirectory("state-mate-cli-", (directory) => {
+    const { mainPath, deployedPath, inputsPath } = writeConfigSet(directory);
+    const fileRun = runStateMate(mainPath, "--auto-load-deployed-and-inputs", "--json");
+    assert.match(JSON.parse(fileRun.stdout).error, /requires a directory/);
+    for (const [flag, selected] of [
+      ["--deployed", deployedPath],
+      ["--inputs", inputsPath],
+    ]) {
+      const run = runStateMate(directory, "--auto-load-deployed-and-inputs", flag, selected, "--json");
+      assert.match(JSON.parse(run.stdout).error, /cannot be combined/);
+    }
+  });
+});
+
+test("directory auto-loading still fails on a missing sibling instead of skipping the config", () => {
+  withTemporaryDirectory("state-mate-cli-", (directory) => {
+    fs.writeFileSync(path.join(directory, "wiring.yaml"), MAIN_CONFIG);
+    const run = runStateMate(directory, "--auto-load-deployed-and-inputs", "--json");
+    const report = JSON.parse(run.stdout);
+    assert.equal(report.status, "error");
+    assert.equal(report.configs.length, 1);
+    assert.match(report.error, /Unresolved aliases/);
+  });
+});
+
+test("directory auto-loading reports ambiguous siblings as a JSON error", () => {
+  withTemporaryDirectory("state-mate-cli-", (directory) => {
+    const { deployedPath } = writeConfigSet(directory);
+    fs.copyFileSync(deployedPath, deployedPath.replace(/\.yaml$/, ".yml"));
+    const run = runStateMate(directory, "--auto-load-deployed-and-inputs", "--json");
+    assert.equal(run.stderr, "");
+    const report = JSON.parse(run.stdout);
+    assert.equal(report.status, "error");
+    assert.match(report.error, /Ambiguous deployed siblings/);
+    assert.equal(report.configs.length, 1);
+    assert.equal(report.configs[0].status, "error");
+    assert.equal(report.configs[0].error, report.error);
+  });
+});
+
 function assertStoppedBeforeSchema(output: string) {
   assert.doesNotMatch(output, /Schema validation passed|Env var .* is not set/);
 }

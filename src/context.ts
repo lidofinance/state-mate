@@ -19,6 +19,7 @@ export interface ErrorDetail {
 
 export const context = {
   configPath: "",
+  autoLoadDeployedAndInputs: false,
   deployed: undefined as string | undefined,
   inputs: undefined as string | undefined,
   checkOnly: null as CheckOnly | null,

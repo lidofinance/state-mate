@@ -66,6 +66,23 @@ export function resolveSiblingFilePath(spec: SiblingSpec, explicitArgument?: str
   return explicitArgument === undefined ? null : resolveExplicitFilePath(spec.optionName, explicitArgument);
 }
 
+/** Discover only same-stem siblings in the main config's directory; never choose between alternatives. */
+export function discoverSiblingPaths(configPath: string): { deployed?: string; inputs?: string } {
+  const stem = path.resolve(configPath).replace(/\.ya?ml$/, "");
+  const selected: { deployed?: string; inputs?: string } = {};
+  for (const kind of ["deployed", "inputs"] as const) {
+    const candidates = ["yaml", "yml"].map((extension) => `${stem}.${kind}.${extension}`);
+    const existing = candidates.filter((candidate) => fs.existsSync(candidate));
+    if (existing.length > 1) {
+      throw new Error(`Ambiguous ${kind} siblings for ${configPath}: ${existing.join(", ")}`);
+    }
+    if (existing.length === 1) {
+      selected[kind] = resolveExplicitFilePath(`--auto-load-deployed-and-inputs (${kind})`, existing[0]);
+    }
+  }
+  return selected;
+}
+
 type ParsedSource = { document: YAML.Document; label: string; lineCounter: YAML.LineCounter };
 
 /** Parse each source once with shared semantics; unresolved aliases are allowed until assembly. */

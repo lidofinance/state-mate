@@ -52,7 +52,7 @@ yarn start path/to/app.yaml --inputs path/to/app.inputs.yaml
 yarn start path/to/app.yaml --deployed path/to/app.deployed.yaml --inputs path/to/app.inputs.yaml
 ```
 
-Both options require a single config file. Paths are relative to the working directory, and files are never loaded automatically. Keep each file to one YAML document. Existing configs with inline `deployed:` still work without `--deployed`.
+Both options require a single config file. Paths are relative to the working directory, and files are not loaded automatically by default. For directory runs, use [`--auto-load-deployed-and-inputs`](cli.md) to load matching siblings. Keep each file to one YAML document. Existing configs with inline `deployed:` still work without `--deployed`.
 
 ## Run a focused check
 

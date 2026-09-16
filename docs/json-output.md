@@ -59,8 +59,8 @@ chain offers no log source for. `warnings` counts the `warnings` entries below.
 | Key                           | Present when                          | Meaning                                                                     |
 | ----------------------------- | ------------------------------------- | --------------------------------------------------------------------------- |
 | `config`                      | always                                | Path of the config file, as resolved from the command line.                 |
-| `deployed`                    | `--deployed` was supplied             | Absolute path of the selected deployed-address file.                        |
-| `inputs`                      | `--inputs` was supplied               | Absolute path of the selected inputs file.                                  |
+| `deployed`                    | a deployed sibling was selected       | Absolute path of the selected deployed-address file.                        |
+| `inputs`                      | an inputs sibling was selected        | Absolute path of the selected inputs file.                                  |
 | `status`                      | always                                | `passed`, `failed`, or `error` when the run aborted inside this config.     |
 | `checks`, `errors`, `skipped` | always                                | The counters of this config; see `summary`.                                 |
 | `error`                       | `status` is `error`                   | The abort message. The contracts checked before the abort are still listed. |
@@ -69,7 +69,7 @@ chain offers no log source for. `warnings` counts the `warnings` entries below.
 
 Sibling paths are resolved relative to the working directory, without resolving symlinks.
 They record the files selected for the run, including when reading or validating those files fails;
-their presence does not mean loading succeeded. Omitted flags produce no corresponding fields.
+their presence does not mean loading succeeded. Selection can be explicit or through `--auto-load-deployed-and-inputs`. Unselected siblings produce no corresponding fields.
 Paths identify the selected files, not their contents or versions.
 
 ## `contracts[]`

@@ -49,6 +49,7 @@ import {
 import { beginConfig, emitReport, endConfig } from "./report";
 import { ContractSectionValidator } from "./section-validators/contract";
 import {
+  discoverSiblingPaths,
   getMissingConfigAliases,
   loadStateWithSiblings,
   resolveSiblingFilePath,
@@ -146,7 +147,8 @@ function loadStateWithOptionalSiblings(): unknown {
       logErrorAndExit(
         `Unresolved aliases in ${chalk.magenta(context.configPath)}: ${missingAliases.map((alias) => `*${alias}`).join(", ")}.\n` +
           `Define their anchors before use. If they belong to separate files, supply ` +
-          `${DEPLOYED_SPEC.optionName} / ${INPUTS_SPEC.optionName}; sibling files are never loaded automatically.`,
+          `${DEPLOYED_SPEC.optionName} / ${INPUTS_SPEC.optionName} for a single-file run, ` +
+          `or --auto-load-deployed-and-inputs for a directory run; sibling files are never loaded automatically by default.`,
       );
     }
     return rejectInlineInputsSections(loadStateFromYaml(context.configPath));
@@ -391,6 +393,13 @@ async function main() {
     logErrorAndExit(`No such file or directory: ${chalk.magenta(context.configPath)}`);
   }
 
+  if (context.autoLoadDeployedAndInputs && (context.deployed !== undefined || context.inputs !== undefined)) {
+    logErrorAndExit("The --auto-load-deployed-and-inputs option cannot be combined with --deployed or --inputs");
+  }
+  if (context.autoLoadDeployedAndInputs && !fs.statSync(context.configPath).isDirectory()) {
+    logErrorAndExit("The --auto-load-deployed-and-inputs option requires a directory");
+  }
+
   if (fs.statSync(context.configPath).isDirectory()) {
     if (context.deployed || context.inputs) {
       logErrorAndExit("The --deployed and --inputs options require a single config file, not a directory");
@@ -408,6 +417,19 @@ async function main() {
       resetAbiCache();
       resetStats();
       logHeader1(configPath);
+      if (context.autoLoadDeployedAndInputs) {
+        context.deployed = undefined;
+        context.inputs = undefined;
+        try {
+          const siblings = discoverSiblingPaths(configPath);
+          context.deployed = siblings.deployed;
+          context.inputs = siblings.inputs;
+        } catch (error) {
+          // Discovery is part of this config's run, even when no selection can be made.
+          beginConfig(configPath);
+          logErrorAndExit(printError(error));
+        }
+      }
       beginConfig(configPath);
       await runConfig();
       endConfig();

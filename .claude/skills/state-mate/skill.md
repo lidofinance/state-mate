@@ -393,9 +393,10 @@ Each file is parsed once, then its root mapping entries are assembled into one Y
 
 Notes:
 
-- **Explicit-only**: `--deployed <path>` is the only way in. `<name>.deployed.<ext>` is a naming
-  convention, not a lookup — a file sitting next to the main config is never loaded on its own, so
-  running the wiring-only config without the flag fails with an error listing missing aliases and conditional guidance to supply sibling flags.
+- **Opt-in**: use `--deployed <path>` for one config, or `--auto-load-deployed-and-inputs` for a directory.
+  Automatic mode loads same-stem `.deployed.yaml`/`.yml` and `.inputs.yaml`/`.yml` files beside each main,
+  rejects ambiguous extensions, and cannot be combined with explicit sibling paths. Without either
+  selection mode, missing aliases fail with guidance to supply sibling flags.
 - The `.deployed` file may contain **only** a `deployed:` section, must be a **single YAML document**
   (no mid-file `---`/`...`), and every value must be a valid `0x` address/hash. RPC/explorer settings
   stay in the main config (they are not deployment addresses).
@@ -425,8 +426,8 @@ externals: # 3rd-party addresses (validated 0x); digit-only ids like chainId are
 ```
 
 The main config holds only the wiring (`*lidoName`, `l1.chainId: *chainId`, …) and **no
-`config:`/`externals:` section**; same full-delegation invariants as `.deployed`. **Explicit-only**
-too — pass `--inputs <path>` (never auto-loaded).
+`config:`/`externals:` section**; same full-delegation invariants as `.deployed`. **Opt-in**
+too — pass `--inputs <path>` for one config or `--auto-load-deployed-and-inputs` for a directory.
 
 ## Workflow
 

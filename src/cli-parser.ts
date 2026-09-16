@@ -17,12 +17,16 @@ export function parseCommandLineArguments() {
     .option(
       "--deployed <path>",
       "path to a '.deployed' YAML file that provides the address anchors for a wiring-only main config " +
-        "(applied only when given — never loaded automatically)",
+        "(single-file runs only)",
     )
     .option(
       "--inputs <path>",
       "path to a '.inputs' YAML file that provides the config/externals anchors for a wiring-only main " +
-        "config (applied only when given — never loaded automatically)",
+        "config (single-file runs only)",
+    )
+    .option(
+      "--auto-load-deployed-and-inputs",
+      "for directory runs, load matching .deployed and .inputs YAML files beside each config",
     )
     .option("--update-abi", "re-download every ABI; missing ones are downloaded without the flag too")
     .option("--skip-implementation-check", "do not verify implementation addresses against the chain")
@@ -74,6 +78,7 @@ export function parseCommandLineArguments() {
 
   return {
     configPath,
+    autoLoadDeployedAndInputs: Boolean(options.autoLoadDeployedAndInputs),
     checkOnly,
     checkOnlyCmdArg: options.only,
     deployed: options.deployed as string | undefined,
