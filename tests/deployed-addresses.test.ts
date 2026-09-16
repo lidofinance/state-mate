@@ -4,7 +4,7 @@ import path from "node:path";
 import { test } from "node:test";
 
 import { DEPLOYED_SPEC } from "../src/deployed-addresses";
-import { configDelegatesAnchors, loadStateWithSiblings, resolveSiblingFilePath } from "../src/sibling-delegation";
+import { getMissingConfigAliases, loadStateWithSiblings, resolveSiblingFilePath } from "../src/sibling-delegation";
 import { composeWithDeployedAddresses, toCrlf, withTemporaryDirectory } from "./delegation-helpers";
 
 const resolveDeployedFilePath = (deployedArgument?: string) => resolveSiblingFilePath(DEPLOYED_SPEC, deployedArgument);
@@ -349,7 +349,7 @@ ${checks}
   assert.equal(checksObject.check149, "0x1111111111111111111111111111111111111111");
 });
 
-test("configDelegatesAnchors: true only for a config that cannot be parsed standalone", () => {
+test("getMissingConfigAliases lists absent anchors and defers other errors to the parser", () => {
   withTemporaryDirectory("state-mate-delegates-", (directory) => {
     const write = (name: string, text: string) => {
       const filePath = path.join(directory, name);
@@ -358,13 +358,16 @@ test("configDelegatesAnchors: true only for a config that cannot be parsed stand
     };
 
     // Wiring only: it references &foo / &bar without defining them.
-    assert.equal(configDelegatesAnchors(write("wiring.yaml", MAIN_CONFIG)), true);
+    assert.deepEqual(getMissingConfigAliases(write("wiring.yaml", MAIN_CONFIG)), ["foo", "bar"]);
     // Self-contained: every alias resolves within the file itself.
-    assert.equal(configDelegatesAnchors(write("self.yaml", `${DEPLOYED}${MAIN_CONFIG}`)), false);
-    // These unreadable, multi-document, or alias-free inputs do not signal delegation.
-    assert.equal(configDelegatesAnchors(write("multi.yaml", `${DEPLOYED}---\n${MAIN_CONFIG}`)), false);
-    assert.equal(configDelegatesAnchors(write("broken.yaml", "l1: [unclosed\n")), false);
-    assert.equal(configDelegatesAnchors(path.join(directory, "missing.yaml")), false);
+    assert.deepEqual(getMissingConfigAliases(write("self.yaml", `${DEPLOYED}${MAIN_CONFIG}`)), []);
+    // Leave unreadable, malformed, and multi-document inputs to the normal parser.
+    assert.deepEqual(getMissingConfigAliases(write("multi.yaml", `${DEPLOYED}---\n${MAIN_CONFIG}`)), []);
+    assert.deepEqual(getMissingConfigAliases(write("broken.yaml", "l1: [unclosed\n")), []);
+    assert.deepEqual(getMissingConfigAliases(path.join(directory, "missing.yaml")), []);
+    assert.deepEqual(getMissingConfigAliases(write("repeated.yaml", "refs: [*foo, *bar, *foo]\n")), ["foo", "bar"]);
+    assert.deepEqual(getMissingConfigAliases(write("forward.yaml", "ref: *foo\nvalue: &foo true\n")), []);
+    assert.deepEqual(getMissingConfigAliases(write("malformed.yaml", "refs: [*foo\n")), []);
   });
 });
 

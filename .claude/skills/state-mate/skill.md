@@ -395,7 +395,7 @@ Notes:
 
 - **Explicit-only**: `--deployed <path>` is the only way in. `<name>.deployed.<ext>` is a naming
   convention, not a lookup — a file sitting next to the main config is never loaded on its own, so
-  running the wiring-only config without the flag fails with `delegates anchors to sibling file(s)`.
+  running the wiring-only config without the flag fails with an error listing missing aliases and conditional guidance to supply sibling flags.
 - The `.deployed` file may contain **only** a `deployed:` section, must be a **single YAML document**
   (no mid-file `---`/`...`), and every value must be a valid `0x` address/hash. RPC/explorer settings
   stay in the main config (they are not deployment addresses).

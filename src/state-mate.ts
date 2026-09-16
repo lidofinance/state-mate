@@ -49,7 +49,7 @@ import {
 import { beginConfig, emitReport, endConfig } from "./report";
 import { ContractSectionValidator } from "./section-validators/contract";
 import {
-  configDelegatesAnchors,
+  getMissingConfigAliases,
   loadStateWithSiblings,
   resolveSiblingFilePath,
   type SiblingSpec,
@@ -141,12 +141,12 @@ function loadStateWithOptionalSiblings(): unknown {
   }
 
   if (siblings.length === 0) {
-    // Explain how to supply missing sibling anchors before alias expansion fails.
-    if (configDelegatesAnchors(context.configPath)) {
+    const missingAliases = getMissingConfigAliases(context.configPath);
+    if (missingAliases.length > 0) {
       logErrorAndExit(
-        `${chalk.magenta(context.configPath)} delegates anchors to sibling file(s) — pass ` +
-          `${DEPLOYED_SPEC.optionName} / ${INPUTS_SPEC.optionName} with the file(s) defining them ` +
-          `(sibling files are never loaded automatically)`,
+        `Unresolved aliases in ${chalk.magenta(context.configPath)}: ${missingAliases.map((alias) => `*${alias}`).join(", ")}.\n` +
+          `Define their anchors before use. If they belong to separate files, supply ` +
+          `${DEPLOYED_SPEC.optionName} / ${INPUTS_SPEC.optionName}; sibling files are never loaded automatically.`,
       );
     }
     return rejectInlineInputsSections(loadStateFromYaml(context.configPath));

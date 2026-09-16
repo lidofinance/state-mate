@@ -298,20 +298,20 @@ export function composeWithSiblings(mainText: string, siblings: { text: string; 
   };
 }
 
-/** Detect aliases whose anchors are absent from the file; unreadable or non-single-document files return false. */
-export function configDelegatesAnchors(configPath: string): boolean {
+/** List aliases with absent anchors; leave unreadable, malformed, and multi-document files to the parser. */
+export function getMissingConfigAliases(configPath: string): string[] {
   let text: string;
   try {
     text = fs.readFileSync(path.resolve(configPath), "utf8");
   } catch {
-    return false;
+    return [];
   }
   const documents = YAML.parseAllDocuments(text, YAML_PARSE_OPTIONS);
-  if (documents.length !== 1) {
-    return false;
+  if (documents.length !== 1 || documents[0].errors.length > 0) {
+    return [];
   }
   const { anchors, aliases } = inspectMainDocument(documents[0]);
-  return [...aliases].some((alias) => !anchors.has(alias));
+  return [...aliases].filter((alias) => !anchors.has(alias));
 }
 
 /** Read the main config and each sibling, then compose them, exiting on any failure. */

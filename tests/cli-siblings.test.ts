@@ -68,11 +68,37 @@ test("a conventionally named sibling next to the config is NOT loaded without it
     const { output } = runStateMate(mainPath);
 
     assertStoppedBeforeSchema(output);
-    assert.match(output, /delegates anchors to sibling file\(s\)/);
-    assert.match(output, /pass --deployed \/ --inputs/);
+    assert.match(output, /Unresolved aliases in .*: \*chainId, \*fooAddress, \*lidoName\./);
+    assert.match(output, /If they belong to separate files, supply --deployed \/ --inputs/);
     assert.match(output, /never loaded automatically/);
     assert.doesNotMatch(output, /Loaded \d+ deployed address\(es\)/);
     assert.doesNotMatch(output, /Loaded \d+ input anchor\(s\)/);
+  });
+});
+
+for (const json of [false, true]) {
+  test(`a standalone alias typo retains its name${json ? " in JSON" : ""}`, () => {
+    withTemporaryDirectory("state-mate-cli-", (directory) => {
+      const mainPath = path.join(directory, "typo.yaml");
+      fs.writeFileSync(mainPath, "value: &foo true\nref: *fooo\n");
+      const run = runStateMate(mainPath, ...(json ? ["--json"] : []));
+      const message = json ? JSON.parse(run.stdout).configs[0].error : run.output;
+      assertStoppedBeforeSchema(run.output);
+      assert.match(message, /Unresolved aliases in .*: \*fooo\./);
+      assert.match(message, /Define their anchors before use/);
+      assert.match(message, /If they belong to separate files, supply --deployed \/ --inputs/);
+      assert.doesNotMatch(message, /delegates anchors/);
+    });
+  });
+}
+
+test("standalone forward aliases retain the native parser diagnostic", () => {
+  withTemporaryDirectory("state-mate-cli-", (directory) => {
+    const mainPath = path.join(directory, "forward.yaml");
+    fs.writeFileSync(mainPath, "ref: *foo\nvalue: &foo true\n");
+    const { output } = runStateMate(mainPath);
+    assert.match(output, /Unresolved alias \(the anchor must be set before the alias\): foo/);
+    assert.doesNotMatch(output, /sibling files/);
   });
 });
 
@@ -108,7 +134,7 @@ l1:
     const { output } = runStateMate(mainPath);
 
     assert.match(output, /Schema validation passed/);
-    assert.doesNotMatch(output, /delegates anchors/);
+    assert.doesNotMatch(output, /Unresolved aliases|sibling files/);
     assert.match(output, new RegExp(`Env var ${RPC_ENV_VAR} is not set`));
   });
 });
