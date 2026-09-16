@@ -102,6 +102,24 @@ test("standalone forward aliases retain the native parser diagnostic", () => {
   });
 });
 
+test("JSON records both selected sibling paths resolved from the working directory", () => {
+  withTemporaryDirectory("state-mate-cli-", (directory) => {
+    const { mainPath, deployedPath, inputsPath } = writeConfigSet(directory);
+    const run = runStateMate(
+      mainPath,
+      "--deployed",
+      path.relative(REPOSITORY_ROOT, deployedPath),
+      "--inputs",
+      path.relative(REPOSITORY_ROOT, inputsPath),
+      "--json",
+    );
+    const report = JSON.parse(run.stdout);
+    assert.match(report.error, new RegExp(`Env var ${RPC_ENV_VAR} is not set`));
+    assert.equal(report.configs[0].deployed, deployedPath);
+    assert.equal(report.configs[0].inputs, inputsPath);
+  });
+});
+
 test("both flags compose the config and it passes schema validation", () => {
   withTemporaryDirectory("state-mate-cli-", (directory) => {
     const { mainPath, deployedPath, inputsPath } = writeConfigSet(directory);
@@ -289,6 +307,8 @@ for (const failure of ["missing path", "unused label", "cross-source aliases"]) 
       assert.equal(report.configs[0].status, "error");
       assert.equal(report.configs[0].error, report.error);
       assert.equal(report.configs[0].config, mainPath);
+      assert.equal(report.configs[0].inputs, selectedPath);
+      assert.equal("deployed" in report.configs[0], false);
       assert.equal(report.summary.checks, 0);
       assertStoppedBeforeSchema(run.output);
       if (failure === "missing path") assert.ok(report.error.includes(selectedPath), report.error);

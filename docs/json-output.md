@@ -59,11 +59,18 @@ chain offers no log source for. `warnings` counts the `warnings` entries below.
 | Key                           | Present when                          | Meaning                                                                     |
 | ----------------------------- | ------------------------------------- | --------------------------------------------------------------------------- |
 | `config`                      | always                                | Path of the config file, as resolved from the command line.                 |
+| `deployed`                    | `--deployed` was supplied             | Absolute path of the selected deployed-address file.                        |
+| `inputs`                      | `--inputs` was supplied               | Absolute path of the selected inputs file.                                  |
 | `status`                      | always                                | `passed`, `failed`, or `error` when the run aborted inside this config.     |
 | `checks`, `errors`, `skipped` | always                                | The counters of this config; see `summary`.                                 |
 | `error`                       | `status` is `error`                   | The abort message. The contracts checked before the abort are still listed. |
 | `warnings`                    | a warning fell outside every contract | Same shape as a contract's `warnings`.                                      |
 | `contracts`                   | a contract has something to report    | One entry per contract with a failure or a warning, in config order.        |
+
+Sibling paths are resolved relative to the working directory, without resolving symlinks.
+They record the files selected for the run, including when reading or validating those files fails;
+their presence does not mean loading succeeded. Omitted flags produce no corresponding fields.
+Paths identify the selected files, not their contents or versions.
 
 ## `contracts[]`
 
