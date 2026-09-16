@@ -19,8 +19,15 @@ import {
   wasFetchedThisRun,
 } from "./abi-provider";
 import { parseCommandLineArguments } from "./cli-parser";
-import { normalizeChainId, printError, readUrlOrFromEnvironment } from "./common";
+import {
+  normalizeChainId,
+  printError,
+  readUrlOrFromEnvironment,
+  YAML_PARSE_OPTIONS,
+  YAML_TO_JS_OPTIONS,
+} from "./common";
 import { context, registerSecret, resetStats, stats } from "./context";
+import { DEPLOYED_SPEC } from "./deployed-addresses";
 import {
   assertProviderChain,
   createProvider,
@@ -28,6 +35,7 @@ import {
   loadContractInfo,
   verifyChainIdWithExplorer,
 } from "./explorer";
+import { INPUTS_SPEC } from "./inputs";
 import {
   FAILURE_MARK,
   FatalError,
@@ -40,6 +48,13 @@ import {
 } from "./logger";
 import { beginConfig, emitReport, endConfig } from "./report";
 import { ContractSectionValidator } from "./section-validators/contract";
+import {
+  discoverSiblingPaths,
+  getMissingConfigAliases,
+  loadStateWithSiblings,
+  resolveSiblingFilePath,
+  type SiblingSpec,
+} from "./sibling-delegation";
 import {
   type EntireDocument,
   EntireDocumentTB,
@@ -80,19 +95,73 @@ function formatAjvErrors(errors: ValidateFunction["errors"]) {
 }
 
 function loadStateFromYaml(configPath: string): unknown {
-  const reviver = (_: unknown, v: unknown) => {
-    return typeof v === "bigint" ? String(v) : v;
-  };
   const file = path.resolve(configPath);
   try {
     const configContent = fs.readFileSync(file, "utf8");
 
-    // maxAliasCount guards against alias-based resource exhaustion in untrusted input;
-    // our configs are first-party and the large ones legitimately exceed the default budget
-    return YAML.parse(configContent, reviver, { schema: "core", intAsBigInt: true, maxAliasCount: -1 });
+    return YAML.parse(configContent, { ...YAML_PARSE_OPTIONS, ...YAML_TO_JS_OPTIONS });
   } catch (error) {
     logErrorAndExit(`Failed to convert the YAML file ${chalk.magenta(configPath)} to JSON:\n${printError(error)}`);
   }
+}
+
+type SelectedSibling = { path: string; spec: SiblingSpec; noun: string };
+
+// Inline `config:`/`externals:` sections would bypass every `.inputs` invariant (`&label` anchors,
+// the address check on externals). The schema must list those keys for composed documents, so the
+// rejection lives here: they are legal only when delegated from a `.inputs` file.
+function rejectInlineInputsSections(document: unknown): unknown {
+  if (typeof document === "object" && document !== null) {
+    const inline = INPUTS_SPEC.ownedSectionKeys.filter((key) => Object.hasOwn(document, key));
+    if (inline.length > 0) {
+      logErrorAndExit(
+        `${chalk.magenta(context.configPath)} holds top-level ${inline.map((key) => `\`${key}:\``).join(" / ")} ` +
+          `section(s) inline; they are only allowed in ${INPUTS_SPEC.fileLabel}, ` +
+          `selected with \`${INPUTS_SPEC.optionName} <path>\``,
+      );
+    }
+  }
+  return document;
+}
+
+function loadStateWithOptionalSiblings(): unknown {
+  const siblings: SelectedSibling[] = [];
+  const siblingKinds: { spec: SiblingSpec; argument: string | undefined; noun: string }[] = [
+    { spec: DEPLOYED_SPEC, argument: context.deployed, noun: "deployed address(es)" },
+    { spec: INPUTS_SPEC, argument: context.inputs, noun: "input anchor(s)" },
+  ];
+  try {
+    for (const { spec, argument, noun } of siblingKinds) {
+      const siblingPath = resolveSiblingFilePath(spec, argument);
+      if (siblingPath) {
+        siblings.push({ path: siblingPath, spec, noun });
+      }
+    }
+  } catch (error) {
+    logErrorAndExit(printError(error));
+  }
+
+  if (siblings.length === 0) {
+    const missingAliases = getMissingConfigAliases(context.configPath);
+    if (missingAliases.length > 0) {
+      logErrorAndExit(
+        `Unresolved aliases in ${chalk.magenta(context.configPath)}: ${missingAliases.map((alias) => `*${alias}`).join(", ")}.\n` +
+          `Define their anchors before use. If they belong to separate files, supply ` +
+          `${DEPLOYED_SPEC.optionName} / ${INPUTS_SPEC.optionName} for a single-file run, ` +
+          `or --auto-load-deployed-and-inputs for a directory run; sibling files are never loaded automatically by default.`,
+      );
+    }
+    return rejectInlineInputsSections(loadStateFromYaml(context.configPath));
+  }
+
+  const { document, labels } = loadStateWithSiblings(
+    context.configPath,
+    siblings.map(({ path: siblingPath, spec }) => ({ path: siblingPath, spec })),
+  );
+  for (const [index, { path: siblingPath, noun }] of siblings.entries()) {
+    log(`Loaded ${labels[index].length} ${noun} from ${chalk.yellow(path.relative(process.cwd(), siblingPath))}`);
+  }
+  return siblings.some(({ spec }) => spec === INPUTS_SPEC) ? document : rejectInlineInputsSections(document);
 }
 
 function validateJsonWithSchema<T extends TSchema>(
@@ -301,8 +370,12 @@ export function collectYamlConfigs(directory: string): string[] {
     const fullPath = path.join(directory, entry.name);
     if (entry.isDirectory()) {
       files.push(...collectYamlConfigs(fullPath));
-    } else if (/\.ya?ml$/.test(entry.name) && !entry.name.includes(".seed.")) {
-      // seed files and their generated siblings are leftovers of the removed --generate flow
+    } else if (
+      /\.ya?ml$/.test(entry.name) &&
+      !entry.name.includes(".seed.") &&
+      !/\.(deployed|inputs)\.ya?ml$/.test(entry.name)
+    ) {
+      // Skip old seed files and anchor-only siblings, which are not standalone configs.
       files.push(fullPath);
     }
   }
@@ -320,7 +393,17 @@ async function main() {
     logErrorAndExit(`No such file or directory: ${chalk.magenta(context.configPath)}`);
   }
 
+  if (context.autoLoadDeployedAndInputs && (context.deployed !== undefined || context.inputs !== undefined)) {
+    logErrorAndExit("The --auto-load-deployed-and-inputs option cannot be combined with --deployed or --inputs");
+  }
+  if (context.autoLoadDeployedAndInputs && !fs.statSync(context.configPath).isDirectory()) {
+    logErrorAndExit("The --auto-load-deployed-and-inputs option requires a directory");
+  }
+
   if (fs.statSync(context.configPath).isDirectory()) {
+    if (context.deployed || context.inputs) {
+      logErrorAndExit("The --deployed and --inputs options require a single config file, not a directory");
+    }
     if (context.checkOnly) {
       logErrorAndExit(`The ${chalk.yellow("-o")} option requires a single config file, not a directory`);
     }
@@ -334,6 +417,19 @@ async function main() {
       resetAbiCache();
       resetStats();
       logHeader1(configPath);
+      if (context.autoLoadDeployedAndInputs) {
+        context.deployed = undefined;
+        context.inputs = undefined;
+        try {
+          const siblings = discoverSiblingPaths(configPath);
+          context.deployed = siblings.deployed;
+          context.inputs = siblings.inputs;
+        } catch (error) {
+          // Discovery is part of this config's run, even when no selection can be made.
+          beginConfig(configPath);
+          logErrorAndExit(printError(error));
+        }
+      }
       beginConfig(configPath);
       await runConfig();
       endConfig();
@@ -371,7 +467,7 @@ function exit(code: number): void {
 }
 
 async function runConfig() {
-  const jsonDocument = loadStateFromYaml(context.configPath);
+  const jsonDocument = loadStateWithOptionalSiblings();
 
   if (validateJsonWithSchema(jsonDocument, EntireDocumentTB)) {
     await downloadAndCheckAllAbi(jsonDocument);

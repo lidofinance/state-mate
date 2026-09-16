@@ -10,7 +10,49 @@ Pass a directory to discover `.yaml` and `.yml` files recursively:
 yarn start path/to/configs
 ```
 
-Files whose names contain `.seed.` are ignored.
+Files whose names contain `.seed.` or end in `.deployed.yaml`, `.inputs.yaml` (or `.yml`) are ignored.
+
+## Separate deployed addresses
+
+Move the entire `deployed:` section into a separate file to reuse the main config with another deployment:
+
+```yaml
+# app.deployed.yaml
+deployed:
+  l1:
+    - &vault "0x1111111111111111111111111111111111111111"
+```
+
+Keep references such as `address: *vault` in the main config, with no `deployed:` section:
+
+```sh
+yarn start path/to/app.yaml --deployed path/to/app.deployed.yaml
+```
+
+The address file may contain only `deployed:`. Each entry must have a unique `&label` and a valid quoted `0x` address or 32-byte hash. Reference every label with a `*alias` in the main config; labels cannot collide across files. RPC and explorer settings stay in the main config.
+
+## Separate input values
+
+Put configurable values in `config:` and external addresses or decimal IDs in `externals:`:
+
+```yaml
+# app.inputs.yaml
+config:
+  - &vaultName "My Vault"
+  - &limits [3600, 1800]
+externals:
+  - &owner "0x2222222222222222222222222222222222222222"
+  - &chainId 1
+```
+
+Reference these labels in the main config, for example `chainId: *chainId` or `owner: *owner` in a contract's checks. `config:` accepts scalars and arrays; `externals:` accepts addresses, 32-byte hashes, and nonnegative decimal IDs. The same label rules apply. Top-level `config:` and `externals:` sections are allowed only in the inputs file.
+
+```sh
+yarn start path/to/app.yaml --inputs path/to/app.inputs.yaml
+yarn start path/to/app.yaml --deployed path/to/app.deployed.yaml --inputs path/to/app.inputs.yaml
+```
+
+Both options require a single config file. Paths are relative to the working directory, and files are not loaded automatically by default. For directory runs, use [`--auto-load-deployed-and-inputs`](cli.md) to load matching siblings. Keep each file to one YAML document. Existing configs with inline `deployed:` still work without `--deployed`.
 
 ## Run a focused check
 
