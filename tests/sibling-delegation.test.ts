@@ -11,6 +11,38 @@ import { CROSS_SOURCE_ERRORS, composeWithInputs } from "./delegation-helpers";
 
 const INPUT = "config: [&value true]\n";
 
+for (const spec of [DEPLOYED_SPEC, INPUTS_SPEC]) {
+  const siblingText = (value: string) =>
+    spec === DEPLOYED_SPEC ? `deployed: {l1: [&value ${value}]}\n` : `externals: [&value ${value}]\n`;
+  for (const digits of [40, 64]) {
+    const literal = `0x00${"aB".repeat((digits - 2) / 2)}`;
+    test(`${spec.fileLabel}: unquoted ${digits / 2}-byte hex retains its spelling and explains quoting`, () => {
+      assert.throws(() => composeWithSiblings("ref: *value\n", [{ text: siblingText(literal), spec }]), {
+        message:
+          `label &value is not a valid address: unquoted hex literal ${literal}. ` +
+          "Quote the value to preserve it as an address or hash.",
+      });
+    });
+    test(`${spec.fileLabel}: quoting the ${digits / 2}-byte hex preserves the address or hash`, () => {
+      const { document } = composeWithSiblings("ref: *value\n", [{ text: siblingText(`"${literal}"`), spec }]);
+      assert.equal((document as { ref: string }).ref, literal);
+    });
+  }
+  test(`${spec.fileLabel}: other invalid values retain their diagnostic`, () => {
+    assert.throws(() => composeWithSiblings("ref: *value\n", [{ text: siblingText('"REPLACEME"'), spec }]), {
+      message: "label &value is not a valid address: REPLACEME",
+    });
+  });
+}
+
+test("config hex numbers and external decimal IDs keep their numeric semantics", () => {
+  const { document } = composeWithInputs(
+    "refs: [*hex, *decimal, *quoted]\n",
+    'config: [&hex 0x0010]\nexternals: [&decimal 560048, &quoted "16015286601757825753"]\n',
+  );
+  assert.deepEqual((document as { refs: string[] }).refs, ["16", "560048", "16015286601757825753"]);
+});
+
 test("flow sibling and block main preserve types, tags, repeated aliases, and entry order", () => {
   const inputs =
     '\uFEFF--- {config: [&values [true, false, null, 16015286601757825753, !!str 123]], externals: [&address "0x1111111111111111111111111111111111111111"]}\n...\n';

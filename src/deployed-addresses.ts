@@ -1,6 +1,6 @@
 import * as YAML from "yaml";
 
-import { ADDRESS_OR_HASH_RE, pairKeyToString, type SiblingSpec } from "./sibling-delegation";
+import { ADDRESS_OR_HASH_RE, invalidAddressMessage, pairKeyToString, type SiblingSpec } from "./sibling-delegation";
 
 function collectDeployedLabels(deployedDocument: YAML.Document, fileLabel: string): Set<string> {
   const deployedNode = deployedDocument.get("deployed");
@@ -23,7 +23,7 @@ function collectDeployedLabels(deployedDocument: YAML.Document, fileLabel: strin
         throw new Error(`address ${value} under \`deployed.${sectionKey}\` has no &label anchor`);
       }
       if (!ADDRESS_OR_HASH_RE.test(value)) {
-        throw new Error(`label &${item.anchor} is not a valid address: ${value}`);
+        throw new Error(invalidAddressMessage(item));
       }
       if (labels.has(item.anchor)) {
         throw new Error(`duplicate label &${item.anchor} in ${fileLabel}`);

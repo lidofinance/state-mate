@@ -1,6 +1,6 @@
 import * as YAML from "yaml";
 
-import { ADDRESS_OR_HASH_RE, pairKeyToString, type SiblingSpec } from "./sibling-delegation";
+import { ADDRESS_OR_HASH_RE, invalidAddressMessage, pairKeyToString, type SiblingSpec } from "./sibling-delegation";
 
 const INPUTS_SECTIONS = ["config", "externals"] as const;
 
@@ -37,7 +37,7 @@ function collectInputsLabels(document: YAML.Document, fileLabel: string): Set<st
           (typeof value === "bigint" && value >= 0n && scalar.format == null) ||
           (typeof value === "string" && /^\d+$/.test(value));
         if (!isChainIdLikeInteger && !ADDRESS_OR_HASH_RE.test(String(value))) {
-          throw new Error(`label &${node.anchor} is not a valid address: ${String(value)}`);
+          throw new Error(invalidAddressMessage(scalar));
         }
       }
       if (labels.has(node.anchor)) {

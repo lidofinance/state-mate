@@ -9,6 +9,17 @@ import { logErrorAndExit } from "./logger";
 // Enforce 20-byte addresses or 32-byte hashes; the schema also accepts placeholders such as REPLACEME.
 export const ADDRESS_OR_HASH_RE = /^0x[a-fA-F0-9]{40}$|^0x[a-fA-F0-9]{64}$/;
 
+/** Explain YAML's numeric interpretation without losing the original hex spelling. */
+export function invalidAddressMessage(scalar: YAML.Scalar): string {
+  if (typeof scalar.value === "bigint" && scalar.format === "HEX") {
+    return (
+      `label &${scalar.anchor} is not a valid address: unquoted hex literal ${scalar.source}. ` +
+      `Quote the value to preserve it as an address or hash.`
+    );
+  }
+  return `label &${scalar.anchor} is not a valid address: ${String(scalar.value)}`;
+}
+
 /** Validation rules and section ownership for a sibling file such as `.deployed` or `.inputs`. */
 export type SiblingSpec = {
   /** The CLI option that selects the file, e.g. `--deployed` (used in resolution errors). */
