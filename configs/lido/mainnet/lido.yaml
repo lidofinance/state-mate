@@ -6040,14 +6040,7 @@ l1:
         PAUSE_ROLE: *PAUSE_ROLE
         PIVOT_SLOT: 0
         RESUME_ROLE: *RESUME_ROLE
-        getConsolidationRequestLimitFullInfo:
-          [
-            *MAX_CONSOLIDATION_REQUESTS_LIMIT,
-            *CONSOLIDATIONS_PER_FRAME,
-            *FRAME_DURATION_IN_SEC,
-            *MAX_CONSOLIDATION_REQUESTS_LIMIT,
-            *MAX_CONSOLIDATION_REQUESTS_LIMIT,
-          ]
+        getConsolidationRequestLimitFullInfo: null # Operational limits change as requests are processed.
         getResumeSinceTimestamp: 0
         getRoleAdmin:
           - args: [*DEFAULT_ADMIN_ROLE]
