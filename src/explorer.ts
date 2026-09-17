@@ -22,6 +22,7 @@ export function loadContract(address: string, abi: Abi, provider: JsonRpcProvide
 }
 
 const RATE_LIMIT_RETRY_MS = 6 * 1000; // 5 seconds is not enough for BscScan free tier
+const EXPLORER_USER_AGENT = "state-mate (+https://github.com/lidofinance/state-mate)";
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -68,7 +69,9 @@ async function _fetchContractInfo(
   explorerKey?: string,
   chainId?: number | string,
 ): Promise<FetchOutcome> {
-  const sourcesUrl = _getExplorerApiUrl(explorerHostname, address, explorerKey, chainId);
+  const sourcesUrl = blockscoutV2Hosts.has(explorerHostname)
+    ? `https://${explorerHostname}/api/v2/smart-contracts/${address}`
+    : _getExplorerApiUrl(explorerHostname, address, explorerKey, chainId);
 
   // One address the explorer cannot serve, an unverified contract or a dead host for instance, must
   // not take the whole run down: the caller skips it and the ABIs downloaded so far reach the store.
@@ -82,9 +85,22 @@ async function _fetchContractInfo(
   try {
     sourcesResponse = await httpGetAsync(sourcesUrl);
   } catch (error) {
+    const rescued = await _fetchFromBlockscoutV2(address, explorerHostname, error);
+    if (rescued) return rescued;
     const transient = error instanceof ExplorerHttpError && error.transient;
     const retryDelayMs = error instanceof ExplorerHttpError ? error.retryDelayMs : 0;
     return skip(`${explorerHostname} is unreachable: ${printError(error)}`, transient, retryDelayMs);
+  }
+
+  const servedByV2 = sourcesResponse as { abi?: unknown; name?: unknown };
+  if (blockscoutV2Hosts.has(explorerHostname) && isValidAbi(servedByV2.abi)) {
+    return {
+      contract: {
+        abi: servedByV2.abi,
+        address,
+        contractName: typeof servedByV2.name === "string" ? servedByV2.name : "",
+      },
+    };
   }
 
   if (isResponseBad(sourcesResponse)) {
@@ -117,39 +133,128 @@ async function _fetchContractInfo(
   };
 }
 
+/** Blockscout's own contract route, tried when the etherscan-compatible one refuses. */
+async function _fetchFromBlockscoutV2(
+  address: string,
+  explorerHostname: string,
+  refusal: unknown,
+): Promise<FetchOutcome | undefined> {
+  if (explorerHostname.includes("etherscan.io")) return undefined;
+  const status = refusal instanceof ExplorerHttpError ? refusal.message : "";
+  if (!/\b(403|429|404)\b/.test(status)) return undefined;
+  let served: { abi?: unknown; name?: unknown };
+  try {
+    served = await httpGetAsync(`https://${explorerHostname}/api/v2/smart-contracts/${address}`);
+  } catch {
+    return undefined;
+  }
+  if (!isValidAbi(served.abi)) return undefined;
+  blockscoutV2Hosts.add(explorerHostname);
+  log(
+    `${WARNING_MARK} ${chalk.yellow(`ABI ${address}: read from ${explorerHostname} v2 after the first route refused`)}`,
+  );
+  return {
+    contract: { abi: served.abi, address, contractName: typeof served.name === "string" ? served.name : "" },
+  };
+}
+
 // The free etherscan tier answers 3 calls per second and charges a multi-second penalty for
 // breaking that, so every request reserves a slot up front instead of finding out the hard way.
 const EXPLORER_REQUESTS_PER_SECOND = 3;
 const MIN_REQUEST_INTERVAL_MS = Math.ceil(1000 / EXPLORER_REQUESTS_PER_SECOND);
-let nextRequestAt = 0;
+const MAX_REQUEST_INTERVAL_MS = 60 * 1000;
+
+/** One queue per host: two explorers in one run have separate limits and separate queues. */
+const paceByHost = new Map<string, { intervalMs: number; nextAt: number }>();
+
+/** Hosts whose v2 route has answered. Asked first afterwards, rather than after another 429. */
+const blockscoutV2Hosts = new Set<string>();
+
+function hostOf(url: string): string {
+  try {
+    return new URL(url).host;
+  } catch {
+    return url;
+  }
+}
+
+/** Limits known before any host has refused anything. Longest suffix first. */
+const KNOWN_LIMITS: ReadonlyArray<[string, number]> = [
+  // measured 2026-09-17: the instance states X-RateLimit-Limit 10 on refusal
+  ["blockscout.com", 10],
+  ["api.etherscan.io", 180],
+];
+
+function openingInterval(host: string): number {
+  for (const [suffix, perMinute] of KNOWN_LIMITS) {
+    if (host === suffix || host.endsWith(`.${suffix}`)) {
+      return Math.min(Math.ceil(60_000 / perMinute), MAX_REQUEST_INTERVAL_MS);
+    }
+  }
+  return MIN_REQUEST_INTERVAL_MS;
+}
+
+function paceFor(url: string) {
+  const host = hostOf(url);
+  let pace = paceByHost.get(host);
+  if (!pace) {
+    pace = { intervalMs: openingInterval(host), nextAt: 0 };
+    paceByHost.set(host, pace);
+  }
+  return pace;
+}
 
 /** Returns how long this request has to wait, and books the slot for it. */
-export function reserveRequestSlot(now: number): number {
-  const slot = Math.max(now, nextRequestAt);
-  nextRequestAt = slot + MIN_REQUEST_INTERVAL_MS;
+export function reserveRequestSlot(now: number, url = ""): number {
+  const pace = paceFor(url);
+  const slot = Math.max(now, pace.nextAt);
+  pace.nextAt = slot + pace.intervalMs;
   return slot - now;
 }
 
+/**
+ * Take a host's limit from its own refusal.
+ *
+ * `RateLimit-Limit` and `Retry-After` are what a server states when it turns a request away;
+ * measuring by trial would be slower, ruder and less accurate. Without either, the interval
+ * doubles, which converges without asking the host to explain itself.
+ */
+export function learnRateLimit(url: string, headers?: Headers, now = Date.now()): number {
+  const pace = paceFor(url);
+  const perMinute = Number(headers?.get("ratelimit-limit") ?? headers?.get("x-ratelimit-limit"));
+  const retryAfter = Number(headers?.get("retry-after"));
+  if (Number.isFinite(perMinute) && perMinute > 0) {
+    pace.intervalMs = Math.min(Math.ceil(60_000 / perMinute), MAX_REQUEST_INTERVAL_MS);
+  } else {
+    pace.intervalMs = Math.min(pace.intervalMs * 2, MAX_REQUEST_INTERVAL_MS);
+  }
+  const wait = Number.isFinite(retryAfter) && retryAfter > 0 ? retryAfter * 1000 : pace.intervalMs;
+  pace.nextAt = Math.max(pace.nextAt, now + wait);
+  return pace.intervalMs;
+}
+
 export function resetRequestSlots(): void {
-  nextRequestAt = 0;
+  paceByHost.clear();
+  blockscoutV2Hosts.clear();
 }
 
 // A single request with no retries of its own: loadContractInfo owns the whole retry budget,
 // and a second layer of attempts here would multiply it
 export async function httpGetAsync<T>(url: string): Promise<T> {
-  const delay = reserveRequestSlot(Date.now());
+  const delay = reserveRequestSlot(Date.now(), url);
   if (delay > 0) await sleep(delay);
   let response: Response;
   try {
-    response = await fetch(url, { method: "GET" });
+    response = await fetch(url, { method: "GET", headers: explorerHeaders(url) });
   } catch (error) {
     throw new ExplorerHttpError(`Failed to fetch contract source code: ${printError(error)}`, true);
   }
   if (!response.ok) {
+    const paced = response.status === 429 ? learnRateLimit(url, response.headers) : 0;
     throw new ExplorerHttpError(
       `Failed to fetch contract source code: HTTP status code ${response.status}: ${response.statusText}`,
       isTransientHttpStatus(response.status),
-      response.status === 429 ? RATE_LIMIT_RETRY_MS : 0,
+      response.status === 429 ? Math.max(paced, RATE_LIMIT_RETRY_MS) : 0,
     );
   }
   try {
@@ -157,6 +262,18 @@ export async function httpGetAsync<T>(url: string): Promise<T> {
   } catch (error) {
     throw new ExplorerHttpError(`Failed to fetch contract source code: ${printError(error)}`, true);
   }
+}
+
+/** Some Cloudflare-fronted instances answer 403 without a same-origin Referer. */
+export function explorerHeaders(url: string): Record<string, string> {
+  const headers: Record<string, string> = { "User-Agent": EXPLORER_USER_AGENT };
+  try {
+    const { protocol, host } = new URL(url);
+    headers["Referer"] = `${protocol}//${host}/`;
+  } catch {
+    /* no origin to send back */
+  }
+  return headers;
 }
 
 function _hexToDecimal(value: unknown): string | undefined {

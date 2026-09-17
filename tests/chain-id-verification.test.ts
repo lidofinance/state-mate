@@ -8,6 +8,7 @@ import { context, resetStats, stats } from "../src/context";
 import {
   assertProviderChain,
   loadContractInfo,
+  learnRateLimit,
   reserveRequestSlot,
   resetRequestSlots,
   verifyChainIdWithExplorer,
@@ -248,6 +249,59 @@ describe("explorer request pacing", () => {
     const now = 1_000_000;
     reserveRequestSlot(now);
     assert.equal(reserveRequestSlot(now + 5000), 0);
+  });
+
+  it("queues each host separately", () => {
+    // One queue for every explorer paced them all at the tightest tier anyone had measured, and
+    // at the loosest one anyone had: a run reading etherscan at 3/s hit a Blockscout instance
+    // allowing 10 a minute eighteen times too fast, and every call came back 429.
+    const now = 1_000_000;
+    assert.equal(reserveRequestSlot(now, "https://api.etherscan.io/v2/api"), 0);
+    assert.equal(reserveRequestSlot(now, "https://one.blockscout.com/api"), 0);
+    assert.equal(reserveRequestSlot(now, "https://api.etherscan.io/v2/api"), 334);
+  });
+
+  it("opens at a limit it already knows, before any refusal", () => {
+    // Earning it costs a 429, and for a scrape one per address until the pacer catches up.
+    const now = 1_000_000;
+    reserveRequestSlot(now, "https://one.blockscout.com/api");
+    assert.equal(reserveRequestSlot(now, "https://one.blockscout.com/api"), 6000);
+    reserveRequestSlot(now, "https://unknown.example/api");
+    assert.equal(reserveRequestSlot(now, "https://unknown.example/api"), 334);
+  });
+
+  it("takes a host's limit from the refusal that states it", () => {
+    const url = "https://one.blockscout.com/api";
+    const now = 1_000_000;
+
+    learnRateLimit(url, new Headers({ "x-ratelimit-limit": "10" }), now);
+
+    assert.equal(reserveRequestSlot(now + 6000, url), 0);
+    assert.equal(reserveRequestSlot(now + 6000, url), 6000);
+  });
+
+  it("honours Retry-After for when to resume", () => {
+    const url = "https://two.blockscout.com/api";
+    const now = 1_000_000;
+
+    learnRateLimit(url, new Headers({ "retry-after": "30" }), now);
+
+    assert.equal(reserveRequestSlot(now, url), 30_000);
+  });
+
+  it("doubles the interval when the host states nothing", () => {
+    const url = "https://quiet.example/api";
+    const now = 1_000_000;
+
+    assert.equal(learnRateLimit(url, new Headers(), now), 668);
+    assert.equal(learnRateLimit(url, undefined, now), 1336);
+  });
+
+  it("never backs off past a minute", () => {
+    const url = "https://stubborn.example/api";
+    let interval = 0;
+    for (let i = 0; i < 20; i++) interval = learnRateLimit(url, new Headers(), 1_000_000);
+    assert.equal(interval, 60_000);
   });
 });
 

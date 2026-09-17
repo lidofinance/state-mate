@@ -16,6 +16,7 @@ import {
   parseQuantity,
   resolveScanBounds,
   type ScanRange,
+  setExplorerTokenEnv,
   setRateLimitPause,
 } from "../src/acl/log-source";
 import { resetRequestSlots } from "../src/explorer";
@@ -290,5 +291,75 @@ describe("chain log sources", () => {
       describeSource({ hostname: "base.blockscout.com", kind: "blockscout" }, "8453"),
       "base.blockscout.com",
     );
+  });
+});
+
+describe("the explorer token", () => {
+  const withEnv = async (vars: Record<string, string | undefined>, body: () => Promise<void>) => {
+    const previous = Object.fromEntries(Object.keys(vars).map((k) => [k, process.env[k]]));
+    for (const [k, v] of Object.entries(vars)) {
+      if (v === undefined) delete process.env[k];
+      else process.env[k] = v;
+    }
+    try {
+      await body();
+    } finally {
+      for (const [k, v] of Object.entries(previous)) {
+        if (v === undefined) delete process.env[k];
+        else process.env[k] = v;
+      }
+    }
+  };
+
+  it("comes from the variable the config names", async () => {
+    // Reading a literal `ETHERSCAN_TOKEN` sent every ACL scan out unkeyed while the deployment
+    // held the same credential under the name its config declares. Etherscan answers
+    // "Missing/Invalid API Key", which reads as a rate limit and gets answered by copying the
+    // secret into the file under a second name.
+    await withEnv({ ETHERSCAN_TOKEN: undefined, ETHERSCAN_API_KEY: "from-the-config" }, async () => {
+      setExplorerTokenEnv("ETHERSCAN_API_KEY");
+      const seen: string[] = [];
+      const restore = mock.method(globalThis, "fetch", async (url: Parameters<typeof fetch>[0]) => {
+        seen.push(String(url));
+        return { ok: true, json: async () => ({ result: [], status: "1" }) } as Response;
+      });
+      try {
+        await collectRoleEvents("1", "0x" + "11".repeat(20), makeSettledScanRange(0, 10));
+      } finally {
+        restore.mock.restore();
+      }
+      assert.ok(
+        seen.some((url) => url.includes("apikey=from-the-config")),
+        `no request carried the configured key: ${seen[0] ?? "(none sent)"}`,
+      );
+    });
+  });
+
+  it("falls back to the historic name, so a deployment relying on it keeps working", async () => {
+    await withEnv({ ETHERSCAN_TOKEN: "the-old-name", ETHERSCAN_API_KEY: undefined }, async () => {
+      setExplorerTokenEnv(undefined);
+      const seen: string[] = [];
+      const restore = mock.method(globalThis, "fetch", async (url: Parameters<typeof fetch>[0]) => {
+        seen.push(String(url));
+        return { ok: true, json: async () => ({ result: [], status: "1" }) } as Response;
+      });
+      try {
+        await collectRoleEvents("1", "0x" + "22".repeat(20), makeSettledScanRange(0, 10));
+      } finally {
+        restore.mock.restore();
+      }
+      assert.ok(
+        seen.some((url) => url.includes("apikey=the-old-name")),
+        seen[0] ?? "(none sent)",
+      );
+    });
+  });
+
+  it("knows chain 4663, whose holders were invisible while it did not", () => {
+    // A chain absent from this table skips the scan and records "holders cannot be enumerated",
+    // so an undeclared role holder is invisible rather than reported.
+    const source = CHAIN_LOG_SOURCES["4663"]?.source;
+    assert.equal(source?.kind, "blockscout");
+    assert.equal(source?.kind === "blockscout" ? source.hostname : "", "robinhoodchain.blockscout.com");
   });
 });

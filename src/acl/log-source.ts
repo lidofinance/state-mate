@@ -31,6 +31,7 @@ export const CHAIN_LOG_SOURCES: Readonly<Record<string, ChainLogSource>> = {
   "1": { confirmationLag: 8, source: { kind: "etherscan" } },
   "10": { confirmationLag: 60, source: { hostname: "explorer.optimism.io", kind: "blockscout" } },
   "130": { confirmationLag: 120, source: { kind: "etherscan" } },
+  "4663": { confirmationLag: 1200, source: { hostname: "robinhoodchain.blockscout.com", kind: "blockscout" } },
   "8453": { confirmationLag: 60, source: { hostname: "base.blockscout.com", kind: "blockscout" } },
   "42161": { confirmationLag: 240, source: { kind: "etherscan" } },
   "59144": { confirmationLag: 30, source: { kind: "etherscan" } },
@@ -133,10 +134,28 @@ async function explorerGet(url: string): Promise<ExplorerLogsResponse> {
   }
 }
 
+/** What the config's `explorerTokenEnv` named, set per section as its checks begin. */
+let configuredTokenEnv: string | undefined;
+
+export function setExplorerTokenEnv(name: string | undefined): void {
+  configuredTokenEnv = name;
+}
+
+function explorerToken(fallback: string): [string | undefined, string] {
+  if (configuredTokenEnv && process.env[configuredTokenEnv]) {
+    return [process.env[configuredTokenEnv], configuredTokenEnv];
+  }
+  return [process.env[fallback], fallback];
+}
+
 function explorerUrl(source: LogSource, chainId: string, query: string): string {
-  if (source.kind === "blockscout") return `https://${source.hostname}/api?${query}`;
-  const key = process.env.ETHERSCAN_TOKEN;
-  if (key) registerSecret(key, "$ETHERSCAN_TOKEN");
+  if (source.kind === "blockscout") {
+    const [key, name] = explorerToken("BLOCKSCOUT_API_KEY");
+    if (key) registerSecret(key, `$${name}`);
+    return `https://${source.hostname}/api?${query}${key ? `&apikey=${encodeURIComponent(key)}` : ""}`;
+  }
+  const [key, name] = explorerToken("ETHERSCAN_TOKEN");
+  if (key) registerSecret(key, `$${name}`);
   return `https://api.etherscan.io/v2/api?chainid=${chainId}&${query}${key ? `&apikey=${key}` : ""}`;
 }
 
@@ -278,8 +297,7 @@ export async function resolveDeploymentBlock(chainId: string, address: string): 
   }
 
   const entry = (Array.isArray(response.result) ? response.result[0] : undefined) as
-    | Record<string, unknown>
-    | undefined;
+    Record<string, unknown> | undefined;
   // getcontractcreation takes a list of addresses and answers in its own order, so the row has to
   // be checked against the address that was asked about rather than assumed to match
   if (!entry || String(entry.contractAddress ?? "").toLowerCase() !== address.toLowerCase()) return undefined;
