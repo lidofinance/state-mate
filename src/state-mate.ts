@@ -18,6 +18,7 @@ import {
   resetAbiCache,
   wasFetchedThisRun,
 } from "./abi-provider";
+import { setExplorerTokenEnv } from "./acl/log-source";
 import { parseCommandLineArguments } from "./cli-parser";
 import { normalizeChainId, printError, readUrlOrFromEnvironment } from "./common";
 import { context, registerSecret, resetStats, stats } from "./context";
@@ -283,6 +284,7 @@ async function checkNetworkSection(sectionTitle: string, section: NetworkSection
   const rpcUrl = readUrlOrFromEnvironment(section.rpcUrl);
   const provider = createProvider(rpcUrl);
   const chainId = normalizeChainId(section.chainId);
+  setExplorerTokenEnv(section.explorerTokenEnv);
   // assertProviderChain vouches for the RPC; the explorer is probed by the ABI pass, and only
   // when it has something to download
   await assertProviderChain(provider, chainId);
