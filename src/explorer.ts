@@ -178,11 +178,27 @@ function hostOf(url: string): string {
   }
 }
 
+/** Limits known before any host has refused anything. Longest suffix first. */
+const KNOWN_LIMITS: ReadonlyArray<[string, number]> = [
+  // measured 2026-09-17: the instance states X-RateLimit-Limit 10 on refusal
+  ["blockscout.com", 10],
+  ["api.etherscan.io", 180],
+];
+
+function openingInterval(host: string): number {
+  for (const [suffix, perMinute] of KNOWN_LIMITS) {
+    if (host === suffix || host.endsWith(`.${suffix}`)) {
+      return Math.min(Math.ceil(60_000 / perMinute), MAX_REQUEST_INTERVAL_MS);
+    }
+  }
+  return MIN_REQUEST_INTERVAL_MS;
+}
+
 function paceFor(url: string) {
   const host = hostOf(url);
   let pace = paceByHost.get(host);
   if (!pace) {
-    pace = { intervalMs: MIN_REQUEST_INTERVAL_MS, nextAt: 0 };
+    pace = { intervalMs: openingInterval(host), nextAt: 0 };
     paceByHost.set(host, pace);
   }
   return pace;

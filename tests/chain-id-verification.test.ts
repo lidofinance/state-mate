@@ -261,13 +261,21 @@ describe("explorer request pacing", () => {
     assert.equal(reserveRequestSlot(now, "https://api.etherscan.io/v2/api"), 334);
   });
 
+  it("opens at a limit it already knows, before any refusal", () => {
+    // Earning it costs a 429, and for a scrape one per address until the pacer catches up.
+    const now = 1_000_000;
+    reserveRequestSlot(now, "https://one.blockscout.com/api");
+    assert.equal(reserveRequestSlot(now, "https://one.blockscout.com/api"), 6000);
+    reserveRequestSlot(now, "https://unknown.example/api");
+    assert.equal(reserveRequestSlot(now, "https://unknown.example/api"), 334);
+  });
+
   it("takes a host's limit from the refusal that states it", () => {
     const url = "https://one.blockscout.com/api";
     const now = 1_000_000;
 
     learnRateLimit(url, new Headers({ "x-ratelimit-limit": "10" }), now);
 
-    // ten a minute, so six seconds apart -- not the three a second the etherscan tier allows
     assert.equal(reserveRequestSlot(now + 6000, url), 0);
     assert.equal(reserveRequestSlot(now + 6000, url), 6000);
   });
