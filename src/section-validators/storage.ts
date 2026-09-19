@@ -2,10 +2,11 @@ import type { JsonRpcProvider } from "ethers";
 
 import { EntryField } from "src/common";
 import { LogCommand, logHeader2 } from "src/logger";
+import { recordObservedStorage } from "src/observed";
 import type { ContractEntry } from "src/typebox";
 import type { ChainId } from "src/types";
 
-import { incChecks, incErrors, SectionValidatorBase, setErrorContext } from "./base";
+import { getErrorContext, incChecks, incErrors, SectionValidatorBase, setErrorContext } from "./base";
 
 /**
  * Normalizes a hex value to a 32-byte (64 hex chars + 0x prefix = 66 chars) representation.
@@ -55,6 +56,7 @@ export class StorageSectionValidator extends SectionValidatorBase {
 
       try {
         const actual = await this.provider.getStorage(address, slot);
+        recordObservedStorage(getErrorContext(), slot, actual);
         const normalizedActual = normalizeToBytes32(actual);
         const normalizedExpected = normalizeToBytes32(expectedValue);
 

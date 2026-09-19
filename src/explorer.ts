@@ -3,6 +3,7 @@ import { Contract, JsonRpcProvider } from "ethers";
 
 import { printError } from "./common";
 import { log, logErrorAndExit, WARNING_MARK } from "./logger";
+import { pinBlockTag, toBlockTag } from "./pinned-block";
 import {
   type Abi,
   type ContractInfo,
@@ -234,13 +235,24 @@ export async function withTransientRetry<T>(run: () => Promise<T>, delayMs = TRA
   }
 }
 
-class RetryingJsonRpcProvider extends JsonRpcProvider {
+export class RetryingJsonRpcProvider extends JsonRpcProvider {
+  // Set by --block: reads name this block instead of "latest", and the log scans end at it
+  public pinnedBlock: number | undefined;
+
   override async send(method: string, parameters: unknown[] | Record<string, unknown>): Promise<unknown> {
-    return withTransientRetry(() => super.send(method, parameters));
+    const pinned =
+      this.pinnedBlock === undefined
+        ? parameters
+        : (pinBlockTag(method, parameters, toBlockTag(this.pinnedBlock)) as typeof parameters);
+    return withTransientRetry(() => super.send(method, pinned));
+  }
+
+  override async getBlockNumber(): Promise<number> {
+    return this.pinnedBlock ?? (await super.getBlockNumber());
   }
 }
 
-export function createProvider(rpcUrl: string): JsonRpcProvider {
+export function createProvider(rpcUrl: string): RetryingJsonRpcProvider {
   // staticNetwork stops ethers from re-sending eth_chainId with every call, which otherwise
   // doubles traffic and trips rate limits on public RPCs
   return new RetryingJsonRpcProvider(rpcUrl, undefined, { staticNetwork: true });
