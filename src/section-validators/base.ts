@@ -6,6 +6,7 @@ import { loadAbiFromFile } from "src/abi-provider";
 import { type EntryField, getNonMutables, printError } from "src/common";
 import { context, type ErrorDetail, stats } from "src/context";
 import { LogCommand, logError, logErrorAndExit, logMethodSkipped } from "src/logger";
+import { recordObservedCall } from "src/observed";
 import {
   type ArbitraryObject,
   type ContractEntry,
@@ -29,6 +30,10 @@ let currentErrorContext: Partial<ErrorDetail> = {};
 
 export function setErrorContext(update: Partial<ErrorDetail>): void {
   currentErrorContext = { ...currentErrorContext, ...update };
+}
+
+export function getErrorContext(): Readonly<Partial<ErrorDetail>> {
+  return currentErrorContext;
 }
 
 export function clearErrorContext(): void {
@@ -181,11 +186,13 @@ export abstract class SectionValidatorBase {
     try {
       actual = await contractFunction.staticCall(...(args || ""));
     } catch (error) {
+      recordObservedCall(currentErrorContext, signature, args, { reverted: printError(error) });
       const errorMessage = `REVERTED with: ${printError(error)}`;
       logHandle.failure(errorMessage);
       incErrors(errorMessage);
       return;
     }
+    recordObservedCall(currentErrorContext, signature, args, { value: actual });
     try {
       _assertEqual(actual, expected);
       logHandle.success(_stringify(actual));
@@ -215,10 +222,12 @@ export abstract class SectionValidatorBase {
     }
     try {
       const actual: unknown = await contractFunction.staticCall(...(args || ""));
+      recordObservedCall(currentErrorContext, signature, args, { value: actual });
       const errorMessage = `Expected revert but got: ${_stringify(actual)}`;
       logHandle.failure(errorMessage);
       incErrors(errorMessage);
     } catch (error) {
+      recordObservedCall(currentErrorContext, signature, args, { reverted: printError(error) });
       logHandle.success(`REVERTED with: ${printError(error)}`);
     }
   }
@@ -236,7 +245,7 @@ export abstract class SectionValidatorBase {
   }
 }
 
-function _stringify(value: unknown) {
+export function _stringify(value: unknown) {
   return value instanceof Object ? JSON.stringify(value) : String(value);
 }
 

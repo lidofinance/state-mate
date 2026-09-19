@@ -1,8 +1,10 @@
 import type { Contract, JsonRpcProvider } from "ethers";
 
-import { EntryField } from "src/common";
+import { EntryField, printError } from "src/common";
+import { context } from "src/context";
 import { loadContract } from "src/explorer";
-import { logErrorAndExit } from "src/logger";
+import { LogCommand, logErrorAndExit } from "src/logger";
+import { recordObservedCall } from "src/observed";
 import {
   ArrayOfStaticCallCheckTB,
   type ChecksEntryValue,
@@ -11,9 +13,45 @@ import {
   StaticCallCheckTB,
   ViewResultTB,
 } from "src/typebox";
-import type { ChainId } from "src/types";
+import type { Abi, ChainId } from "src/types";
 
-import { CheckLevel, needCheck, SectionValidatorBase } from "./base";
+import { _stringify, CheckLevel, getErrorContext, needCheck, SectionValidatorBase } from "./base";
+
+// <name>Length or <name>Count next to an indexed getter <name>(uint256) is an enumeration
+const ENUMERATION = /^(.+?)(Length|Count)$/;
+// Beyond this many entries the expansion would be a scan, not a check
+const ENUMERATION_CAP = 1000;
+
+function indexedGetter(abi: Abi, stem: string): boolean {
+  return abi.some(
+    ({ type, name, inputs, stateMutability }) =>
+      type === "function" &&
+      name === stem &&
+      (stateMutability === "view" || stateMutability === "pure") &&
+      inputs?.length === 1 &&
+      /^uint\d*$/.test(inputs[0].type ?? ""),
+  );
+}
+
+function argumentless(abi: Abi, name: string): boolean {
+  return abi.some((entry) => entry.type === "function" && entry.name === name && (entry.inputs?.length ?? 0) === 0);
+}
+
+/** The indices the config pins as <stem>(i) entries. */
+export function pinnedIndices(declared: ChecksEntryValue | undefined): Set<number> {
+  const entries = isTypeOfTB(declared, ArrayOfStaticCallCheckTB)
+    ? declared
+    : isTypeOfTB(declared, StaticCallCheckTB)
+      ? [declared]
+      : [];
+  const indices = new Set<number>();
+  for (const entry of entries) {
+    if (entry.args?.length !== 1) continue;
+    const index = Number(entry.args[0]);
+    if (Number.isInteger(index) && index >= 0) indices.add(index);
+  }
+  return indices;
+}
 
 export class ChecksSectionValidator extends SectionValidatorBase {
   constructor(provider: JsonRpcProvider, chainId: ChainId, sectionName: EntryField = EntryField.checks) {
@@ -49,6 +87,45 @@ export class ChecksSectionValidator extends SectionValidatorBase {
       if (!needCheck(CheckLevel.method, method)) continue;
 
       await this._validateSubsection(contract, method, checkEntryValue);
+    }
+    if (context.expandEnumerations) await this._expandEnumerations(contract, abi, checks);
+  }
+
+  /**
+   * For every pinned <stem>Length the chain says how many <stem>(i) exist; the entries the
+   * config does not pin are read, recorded as observed and reported as warnings, so that a
+   * list can no longer be verified by its length alone.
+   */
+  protected async _expandEnumerations(contract: Contract, abi: Abi, checks: Record<string, ChecksEntryValue>) {
+    for (const [key, declared] of Object.entries(checks)) {
+      const stem = ENUMERATION.exec(key)?.[1];
+      if (!stem || declared === null || !indexedGetter(abi, stem) || !argumentless(abi, key)) continue;
+      if (!needCheck(CheckLevel.method, key) && !needCheck(CheckLevel.method, stem)) continue;
+
+      let count: number;
+      try {
+        count = Number(await contract.getFunction(key).staticCall());
+      } catch {
+        continue;
+      }
+      if (count > ENUMERATION_CAP) {
+        new LogCommand(`.${stem}[0..${count})`).warning(
+          `${count} entries exceed the expansion cap of ${ENUMERATION_CAP}`,
+        );
+        continue;
+      }
+      const pinned = pinnedIndices(checks[stem]);
+      for (let index = 0; index < count; index++) {
+        if (pinned.has(index)) continue;
+        const logHandle = new LogCommand(`.${stem}(${index})`);
+        try {
+          const value: unknown = await contract.getFunction(stem).staticCall(index);
+          recordObservedCall(getErrorContext(), stem, [index], { value });
+          logHandle.warning(`not in the config; the chain says ${_stringify(value)}`);
+        } catch (error) {
+          logHandle.warning(`not in the config; the read REVERTED with: ${printError(error)}`);
+        }
+      }
     }
   }
 }
