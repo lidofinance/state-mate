@@ -67,13 +67,13 @@ chain offers no log source for. `warnings` counts the `warnings` entries below.
 
 ## `contracts[]`
 
-| Key        | Present when          | Meaning                                                                                |
-| ---------- | --------------------- | -------------------------------------------------------------------------------------- |
-| `path`     | always                | `<section>/<alias>`, the same path `--only` accepts.                                   |
-| `name`     | always                | `name:` from the config.                                                               |
-| `address`  | always                | `address:` from the config.                                                            |
-| `failures` | a check failed        | `{ type, check, message }` per failed check.                                           |
-| `warnings` | a check could not run | `{ check, message }` per check, for example an ACL scan on a chain with no log source. |
+| Key        | Present when                                                                      | Meaning                                                                                                                                   |
+| ---------- | --------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| `path`     | always                                                                            | `<section>/<alias>`, the same path `--only` accepts.                                                                                      |
+| `name`     | always                                                                            | `name:` from the config.                                                                                                                  |
+| `address`  | always                                                                            | `address:` from the config.                                                                                                               |
+| `failures` | a check failed                                                                    | `{ type, check, message }` per failed check.                                                                                              |
+| `warnings` | a check could not run, or `--expand-enumerations` found an entry the config omits | `{ check, message }` per check, for example an ACL scan on a chain with no log source, or `.marketIds(4)` with the value the chain holds. |
 
 `type` names the check type: `checks`, `storage`, `proxyChecks`, `implementationChecks`,
 `ozAcl`, `ozNonEnumerableAcl`, `aragonAcl`, or one of the automatic checks `implementation`,
