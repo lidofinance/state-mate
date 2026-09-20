@@ -63,6 +63,14 @@ The file is not a config: it says what the chain answered, not what the reviewer
 Diffing two observed files taken at two blocks shows what moved; diffing the config against the
 observed file shows what the config is silent about.
 
+## Checks the config declines to assert
+
+`checks: { _totalAssets: null }` declares the function so the coverage rule passes and tells the
+run not to assert its value. With `--observed` the value is still read once at the block and
+written to the observed file, marked no differently from any other answer; the check statistics
+still count it as skipped, because nothing was asserted. Without `--observed` such a check is not
+read at all.
+
 ## `--expand-enumerations`
 
 A `<name>Length` or `<name>Count` check next to a `<name>(uint256)` view is an enumeration.

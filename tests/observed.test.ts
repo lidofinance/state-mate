@@ -4,10 +4,13 @@ import os from "node:os";
 import path from "node:path";
 import { afterEach, beforeEach, describe, it } from "node:test";
 
+import type { Contract, JsonRpcProvider } from "ethers";
 import { Result } from "ethers";
 import * as YAML from "yaml";
 
-import { context } from "../src/context";
+import { EntryField } from "../src/common";
+import { context, resetStats, stats } from "../src/context";
+import type { ObservedCall } from "../src/observed";
 import {
   beginObservedSection,
   buildObservedDocument,
@@ -17,6 +20,9 @@ import {
   toPlain,
   writeObservedFile,
 } from "../src/observed";
+import { resetContractCounters, setErrorContext } from "../src/section-validators/base";
+import { ChecksSectionValidator } from "../src/section-validators/checks";
+import type { StaticCallCheck } from "../src/typebox";
 
 const POSITION = { section: "robinhood", contract: "vault", contractAddress: "0xVault", checksType: "checks" };
 
@@ -100,5 +106,74 @@ describe("observed values", () => {
       { block: 100, pinned: false },
     );
     fs.rmSync(directory, { recursive: true });
+  });
+});
+
+describe("a check the config declines to assert", () => {
+  const answered = {
+    getFunction: () => ({ staticCall: () => Promise.resolve("0xTotal") }),
+  } as unknown as Contract;
+  const reverts = {
+    getFunction: () => ({ staticCall: () => Promise.reject(new Error("execution reverted")) }),
+  } as unknown as Contract;
+
+  class Exposed extends ChecksSectionValidator {
+    public run(contract: Contract, method: string, check: StaticCallCheck) {
+      return this._checkViewFunction(contract, method, check);
+    }
+  }
+
+  const validator = new Exposed({} as JsonRpcProvider, 1, EntryField.checks);
+
+  beforeEach(() => {
+    resetObserved();
+    resetStats();
+    resetContractCounters();
+    setErrorContext(POSITION);
+  });
+
+  afterEach(() => {
+    context.observedPath = undefined;
+  });
+
+  it("is read and recorded when the run keeps what the chain answered", async () => {
+    context.observedPath = "state.observed.yaml";
+    await validator.run(answered, "_totalAssets", { result: null } as unknown as StaticCallCheck);
+
+    assert.deepEqual(buildObservedDocument("state.yaml").sections.robinhood.contracts.vault.checks, {
+      _totalAssets: [{ value: "0xTotal" }],
+    });
+    // still not a check: nothing was asserted
+    assert.deepEqual({ checks: stats.totalChecks, skipped: stats.skipped }, { checks: 0, skipped: 1 });
+  });
+
+  it("records a revert as a revert, and is not an error", async () => {
+    context.observedPath = "state.observed.yaml";
+    await validator.run(reverts, "canSendAssets", { result: null } as unknown as StaticCallCheck);
+
+    const checks = buildObservedDocument("state.yaml").sections.robinhood.contracts.vault.checks as Record<
+      string,
+      ObservedCall[]
+    >;
+    assert.deepEqual(Object.keys(checks), ["canSendAssets"]);
+    assert.match(String(checks.canSendAssets[0].reverted), /execution reverted/);
+    assert.equal(stats.errors, 0);
+  });
+
+  it("is not read at all without the observed file", async () => {
+    let calls = 0;
+    const counted = {
+      getFunction: () => ({
+        staticCall: () => {
+          calls += 1;
+          return Promise.resolve("0x0");
+        },
+      }),
+    } as unknown as Contract;
+
+    await validator.run(counted, "_totalAssets", { result: null } as unknown as StaticCallCheck);
+
+    assert.equal(calls, 0);
+    assert.deepEqual(buildObservedDocument("state.yaml").sections, {});
   });
 });

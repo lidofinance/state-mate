@@ -163,6 +163,9 @@ export abstract class SectionValidatorBase {
     if (staticCallResult.result === null) {
       incSkipped();
       logMethodSkipped(method);
+      // `null` declines to assert a value, not to look: with --observed the run still records
+      // what the chain answered, so the evidence covers every read the config declares.
+      if (context.observedPath) await this._recordOnly(contract, method, staticCallResult);
       return;
     }
     incChecks();
@@ -200,6 +203,25 @@ export abstract class SectionValidatorBase {
       const errorMessage = printError(error);
       logHandle.failure(errorMessage);
       incErrors(errorMessage);
+    }
+  }
+
+  /** Read a check the config declines to assert, for the observed file alone. */
+  protected async _recordOnly(contract: Contract, method: string, entry: StaticCallResult) {
+    const { args, signature = method } = entry;
+    setErrorContext({ method: `${signature}${args ? `(${args.toString()})` : ""}` });
+    let contractFunction: ReturnType<typeof contract.getFunction>;
+    try {
+      contractFunction = contract.getFunction(signature);
+    } catch {
+      return;
+    }
+    try {
+      recordObservedCall(currentErrorContext, signature, args, {
+        value: await contractFunction.staticCall(...(args || "")),
+      });
+    } catch (error) {
+      recordObservedCall(currentErrorContext, signature, args, { reverted: printError(error) });
     }
   }
 
