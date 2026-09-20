@@ -68,6 +68,11 @@ describe("observed values", () => {
     assert.equal(toPlain(10n), "10");
     assert.deepEqual(toPlain(Result.fromItems([1n, "0xabc"], ["cap", "adapter"])), { cap: "1", adapter: "0xabc" });
     assert.deepEqual(toPlain(Result.fromItems([1n, [2n, true]])), ["1", ["2", true]]);
+    assert.deepEqual(toPlain(Result.fromItems(["0xabc"], ["_"])), ["0xabc"]);
+    assert.deepEqual(toPlain(Result.fromItems([])), []);
+    assert.deepEqual(toPlain(Result.fromItems([Result.fromItems(["0xabc"], ["_"])], ["vaults"])), {
+      vaults: ["0xabc"],
+    });
     assert.deepEqual(toPlain([null, 3, "x", false]), [null, 3, "x", false]);
   });
 

@@ -50,11 +50,17 @@ export function beginObservedSection(title: string, chainId: string, block: numb
 export function toPlain(value: unknown): Plain {
   if (typeof value === "bigint") return value.toString();
   if (value instanceof Result) {
+    // ethers names the elements of an unnamed array `_`, so a map is right only for real names
+    if (value.length === 0) return [];
     try {
-      return Object.fromEntries(Object.entries(value.toObject()).map(([key, item]) => [key, toPlain(item)]));
+      const entries = Object.entries(value.toObject());
+      if (entries.length === value.length && entries.every(([key]) => key !== "_")) {
+        return Object.fromEntries(entries.map(([key, item]) => [key, toPlain(item)]));
+      }
     } catch {
-      return value.toArray().map((item) => toPlain(item));
+      // unnamed: the array form below
     }
+    return value.toArray().map((item) => toPlain(item));
   }
   if (Array.isArray(value)) return value.map((item) => toPlain(item));
   if (value === null || typeof value === "string" || typeof value === "number" || typeof value === "boolean") {
