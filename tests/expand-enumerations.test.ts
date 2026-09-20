@@ -95,11 +95,28 @@ describe("enumeration expansion", () => {
     assert.deepEqual(warnings(), []);
   });
 
-  it("leaves a length with no indexed getter, and an unpinned length, alone", async () => {
-    await validator.expand(fakeContract(IDS, reads), { adaptersLength: 5, marketIdsLength: null, owner: "0x1" });
+  it("leaves a length with no indexed getter alone", async () => {
+    await validator.expand(fakeContract(IDS, reads), { adaptersLength: 5, owner: "0x1" });
 
     assert.deepEqual(reads, []);
     assert.deepEqual(warnings(), []);
+  });
+
+  it("expands a length the config declines to assert, and records the count", async () => {
+    await validator.expand(fakeContract(IDS.slice(0, 2), reads), { marketIdsLength: null });
+
+    assert.deepEqual(reads, ["marketIdsLength()", "marketIds(0)", "marketIds(1)"]);
+    assert.deepEqual(
+      warnings().map(({ check }) => check),
+      [".marketIds(0)", ".marketIds(1)"],
+    );
+    assert.deepEqual(buildObservedDocument("cfg.yaml").sections.l1.contracts.vault.checks, {
+      marketIdsLength: [{ value: "2" }],
+      marketIds: [
+        { args: [0], value: "0xa" },
+        { args: [1], value: "0xb" },
+      ],
+    });
   });
 
   it("reports instead of scanning when the enumeration is beyond the cap", async () => {

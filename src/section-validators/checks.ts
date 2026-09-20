@@ -92,19 +92,23 @@ export class ChecksSectionValidator extends SectionValidatorBase {
   }
 
   /**
-   * For every pinned <stem>Length the chain says how many <stem>(i) exist; the entries the
+   * For every declared <stem>Length the chain says how many <stem>(i) exist; the entries the
    * config does not pin are read, recorded as observed and reported as warnings, so that a
-   * list can no longer be verified by its length alone.
+   * list can no longer be verified by its length alone. A length declared `null` is read here
+   * even though the checks skip it: `null` declines to assert a value, not to look.
    */
   protected async _expandEnumerations(contract: Contract, abi: Abi, checks: Record<string, ChecksEntryValue>) {
     for (const [key, declared] of Object.entries(checks)) {
       const stem = ENUMERATION.exec(key)?.[1];
-      if (!stem || declared === null || !indexedGetter(abi, stem) || !argumentless(abi, key)) continue;
+      if (!stem || !indexedGetter(abi, stem) || !argumentless(abi, key)) continue;
       if (!needCheck(CheckLevel.method, key) && !needCheck(CheckLevel.method, stem)) continue;
 
       let count: number;
       try {
-        count = Number(await contract.getFunction(key).staticCall());
+        const answer: unknown = await contract.getFunction(key).staticCall();
+        count = Number(answer);
+        // The checks skipped a null length, so this read is the only record of the count
+        if (declared === null) recordObservedCall(getErrorContext(), key, undefined, { value: answer });
       } catch {
         continue;
       }

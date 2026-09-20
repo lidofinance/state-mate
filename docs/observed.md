@@ -66,8 +66,10 @@ observed file shows what the config is silent about.
 ## `--expand-enumerations`
 
 A `<name>Length` or `<name>Count` check next to a `<name>(uint256)` view is an enumeration.
-For every one the config pins, the run reads the count from the chain, then reads every index the
-config does not list as a `<name>(i)` entry. Each such value goes into the observed file and into
+For every one the config declares, the run reads the count from the chain, then reads every index
+the config does not list as a `<name>(i)` entry. A length declared `null` counts as declared: the
+checks skip it, and the expansion reads it and records the count, because `null` declines to
+assert a value, not to look. Each such value goes into the observed file and into
 the report as a warning:
 
 ```text
