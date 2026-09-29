@@ -1,0 +1,1386 @@
+# yaml-language-server: $schema=../../../schemas/main-schema.json
+# Earn core deployment on MegaETH, chain 4326. Observed at block 27002227.
+# State baseline only: see docs/reviews/earn-megaeth-2026-09-19.md for launch blockers.
+# No component instances exist in the supplied factories. Shared implementations are checked once.
+
+deployed:
+  l1:
+    - &factory "0x0000000072BAfCeAff1AD0237Ea58f06cfc4467F"
+    - &consensus "0x000000007e6b679B9196a1609e5Bc2405eDFd6Aa"
+    - &depositQueue "0x00000000B2d2373aAF1C370cFE4e1Ee8BDE7C546"
+    - &signatureDepositQueue "0x000000000Af33501e5BDAF9B481Ad2712a024727"
+    - &syncDepositQueue "0x000000001CC8c3E40856E956db870095EF6C98bd"
+    - &feeManager "0x00000000C18039E1F415fe07C33A316232238648"
+    - &oracle "0x000000009adE4dAE1f868775A3f087945983f062"
+    - &redeemQueue "0x0000000045d70ee8145135f08309fF5B1A63d43F"
+    - &signatureRedeemQueue "0x000000008D14Ef3658805765107d9F12776f4138"
+    - &syncRedeemQueue "0x0000000091823b6654c7D724BCaca603Ff34bCd6"
+    - &riskManager "0x00000000CC26BC741E75B181738Ac2B16156179b"
+    - &tokenizedShareManager "0x00000000861e8B90B81f35C18cA14858Cc91d1Df"
+    - &basicShareManager "0x00000000e5F0cddA56447b2a29e2847A52c8725D"
+    - &burnableTokenizedShareManager "0x00000000C534B8680e3aa7165DeDc3Ab8781f602"
+    - &subvault "0x00000000CA30010B8417f791250AE221FdaD5920"
+    - &verifier "0x000000007e86a96e279662108cc19bA4c32EdE3C"
+    - &erc20Verifier "0x00000000ACD80376E999Af8c424e5e33BD224A08"
+    - &mellowAccountV1 "0x00000000860913f37fab81ce8ce4E5BD1f664482"
+    - &swapModule "0x0000000022B540Fe06d7a9c32d81163971b583D6"
+    - &vault "0x0000000070f44289ec5ea3E5972f058f75B29801"
+    - &bitmaskVerifier "0x0000000009E9368ad21fc19DCE1cFcf9Af6dE339"
+    - &vaultConfigurator "0x0000000005a67199ABE0f9C995EAB9DaDfA31Ccd"
+    - &basicRedeemHook "0x00000000176dD23550c3845746b2036E90DC5912"
+    - &redirectingDepositHook "0x0000000024ABbd08686Abb2987831dEa88eF1180"
+    - &oracleHelper "0x000000007d2552AD746Af5c13f91B5e72f97c2B7"
+
+deployed-aux:
+  - &factoryFactory "0x00000000741292C88f9fF5050b07051C4f592EBf"
+  - &consensusFactory "0xAfef40968b5304135677f0C89203948e1A145105"
+  - &depositQueueFactory "0xF429ba2a8437E7de85078CF7481E8Ad52df7E58c"
+  - &redeemQueueFactory "0xe08dc488bD6756323F8bf478869529D03db627ef"
+  - &oracleFactory "0x727c295b5D99b15280Ca8736b6F97ABA6aEd0E88"
+  - &feeManagerFactory "0x52d56c20B0C8d403888880d0A1610e5ed17addA8"
+  - &riskManagerFactory "0x9885215ef8DB25C87466E73018061e532784D716"
+  - &shareManagerFactory "0xDA2a7aE07B6803feF9d95E47Ab83c8a5A09929F0"
+  - &subvaultFactory "0xA64e324DFF04e3C0613ff0706867868C7b370a45"
+  - &vaultFactory "0xBBCD2aC50aF2EA12Cc9cb7B16dBDa85859BeB3da"
+  - &verifierFactory "0x9fBAF5AEB9F52bA57E1cC1D3050eac6d75Df8ae7"
+  - &erc20VerifierFactory "0x711F6236e325634AA8c1F692b5312bfF3A8558D0"
+  - &accountFactory "0x870DB41df0905cc5a790f6582a3dA99A4A33F923"
+  - &swapModuleFactory "0xC5a52E4bB718Dfe86938e5cB967362EdA1E62698"
+  - &factoryFactoryProxyAdmin "0x44231e174C4662c197443b02Eb5E9e71f368a6D9"
+  - &consensusFactoryProxyAdmin "0x9eDd95ed9A618911acB8aD43894344fcC5fbadDE"
+  - &depositQueueFactoryProxyAdmin "0x2DDB00912601F9447Ee818b8574A475E9b4BeBA1"
+  - &redeemQueueFactoryProxyAdmin "0xc494D937ECBCEF9d48b398A765cE5893Ea780b62"
+  - &oracleFactoryProxyAdmin "0x24e54579e6931a1DE1dBb0De15119BE5D9fB68BE"
+  - &feeManagerFactoryProxyAdmin "0xe552f353B1df4265C1852C52FCca08b0889bD2a9"
+  - &riskManagerFactoryProxyAdmin "0x968A436697AC3ed0AC79c3Ff55da180D428f16D9"
+  - &shareManagerFactoryProxyAdmin "0x66E406ccBe6982604E63CbC1e5E60404f3663780"
+  - &subvaultFactoryProxyAdmin "0x2e1658b8C3228cEd031c016c404E0f00B74e0391"
+  - &vaultFactoryProxyAdmin "0x9577f0bD67e77ea8aea8E40B1444D4823C4e13d3"
+  - &verifierFactoryProxyAdmin "0x12b433Eb13ADa311688Ada7d81b047e43Fe416c5"
+  - &erc20VerifierFactoryProxyAdmin "0x792BCAb07Ab5bC9EfdB98CF66ad4a3b481540ae9"
+  - &accountFactoryProxyAdmin "0xb29abAd2d971377c9A38389184B592bDa1287045"
+  - &swapModuleFactoryProxyAdmin "0x3F24B894CF23e2cCbd92DEAC837bA63ff27233cC"
+
+  # TODO: NEEDS TO BE DEPLOYED
+  - &factoryAdmin "0x81698f87C6482bF1ce9bFcfC0F103C4A0Adf0Af0"
+
+eoa:
+  - &mellowDeployer "0xE98Be1E5538FCbD716C506052eB1Fd5d6fC495A3"
+
+parameters:
+  - &weth "0x4200000000000000000000000000000000000006"
+
+# The two CoW addresses have no code on MegaETH at the review block.
+misc:
+  - &cowswapSettlement "0x9008D19f58AAbD9eD0D60971565AA8510560ab41"
+  - &cowswapVaultRelayer "0xC92E8bdf79f0507f65a392b0ab4667716BFE0110"
+  - &ZERO_ADDRESS "0x0000000000000000000000000000000000000000"
+  # ERC-7201: keccak256(abi.encode(uint256(keccak256("openzeppelin.storage.Initializable")) - 1)) & ~bytes32(uint256(0xff))
+  - &INITIALIZABLE_STORAGE "0xf0c57e16840df040f15088dc2f81fe391c3923bec73e23a9662efc9c229c6a00"
+  - &DISABLED_INITIALIZERS "0x000000000000000000000000000000000000000000000000ffffffffffffffff"
+  # keccak256("Order(uint256 orderId,address queue,address asset,address caller,address recipient,uint256 ordered,uint256 requested,uint256 deadline,uint256 nonce)")
+  - &ORDER_TYPEHASH "0xb367c53189b3057a91923801116b5f9c4e7211a314d1961f94770747512a1b68"
+
+roles:
+  - &DEFAULT_ADMIN_ROLE "0x0000000000000000000000000000000000000000000000000000000000000000"
+  # keccak256("queues.SyncDepositQueue.SET_SYNC_DEPOSIT_PARAMS_ROLE")
+  - &SET_SYNC_DEPOSIT_PARAMS_ROLE "0x07c44dbab396497d56fa954370602fee5a40eebde0c94923e44fcf920c918f87"
+  # keccak256("oracles.Oracle.ACCEPT_REPORT_ROLE")
+  - &ACCEPT_REPORT_ROLE "0x341f4b58682c3a888bdb3eb9a8a4452a6e847be8a380eb3d742794b4f9ac0ab3"
+  # keccak256("oracles.Oracle.ADD_SUPPORTED_ASSETS_ROLE")
+  - &ADD_SUPPORTED_ASSETS_ROLE "0x73c07eddbe5b5274995c8e6cbe94d644cedc04911df3baf934188d230ca7a2cd"
+  # keccak256("oracles.Oracle.REMOVE_SUPPORTED_ASSETS_ROLE")
+  - &REMOVE_SUPPORTED_ASSETS_ROLE "0x748ab7827e75e9f34387e3ded8598f06eb04cc7bb90fff07bc6dc2a748377021"
+  # keccak256("oracles.Oracle.SET_SECURITY_PARAMS_ROLE")
+  - &SET_SECURITY_PARAMS_ROLE "0x79abe62d91dbd05fcda41b212f4c8c1f1d8be54ccddf859de3ccd1361b71fcb6"
+  # keccak256("oracles.Oracle.SUBMIT_REPORTS_ROLE")
+  - &SUBMIT_REPORTS_ROLE "0xb54eea9408efadf36da92cc5ecd8af0f45d6dd90de54634bbc5a2113ddcb505d"
+  # keccak256("queues.SyncRedeemQueue.SET_SYNC_REDEEM_PARAMS_ROLE")
+  - &SET_SYNC_REDEEM_PARAMS_ROLE "0x688ee03c1800634f817b5121121cb9400d41810aec63e2d50755ddf1af5d2ae4"
+  # keccak256("managers.RiskManager.ALLOW_SUBVAULT_ASSETS_ROLE")
+  - &ALLOW_SUBVAULT_ASSETS_ROLE "0x4a899e3e648ea55418d9c99177e5c522df621b1953c0ad7e99da3711043ba1c1"
+  # keccak256("managers.RiskManager.DISALLOW_SUBVAULT_ASSETS_ROLE")
+  - &DISALLOW_SUBVAULT_ASSETS_ROLE "0x35c8c55cb15b3aef15751488f551edf793583e377f8951cf9738f035a1649ec5"
+  # keccak256("managers.RiskManager.MODIFY_PENDING_ASSETS_ROLE")
+  - &MODIFY_PENDING_ASSETS_ROLE "0xcaa6b67a612f0bc4bdf15a48dde19f543e93099681b3ceaee93d630e38bcff38"
+  # keccak256("managers.RiskManager.MODIFY_SUBVAULT_BALANCE_ROLE")
+  - &MODIFY_SUBVAULT_BALANCE_ROLE "0xa7ecfd54b0ab6ce6ecc88746fe62beba4e9a103dbb00d88cfedffbc0c6069ce8"
+  # keccak256("managers.RiskManager.MODIFY_VAULT_BALANCE_ROLE")
+  - &MODIFY_VAULT_BALANCE_ROLE "0x94b8a54d503c6b752e707c591f9345ae8ccc138255588e460ee15622d499fdba"
+  # keccak256("managers.RiskManager.SET_SUBVAULT_LIMIT_ROLE")
+  - &SET_SUBVAULT_LIMIT_ROLE "0x253eb39d0edc77da10bbc4bcaa23c44e40e3c67ed649fbecb18a3f7c51bfbb10"
+  # keccak256("managers.RiskManager.SET_VAULT_LIMIT_ROLE")
+  - &SET_VAULT_LIMIT_ROLE "0x2b2a32ecca586a148d15aea321ddbb421a2a3ac6b4d56c0a9ad9de32e84cf5c4"
+  # keccak256("managers.ShareManager.SET_ACCOUNT_INFO_ROLE")
+  - &SET_ACCOUNT_INFO_ROLE "0x58258f737b9cea9d7da81a3a12943f800a9668a2494235fec0d84cc60ad04cff"
+  # keccak256("managers.ShareManager.SET_FLAGS_ROLE")
+  - &SET_FLAGS_ROLE "0x78b235a1fa2fd5e00dba7867d599bed6f088684010a7fee7b9fe05fa1082d01e"
+  # keccak256("managers.ShareManager.SET_WHITELIST_MERKLE_ROOT_ROLE")
+  - &SET_WHITELIST_MERKLE_ROOT_ROLE "0xca196afb47c2d16c8388ba0ef201b98a808acb83a856576ffc57360840a5fd99"
+  # keccak256("permissions.Verifier.ALLOW_CALL_ROLE")
+  - &ALLOW_CALL_ROLE "0x7e8318b807524ed75f0b7cc82d3cd61e590497e7502a54c698a969fa62dc0a2e"
+  # keccak256("permissions.Verifier.CALLER_ROLE")
+  - &VERIFIER_CALLER_ROLE "0x877766a829235d063c3ba37802a4874fcf1b575d310fbe898df17d8ebabee463"
+  # keccak256("permissions.Verifier.DISALLOW_CALL_ROLE")
+  - &DISALLOW_CALL_ROLE "0xf3354d076b52bf34f14c15ff5c85faef55353add7b5bb69cd8ac10c4b85748cf"
+  # keccak256("permissions.Verifier.SET_MERKLE_ROOT_ROLE")
+  - &SET_MERKLE_ROOT_ROLE "0xfc199f685d023b44b528c5fcb9cebfe292e64340dd5729b20761da4ad1e93024"
+  # keccak256("permissions.protocols.ERC20Verifier.ASSET_ROLE")
+  - &ASSET_ROLE "0x8b4b1250247f1cbb35f7f69415df3cf642553a6953f81fae69e135c5feefc94b"
+  # keccak256("permissions.protocols.ERC20Verifier.CALLER_ROLE")
+  - &ERC20VERIFIER_CALLER_ROLE "0xc896aac795f7376adc96049886670c0e28cf66652e338a4139e37d2503456058"
+  # keccak256("permissions.protocols.ERC20Verifier.RECIPIENT_ROLE")
+  - &RECIPIENT_ROLE "0x7c6c5b36d31deb1f0c3cbcc15c12c0be85fe383faacee29701116ad6cfb3a29a"
+  # keccak256("utils.SwapModule.CALLER_ROLE")
+  - &SWAP_MODULE_CALLER_ROLE "0xaef53ff2a64da421565efa45c50a96f070d7bb66ffc4ca806c77c72a0e763f66"
+  # keccak256("utils.SwapModule.ROUTER_ROLE")
+  - &ROUTER_ROLE "0x59a256c4d42df67b80d5d3fdaf91897a0d929e43a43a5f8e1a88cbd1476e5d90"
+  # keccak256("utils.SwapModule.SET_SLIPPAGE_ROLE")
+  - &SET_SLIPPAGE_ROLE "0x32a83f2101a3db03d031fa7d978ba44116bbbd832fcef7908374354ae8de2b38"
+  # keccak256("utils.SwapModule.TOKEN_IN_ROLE")
+  - &TOKEN_IN_ROLE "0x35f08086aac3799af637e5e9fa5ff324170893731444bf3a9d1edc368bcbfaeb"
+  # keccak256("utils.SwapModule.TOKEN_OUT_ROLE")
+  - &TOKEN_OUT_ROLE "0x9d556436fc766d4a6d24fe48c90073bc03600d7556265a3217def4578d7c2531"
+  # keccak256("modules.ShareModule.CREATE_QUEUE_ROLE")
+  - &CREATE_QUEUE_ROLE "0x6788636e7899d6d227901dc9f8c4c785401c0991724cf908dc65388af686da6f"
+  # keccak256("modules.VaultModule.CREATE_SUBVAULT_ROLE")
+  - &CREATE_SUBVAULT_ROLE "0x85c2023fdfb1e93dedf5d18f9bc0e79347e071d12740ba71aeb84a4fcbdc4b79"
+  # keccak256("modules.VaultModule.DISCONNECT_SUBVAULT_ROLE")
+  - &DISCONNECT_SUBVAULT_ROLE "0xf610639f4b9b8986f875fcb4e49486da5c7aa449a6942b5013fabd061e9b9fff"
+  # keccak256("modules.VaultModule.PULL_LIQUIDITY_ROLE")
+  - &PULL_LIQUIDITY_ROLE "0x68895691ff006f290ca74825ce06ed17fffab55af49f0274f49b7424f752583a"
+  # keccak256("modules.VaultModule.PUSH_LIQUIDITY_ROLE")
+  - &PUSH_LIQUIDITY_ROLE "0x32a781031f04cc60b32394e40124d1e87f54273bf26d0532a115a424f6a93298"
+  # keccak256("modules.VaultModule.RECONNECT_SUBVAULT_ROLE")
+  - &RECONNECT_SUBVAULT_ROLE "0xb557d53a2e72d8333ffa3bf2f556678becb5e995b0e25b7dca354627e550c08f"
+  # keccak256("modules.ShareModule.REMOVE_QUEUE_ROLE")
+  - &REMOVE_QUEUE_ROLE "0x9a4c49d6fb9452bbfe187968075d0fac7d7202d2b7f731d8cffbce9cf66756b2"
+  # keccak256("modules.ShareModule.SET_HOOK_ROLE")
+  - &SET_HOOK_ROLE "0x627f9e4ac2dadb64d045e7e6333c09f39ed34e0e066957955d0052b46d2e83e8"
+  # keccak256("modules.ShareModule.SET_QUEUE_LIMIT_ROLE")
+  - &SET_QUEUE_LIMIT_ROLE "0x407fc42eadf1aba68b1d4a8c3c4aa2e8b6beac7957623f3694d0ad77bfb70e06"
+  # keccak256("modules.ShareModule.SET_QUEUE_STATUS_ROLE")
+  - &SET_QUEUE_STATUS_ROLE "0x6618a6d92147bbcacfb2ef2375976fc4c529eeeaeb72a66048296571370c6946"
+
+l1:
+  rpcUrl: MEGAETH_RPC_URL
+  explorerHostname: megaeth.blockscout.com
+  chainId: 4326
+  contracts:
+    factory:
+      name: Factory
+      address: *factory
+      storage:
+        - slot: *INITIALIZABLE_STORAGE
+          expected: *DISABLED_INITIALIZERS
+          label: initializers disabled
+      checks:
+        entities: 0
+        entityAt:
+          - args: [0]
+            mustRevert: true
+        implementationAt:
+          - args: [0]
+            mustRevert: true
+        implementations: 0
+        isBlacklisted:
+          - args: [0]
+            result: false
+        isEntity:
+          - args: [*ZERO_ADDRESS]
+            result: false
+        owner: *ZERO_ADDRESS
+        proposalAt:
+          - args: [0]
+            mustRevert: true
+        proposals: 0
+
+    factoryFactory:
+      name: Factory
+      address: *factoryFactory
+      proxyName: TransparentUpgradeableProxy
+      implementation: *factory
+      proxyAdmin: *factoryFactoryProxyAdmin
+      proxyAdminOwner: *factoryAdmin
+      proxyChecks: {}
+      checks:
+        entities: 13
+        entityAt:
+          - args: [0]
+            result: *consensusFactory
+          - args: [1]
+            result: *depositQueueFactory
+          - args: [2]
+            result: *redeemQueueFactory
+          - args: [3]
+            result: *oracleFactory
+          - args: [4]
+            result: *feeManagerFactory
+          - args: [5]
+            result: *riskManagerFactory
+          - args: [6]
+            result: *shareManagerFactory
+          - args: [7]
+            result: *subvaultFactory
+          - args: [8]
+            result: *vaultFactory
+          - args: [9]
+            result: *verifierFactory
+          - args: [10]
+            result: *erc20VerifierFactory
+          - args: [11]
+            result: *accountFactory
+          - args: [12]
+            result: *swapModuleFactory
+          - args: [13]
+            mustRevert: true
+        implementationAt:
+          - args: [0]
+            result: *factory
+          - args: [1]
+            mustRevert: true
+        implementations: 1
+        isBlacklisted:
+          - args: [0]
+            result: false
+        isEntity:
+          - args: [*consensusFactory]
+            result: true
+          - args: [*depositQueueFactory]
+            result: true
+          - args: [*redeemQueueFactory]
+            result: true
+          - args: [*oracleFactory]
+            result: true
+          - args: [*feeManagerFactory]
+            result: true
+          - args: [*riskManagerFactory]
+            result: true
+          - args: [*shareManagerFactory]
+            result: true
+          - args: [*subvaultFactory]
+            result: true
+          - args: [*vaultFactory]
+            result: true
+          - args: [*verifierFactory]
+            result: true
+          - args: [*erc20VerifierFactory]
+            result: true
+          - args: [*accountFactory]
+            result: true
+          - args: [*swapModuleFactory]
+            result: true
+          - args: [*ZERO_ADDRESS]
+            result: false
+        owner: *factoryAdmin
+        proposalAt:
+          - args: [0]
+            mustRevert: true
+        proposals: 0
+
+    consensusFactory:
+      name: Factory
+      address: *consensusFactory
+      proxyName: TransparentUpgradeableProxy
+      implementation: *factory
+      proxyAdmin: *consensusFactoryProxyAdmin
+      proxyAdminOwner: *factoryAdmin
+      proxyChecks: {}
+      checks:
+        entities: 0
+        entityAt:
+          - args: [0]
+            mustRevert: true
+        implementationAt:
+          - args: [0]
+            result: *consensus
+          - args: [1]
+            mustRevert: true
+        implementations: 1
+        isBlacklisted:
+          - args: [0]
+            result: false
+        isEntity:
+          - args: [*ZERO_ADDRESS]
+            result: false
+        owner: *factoryAdmin
+        proposalAt:
+          - args: [0]
+            mustRevert: true
+        proposals: 0
+
+    depositQueueFactory:
+      name: Factory
+      address: *depositQueueFactory
+      proxyName: TransparentUpgradeableProxy
+      implementation: *factory
+      proxyAdmin: *depositQueueFactoryProxyAdmin
+      proxyAdminOwner: *factoryAdmin
+      proxyChecks: {}
+      checks:
+        entities: 0
+        entityAt:
+          - args: [0]
+            mustRevert: true
+        implementationAt:
+          - args: [0]
+            result: *depositQueue
+          - args: [1]
+            result: *signatureDepositQueue
+          - args: [2]
+            result: *syncDepositQueue
+          - args: [3]
+            mustRevert: true
+        implementations: 3
+        isBlacklisted:
+          - args: [0]
+            result: false
+          - args: [1]
+            result: false
+          - args: [2]
+            result: false
+        isEntity:
+          - args: [*ZERO_ADDRESS]
+            result: false
+        owner: *factoryAdmin
+        proposalAt:
+          - args: [0]
+            mustRevert: true
+        proposals: 0
+
+    redeemQueueFactory:
+      name: Factory
+      address: *redeemQueueFactory
+      proxyName: TransparentUpgradeableProxy
+      implementation: *factory
+      proxyAdmin: *redeemQueueFactoryProxyAdmin
+      proxyAdminOwner: *factoryAdmin
+      proxyChecks: {}
+      checks:
+        entities: 0
+        entityAt:
+          - args: [0]
+            mustRevert: true
+        implementationAt:
+          - args: [0]
+            result: *redeemQueue
+          - args: [1]
+            result: *signatureRedeemQueue
+          - args: [2]
+            result: *syncRedeemQueue
+          - args: [3]
+            mustRevert: true
+        implementations: 3
+        isBlacklisted:
+          - args: [0]
+            result: false
+          - args: [1]
+            result: false
+          - args: [2]
+            result: false
+        isEntity:
+          - args: [*ZERO_ADDRESS]
+            result: false
+        owner: *factoryAdmin
+        proposalAt:
+          - args: [0]
+            mustRevert: true
+        proposals: 0
+
+    oracleFactory:
+      name: Factory
+      address: *oracleFactory
+      proxyName: TransparentUpgradeableProxy
+      implementation: *factory
+      proxyAdmin: *oracleFactoryProxyAdmin
+      proxyAdminOwner: *factoryAdmin
+      proxyChecks: {}
+      checks:
+        entities: 0
+        entityAt:
+          - args: [0]
+            mustRevert: true
+        implementationAt:
+          - args: [0]
+            result: *oracle
+          - args: [1]
+            mustRevert: true
+        implementations: 1
+        isBlacklisted:
+          - args: [0]
+            result: false
+        isEntity:
+          - args: [*ZERO_ADDRESS]
+            result: false
+        owner: *factoryAdmin
+        proposalAt:
+          - args: [0]
+            mustRevert: true
+        proposals: 0
+
+    feeManagerFactory:
+      name: Factory
+      address: *feeManagerFactory
+      proxyName: TransparentUpgradeableProxy
+      implementation: *factory
+      proxyAdmin: *feeManagerFactoryProxyAdmin
+      proxyAdminOwner: *factoryAdmin
+      proxyChecks: {}
+      checks:
+        entities: 0
+        entityAt:
+          - args: [0]
+            mustRevert: true
+        implementationAt:
+          - args: [0]
+            result: *feeManager
+          - args: [1]
+            mustRevert: true
+        implementations: 1
+        isBlacklisted:
+          - args: [0]
+            result: false
+        isEntity:
+          - args: [*ZERO_ADDRESS]
+            result: false
+        owner: *factoryAdmin
+        proposalAt:
+          - args: [0]
+            mustRevert: true
+        proposals: 0
+
+    riskManagerFactory:
+      name: Factory
+      address: *riskManagerFactory
+      proxyName: TransparentUpgradeableProxy
+      implementation: *factory
+      proxyAdmin: *riskManagerFactoryProxyAdmin
+      proxyAdminOwner: *factoryAdmin
+      proxyChecks: {}
+      checks:
+        entities: 0
+        entityAt:
+          - args: [0]
+            mustRevert: true
+        implementationAt:
+          - args: [0]
+            result: *riskManager
+          - args: [1]
+            mustRevert: true
+        implementations: 1
+        isBlacklisted:
+          - args: [0]
+            result: false
+        isEntity:
+          - args: [*ZERO_ADDRESS]
+            result: false
+        owner: *factoryAdmin
+        proposalAt:
+          - args: [0]
+            mustRevert: true
+        proposals: 0
+
+    # The deployer owns the version registry, as in the newer Base/Mantle/Plasma deployments.
+    shareManagerFactory:
+      name: Factory
+      address: *shareManagerFactory
+      proxyName: TransparentUpgradeableProxy
+      implementation: *factory
+      proxyAdmin: *shareManagerFactoryProxyAdmin
+      proxyAdminOwner: *factoryAdmin
+      proxyChecks: {}
+      checks:
+        entities: 0
+        entityAt:
+          - args: [0]
+            mustRevert: true
+        implementationAt:
+          - args: [0]
+            result: *tokenizedShareManager
+          - args: [1]
+            result: *basicShareManager
+          - args: [2]
+            result: *burnableTokenizedShareManager
+          - args: [3]
+            mustRevert: true
+        implementations: 3
+        isBlacklisted:
+          - args: [0]
+            result: false
+          - args: [1]
+            result: false
+          - args: [2]
+            result: false
+        isEntity:
+          - args: [*ZERO_ADDRESS]
+            result: false
+        owner: *factoryAdmin
+        proposalAt:
+          - args: [0]
+            mustRevert: true
+        proposals: 0
+
+    subvaultFactory:
+      name: Factory
+      address: *subvaultFactory
+      proxyName: TransparentUpgradeableProxy
+      implementation: *factory
+      proxyAdmin: *subvaultFactoryProxyAdmin
+      proxyAdminOwner: *factoryAdmin
+      proxyChecks: {}
+      checks:
+        entities: 0
+        entityAt:
+          - args: [0]
+            mustRevert: true
+        implementationAt:
+          - args: [0]
+            result: *subvault
+          - args: [1]
+            mustRevert: true
+        implementations: 1
+        isBlacklisted:
+          - args: [0]
+            result: false
+        isEntity:
+          - args: [*ZERO_ADDRESS]
+            result: false
+        owner: *factoryAdmin
+        proposalAt:
+          - args: [0]
+            mustRevert: true
+        proposals: 0
+
+    vaultFactory:
+      name: Factory
+      address: *vaultFactory
+      proxyName: TransparentUpgradeableProxy
+      implementation: *factory
+      proxyAdmin: *vaultFactoryProxyAdmin
+      proxyAdminOwner: *factoryAdmin
+      proxyChecks: {}
+      checks:
+        entities: 0
+        entityAt:
+          - args: [0]
+            mustRevert: true
+        implementationAt:
+          - args: [0]
+            result: *vault
+          - args: [1]
+            mustRevert: true
+        implementations: 1
+        isBlacklisted:
+          - args: [0]
+            result: false
+        isEntity:
+          - args: [*ZERO_ADDRESS]
+            result: false
+        owner: *factoryAdmin
+        proposalAt:
+          - args: [0]
+            mustRevert: true
+        proposals: 0
+
+    verifierFactory:
+      name: Factory
+      address: *verifierFactory
+      proxyName: TransparentUpgradeableProxy
+      implementation: *factory
+      proxyAdmin: *verifierFactoryProxyAdmin
+      proxyAdminOwner: *factoryAdmin
+      proxyChecks: {}
+      checks:
+        entities: 0
+        entityAt:
+          - args: [0]
+            mustRevert: true
+        implementationAt:
+          - args: [0]
+            result: *verifier
+          - args: [1]
+            mustRevert: true
+        implementations: 1
+        isBlacklisted:
+          - args: [0]
+            result: false
+        isEntity:
+          - args: [*ZERO_ADDRESS]
+            result: false
+        owner: *factoryAdmin
+        proposalAt:
+          - args: [0]
+            mustRevert: true
+        proposals: 0
+
+    erc20VerifierFactory:
+      name: Factory
+      address: *erc20VerifierFactory
+      proxyName: TransparentUpgradeableProxy
+      implementation: *factory
+      proxyAdmin: *erc20VerifierFactoryProxyAdmin
+      proxyAdminOwner: *factoryAdmin
+      proxyChecks: {}
+      checks:
+        entities: 0
+        entityAt:
+          - args: [0]
+            mustRevert: true
+        implementationAt:
+          - args: [0]
+            result: *erc20Verifier
+          - args: [1]
+            mustRevert: true
+        implementations: 1
+        isBlacklisted:
+          - args: [0]
+            result: false
+        isEntity:
+          - args: [*ZERO_ADDRESS]
+            result: false
+        owner: *factoryAdmin
+        proposalAt:
+          - args: [0]
+            mustRevert: true
+        proposals: 0
+
+    accountFactory:
+      name: Factory
+      address: *accountFactory
+      proxyName: TransparentUpgradeableProxy
+      implementation: *factory
+      proxyAdmin: *accountFactoryProxyAdmin
+      proxyAdminOwner: *factoryAdmin
+      proxyChecks: {}
+      checks:
+        entities: 0
+        entityAt:
+          - args: [0]
+            mustRevert: true
+        implementationAt:
+          - args: [0]
+            result: *mellowAccountV1
+          - args: [1]
+            mustRevert: true
+        implementations: 1
+        isBlacklisted:
+          - args: [0]
+            result: false
+        isEntity:
+          - args: [*ZERO_ADDRESS]
+            result: false
+        owner: *factoryAdmin
+        proposalAt:
+          - args: [0]
+            mustRevert: true
+        proposals: 0
+
+    swapModuleFactory:
+      name: Factory
+      address: *swapModuleFactory
+      proxyName: TransparentUpgradeableProxy
+      implementation: *factory
+      proxyAdmin: *swapModuleFactoryProxyAdmin
+      proxyAdminOwner: *factoryAdmin
+      proxyChecks: {}
+      checks:
+        entities: 0
+        entityAt:
+          - args: [0]
+            mustRevert: true
+        implementationAt:
+          - args: [0]
+            result: *swapModule
+          - args: [1]
+            mustRevert: true
+        implementations: 1
+        isBlacklisted:
+          - args: [0]
+            result: false
+        isEntity:
+          - args: [*ZERO_ADDRESS]
+            result: false
+        owner: *factoryAdmin
+        proposalAt:
+          - args: [0]
+            mustRevert: true
+        proposals: 0
+
+    consensus:
+      name: Consensus
+      address: *consensus
+      storage:
+        - slot: *INITIALIZABLE_STORAGE
+          expected: *DISABLED_INITIALIZERS
+          label: initializers disabled
+      checks:
+        checkSignatures:
+          - args: [*DEFAULT_ADMIN_ROLE, []]
+            result: false
+        isSigner:
+          - args: [*ZERO_ADDRESS]
+            result: false
+        owner: *ZERO_ADDRESS
+        requireValidSignatures:
+          - args: [*DEFAULT_ADMIN_ROLE, []]
+            mustRevert: true
+        # [address[0], uint256[1]]
+        signerAt:
+          - args: [0]
+            mustRevert: true
+        signers: 0
+        threshold: 0
+
+    depositQueue:
+      name: DepositQueue
+      address: *depositQueue
+      storage:
+        - slot: *INITIALIZABLE_STORAGE
+          expected: *DISABLED_INITIALIZERS
+          label: initializers disabled
+      checks:
+        asset: *ZERO_ADDRESS
+        canBeRemoved: true
+        claimableOf: null
+        requestOf: null
+        unclaimedRequests: 0
+        vault: *ZERO_ADDRESS
+
+    signatureDepositQueue:
+      name: SignatureDepositQueue
+      address: *signatureDepositQueue
+      storage:
+        - slot: *INITIALIZABLE_STORAGE
+          expected: *DISABLED_INITIALIZERS
+          label: initializers disabled
+      checks:
+        ORDER_TYPEHASH: *ORDER_TYPEHASH
+        asset: *ZERO_ADDRESS
+        canBeRemoved: true
+        claimableOf: null
+        consensus: *ZERO_ADDRESS
+        consensusFactory: *consensusFactory
+        # [fields, name, version, chainId, verifyingContract, salt, extensions]
+        eip712Domain: ["0x0f", "", "", 4326, *signatureDepositQueue, *DEFAULT_ADMIN_ROLE, []]
+        handleReport: null
+        hashOrder: null
+        nonces: null
+        validateOrder: null
+        vault: *ZERO_ADDRESS
+
+    syncDepositQueue:
+      name: SyncDepositQueue
+      address: *syncDepositQueue
+      storage:
+        - slot: *INITIALIZABLE_STORAGE
+          expected: *DISABLED_INITIALIZERS
+          label: initializers disabled
+      checks:
+        SET_SYNC_DEPOSIT_PARAMS_ROLE: *SET_SYNC_DEPOSIT_PARAMS_ROLE
+        asset: *ZERO_ADDRESS
+        canBeRemoved: true
+        claim: null
+        claimableOf: null
+        name: SyncDepositQueue
+        # [uint256[0], uint32[1]]
+        syncDepositParams: [0, 0]
+        vault: *ZERO_ADDRESS
+
+    feeManager:
+      name: FeeManager
+      address: *feeManager
+      storage:
+        - slot: *INITIALIZABLE_STORAGE
+          expected: *DISABLED_INITIALIZERS
+          label: initializers disabled
+      checks:
+        baseAsset: null
+        calculateDepositFee: null
+        calculateFee: null
+        calculateRedeemFee: null
+        depositFeeD6: 0
+        feeRecipient: *ZERO_ADDRESS
+        minPriceD18: null
+        owner: *ZERO_ADDRESS
+        performanceFeeD6: 0
+        protocolFeeD6: 0
+        redeemFeeD6: 0
+        timestamps: null
+
+    oracle:
+      name: Oracle
+      address: *oracle
+      storage:
+        - slot: *INITIALIZABLE_STORAGE
+          expected: *DISABLED_INITIALIZERS
+          label: initializers disabled
+      checks:
+        ACCEPT_REPORT_ROLE: *ACCEPT_REPORT_ROLE
+        ADD_SUPPORTED_ASSETS_ROLE: *ADD_SUPPORTED_ASSETS_ROLE
+        REMOVE_SUPPORTED_ASSETS_ROLE: *REMOVE_SUPPORTED_ASSETS_ROLE
+        SET_SECURITY_PARAMS_ROLE: *SET_SECURITY_PARAMS_ROLE
+        SUBMIT_REPORTS_ROLE: *SUBMIT_REPORTS_ROLE
+        getReport: null
+        isSupportedAsset: null
+        # [maxAbsoluteDeviation, suspiciousAbsoluteDeviation, maxRelativeDeviationD18, suspiciousRelativeDeviationD18, timeout, depositInterval, redeemInterval]
+        securityParams: [0, 0, 0, 0, 0, 0, 0]
+        supportedAssetAt:
+          - args: [0]
+            mustRevert: true
+        supportedAssets: 0
+        validatePrice: null
+        vault: *ZERO_ADDRESS
+
+    redeemQueue:
+      name: RedeemQueue
+      address: *redeemQueue
+      storage:
+        - slot: *INITIALIZABLE_STORAGE
+          expected: *DISABLED_INITIALIZERS
+          label: initializers disabled
+      checks:
+        asset: *ZERO_ADDRESS
+        batchAt: null
+        canBeRemoved: true
+        # [uint256[0], uint256[1], uint256[2], uint256[3]]
+        getState: [0, 0, 0, 0]
+        requestsOf: null
+        vault: *ZERO_ADDRESS
+
+    signatureRedeemQueue:
+      name: SignatureRedeemQueue
+      address: *signatureRedeemQueue
+      storage:
+        - slot: *INITIALIZABLE_STORAGE
+          expected: *DISABLED_INITIALIZERS
+          label: initializers disabled
+      checks:
+        ORDER_TYPEHASH: *ORDER_TYPEHASH
+        asset: *ZERO_ADDRESS
+        canBeRemoved: true
+        claimableOf: null
+        consensus: *ZERO_ADDRESS
+        consensusFactory: *consensusFactory
+        # [fields, name, version, chainId, verifyingContract, salt, extensions]
+        eip712Domain: ["0x0f", "", "", 4326, *signatureRedeemQueue, *DEFAULT_ADMIN_ROLE, []]
+        handleReport: null
+        hashOrder: null
+        nonces: null
+        validateOrder: null
+        vault: *ZERO_ADDRESS
+
+    syncRedeemQueue:
+      name: SyncRedeemQueue
+      address: *syncRedeemQueue
+      storage:
+        - slot: *INITIALIZABLE_STORAGE
+          expected: *DISABLED_INITIALIZERS
+          label: initializers disabled
+      checks:
+        SET_SYNC_REDEEM_PARAMS_ROLE: *SET_SYNC_REDEEM_PARAMS_ROLE
+        asset: *ZERO_ADDRESS
+        canBeRemoved: true
+        getLiquidAssets:
+          args: []
+          mustRevert: true
+        name: SyncRedeemQueue
+        # [usage, remainingDailyLimit_]
+        remainingDailyLimit: [0, 0]
+        # [penaltyD6, maxAge, usage, dailyLimit, latestRequestTimestamp]
+        syncRedeemParams: [0, 0, 0, 0, 0]
+        vault: *ZERO_ADDRESS
+
+    riskManager:
+      name: RiskManager
+      address: *riskManager
+      storage:
+        - slot: *INITIALIZABLE_STORAGE
+          expected: *DISABLED_INITIALIZERS
+          label: initializers disabled
+      checks:
+        ALLOW_SUBVAULT_ASSETS_ROLE: *ALLOW_SUBVAULT_ASSETS_ROLE
+        DISALLOW_SUBVAULT_ASSETS_ROLE: *DISALLOW_SUBVAULT_ASSETS_ROLE
+        MODIFY_PENDING_ASSETS_ROLE: *MODIFY_PENDING_ASSETS_ROLE
+        MODIFY_SUBVAULT_BALANCE_ROLE: *MODIFY_SUBVAULT_BALANCE_ROLE
+        MODIFY_VAULT_BALANCE_ROLE: *MODIFY_VAULT_BALANCE_ROLE
+        SET_SUBVAULT_LIMIT_ROLE: *SET_SUBVAULT_LIMIT_ROLE
+        SET_VAULT_LIMIT_ROLE: *SET_VAULT_LIMIT_ROLE
+        allowedAssetAt: null
+        allowedAssets: null
+        convertToShares: null
+        isAllowedAsset: null
+        maxDeposit: null
+        pendingAssets: null
+        pendingBalance: 0
+        pendingShares: null
+        requireValidSubvault: null
+        subvaultState: null
+        vault: *ZERO_ADDRESS
+        # [balance, limit]
+        vaultState: [0, 0]
+
+    tokenizedShareManager:
+      name: TokenizedShareManager
+      address: *tokenizedShareManager
+      storage:
+        - slot: *INITIALIZABLE_STORAGE
+          expected: *DISABLED_INITIALIZERS
+          label: initializers disabled
+      checks:
+        SET_ACCOUNT_INFO_ROLE: *SET_ACCOUNT_INFO_ROLE
+        SET_FLAGS_ROLE: *SET_FLAGS_ROLE
+        SET_WHITELIST_MERKLE_ROOT_ROLE: *SET_WHITELIST_MERKLE_ROOT_ROLE
+        accounts: null
+        activeShares: 0
+        activeSharesOf: null
+        allocatedShares: 0
+        allowance: null
+        balanceOf: null
+        claimableSharesOf: null
+        decimals: 18
+        # [hasMintPause, hasBurnPause, hasTransferPause, hasWhitelist, hasTransferWhitelist, globalLockup]
+        flags: [false, false, false, false, false, 0]
+        isDepositorWhitelisted: null
+        name: ""
+        sharesOf: null
+        symbol: ""
+        totalShares: 0
+        totalSupply: 0
+        updateChecks: null
+        vault: *ZERO_ADDRESS
+        whitelistMerkleRoot: *DEFAULT_ADMIN_ROLE
+
+    basicShareManager:
+      name: BasicShareManager
+      address: *basicShareManager
+      storage:
+        - slot: *INITIALIZABLE_STORAGE
+          expected: *DISABLED_INITIALIZERS
+          label: initializers disabled
+      checks:
+        SET_ACCOUNT_INFO_ROLE: *SET_ACCOUNT_INFO_ROLE
+        SET_FLAGS_ROLE: *SET_FLAGS_ROLE
+        SET_WHITELIST_MERKLE_ROOT_ROLE: *SET_WHITELIST_MERKLE_ROOT_ROLE
+        accounts: null
+        activeShares: 0
+        activeSharesOf: null
+        allocatedShares: 0
+        claimableSharesOf: null
+        # [hasMintPause, hasBurnPause, hasTransferPause, hasWhitelist, hasTransferWhitelist, globalLockup]
+        flags: [false, false, false, false, false, 0]
+        isDepositorWhitelisted: null
+        sharesOf: null
+        totalShares: 0
+        updateChecks: null
+        vault: *ZERO_ADDRESS
+        whitelistMerkleRoot: *DEFAULT_ADMIN_ROLE
+
+    burnableTokenizedShareManager:
+      name: BurnableTokenizedShareManager
+      address: *burnableTokenizedShareManager
+      storage:
+        - slot: *INITIALIZABLE_STORAGE
+          expected: *DISABLED_INITIALIZERS
+          label: initializers disabled
+      checks:
+        SET_ACCOUNT_INFO_ROLE: *SET_ACCOUNT_INFO_ROLE
+        SET_FLAGS_ROLE: *SET_FLAGS_ROLE
+        SET_WHITELIST_MERKLE_ROOT_ROLE: *SET_WHITELIST_MERKLE_ROOT_ROLE
+        accounts: null
+        activeShares: 0
+        activeSharesOf: null
+        allocatedShares: 0
+        allowance: null
+        balanceOf: null
+        claimableSharesOf: null
+        decimals: 18
+        # [hasMintPause, hasBurnPause, hasTransferPause, hasWhitelist, hasTransferWhitelist, globalLockup]
+        flags: [false, false, false, false, false, 0]
+        isDepositorWhitelisted: null
+        name: ""
+        sharesOf: null
+        symbol: ""
+        totalShares: 0
+        totalSupply: 0
+        updateChecks: null
+        vault: *ZERO_ADDRESS
+        whitelistMerkleRoot: *DEFAULT_ADMIN_ROLE
+
+    subvault:
+      name: Subvault
+      address: *subvault
+      storage:
+        - slot: *INITIALIZABLE_STORAGE
+          expected: *DISABLED_INITIALIZERS
+          label: initializers disabled
+      checks:
+        getStorageAt: null
+        onERC721Received: null
+        vault: *ZERO_ADDRESS
+        verifier: *ZERO_ADDRESS
+
+    verifier:
+      name: Verifier
+      address: *verifier
+      storage:
+        - slot: *INITIALIZABLE_STORAGE
+          expected: *DISABLED_INITIALIZERS
+          label: initializers disabled
+      checks:
+        ALLOW_CALL_ROLE: *ALLOW_CALL_ROLE
+        CALLER_ROLE: *VERIFIER_CALLER_ROLE
+        DISALLOW_CALL_ROLE: *DISALLOW_CALL_ROLE
+        SET_MERKLE_ROOT_ROLE: *SET_MERKLE_ROOT_ROLE
+        # [who, where, selector]
+        allowedCallAt:
+          - args: [0]
+            mustRevert: true
+        allowedCalls: 0
+        getVerificationResult: null
+        hashCall: null
+        isAllowedCall: null
+        merkleRoot: *DEFAULT_ADMIN_ROLE
+        vault: *ZERO_ADDRESS
+        verifyCall: null
+
+    erc20Verifier:
+      name: ERC20Verifier
+      address: *erc20Verifier
+      storage:
+        - slot: *INITIALIZABLE_STORAGE
+          expected: *DISABLED_INITIALIZERS
+          label: initializers disabled
+      ozAcl:
+        *ASSET_ROLE : []
+        *ERC20VERIFIER_CALLER_ROLE : []
+        *DEFAULT_ADMIN_ROLE : []
+        *RECIPIENT_ROLE : []
+      checks:
+        ASSET_ROLE: *ASSET_ROLE
+        CALLER_ROLE: *ERC20VERIFIER_CALLER_ROLE
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        RECIPIENT_ROLE: *RECIPIENT_ROLE
+        getRoleAdmin:
+          - args: [*ASSET_ROLE]
+            result: *DEFAULT_ADMIN_ROLE
+          - args: [*ERC20VERIFIER_CALLER_ROLE]
+            result: *DEFAULT_ADMIN_ROLE
+          - args: [*DEFAULT_ADMIN_ROLE]
+            result: *DEFAULT_ADMIN_ROLE
+          - args: [*RECIPIENT_ROLE]
+            result: *DEFAULT_ADMIN_ROLE
+        getRoleMember: null
+        getRoleMemberCount: null
+        getRoleMembers: null
+        hasRole:
+          - args: [*ASSET_ROLE, *mellowDeployer]
+            result: false
+          - args: [*ASSET_ROLE, *factoryAdmin]
+            result: false
+          - args: [*ERC20VERIFIER_CALLER_ROLE, *mellowDeployer]
+            result: false
+          - args: [*ERC20VERIFIER_CALLER_ROLE, *factoryAdmin]
+            result: false
+          - args: [*DEFAULT_ADMIN_ROLE, *mellowDeployer]
+            result: false
+          - args: [*DEFAULT_ADMIN_ROLE, *factoryAdmin]
+            result: false
+          - args: [*RECIPIENT_ROLE, *mellowDeployer]
+            result: false
+          - args: [*RECIPIENT_ROLE, *factoryAdmin]
+            result: false
+        hasSupportedRole: null
+        supportedRoleAt:
+          - args: [0]
+            mustRevert: true
+        supportedRoles: 0
+        supportsInterface: null
+        verifyCall: null
+
+    mellowAccountV1:
+      name: MellowAccountV1
+      address: *mellowAccountV1
+      storage:
+        - slot: *INITIALIZABLE_STORAGE
+          expected: *DISABLED_INITIALIZERS
+          label: initializers disabled
+      checks:
+        owner: *ZERO_ADDRESS
+
+    swapModule:
+      name: SwapModule
+      address: *swapModule
+      storage:
+        - slot: *INITIALIZABLE_STORAGE
+          expected: *DISABLED_INITIALIZERS
+          label: initializers disabled
+      ozAcl:
+        *SWAP_MODULE_CALLER_ROLE : []
+        *DEFAULT_ADMIN_ROLE : []
+        *ROUTER_ROLE : []
+        *SET_SLIPPAGE_ROLE : []
+        *TOKEN_IN_ROLE : []
+        *TOKEN_OUT_ROLE : []
+      checks:
+        BASE_MULTIPLIER: 100000000
+        CALLER_ROLE: *SWAP_MODULE_CALLER_ROLE
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        MAX_MULTIPLIER: 110000000
+        MIN_MULTIPLIER: 90000000
+        ROUTER_ROLE: *ROUTER_ROLE
+        SET_SLIPPAGE_ROLE: *SET_SLIPPAGE_ROLE
+        TOKEN_IN_ROLE: *TOKEN_IN_ROLE
+        TOKEN_OUT_ROLE: *TOKEN_OUT_ROLE
+        checkCowswapOrder: null
+        checkMultiplier: null
+        checkParams: null
+        cowswapSettlement: *cowswapSettlement
+        cowswapVaultRelayer: *cowswapVaultRelayer
+        customMultiplier: null
+        defaultMultiplier: 0
+        evaluate: null
+        getRoleAdmin:
+          - args: [*SWAP_MODULE_CALLER_ROLE]
+            result: *DEFAULT_ADMIN_ROLE
+          - args: [*DEFAULT_ADMIN_ROLE]
+            result: *DEFAULT_ADMIN_ROLE
+          - args: [*ROUTER_ROLE]
+            result: *DEFAULT_ADMIN_ROLE
+          - args: [*SET_SLIPPAGE_ROLE]
+            result: *DEFAULT_ADMIN_ROLE
+          - args: [*TOKEN_IN_ROLE]
+            result: *DEFAULT_ADMIN_ROLE
+          - args: [*TOKEN_OUT_ROLE]
+            result: *DEFAULT_ADMIN_ROLE
+        getRoleMember: null
+        getRoleMemberCount: null
+        getRoleMembers: null
+        hasRole:
+          - args: [*SWAP_MODULE_CALLER_ROLE, *mellowDeployer]
+            result: false
+          - args: [*SWAP_MODULE_CALLER_ROLE, *factoryAdmin]
+            result: false
+          - args: [*DEFAULT_ADMIN_ROLE, *mellowDeployer]
+            result: false
+          - args: [*DEFAULT_ADMIN_ROLE, *factoryAdmin]
+            result: false
+          - args: [*ROUTER_ROLE, *mellowDeployer]
+            result: false
+          - args: [*ROUTER_ROLE, *factoryAdmin]
+            result: false
+          - args: [*SET_SLIPPAGE_ROLE, *mellowDeployer]
+            result: false
+          - args: [*SET_SLIPPAGE_ROLE, *factoryAdmin]
+            result: false
+          - args: [*TOKEN_IN_ROLE, *mellowDeployer]
+            result: false
+          - args: [*TOKEN_IN_ROLE, *factoryAdmin]
+            result: false
+          - args: [*TOKEN_OUT_ROLE, *mellowDeployer]
+            result: false
+          - args: [*TOKEN_OUT_ROLE, *factoryAdmin]
+            result: false
+        hasSupportedRole: null
+        oracle: *ZERO_ADDRESS
+        subvault: *ZERO_ADDRESS
+        supportedRoleAt:
+          - args: [0]
+            mustRevert: true
+        supportedRoles: 0
+        supportsInterface: null
+        weth: *weth
+
+    vault:
+      name: Vault
+      address: *vault
+      storage:
+        - slot: *INITIALIZABLE_STORAGE
+          expected: *DISABLED_INITIALIZERS
+          label: initializers disabled
+      ozAcl:
+        *CREATE_QUEUE_ROLE : []
+        *CREATE_SUBVAULT_ROLE : []
+        *DEFAULT_ADMIN_ROLE : []
+        *DISCONNECT_SUBVAULT_ROLE : []
+        *PULL_LIQUIDITY_ROLE : []
+        *PUSH_LIQUIDITY_ROLE : []
+        *RECONNECT_SUBVAULT_ROLE : []
+        *REMOVE_QUEUE_ROLE : []
+        *SET_HOOK_ROLE : []
+        *SET_QUEUE_LIMIT_ROLE : []
+        *SET_QUEUE_STATUS_ROLE : []
+      checks:
+        CREATE_QUEUE_ROLE: *CREATE_QUEUE_ROLE
+        CREATE_SUBVAULT_ROLE: *CREATE_SUBVAULT_ROLE
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        DISCONNECT_SUBVAULT_ROLE: *DISCONNECT_SUBVAULT_ROLE
+        PULL_LIQUIDITY_ROLE: *PULL_LIQUIDITY_ROLE
+        PUSH_LIQUIDITY_ROLE: *PUSH_LIQUIDITY_ROLE
+        RECONNECT_SUBVAULT_ROLE: *RECONNECT_SUBVAULT_ROLE
+        REMOVE_QUEUE_ROLE: *REMOVE_QUEUE_ROLE
+        SET_HOOK_ROLE: *SET_HOOK_ROLE
+        SET_QUEUE_LIMIT_ROLE: *SET_QUEUE_LIMIT_ROLE
+        SET_QUEUE_STATUS_ROLE: *SET_QUEUE_STATUS_ROLE
+        assetAt:
+          - args: [0]
+            mustRevert: true
+        claimableSharesOf: null
+        defaultDepositHook: *ZERO_ADDRESS
+        defaultRedeemHook: *ZERO_ADDRESS
+        depositQueueFactory: *depositQueueFactory
+        feeManager: *ZERO_ADDRESS
+        getAssetCount: 0
+        getHook: null
+        getLiquidAssets:
+          args: []
+          mustRevert: true
+        getQueueCount:
+          - args: []
+            signature: getQueueCount()
+            result: 0
+          - args: [*ZERO_ADDRESS]
+            signature: getQueueCount(address)
+            result: 0
+        getRoleAdmin:
+          - args: [*CREATE_QUEUE_ROLE]
+            result: *DEFAULT_ADMIN_ROLE
+          - args: [*CREATE_SUBVAULT_ROLE]
+            result: *DEFAULT_ADMIN_ROLE
+          - args: [*DEFAULT_ADMIN_ROLE]
+            result: *DEFAULT_ADMIN_ROLE
+          - args: [*DISCONNECT_SUBVAULT_ROLE]
+            result: *DEFAULT_ADMIN_ROLE
+          - args: [*PULL_LIQUIDITY_ROLE]
+            result: *DEFAULT_ADMIN_ROLE
+          - args: [*PUSH_LIQUIDITY_ROLE]
+            result: *DEFAULT_ADMIN_ROLE
+          - args: [*RECONNECT_SUBVAULT_ROLE]
+            result: *DEFAULT_ADMIN_ROLE
+          - args: [*REMOVE_QUEUE_ROLE]
+            result: *DEFAULT_ADMIN_ROLE
+          - args: [*SET_HOOK_ROLE]
+            result: *DEFAULT_ADMIN_ROLE
+          - args: [*SET_QUEUE_LIMIT_ROLE]
+            result: *DEFAULT_ADMIN_ROLE
+          - args: [*SET_QUEUE_STATUS_ROLE]
+            result: *DEFAULT_ADMIN_ROLE
+        getRoleMember: null
+        getRoleMemberCount: null
+        getRoleMembers: null
+        getStorageAt: null
+        hasAsset:
+          - args: [*ZERO_ADDRESS]
+            result: false
+        hasQueue:
+          - args: [*depositQueue]
+            result: false
+          # hasQueue calls IQueue(queue).asset(); a zero address cannot answer it.
+          - args: [*ZERO_ADDRESS]
+            mustRevert: true
+        hasRole:
+          - args: [*CREATE_QUEUE_ROLE, *mellowDeployer]
+            result: false
+          - args: [*CREATE_QUEUE_ROLE, *factoryAdmin]
+            result: false
+          - args: [*CREATE_SUBVAULT_ROLE, *mellowDeployer]
+            result: false
+          - args: [*CREATE_SUBVAULT_ROLE, *factoryAdmin]
+            result: false
+          - args: [*DEFAULT_ADMIN_ROLE, *mellowDeployer]
+            result: false
+          - args: [*DEFAULT_ADMIN_ROLE, *factoryAdmin]
+            result: false
+          - args: [*DISCONNECT_SUBVAULT_ROLE, *mellowDeployer]
+            result: false
+          - args: [*DISCONNECT_SUBVAULT_ROLE, *factoryAdmin]
+            result: false
+          - args: [*PULL_LIQUIDITY_ROLE, *mellowDeployer]
+            result: false
+          - args: [*PULL_LIQUIDITY_ROLE, *factoryAdmin]
+            result: false
+          - args: [*PUSH_LIQUIDITY_ROLE, *mellowDeployer]
+            result: false
+          - args: [*PUSH_LIQUIDITY_ROLE, *factoryAdmin]
+            result: false
+          - args: [*RECONNECT_SUBVAULT_ROLE, *mellowDeployer]
+            result: false
+          - args: [*RECONNECT_SUBVAULT_ROLE, *factoryAdmin]
+            result: false
+          - args: [*REMOVE_QUEUE_ROLE, *mellowDeployer]
+            result: false
+          - args: [*REMOVE_QUEUE_ROLE, *factoryAdmin]
+            result: false
+          - args: [*SET_HOOK_ROLE, *mellowDeployer]
+            result: false
+          - args: [*SET_HOOK_ROLE, *factoryAdmin]
+            result: false
+          - args: [*SET_QUEUE_LIMIT_ROLE, *mellowDeployer]
+            result: false
+          - args: [*SET_QUEUE_LIMIT_ROLE, *factoryAdmin]
+            result: false
+          - args: [*SET_QUEUE_STATUS_ROLE, *mellowDeployer]
+            result: false
+          - args: [*SET_QUEUE_STATUS_ROLE, *factoryAdmin]
+            result: false
+        hasSubvault:
+          - args: [*ZERO_ADDRESS]
+            result: false
+        hasSupportedRole: null
+        isDepositQueue:
+          - args: [*ZERO_ADDRESS]
+            result: false
+        isPausedQueue:
+          - args: [*ZERO_ADDRESS]
+            result: false
+        onERC721Received: null
+        oracle: *ZERO_ADDRESS
+        queueAt: null
+        queueLimit: 0
+        redeemQueueFactory: *redeemQueueFactory
+        riskManager: *ZERO_ADDRESS
+        shareManager: *ZERO_ADDRESS
+        subvaultAt:
+          - args: [0]
+            mustRevert: true
+        subvaultFactory: *subvaultFactory
+        subvaults: 0
+        supportedRoleAt:
+          - args: [0]
+            mustRevert: true
+        supportedRoles: 0
+        supportsInterface: null
+        verifierFactory: *verifierFactory
+
+    bitmaskVerifier:
+      name: BitmaskVerifier
+      address: *bitmaskVerifier
+      checks:
+        calculateHash: null
+        verifyCall: null
+
+    vaultConfigurator:
+      name: VaultConfigurator
+      address: *vaultConfigurator
+      checks:
+        feeManagerFactory: *feeManagerFactory
+        oracleFactory: *oracleFactory
+        riskManagerFactory: *riskManagerFactory
+        shareManagerFactory: *shareManagerFactory
+        vaultFactory: *vaultFactory
+
+    basicRedeemHook:
+      name: BasicRedeemHook
+      address: *basicRedeemHook
+      checks:
+        getLiquidAssets: null
+
+    redirectingDepositHook:
+      name: RedirectingDepositHook
+      address: *redirectingDepositHook
+      checks: {}
+
+    oracleHelper:
+      name: OracleHelper
+      address: *oracleHelper
+      checks:
+        getPricesD18: null

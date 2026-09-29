@@ -53,6 +53,7 @@ jobs:
           BNB_TESTNET_RPC_URL: ${{ secrets.BNB_TESTNET_RPC_URL || 'https://bsc-testnet-rpc.publicnode.com' }}
           LINEA_RPC_URL: ${{ secrets.LINEA_RPC_URL || 'https://linea.drpc.org' }}
           MANTLE_RPC_URL: ${{ secrets.MANTLE_RPC_URL || 'https://mantle.drpc.org' }}
+          MEGAETH_RPC_URL: ${{ secrets.MEGAETH_RPC_URL || 'https://mainnet.megaeth.com/rpc' }}
           OPTIMISM_RPC_URL: ${{ secrets.OPTIMISM_RPC_URL || 'https://optimism.drpc.org' }}
           OPTIMISM_SEPOLIA_RPC_URL: ${{ secrets.OPTIMISM_SEPOLIA_RPC_URL || 'https://optimism-sepolia.drpc.org' }}
           PLASMA_RPC_URL: ${{ secrets.PLASMA_RPC_URL || 'https://plasma.drpc.org' }}
