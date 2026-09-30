@@ -59,7 +59,7 @@ The flag permits downloads when the explorer cannot confirm its chain. It still 
 
 Set `explorerTokenEnv` to the API-key variable for the section's `explorerHostname`. ACL scans select their explorer by chain and reuse that key only when the provider matches. For an independent ACL source, set `ETHERSCAN_TOKEN` for Etherscan or `BLOCKSCOUT_TOKEN` for Blockscout. Blockscout scans can also run without a key.
 
-Each explorer host has its own request queue. An HTTP 429 applies the server's cooldown to waiting requests: `Retry-After`, in seconds or as an HTTP date, or Blockscout's millisecond reset. Without a usable header, the host pauses for six seconds; request spacing does not grow. A bare rate-limit count does not establish a per-minute allowance.
+Each explorer host has its own request queue; on Blockscout, whose quotas are per route, so does each route family (`/api/v2`, `/api/eth-rpc`, the rest of `/api`). An HTTP 429 applies the server's cooldown to waiting requests: `Retry-After`, in seconds or as an HTTP date, or Blockscout's millisecond reset; any other error status that carries `Retry-After`, such as a 503, applies it too. A cooldown above 300 seconds fails the request as a rate limit, for ABI downloads and ACL scans alike. Without a usable header, the host pauses for six seconds; request spacing does not grow. A bare rate-limit count does not establish a per-minute allowance.
 
 ## Keep CI output concise
 

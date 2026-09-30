@@ -39,12 +39,14 @@ The `proxyAdmin` and `proxyAdminOwner` checks are independent of the implementat
 
 Neither field needs an ABI entry. An admin that does not implement `owner()`, such as a Safe, fails `proxyAdminOwner` and should be pinned with `proxyAdmin` instead.
 
-Explorer requests share a cooldown per host. Retry-After accepts integer seconds
-or an HTTP-date in UTC. Blockscout reset headers are read as milliseconds only
-on a 429 when bypass-429-option identifies the response; bare rate-limit counts do not
-establish a window. Cooldowns do not permanently increase request spacing.
+Explorer requests share a cooldown per host, and on Blockscout per route family
+(`/api/v2`, `/api/eth-rpc`, the rest of `/api`), since each family has its own
+quota. Retry-After accepts integer seconds or an HTTP-date in UTC. Blockscout
+reset headers are read as milliseconds only on a 429 when bypass-429-option
+identifies the response; bare rate-limit counts do not establish a window. Cooldowns do not permanently increase request spacing.
 The ABI download's existing single retry and its queued waits share a 300-second
 wait budget; the Blockscout route probe, run once per host, waits outside it.
 An excessive cooldown fails explicitly rather than retrying early; an
-unsuccessful ABI download remains unresolved. This bounds waiting, not network
+unsuccessful ABI download remains unresolved, and an ACL scan fails as a rate
+limit. This bounds waiting, not network
 request duration. A failed wait does not reject later requests in the host queue.

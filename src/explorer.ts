@@ -55,6 +55,11 @@ async function _probeBlockscoutHost(hostname: string, attempt = 0): Promise<bool
     // a 403 here may be a WAF guarding an unknown path, not an anti-bot wall; the follow-up
     // request settles it — a genuinely challenged host fails there with the same diagnostic
     if (error instanceof ExplorerChallengeError) return false;
+    // a cooldown is a flake too: forget the verdict, so a later download probes again
+    if (error instanceof ExplorerBudgetError) {
+      blockscoutHostProbes.delete(hostname);
+      return false;
+    }
     if (error instanceof ExplorerHttpError && error.transient) {
       if (attempt === 0) {
         if (error.retryDelayMs) await sleep(error.retryDelayMs);
@@ -103,6 +108,13 @@ class ExplorerChallengeError extends ExplorerHttpError {
       `The explorer challenged the request (HTTP ${status}); set STATE_MATE_USER_AGENT to override the User-Agent`,
       false,
     );
+  }
+}
+
+// A cooldown the wait budget cannot cover: the host is throttling, not refusing
+class ExplorerBudgetError extends ExplorerHttpError {
+  constructor(message: string) {
+    super(message, false);
   }
 }
 
@@ -164,7 +176,8 @@ async function _fetchContractInfo(
     if (error instanceof ExplorerChallengeError) throw error;
     const transient = error instanceof ExplorerHttpError && error.transient;
     const retryDelayMs = error instanceof ExplorerHttpError ? error.retryDelayMs : 0;
-    return skip(`${explorerHostname} is unreachable: ${printError(error)}`, transient, retryDelayMs);
+    const state = error instanceof ExplorerBudgetError ? "is rate-limited" : "is unreachable";
+    return skip(`${explorerHostname} ${state}: ${printError(error)}`, transient, retryDelayMs);
   }
 
   if (blockscout) {
@@ -232,12 +245,21 @@ const MAX_RETRY_WAIT_MS = 300 * 1000;
 type WaitBudget = { remainingMs: number };
 const paceByHost = new Map<string, { nextAt: number; queue: Promise<void> }>();
 
+// Blockscout keeps a quota per route family, so a cooldown on one family must not hold the others
+function paceKey(url: string): string {
+  if (!url) return "";
+  const { host, pathname } = new URL(url);
+  if (pathname.startsWith("/api/v2/")) return `${host}/api/v2`;
+  if (pathname.startsWith("/api/eth-rpc")) return `${host}/api/eth-rpc`;
+  return host;
+}
+
 function paceFor(url: string) {
-  const host = url ? new URL(url).host : "";
-  let pace = paceByHost.get(host);
+  const key = paceKey(url);
+  let pace = paceByHost.get(key);
   if (!pace) {
     pace = { nextAt: 0, queue: Promise.resolve() };
-    paceByHost.set(host, pace);
+    paceByHost.set(key, pace);
   }
   return pace;
 }
@@ -271,7 +293,9 @@ export function learnRateLimit(url: string, headers?: Headers, now = Date.now(),
   }
   const wait = Number.isNaN(delay) ? RATE_LIMIT_RETRY_MS : Math.max(0, delay);
   if (!Number.isFinite(wait) || wait > MAX_RETRY_WAIT_MS) {
-    throw new ExplorerHttpError(`Explorer cooldown ${wait}ms exceeds the ${MAX_RETRY_WAIT_MS}ms wait budget`, false);
+    throw new ExplorerBudgetError(
+      `Explorer rate limit: cooldown ${wait}ms exceeds the ${MAX_RETRY_WAIT_MS}ms wait budget`,
+    );
   }
   pace.nextAt = Math.max(pace.nextAt, now + wait);
   return wait;
@@ -279,9 +303,8 @@ export function learnRateLimit(url: string, headers?: Headers, now = Date.now(),
 
 async function sleepWithinBudget(ms: number, budget: WaitBudget): Promise<void> {
   if (!Number.isFinite(ms) || ms > budget.remainingMs) {
-    throw new ExplorerHttpError(
-      `Explorer needs ${ms}ms more; wait budget has ${budget.remainingMs}ms remaining`,
-      false,
+    throw new ExplorerBudgetError(
+      `Explorer rate limit: ${ms}ms more needed; wait budget has ${budget.remainingMs}ms remaining`,
     );
   }
   if (ms > 0) {

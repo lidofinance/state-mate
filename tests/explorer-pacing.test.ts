@@ -4,8 +4,11 @@ import { afterEach, beforeEach, describe, it, mock } from "node:test";
 import {
   fetchExplorerChainId,
   httpGetAsync,
+  isBlockscoutHost,
   learnRateLimit,
   loadContractInfo,
+  reserveRequestSlot,
+  resetBlockscoutHostProbes,
   resetRequestSlots,
 } from "../src/explorer";
 
@@ -218,4 +221,30 @@ it("stops the chain-id probe on a cooldown beyond the budget", async () => {
   });
   assert.equal(await fetchExplorerChainId("one.example"), undefined);
   assert.equal(calls, 1);
+});
+
+it("probes the Blockscout route again after a cooldown beyond the budget", async () => {
+  resetBlockscoutHostProbes();
+  let calls = 0;
+  mock.method(globalThis, "fetch", async () => {
+    calls++;
+    return calls === 1
+      ? new Response("", { status: 429, headers: { "retry-after": "301" } })
+      : Response.json({ backend_version: "v9.0.0" });
+  });
+  assert.equal(await isBlockscoutHost("scout.example"), false);
+  const second = isBlockscoutHost("scout.example");
+  await flush();
+  mock.timers.tick(334);
+  assert.equal(await second, true);
+  assert.equal(calls, 2);
+});
+
+it("holds only the throttled route family of a Blockscout host", () => {
+  const now = Date.now();
+  const blockscout429 = new Headers({ "bypass-429-option": "temporary_token", "x-ratelimit-reset": "290000" });
+  learnRateLimit("https://scout.example/api?module=logs&action=getLogs", blockscout429, now);
+  assert.equal(reserveRequestSlot(now, "https://scout.example/api/v2/smart-contracts/0x1"), 0);
+  assert.equal(reserveRequestSlot(now, "https://scout.example/api/eth-rpc"), 0);
+  assert.equal(reserveRequestSlot(now, "https://scout.example/api?module=contract"), 290_000);
 });

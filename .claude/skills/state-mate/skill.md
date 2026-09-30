@@ -439,7 +439,7 @@ The entry has no `implementation:`, yet the address holds a non-empty EIP-1967 s
 ### `The explorer challenged the request (HTTP 403)`
 
 - Explorer requests send a browser-like User-Agent and a same-origin Referer without API keys. If the host still challenges the request, try another `STATE_MATE_USER_AGENT` in `.env`; the override applies to explorer and RPC requests.
-- Explorer cooldowns honor Retry-After and Blockscout's millisecond reset only on an identified Blockscout 429 response. ABI retries and queue waits have a shared 300-second wait budget; a budget error leaves the ABI unresolved. Do not infer a per-minute window from a bare rate-limit count or treat skipped ABI downloads as verified coverage.
+- Explorer cooldowns honor Retry-After. Blockscout's millisecond reset is read only on an identified Blockscout 429 response, and holds only the route family that answered. ABI retries and queue waits have a shared 300-second wait budget; a budget error leaves the ABI unresolved and fails an ACL scan as a rate limit. Do not infer a per-minute window from a bare rate-limit count or treat skipped ABI downloads as verified coverage.
 
 ### `did not confirm chainId ... --allow-unverified-explorer`
 
