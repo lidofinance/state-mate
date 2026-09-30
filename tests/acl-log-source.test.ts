@@ -105,6 +105,25 @@ describe("rate-limit detection", () => {
       resetRequestSlots();
     }
   });
+
+  it("fails a cooldown beyond the wait budget at once, naming it a rate limit", async () => {
+    resetRequestSlots();
+    const fetchMock = mock.method(
+      globalThis,
+      "fetch",
+      async () => new Response("", { status: 429, headers: { "retry-after": "600" } }),
+    );
+
+    try {
+      const outcome = await collectRoleEvents("10", CONTRACT, { fromBlock: 1, toBlock: 2 });
+      assert.equal(outcome.ok, false);
+      assert.match(outcome.ok ? "" : outcome.reason, /rate limit: cooldown 600000ms exceeds/);
+      assert.equal(fetchMock.mock.calls.length, 1);
+    } finally {
+      fetchMock.mock.restore();
+      resetRequestSlots();
+    }
+  });
 });
 
 describe("settled scan range", () => {

@@ -1,7 +1,16 @@
 import assert from "node:assert/strict";
 import { afterEach, beforeEach, describe, it, mock } from "node:test";
 
-import { httpGetAsync, learnRateLimit, resetRequestSlots } from "../src/explorer";
+import {
+  fetchExplorerChainId,
+  httpGetAsync,
+  isBlockscoutHost,
+  learnRateLimit,
+  loadContractInfo,
+  reserveRequestSlot,
+  resetBlockscoutHostProbes,
+  resetRequestSlots,
+} from "../src/explorer";
 
 const flush = () => new Promise<void>((resolve) => setImmediate(resolve));
 const URL_A = "https://one.example/api";
@@ -39,9 +48,9 @@ describe("explorer HTTP scheduling", () => {
     await flush();
     await second;
     assert.deepEqual(times, [1_000_000, 1_030_000]);
-    mock.timers.tick(668);
+    mock.timers.tick(334);
     await third;
-    assert.deepEqual(times, [1_000_000, 1_030_000, 1_030_668]);
+    assert.deepEqual(times, [1_000_000, 1_030_000, 1_030_334]);
   });
 
   it("honors an HTTP-date Retry-After for waiting requests", async () => {
@@ -81,7 +90,161 @@ describe("explorer HTTP scheduling", () => {
     assert.deepEqual(sent, [URL_A, URL_B, URL_A]);
   });
 
-  it("does not cap an explicit server cooldown at the adaptive interval limit", () => {
+  it("honors an explicit server cooldown longer than the default spacing", () => {
     assert.equal(learnRateLimit(URL_A, new Headers({ "retry-after": "120" })), 120_000);
   });
+});
+
+it("honors Blockscout reset milliseconds but not GitHub epoch seconds", () => {
+  assert.equal(
+    learnRateLimit(URL_A, new Headers({ "bypass-429-option": "no_bypass", "x-ratelimit-reset": "273095" })),
+    273095,
+  );
+  assert.equal(learnRateLimit(URL_B, new Headers({ "x-ratelimit-reset": "1790776800" })), 6000);
+  assert.equal(
+    learnRateLimit(
+      URL_B,
+      new Headers({ "bypass-429-option": "no_bypass", "x-ratelimit-reset": "273095" }),
+      Date.now(),
+      500,
+    ),
+    6000,
+  );
+});
+
+it("rejects an excessive cooldown without poisoning the host queue", async () => {
+  assert.throws(() => learnRateLimit(URL_A, new Headers({ "retry-after": "9999999999" })), /budget/);
+  mock.method(globalThis, "fetch", async () => Response.json({ ok: true }));
+  assert.deepEqual(await httpGetAsync(URL_A), { ok: true });
+});
+
+it("rejects non-decimal Retry-After values", () => {
+  for (const value of ["1e9", "+120", "1_20", "120.5"]) {
+    resetRequestSlots();
+    assert.equal(learnRateLimit(URL_A, new Headers({ "retry-after": value })), 6000);
+  }
+});
+
+it("interprets obsolete HTTP dates as UTC", () => {
+  const previous = process.env.TZ;
+  try {
+    process.env.TZ = "America/New_York";
+    const now = Date.UTC(2026, 8, 30, 14, 0);
+    assert.equal(learnRateLimit(URL_A, new Headers({ "retry-after": "Wed Sep 30 14:02:00 2026" }), now), 120000);
+  } finally {
+    if (previous === undefined) delete process.env.TZ;
+    else process.env.TZ = previous;
+  }
+});
+
+it("does not persist exponential spacing after a cooldown", async () => {
+  const times: number[] = [];
+  mock.method(globalThis, "fetch", async () => {
+    times.push(Date.now());
+    return Response.json({});
+  });
+  learnRateLimit(URL_A, new Headers({ "retry-after": "1" }));
+  const first = httpGetAsync(URL_A);
+  await flush();
+  mock.timers.tick(1000);
+  await first;
+  const second = httpGetAsync(URL_A);
+  await flush();
+  mock.timers.tick(334);
+  await flush();
+  assert.deepEqual(times, [1001000, 1001334]);
+  await second;
+});
+
+it("bounds a queued request after the host extends its cooldown and releases the queue", async () => {
+  const url = "https://api.etherscan.io/v2/api";
+  let calls = 0;
+  mock.method(globalThis, "fetch", async () => {
+    calls++;
+    return calls === 1 ? new Response("", { status: 429, headers: { "retry-after": "200" } }) : Response.json({});
+  });
+  const first = httpGetAsync(url).catch((error: unknown) => error);
+  const waiting = httpGetAsync(url).catch((error: unknown) => error);
+  await first;
+  mock.timers.tick(150000);
+  await flush();
+  learnRateLimit(url, new Headers({ "retry-after": "160" }));
+  mock.timers.tick(50000);
+  await flush();
+  assert.match(String(await waiting), /budget/);
+  assert.equal(calls, 1);
+  const next = httpGetAsync(url);
+  await flush();
+  mock.timers.tick(110000);
+  await next;
+  assert.equal(calls, 2);
+});
+
+it("shares the wait budget across the ABI download's single retry", async () => {
+  let calls = 0;
+  const host = "api.etherscan.io";
+  mock.method(globalThis, "fetch", async () => {
+    calls++;
+    return new Response("", { status: 429, headers: { "retry-after": "200" } });
+  });
+  const result = loadContractInfo("0x0000000000000000000000000000000000000001", host, undefined, 1);
+  await flush();
+  mock.timers.tick(150000);
+  learnRateLimit(`https://${host}/api`, new Headers({ "retry-after": "160" }));
+  mock.timers.tick(50000);
+  await flush();
+  assert.equal(await result, undefined);
+  assert.equal(calls, 1);
+});
+
+it("leaves the ABI unresolved when the retry delay exceeds the remaining budget", async () => {
+  const host = "api.etherscan.io";
+  let calls = 0;
+  mock.method(globalThis, "fetch", async () => {
+    calls++;
+    return new Response("", { status: 429, headers: { "retry-after": "290" } });
+  });
+  learnRateLimit(`https://${host}/v2/api`, new Headers({ "retry-after": "20" }));
+  const result = loadContractInfo("0x0000000000000000000000000000000000000001", host, "key", 1);
+  await flush();
+  mock.timers.tick(20000);
+  await flush();
+  assert.equal(await result, undefined);
+  assert.equal(calls, 1);
+});
+
+it("stops the chain-id probe on a cooldown beyond the budget", async () => {
+  let calls = 0;
+  mock.method(globalThis, "fetch", async () => {
+    calls++;
+    return new Response("", { status: 429, headers: { "retry-after": "3600" } });
+  });
+  assert.equal(await fetchExplorerChainId("one.example"), undefined);
+  assert.equal(calls, 1);
+});
+
+it("probes the Blockscout route again after a cooldown beyond the budget", async () => {
+  resetBlockscoutHostProbes();
+  let calls = 0;
+  mock.method(globalThis, "fetch", async () => {
+    calls++;
+    return calls === 1
+      ? new Response("", { status: 429, headers: { "retry-after": "301" } })
+      : Response.json({ backend_version: "v9.0.0" });
+  });
+  assert.equal(await isBlockscoutHost("scout.example"), false);
+  const second = isBlockscoutHost("scout.example");
+  await flush();
+  mock.timers.tick(334);
+  assert.equal(await second, true);
+  assert.equal(calls, 2);
+});
+
+it("holds only the throttled route family of a Blockscout host", () => {
+  const now = Date.now();
+  const blockscout429 = new Headers({ "bypass-429-option": "temporary_token", "x-ratelimit-reset": "290000" });
+  learnRateLimit("https://scout.example/api?module=logs&action=getLogs", blockscout429, now);
+  assert.equal(reserveRequestSlot(now, "https://scout.example/api/v2/smart-contracts/0x1"), 0);
+  assert.equal(reserveRequestSlot(now, "https://scout.example/api/eth-rpc"), 0);
+  assert.equal(reserveRequestSlot(now, "https://scout.example/api?module=contract"), 290_000);
 });

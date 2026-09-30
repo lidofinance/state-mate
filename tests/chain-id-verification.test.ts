@@ -270,10 +270,10 @@ describe("explorer request pacing", () => {
     const url = "https://one.blockscout.com/api";
     const now = 1_000_000;
 
-    assert.equal(learnRateLimit(url, new Headers({ "x-ratelimit-limit": "10" }), now), 668);
+    assert.equal(learnRateLimit(url, new Headers({ "x-ratelimit-limit": "10" }), now), 6000);
 
     assert.equal(reserveRequestSlot(now + 6000, url), 0);
-    assert.equal(reserveRequestSlot(now + 6000, url), 668);
+    assert.equal(reserveRequestSlot(now + 6000, url), 334);
   });
 
   it("honours Retry-After for when to resume", () => {
@@ -285,19 +285,19 @@ describe("explorer request pacing", () => {
     assert.equal(reserveRequestSlot(now, url), 30_000);
   });
 
-  it("doubles the interval when the host states nothing", () => {
+  it("uses a fixed fallback cooldown without changing later spacing", () => {
     const url = "https://quiet.example/api";
     const now = 1_000_000;
 
-    assert.equal(learnRateLimit(url, new Headers(), now), 668);
-    assert.equal(learnRateLimit(url, undefined, now), 1336);
+    assert.equal(learnRateLimit(url, new Headers(), now), 6000);
+    assert.equal(learnRateLimit(url, undefined, now), 6000);
   });
 
-  it("never backs off past a minute", () => {
+  it("does not grow the fallback after repeated refusals", () => {
     const url = "https://stubborn.example/api";
     let interval = 0;
     for (let i = 0; i < 20; i++) interval = learnRateLimit(url, new Headers(), 1_000_000);
-    assert.equal(interval, 60_000);
+    assert.equal(interval, 6000);
   });
 });
 
