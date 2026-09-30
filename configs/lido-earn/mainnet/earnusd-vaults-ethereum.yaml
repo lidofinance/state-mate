@@ -70,6 +70,7 @@ deployed:
     - &earnUSDc_vault "0xDF0fb76Df2c21F79798949A4E886cd22D1C085d7"
     - &earnUSDc_syncDepositQueueUSDC "0xEdcd9C257719799435B05C28ff9a8a34e6872bE0"
     - &earnUSDc_redeemQueueUSDC "0x59fC26AFFF725eBb77Db8E1de14572e5eA9e87EB"
+    - &earnUSDc_redeemQueueUSDT "0xF210B2E34190923afe746b297cD96465D605F33f"
     - &earnUSDc_syncRedeemQueueUSDC "0x395d3230B47c8EAd7b4152c670945f6545efe3c9"
     - &earnUSDc_syncDepositQueueUSDT "0xeC3EE7F7669b7ce0aC91c4638e4b89c9F40E179F"
     - &earnUSDc_syncRedeemQueueUSDT "0xe04A1c2D63e6964f5629B3c08BF08D2472faaB09"
@@ -87,6 +88,7 @@ deployed:
     - &earnUSDe_vault "0x0cC65147BF7F615A8dD9E78e2c53158F8E01754d"
     - &earnUSDe_syncDepositQueueUSDC "0xBb647898e0CF0aE81Ac480d04A8a9973763eBD2D"
     - &earnUSDe_redeemQueueUSDC "0x8B857170F2a6C10Ce64ec8b920428ca977fb7710"
+    - &earnUSDe_redeemQueueUSDT "0xfAc01645CA39EcD6C80bd15C052d448ED5069DF0"
     - &earnUSDe_syncRedeemQueueUSDC "0xaFd38D9a5F48f6953c0d110c4e0ecBA2381f7Fc5"
     - &earnUSDe_syncDepositQueueUSDT "0xa01aEfeC7A3384C8440e99084458030BDbdD7404"
     - &earnUSDe_syncRedeemQueueUSDT "0x978f41aF86E14901C77ebaB799c307886e7C2c54"
@@ -99,7 +101,9 @@ deployed:
     - &earnUSDe_oracleSubmitter "0xDa5508789B5f93fb49b644c87Ef9D8CddB699d59"
     - &earnUSDe_swapModule0 "0xC99DaA2dC366cFd115130a0b7D21Df01CB5FcF7b"
     - &earnUSDe_subvault0 "0x31B7d5A2B1CE1871Dd642F6aeCC0Ef68d126B95A"
+    - &earnUSDe_subvault1 "0x902FbA36Ca71b8FF947CB1A0fAE9b3a4f586Eb38"
     - &earnUSDe_verifier0 "0x87631dbf0224234107B593c874f63f577e1336Da"
+    - &earnUSDe_verifier1 "0x837e702a45c57d6D713466D6C44f5274BDbFC05E"
 
     # --- Lido Actors (multisigs) ---
     - &proxyAdmin "0x81698f87C6482bF1ce9bFcfC0F103C4A0Adf0Af0"
@@ -1248,7 +1252,9 @@ l1:
             result: *redirectingDepositHook
           - args: [*earnUSDc_syncRedeemQueueUSDT]
             result: *basicRedeemHook
-        getQueueCount: 5
+          - args: [*earnUSDc_redeemQueueUSDT]
+            result: *basicRedeemHook
+        getQueueCount: 6
         getLiquidAssets:
         getRoleAdmin:
         getRoleMember:
@@ -1271,6 +1277,8 @@ l1:
             result: true
           - args: [*earnUSDc_syncRedeemQueueUSDT]
             result: true
+          - args: [*earnUSDc_redeemQueueUSDT]
+            result: true
         hasRole:
         hasSubvault:
           - args: [*earnUSDc_subvault0]
@@ -1287,6 +1295,8 @@ l1:
             result: true
           - args: [*earnUSDc_syncRedeemQueueUSDT]
             result: false
+          - args: [*earnUSDc_redeemQueueUSDT]
+            result: false
         isPausedQueue:
           - args: [*earnUSDc_syncDepositQueueUSDC]
             result: false
@@ -1298,6 +1308,8 @@ l1:
             result: false
           - args: [*earnUSDc_syncRedeemQueueUSDT]
             result: false
+          - args: [*earnUSDc_redeemQueueUSDT]
+            result: false
         onERC721Received:
         oracle: *earnUSDc_oracle
         queueAt:
@@ -1308,12 +1320,14 @@ l1:
             result: *earnUSDc_redeemQueueUSDC
           - args: [*usdc, 2]
             result: *earnUSDc_syncRedeemQueueUSDC
-          # USDT - syncDepositQueue + syncRedeemQueue
+          # USDT - syncDepositQueue + syncRedeemQueue + redeemQueue
           - args: [*usdt, 0]
             result: *earnUSDc_syncDepositQueueUSDT
           - args: [*usdt, 1]
             result: *earnUSDc_syncRedeemQueueUSDT
-        queueLimit: 5
+          - args: [*usdt, 2]
+            result: *earnUSDc_redeemQueueUSDT
+        queueLimit: 6
         redeemQueueFactory: *redeemQueueFactory
         riskManager: *earnUSDc_riskManager
         shareManager: *earnUSDc_shareManager
@@ -1527,6 +1541,36 @@ l1:
           label: implementation
       checks:
         asset: *usdc
+        batchAt:
+        canBeRemoved:
+        claimableOf:
+        # getState: [batchIterator, batchCount, totalDemandAssets, totalPendingShares]
+        getState:
+        requestsOf:
+        vault: *earnUSDc_vault
+      implementationChecks:
+        asset: *ZERO_ADDRESS
+        batchAt:
+        canBeRemoved:
+        claimableOf:
+        getState:
+        requestsOf:
+        vault: *ZERO_ADDRESS
+
+    earnUSDc_redeemQueueUSDT:
+      name: RedeemQueue
+      address: *earnUSDc_redeemQueueUSDT
+      proxyName: TransparentUpgradeableProxy
+      implementation: *redeemQueueImplementation
+      proxyAdmin: "0x4e75A5897d821Dba07346735F935D584dF3Fb2bf"
+      proxyAdminOwner: *proxyAdmin
+      proxyChecks: {}
+      storage:
+        - slot: *EIP1967_IMPLEMENTATION_SLOT
+          expected: *redeemQueueImplementation
+          label: implementation
+      checks:
+        asset: *usdt
         batchAt:
         canBeRemoved:
         claimableOf:
@@ -2054,7 +2098,9 @@ l1:
             result: *basicRedeemHook
           - args: [*earnUSDe_syncDepositQueueUSDe]
             result: *redirectingDepositHook
-        getQueueCount: 6
+          - args: [*earnUSDe_redeemQueueUSDT]
+            result: *basicRedeemHook
+        getQueueCount: 7
         getLiquidAssets:
         getRoleAdmin:
         getRoleMember:
@@ -2081,9 +2127,13 @@ l1:
             result: true
           - args: [*earnUSDe_syncDepositQueueUSDe]
             result: true
+          - args: [*earnUSDe_redeemQueueUSDT]
+            result: true
         hasRole:
         hasSubvault:
           - args: [*earnUSDe_subvault0]
+            result: true
+          - args: [*earnUSDe_subvault1]
             result: true
         hasSupportedRole:
         isDepositQueue:
@@ -2099,6 +2149,8 @@ l1:
             result: false
           - args: [*earnUSDe_syncDepositQueueUSDe]
             result: true
+          - args: [*earnUSDe_redeemQueueUSDT]
+            result: false
         isPausedQueue:
           - args: [*earnUSDe_syncDepositQueueUSDC]
             result: false
@@ -2112,6 +2164,8 @@ l1:
             result: false
           - args: [*earnUSDe_syncDepositQueueUSDe]
             result: false
+          - args: [*earnUSDe_redeemQueueUSDT]
+            result: false
         onERC721Received:
         oracle: *earnUSDe_oracle
         queueAt:
@@ -2122,21 +2176,27 @@ l1:
             result: *earnUSDe_redeemQueueUSDC
           - args: [*usdc, 2]
             result: *earnUSDe_syncRedeemQueueUSDC
-          # USDT - syncDepositQueue + syncRedeemQueue
+          # USDT - syncDepositQueue + syncRedeemQueue + redeemQueue
           - args: [*usdt, 0]
             result: *earnUSDe_syncDepositQueueUSDT
           - args: [*usdt, 1]
             result: *earnUSDe_syncRedeemQueueUSDT
+          - args: [*usdt, 2]
+            result: *earnUSDe_redeemQueueUSDT
           # USDe - syncDepositQueue
           - args: [*usDe, 0]
             result: *earnUSDe_syncDepositQueueUSDe
-        queueLimit: 6
+        queueLimit: 7
         redeemQueueFactory: *redeemQueueFactory
         riskManager: *earnUSDe_riskManager
         shareManager: *earnUSDe_shareManager
         subvaultAt:
+          - args: [0]
+            result: *earnUSDe_subvault0
+          - args: [1]
+            result: *earnUSDe_subvault1
         subvaultFactory: *subvaultFactory
-        subvaults: 1
+        subvaults: 2
         supportedRoleAt:
           - args: [13]
             result: *ACCEPT_REPORT_ROLE
@@ -2258,6 +2318,29 @@ l1:
         vault: *ZERO_ADDRESS
         verifier: *ZERO_ADDRESS
 
+    earnUSDe_subvault1:
+      name: Subvault
+      address: *earnUSDe_subvault1
+      proxyName: TransparentUpgradeableProxy
+      implementation: *subvaultImplementation
+      proxyAdmin: "0xc5Fa6fa786AC6CE6fcC443C11eAE66bBC65C8664"
+      proxyAdminOwner: *proxyAdmin
+      proxyChecks: {}
+      storage:
+        - slot: *EIP1967_IMPLEMENTATION_SLOT
+          expected: *subvaultImplementation
+          label: implementation
+      checks:
+        getStorageAt:
+        onERC721Received:
+        vault: *earnUSDe_vault
+        verifier: *earnUSDe_verifier1
+      implementationChecks:
+        getStorageAt:
+        onERC721Received:
+        vault: *ZERO_ADDRESS
+        verifier: *ZERO_ADDRESS
+
     earnUSDe_verifier0:
       name: Verifier
       address: *earnUSDe_verifier0
@@ -2280,7 +2363,46 @@ l1:
         getVerificationResult:
         hashCall:
         isAllowedCall:
-        merkleRoot: "0x91d88b2bf915c1914e4ad0bffdc3710e2c65630c634aa80d348a0fbc14e97921"
+        merkleRoot: "0x41ac9bec065d13a5c929e29df8a78e1567fc80044287058beba831662334f236"
+        vault: *earnUSDe_vault
+        verifyCall:
+      implementationChecks:
+        ALLOW_CALL_ROLE: *ALLOW_CALL_ROLE
+        CALLER_ROLE: *CALLER_ROLE
+        DISALLOW_CALL_ROLE: *DISALLOW_CALL_ROLE
+        SET_MERKLE_ROOT_ROLE: *SET_MERKLE_ROOT_ROLE
+        allowedCallAt:
+        allowedCalls:
+        getVerificationResult:
+        hashCall:
+        isAllowedCall:
+        merkleRoot: *ZERO_BYTES32
+        vault: *ZERO_ADDRESS
+        verifyCall:
+
+    earnUSDe_verifier1:
+      name: Verifier
+      address: *earnUSDe_verifier1
+      proxyName: TransparentUpgradeableProxy
+      implementation: *verifierImplementation
+      proxyAdmin: "0x697ae09D68078124D2b0F85156035828Db6a209F"
+      proxyAdminOwner: *proxyAdmin
+      proxyChecks: {}
+      storage:
+        - slot: *EIP1967_IMPLEMENTATION_SLOT
+          expected: *verifierImplementation
+          label: implementation
+      checks:
+        ALLOW_CALL_ROLE: *ALLOW_CALL_ROLE
+        CALLER_ROLE: *CALLER_ROLE
+        DISALLOW_CALL_ROLE: *DISALLOW_CALL_ROLE
+        SET_MERKLE_ROOT_ROLE: *SET_MERKLE_ROOT_ROLE
+        allowedCallAt:
+        allowedCalls: 0
+        getVerificationResult:
+        hashCall:
+        isAllowedCall:
+        merkleRoot: *ZERO_BYTES32
         vault: *earnUSDe_vault
         verifyCall:
       implementationChecks:
@@ -2342,6 +2464,36 @@ l1:
           label: implementation
       checks:
         asset: *usdc
+        batchAt:
+        canBeRemoved:
+        claimableOf:
+        # getState: [batchIterator, batchCount, totalDemandAssets, totalPendingShares]
+        getState:
+        requestsOf:
+        vault: *earnUSDe_vault
+      implementationChecks:
+        asset: *ZERO_ADDRESS
+        batchAt:
+        canBeRemoved:
+        claimableOf:
+        getState:
+        requestsOf:
+        vault: *ZERO_ADDRESS
+
+    earnUSDe_redeemQueueUSDT:
+      name: RedeemQueue
+      address: *earnUSDe_redeemQueueUSDT
+      proxyName: TransparentUpgradeableProxy
+      implementation: *redeemQueueImplementation
+      proxyAdmin: "0xC84cA285FA41D9E36E1348041050eDDe1cc0C143"
+      proxyAdminOwner: *proxyAdmin
+      proxyChecks: {}
+      storage:
+        - slot: *EIP1967_IMPLEMENTATION_SLOT
+          expected: *redeemQueueImplementation
+          label: implementation
+      checks:
+        asset: *usdt
         batchAt:
         canBeRemoved:
         claimableOf:
@@ -2531,8 +2683,10 @@ l1:
           - args: [2]
             result: *usDe
           - args: [3]
+            result: "0x59bC9FaE5D62B19d4f8d07D758047aCb9EE19d34" # PT-srUSDe-22OCT2026
+          - args: [4]
             mustRevert: true
-        supportedAssets: 3
+        supportedAssets: 4
         validatePrice:
         vault: *earnUSDe_vault
       implementationChecks:
