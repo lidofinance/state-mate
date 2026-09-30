@@ -9,7 +9,7 @@ parameters:
 
   # https://docs.lido.fi/deployed-contracts
   - &lidoDaoAgent "0x3e40D73EB977Dc6a537aF587D48316feE66E9C8c"
-  - &automationOwner "0x23AC4BF8ca7345eE533B12705aF40F69060D9b5b" # multisig the CRE workflow and the lane automation are handed to
+  - &automationOwner "0x23AC4BF8ca7345eE533B12705aF40F69060D9b5b" # multisig owning the CRE workflow and lane automation
   - &l1wstETH "0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0"
   - &l1OptimismStandardBridge "0x76943C0D61395d8F2edF9060e1533529cAe05dE6"
   - &l1BaseStandardBridge "0x9de443AdC5A411E83F1878Ef24C3F52C61571e72"
@@ -26,7 +26,6 @@ parameters:
 
 eoa:
   - &initialOwner "0xb5c336a5c60D3482b29d83C742C65AE8351b91a8"
-  - &creWorkflowOwner "0xeDe1750ac52156E10bE2b41d8b8dF816D58bAFe1" # current CRE workflow owner; handoff: *automationOwner
 
 deployed:
   l1:
@@ -59,8 +58,8 @@ misc:
 
   # The single CRE workflow driving all four lanes; its owner is the only report author the
   # lane receivers accept
-  - &creWorkflowId "0x0058177423bc02195d4a73d4dac5f97e633051583e50bea7e16fe06643752e5b"
-  - &creWorkflowName "direct-staking-sync-test"
+  - &creWorkflowId "0x00baf350f6796ceb9860deb4eaf85e61efd3ab41b7f3fd5c9c9aca0fe2d4e242"
+  - &creWorkflowName "direct-staking-sync"
   - &creDonFamily "zone-a"
   - &WORKFLOW_ACTIVE 0 # WorkflowRegistry.WorkflowStatus.ACTIVE
 
@@ -191,7 +190,7 @@ l1:
           args: [*creWorkflowId]
           result:
             workflowId: *creWorkflowId
-            owner: *creWorkflowOwner
+            owner: *automationOwner
             createdAt:
             status: *WORKFLOW_ACTIVE
             workflowName: *creWorkflowName

@@ -17,7 +17,11 @@ state-mate keeps one compressed `abis.json.gz` beside each group of configs. Ent
 
 The chain ID prevents collisions when different networks deploy contracts at the same address. The YAML `name` must match the contract or implementation ABI. When `proxyChecks` run, `proxyName` must match the proxy ABI.
 
-Etherscan V2 receives the configured chain ID with each request. Before a download from a fixed-chain explorer, state-mate verifies that the explorer serves the configured network. A run with a complete ABI store does not contact the explorer.
+Etherscan V2 receives the configured chain ID with each request. Before a download from a fixed-chain explorer, state-mate verifies that the explorer serves the configured network. If the probe cannot answer, downloads require the explicit [unverified-explorer override](how-to.md#download-abis-when-the-explorer-cannot-confirm-its-chain). A reported chain mismatch is always rejected.
+
+Blockscout instances are detected with one shared API probe per host, including concurrent downloads. Their ABIs come from `/api/v2/smart-contracts/<address>`; other explorers keep the Etherscan-compatible route. A missing or malformed ABI skips that address.
+
+A complete ABI store avoids explorer requests for ABI downloads. Exhaustive ACL checks can still query their log source.
 
 During `--update-abi`, an explorer that no longer serves a stored contract does not erase the existing ABI. A section without `explorerHostname` also keeps its stored entries.
 

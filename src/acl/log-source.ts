@@ -31,6 +31,7 @@ export const CHAIN_LOG_SOURCES: Readonly<Record<string, ChainLogSource>> = {
   "1": { confirmationLag: 8, source: { kind: "etherscan" } },
   "10": { confirmationLag: 60, source: { hostname: "explorer.optimism.io", kind: "blockscout" } },
   "130": { confirmationLag: 120, source: { kind: "etherscan" } },
+  "4663": { confirmationLag: 1200, source: { hostname: "robinhoodchain.blockscout.com", kind: "blockscout" } },
   "8453": { confirmationLag: 60, source: { hostname: "base.blockscout.com", kind: "blockscout" } },
   "42161": { confirmationLag: 240, source: { kind: "etherscan" } },
   "59144": { confirmationLag: 30, source: { kind: "etherscan" } },
@@ -133,11 +134,40 @@ async function explorerGet(url: string): Promise<ExplorerLogsResponse> {
   }
 }
 
+/** Credentials for the section's ABI explorer, set as its checks begin. */
+let configuredTokenEnv: string | undefined;
+let configuredExplorerHostname: string | undefined;
+
+export function setExplorerTokenEnv(name: string | undefined, hostname: string | undefined): void {
+  configuredTokenEnv = name;
+  configuredExplorerHostname = hostname?.toLowerCase();
+}
+
+function explorerToken(fallback: string, hostname: string): [string | undefined, string] {
+  const sameExplorer =
+    configuredExplorerHostname === hostname ||
+    (hostname === "api.etherscan.io" && configuredExplorerHostname?.endsWith(".etherscan.io"));
+  if (sameExplorer && configuredTokenEnv && process.env[configuredTokenEnv]) {
+    return [process.env[configuredTokenEnv], configuredTokenEnv];
+  }
+  return [process.env[fallback], fallback];
+}
+
 function explorerUrl(source: LogSource, chainId: string, query: string): string {
-  if (source.kind === "blockscout") return `https://${source.hostname}/api?${query}`;
-  const key = process.env.ETHERSCAN_TOKEN;
-  if (key) registerSecret(key, "$ETHERSCAN_TOKEN");
-  return `https://api.etherscan.io/v2/api?chainid=${chainId}&${query}${key ? `&apikey=${key}` : ""}`;
+  if (source.kind === "blockscout") {
+    const [key, name] = explorerToken("BLOCKSCOUT_TOKEN", source.hostname);
+    if (key) {
+      registerSecret(key, `$${name}`);
+      registerSecret(encodeURIComponent(key), `$${name}`);
+    }
+    return `https://${source.hostname}/api?${query}${key ? `&apikey=${encodeURIComponent(key)}` : ""}`;
+  }
+  const [key, name] = explorerToken("ETHERSCAN_TOKEN", "api.etherscan.io");
+  if (key) {
+    registerSecret(key, `$${name}`);
+    registerSecret(encodeURIComponent(key), `$${name}`);
+  }
+  return `https://api.etherscan.io/v2/api?chainid=${chainId}&${query}${key ? `&apikey=${encodeURIComponent(key)}` : ""}`;
 }
 
 /**

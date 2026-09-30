@@ -41,6 +41,26 @@ yarn start path/to/configs --update-abi
 
 A single-file refresh leaves entries used by sibling configs untouched.
 
+## Get past an explorer's anti-bot challenge
+
+Explorer requests carry a browser-like User-Agent and a same-origin Referer. The Referer contains only the origin, without query parameters or API keys. If the explorer still returns a challenge, try setting `STATE_MATE_USER_AGENT` in `.env` and re-run. The override applies to explorer and RPC requests.
+
+## Download ABIs when the explorer cannot confirm its chain
+
+Before downloading missing ABIs from a fixed-chain explorer, the run probes the host for its chain id. If the host cannot answer, a run with missing ABIs exits with `could not verify chainId`. Check that the configured explorer serves the intended network before using the override:
+
+```sh
+yarn start path/to/config.yaml --update-abi --allow-unverified-explorer
+```
+
+The flag permits downloads when the explorer cannot confirm its chain. It still rejects a reported chain mismatch. RPC chain verification, ABI validation, contract-name checks, and state checks remain enabled. These checks do not prove that an ABI came from the intended chain: contracts on different networks can share the same name and interface.
+
+## Configure credentials for ACL scans
+
+Set `explorerTokenEnv` to the API-key variable for the section's `explorerHostname`. ACL scans select their explorer by chain and reuse that key only when the provider matches. For an independent ACL source, set `ETHERSCAN_TOKEN` for Etherscan or `BLOCKSCOUT_TOKEN` for Blockscout. Blockscout scans can also run without a key.
+
+Each explorer host has its own request queue. An HTTP 429 slows that host and applies `Retry-After`, in seconds or as an HTTP date, to waiting requests. Without a usable header, the interval doubles up to one minute. A bare rate-limit count does not establish a per-minute allowance.
+
 ## Keep CI output concise
 
 ```sh

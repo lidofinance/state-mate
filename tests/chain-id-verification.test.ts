@@ -7,6 +7,7 @@ import { normalizeChainId } from "../src/common";
 import { context, resetStats, stats } from "../src/context";
 import {
   assertProviderChain,
+  learnRateLimit,
   loadContractInfo,
   reserveRequestSlot,
   resetRequestSlots,
@@ -249,6 +250,55 @@ describe("explorer request pacing", () => {
     reserveRequestSlot(now);
     assert.equal(reserveRequestSlot(now + 5000), 0);
   });
+
+  it("queues each host separately", () => {
+    const now = 1_000_000;
+    assert.equal(reserveRequestSlot(now, "https://api.etherscan.io/v2/api"), 0);
+    assert.equal(reserveRequestSlot(now, "https://one.blockscout.com/api"), 0);
+    assert.equal(reserveRequestSlot(now, "https://api.etherscan.io/v2/api"), 334);
+  });
+
+  it("starts an unknown host at the default pace", () => {
+    const now = 1_000_000;
+    reserveRequestSlot(now, "https://one.blockscout.com/api");
+    assert.equal(reserveRequestSlot(now, "https://one.blockscout.com/api"), 334);
+    reserveRequestSlot(now, "https://unknown.example/api");
+    assert.equal(reserveRequestSlot(now, "https://unknown.example/api"), 334);
+  });
+
+  it("does not assume a per-minute window from a bare limit count", () => {
+    const url = "https://one.blockscout.com/api";
+    const now = 1_000_000;
+
+    assert.equal(learnRateLimit(url, new Headers({ "x-ratelimit-limit": "10" }), now), 668);
+
+    assert.equal(reserveRequestSlot(now + 6000, url), 0);
+    assert.equal(reserveRequestSlot(now + 6000, url), 668);
+  });
+
+  it("honours Retry-After for when to resume", () => {
+    const url = "https://two.blockscout.com/api";
+    const now = 1_000_000;
+
+    learnRateLimit(url, new Headers({ "retry-after": "30" }), now);
+
+    assert.equal(reserveRequestSlot(now, url), 30_000);
+  });
+
+  it("doubles the interval when the host states nothing", () => {
+    const url = "https://quiet.example/api";
+    const now = 1_000_000;
+
+    assert.equal(learnRateLimit(url, new Headers(), now), 668);
+    assert.equal(learnRateLimit(url, undefined, now), 1336);
+  });
+
+  it("never backs off past a minute", () => {
+    const url = "https://stubborn.example/api";
+    let interval = 0;
+    for (let i = 0; i < 20; i++) interval = learnRateLimit(url, new Headers(), 1_000_000);
+    assert.equal(interval, 60_000);
+  });
 });
 
 describe("loadContractInfo", () => {
@@ -389,7 +439,7 @@ describe("loadContractInfo", () => {
         calls++;
         return answer();
       });
-      mock.timers.enable({ apis: ["setTimeout"] });
+      mock.timers.enable({ apis: ["setTimeout", "Date"] });
       try {
         const { lines, result: info } = await captureLog(async () => {
           const pending = loadContractInfo(ADDRESS, "api.etherscan.io", "", 1);
@@ -422,7 +472,7 @@ describe("loadContractInfo", () => {
       calls++;
       return { ok: false, status: 429, statusText: "Too Many Requests" } as Response;
     });
-    mock.timers.enable({ apis: ["setTimeout"] });
+    mock.timers.enable({ apis: ["setTimeout", "Date"] });
     try {
       const { lines, result } = await captureLog(async () => {
         const pending = loadContractInfo(ADDRESS, "api.etherscan.io", "", 1);
@@ -480,7 +530,7 @@ describe("loadContractInfo", () => {
         }),
       } as Response;
     });
-    mock.timers.enable({ apis: ["setTimeout"] });
+    mock.timers.enable({ apis: ["setTimeout", "Date"] });
     try {
       const { lines, result: info } = await captureLog(async () => {
         const pending = loadContractInfo(ADDRESS, "api.etherscan.io", "", 1);
