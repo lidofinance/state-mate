@@ -44,6 +44,7 @@ or an HTTP-date in UTC. Blockscout reset headers are read as milliseconds only
 on a 429 when bypass-429-option identifies the response; bare rate-limit counts do not
 establish a window. Cooldowns do not permanently increase request spacing.
 The ABI download's existing single retry and its queued waits share a 300-second
-wait budget. An excessive cooldown fails explicitly rather than retrying early;
-an unsuccessful ABI download remains unresolved. This bounds waiting, not network
+wait budget; the Blockscout route probe, run once per host, waits outside it.
+An excessive cooldown fails explicitly rather than retrying early; an
+unsuccessful ABI download remains unresolved. This bounds waiting, not network
 request duration. A failed wait does not reject later requests in the host queue.
