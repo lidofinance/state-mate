@@ -18,6 +18,7 @@
   <a href="docs/how-to.md">How-To Guides</a> ·
   <a href="docs/configuration.md">Configuration Reference</a> ·
   <a href="docs/cli.md">CLI Reference</a> ·
+  <a href="docs/environment.md">Environment Reference</a> ·
   <a href="docs/json-output.md">JSON Output</a> ·
   <a href="docs/observed.md">Observed Values</a> ·
   <a href="docs/abi-and-proxies.md">ABI &amp; Proxies</a>
@@ -35,7 +36,7 @@ yarn install
 cp .env.sample .env
 ```
 
-Set the RPC URLs and explorer tokens required by your config, then run it:
+Set the [environment variables](docs/environment.md) required by your config, then run it:
 
 ```sh
 yarn start path/to/config.yaml
