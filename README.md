@@ -19,6 +19,7 @@
   <a href="docs/configuration.md">Configuration Reference</a> ·
   <a href="docs/cli.md">CLI Reference</a> ·
   <a href="docs/json-output.md">JSON Output</a> ·
+  <a href="docs/observed.md">Observed Values</a> ·
   <a href="docs/abi-and-proxies.md">ABI &amp; Proxies</a>
 </p>
 
