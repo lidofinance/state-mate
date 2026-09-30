@@ -39,14 +39,6 @@ The `proxyAdmin` and `proxyAdminOwner` checks are independent of the implementat
 
 Neither field needs an ABI entry. An admin that does not implement `owner()`, such as a Safe, fails `proxyAdminOwner` and should be pinned with `proxyAdmin` instead.
 
-Explorer requests share a cooldown per host, and on Blockscout per route family
-(`/api/v2`, `/api/eth-rpc`, the rest of `/api`), since each family has its own
-quota. Retry-After accepts integer seconds or an HTTP-date in UTC. Blockscout
-reset headers are read as milliseconds only on a 429 when bypass-429-option
-identifies the response; bare rate-limit counts do not establish a window. Cooldowns do not permanently increase request spacing.
-The ABI download's existing single retry and its queued waits share a 300-second
-wait budget; the Blockscout route probe, run once per host, waits outside it.
-An excessive cooldown fails explicitly rather than retrying early; an
-unsuccessful ABI download remains unresolved, and an ACL scan fails as a rate
-limit. This bounds waiting, not network
-request duration. A failed wait does not reject later requests in the host queue.
+Each explorer host has one request queue, spaced at three requests per second. Blockscout keeps a separate quota for each route family (`/api/v2`, `/api/eth-rpc` and the rest of `/api`), so there each family gets its own queue. A 429, or any error response with `Retry-After` such as a 503, pauses the queue for the cooldown the server names: `Retry-After` in integer seconds or as an HTTP date in UTC, or, on a Blockscout 429 identified by `bypass-429-option`, `x-ratelimit-reset` in milliseconds. A bare rate-limit count names no window and is ignored. Without a usable header the queue pauses for six seconds, and the spacing does not grow.
+
+Each ABI download has a 300-second wait budget for its queue waits and its single retry. The Blockscout route probe runs once per host and waits outside this budget. A longer cooldown fails at once instead of retrying early: the ABI stays unresolved, and an ACL scan fails as a rate limit. The budget bounds waiting, not network time. A failed wait does not block later requests in the queue.

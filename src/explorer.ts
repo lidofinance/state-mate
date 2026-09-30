@@ -238,7 +238,7 @@ function _parseBlockscoutV2(response: unknown, address: string, skip: SkipFn): F
   return { contract: { abi: parsed.abi, address, contractName: source.name } };
 }
 
-// Use the Etherscan free tier spacing; each host shares its own server cooldown.
+// Etherscan free-tier spacing; paceKey decides which requests share a queue and its cooldown.
 const EXPLORER_REQUESTS_PER_SECOND = 3;
 const MIN_REQUEST_INTERVAL_MS = Math.ceil(1000 / EXPLORER_REQUESTS_PER_SECOND);
 const MAX_RETRY_WAIT_MS = 300 * 1000;
