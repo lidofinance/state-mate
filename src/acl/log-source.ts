@@ -101,9 +101,9 @@ interface ExplorerLogsResponse {
 }
 
 /**
- * A rate limit is the explorer asking to be asked again, not a refusal. Turning one into a failed
- * check would make the scan red on load rather than on state, and a check that cries wolf on a
- * busy afternoon is one people learn to ignore.
+ * A rate limit asks for a later retry, so the scan waits it out within the 300-second budget.
+ * A longer cooldown fails the scan with a rate-limit error: the run ends, and the error blames
+ * the explorer's load, not the state.
  */
 const RATE_LIMITED = /rate limit|max calls per sec|too many requests|throttle/i;
 let rateLimitPauseMs = 6000;
