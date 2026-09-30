@@ -39,6 +39,7 @@ import {
   SUCCESS_MARK,
   WARNING_MARK,
 } from "./logger";
+import { assertPinnedHashCanonical, pinSectionBlock } from "./pinned-block";
 import { beginConfig, emitReport, endConfig } from "./report";
 import { ContractSectionValidator } from "./section-validators/contract";
 import {
@@ -288,12 +289,14 @@ async function checkNetworkSection(sectionTitle: string, section: NetworkSection
   // assertProviderChain vouches for the RPC; the explorer is probed by the ABI pass, and only
   // when it has something to download
   await assertProviderChain(provider, chainId);
+  await pinSectionBlock(provider);
   const contractSectionChecker = new ContractSectionValidator(provider, chainId);
 
   for (const contractAlias in section.contracts) {
     const contractEntry = section.contracts[contractAlias];
     await contractSectionChecker.see(contractEntry, sectionTitle, contractAlias);
   }
+  await assertPinnedHashCanonical(provider);
 }
 
 export function collectYamlConfigs(directory: string): string[] {
@@ -325,6 +328,11 @@ async function main() {
   if (fs.statSync(context.configPath).isDirectory()) {
     if (context.checkOnly) {
       logErrorAndExit(`The ${chalk.yellow("-o")} option requires a single config file, not a directory`);
+    }
+    if (context.block !== undefined && context.block !== "latest") {
+      logErrorAndExit(
+        `A ${chalk.yellow("--block")} number or hash requires a single config file; a directory takes --block latest`,
+      );
     }
     const configs = collectYamlConfigs(context.configPath);
     if (configs.length === 0) {
