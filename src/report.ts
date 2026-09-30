@@ -31,10 +31,11 @@ interface ConfigReport {
   checks: number;
   config: string;
   contracts?: ContractReport[];
-  deployed?: string;
+  /** The selected sibling files of each kind, in argument order; absent when none was selected. */
+  deployed?: string[];
   error?: string;
   errors: number;
-  inputs?: string;
+  inputs?: string[];
   skipped: number;
   status: Status;
   warnings?: Warning[];
@@ -68,11 +69,13 @@ export function resetReport(): void {
   emitted = false;
 }
 
+const selectedFiles = (files: string[]) => (files.length > 0 ? files.map((file) => path.resolve(file)) : undefined);
+
 export function beginConfig(configPath: string): void {
   config = {
     config: configPath,
-    deployed: context.deployed === undefined ? undefined : path.resolve(context.deployed),
-    inputs: context.inputs === undefined ? undefined : path.resolve(context.inputs),
+    deployed: selectedFiles(context.deployed),
+    inputs: selectedFiles(context.inputs),
     status: "passed",
     checks: 0,
     errors: 0,

@@ -65,8 +65,14 @@ test("directory auto-loading handles mixed configs, records paths, and resets se
     for (const [index, fixture] of fixtures.entries()) {
       const entry = report.configs[index];
       assert.equal(entry.config, path.join(directory, `${fixture.stem}.yaml`));
-      assert.equal(entry.deployed, fixture.deployed ? path.join(directory, `${fixture.stem}.deployed.yml`) : undefined);
-      assert.equal(entry.inputs, fixture.inputs ? path.join(directory, `${fixture.stem}.inputs.yaml`) : undefined);
+      assert.deepEqual(
+        entry.deployed,
+        fixture.deployed ? [path.join(directory, `${fixture.stem}.deployed.yml`)] : undefined,
+      );
+      assert.deepEqual(
+        entry.inputs,
+        fixture.inputs ? [path.join(directory, `${fixture.stem}.inputs.yaml`)] : undefined,
+      );
     }
 
     // A later discovery error must retain both the completed config and the aborted one,

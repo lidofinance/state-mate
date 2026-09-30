@@ -59,8 +59,8 @@ chain offers no log source for. `warnings` counts the `warnings` entries below.
 | Key                           | Present when                          | Meaning                                                                     |
 | ----------------------------- | ------------------------------------- | --------------------------------------------------------------------------- |
 | `config`                      | always                                | Path of the config file, as resolved from the command line.                 |
-| `deployed`                    | a deployed sibling was selected       | Absolute path of the selected deployed-address file.                        |
-| `inputs`                      | an inputs sibling was selected        | Absolute path of the selected inputs file.                                  |
+| `deployed`                    | a deployed sibling was selected       | Absolute paths of every selected deployed-address file, in argument order.  |
+| `inputs`                      | an inputs sibling was selected        | Absolute paths of every selected inputs file, in argument order.            |
 | `status`                      | always                                | `passed`, `failed`, or `error` when the run aborted inside this config.     |
 | `checks`, `errors`, `skipped` | always                                | The counters of this config; see `summary`.                                 |
 | `error`                       | `status` is `error`                   | The abort message. The contracts checked before the abort are still listed. |

@@ -20,8 +20,9 @@ export interface ErrorDetail {
 export const context = {
   configPath: "",
   autoLoadDeployedAndInputs: false,
-  deployed: undefined as string | undefined,
-  inputs: undefined as string | undefined,
+  // --deployed / --inputs, in argument order; empty when none was selected
+  deployed: [] as string[],
+  inputs: [] as string[],
   checkOnly: null as CheckOnly | null,
   checkOnlyCmdArg: undefined as string | undefined,
   // --update-abi: rebuild the store from scratch instead of only downloading what is missing

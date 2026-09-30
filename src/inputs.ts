@@ -2,9 +2,11 @@ import * as YAML from "yaml";
 
 import { ADDRESS_OR_HASH_RE, invalidAddressMessage, pairKeyToString, type SiblingSpec } from "./sibling-delegation";
 
-const INPUTS_SECTIONS = ["config", "externals"] as const;
+// Composed in this order: `externals:` entries are scalars and so hold no alias, while a
+// `config:` array may alias an external fact.
+const INPUTS_SECTIONS = ["externals", "config"] as const;
 
-function collectInputsLabels(document: YAML.Document, fileLabel: string): Set<string> {
+function collectInputsLabels(document: YAML.Document): Set<string> {
   const labels = new Set<string>();
   if (!YAML.isMap(document.contents)) {
     return labels; // unreachable: the engine has already rejected non-mapping files
@@ -41,7 +43,7 @@ function collectInputsLabels(document: YAML.Document, fileLabel: string): Set<st
         }
       }
       if (labels.has(node.anchor)) {
-        throw new Error(`duplicate label &${node.anchor} in ${fileLabel}`);
+        throw new Error(`duplicate label &${node.anchor}`);
       }
       labels.add(node.anchor);
     }
@@ -53,6 +55,7 @@ function collectInputsLabels(document: YAML.Document, fileLabel: string): Set<st
 export const INPUTS_SPEC: SiblingSpec = {
   optionName: "--inputs",
   fileLabel: "the .inputs file",
+  entryNoun: "input anchor(s)",
   ownedSectionKeys: [...INPUTS_SECTIONS],
   collectLabels: collectInputsLabels,
 };

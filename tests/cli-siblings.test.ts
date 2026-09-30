@@ -4,6 +4,9 @@ import fs from "node:fs";
 import path from "node:path";
 import { test } from "node:test";
 
+import { DEPLOYED_SPEC } from "../src/deployed-addresses";
+import { INPUTS_SPEC } from "../src/inputs";
+import { composeWithSiblings } from "../src/sibling-delegation";
 import { CROSS_SOURCE_ERRORS, composeWithInputs, withTemporaryDirectory } from "./delegation-helpers";
 
 // Exercise CLI loading in a subprocess because validation failures exit the process.
@@ -115,8 +118,8 @@ test("JSON records both selected sibling paths resolved from the working directo
     );
     const report = JSON.parse(run.stdout);
     assert.match(report.error, new RegExp(`Env var ${RPC_ENV_VAR} is not set`));
-    assert.equal(report.configs[0].deployed, deployedPath);
-    assert.equal(report.configs[0].inputs, inputsPath);
+    assert.deepEqual(report.configs[0].deployed, [deployedPath]);
+    assert.deepEqual(report.configs[0].inputs, [inputsPath]);
   });
 });
 
@@ -129,6 +132,212 @@ test("both flags compose the config and it passes schema validation", () => {
     assert.match(output, /Loaded 2 input anchor\(s\)/);
     assert.match(output, /Schema validation passed/);
     assert.match(output, new RegExp(`Env var ${RPC_ENV_VAR} is not set`));
+  });
+});
+
+// The kind order is the CLI's: `.deployed` files come before `.inputs` files in the composed
+// document whatever the flag order, so an input array may alias a deployed address.
+test("an input array aliases a deployed address even when --inputs precedes --deployed", () => {
+  withTemporaryDirectory("state-mate-cli-", (directory) => {
+    const { mainPath, deployedPath, inputsPath } = writeConfigSet(directory);
+    fs.writeFileSync(mainPath, MAIN_CONFIG.replace("name: *lidoName", "name: *lidoName\n        allowed: *allowed"));
+    fs.writeFileSync(inputsPath, INPUTS.replace("externals:", "  - &allowed [*fooAddress]\nexternals:"));
+    const { output } = runStateMate(mainPath, "--inputs", inputsPath, "--deployed", deployedPath);
+
+    assert.match(output, /Loaded 1 deployed address\(es\)/);
+    assert.match(output, /Loaded 3 input anchor\(s\)/);
+    assert.match(output, /Schema validation passed/);
+    assert.match(output, new RegExp(`Env var ${RPC_ENV_VAR} is not set`));
+  });
+});
+
+// Shared-plus-per-network layout: one wiring config, a common address file and a network one.
+const L2_MAIN_CONFIG = `
+l1:
+  rpcUrl: ${RPC_ENV_VAR}
+  chainId: 560048
+  contracts:
+    workflow:
+      name: Workflow
+      address: *l1Workflow
+      checks:
+        bridge: *l2Bridge
+l2:
+  rpcUrl: ${RPC_ENV_VAR}
+  chainId: 11155420
+  contracts:
+    bridge:
+      name: Bridge
+      address: *l2Bridge
+      checks:
+        workflow: *l1Workflow
+`;
+const COMMON_DEPLOYED = 'deployed:\n  l1:\n    - &l1Workflow "0x1111111111111111111111111111111111111111"\n';
+const OPTIMISM_DEPLOYED = 'deployed:\n  l2:\n    - &l2Bridge "0x2222222222222222222222222222222222222222"\n';
+
+function writeL2ConfigSet(directory: string): { mainPath: string; commonPath: string; optimismPath: string } {
+  const mainPath = path.join(directory, "l2.yaml");
+  const commonPath = path.join(directory, "common.deployed.yaml");
+  const optimismPath = path.join(directory, "optimism.deployed.yaml");
+  fs.writeFileSync(mainPath, L2_MAIN_CONFIG);
+  fs.writeFileSync(commonPath, COMMON_DEPLOYED);
+  fs.writeFileSync(optimismPath, OPTIMISM_DEPLOYED);
+  return { mainPath, commonPath, optimismPath };
+}
+
+test("two --deployed files compose one address book and the run reaches the RPC stop", () => {
+  withTemporaryDirectory("state-mate-cli-", (directory) => {
+    const { mainPath, commonPath, optimismPath } = writeL2ConfigSet(directory);
+    const { output } = runStateMate(mainPath, "--deployed", commonPath, "--deployed", optimismPath);
+    assertLoaded(output);
+    const loaded = output.match(/Loaded 1 deployed address\(es\) from (\S+)/g);
+    assert.deepEqual(loaded, [
+      `Loaded 1 deployed address(es) from ${path.relative(REPOSITORY_ROOT, commonPath)}`,
+      `Loaded 1 deployed address(es) from ${path.relative(REPOSITORY_ROOT, optimismPath)}`,
+    ]);
+  });
+});
+
+test("a JSON report lists every selected --deployed file in argument order", () => {
+  withTemporaryDirectory("state-mate-cli-", (directory) => {
+    const { mainPath, commonPath, optimismPath } = writeL2ConfigSet(directory);
+    const run = runStateMate(
+      mainPath,
+      "--deployed",
+      path.relative(REPOSITORY_ROOT, optimismPath),
+      "--deployed",
+      commonPath,
+      "--json",
+    );
+    const [entry] = JSON.parse(run.stdout).configs;
+    assert.deepEqual(entry.deployed, [optimismPath, commonPath]);
+  });
+});
+
+test("a single --deployed file is listed the same way, as a one-element list", () => {
+  withTemporaryDirectory("state-mate-cli-", (directory) => {
+    const { mainPath, deployedPath } = writeConfigSet(directory);
+    const run = runStateMate(mainPath, "--deployed", deployedPath, "--json");
+    const [entry] = JSON.parse(run.stdout).configs;
+    assert.deepEqual(entry.deployed, [deployedPath]);
+  });
+});
+
+test("selecting the same --deployed file twice is rejected before anything loads", () => {
+  withTemporaryDirectory("state-mate-cli-", (directory) => {
+    const { mainPath, commonPath, optimismPath } = writeL2ConfigSet(directory);
+    const relative = path.relative(REPOSITORY_ROOT, commonPath);
+    const run = runStateMate(
+      mainPath,
+      "--deployed",
+      commonPath,
+      "--deployed",
+      optimismPath,
+      "--deployed",
+      relative,
+      "--json",
+    );
+    const report = JSON.parse(run.stdout);
+    assert.equal(report.status, "error");
+    assert.equal(
+      report.error,
+      `The --deployed file is selected more than once: ${relative} (the same file as ${commonPath})`,
+    );
+    assert.deepEqual(
+      report.configs[0].deployed,
+      [commonPath, optimismPath, relative].map((file) => path.resolve(file)),
+    );
+    assertStoppedBeforeSchema(run.output);
+  });
+});
+
+test("a label defined in two --deployed files is rejected, and unresolved aliases name both files", () => {
+  withTemporaryDirectory("state-mate-cli-", (directory) => {
+    const { mainPath, commonPath, optimismPath } = writeL2ConfigSet(directory);
+    fs.appendFileSync(optimismPath, '  l1:\n    - &l1Workflow "0x3333333333333333333333333333333333333333"\n');
+    const duplicate = runStateMate(mainPath, "--deployed", commonPath, "--deployed", optimismPath);
+    assertStoppedBeforeSchema(duplicate.output);
+    assert.match(
+      duplicate.output,
+      /label\(s\) defined in more than one delegated file: &l1Workflow \(in the \.deployed file \S*common\.deployed\.yaml and the \.deployed file \S*optimism\.deployed\.yaml\)/,
+    );
+
+    fs.writeFileSync(optimismPath, OPTIMISM_DEPLOYED);
+    fs.appendFileSync(mainPath, "misc: [*l2Token]\n");
+    const missing = runStateMate(mainPath, "--deployed", commonPath, "--deployed", optimismPath);
+    assertStoppedBeforeSchema(missing.output);
+    const common = path.relative(REPOSITORY_ROOT, commonPath);
+    const optimism = path.relative(REPOSITORY_ROOT, optimismPath);
+    assert.ok(
+      missing.output.includes(
+        `defined neither in it nor in the .deployed file ${common} / the .deployed file ${optimism}: &l2Token`,
+      ),
+      missing.output,
+    );
+  });
+});
+
+test("two --inputs files compose config: and externals: lists, alongside two --deployed files", () => {
+  withTemporaryDirectory("state-mate-cli-", (directory) => {
+    const { mainPath, commonPath, optimismPath } = writeL2ConfigSet(directory);
+    fs.writeFileSync(
+      mainPath,
+      L2_MAIN_CONFIG.replace("chainId: 560048", "chainId: *l1ChainId")
+        .replace("chainId: 11155420", "chainId: *l2ChainId")
+        .replace("bridge: *l2Bridge", "bridge: *l2Bridge\n        name: *workflowName\n        limits: *limits"),
+    );
+    const commonInputs = path.join(directory, "common.inputs.yaml");
+    const optimismInputs = path.join(directory, "optimism.inputs.yaml");
+    fs.writeFileSync(commonInputs, 'config:\n  - &workflowName "Workflow"\nexternals:\n  - &l1ChainId 560048\n');
+    fs.writeFileSync(optimismInputs, "config:\n  - &limits [1, 2]\nexternals:\n  - &l2ChainId 11155420\n");
+    const run = runStateMate(
+      mainPath,
+      "--inputs",
+      commonInputs,
+      "--deployed",
+      commonPath,
+      "--inputs",
+      optimismInputs,
+      "--deployed",
+      optimismPath,
+      "--json",
+    );
+    const report = JSON.parse(run.stdout);
+    assert.match(report.error, new RegExp(`Env var ${RPC_ENV_VAR} is not set`));
+    const [entry] = report.configs;
+    assert.deepEqual(entry.inputs, [commonInputs, optimismInputs]);
+    assert.deepEqual(entry.deployed, [commonPath, optimismPath]);
+
+    const { document } = composeWithSiblings(fs.readFileSync(mainPath, "utf8"), [
+      { text: fs.readFileSync(commonInputs, "utf8"), spec: INPUTS_SPEC },
+      { text: fs.readFileSync(optimismInputs, "utf8"), spec: INPUTS_SPEC },
+      { text: COMMON_DEPLOYED, spec: DEPLOYED_SPEC },
+      { text: OPTIMISM_DEPLOYED, spec: DEPLOYED_SPEC },
+    ]);
+    const composed = document as { config: unknown[]; externals: string[]; l2: { chainId: string } };
+    assert.deepEqual(composed.config, ["Workflow", ["1", "2"]]);
+    assert.deepEqual(composed.externals, ["560048", "11155420"]);
+    assert.equal(composed.l2.chainId, "11155420");
+  });
+});
+
+test("selecting the same --inputs file twice is rejected, and a cross-file duplicate label names both", () => {
+  withTemporaryDirectory("state-mate-cli-", (directory) => {
+    const { mainPath, inputsPath } = writeConfigSet(directory);
+    const twice = runStateMate(mainPath, "--inputs", inputsPath, "--inputs", inputsPath, "--json");
+    const report = JSON.parse(twice.stdout);
+    assert.equal(report.status, "error");
+    assert.equal(report.error, `The --inputs file is selected more than once: ${inputsPath}`);
+    assertStoppedBeforeSchema(twice.output);
+
+    const otherPath = path.join(directory, "other.inputs.yaml");
+    fs.writeFileSync(otherPath, 'config:\n  - &lidoName "Other"\n');
+    const duplicate = runStateMate(mainPath, "--inputs", inputsPath, "--inputs", otherPath);
+    assertStoppedBeforeSchema(duplicate.output);
+    assert.match(
+      duplicate.output,
+      /label\(s\) defined in more than one delegated file: &lidoName \(in the \.inputs file \S+ and the \.inputs file \S*other\.inputs\.yaml\)/,
+    );
   });
 });
 
@@ -167,7 +376,7 @@ test("an inline config:/externals: section without --inputs is rejected", () => 
     const { output } = runStateMate(mainPath);
 
     assertStoppedBeforeSchema(output);
-    assert.match(output, /holds top-level `config:` \/ `externals:` section\(s\) inline/);
+    assert.match(output, /holds top-level `externals:` \/ `config:` section\(s\) inline/);
     assert.match(output, /only allowed in the \.inputs file/);
   });
 });
@@ -348,7 +557,7 @@ for (const failure of ["missing path", "unused label", "cross-source aliases"]) 
       assert.equal(report.configs[0].status, "error");
       assert.equal(report.configs[0].error, report.error);
       assert.equal(report.configs[0].config, mainPath);
-      assert.equal(report.configs[0].inputs, selectedPath);
+      assert.deepEqual(report.configs[0].inputs, [selectedPath]);
       assert.equal("deployed" in report.configs[0], false);
       assert.equal(report.summary.checks, 0);
       assertStoppedBeforeSchema(run.output);
@@ -358,7 +567,8 @@ for (const failure of ["missing path", "unused label", "cross-source aliases"]) 
         assert.match(report.error, /&unused/);
       }
       if (failure === "cross-source aliases") {
-        for (const diagnostic of CROSS_SOURCE_ERRORS.diagnostics)
+        const inputsLabel = `the .inputs file ${path.relative(REPOSITORY_ROOT, inputsPath)}`;
+        for (const diagnostic of CROSS_SOURCE_ERRORS.diagnostics(inputsLabel))
           assert.ok(report.error.includes(diagnostic), report.error);
       }
     });

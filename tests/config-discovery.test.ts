@@ -47,9 +47,9 @@ describe("collectYamlConfigs", () => {
     const inputs = path.join(directory, "nested", "foo.mainnet.inputs.yml");
     fs.writeFileSync(deployed, "");
     fs.writeFileSync(inputs, "");
-    assert.deepEqual(discoverSiblingPaths(config), { deployed, inputs });
-    assert.deepEqual(discoverSiblingPaths(path.join(directory, "foo.mainnet.yml")), {});
-    assert.deepEqual(discoverSiblingPaths(path.join(directory, "nested", "other.yaml")), {});
+    assert.deepEqual(discoverSiblingPaths(config), { deployed: [deployed], inputs: [inputs] });
+    assert.deepEqual(discoverSiblingPaths(path.join(directory, "foo.mainnet.yml")), { deployed: [], inputs: [] });
+    assert.deepEqual(discoverSiblingPaths(path.join(directory, "nested", "other.yaml")), { deployed: [], inputs: [] });
   });
 
   for (const kind of ["deployed", "inputs"]) {
