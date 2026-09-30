@@ -47,7 +47,7 @@ jobs:
           BLOCKSCOUT_TOKEN: ${{ secrets.BLOCKSCOUT_TOKEN }}
           STATE_MATE_USER_AGENT: ${{ vars.STATE_MATE_USER_AGENT }}
           ETH_RPC_URL: ${{ secrets.ETH_RPC_URL || 'https://eth.drpc.org' }}
-          ETH_HOODI_RPC_URL: ${{ secrets.HOODI_REMOTE_RPC_URL || 'https://hoodi.drpc.org' }}
+          ETH_HOODI_RPC_URL: ${{ secrets.ETH_HOODI_RPC_URL || 'https://hoodi.drpc.org' }}
           ETH_SEPOLIA_RPC_URL: ${{ secrets.ETH_SEPOLIA_RPC_URL || 'https://ethereum-sepolia-rpc.publicnode.com' }}
           ARBITRUM_RPC_URL: ${{ secrets.ARBITRUM_RPC_URL || 'https://arbitrum.drpc.org' }}
           BASE_RPC_URL: ${{ secrets.BASE_RPC_URL || 'https://base.drpc.org' }}
