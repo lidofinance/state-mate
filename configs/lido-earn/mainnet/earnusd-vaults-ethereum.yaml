@@ -150,6 +150,7 @@ misc:
   - &lidoSigner10 "0xE6CD29BF19769E44534099d241abAa07aa8c8E9a"
   - &lidoSigner11 "0x8aA493BcD7f989caD67dd3CB48A4c2E6b40FeDB0"
   - &lidoSigner12 "0xf2374BCb265505002055942D070459a4d2011012"
+  - &lidoSigner13 "0x7a63a5cc7F6A6352d0Ae1fE175D745Bce5d75657"
 
   # --- Mellow signers ---
   - &mellowSigner1 "0x44A388BBD782AE1D7f4542aEb6C3569E2CfdF5a1"
@@ -2966,6 +2967,7 @@ l1:
         getChainId: 1
         getModulesPaginated:
         getOwners:
+          - *lidoSigner13
           - *lidoSigner6
           - *lidoSigner9
           - *lidoSigner2

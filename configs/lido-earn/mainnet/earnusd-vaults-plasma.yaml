@@ -395,7 +395,7 @@ l1:
         getVerificationResult:
         hashCall:
         isAllowedCall:
-        merkleRoot: "0x3290cff12dc523502faa7784661dc051c8e8d9c8c06446e8c038d37f06996ebd"
+        merkleRoot: "0x11e7220e6e437097fa13c38b8f9e7bf186b9e0d807c8f47d05bb81735721f76f"
         vault: *earnUSDe_vault
         verifyCall:
       implementationChecks:

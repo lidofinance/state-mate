@@ -9,6 +9,8 @@ export const ROLE_REVOKED_TOPIC = keccakId("RoleRevoked(bytes32,address,address)
 export interface RawLog {
   address: string;
   topics: readonly string[];
+  /** Hex payload; carries the grant/revoke bool of an Aragon SetPermission. Absent on OZ logs. */
+  data?: string;
   blockNumber: number;
   logIndex: number;
 }
