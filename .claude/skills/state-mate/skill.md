@@ -438,11 +438,11 @@ The entry has no `implementation:`, yet the address holds a non-empty EIP-1967 s
 
 ### `The explorer challenged the request (HTTP 403)`
 
-- The explorer's anti-bot layer rejected the built-in User-Agent. Set `STATE_MATE_USER_AGENT` in `.env` to another string — every explorer and RPC request carries it.
+- Explorer requests send a browser-like User-Agent and a same-origin Referer without API keys. If the host still challenges the request, try another `STATE_MATE_USER_AGENT` in `.env`; the override applies to explorer and RPC requests.
 
 ### `did not confirm chainId ... --allow-unverified-explorer`
 
-- The explorer left the chain-id probe unanswered — rate-limited, or not serving the probe routes. Re-run with `--allow-unverified-explorer`; the RPC chain assertion and the stored-name match still guard the ABI store.
+- The explorer left the chain-id probe unanswered. Confirm the explorer serves the intended network before using `--allow-unverified-explorer`. A reported mismatch is still rejected. RPC, ABI, name and state checks remain enabled, but cannot prove the ABI's chain of origin: names and interfaces can match across networks.
 
 ### `Invalid address` in `deployed:`
 

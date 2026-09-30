@@ -63,7 +63,7 @@ describe("blockscout v2 ABI download", () => {
         return { body: { name: "AdaptiveCurveIrm", is_verified: true, abi: IRM_ABI } };
       return { body: { status: "0", message: "NOTOK", result: "legacy quota exhausted" } };
     });
-    mock.timers.enable({ apis: ["setTimeout"] });
+    mock.timers.enable({ apis: ["setTimeout", "Date"] });
     try {
       const pending = loadContractInfo(ADDRESS, BLOCKSCOUT_HOST);
       for (let round = 0; round < 12; round++) {
@@ -95,6 +95,33 @@ describe("blockscout v2 ABI download", () => {
     }
   });
 
+  it("shares a pending probe and sends every concurrent download directly to v2", async () => {
+    const fetchMock = mockFetch((url) =>
+      url.endsWith(PROBE_SUFFIX)
+        ? PROBE_ANSWER
+        : { body: { name: "AdaptiveCurveIrm", is_verified: true, abi: IRM_ABI } },
+    );
+    mock.timers.enable({ apis: ["setTimeout", "Date"] });
+    try {
+      const pending = Promise.all(
+        [ADDRESS, ADDRESS, ADDRESS].map((address) => loadContractInfo(address, BLOCKSCOUT_HOST)),
+      );
+      for (let round = 0; round < 8; round++) {
+        await new Promise((resolve) => setImmediate(resolve));
+        mock.timers.tick(1000);
+      }
+      const contracts = await pending;
+      const urls = fetchMock.mock.calls.map((call) => String(call.arguments[0]));
+      assert.equal(urls.filter((url) => url.endsWith(PROBE_SUFFIX)).length, 1);
+      assert.equal(urls.filter((url) => url.includes("/api/v2/smart-contracts/")).length, 3);
+      assert.ok(urls.every((url) => url.includes("/api/v2/")));
+      assert.ok(contracts.every((contract) => contract?.contractName === "AdaptiveCurveIrm"));
+    } finally {
+      mock.timers.reset();
+      fetchMock.mock.restore();
+    }
+  });
+
   it("accepts the documented form where the ABI arrives as a JSON string", async () => {
     const fetchMock = mockFetch((url) =>
       url.endsWith(PROBE_SUFFIX)
@@ -111,8 +138,11 @@ describe("blockscout v2 ABI download", () => {
 
   it("rejects an answer without a usable ABI as final, with no second request", async () => {
     const rejected: Record<string, unknown> = {
+      "a null response": null,
+      "a primitive response": 42,
       "a missing name": { is_verified: true, abi: IRM_ABI },
       "a missing ABI": { name: "AdaptiveCurveIrm", is_verified: false },
+      "a null ABI": { name: "AdaptiveCurveIrm", abi: null },
       "a malformed ABI string": { name: "AdaptiveCurveIrm", is_verified: true, abi: "not json [" },
       "an ABI of the wrong shape": { name: "AdaptiveCurveIrm", is_verified: true, abi: [42] },
     };
@@ -148,7 +178,7 @@ describe("blockscout v2 ABI download", () => {
           ? { status: 429 }
           : { body: { name: "AdaptiveCurveIrm", is_verified: true, abi: IRM_ABI } },
     );
-    mock.timers.enable({ apis: ["setTimeout"] });
+    mock.timers.enable({ apis: ["setTimeout", "Date"] });
     try {
       const pending = loadContractInfo(ADDRESS, BLOCKSCOUT_HOST);
       for (let round = 0; round < 8; round++) {

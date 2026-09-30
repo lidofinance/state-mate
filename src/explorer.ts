@@ -13,15 +13,16 @@ import {
   isValidAbi,
 } from "./types";
 
-// a bare `state-mate/<version>` UA gets challenged by anti-bot layers the same way as the undici default
+// Some explorer frontends reject the default HTTP client User-Agent.
 export const DEFAULT_USER_AGENT = `Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36 state-mate/${packageJson.version}`;
 
 export function userAgent(): string {
   return process.env.STATE_MATE_USER_AGENT?.trim() || DEFAULT_USER_AGENT;
 }
 
-function requestHeaders(extra: Record<string, string> = {}): Record<string, string> {
-  return { "User-Agent": userAgent(), ...extra };
+function requestHeaders(url: string, extra: Record<string, string> = {}): Record<string, string> {
+  // Send only the origin: explorer URLs can carry API keys in their query string.
+  return { "User-Agent": userAgent(), Referer: `${new URL(url).origin}/`, ...extra };
 }
 
 /** Blockscout instances serve ABIs without a key; etherscan does not. */
@@ -105,10 +106,12 @@ class ExplorerChallengeError extends ExplorerHttpError {
   }
 }
 
-// explorer APIs express their own refusals in-band as HTTP 200, so a bare 403 means a wall
-// in front of them even without the challenge marker
+// Keep API authorization errors separate from explicit challenges and HTML refusals.
 function isChallenged(response: Response): boolean {
-  return response.headers?.get("cf-mitigated") === "challenge" || response.status === 403;
+  return (
+    response.headers?.get("cf-mitigated") === "challenge" ||
+    (response.status === 403 && /text\/html/i.test(response.headers?.get("content-type") ?? ""))
+  );
 }
 
 /** Keeps the HTTP error type private while letting a caller own one bounded retry budget. */
@@ -218,40 +221,74 @@ function _parseBlockscoutV2(response: unknown, address: string, skip: SkipFn): F
   return { contract: { abi: parsed.abi, address, contractName: source.name } };
 }
 
-// The free etherscan tier answers 3 calls per second and charges a multi-second penalty for
-// breaking that, so every request reserves a slot up front instead of finding out the hard way.
+// Start at the Etherscan free tier; each host backs off independently when it refuses requests.
 const EXPLORER_REQUESTS_PER_SECOND = 3;
 const MIN_REQUEST_INTERVAL_MS = Math.ceil(1000 / EXPLORER_REQUESTS_PER_SECOND);
-let nextRequestAt = 0;
+const MAX_REQUEST_INTERVAL_MS = 60 * 1000;
+const paceByHost = new Map<string, { intervalMs: number; nextAt: number; queue: Promise<void> }>();
+
+function paceFor(url: string) {
+  const host = url ? new URL(url).host : "";
+  let pace = paceByHost.get(host);
+  if (!pace) {
+    pace = { intervalMs: MIN_REQUEST_INTERVAL_MS, nextAt: 0, queue: Promise.resolve() };
+    paceByHost.set(host, pace);
+  }
+  return pace;
+}
 
 /** Returns how long this request has to wait, and books the slot for it. */
-export function reserveRequestSlot(now: number): number {
-  const slot = Math.max(now, nextRequestAt);
-  nextRequestAt = slot + MIN_REQUEST_INTERVAL_MS;
+export function reserveRequestSlot(now: number, url = ""): number {
+  const pace = paceFor(url);
+  const slot = Math.max(now, pace.nextAt);
+  pace.nextAt = slot + pace.intervalMs;
   return slot - now;
 }
 
+/** Retry-After is seconds or an HTTP date; a bare rate-limit count gives no window duration. */
+export function learnRateLimit(url: string, headers?: Headers, now = Date.now()): number {
+  const pace = paceFor(url);
+  pace.intervalMs = Math.min(pace.intervalMs * 2, MAX_REQUEST_INTERVAL_MS);
+  const value = headers?.get("retry-after");
+  const seconds = value ? Number(value) : NaN;
+  const delay = Number.isFinite(seconds) ? seconds * 1000 : Date.parse(value ?? "") - now;
+  const wait = Number.isFinite(delay) && delay >= 0 ? delay : pace.intervalMs;
+  pace.nextAt = Math.max(pace.nextAt, now + wait);
+  return wait;
+}
+
+async function waitForRequestSlot(url: string): Promise<void> {
+  const pace = paceFor(url);
+  const turn = pace.queue.then(async () => {
+    // A response can extend the cooldown while this request is waiting.
+    while (pace.nextAt > Date.now()) await sleep(pace.nextAt - Date.now());
+    reserveRequestSlot(Date.now(), url);
+  });
+  pace.queue = turn;
+  await turn;
+}
+
 export function resetRequestSlots(): void {
-  nextRequestAt = 0;
+  paceByHost.clear();
 }
 
 // A single request with no retries of its own: loadContractInfo owns the whole retry budget,
 // and a second layer of attempts here would multiply it
 export async function httpGetAsync<T>(url: string): Promise<T> {
-  const delay = reserveRequestSlot(Date.now());
-  if (delay > 0) await sleep(delay);
+  await waitForRequestSlot(url);
   let response: Response;
   try {
-    response = await fetch(url, { method: "GET", headers: requestHeaders() });
+    response = await fetch(url, { method: "GET", headers: requestHeaders(url) });
   } catch (error) {
     throw new ExplorerHttpError(`Failed to fetch contract source code: ${printError(error)}`, true);
   }
   if (!response.ok) {
     if (isChallenged(response)) throw new ExplorerChallengeError(response.status);
+    const cooldown = response.status === 429 ? learnRateLimit(url, response.headers) : 0;
     throw new ExplorerHttpError(
       `Failed to fetch contract source code: HTTP status code ${response.status}: ${response.statusText}`,
       isTransientHttpStatus(response.status),
-      response.status === 429 ? RATE_LIMIT_RETRY_MS : 0,
+      response.status === 429 ? Math.max(cooldown, RATE_LIMIT_RETRY_MS) : 0,
     );
   }
   try {
@@ -270,21 +307,26 @@ export async function fetchExplorerChainId(
   explorerKey?: string,
 ): Promise<string | undefined> {
   // A probe nobody answered blocks ABI downloads outright, so each route gets its own bounded
-  // retry on a flake; the two-fetch budget of loadContractInfo is not involved.
+  // retry on a flake; the download retry budget is not involved.
   // The eth-rpc route is the one every checked blockscout actually serves, so giving up on it
   // early would send the probe to a fallback that answers "Unknown module"
   for (let attempt = 0; attempt < 2; attempt++) {
     try {
-      const response = await fetch(`https://${explorerHostname}/api/eth-rpc`, {
+      const url = `https://${explorerHostname}/api/eth-rpc`;
+      await waitForRequestSlot(url);
+      const response = await fetch(url, {
         method: "POST",
-        headers: requestHeaders({ "Content-Type": "application/json" }),
+        headers: requestHeaders(url, { "Content-Type": "application/json" }),
         body: JSON.stringify({ jsonrpc: "2.0", method: "eth_chainId", params: [], id: 1 }),
       });
       if (!response.ok) {
         // the fallback route on the same host would meet the same challenge
         if (isChallenged(response)) throw new ExplorerChallengeError(response.status);
         if (!isTransientHttpStatus(response.status) || attempt > 0) break;
-        if (response.status === 429) await sleep(RATE_LIMIT_RETRY_MS);
+        if (response.status === 429) {
+          learnRateLimit(url, response.headers);
+          await sleep(RATE_LIMIT_RETRY_MS);
+        }
         continue;
       }
       const decimal = _hexToDecimal(((await response.json()) as { result?: unknown }).result);

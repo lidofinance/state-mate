@@ -19,7 +19,7 @@ import {
 } from "../src/abi-provider";
 import { EntryField } from "../src/common";
 import { context, resetStats, stats } from "../src/context";
-import { fetchExplorerChainId, resetBlockscoutHostProbes } from "../src/explorer";
+import { fetchExplorerChainId, resetBlockscoutHostProbes, resetRequestSlots } from "../src/explorer";
 import { SectionValidatorBase } from "../src/section-validators/base";
 import * as stateMate from "../src/state-mate";
 import type { ContractEntry, EntireDocument } from "../src/typebox";
@@ -101,6 +101,7 @@ afterEach(() => {
   context.allowUnverifiedExplorer = false;
   resetAbiRebuildState();
   resetBlockscoutHostProbes();
+  resetRequestSlots();
   for (const directory of temporaryDirectories) {
     fs.rmSync(directory, { recursive: true, force: true });
   }
@@ -641,7 +642,7 @@ describe("fetchExplorerChainId", () => {
       fallbackCalls++;
       return { ok: true, json: async () => ({ status: "0", message: "NOTOK", result: "Unknown module" }) } as Response;
     });
-    mock.timers.enable({ apis: ["setTimeout"] });
+    mock.timers.enable({ apis: ["setTimeout", "Date"] });
     try {
       const pending = fetchExplorerChainId("api.bscscan.com");
       for (let round = 0; round < 8; round++) {
@@ -673,7 +674,7 @@ describe("fetchExplorerChainId", () => {
       }
       return { ok: true, json: async () => ({ jsonrpc: "2.0", id: 83, result: "0x38" }) } as Response;
     });
-    mock.timers.enable({ apis: ["setTimeout"] });
+    mock.timers.enable({ apis: ["setTimeout", "Date"] });
     try {
       const pending = fetchExplorerChainId("api.bscscan.com");
       for (let round = 0; round < 8; round++) {
@@ -701,7 +702,7 @@ describe("fetchExplorerChainId", () => {
       }
       return { ok: true, json: async () => ({ jsonrpc: "2.0", id: 83, result: "0x38" }) } as Response;
     });
-    mock.timers.enable({ apis: ["setTimeout"] });
+    mock.timers.enable({ apis: ["setTimeout", "Date"] });
     try {
       const pending = fetchExplorerChainId("api.bscscan.com");
       for (let round = 0; round < 8; round++) {
@@ -725,7 +726,7 @@ describe("fetchExplorerChainId", () => {
       fallbackCalls++;
       return { ok: false, status: 429, statusText: "Too Many Requests" } as Response;
     });
-    mock.timers.enable({ apis: ["setTimeout"] });
+    mock.timers.enable({ apis: ["setTimeout", "Date"] });
     try {
       const pending = fetchExplorerChainId("api.bscscan.com");
       for (let round = 0; round < 8; round++) {

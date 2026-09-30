@@ -79,6 +79,16 @@ describe("explorer request headers", () => {
     }
   });
 
+  it("sends only the explorer origin in Referer, without URL credentials or query keys", async () => {
+    const fetchMock = mockFetch(() => ({ body: {} }));
+    try {
+      await httpGetAsync("https://user:password@robinhoodchain.blockscout.com/api?apikey=secret");
+      assert.equal(headerOf(fetchMock.mock.calls[0], "Referer"), "https://robinhoodchain.blockscout.com/");
+    } finally {
+      fetchMock.mock.restore();
+    }
+  });
+
   it("sends the User-Agent on the Blockscout chain-id probe", async () => {
     const fetchMock = mockFetch(() => ({ body: { result: "0x1237" } }));
     try {
@@ -86,6 +96,7 @@ describe("explorer request headers", () => {
       const probe = fetchMock.mock.calls.find((call) => String(call.arguments[0]).endsWith("/api/eth-rpc"));
       assert.equal(headerOf(probe, "User-Agent"), DEFAULT_USER_AGENT);
       assert.equal(headerOf(probe, "Content-Type"), "application/json");
+      assert.equal(headerOf(probe, "Referer"), `https://${BLOCKSCOUT_HOST}/`);
     } finally {
       fetchMock.mock.restore();
     }
@@ -106,10 +117,23 @@ describe("explorer challenges", () => {
     }
   });
 
-  it("treats a bare 403 without the challenge marker as a challenge too", async () => {
-    const fetchMock = mockFetch(() => ({ status: 403 }));
+  it("treats an HTML 403 without the challenge marker as a challenge too", async () => {
+    const fetchMock = mockFetch(() => ({ status: 403, headers: { "content-type": "text/html" } }));
     try {
       await assert.rejects(httpGetAsync("https://robinhoodchain.blockscout.com/api"), /STATE_MATE_USER_AGENT/);
+    } finally {
+      fetchMock.mock.restore();
+    }
+  });
+
+  it("keeps a JSON API 403 as a per-address refusal instead of aborting the batch", async () => {
+    const fetchMock = mockFetch((url) =>
+      url.endsWith("/api/v2/config/backend-version")
+        ? { body: { backend_version: "v11.3.2" } }
+        : { status: 403, headers: { "content-type": "application/json" }, body: { message: "Forbidden" } },
+    );
+    try {
+      assert.equal(await loadContractInfo(ADDRESS, BLOCKSCOUT_HOST), undefined);
     } finally {
       fetchMock.mock.restore();
     }

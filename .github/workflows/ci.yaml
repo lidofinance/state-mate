@@ -44,6 +44,8 @@ jobs:
       - name: Run state-mate
         env:
           ETHERSCAN_TOKEN: ${{ secrets.ETHERSCAN_TOKEN }}
+          BLOCKSCOUT_TOKEN: ${{ secrets.BLOCKSCOUT_TOKEN }}
+          STATE_MATE_USER_AGENT: ${{ vars.STATE_MATE_USER_AGENT }}
           ETH_RPC_URL: ${{ secrets.MAINNET_REMOTE_RPC_URL || 'https://eth.drpc.org' }}
           ETH_HOODI_RPC_URL: ${{ secrets.HOODI_REMOTE_RPC_URL || 'https://hoodi.drpc.org' }}
           ETH_SEPOLIA_RPC_URL: ${{ secrets.ETH_SEPOLIA_RPC_URL || 'https://ethereum-sepolia-rpc.publicnode.com' }}
