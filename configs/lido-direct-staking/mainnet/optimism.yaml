@@ -13,7 +13,7 @@ parameters:
   - &lidoDaoAgent "0x3e40D73EB977Dc6a537aF587D48316feE66E9C8c"
   - &l2Wsteth "0x1F32b1c2345538c0c6f582fCB022739c4A194Ebb"
   - &lolMsig "0xFc832dA3D688352C0aB1A32136c7fABbB16d66E6" # LOL multisig
-  - &automationOwner "0x23AC4BF8ca7345eE533B12705aF40F69060D9b5b" # multisig the automation pair is handed to
+  - &automationOwner "0x23AC4BF8ca7345eE533B12705aF40F69060D9b5b" # multisig owning the automation pair
 
   # CCIP router (Optimism): https://docs.chain.link/ccip/directory/mainnet/chain/ethereum-mainnet-optimism-1
   - &l2CcipRouter "0x3206695CaE29952f4b0c22a169725a865bc8Ce0f"
@@ -28,8 +28,6 @@ parameters:
   - &l2CreForwarder "0xF8344CFd5c43616a4366C34E3EEE75af79a74482"
 
 eoa:
-  - &automationDeployer "0x2A140ba9aD3b306Ff62185954F49b130492266AB" # deploy key still holding the automation pair
-  - &creWorkflowOwner "0xeDe1750ac52156E10bE2b41d8b8dF816D58bAFe1" # current CRE workflow owner, the only report author the receivers accept; handoff: *automationOwner
   - &initialOwner "0xb5c336a5c60D3482b29d83C742C65AE8351b91a8"
   - &deployer "0xBeedf0c72D63eE8f8784eDB4A9326Fb43b69D50c"
 
@@ -204,7 +202,7 @@ l1:
         DEST_CHAIN_SELECTOR: *ethMainnetCcipChainSelector
         WNATIVE: *l2Weth
         MIN_DELAY: 60
-        owner: *automationDeployer # handoff: *automationOwner
+        owner: *automationOwner
         getDelay: *syncDelay
         getAmounts:
           result: [*syncMinAmount, *syncMaxAmount]
@@ -221,9 +219,9 @@ l1:
       name: CREReceiver
       address: *l2CreReceiver
       checks:
-        owner: *automationDeployer # handoff: *automationOwner
+        owner: *automationOwner
         getForwarder: *l2CreForwarder
-        getExpectedAuthor: *creWorkflowOwner # handoff: *automationOwner
+        getExpectedAuthor: *automationOwner
         isCallAllowed:
           - args: [*l2SyncTrigger, *TRIGGER_SYNC_SELECTOR]
             result: true
