@@ -1,7 +1,13 @@
 import assert from "node:assert/strict";
 import { afterEach, beforeEach, describe, it, mock } from "node:test";
 
-import { httpGetAsync, learnRateLimit, loadContractInfo, resetRequestSlots } from "../src/explorer";
+import {
+  fetchExplorerChainId,
+  httpGetAsync,
+  learnRateLimit,
+  loadContractInfo,
+  resetRequestSlots,
+} from "../src/explorer";
 
 const flush = () => new Promise<void>((resolve) => setImmediate(resolve));
 const URL_A = "https://one.example/api";
@@ -185,5 +191,31 @@ it("shares the wait budget across the ABI download's single retry", async () => 
   mock.timers.tick(50000);
   await flush();
   assert.equal(await result, undefined);
+  assert.equal(calls, 1);
+});
+
+it("leaves the ABI unresolved when the retry delay exceeds the remaining budget", async () => {
+  const host = "api.etherscan.io";
+  let calls = 0;
+  mock.method(globalThis, "fetch", async () => {
+    calls++;
+    return new Response("", { status: 429, headers: { "retry-after": "290" } });
+  });
+  learnRateLimit(`https://${host}/v2/api`, new Headers({ "retry-after": "20" }));
+  const result = loadContractInfo("0x0000000000000000000000000000000000000001", host, "key", 1);
+  await flush();
+  mock.timers.tick(20000);
+  await flush();
+  assert.equal(await result, undefined);
+  assert.equal(calls, 1);
+});
+
+it("stops the chain-id probe on a cooldown beyond the budget", async () => {
+  let calls = 0;
+  mock.method(globalThis, "fetch", async () => {
+    calls++;
+    return new Response("", { status: 429, headers: { "retry-after": "3600" } });
+  });
+  assert.equal(await fetchExplorerChainId("one.example"), undefined);
   assert.equal(calls, 1);
 });

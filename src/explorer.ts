@@ -128,8 +128,7 @@ export async function loadContractInfo(
   const budget = { remainingMs: MAX_RETRY_WAIT_MS };
   let outcome = await _fetchContractInfo(address, explorerHostname, explorerKey, chainId, budget);
   if (!outcome.contract && outcome.transient) {
-    if (outcome.retryDelayMs) await sleepWithinBudget(outcome.retryDelayMs, budget);
-    outcome = await _fetchContractInfo(address, explorerHostname, explorerKey, chainId, budget);
+    outcome = await _fetchContractInfo(address, explorerHostname, explorerKey, chainId, budget, outcome.retryDelayMs);
   }
   return outcome.contract;
 }
@@ -142,6 +141,7 @@ async function _fetchContractInfo(
   explorerKey: string | undefined,
   chainId: number | string | undefined,
   budget: WaitBudget,
+  retryDelayMs = 0,
 ): Promise<FetchOutcome> {
   // One address the explorer cannot serve, an unverified contract or a dead host for instance, must
   // not take the whole run down: the caller skips it and the ABIs downloaded so far reach the store.
@@ -154,6 +154,8 @@ async function _fetchContractInfo(
   let sourcesResponse: unknown;
   let blockscout = false;
   try {
+    // inside the try, so a retry delay beyond the budget skips this address like any failed download
+    await sleepWithinBudget(retryDelayMs, budget);
     blockscout = !explorerNeedsApiKey(explorerHostname) && (await isBlockscoutHost(explorerHostname));
     const sourcesUrl = _getExplorerApiUrl(explorerHostname, address, blockscout, explorerKey, chainId);
     sourcesResponse = await httpGetAsync(sourcesUrl, budget);
@@ -377,6 +379,8 @@ export async function fetchExplorerChainId(
       break;
     } catch (error) {
       if (error instanceof ExplorerChallengeError) throw error;
+      // a cooldown beyond the budget holds for the fallback route on the same host too
+      if (error instanceof ExplorerHttpError && !error.transient) return undefined;
       if (attempt > 0) break;
       /* a network flake: one more try, then the etherscan-compatible endpoint */
     }
