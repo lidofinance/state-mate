@@ -4,7 +4,7 @@ import { Contract, FetchRequest, JsonRpcProvider } from "ethers";
 import packageJson from "../package.json";
 import { printError } from "./common";
 import { log, logErrorAndExit, WARNING_MARK } from "./logger";
-import { pinBlockTag, toBlockTag } from "./pinned-block";
+import { type PinnedTag, pinBlockTag } from "./pinned-block";
 import {
   type Abi,
   type ContractInfo,
@@ -453,19 +453,17 @@ export async function withTransientRetry<T>(run: () => Promise<T>, delayMs = TRA
 }
 
 export class RetryingJsonRpcProvider extends JsonRpcProvider {
-  // Set by --block: reads name this block instead of "latest", and the log scans end at it
-  public pinnedBlock: number | undefined;
+  // Set by --block: reads name this block instead of "latest", and the log scans end at its number
+  public pinned: { number: number; tag: PinnedTag } | undefined;
 
   override async send(method: string, parameters: unknown[] | Record<string, unknown>): Promise<unknown> {
-    const pinned =
-      this.pinnedBlock === undefined
-        ? parameters
-        : (pinBlockTag(method, parameters, toBlockTag(this.pinnedBlock)) as typeof parameters);
-    return withTransientRetry(() => super.send(method, pinned));
+    const sent =
+      this.pinned === undefined ? parameters : (pinBlockTag(method, parameters, this.pinned.tag) as typeof parameters);
+    return withTransientRetry(() => super.send(method, sent));
   }
 
   override async getBlockNumber(): Promise<number> {
-    return this.pinnedBlock ?? (await super.getBlockNumber());
+    return this.pinned?.number ?? (await super.getBlockNumber());
   }
 }
 

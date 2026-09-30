@@ -20,9 +20,7 @@ export function parseCommandLineArguments() {
     .option("--allow-unverified-explorer", "download ABIs even when the explorer does not confirm the config's chainId")
     .option("-q, --quiet", "print only contract headers, per-contract totals and errors")
     .option("-J, --json", "one JSON report on stdout: verdict, counters, failed checks; see docs/json-output.md")
-    .option("--block <number|latest>", "read every value at this block; 'latest' is resolved once per section")
-    .option("--observed <file>", "write every value the chain answered, with its block, to this YAML file")
-    .option("--expand-enumerations", "read every element behind a pinned <name>Length and report the unpinned ones");
+    .option("--block <number|hash|latest>", "read every value at this block; 'latest' is resolved once per section");
 
   // A usage error under --json must reach the caller as a report, so commander may neither
   // print nor exit on its own; the flag is read off argv because parsing is what failed
@@ -68,7 +66,9 @@ export function parseCommandLineArguments() {
 
   const block = options.block === undefined ? undefined : parseBlockOption(String(options.block));
   if (block === null) {
-    logErrorAndExit(`Invalid --block value "${String(options.block)}": expected a block number or "latest"`);
+    logErrorAndExit(
+      `Invalid --block value "${String(options.block)}": expected a block number, a block hash or "latest"`,
+    );
   }
 
   return {
@@ -81,7 +81,5 @@ export function parseCommandLineArguments() {
     quiet: Boolean(options.quiet),
     json: Boolean(options.json),
     block,
-    observedPath: options.observed === undefined ? undefined : String(options.observed),
-    expandEnumerations: Boolean(options.expandEnumerations),
   };
 }
