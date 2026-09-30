@@ -125,10 +125,11 @@ export async function loadContractInfo(
   explorerKey?: string,
   chainId?: number | string,
 ): Promise<ContractInfo | undefined> {
-  let outcome = await _fetchContractInfo(address, explorerHostname, explorerKey, chainId);
+  const budget = { remainingMs: MAX_RETRY_WAIT_MS };
+  let outcome = await _fetchContractInfo(address, explorerHostname, explorerKey, chainId, budget);
   if (!outcome.contract && outcome.transient) {
-    if (outcome.retryDelayMs) await sleep(outcome.retryDelayMs);
-    outcome = await _fetchContractInfo(address, explorerHostname, explorerKey, chainId);
+    if (outcome.retryDelayMs) await sleepWithinBudget(outcome.retryDelayMs, budget);
+    outcome = await _fetchContractInfo(address, explorerHostname, explorerKey, chainId, budget);
   }
   return outcome.contract;
 }
@@ -138,8 +139,9 @@ type FetchOutcome = { contract?: ContractInfo; retryDelayMs?: number; transient?
 async function _fetchContractInfo(
   address: string,
   explorerHostname: string,
-  explorerKey?: string,
-  chainId?: number | string,
+  explorerKey: string | undefined,
+  chainId: number | string | undefined,
+  budget: WaitBudget,
 ): Promise<FetchOutcome> {
   // One address the explorer cannot serve, an unverified contract or a dead host for instance, must
   // not take the whole run down: the caller skips it and the ABIs downloaded so far reach the store.
@@ -154,7 +156,7 @@ async function _fetchContractInfo(
   try {
     blockscout = !explorerNeedsApiKey(explorerHostname) && (await isBlockscoutHost(explorerHostname));
     const sourcesUrl = _getExplorerApiUrl(explorerHostname, address, blockscout, explorerKey, chainId);
-    sourcesResponse = await httpGetAsync(sourcesUrl);
+    sourcesResponse = await httpGetAsync(sourcesUrl, budget);
   } catch (error) {
     // a challenge dooms every request to the host: fail the run instead of skipping address by address
     if (error instanceof ExplorerChallengeError) throw error;
@@ -221,17 +223,18 @@ function _parseBlockscoutV2(response: unknown, address: string, skip: SkipFn): F
   return { contract: { abi: parsed.abi, address, contractName: source.name } };
 }
 
-// Start at the Etherscan free tier; each host backs off independently when it refuses requests.
+// Use the Etherscan free tier spacing; each host shares its own server cooldown.
 const EXPLORER_REQUESTS_PER_SECOND = 3;
 const MIN_REQUEST_INTERVAL_MS = Math.ceil(1000 / EXPLORER_REQUESTS_PER_SECOND);
-const MAX_REQUEST_INTERVAL_MS = 60 * 1000;
-const paceByHost = new Map<string, { intervalMs: number; nextAt: number; queue: Promise<void> }>();
+const MAX_RETRY_WAIT_MS = 300 * 1000;
+type WaitBudget = { remainingMs: number };
+const paceByHost = new Map<string, { nextAt: number; queue: Promise<void> }>();
 
 function paceFor(url: string) {
   const host = url ? new URL(url).host : "";
   let pace = paceByHost.get(host);
   if (!pace) {
-    pace = { intervalMs: MIN_REQUEST_INTERVAL_MS, nextAt: 0, queue: Promise.resolve() };
+    pace = { nextAt: 0, queue: Promise.resolve() };
     paceByHost.set(host, pace);
   }
   return pace;
@@ -241,30 +244,63 @@ function paceFor(url: string) {
 export function reserveRequestSlot(now: number, url = ""): number {
   const pace = paceFor(url);
   const slot = Math.max(now, pace.nextAt);
-  pace.nextAt = slot + pace.intervalMs;
+  pace.nextAt = slot + MIN_REQUEST_INTERVAL_MS;
   return slot - now;
 }
 
 /** Retry-After is seconds or an HTTP date; a bare rate-limit count gives no window duration. */
-export function learnRateLimit(url: string, headers?: Headers, now = Date.now()): number {
+export function learnRateLimit(url: string, headers?: Headers, now = Date.now(), status = 429): number {
   const pace = paceFor(url);
-  pace.intervalMs = Math.min(pace.intervalMs * 2, MAX_REQUEST_INTERVAL_MS);
-  const value = headers?.get("retry-after");
-  const seconds = value ? Number(value) : NaN;
-  const delay = Number.isFinite(seconds) ? seconds * 1000 : Date.parse(value ?? "") - now;
-  const wait = Number.isFinite(delay) && delay >= 0 ? delay : pace.intervalMs;
+  const value = headers?.get("retry-after")?.trim() ?? "";
+  let delay = NaN;
+  if (/^[0-9]+$/.test(value)) {
+    delay = Number(value) * 1000;
+  } else if (
+    /^[A-Za-z]{3}, [0-9]{2} [A-Za-z]{3} [0-9]{4} [0-9:]{8} GMT$/.test(value) ||
+    /^[A-Za-z]+, [0-9]{2}-[A-Za-z]{3}-[0-9]{2} [0-9:]{8} GMT$/.test(value)
+  ) {
+    delay = Date.parse(value) - now;
+  } else if (/^[A-Za-z]{3} [A-Za-z]{3} +[0-9]{1,2} [0-9:]{8} [0-9]{4}$/.test(value)) {
+    delay = Date.parse(`${value} GMT`) - now;
+  }
+  if (Number.isNaN(delay) && status === 429 && headers?.has("bypass-429-option")) {
+    const reset = headers.get("x-ratelimit-reset") ?? "";
+    if (/^[0-9]+$/.test(reset)) delay = Number(reset);
+  }
+  const wait = Number.isNaN(delay) ? RATE_LIMIT_RETRY_MS : Math.max(0, delay);
+  if (!Number.isFinite(wait) || wait > MAX_RETRY_WAIT_MS) {
+    throw new ExplorerHttpError(`Explorer cooldown ${wait}ms exceeds the ${MAX_RETRY_WAIT_MS}ms wait budget`, false);
+  }
   pace.nextAt = Math.max(pace.nextAt, now + wait);
   return wait;
 }
 
-async function waitForRequestSlot(url: string): Promise<void> {
+async function sleepWithinBudget(ms: number, budget: WaitBudget): Promise<void> {
+  if (!Number.isFinite(ms) || ms > budget.remainingMs) {
+    throw new ExplorerHttpError(
+      `Explorer needs ${ms}ms more; wait budget has ${budget.remainingMs}ms remaining`,
+      false,
+    );
+  }
+  if (ms > 0) {
+    const started = Date.now();
+    await sleep(ms);
+    budget.remainingMs -= Math.max(ms, Date.now() - started);
+  }
+}
+
+async function waitForRequestSlot(url: string, budget: WaitBudget = { remainingMs: MAX_RETRY_WAIT_MS }): Promise<void> {
   const pace = paceFor(url);
+  const queuedAt = Date.now();
   const turn = pace.queue.then(async () => {
+    budget.remainingMs -= Date.now() - queuedAt;
     // A response can extend the cooldown while this request is waiting.
-    while (pace.nextAt > Date.now()) await sleep(pace.nextAt - Date.now());
+    while (pace.nextAt > Date.now()) await sleepWithinBudget(pace.nextAt - Date.now(), budget);
+    await sleepWithinBudget(0, budget);
     reserveRequestSlot(Date.now(), url);
   });
-  pace.queue = turn;
+  // A rejected wait must not reject every later request to the host.
+  pace.queue = turn.catch(() => {});
   await turn;
 }
 
@@ -274,8 +310,11 @@ export function resetRequestSlots(): void {
 
 // A single request with no retries of its own: loadContractInfo owns the whole retry budget,
 // and a second layer of attempts here would multiply it
-export async function httpGetAsync<T>(url: string): Promise<T> {
-  await waitForRequestSlot(url);
+export async function httpGetAsync<T>(
+  url: string,
+  budget: WaitBudget = { remainingMs: MAX_RETRY_WAIT_MS },
+): Promise<T> {
+  await waitForRequestSlot(url, budget);
   let response: Response;
   try {
     response = await fetch(url, { method: "GET", headers: requestHeaders(url) });
@@ -284,7 +323,10 @@ export async function httpGetAsync<T>(url: string): Promise<T> {
   }
   if (!response.ok) {
     if (isChallenged(response)) throw new ExplorerChallengeError(response.status);
-    const cooldown = response.status === 429 ? learnRateLimit(url, response.headers) : 0;
+    const cooldown =
+      response.status === 429 || response.headers?.has("retry-after")
+        ? learnRateLimit(url, response.headers, Date.now(), response.status)
+        : 0;
     throw new ExplorerHttpError(
       `Failed to fetch contract source code: HTTP status code ${response.status}: ${response.statusText}`,
       isTransientHttpStatus(response.status),

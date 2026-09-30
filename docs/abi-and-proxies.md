@@ -38,3 +38,12 @@ An entry without `implementation` must have an empty EIP-1967 implementation slo
 The `proxyAdmin` and `proxyAdminOwner` checks are independent of the implementation bypass and share one read of the EIP-1967 admin slot. `proxyAdmin` pins the contract the slot holds; `proxyAdminOwner` calls `owner()` on that contract and compares the answer. They answer different questions — an unexpected ProxyAdmin owned by the expected owner passes `proxyAdminOwner` alone — so pin both when the admin contract itself matters.
 
 Neither field needs an ABI entry. An admin that does not implement `owner()`, such as a Safe, fails `proxyAdminOwner` and should be pinned with `proxyAdmin` instead.
+
+Explorer requests share a cooldown per host. Retry-After accepts integer seconds
+or an HTTP-date in UTC. Blockscout reset headers are read as milliseconds only
+on a 429 when bypass-429-option identifies the response; bare rate-limit counts do not
+establish a window. Cooldowns do not permanently increase request spacing.
+The ABI download's existing single retry and its queued waits share a 300-second
+wait budget. An excessive cooldown fails explicitly rather than retrying early;
+an unsuccessful ABI download remains unresolved. This bounds waiting, not network
+request duration. A failed wait does not reject later requests in the host queue.
