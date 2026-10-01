@@ -4,10 +4,16 @@ import path from "node:path";
 import { test } from "node:test";
 
 import { DEPLOYED_SPEC } from "../src/deployed-addresses";
-import { getMissingConfigAliases, loadStateWithSiblings, resolveSiblingFilePath } from "../src/sibling-delegation";
+import {
+  composeWithSiblings,
+  getMissingConfigAliases,
+  loadStateWithSiblings,
+  resolveSiblingFilePaths,
+} from "../src/sibling-delegation";
 import { composeWithDeployedAddresses, toCrlf, withTemporaryDirectory } from "./delegation-helpers";
 
-const resolveDeployedFilePath = (deployedArgument?: string) => resolveSiblingFilePath(DEPLOYED_SPEC, deployedArgument);
+const resolveDeployedFilePath = (deployedArgument: string) =>
+  resolveSiblingFilePaths(DEPLOYED_SPEC, [deployedArgument])[0];
 
 // Include a main-file anchor alongside delegated addresses to exercise both alias sources.
 const MAIN_CONFIG = `
@@ -158,7 +164,15 @@ test("a .deployed file that is not a mapping is rejected with a file-targeted er
 test("a `deployed:` section that is not a mapping of chains is rejected", () => {
   assert.throws(
     () => composeWithDeployedAddresses(MAIN_CONFIG, "deployed: []\n"),
-    /must contain a `deployed:` mapping/,
+    /`deployed:` must be a mapping of network names to address lists \(in the .deployed file\)/,
+  );
+});
+
+test("a non-scalar key under `deployed:` is rejected as not a network name", () => {
+  const deployed = 'deployed:\n  ? [l1]\n  : [&foo "0x1111111111111111111111111111111111111111"]\n';
+  assert.throws(
+    () => composeWithDeployedAddresses(MAIN_CONFIG, deployed),
+    /every key under `deployed:` must be a network name \(in the .deployed file\)/,
   );
 });
 
@@ -308,7 +322,7 @@ test("H2: a directory passed as --deployed is rejected as not a file", () => {
   });
 });
 
-test("resolveDeployedFilePath: --deployed is the only way in; a neighbouring file is never auto-loaded", () => {
+test("resolveSiblingFilePaths: --deployed is the only way in; a neighbouring file is never auto-loaded", () => {
   withTemporaryDirectory("state-mate-deployed-", (directory) => {
     const siblingPath = path.join(directory, "lido.deployed.yaml");
     const variantPath = path.join(directory, "lido.hoodi.deployed.yaml");
@@ -316,7 +330,7 @@ test("resolveDeployedFilePath: --deployed is the only way in; a neighbouring fil
     fs.writeFileSync(siblingPath, DEPLOYED);
     fs.writeFileSync(variantPath, DEPLOYED);
 
-    assert.equal(resolveDeployedFilePath(), null);
+    assert.deepEqual(resolveSiblingFilePaths(DEPLOYED_SPEC, []), []);
 
     assert.equal(resolveDeployedFilePath(siblingPath), siblingPath);
     assert.equal(resolveDeployedFilePath(variantPath), variantPath);
@@ -326,6 +340,103 @@ test("resolveDeployedFilePath: --deployed is the only way in; a neighbouring fil
     // An explicit but EMPTY path (a hollow shell variable) is a hard error too — it must never
     // silently degrade to a standalone run.
     assert.throws(() => resolveDeployedFilePath(""), /is not a file|not found/);
+  });
+});
+
+// Several .deployed files compose one address book: `deployed.<chain>` lists concatenate in
+// selection order, chains present in only one file are carried over, and each file keeps its
+// own label count. This is the shared-plus-per-network layout that motivates the feature.
+test("several .deployed files unite into one deployed: section, lists concatenated in order", () => {
+  const main = `
+l1:
+  contracts:
+    workflow: {address: *l1Workflow, checks: {peer: *l2Bridge, token: *l2Token}}
+l2:
+  contracts:
+    bridge: {address: *l2Bridge}
+`;
+  const common = {
+    text: 'deployed:\n  l1: [&l1Workflow "0x1111111111111111111111111111111111111111"]\n',
+    spec: DEPLOYED_SPEC,
+    label: "the .deployed file common.deployed.yaml",
+  };
+  const optimism = {
+    text: 'deployed:\n  l1: [&l2Token "0x3333333333333333333333333333333333333333"]\n  l2: [&l2Bridge "0x2222222222222222222222222222222222222222"]\n',
+    spec: DEPLOYED_SPEC,
+    label: "the .deployed file optimism.deployed.yaml",
+  };
+  const { document, labels } = composeWithSiblings(main, [common, optimism]);
+  const composed = document as { deployed: { l1: string[]; l2: string[] } };
+  assert.deepEqual(composed.deployed, {
+    l1: ["0x1111111111111111111111111111111111111111", "0x3333333333333333333333333333333333333333"],
+    l2: ["0x2222222222222222222222222222222222222222"],
+  });
+  assert.deepEqual(Object.keys(composed), ["deployed", "l1", "l2"]);
+  assert.deepEqual(labels, [["l1Workflow"], ["l2Token", "l2Bridge"]]);
+  // The reverse selection reverses the l1 list and nothing else.
+  const reversed = composeWithSiblings(main, [optimism, common]).document as { deployed: { l1: string[] } };
+  assert.deepEqual(reversed.deployed.l1, [
+    "0x3333333333333333333333333333333333333333",
+    "0x1111111111111111111111111111111111111111",
+  ]);
+});
+
+test("a label defined in two .deployed files is rejected as a cross-file duplicate", () => {
+  const text = (address: string) => `deployed: {l1: [&foo "${address}"]}\n`;
+  assert.throws(
+    () =>
+      composeWithSiblings("ref: *foo\n", [
+        {
+          text: text("0x1111111111111111111111111111111111111111"),
+          spec: DEPLOYED_SPEC,
+          label: "the .deployed file a",
+        },
+        {
+          text: text("0x2222222222222222222222222222222222222222"),
+          spec: DEPLOYED_SPEC,
+          label: "the .deployed file b",
+        },
+      ]),
+    /label\(s\) defined in more than one delegated file: &foo \(in the .deployed file a and the .deployed file b\)/,
+  );
+});
+
+test("every .deployed file must still define at least one labeled address", () => {
+  assert.throws(
+    () =>
+      composeWithSiblings("ref: *foo\n", [
+        { text: 'deployed: {l1: [&foo "0x1111111111111111111111111111111111111111"]}\n', spec: DEPLOYED_SPEC },
+        { text: "deployed: {l2: []}\n", spec: DEPLOYED_SPEC, label: "the .deployed file empty" },
+      ]),
+    /the .deployed file empty defines no labeled entries/,
+  );
+});
+
+test("resolveSiblingFilePaths keeps argument order and rejects one file selected twice", () => {
+  withTemporaryDirectory("state-mate-deployed-", (directory) => {
+    const common = path.join(directory, "common.deployed.yaml");
+    const optimism = path.join(directory, "optimism.deployed.yaml");
+    fs.writeFileSync(common, DEPLOYED);
+    fs.writeFileSync(optimism, DEPLOYED);
+    assert.deepEqual(resolveSiblingFilePaths(DEPLOYED_SPEC, []), []);
+    assert.deepEqual(resolveSiblingFilePaths(DEPLOYED_SPEC, [optimism, common]), [optimism, common]);
+
+    assert.throws(() => resolveSiblingFilePaths(DEPLOYED_SPEC, [common, optimism, common]), {
+      message: `The --deployed file is selected more than once: ${common}`,
+    });
+    // One file under two spellings is still one file
+    const relative = path.relative(process.cwd(), common);
+    assert.throws(() => resolveSiblingFilePaths(DEPLOYED_SPEC, [common, relative]), {
+      message: `The --deployed file is selected more than once: ${relative} (the same file as ${common})`,
+    });
+    const link = path.join(directory, "link.deployed.yaml");
+    fs.symlinkSync(common, link);
+    assert.throws(() => resolveSiblingFilePaths(DEPLOYED_SPEC, [common, link]), /selected more than once: .*link/);
+    // A missing file is still reported as such, wherever it sits in the list
+    assert.throws(
+      () => resolveSiblingFilePaths(DEPLOYED_SPEC, [common, path.join(directory, "missing.yaml")]),
+      /not found/,
+    );
   });
 });
 

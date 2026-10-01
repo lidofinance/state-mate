@@ -53,8 +53,8 @@ import {
   discoverSiblingPaths,
   getMissingConfigAliases,
   loadStateWithSiblings,
-  resolveSiblingFilePath,
-  type SiblingSpec,
+  resolveSiblingFilePaths,
+  type SelectedSibling,
 } from "./sibling-delegation";
 import {
   type EntireDocument,
@@ -106,8 +106,6 @@ function loadStateFromYaml(configPath: string): unknown {
   }
 }
 
-type SelectedSibling = { path: string; spec: SiblingSpec; noun: string };
-
 // Inline `config:`/`externals:` sections would bypass every `.inputs` invariant (`&label` anchors,
 // the address check on externals). The schema must list those keys for composed documents, so the
 // rejection lives here: they are legal only when delegated from a `.inputs` file.
@@ -127,16 +125,15 @@ function rejectInlineInputsSections(document: unknown): unknown {
 
 function loadStateWithOptionalSiblings(): unknown {
   const siblings: SelectedSibling[] = [];
-  const siblingKinds: { spec: SiblingSpec; argument: string | undefined; noun: string }[] = [
-    { spec: DEPLOYED_SPEC, argument: context.deployed, noun: "deployed address(es)" },
-    { spec: INPUTS_SPEC, argument: context.inputs, noun: "input anchor(s)" },
-  ];
   try {
-    for (const { spec, argument, noun } of siblingKinds) {
-      const siblingPath = resolveSiblingFilePath(spec, argument);
-      if (siblingPath) {
-        siblings.push({ path: siblingPath, spec, noun });
-      }
+    // The kind order of the composed document: every `.deployed` file before every `.inputs`
+    // file, whatever the argument interleaving, so an input array may alias a deployed address.
+    // Within a kind the files compose in argument order.
+    for (const { spec, selected } of [
+      { spec: DEPLOYED_SPEC, selected: context.deployed },
+      { spec: INPUTS_SPEC, selected: context.inputs },
+    ]) {
+      for (const siblingPath of resolveSiblingFilePaths(spec, selected)) siblings.push({ path: siblingPath, spec });
     }
   } catch (error) {
     logErrorAndExit(printError(error));
@@ -155,12 +152,11 @@ function loadStateWithOptionalSiblings(): unknown {
     return rejectInlineInputsSections(loadStateFromYaml(context.configPath));
   }
 
-  const { document, labels } = loadStateWithSiblings(
-    context.configPath,
-    siblings.map(({ path: siblingPath, spec }) => ({ path: siblingPath, spec })),
-  );
-  for (const [index, { path: siblingPath, noun }] of siblings.entries()) {
-    log(`Loaded ${labels[index].length} ${noun} from ${chalk.yellow(path.relative(process.cwd(), siblingPath))}`);
+  const { document, labels } = loadStateWithSiblings(context.configPath, siblings);
+  for (const [index, { path: siblingPath, spec }] of siblings.entries()) {
+    log(
+      `Loaded ${labels[index].length} ${spec.entryNoun} from ${chalk.yellow(path.relative(process.cwd(), siblingPath))}`,
+    );
   }
   return siblings.some(({ spec }) => spec === INPUTS_SPEC) ? document : rejectInlineInputsSections(document);
 }
@@ -395,7 +391,7 @@ async function main() {
     logErrorAndExit(`No such file or directory: ${chalk.magenta(context.configPath)}`);
   }
 
-  if (context.autoLoadDeployedAndInputs && (context.deployed !== undefined || context.inputs !== undefined)) {
+  if (context.autoLoadDeployedAndInputs && (context.deployed.length > 0 || context.inputs.length > 0)) {
     logErrorAndExit("The --auto-load-deployed-and-inputs option cannot be combined with --deployed or --inputs");
   }
   if (context.autoLoadDeployedAndInputs && !fs.statSync(context.configPath).isDirectory()) {
@@ -403,7 +399,7 @@ async function main() {
   }
 
   if (fs.statSync(context.configPath).isDirectory()) {
-    if (context.deployed || context.inputs) {
+    if (context.deployed.length > 0 || context.inputs.length > 0) {
       logErrorAndExit("The --deployed and --inputs options require a single config file, not a directory");
     }
     if (context.checkOnly) {
@@ -420,12 +416,10 @@ async function main() {
       resetStats();
       logHeader1(configPath);
       if (context.autoLoadDeployedAndInputs) {
-        context.deployed = undefined;
-        context.inputs = undefined;
+        context.deployed = [];
+        context.inputs = [];
         try {
-          const siblings = discoverSiblingPaths(configPath);
-          context.deployed = siblings.deployed;
-          context.inputs = siblings.inputs;
+          Object.assign(context, discoverSiblingPaths(configPath));
         } catch (error) {
           // Discovery is part of this config's run, even when no selection can be made.
           beginConfig(configPath);

@@ -31,14 +31,14 @@ describe("--json report", () => {
     resetContractCounters();
     resetReport();
     context.json = true;
-    context.deployed = undefined;
-    context.inputs = undefined;
+    context.deployed = [];
+    context.inputs = [];
   });
 
   afterEach(() => {
     context.json = false;
-    context.deployed = undefined;
-    context.inputs = undefined;
+    context.deployed = [];
+    context.inputs = [];
   });
 
   it("reduces a clean run to the verdict and the counters, listing no contract", () => {
@@ -60,37 +60,53 @@ describe("--json report", () => {
   for (const selection of ["deployed", "inputs", "both"]) {
     for (const status of ["passed", "failed", "error"]) {
       it(`records selected ${selection} paths when the config ${status}`, () => {
-        context.deployed = selection === "inputs" ? undefined : "configs/../selected.deployed.yaml";
-        context.inputs = selection === "deployed" ? undefined : path.resolve("selected.inputs.yaml");
+        context.deployed = selection === "inputs" ? [] : ["configs/../selected.deployed.yaml"];
+        context.inputs = selection === "deployed" ? [] : [path.resolve("selected.inputs.yaml")];
         beginConfig("cfg.yaml");
         if (status === "failed") stats.errors = 1;
         if (status !== "error") endConfig();
         const report = rendered(status === "passed" ? 0 : 1, status === "error" ? "loading failed" : undefined);
         const entry = report.configs[0];
         assert.equal(entry.status, status);
-        if (selection !== "inputs") assert.equal(entry.deployed, path.resolve("selected.deployed.yaml"));
-        else assert.equal("deployed" in entry, false);
-        if (selection !== "deployed") assert.equal(entry.inputs, path.resolve("selected.inputs.yaml"));
-        else assert.equal("inputs" in entry, false);
+        if (selection !== "inputs") {
+          assert.deepEqual(entry.deployed, [path.resolve("selected.deployed.yaml")]);
+        } else {
+          assert.equal("deployed" in entry, false);
+        }
+        if (selection !== "deployed") {
+          assert.deepEqual(entry.inputs, [path.resolve("selected.inputs.yaml")]);
+        } else {
+          assert.equal("inputs" in entry, false);
+        }
       });
     }
   }
 
   it("captures each config's selected files without leaking them into subsequent entries", () => {
-    context.deployed = "first.deployed.yaml";
+    context.deployed = ["first.deployed.yaml"];
     beginConfig("cfg.yaml");
     endConfig();
-    context.deployed = "second.deployed.yaml";
+    context.deployed = ["second.deployed.yaml"];
     beginConfig("cfg.yaml");
     endConfig();
-    context.deployed = undefined;
+    context.deployed = [];
     beginConfig("standalone.yaml");
     endConfig();
     const entries = rendered(0).configs;
-    assert.equal(entries[0].deployed, path.resolve("first.deployed.yaml"));
-    assert.equal(entries[1].deployed, path.resolve("second.deployed.yaml"));
+    assert.deepEqual(entries[0].deployed, [path.resolve("first.deployed.yaml")]);
+    assert.deepEqual(entries[1].deployed, [path.resolve("second.deployed.yaml")]);
     assert.equal("deployed" in entries[2], false);
     assert.equal("inputs" in entries[2], false);
+  });
+
+  it("lists several selected sibling files of each kind in selection order", () => {
+    context.deployed = ["common.deployed.yaml", "configs/../optimism.deployed.yaml"];
+    context.inputs = ["common.inputs.yaml", "optimism.inputs.yaml"];
+    beginConfig("cfg.yaml");
+    endConfig();
+    const [entry] = rendered(0).configs;
+    assert.deepEqual(entry.deployed, [path.resolve("common.deployed.yaml"), path.resolve("optimism.deployed.yaml")]);
+    assert.deepEqual(entry.inputs, [path.resolve("common.inputs.yaml"), path.resolve("optimism.inputs.yaml")]);
   });
 
   it("lists a failed check under its contract with the section type and a colour-free message", () => {

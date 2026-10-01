@@ -7,7 +7,7 @@ import * as YAML from "yaml";
 
 import { DEPLOYED_SPEC } from "../src/deployed-addresses";
 import { INPUTS_SPEC } from "../src/inputs";
-import { composeWithSiblings, loadStateWithSiblings, resolveSiblingFilePath } from "../src/sibling-delegation";
+import { composeWithSiblings, loadStateWithSiblings, resolveSiblingFilePaths } from "../src/sibling-delegation";
 import {
   composeWithDeployedAddresses,
   composeWithInputs,
@@ -17,7 +17,7 @@ import {
   withTemporaryDirectory,
 } from "./delegation-helpers";
 
-const resolveInputsFilePath = (inputsArgument?: string) => resolveSiblingFilePath(INPUTS_SPEC, inputsArgument);
+const resolveInputsFilePath = (inputsArgument: string) => resolveSiblingFilePaths(INPUTS_SPEC, [inputsArgument])[0];
 
 for (const style of ["|-", "|", "|+", ">-", ">", ">+"]) {
   for (const boundary of ["end marker", "leading blank lines", "start marker", "no final newline"]) {
@@ -195,13 +195,13 @@ roles:
 });
 
 test("the .inputs file must contain at least one of config:/externals:", () => {
-  assert.throws(() => composeWithInputs(MAIN_CONFIG, "{}\n"), /must contain `config:` and\/or `externals:`/);
+  assert.throws(() => composeWithInputs(MAIN_CONFIG, "{}\n"), /must contain `externals:` and\/or `config:`/);
 });
 
 test("an .inputs file that is not a mapping is rejected with a file-targeted error", () => {
   assert.throws(
     () => composeWithInputs(MAIN_CONFIG, "- just a list\n"),
-    /must be a mapping with `config:` and\/or `externals:`/,
+    /must be a mapping with `externals:` and\/or `config:`/,
   );
 });
 
@@ -281,7 +281,7 @@ test("H3: CRLF line endings compose correctly", () => {
   assert.equal(document_.l1.contracts.fooContract.checks.deposit, "0x00000000219ab540356cBB839Cbe05303d7705Fa");
 });
 
-test("resolveInputsFilePath: --inputs is the only way in; a neighbouring file is never auto-loaded", () => {
+test("resolveSiblingFilePaths: --inputs is the only way in; a neighbouring file is never auto-loaded", () => {
   withTemporaryDirectory("state-mate-inputs-", (directory) => {
     const siblingPath = path.join(directory, "lido.inputs.yaml");
     const variantPath = path.join(directory, "lido.hoodi.inputs.yaml");
@@ -289,7 +289,7 @@ test("resolveInputsFilePath: --inputs is the only way in; a neighbouring file is
     fs.writeFileSync(siblingPath, INPUTS);
     fs.writeFileSync(variantPath, INPUTS);
 
-    assert.equal(resolveInputsFilePath(), null);
+    assert.deepEqual(resolveSiblingFilePaths(INPUTS_SPEC, []), []);
 
     assert.equal(resolveInputsFilePath(siblingPath), siblingPath);
     assert.equal(resolveInputsFilePath(variantPath), variantPath);

@@ -6,6 +6,9 @@ import { FatalError, logErrorAndExit } from "./logger";
 
 type CheckOnlyOptionType = null | CheckOnly;
 
+/** Commander calls this once per occurrence of a repeatable option; argument order is kept. */
+const collect = (value: string, previous: string[] = []) => [...previous, value];
+
 export function parseCommandLineArguments() {
   program
     .argument("<config-path>", "path to a .yaml state config file, or a directory to run every config inside it")
@@ -17,12 +20,14 @@ export function parseCommandLineArguments() {
     .option(
       "--deployed <path>",
       "path to a '.deployed' YAML file that provides the address anchors for a wiring-only main config " +
-        "(single-file runs only)",
+        "(single-file runs only); repeat to compose several files, e.g. a shared one and a per-network one",
+      collect,
     )
     .option(
       "--inputs <path>",
       "path to a '.inputs' YAML file that provides the config/externals anchors for a wiring-only main " +
-        "config (single-file runs only)",
+        "config (single-file runs only); repeat to compose several files",
+      collect,
     )
     .option(
       "--auto-load-deployed-and-inputs",
@@ -56,6 +61,8 @@ export function parseCommandLineArguments() {
 
   const configPath = program.args[0];
   const options = program.opts();
+  const deployed = (options.deployed as string[] | undefined) ?? [];
+  const inputs = (options.inputs as string[] | undefined) ?? [];
   // Set before the -o validation below, so that a malformed filter is reported the way the caller
   // asked, and under the filter they gave
   context.json = Boolean(options.json);
@@ -81,8 +88,8 @@ export function parseCommandLineArguments() {
     autoLoadDeployedAndInputs: Boolean(options.autoLoadDeployedAndInputs),
     checkOnly,
     checkOnlyCmdArg: options.only,
-    deployed: options.deployed as string | undefined,
-    inputs: options.inputs as string | undefined,
+    deployed,
+    inputs,
     updateAbi: options.updateAbi,
     skipImplementationCheck: Boolean(options.skipImplementationCheck),
     allowUnverifiedExplorer: Boolean(options.allowUnverifiedExplorer),

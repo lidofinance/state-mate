@@ -2,15 +2,18 @@ import * as YAML from "yaml";
 
 import { ADDRESS_OR_HASH_RE, invalidAddressMessage, pairKeyToString, type SiblingSpec } from "./sibling-delegation";
 
-function collectDeployedLabels(deployedDocument: YAML.Document, fileLabel: string): Set<string> {
+function collectDeployedLabels(deployedDocument: YAML.Document): Set<string> {
   const deployedNode = deployedDocument.get("deployed");
   if (!YAML.isMap(deployedNode)) {
-    throw new Error("the .deployed file must contain a `deployed:` mapping");
+    throw new Error("`deployed:` must be a mapping of network names to address lists");
   }
 
   const labels = new Set<string>();
   for (const pair of deployedNode.items) {
-    const sectionKey = pairKeyToString(pair.key, "?");
+    if (!YAML.isScalar(pair.key)) {
+      throw new Error("every key under `deployed:` must be a network name");
+    }
+    const sectionKey = pairKeyToString(pair.key);
     if (!YAML.isSeq(pair.value)) {
       throw new Error(`\`deployed.${sectionKey}\` must be a list of labeled addresses`);
     }
@@ -26,7 +29,7 @@ function collectDeployedLabels(deployedDocument: YAML.Document, fileLabel: strin
         throw new Error(invalidAddressMessage(item));
       }
       if (labels.has(item.anchor)) {
-        throw new Error(`duplicate label &${item.anchor} in ${fileLabel}`);
+        throw new Error(`duplicate label &${item.anchor}`);
       }
       labels.add(item.anchor);
     }
@@ -38,6 +41,7 @@ function collectDeployedLabels(deployedDocument: YAML.Document, fileLabel: strin
 export const DEPLOYED_SPEC: SiblingSpec = {
   optionName: "--deployed",
   fileLabel: "the .deployed file",
+  entryNoun: "deployed address(es)",
   ownedSectionKeys: ["deployed"],
   collectLabels: collectDeployedLabels,
 };

@@ -20,7 +20,7 @@ for (const spec of [DEPLOYED_SPEC, INPUTS_SPEC]) {
       assert.throws(() => composeWithSiblings("ref: *value\n", [{ text: siblingText(literal), spec }]), {
         message:
           `label &value is not a valid address: unquoted hex literal ${literal}. ` +
-          "Quote the value to preserve it as an address or hash.",
+          `Quote the value to preserve it as an address or hash. (in ${spec.fileLabel})`,
       });
     });
     test(`${spec.fileLabel}: quoting the ${digits / 2}-byte hex preserves the address or hash`, () => {
@@ -30,7 +30,7 @@ for (const spec of [DEPLOYED_SPEC, INPUTS_SPEC]) {
   }
   test(`${spec.fileLabel}: other invalid values retain their diagnostic`, () => {
     assert.throws(() => composeWithSiblings("ref: *value\n", [{ text: siblingText('"REPLACEME"'), spec }]), {
-      message: "label &value is not a valid address: REPLACEME",
+      message: `label &value is not a valid address: REPLACEME (in ${spec.fileLabel})`,
     });
   });
 }
@@ -53,7 +53,7 @@ test("flow sibling and block main preserve types, tags, repeated aliases, and en
   assert.deepEqual(result.config, expected.config);
   assert.deepEqual(result.externals, expected.externals);
   assert.deepEqual(result.refs, [expected.config[0], expected.config[0], expected.externals[0]]);
-  assert.deepEqual(Object.keys(result), ["config", "externals", "refs"]);
+  assert.deepEqual(Object.keys(result), ["externals", "config", "refs"]);
 });
 
 test("local repeated anchor names resolve to the nearest preceding definition", () => {
@@ -97,14 +97,128 @@ test("aliases across sibling arrays follow caller order", () => {
   );
 });
 
-test("duplicate root keys across siblings identify both original definitions", () => {
+// Two sibling files of one kind hold parts of one owned section: the parts unite in selection
+// order, so the composed document has one `config:` list and both labels resolve.
+test("an owned section split across two sibling files is concatenated in selection order", () => {
+  const { document, labels } = composeWithSiblings("refs: [*one, *two]\n", [
+    { text: "# first\nconfig: [&one true]\n", spec: INPUTS_SPEC, label: "first inputs" },
+    { text: "# second\n\nconfig: [&two false]\n", spec: INPUTS_SPEC, label: "second inputs" },
+  ]);
+  assert.deepEqual(document, { config: [true, false], refs: [true, false] });
+  assert.deepEqual(labels, [["one"], ["two"]]);
+});
+
+test("a per-file label names the file in every diagnostic the engine raises about it", () => {
+  const first = { text: "config: [&one true]\n", spec: INPUTS_SPEC, label: "first inputs" };
+  const second = (text: string) => ({ text, spec: INPUTS_SPEC, label: "second inputs" });
+  assert.throws(
+    () => composeWithSiblings("refs: [*one, *two, *three]\n", [first, second("config: [&two false, &two 7]\n")]),
+    /duplicate label &two \(in second inputs\)/,
+  );
+  assert.throws(
+    () => composeWithSiblings("refs: [*one, *two]\n", [first, second("externals: [&two REPLACEME]\n")]),
+    /label &two is not a valid address: REPLACEME \(in second inputs\)/,
+  );
+  assert.throws(
+    () => composeWithSiblings("refs: [*one]\n", [first, second("config: [&two false]\n")]),
+    /label\(s\) in second inputs are never referenced in the main config: &two/,
+  );
+  assert.throws(
+    () => composeWithSiblings("refs: [*one, *two]\n", [first, second("deployed: {l1: [&two true]}\n")]),
+    /second inputs may only contain `externals:` and\/or `config:` section\(s\), but also has: deployed/,
+  );
+  assert.throws(
+    () => composeWithSiblings("refs: [*one, *two, *three]\n", [first, second("config: [&two false]\n")]),
+    /defined neither in it nor in first inputs \/ second inputs: &three/,
+  );
+  assert.throws(
+    () => composeWithSiblings("config: []\nrefs: [*one, *two]\n", [first, second("config: [&two false]\n")]),
+    /main config still has `config:` section\(s\); move every value to first inputs or second inputs so/,
+  );
+});
+
+test("a label defined in two sibling files of one kind is rejected, naming the label and both files", () => {
+  assert.throws(
+    () =>
+      composeWithSiblings("refs: [*one]\n", [
+        { text: "config: [&one true]\n", spec: INPUTS_SPEC, label: "first inputs" },
+        { text: "config: [&one false]\n", spec: INPUTS_SPEC, label: "second inputs" },
+      ]),
+    /label\(s\) defined in more than one delegated file: &one \(in first inputs and second inputs\)/,
+  );
+});
+
+test("a label defined in a sibling and in the main config is rejected even with several siblings", () => {
+  assert.throws(
+    () =>
+      composeWithSiblings("misc: [&two 1]\nrefs: [*one, *two]\n", [
+        { text: "config: [&one true]\n", spec: INPUTS_SPEC, label: "first inputs" },
+        { text: "config: [&two false]\n", spec: INPUTS_SPEC, label: "second inputs" },
+      ]),
+    /label\(s\) defined in both the main config and second inputs: &two/,
+  );
+});
+
+test("an alias in a later sibling file resolves an anchor from an earlier one, not the reverse", () => {
+  const first = { text: "config: [&one true]\n", spec: INPUTS_SPEC, label: "first inputs" };
+  const second = { text: "config: [&two [*one]]\n", spec: INPUTS_SPEC, label: "second inputs" };
+  const { document } = composeWithSiblings("refs: [*one, *two]\n", [first, second]);
+  assert.deepEqual(document, { config: [true, [true]], refs: [true, [true]] });
+  assert.throws(
+    () => composeWithSiblings("refs: [*one, *two]\n", [second, first]),
+    /Unresolved alias \*one: the anchor must be set before the alias \(in second inputs at line 1, column 16\), but &one is only set later \(in first inputs at line 1, column 15\)/,
+  );
+});
+
+// The composed document lays a kind's sections out in its spec's order (`externals:` before
+// `config:`), so a file may write them in any order and a `config:` array still finds an external.
+test("a file's own section order never decides whether an alias finds its anchor", () => {
+  const x = "0x1111111111111111111111111111111111111111";
+  const y = "0x2222222222222222222222222222222222222222";
+  const first = { text: `config: [&flag true]\nexternals: [&x "${x}"]\n`, spec: INPUTS_SPEC, label: "first inputs" };
+  const second = {
+    text: `externals: [&y "${y}"]\nconfig: [&pair [*y, *x]]\n`,
+    spec: INPUTS_SPEC,
+    label: "second inputs",
+  };
+  const { document } = composeWithSiblings("refs: [*flag, *x, *y, *pair]\n", [first, second]);
+  assert.deepEqual(document, { externals: [x, y], config: [true, [y, x]], refs: [true, x, y, [y, x]] });
+  assert.deepEqual(Object.keys(document as object), ["externals", "config", "refs"]);
+});
+
+// The layout, not argument order, decides what an earlier file's `config:` array may alias: a
+// later file's external is laid out before every `config:` entry, a later file's `config:` entry after.
+test("an earlier file's config array may alias a later file's external, not its config entry", () => {
+  const y = "0x2222222222222222222222222222222222222222";
+  const first = { text: "config: [&pair [*y]]\n", spec: INPUTS_SPEC, label: "first inputs" };
+  const second = { text: `externals: [&y "${y}"]\n`, spec: INPUTS_SPEC, label: "second inputs" };
+  const { document } = composeWithSiblings("refs: [*pair, *y]\n", [first, second]);
+  assert.deepEqual(document, { externals: [y], config: [[y]], refs: [[y], y] });
+
+  const laterConfig = { text: "config: [&y 1]\n", spec: INPUTS_SPEC, label: "second inputs" };
+  assert.throws(
+    () => composeWithSiblings("refs: [*pair, *y]\n", [first, laterConfig]),
+    /Unresolved alias \*y: the anchor must be set before the alias \(in first inputs at line 1, column 17\), but &y is only set later \(in second inputs at line 1, column 13\)/,
+  );
+});
+
+test("sections of different kinds never merge: two kinds owning one key are rejected before assembly", () => {
+  const other = { ...INPUTS_SPEC, fileLabel: "the .misc file", ownedSectionKeys: ["config", "misc"] };
   assert.throws(
     () =>
       composeWithSiblings("refs: [*one, *two]\n", [
-        { text: "# first\nconfig: [&one true]\n", spec: { ...INPUTS_SPEC, fileLabel: "first inputs" } },
-        { text: "# second\n\nconfig: [&two false]\n", spec: { ...INPUTS_SPEC, fileLabel: "second inputs" } },
+        { text: "config: [&one true]\n", spec: INPUTS_SPEC },
+        { text: "config: [&two true]\n", spec: other },
       ]),
-    /Duplicate top-level key 'config' \(in second inputs at line 3, column 1; first defined in first inputs at line 2, column 1\)/,
+    /`config:` is owned by both the .inputs file and the .misc file; sibling kinds must own distinct sections/,
+  );
+});
+
+test("a sibling section the main config also holds is an ownership error, whatever the spec owns", () => {
+  const spec = { ...INPUTS_SPEC, ownedSectionKeys: ["config", "misc"] };
+  assert.throws(
+    () => composeWithSiblings("misc: [1]\nrefs: [*one]\n", [{ text: "misc: [&one true]\n", spec }]),
+    /main config still has `misc:` section\(s\)/,
   );
 });
 
@@ -209,7 +323,7 @@ test("alias diagnostics aggregate missing and forward references across sibling 
     () => composeWithInputs(CROSS_SOURCE_ERRORS.main, CROSS_SOURCE_ERRORS.inputs),
     (error: unknown) => {
       assert.ok(error instanceof Error);
-      for (const diagnostic of CROSS_SOURCE_ERRORS.diagnostics)
+      for (const diagnostic of CROSS_SOURCE_ERRORS.diagnostics())
         assert.ok(error.message.includes(diagnostic), error.message);
       return true;
     },

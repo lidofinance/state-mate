@@ -50,10 +50,10 @@ The addresses under `deployed` determine which ABIs state-mate stores. Include i
 
 Use `--deployed <path>` and/or `--inputs <path>` to supply anchors from separate YAML files. For a single config file, they are loaded only when explicitly selected. Directory runs can opt into matching sibling files with [`--auto-load-deployed-and-inputs`](cli.md). See the [how-to examples](how-to.md#separate-deployed-addresses).
 
-| File option  | Allowed top-level sections                    | Entry values                                                                                      |
-| ------------ | --------------------------------------------- | ------------------------------------------------------------------------------------------------- |
-| `--deployed` | `deployed:` mapping of network names to lists | Quoted `0x` addresses (20 bytes) or hashes (32 bytes)                                             |
-| `--inputs`   | `config:` and/or `externals:` lists           | `config:`: scalars or arrays; `externals:`: addresses, 32-byte hashes, or nonnegative decimal IDs |
+| File option  | Allowed top-level sections                                                                                       | Entry values                                                                                      |
+| ------------ | ---------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| `--deployed` | `deployed:` mapping of network names to lists; repeatable, lists under one network concatenate in argument order | Quoted `0x` addresses (20 bytes) or hashes (32 bytes)                                             |
+| `--inputs`   | `config:` and/or `externals:` lists; repeatable, lists concatenate in argument order                             | `config:`: scalars or arrays; `externals:`: addresses, 32-byte hashes, or nonnegative decimal IDs |
 
 Each list entry must define a unique `&label` referenced by a `*alias` in the main config. Unused labels, duplicate labels, and labels colliding with main-config anchors are rejected. Unlike inline `deployed:` above, a separate address file defines anchors directly rather than listing aliases.
 

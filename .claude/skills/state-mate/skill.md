@@ -381,7 +381,18 @@ deployed:
 ```bash
 yarn start configs/lido/lido.yaml --deployed configs/lido/lido.deployed.yaml
 yarn start configs/lido/lido.yaml --deployed configs/lido/lido.hoodi.deployed.yaml   # another variant
+yarn start configs/l2.yaml --deployed configs/common.deployed.yaml --deployed configs/optimism.deployed.yaml  # composed
 ```
+
+`--deployed` is repeatable: the files load in argument order and their `deployed:` maps unite into
+one (lists under the same chain key concatenate, earlier file first; a chain key held by one file is
+carried over). Use it when several networks share one wiring config and some addresses: put the shared
+addresses in one file and each network's own in another. Labels stay unique across all files, and
+selecting the same file twice (under any spelling) is rejected. `--inputs` is repeatable the same way:
+`config:` and `externals:` lists concatenate in argument order. The composed layout is fixed: all
+`deployed:`, then all `externals:`, then all `config:`, then main; argument order only places a file's
+entries inside a section. A `config:` array may alias any deployed address or external, but a `config:`
+entry only from the same or an earlier `--inputs` file.
 
 Each file is parsed once, then its root mapping entries are assembled into one YAML document
 (addresses first), so `*label` aliases resolve to the `&label` anchors natively. Four invariants are enforced — each a hard error:
@@ -395,7 +406,8 @@ Notes:
 
 - **Opt-in**: use `--deployed <path>` for one config, or `--auto-load-deployed-and-inputs` for a directory.
   Automatic mode loads same-stem `.deployed.yaml`/`.yml` and `.inputs.yaml`/`.yml` files beside each main,
-  rejects ambiguous extensions, and cannot be combined with explicit sibling paths. Without either
+  rejects ambiguous extensions, selects at most one file of each kind per config, and cannot be
+  combined with explicit sibling paths. Without either
   selection mode, missing aliases fail with guidance to supply sibling flags.
 - The `.deployed` file may contain **only** a `deployed:` section, must be a **single YAML document**
   (no mid-file `---`/`...`), and every value must be a valid `0x` address/hash. RPC/explorer settings

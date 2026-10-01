@@ -55,9 +55,11 @@ externals:
 export const CROSS_SOURCE_ERRORS = {
   inputs: "config:\n  - &values [*absentInput, *later]\n  - &later true\n",
   main: "# Main wiring\n\nrefs: [*values, *later]\nmissing: [*absentMain, *alsoAbsent]\n",
-  diagnostics: [
-    "Unresolved alias *absentInput: anchor is not defined in any composed source (in the .inputs file at line 2, column 14)",
-    "Unresolved alias *later: the anchor must be set before the alias (in the .inputs file at line 2, column 28)",
+  /** The expected diagnostics, for the label the run gives the inputs file. */
+  diagnostics: (inputsLabel = "the .inputs file") => [
+    `Unresolved alias *absentInput: anchor is not defined in any composed source (in ${inputsLabel} at line 2, column 14)`,
+    `Unresolved alias *later: the anchor must be set before the alias (in ${inputsLabel} at line 2, column 28), ` +
+      `but &later is only set later (in ${inputsLabel} at line 3, column 12)`,
     "&absentMain (in the main config at line 4, column 11)",
     "&alsoAbsent (in the main config at line 4, column 24)",
   ],

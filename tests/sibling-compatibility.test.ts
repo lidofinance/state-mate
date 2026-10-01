@@ -33,13 +33,13 @@ l1:
   },
   {
     name: "input scalars, arrays, large decimal identifiers and block scalars",
-    standalone: `config:
+    standalone: `externals: [&id 16015286601757825753]
+config:
   - &name stETH
   - &values [true, 7, 16015286601757825753]
   - &message |-
       hello
       world
-externals: [&id 16015286601757825753]
 refs: {name: *name, values: *values, message: *message, id: *id}
 `,
     siblings: [
@@ -65,8 +65,8 @@ refs: {name: *name, values: *values, message: *message, id: *id}
     standalone: `deployed:
   l1: [&first "${ADDRESS}"]
   l2: [&second "${OTHER_ADDRESS}"]
-config: [&enabled true]
 externals: [&chain 1]
+config: [&enabled true]
 l1: {chainId: *chain, contracts: {foo: {address: *first, checks: {enabled: *enabled}}}}
 l2: {chainId: 10, contracts: {foo: {address: *second, checks: {enabled: *enabled, peer: *first}}}}
 `,

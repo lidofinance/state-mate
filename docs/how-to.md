@@ -31,6 +31,34 @@ yarn start path/to/app.yaml --deployed path/to/app.deployed.yaml
 
 The address file may contain only `deployed:`. Each entry must have a unique `&label` and a valid quoted `0x` address or 32-byte hash. Reference every label with a `*alias` in the main config; labels cannot collide across files. RPC and explorer settings stay in the main config.
 
+### Compose shared and per-network address files
+
+When several deployments share one wiring config and some addresses (say, one L1 workflow serving four L2 networks), split the addresses by what they are shared with and repeat `--deployed`:
+
+```yaml
+# common.deployed.yaml — shared by every network
+deployed:
+  l1:
+    - &l1Workflow "0x1111111111111111111111111111111111111111"
+```
+
+```yaml
+# optimism.deployed.yaml — this network only
+deployed:
+  l1:
+    - &optimismRouter "0x3333333333333333333333333333333333333333"
+  l2:
+    - &l2Bridge "0x2222222222222222222222222222222222222222"
+```
+
+```sh
+yarn start path/to/l2.yaml --deployed path/to/common.deployed.yaml --deployed path/to/optimism.deployed.yaml
+```
+
+The files load in argument order and their `deployed:` maps unite: `deployed.l1` becomes the common list followed by the network list, and `deployed.l2` comes from the network file alone. Labels stay unique across all files, every label must be referenced, and the same file cannot be selected twice. Diagnostics name the file they point at.
+
+`--inputs` composes the same way: repeat it, and the `config:` and `externals:` lists of every selected file concatenate in argument order. A `config:` array may alias any deployed address or external fact, whichever file and flag position holds it; a `config:` entry it aliases must come from the same `--inputs` file or an earlier one. The [CLI reference](cli.md) states the full layout.
+
 ## Separate input values
 
 Put configurable values in `config:` and external addresses or decimal IDs in `externals:`:
