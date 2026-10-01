@@ -1,0 +1,13 @@
+# Direct Staking deployment identities on Base.
+# Adapted from lidofinance/l2-direct-staking config/state/base.deployed.yaml and base.inputs.yaml.
+# Keep every checked contract here so nightly --update-abi refreshes its ABI.
+deployed:
+  l1:
+    - &l2CustomSender "0x328de900860816d29D1367F6903a24D8ed40C997"
+    - &l2CustomSenderImpl "0x65498495DdC07c52E12EEe3c44D3a1166eed8703"
+    - &l2ProxyAdmin "0x4c8c4A15c1e810e481c412A9B06Be5f79dC02192"
+    - &l2OraclePool "0xac143bF41BBA4a8014b4Ef5a5F46b39a36AE40A8"
+    - &l2SyncTrigger "0x871a5cddE9813627Ff37A2895A0c9B117A664622"
+    - &l2CreReceiver "0x09BdB4E8BA68d245DCb1c6fbEb1e4f13b57cc69A"
+    - &l2GovernanceExecutor "0x0E37599436974a25dDeEdF795C848d30Af46eaCF"
+    - &l2PriceOracle "0x301cBCDA894c932E9EDa3Cf8878f78304e69E367"

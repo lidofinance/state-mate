@@ -527,6 +527,15 @@ The entry has no `implementation:`, yet the address holds a non-empty EIP-1967 s
 - Retry with `-o l1/contractName` scope; or switch RPC provider.
 - `drpc.org` public endpoints are decent for ad-hoc queries.
 
+### `The explorer challenged the request (HTTP 403)`
+
+- Explorer requests send a browser-like User-Agent and a same-origin Referer without API keys. If the host still challenges the request, try another `STATE_MATE_USER_AGENT` in `.env`; the override applies to explorer and RPC requests.
+- A 429 pauses the explorer queue for the server's `Retry-After`, or on Blockscout for `x-ratelimit-reset` milliseconds, which hold only the route family that answered. Each ABI download has a 300-second wait budget. A longer cooldown leaves the ABI unresolved and fails an ACL scan as a rate limit. A bare rate-limit count gives no per-minute window, and a skipped ABI download is not verified coverage.
+
+### `did not confirm chainId ... --allow-unverified-explorer`
+
+- The explorer left the chain-id probe unanswered. Confirm the explorer serves the intended network before using `--allow-unverified-explorer`. A reported mismatch is still rejected. RPC, ABI, name and state checks remain enabled, but cannot prove the ABI's chain of origin: names and interfaces can match across networks.
+
 ### `Invalid address` in `deployed:`
 
 - `REPLACEME` is invalid in `deployed:` — resolve the address via `cast storage` / `cast admin` first, then add a real anchor.

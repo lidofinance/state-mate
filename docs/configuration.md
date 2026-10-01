@@ -57,19 +57,30 @@ Use `--deployed <path>` and/or `--inputs <path>` to supply anchors from separate
 
 Each list entry must define a unique `&label` referenced by a `*alias` in the main config. Unused labels, duplicate labels, and labels colliding with main-config anchors are rejected. Unlike inline `deployed:` above, a separate address file defines anchors directly rather than listing aliases.
 
+Automatic loading pairs each main config with files in the same directory and with the same stem:
+`foo.yaml` loads only `foo.deployed.yaml` / `.yml` and `foo.inputs.yaml` / `.yml`.
+There is no directory-wide shared address book. For example, multiple wiring configs under
+`configs/lido-earn/mainnet` each need their own matching siblings when using automatic loading.
+An address book containing the union of their labels cannot serve configs that reference only a subset,
+because every label is checked against each main config independently.
+
+Separate single-file runs can explicitly select the same `--deployed <path>` or `--inputs <path>`,
+regardless of filename, provided each main config references every label in the selected files and
+satisfies the other composition rules.
+
 When using `--deployed`, remove the entire `deployed:` section from the main config. Top-level `config:` and `externals:` sections are allowed only in the inputs file. Keep network settings and contract checks in the main config. Each file must contain one YAML document without `%YAML` or `%TAG` directives.
 
 Existing configs with inline `deployed:` remain valid without `--deployed`.
 
 ## Network fields
 
-| Field              | Description                                                         |
-| ------------------ | ------------------------------------------------------------------- |
-| `rpcUrl`           | An RPC URL or the name of an environment variable that contains one |
-| `chainId`          | The positive decimal EVM chain ID expected from the RPC             |
-| `explorerHostname` | Optional explorer host used to download missing ABIs                |
-| `explorerTokenEnv` | Optional environment variable that contains the explorer API token  |
-| `contracts`        | Contract entries keyed by local alias                               |
+| Field              | Description                                                                                   |
+| ------------------ | --------------------------------------------------------------------------------------------- |
+| `rpcUrl`           | An RPC URL or the name of an environment variable that contains one                           |
+| `chainId`          | The positive decimal EVM chain ID expected from the RPC                                       |
+| `explorerHostname` | Optional explorer host used to download missing ABIs                                          |
+| `explorerTokenEnv` | Optional API-key variable for `explorerHostname`; also used by ACL scans on the same explorer |
+| `contracts`        | Contract entries keyed by local alias                                                         |
 
 ## Contract fields
 
@@ -121,7 +132,7 @@ cannot be narrowed, or a contract whose storage matches no known AccessControl l
 not a quiet fall back to the declared-only checks. A chain with no log source at all is different
 and counts as **skipped** — a structural limit, printed in the run's totals, never counted as
 passed. The chain-to-source registry lives in `src/acl/log-source.ts`; etherscan-served chains
-need `ETHERSCAN_TOKEN`, blockscout-served ones need no key.
+use the matching configured key or the `ETHERSCAN_TOKEN` fallback. Blockscout sources can run without a key; a matching configured key or `BLOCKSCOUT_TOKEN` can be used when needed. See [ACL credentials](how-to.md#configure-credentials-for-acl-scans).
 
 Two assumptions carry the result, and the scan checks neither directly. Every grant must have
 emitted a standard event — storage calibration establishes that the membership layout matches a
