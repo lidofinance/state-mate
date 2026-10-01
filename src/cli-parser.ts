@@ -1,10 +1,23 @@
-import { CommanderError, program } from "commander";
+import { CommanderError, InvalidArgumentError, program } from "commander";
 
 import { EntryField, printError } from "./common";
 import { type CheckOnly, context } from "./context";
 import { FatalError, logErrorAndExit } from "./logger";
 
 type CheckOnlyOptionType = null | CheckOnly;
+
+// Commander keeps only the last value of a repeated option, which would silently drop the anchors
+// of every earlier file. Each sibling kind takes one file, so a repeat is a usage error.
+function oneSiblingFile(optionName: string) {
+  return (value: string, previous: string | undefined): string => {
+    if (previous !== undefined) {
+      throw new InvalidArgumentError(
+        `${optionName} takes one file and already has '${previous}'; put all anchors of one kind in one file.`,
+      );
+    }
+    return value;
+  };
+}
 
 export function parseCommandLineArguments() {
   program
@@ -18,11 +31,13 @@ export function parseCommandLineArguments() {
       "--deployed <path>",
       "path to a '.deployed' YAML file that provides the address anchors for a wiring-only main config " +
         "(single-file runs only)",
+      oneSiblingFile("--deployed"),
     )
     .option(
       "--inputs <path>",
       "path to a '.inputs' YAML file that provides the config/externals anchors for a wiring-only main " +
         "config (single-file runs only)",
+      oneSiblingFile("--inputs"),
     )
     .option(
       "--auto-load-deployed-and-inputs",
