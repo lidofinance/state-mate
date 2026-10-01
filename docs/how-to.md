@@ -54,6 +54,8 @@ yarn start path/to/app.yaml --deployed path/to/app.deployed.yaml --inputs path/t
 
 Both options require a single config file. Paths are relative to the working directory, and files are not loaded automatically by default. For directory runs, use [`--auto-load-deployed-and-inputs`](cli.md) to load matching siblings. Keep each file to one YAML document. Existing configs with inline `deployed:` still work without `--deployed`.
 
+For complete examples exercised by CI across Ethereum, Arbitrum, Base, Optimism, and Linea, see [Direct Staking](../configs/lido-direct-staking/README.md).
+
 ## Run a focused check
 
 Use `--only` with a single config file. The filter can stop at the section, contract, or check type:
