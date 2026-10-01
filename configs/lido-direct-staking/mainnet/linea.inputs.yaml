@@ -1,6 +1,6 @@
 # Direct Staking linea parameters and external references.
 # Source layout: lidofinance/l2-direct-staking config/state; see ../README.md.
-# Automation ownership and CRE author match the Direct Staking source configs.
+# Automation ownership and the CRE author match the chain after the multisig handoff; see ../README.md.
 config:
   - &syncDelay 43200 # 12h
   - &executorGracePeriod 86400 # 24h

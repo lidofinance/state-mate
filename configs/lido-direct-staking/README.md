@@ -7,9 +7,11 @@ Each network has three matching files, illustrated by Base:
 - [`mainnet/base.deployed.yaml`](mainnet/base.deployed.yaml) contains the eight contract addresses used by ABI verification and refresh.
 - [`mainnet/base.inputs.yaml`](mainnet/base.inputs.yaml) contains configurable values and external references.
 
-The split follows the [Direct Staking source configs](https://github.com/lidofinance/l2-direct-staking/tree/main/config/state).
+The split follows the layout of the [Direct Staking source configs](https://github.com/lidofinance/l2-direct-staking/tree/main/config/state).
 Their shared and per-chain inputs are represented here by one inputs file per network, as this CLI accepts one file per option.
-The split retains this repository's check coverage. Automation ownership, CRE report authors, and the workflow ID, name, and tag match the Direct Staking source configs.
+The split retains this repository's check coverage.
+Automation ownership, CRE report authors, and the workflow ID, name, and tag match the chain after the multisig handoff, which the CI job for this directory checks.
+On 2026-10-01 the upstream `main` configs still held the earlier values; [lidofinance/l2-direct-staking#13](https://github.com/lidofinance/l2-direct-staking/pull/13) carries the current ones.
 The source's retired-contract checks are outside these configs, so their unused deployment labels are omitted.
 Contracts listed as external inputs upstream remain in `deployed:` here when needed for the existing nightly ABI refresh.
 Each config retains this repository's `l1` network key; its chain ID and RPC setting select the actual network.

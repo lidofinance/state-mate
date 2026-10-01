@@ -1,6 +1,6 @@
 # Direct Staking ethereum parameters and external references.
 # Source layout: lidofinance/l2-direct-staking config/state; see ../README.md.
-# CRE workflow identity and ownership match the Direct Staking source configs.
+# CRE workflow identity and ownership match the chain after the multisig handoff; see ../README.md.
 config:
   - &minFailedMessageGas 45000 # LidoCustomReceiver.MIN_FAILED_MESSAGE_GAS (CCIPDefensiveReceiver immutable)
   - &creWorkflowName "direct-staking-sync"
