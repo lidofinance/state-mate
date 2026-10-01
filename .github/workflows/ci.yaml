@@ -57,7 +57,7 @@ jobs:
           OPTIMISM_SEPOLIA_RPC_URL: ${{ secrets.OPTIMISM_SEPOLIA_RPC_URL || 'https://optimism-sepolia.drpc.org' }}
           PLASMA_RPC_URL: ${{ secrets.PLASMA_RPC_URL || 'https://plasma.drpc.org' }}
           UNICHAIN_RPC_URL: ${{ secrets.UNICHAIN_RPC_URL || 'https://unichain.drpc.org' }}
-        run: yarn start ${{ matrix.config }} --quiet ${{ github.event_name == 'schedule' && '--update-abi' || '' }}
+        run: yarn start ${{ matrix.config }} --quiet --auto-load-deployed-and-inputs ${{ github.event_name == 'schedule' && '--update-abi' || '' }}
 
       # gzip stamps the writer's OS into its header, so a store committed from macOS never matches
       # its Linux rebuild byte for byte even when every ABI does: compare the decompressed JSON
