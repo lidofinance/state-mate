@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 
-import "dotenv/config";
+import "./load-environment";
 
 import type { Static, TSchema } from "@sinclair/typebox";
 import Ajv, { type ValidateFunction } from "ajv";

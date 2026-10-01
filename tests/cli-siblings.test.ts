@@ -190,6 +190,29 @@ test("sibling flags require a single config file", () => {
   });
 });
 
+for (const json of [false, true]) {
+  test(`a repeated sibling flag is a usage error, not a silent switch to the last file${json ? " in JSON" : ""}`, () => {
+    withTemporaryDirectory("state-mate-cli-", (directory) => {
+      const { mainPath, deployedPath, inputsPath } = writeConfigSet(directory);
+      const selections = [
+        ["--deployed", deployedPath, "--inputs", inputsPath],
+        ["--inputs", inputsPath, "--deployed", deployedPath],
+      ];
+      for (const [flag, first, otherFlag, otherPath] of selections) {
+        // The copy defines every label, so a run that kept only the last file would compose and pass
+        const copy = path.join(directory, `copy-${path.basename(first)}`);
+        fs.copyFileSync(first, copy);
+        const run = runStateMate(mainPath, otherFlag, otherPath, flag, first, flag, copy, ...(json ? ["--json"] : []));
+        const message = json ? JSON.parse(run.stdout).error : run.output;
+        assertStoppedBeforeSchema(run.output);
+        assert.ok(message.includes(`${flag} takes one file and already has '${first}'`), message);
+        assert.doesNotMatch(run.output, /Loaded \d+/);
+        if (json) assert.equal(run.stderr, "");
+      }
+    });
+  });
+}
+
 test("auto-loading requires a directory and cannot be mixed with explicit siblings", () => {
   withTemporaryDirectory("state-mate-cli-", (directory) => {
     const { mainPath, deployedPath, inputsPath } = writeConfigSet(directory);

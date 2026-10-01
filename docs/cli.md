@@ -22,7 +22,7 @@ Directory runs discover `.yaml` and `.yml` files recursively, skipping names con
 | `-q, --quiet`                     | Print contract headers, per-contract totals, warnings, and errors                               |
 | `-J, --json`                      | Write one JSON report to stdout instead of the log; format in [json-output.md](json-output.md)  |
 
-`--deployed` and `--inputs` can be used together. Paths are relative to the working directory; neither file is loaded automatically by default. See the [separate-file examples](how-to.md#separate-deployed-addresses).
+`--deployed` and `--inputs` can be used together. Paths are relative to the working directory; neither file is loaded automatically by default. Each option takes one file: a repeated option is a usage error, so keep all anchors of one kind in one file. See the [separate-file examples](how-to.md#separate-deployed-addresses).
 
 For a directory containing split configs, opt into automatic loading:
 
