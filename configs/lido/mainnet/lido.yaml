@@ -6119,7 +6119,8 @@ l1:
         hasRole:
           - args: [*TOP_UP_ROLE, *depositorBot]
             result: false
-        isBlockDistancePassed: true
+        # Readiness resets after each top-up; getMinBlockDistance pins the configured limit.
+        isBlockDistancePassed: null
         isPaused: false
         supportsInterface:
       ozAcl:
