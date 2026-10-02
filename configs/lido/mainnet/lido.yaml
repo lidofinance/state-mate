@@ -118,6 +118,26 @@ deployed:
     - &csHashConsensus "0x71093efF8D8599b5fA340D665Ad60fA7C80688e4"
     - &csIdentifiedDVTClusterGate "0xa12760721A72A7199aB38059DA6690b9Cd4ed7B8"
 
+    # --- CSM 0x02 ---
+    - &csm0x02PermissionlessGate "0x78e36353FE904c3685585D9F3204D4aAcb3Ad506"
+    - &csm0x02Module "0x792Cd25e4aE3578375031FB55e048E163A804F7B"
+    - &csm0x02ModuleImpl "0xF66826CeFDD4F163f1e8bfB6c0b6808744264d46"
+    - &csm0x02Accounting "0x3696dDd942A9e156F5D4728505D1b9a32dCef900"
+    - &csm0x02AccountingImpl "0x1e262530C7d142b2d1C113C11778294cc662874C"
+    - &csm0x02ParametersRegistry "0x5352b3d8274933c72dC774DccCD12B7301EdBfD7"
+    - &csm0x02ParametersRegistryImpl "0x122E385434Eb5dD0a2a1EdF7b3b13e369C730E6e"
+    - &csm0x02FeeDistributor "0x122CdeDD0da630B555050976052C262EA25f8335"
+    - &csm0x02FeeDistributorImpl "0x4e939B8c69e53900b2330A8C68e29953118Ca1C7"
+    - &csm0x02Verifier "0x69b4C32a43565e768794D41b4A265F86dE61b861"
+    - &csm0x02FeeOracle "0x0fB5EC09Cc975d8E1aF43063e51882798814f311"
+    - &csm0x02FeeOracleImpl "0x607cBd562f83736BB258FC50b6d0ceB323471Ff9"
+    - &csm0x02HashConsensus "0xd5a965FAab2d02D3cC2286A9da42d09F0F2aE210"
+    - &csm0x02Strikes "0x89bd84481F7679732EADDF7d99d02ABD8309df65"
+    - &csm0x02StrikesImpl "0x855ead6778b1162bdB728e4613Af852cb2eb73c4"
+    - &csm0x02Ejector "0x2EE500885870b020e84E86a09A5d26D1EEec3E5E"
+    - &csm0x02ExitPenalties "0xa96021Eff64E8FE927424C77902c56C4F17d10A5"
+    - &csm0x02ExitPenaltiesImpl "0x5131f7f71C69b25AE320457d5543Ae0A26e4A7c2"
+
     # --- CMv2 ---
     - &curatedModule "0xDa5F930cE326EB5205085D66c72A4E79d60cB8C1"
     - &curatedModuleImpl "0x959fc67fe53c8a6c7a1aed73430aa07a36ed9337"
@@ -2464,6 +2484,587 @@ l1:
         getRoleAdmin: null
         getRoleMember: null
         getRoleMemberCount: null
+        hasRole: null
+        supportsInterface: null
+      ozAcl:
+        *DEFAULT_ADMIN_ROLE : [*aragonAgent]
+        *DISABLE_CONSENSUS_ROLE : []
+        *MANAGE_FAST_LANE_CONFIG_ROLE : []
+        *MANAGE_FRAME_CONFIG_ROLE : []
+        *MANAGE_MEMBERS_AND_QUORUM_ROLE : [*aragonAgent]
+        *MANAGE_REPORT_PROCESSOR_ROLE : []
+
+    # --- CSM 0x02 ---
+    csm0x02Module:
+      name: CSModule
+      address: *csm0x02Module
+      proxyName: OssifiableProxy
+      implementation: *csm0x02ModuleImpl
+      proxyChecks:
+        proxy__getAdmin: *aragonAgent
+        proxy__getImplementation: *csm0x02ModuleImpl
+        proxy__getIsOssified: false
+      checks:
+        ACCOUNTING: *csm0x02Accounting
+        EXIT_PENALTIES: *csm0x02ExitPenalties
+        FEE_DISTRIBUTOR: *csm0x02FeeDistributor
+        LIDO_LOCATOR: *lidoLocator
+        PARAMETERS_REGISTRY: *csm0x02ParametersRegistry
+        STETH: *lido
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        CREATE_NODE_OPERATOR_ROLE: *SM_CREATE_NODE_OPERATOR_ROLE
+        MANAGE_TOP_UP_QUEUE_ROLE: *SM_MANAGE_TOP_UP_QUEUE_ROLE
+        OPERATOR_ADDRESSES_ADMIN_ROLE: *SM_OPERATOR_ADDRESSES_ADMIN_ROLE
+        PAUSE_INFINITELY: *MAX_UINT256
+        PAUSE_ROLE: *SM_PAUSE_ROLE
+        RECOVERER_ROLE: *SM_RECOVERER_ROLE
+        REPORT_GENERAL_DELAYED_PENALTY_ROLE: *SM_REPORT_GENERAL_DELAYED_PENALTY_ROLE
+        REPORT_REGULAR_WITHDRAWN_VALIDATORS_ROLE: *SM_REPORT_REGULAR_WITHDRAWN_VALIDATORS_ROLE
+        REPORT_SLASHED_WITHDRAWN_VALIDATORS_ROLE: *SM_REPORT_SLASHED_WITHDRAWN_VALIDATORS_ROLE
+        RESUME_ROLE: *SM_RESUME_ROLE
+        REWIND_TOP_UP_QUEUE_ROLE: *SM_REWIND_TOP_UP_QUEUE_ROLE
+        SETTLE_GENERAL_DELAYED_PENALTY_ROLE: *SM_SETTLE_GENERAL_DELAYED_PENALTY_ROLE
+        STAKING_ROUTER_ROLE: *STAKING_ROUTER_ROLE
+        VERIFIER_ROLE: *SM_VERIFIER_ROLE
+        getInitializedVersion: 3
+        getType: *CSM_TYPE
+        getTopUpQueue: [true, 16, null, null]
+        getResumeSinceTimestamp: null
+        isPaused: true
+        depositQueueItem: null
+        depositQueuePointers: null
+        exitDeadlineThreshold: null
+        getActiveNodeOperatorsCount: null
+        getKeyAllocatedBalances: null
+        getKeyConfirmedBalances: null
+        getKeysForTopUp: null
+        getNodeOperator: null
+        getNodeOperatorBalance: null
+        getNodeOperatorDepositInfoToUpdateCount: null
+        getNodeOperatorIds: null
+        getNodeOperatorIsActive: null
+        getNodeOperatorManagementProperties: null
+        getNodeOperatorNonWithdrawnKeys: null
+        getNodeOperatorOwner: null
+        getNodeOperatorSummary: null
+        getNodeOperatorsCount: null
+        getNonce: null
+        getRoleAdmin: null
+        getRoleMember: null
+        getRoleMemberCount: null
+        getRoleMembers: null
+        getSigningKeys: null
+        getSigningKeysWithSignatures: null
+        getStakingModuleSummary: null
+        getTopUpQueueItem: null
+        getTotalModuleStake: null
+        hasRole: null
+        isValidatorExitDelayPenaltyApplicable: null
+        isValidatorSlashed: null
+        isValidatorWithdrawn: null
+        onExitedAndStuckValidatorsCountsUpdated: null
+        onWithdrawalCredentialsChanged: null
+        supportsInterface: null
+      ozAcl:
+        *DEFAULT_ADMIN_ROLE : [*aragonAgent]
+        *SM_CREATE_NODE_OPERATOR_ROLE : [*csm0x02PermissionlessGate]
+        *SM_MANAGE_TOP_UP_QUEUE_ROLE : []
+        *SM_OPERATOR_ADDRESSES_ADMIN_ROLE : []
+        *SM_PAUSE_ROLE : [*resealManager, *circuitBreaker]
+        *SM_RECOVERER_ROLE : []
+        *SM_REPORT_GENERAL_DELAYED_PENALTY_ROLE : [*csmCommittee]
+        *SM_REPORT_REGULAR_WITHDRAWN_VALIDATORS_ROLE : [*csm0x02Verifier]
+        *SM_REPORT_SLASHED_WITHDRAWN_VALIDATORS_ROLE : [*evmScriptExecutor]
+        *SM_RESUME_ROLE : [*resealManager]
+        *SM_REWIND_TOP_UP_QUEUE_ROLE : [*csmCommittee]
+        *SM_SETTLE_GENERAL_DELAYED_PENALTY_ROLE : [*evmScriptExecutor]
+        *STAKING_ROUTER_ROLE : [*stakingRouter]
+        *SM_VERIFIER_ROLE : [*csm0x02Verifier]
+      implementationChecks:
+        ACCOUNTING: *csm0x02Accounting
+        EXIT_PENALTIES: *csm0x02ExitPenalties
+        FEE_DISTRIBUTOR: *csm0x02FeeDistributor
+        LIDO_LOCATOR: *lidoLocator
+        PARAMETERS_REGISTRY: *csm0x02ParametersRegistry
+        STETH: *lido
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        CREATE_NODE_OPERATOR_ROLE: *SM_CREATE_NODE_OPERATOR_ROLE
+        MANAGE_TOP_UP_QUEUE_ROLE: *SM_MANAGE_TOP_UP_QUEUE_ROLE
+        OPERATOR_ADDRESSES_ADMIN_ROLE: *SM_OPERATOR_ADDRESSES_ADMIN_ROLE
+        PAUSE_INFINITELY: *MAX_UINT256
+        PAUSE_ROLE: *SM_PAUSE_ROLE
+        RECOVERER_ROLE: *SM_RECOVERER_ROLE
+        REPORT_GENERAL_DELAYED_PENALTY_ROLE: *SM_REPORT_GENERAL_DELAYED_PENALTY_ROLE
+        REPORT_REGULAR_WITHDRAWN_VALIDATORS_ROLE: *SM_REPORT_REGULAR_WITHDRAWN_VALIDATORS_ROLE
+        REPORT_SLASHED_WITHDRAWN_VALIDATORS_ROLE: *SM_REPORT_SLASHED_WITHDRAWN_VALIDATORS_ROLE
+        RESUME_ROLE: *SM_RESUME_ROLE
+        REWIND_TOP_UP_QUEUE_ROLE: *SM_REWIND_TOP_UP_QUEUE_ROLE
+        SETTLE_GENERAL_DELAYED_PENALTY_ROLE: *SM_SETTLE_GENERAL_DELAYED_PENALTY_ROLE
+        STAKING_ROUTER_ROLE: *STAKING_ROUTER_ROLE
+        VERIFIER_ROLE: *SM_VERIFIER_ROLE
+
+    csm0x02Accounting:
+      name: Accounting
+      address: *csm0x02Accounting
+      proxyName: OssifiableProxy
+      implementation: *csm0x02AccountingImpl
+      proxyChecks:
+        proxy__getAdmin: *aragonAgent
+        proxy__getImplementation: *csm0x02AccountingImpl
+        proxy__getIsOssified: false
+      checks:
+        BURNER: *burner
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        DEFAULT_BOND_CURVE_ID: 0
+        FEE_DISTRIBUTOR: *csm0x02FeeDistributor
+        LIDO: *lido
+        LIDO_LOCATOR: *lidoLocator
+        MANAGE_BOND_CURVES_ROLE: *SM_MANAGE_BOND_CURVES_ROLE
+        MAX_BOND_LOCK_PERIOD: *DURATION_1_YEAR
+        MAX_FEE_SPLITS: 10
+        MIN_BOND_LOCK_PERIOD: *DURATION_28_DAYS
+        MODULE: *csm0x02Module
+        PAUSE_INFINITELY: *MAX_UINT256
+        PAUSE_ROLE: *SM_PAUSE_ROLE
+        RECOVERER_ROLE: *SM_RECOVERER_ROLE
+        RESUME_ROLE: *SM_RESUME_ROLE
+        SET_BOND_CURVE_ROLE: *SM_SET_BOND_CURVE_ROLE
+        WITHDRAWAL_QUEUE: *withdrawalQueueERC721
+        WSTETH: *wstETH
+        getCurvesCount: 1
+        getCurveInfo:
+          - args: [0]
+            result: [[[1, 32000000000000000000, 32000000000000000000], [2, 62000000000000000000, 30000000000000000000]]]
+        getBondLockPeriod: *DURATION_8_WEEKS
+        chargePenaltyRecipient: *aragonAgent
+        isPaused: false
+        getBond: null
+        getBondAmountByKeysCount: null
+        getBondAmountByKeysCountWstETH: null
+        getBondCurve: null
+        getBondCurveId: null
+        getBondDebt: null
+        getBondLockNonce: null
+        getBondShares: null
+        getBondSummary: null
+        getBondSummaryShares: null
+        getClaimableBondShares: null
+        getClaimableRewardsAndBondShares: null
+        getCustomRewardsClaimer: null
+        getFeeSplitTransfers: null
+        getFeeSplits: null
+        getInitializedVersion: null
+        getKeysCountByBondAmount: null
+        getLockedBond: null
+        getLockedBondInfo: null
+        getNodeOperatorBondInfo: null
+        getPendingSharesToSplit: null
+        getRequiredBondForNextKeys: null
+        getRequiredBondForNextKeysWstETH: null
+        getResumeSinceTimestamp: null
+        getRoleAdmin: null
+        getRoleMember: null
+        getRoleMemberCount: null
+        getRoleMembers: null
+        getUnbondedKeysCount: null
+        getUnbondedKeysCountToEject: null
+        hasRole: null
+        hasSplits: null
+        isLockExpired: null
+        supportsInterface: null
+        totalBondShares: null
+      ozAcl:
+        *DEFAULT_ADMIN_ROLE : [*aragonAgent]
+        *SM_MANAGE_BOND_CURVES_ROLE : []
+        *SM_SET_BOND_CURVE_ROLE : []
+        *SM_RECOVERER_ROLE : []
+        *SM_RESUME_ROLE : [*resealManager]
+        *SM_PAUSE_ROLE : [*resealManager, *circuitBreaker]
+      implementationChecks:
+        BURNER: *burner
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        DEFAULT_BOND_CURVE_ID: 0
+        FEE_DISTRIBUTOR: *csm0x02FeeDistributor
+        LIDO: *lido
+        LIDO_LOCATOR: *lidoLocator
+        MANAGE_BOND_CURVES_ROLE: *SM_MANAGE_BOND_CURVES_ROLE
+        MAX_BOND_LOCK_PERIOD: *DURATION_1_YEAR
+        MAX_FEE_SPLITS: 10
+        MIN_BOND_LOCK_PERIOD: *DURATION_28_DAYS
+        MODULE: *csm0x02Module
+        PAUSE_INFINITELY: *MAX_UINT256
+        PAUSE_ROLE: *SM_PAUSE_ROLE
+        RECOVERER_ROLE: *SM_RECOVERER_ROLE
+        RESUME_ROLE: *SM_RESUME_ROLE
+        SET_BOND_CURVE_ROLE: *SM_SET_BOND_CURVE_ROLE
+        WITHDRAWAL_QUEUE: *withdrawalQueueERC721
+        WSTETH: *wstETH
+        isPaused: false
+        totalBondShares: 0
+
+    csm0x02ParametersRegistry:
+      name: ParametersRegistry
+      address: *csm0x02ParametersRegistry
+      proxyName: OssifiableProxy
+      implementation: *csm0x02ParametersRegistryImpl
+      proxyChecks:
+        proxy__getAdmin: *aragonAgent
+        proxy__getImplementation: *csm0x02ParametersRegistryImpl
+        proxy__getIsOssified: false
+      checks:
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        MANAGE_CURVE_PARAMETERS_ROLE: *SM_MANAGE_CURVE_PARAMETERS_ROLE
+        MANAGE_GENERAL_PENALTIES_AND_CHARGES_ROLE: *SM_MANAGE_GENERAL_PENALTIES_AND_CHARGES_ROLE
+        MANAGE_KEYS_LIMIT_ROLE: *SM_MANAGE_KEYS_LIMIT_ROLE
+        MANAGE_PERFORMANCE_PARAMETERS_ROLE: *SM_MANAGE_PERFORMANCE_PARAMETERS_ROLE
+        MANAGE_QUEUE_CONFIG_ROLE: *SM_MANAGE_QUEUE_CONFIG_ROLE
+        MANAGE_REWARD_SHARE_ROLE: *SM_MANAGE_REWARD_SHARE_ROLE
+        MANAGE_VALIDATOR_EXIT_PARAMETERS_ROLE: *SM_MANAGE_VALIDATOR_EXIT_PARAMETERS_ROLE
+        QUEUE_LOWEST_PRIORITY: *QUEUE_LOWEST_PRIORITY
+        defaultAllowedExitDelay: *DEFAULT_ALLOWED_EXIT_DELAY
+        defaultBadPerformancePenalty: *DEFAULT_BAD_PERFORMANCE_PENALTY
+        defaultExitDelayFee: *DEFAULT_EXIT_DELAY_FEE
+        defaultGeneralDelayedPenaltyAdditionalFine: *DEFAULT_GENERAL_DELAYED_PENALTY_ADDITIONAL_FINE
+        defaultKeyRemovalCharge: *DEFAULT_KEY_REMOVAL_CHARGE
+        defaultKeysLimit: *MAX_UINT256
+        defaultMaxElWithdrawalRequestFee: *DEFAULT_MAX_EL_WITHDRAWAL_REQUEST_FEE
+        defaultPerformanceCoefficients: *defaultPerformanceCoefficients
+        defaultPerformanceLeeway: *DEFAULT_PERFORMANCE_LEEWAY
+        defaultQueueConfig: *defaultQueueConfig
+        defaultRewardShare: 10000
+        defaultStrikesParams: *defaultStrikesParams
+        getInitializedVersion: 3
+        getAllowedExitDelay: null
+        getBadPerformancePenalty: null
+        getCurveParameters: null
+        getElRewardsStealingAdditionalFine: null
+        getExitDelayFee: null
+        getExitDelayPenalty: null
+        getGeneralDelayedPenaltyAdditionalFine: null
+        getKeyRemovalCharge: null
+        getKeysLimit: null
+        getMaxElWithdrawalRequestFee: null
+        getMaxWithdrawalRequestFee: null
+        getPerformanceCoefficients: null
+        getPerformanceLeewayData: null
+        getQueueConfig: null
+        getRewardShareData: null
+        getRoleAdmin: null
+        getRoleMember: null
+        getRoleMemberCount: null
+        getRoleMembers: null
+        getStrikesParams: null
+        hasRole: null
+        supportsInterface: null
+      ozAcl:
+        *DEFAULT_ADMIN_ROLE : [*aragonAgent]
+        *SM_MANAGE_CURVE_PARAMETERS_ROLE : []
+        *SM_MANAGE_GENERAL_PENALTIES_AND_CHARGES_ROLE : [*csmCommittee]
+        *SM_MANAGE_KEYS_LIMIT_ROLE : []
+        *SM_MANAGE_PERFORMANCE_PARAMETERS_ROLE : []
+        *SM_MANAGE_QUEUE_CONFIG_ROLE : []
+        *SM_MANAGE_REWARD_SHARE_ROLE : []
+        *SM_MANAGE_VALIDATOR_EXIT_PARAMETERS_ROLE : []
+      implementationChecks:
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        MANAGE_CURVE_PARAMETERS_ROLE: *SM_MANAGE_CURVE_PARAMETERS_ROLE
+        MANAGE_GENERAL_PENALTIES_AND_CHARGES_ROLE: *SM_MANAGE_GENERAL_PENALTIES_AND_CHARGES_ROLE
+        MANAGE_KEYS_LIMIT_ROLE: *SM_MANAGE_KEYS_LIMIT_ROLE
+        MANAGE_PERFORMANCE_PARAMETERS_ROLE: *SM_MANAGE_PERFORMANCE_PARAMETERS_ROLE
+        MANAGE_QUEUE_CONFIG_ROLE: *SM_MANAGE_QUEUE_CONFIG_ROLE
+        MANAGE_REWARD_SHARE_ROLE: *SM_MANAGE_REWARD_SHARE_ROLE
+        MANAGE_VALIDATOR_EXIT_PARAMETERS_ROLE: *SM_MANAGE_VALIDATOR_EXIT_PARAMETERS_ROLE
+        QUEUE_LOWEST_PRIORITY: *QUEUE_LOWEST_PRIORITY
+
+    csm0x02FeeOracle:
+      name: FeeOracle
+      address: *csm0x02FeeOracle
+      proxyName: OssifiableProxy
+      implementation: *csm0x02FeeOracleImpl
+      proxyChecks:
+        proxy__getAdmin: *aragonAgent
+        proxy__getImplementation: *csm0x02FeeOracleImpl
+        proxy__getIsOssified: false
+      checks:
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        FEE_DISTRIBUTOR: *csm0x02FeeDistributor
+        GENESIS_TIME: *GENESIS_TIME
+        MANAGE_CONSENSUS_CONTRACT_ROLE: *ORACLE_MANAGE_CONSENSUS_CONTRACT_ROLE
+        MANAGE_CONSENSUS_VERSION_ROLE: *ORACLE_MANAGE_CONSENSUS_VERSION_ROLE
+        PAUSE_INFINITELY: *MAX_UINT256
+        PAUSE_ROLE: *SM_PAUSE_ROLE
+        RECOVERER_ROLE: *SM_RECOVERER_ROLE
+        RESUME_ROLE: *SM_RESUME_ROLE
+        SECONDS_PER_SLOT: *SECONDS_PER_SLOT
+        STRIKES: *csm0x02Strikes
+        SUBMIT_DATA_ROLE: *ORACLE_SUBMIT_DATA_ROLE
+        getConsensusContract: *csm0x02HashConsensus
+        getConsensusVersion: 4
+        getContractVersion: 3
+        getResumeSinceTimestamp: null
+        isPaused: false
+        getConsensusReport: null
+        getLastProcessingRefSlot: null
+        getRoleAdmin: null
+        getRoleMember: null
+        getRoleMemberCount: null
+        getRoleMembers: null
+        hasRole: null
+        supportsInterface: null
+      ozAcl:
+        *DEFAULT_ADMIN_ROLE : [*aragonAgent]
+        *ORACLE_MANAGE_CONSENSUS_CONTRACT_ROLE : []
+        *ORACLE_MANAGE_CONSENSUS_VERSION_ROLE : []
+        *SM_PAUSE_ROLE : [*resealManager, *circuitBreaker]
+        *SM_RECOVERER_ROLE : []
+        *SM_RESUME_ROLE : [*resealManager]
+        *ORACLE_SUBMIT_DATA_ROLE : []
+      implementationChecks:
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        FEE_DISTRIBUTOR: *csm0x02FeeDistributor
+        GENESIS_TIME: *GENESIS_TIME
+        MANAGE_CONSENSUS_CONTRACT_ROLE: *ORACLE_MANAGE_CONSENSUS_CONTRACT_ROLE
+        MANAGE_CONSENSUS_VERSION_ROLE: *ORACLE_MANAGE_CONSENSUS_VERSION_ROLE
+        PAUSE_INFINITELY: *MAX_UINT256
+        PAUSE_ROLE: *SM_PAUSE_ROLE
+        RECOVERER_ROLE: *SM_RECOVERER_ROLE
+        RESUME_ROLE: *SM_RESUME_ROLE
+        SECONDS_PER_SLOT: *SECONDS_PER_SLOT
+        STRIKES: *csm0x02Strikes
+        SUBMIT_DATA_ROLE: *ORACLE_SUBMIT_DATA_ROLE
+        getContractVersion: *MAX_UINT256
+        isPaused: false
+
+    csm0x02FeeDistributor:
+      name: FeeDistributor
+      address: *csm0x02FeeDistributor
+      proxyName: OssifiableProxy
+      implementation: *csm0x02FeeDistributorImpl
+      proxyChecks:
+        proxy__getAdmin: *aragonAgent
+        proxy__getImplementation: *csm0x02FeeDistributorImpl
+        proxy__getIsOssified: false
+      checks:
+        ACCOUNTING: *csm0x02Accounting
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        ORACLE: *csm0x02FeeOracle
+        RECOVERER_ROLE: *SM_RECOVERER_ROLE
+        STETH: *lido
+        getInitializedVersion: 3
+        rebateRecipient: *aragonAgent
+        distributedShares: null
+        distributionDataHistoryCount: null
+        getFeesToDistribute: null
+        getHistoricalDistributionData: null
+        getRoleAdmin: null
+        getRoleMember: null
+        getRoleMemberCount: null
+        getRoleMembers: null
+        hasRole: null
+        hashLeaf: null
+        logCid: null
+        pendingSharesToDistribute: null
+        supportsInterface: null
+        totalClaimableShares: null
+        treeCid: null
+        treeRoot: null
+      ozAcl:
+        *DEFAULT_ADMIN_ROLE : [*aragonAgent]
+        *SM_RECOVERER_ROLE : []
+      implementationChecks:
+        ACCOUNTING: *csm0x02Accounting
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        ORACLE: *csm0x02FeeOracle
+        RECOVERER_ROLE: *SM_RECOVERER_ROLE
+        STETH: *lido
+        getInitializedVersion: *MAX_UINT64
+        rebateRecipient: *ZERO_ADDRESS
+        pendingSharesToDistribute: 0
+        totalClaimableShares: 0
+        treeCid: ""
+        treeRoot: *ZERO_BYTES32
+
+    csm0x02ExitPenalties:
+      name: ExitPenalties
+      address: *csm0x02ExitPenalties
+      proxyName: OssifiableProxy
+      implementation: *csm0x02ExitPenaltiesImpl
+      proxyChecks:
+        proxy__getAdmin: *aragonAgent
+        proxy__getImplementation: *csm0x02ExitPenaltiesImpl
+        proxy__getIsOssified: false
+      checks:
+        ACCOUNTING: *csm0x02Accounting
+        MODULE: *csm0x02Module
+        PARAMETERS_REGISTRY: *csm0x02ParametersRegistry
+        STRIKES: *csm0x02Strikes
+        STRIKES_EXIT_TYPE_ID: 1
+        VOLUNTARY_EXIT_TYPE_ID: 0
+        getExitPenaltyInfo: null
+        isValidatorExitDelayPenaltyApplicable: null
+      implementationChecks:
+        ACCOUNTING: *csm0x02Accounting
+        MODULE: *csm0x02Module
+        PARAMETERS_REGISTRY: *csm0x02ParametersRegistry
+        STRIKES: *csm0x02Strikes
+        STRIKES_EXIT_TYPE_ID: 1
+        VOLUNTARY_EXIT_TYPE_ID: 0
+
+    csm0x02Strikes:
+      name: ValidatorStrikes
+      address: *csm0x02Strikes
+      proxyName: OssifiableProxy
+      implementation: *csm0x02StrikesImpl
+      proxyChecks:
+        proxy__getAdmin: *aragonAgent
+        proxy__getImplementation: *csm0x02StrikesImpl
+        proxy__getIsOssified: false
+      checks:
+        ACCOUNTING: *csm0x02Accounting
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        EXIT_PENALTIES: *csm0x02ExitPenalties
+        MODULE: *csm0x02Module
+        ORACLE: *csm0x02FeeOracle
+        PARAMETERS_REGISTRY: *csm0x02ParametersRegistry
+        ejector: *csm0x02Ejector
+        getInitializedVersion: 1
+        getRoleAdmin: null
+        getRoleMember: null
+        getRoleMemberCount: null
+        getRoleMembers: null
+        hasRole: null
+        hashLeaf: null
+        supportsInterface: null
+        treeCid: null
+        treeRoot: null
+        verifyProof: null
+      ozAcl:
+        *DEFAULT_ADMIN_ROLE : [*aragonAgent]
+      implementationChecks:
+        ACCOUNTING: *csm0x02Accounting
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        EXIT_PENALTIES: *csm0x02ExitPenalties
+        MODULE: *csm0x02Module
+        ORACLE: *csm0x02FeeOracle
+        PARAMETERS_REGISTRY: *csm0x02ParametersRegistry
+        ejector: *ZERO_ADDRESS
+        getInitializedVersion: *MAX_UINT64
+        treeCid: ""
+        treeRoot: *ZERO_BYTES32
+
+    csm0x02PermissionlessGate:
+      name: PermissionlessGate
+      address: *csm0x02PermissionlessGate
+      checks:
+        CURVE_ID: 0
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        MODULE: *csm0x02Module
+        RECOVERER_ROLE: *SM_RECOVERER_ROLE
+        getRoleAdmin: null
+        getRoleMember: null
+        getRoleMemberCount: null
+        getRoleMembers: null
+        hasRole: null
+        supportsInterface: null
+      ozAcl:
+        *DEFAULT_ADMIN_ROLE : [*aragonAgent]
+        *SM_RECOVERER_ROLE : []
+
+    csm0x02Verifier:
+      name: Verifier
+      address: *csm0x02Verifier
+      checks:
+        BEACON_ROOTS: *eip4788BeaconRootsContract
+        CAPELLA_SLOT: *CAPELLA_SLOT
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        FIRST_SUPPORTED_SLOT: *ELECTRA_SLOT
+        GI_FIRST_BALANCES_NODE_CURR: *GI_FIRST_BALANCES_NODE_ELECTRA
+        GI_FIRST_BALANCES_NODE_PREV: *GI_FIRST_BALANCES_NODE_ELECTRA
+        GI_FIRST_BLOCK_ROOT_IN_SUMMARY: *GI_FIRST_BLOCK_ROOT_IN_SUMMARY_ELECTRA
+        GI_FIRST_HISTORICAL_SUMMARY_CURR: *GI_FIRST_HISTORICAL_SUMMARY_ELECTRA
+        GI_FIRST_HISTORICAL_SUMMARY_PREV: *GI_FIRST_HISTORICAL_SUMMARY_ELECTRA
+        GI_FIRST_VALIDATOR_CURR: *GI_FIRST_VALIDATOR_ELECTRA
+        GI_FIRST_VALIDATOR_PREV: *GI_FIRST_VALIDATOR_ELECTRA
+        GI_FIRST_WITHDRAWAL_CURR: *GI_FIRST_WITHDRAWAL_ELECTRA
+        GI_FIRST_WITHDRAWAL_PREV: *GI_FIRST_WITHDRAWAL_ELECTRA
+        MIN_WITHDRAWAL_RATIO: *CSM_MIN_WITHDRAWAL_RATIO
+        MODULE: *csm0x02Module
+        PAUSE_INFINITELY: *MAX_UINT256
+        PAUSE_ROLE: *SM_PAUSE_ROLE
+        PIVOT_SLOT: *ELECTRA_SLOT
+        RESUME_ROLE: *SM_RESUME_ROLE
+        SLOTS_PER_EPOCH: *SLOTS_PER_EPOCH
+        SLOTS_PER_HISTORICAL_ROOT: *SLOTS_PER_HISTORICAL_ROOT
+        WITHDRAWAL_ADDRESS: *withdrawalVault
+        getResumeSinceTimestamp: null
+        isPaused: false
+        getRoleAdmin: null
+        getRoleMember: null
+        getRoleMemberCount: null
+        getRoleMembers: null
+        hasRole: null
+        supportsInterface: null
+      ozAcl:
+        *DEFAULT_ADMIN_ROLE : [*aragonAgent]
+        *SM_PAUSE_ROLE : [*resealManager, *circuitBreaker]
+        *SM_RESUME_ROLE : [*resealManager]
+
+    csm0x02Ejector:
+      name: Ejector
+      address: *csm0x02Ejector
+      checks:
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        MODULE: *csm0x02Module
+        PAUSE_INFINITELY: *MAX_UINT256
+        PAUSE_ROLE: *SM_PAUSE_ROLE
+        RECOVERER_ROLE: *SM_RECOVERER_ROLE
+        RESUME_ROLE: *SM_RESUME_ROLE
+        STRIKES: *csm0x02Strikes
+        STRIKES_EXIT_TYPE_ID: 1
+        VOLUNTARY_EXIT_TYPE_ID: 0
+        stakingModuleId: 0
+        triggerableWithdrawalsGateway: *triggerableWithdrawalsGateway
+        getResumeSinceTimestamp: null
+        isPaused: false
+        getRoleAdmin: null
+        getRoleMember: null
+        getRoleMemberCount: null
+        getRoleMembers: null
+        hasRole: null
+        supportsInterface: null
+      ozAcl:
+        *DEFAULT_ADMIN_ROLE : [*aragonAgent]
+        *SM_PAUSE_ROLE : [*resealManager, *circuitBreaker]
+        *SM_RECOVERER_ROLE : []
+        *SM_RESUME_ROLE : [*resealManager]
+
+    csm0x02HashConsensus:
+      name: HashConsensus
+      address: *csm0x02HashConsensus
+      checks:
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        DISABLE_CONSENSUS_ROLE: *DISABLE_CONSENSUS_ROLE
+        MANAGE_FAST_LANE_CONFIG_ROLE: *MANAGE_FAST_LANE_CONFIG_ROLE
+        MANAGE_FRAME_CONFIG_ROLE: *MANAGE_FRAME_CONFIG_ROLE
+        MANAGE_MEMBERS_AND_QUORUM_ROLE: *MANAGE_MEMBERS_AND_QUORUM_ROLE
+        MANAGE_REPORT_PROCESSOR_ROLE: *MANAGE_REPORT_PROCESSOR_ROLE
+        getChainConfig: [*SLOTS_PER_EPOCH, *SECONDS_PER_SLOT, *GENESIS_TIME]
+        getFrameConfig: [null, *HC_CSM_FRAME_EPOCHS, *HC_CSM_FAST_LANE]
+        getMembers: [*HASH_CONSENSUS_MEMBERS, null]
+        getQuorum: *HASH_CONSENSUS_QUORUM
+        getReportProcessor: *csm0x02FeeOracle
+        getConsensusState: null
+        getConsensusStateForMember: null
+        getCurrentFrame: null
+        getFastLaneMembers: null
+        getInitialRefSlot: null
+        getIsFastLaneMember: null
+        getIsMember: null
+        getReportVariants: null
+        getRoleAdmin: null
+        getRoleMember: null
+        getRoleMemberCount: null
+        getRoleMembers: null
         hasRole: null
         supportsInterface: null
       ozAcl:
