@@ -30,6 +30,8 @@ export const context = {
   json: false,
   // --block: every read comes from this block, "latest" resolved once per section; see docs/cli.md
   block: undefined as string | undefined,
+  // --observed: the file that receives every value the chain answered; see docs/observed.md
+  observedPath: undefined as string | undefined,
 };
 
 // Values read from the environment that no report may echo back: RPC URLs carry keys, and
