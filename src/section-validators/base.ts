@@ -275,7 +275,7 @@ export abstract class SectionValidatorBase {
   }
 }
 
-function _stringify(value: unknown) {
+export function _stringify(value: unknown) {
   return value instanceof Object ? JSON.stringify(value) : String(value);
 }
 

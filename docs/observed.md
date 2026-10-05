@@ -67,3 +67,22 @@ Two kinds of `null` are not read:
   call it with;
 - the placeholders `implementationChecks` supplies for every view of the implementation ABI the
   config does not list: the config never declared them.
+
+## `--expand-enumerations`
+
+A `<name>Length` or `<name>Count` check next to a `<name>(uint256)` view is an enumeration.
+For every one the config declares, the run reads the count from the chain, then reads every index
+the config does not list as a `<name>(i)` entry. A length declared `null` counts as declared: the
+checks skip it, and the expansion reads it, because `null` declines to assert a value, not to
+look. The placeholders `implementationChecks` supplies for an undeclared view are not expanded.
+Each such value goes into the report as a warning, and into the observed file with the count it
+was read against:
+
+```text
+⚠ .marketIds(4): not in the config; the chain says 0x127353ba...
+```
+
+Warnings do not change the exit code: the config is incomplete, not wrong. A reviewer that wants
+completeness enforced reads the warnings from the [JSON report](json-output.md). A count that
+cannot be read is a warning too, so an enumeration is never taken for fully expanded when it was
+not read. Enumerations of more than 1000 entries are reported and not read.
