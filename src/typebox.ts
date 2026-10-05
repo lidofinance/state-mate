@@ -212,6 +212,8 @@ export const ExplorerSectionTB = Type.Readonly(
   Type.Object(
     {
       rpcUrl: Type.String(),
+      // Every eth_getLogs of the section goes here: a node that serves wide log windows, not old state
+      logsRpcUrl: Type.Optional(Type.String()),
       explorerHostname: Type.Optional(Type.String()),
       explorerTokenEnv: Type.Optional(Type.String()),
       chainId: Type.Union([Type.Integer({ minimum: 1 }), Type.String({ pattern: "^[1-9][0-9]*$" })]),

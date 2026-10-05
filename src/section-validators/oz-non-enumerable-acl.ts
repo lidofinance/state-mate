@@ -37,7 +37,12 @@ function pairKey(role: string, holder: string): string {
 }
 
 export class OzNonEnumerableAclSectionValidator extends SectionValidatorBase {
-  constructor(provider: JsonRpcProvider, chainId: ChainId) {
+  constructor(
+    provider: JsonRpcProvider,
+    chainId: ChainId,
+    /** The section's `logsRpcUrl`: when set, every log of the scan is read there. */
+    protected readonly logsProvider?: JsonRpcProvider,
+  ) {
     super(provider, EntryField.ozNonEnumerableAcl, chainId);
   }
 
@@ -151,11 +156,11 @@ export class OzNonEnumerableAclSectionValidator extends SectionValidatorBase {
       return fail(printError(error));
     }
 
-    const outcome = await collectRoleEvents(chainId, address, range.explorer);
+    const outcome = await collectRoleEvents(chainId, address, range.explorer, this.logsProvider);
     if (!outcome.ok) return fail(outcome.reason);
     // the RPC fills the unsettled tail, so candidacy is complete through the captured head rather
     // than stopping minutes short of it on a schedule an attacker could rely on
-    const tail = await collectTailRoleEvents(this.provider, address, {
+    const tail = await collectTailRoleEvents(this.logsProvider ?? this.provider, address, {
       fromBlock: range.explorer.toBlock + 1,
       toBlock: range.captured,
     });
@@ -175,7 +180,7 @@ export class OzNonEnumerableAclSectionValidator extends SectionValidatorBase {
   private async _scanRange(chainId: string, address: string): Promise<{ captured: number; explorer: ScanRange }> {
     const deployed = await resolveDeploymentBlock(chainId, address);
     if (deployed === undefined) throw new Error(`the explorer would not give a deployment block for ${address}`);
-    const bounds = await resolveScanBounds(chainId, this.provider);
+    const bounds = await resolveScanBounds(chainId, this.provider, this.logsProvider);
     return { captured: bounds.captured, explorer: makeSettledScanRange(deployed, bounds.settled) };
   }
 

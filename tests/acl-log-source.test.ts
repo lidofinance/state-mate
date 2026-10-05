@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it, mock } from "node:test";
 
-import type { JsonRpcProvider } from "ethers";
+import { JsonRpcProvider } from "ethers";
 
 import { ROLE_GRANTED_TOPIC } from "../src/acl/fold";
 import {
@@ -12,6 +12,7 @@ import {
   describeSource,
   fetchWindow,
   isRateLimitAnswer,
+  isSpanRefusal,
   makeSettledScanRange,
   parseQuantity,
   resolveScanBounds,
@@ -19,7 +20,9 @@ import {
   setExplorerTokenEnv,
   setRateLimitPause,
 } from "../src/acl/log-source";
-import { resetRequestSlots } from "../src/explorer";
+import { RetryingJsonRpcProvider, resetRequestSlots } from "../src/explorer";
+import { toBlockTag } from "../src/pinned-block";
+import { isTypeOfTB, NetworkSectionTB } from "../src/typebox";
 
 const CONTRACT = "0xccccccccccccccccccccccccccccccccccccccc3";
 
@@ -450,5 +453,200 @@ describe("the explorer token", () => {
         );
       },
     );
+  });
+});
+
+describe("a node that limits the eth_getLogs span", () => {
+  const ALCHEMY_FREE =
+    'could not coalesce error (error={ "code": -32600, "message": "Under the Free tier plan, you can make ' +
+    "eth_getLogs requests with up to a 10 block range. Based on your parameters, this block range should work: " +
+    '[0x4, 0xd]" }, code=UNKNOWN_ERROR, version=6.17.0)';
+
+  function limitedTo(span: number, asked: ScanRange[], blocks: number[] = []) {
+    return {
+      getLogs: async ({ fromBlock, toBlock }: ScanRange) => {
+        asked.push({ fromBlock, toBlock });
+        if (toBlock - fromBlock + 1 > span) throw new Error(ALCHEMY_FREE);
+        return blocks
+          .filter((block) => block >= fromBlock && block <= toBlock)
+          .map((blockNumber) => ({
+            address: CONTRACT,
+            blockNumber,
+            data: "0x",
+            index: 0,
+            topics: [ROLE_GRANTED_TOPIC],
+          }));
+      },
+    } as unknown as JsonRpcProvider;
+  }
+
+  it("halves the tail until the node answers, and covers every block exactly once", async () => {
+    // chain 4663: a 1200-block tail against an archive node that serves ten blocks at a time
+    const asked: ScanRange[] = [];
+    const logs = await collectTailLogs(limitedTo(10, asked, [7, 600, 1199]), CONTRACT, [ROLE_GRANTED_TOPIC], {
+      fromBlock: 1,
+      toBlock: 1200,
+    });
+
+    assert.deepEqual(
+      logs.map((entry) => entry.blockNumber),
+      [7, 600, 1199],
+    );
+    const served = asked.filter(({ fromBlock, toBlock }) => toBlock - fromBlock + 1 <= 10);
+    const covered = served.flatMap(({ fromBlock, toBlock }) =>
+      Array.from({ length: toBlock - fromBlock + 1 }, (_, index) => fromBlock + index),
+    );
+    assert.deepEqual(
+      covered,
+      Array.from({ length: 1200 }, (_, index) => index + 1),
+    );
+    // a refused span is not asked again: one refusal per halving on the way down, not per window
+    assert.ok(asked.length - served.length <= 8, `${asked.length - served.length} refusals`);
+  });
+
+  it("gives up on a single block the node still refuses", async () => {
+    await assert.rejects(
+      collectTailLogs(limitedTo(0, []), CONTRACT, [ROLE_GRANTED_TOPIC], { fromBlock: 1, toBlock: 4 }),
+      /10 block range/,
+    );
+  });
+
+  it("does not halve on a rate limit, which a narrower window would not cure", async () => {
+    const asked: ScanRange[] = [];
+    const provider = {
+      getLogs: async (range: ScanRange) => {
+        asked.push(range);
+        throw new Error("server response 429 Too Many Requests");
+      },
+    } as unknown as JsonRpcProvider;
+
+    await assert.rejects(collectTailLogs(provider, CONTRACT, [ROLE_GRANTED_TOPIC], { fromBlock: 1, toBlock: 1200 }));
+    assert.equal(asked.length, 1);
+  });
+
+  it("recognises how the common nodes word a span refusal", () => {
+    for (const text of [
+      ALCHEMY_FREE,
+      "query returned more than 10000 results",
+      "eth_getLogs is limited to a 10,000 range",
+      "exceed maximum block range: 50000",
+      "block range is too wide",
+      "Log response size exceeded.",
+      "ranges over 10000 blocks are not supported on freemium keys",
+    ]) {
+      assert.equal(isSpanRefusal(new Error(text)), true, text);
+    }
+    for (const text of ["execution reverted", "Too Many Requests", "rate limit exceeded", "missing trie node"]) {
+      assert.equal(isSpanRefusal(new Error(text)), false, text);
+    }
+  });
+});
+
+describe("a pinned scan", () => {
+  const prototype = JsonRpcProvider.prototype as { send?: unknown };
+
+  function pinnedAt(pin: number, head: number): RetryingJsonRpcProvider {
+    prototype.send = async (method: string) => {
+      if (method === "eth_blockNumber") return `0x${head.toString(16)}`;
+      throw new Error(`unexpected ${method}`);
+    };
+    const provider = new RetryingJsonRpcProvider("http://localhost:0", undefined, { staticNetwork: true });
+    provider.pinned = { number: pin, tag: toBlockTag(pin) };
+    return provider;
+  }
+
+  it("lets the log source serve all the way to a pin older than head minus the lag", async () => {
+    // chain 4663's lag is 1200 blocks, which the archive node's ten-block eth_getLogs cannot cover
+    try {
+      assert.deepEqual(await resolveScanBounds("4663", pinnedAt(67_125_350, 67_200_000)), {
+        captured: 67_125_350,
+        settled: 67_125_350,
+      });
+    } finally {
+      delete prototype.send;
+    }
+  });
+
+  it("still leaves a tail when the pin is within the lag of the head", async () => {
+    try {
+      assert.deepEqual(await resolveScanBounds("4663", pinnedAt(10_000, 10_500)), { captured: 10_000, settled: 9_300 });
+    } finally {
+      delete prototype.send;
+    }
+  });
+
+  it("refuses a logs node that has not reached the pin, whose silence would read as no grants", async () => {
+    const behind = { getBlockNumber: async () => 67_125_000 } as unknown as JsonRpcProvider;
+    try {
+      await assert.rejects(resolveScanBounds("4663", pinnedAt(67_125_350, 67_200_000), behind), /short of the pinned/);
+    } finally {
+      delete prototype.send;
+    }
+  });
+
+  it("refuses a logs node on another branch than a hash pin", async () => {
+    const pinnedHash = `0x${"ab".repeat(32)}`;
+    const provider = pinnedAt(67_125_350, 67_200_000);
+    provider.pinned = { number: 67_125_350, tag: { blockHash: pinnedHash, requireCanonical: true } };
+    const logsOn = (hash: string) =>
+      ({ getBlock: async () => ({ hash }), getBlockNumber: async () => 67_200_000 }) as unknown as JsonRpcProvider;
+    try {
+      assert.deepEqual(
+        await resolveScanBounds("4663", provider, logsOn(pinnedHash.toUpperCase().replace("0X", "0x"))),
+        {
+          captured: 67_125_350,
+          settled: 67_125_350,
+        },
+      );
+      await assert.rejects(resolveScanBounds("4663", provider, logsOn(`0x${"cd".repeat(32)}`)), /not the pinned/);
+    } finally {
+      delete prototype.send;
+    }
+  });
+
+  it("captures no further than an unpinned logs node has reached", async () => {
+    const state = { getBlockNumber: async () => 1000 } as unknown as JsonRpcProvider;
+    const logs = { getBlockNumber: async () => 998 } as unknown as JsonRpcProvider;
+    assert.deepEqual(await resolveScanBounds("1", state, logs), { captured: 998, settled: 992 });
+  });
+});
+
+describe("a section's logs RPC", () => {
+  it("is accepted by the schema next to rpcUrl", () => {
+    const section = { chainId: 4663, contracts: {}, logsRpcUrl: "ROBINHOOD_LOGS_RPC_URL", rpcUrl: "ROBINHOOD_RPC_URL" };
+    assert.equal(isTypeOfTB(section, NetworkSectionTB), true);
+  });
+
+  it("serves the settled range in place of the explorer", async () => {
+    resetRequestSlots();
+    const fetchMock = mock.method(globalThis, "fetch", async () => {
+      throw new Error("the explorer must not be asked");
+    });
+    const asked: ScanRange[] = [];
+    const logsProvider = {
+      getLogs: async ({ fromBlock, toBlock }: ScanRange) => {
+        asked.push({ fromBlock, toBlock });
+        return [];
+      },
+    } as unknown as JsonRpcProvider;
+    try {
+      const outcome = await collectRoleEvents("4663", CONTRACT, { fromBlock: 0, toBlock: 67_125_350 }, logsProvider);
+      assert.deepEqual(outcome, { events: [], ok: true, source: "logs rpc" });
+      assert.deepEqual(asked, [{ fromBlock: 0, toBlock: 67_125_350 }]);
+      assert.equal(fetchMock.mock.calls.length, 0);
+    } finally {
+      fetchMock.mock.restore();
+    }
+  });
+
+  it("reports a logs RPC that refuses outright as a failed scan", async () => {
+    const logsProvider = {
+      getLogs: async () => {
+        throw new Error("missing trie node");
+      },
+    } as unknown as JsonRpcProvider;
+    const outcome = await collectRoleEvents("4663", CONTRACT, { fromBlock: 0, toBlock: 10 }, logsProvider);
+    assert.equal(outcome.ok, false);
+    if (!outcome.ok) assert.match(outcome.reason, /logs rpc failed: missing trie node/);
   });
 });
