@@ -32,6 +32,8 @@ export const context = {
   block: undefined as string | undefined,
   // --observed: the file that receives every value the chain answered; see docs/observed.md
   observedPath: undefined as string | undefined,
+  // --expand-enumerations: read every element behind a declared <name>Length and report the unpinned ones
+  expandEnumerations: false,
 };
 
 // Values read from the environment that no report may echo back: RPC URLs carry keys, and
