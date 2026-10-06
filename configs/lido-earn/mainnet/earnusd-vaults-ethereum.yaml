@@ -1076,8 +1076,9 @@ l1:
         feeRecipient: *treasury
         minPriceD18:
         owner: *lazyVaultAdmin
-        performanceFeeD6: 0
-        protocolFeeD6: 0
+        # Lazy Vault Admin nonce 41, executed on 2026-10-06 in tx 0xdef1ed4c51aca291b63213a3ec40e582ef88fd2d25d0b615690b81b17d4dc09b
+        performanceFeeD6: 150000
+        protocolFeeD6: 2000
         redeemFeeD6: 0
         timestamps:
       implementationChecks:
