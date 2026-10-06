@@ -15,7 +15,7 @@ import {
 } from "src/typebox";
 import type { Abi, ChainId } from "src/types";
 
-import { _stringify, CheckLevel, getErrorContext, needCheck, SectionValidatorBase } from "./base";
+import { _stringify, type Answer, CheckLevel, getErrorContext, needCheck, SectionValidatorBase } from "./base";
 
 // <name>Length or <name>Count next to an indexed getter <name>(uint256) is an enumeration
 const ENUMERATION = /^(.+?)(Length|Count)$/;
@@ -83,6 +83,7 @@ export class ChecksSectionValidator extends SectionValidatorBase {
     this._reportNonCoveredNonMutableChecks(contractAlias, abi, Object.keys(checks));
 
     const contract = loadContract(address, abi, this.provider);
+    this.answers.clear();
     for (const [method, checkEntryValue] of Object.entries(checks)) {
       if (!needCheck(CheckLevel.method, method)) continue;
 
@@ -105,17 +106,21 @@ export class ChecksSectionValidator extends SectionValidatorBase {
       if (!stem || !indexedGetter(abi, stem) || !argumentless(abi, key)) continue;
       if (!needCheck(CheckLevel.method, key) && !needCheck(CheckLevel.method, stem)) continue;
 
-      let count: number;
-      try {
-        const answer: unknown = await contract.getFunction(key).staticCall();
-        // the count the expansion goes by is an answer like any other, asserted or not
-        recordObservedCall(getErrorContext(), key, undefined, { value: answer });
-        count = Number(answer);
-      } catch (error) {
-        recordObservedCall(getErrorContext(), key, undefined, { reverted: printError(error) });
-        new LogCommand(`.${key}`).warning(`.${stem}(i) not expanded: the count REVERTED with: ${printError(error)}`);
+      // the check's own read of the count, when it made one: a second read is a second observed row
+      let answer: Answer | undefined = this.answers.get(key);
+      if (!answer) {
+        try {
+          answer = { value: await contract.getFunction(key).staticCall() };
+        } catch (error) {
+          answer = { reverted: printError(error) };
+        }
+        recordObservedCall(getErrorContext(), key, undefined, answer);
+      }
+      if ("reverted" in answer) {
+        new LogCommand(`.${key}`).warning(`.${stem}(i) not expanded: the count REVERTED with: ${answer.reverted}`);
         continue;
       }
+      const count = Number(answer.value);
       if (count > ENUMERATION_CAP) {
         new LogCommand(`.${stem}[0..${count})`).warning(
           `${count} entries exceed the expansion cap of ${ENUMERATION_CAP}`,

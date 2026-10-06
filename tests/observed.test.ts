@@ -269,6 +269,20 @@ describe("an aborted run", () => {
       { cwd: path.resolve(__dirname, ".."), encoding: "utf8", env: { ...process.env, NO_COLOR: "1" } },
     );
 
+  it("is refused for a directory and leaves no file behind", () => {
+    const directory = fs.mkdtempSync(path.join(os.tmpdir(), "state-mate-observed-"));
+    const observed = path.join(directory, "out.observed.yaml");
+    try {
+      const run = runCli(directory, "--observed", observed);
+
+      assert.equal(run.status, 1);
+      assert.match(`${run.stdout}${run.stderr}`, /--observed option requires a single config file/);
+      assert.equal(fs.existsSync(observed), false);
+    } finally {
+      fs.rmSync(directory, { recursive: true, force: true });
+    }
+  });
+
   for (const mode of [[], ["--json"]]) {
     it(`still writes the observed file${mode.length ? " under --json" : ""}`, () => {
       // the section's RPC variable is unset, so the run exits before its first read

@@ -1,6 +1,10 @@
 import assert from "node:assert/strict";
+import { spawnSync } from "node:child_process";
+import fs from "node:fs";
 import http from "node:http";
 import type { AddressInfo } from "node:net";
+import os from "node:os";
+import path from "node:path";
 import { afterEach, describe, it } from "node:test";
 
 import { Contract, JsonRpcProvider } from "ethers";
@@ -29,6 +33,52 @@ describe("--block option", () => {
   it("renders a block as the hex tag JSON-RPC takes", () => {
     assert.equal(toBlockTag(65439916), "0x3e688ac");
     assert.equal(toBlockTag(0), "0x0");
+  });
+});
+
+describe("a block number or hash on the command line", () => {
+  const runCli = (...args: string[]) => {
+    const run = spawnSync(
+      process.execPath,
+      ["--require", "ts-node/register", "--require", "tsconfig-paths/register", "src/state-mate.ts", ...args],
+      { cwd: path.resolve(__dirname, ".."), encoding: "utf8", env: { ...process.env, NO_COLOR: "1" } },
+    );
+    assert.equal(run.status, 1);
+    return `${run.stdout}${run.stderr}`;
+  };
+
+  // the RPC variables are unset: a run that accepts the option stops at the first section it reads
+  const CONFIG = [
+    "deployed:\n  l1: []\n  l2: []",
+    "l1:\n  rpcUrl: STATE_MATE_TEST_UNSET_L1_RPC_URL\n  chainId: 1\n  contracts: {}",
+    "l2:\n  rpcUrl: STATE_MATE_TEST_UNSET_L2_RPC_URL\n  chainId: 10\n  contracts: {}\n",
+  ].join("\n");
+
+  function withConfig(run: (directory: string, config: string) => void): void {
+    const directory = fs.mkdtempSync(path.join(os.tmpdir(), "state-mate-block-"));
+    const config = path.join(directory, "cfg.yaml");
+    fs.writeFileSync(config, CONFIG);
+    try {
+      run(directory, config);
+    } finally {
+      fs.rmSync(directory, { recursive: true, force: true });
+    }
+  }
+
+  it("needs -o to select one chain when the config spans several", () => {
+    withConfig((_, config) => {
+      const unselected = runCli(config, "--block", "16");
+      assert.match(unselected, /spans 2 chains; select a section with -o/);
+      assert.doesNotMatch(unselected, /UNSET_L1_RPC_URL/);
+
+      assert.match(runCli(config, "--block", "16", "-o", "l2"), /Env var STATE_MATE_TEST_UNSET_L2_RPC_URL is not set/);
+    });
+  });
+
+  it("is refused for a directory, which takes only latest", () => {
+    withConfig((directory) => {
+      assert.match(runCli(directory, "--block", "16"), /a directory takes --block latest/);
+    });
   });
 });
 

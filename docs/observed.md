@@ -45,7 +45,9 @@ with `args` when the call took any and either `value` or `reverted`. Numbers are
 strings, structs with named fields are maps, other tuples and arrays are lists. `block` is the
 pinned block, or the head when the section started with `pinned: false`; a section pinned by
 hash also carries `blockHash`. `storage` maps each slot the config checks to the word the chain
-holds.
+holds. `ozAcl` records its `getRoleMemberCount` and `hasRole` calls; `ozNonEnumerableAcl`,
+`aragonAcl` and the automatic proxy checks record nothing.
+[`--expand-enumerations`](cli.md#expand-enumerations) adds the entries it reads and their count.
 
 A run that ends early still writes what it read: a failed check that exits, a fatal error, Ctrl+C
 and SIGTERM all pass through the same single write. Without `--observed` nothing is kept.
@@ -61,28 +63,10 @@ run not to assert its value. With `--observed` the value is still read once and 
 observed file, marked no differently from any other answer; the check statistics still count it
 as skipped, because nothing was asserted. Without `--observed` such a check is not read at all.
 
-Two kinds of `null` are not read:
+Three kinds of `null` are not read:
 
 - a function that takes arguments, such as `balanceOf: null`: the config names no argument to
   call it with;
+- a bare name that matches several overloads: the config names no signature to call;
 - the placeholders `implementationChecks` supplies for every view of the implementation ABI the
   config does not list: the config never declared them.
-
-## `--expand-enumerations`
-
-A `<name>Length` or `<name>Count` check next to a `<name>(uint256)` view is an enumeration.
-For every one the config declares, the run reads the count from the chain, then reads every index
-the config does not list as a `<name>(i)` entry. A length declared `null` counts as declared: the
-checks skip it, and the expansion reads it, because `null` declines to assert a value, not to
-look. The placeholders `implementationChecks` supplies for an undeclared view are not expanded.
-Each such value goes into the report as a warning, and into the observed file with the count it
-was read against:
-
-```text
-⚠ .marketIds(4): not in the config; the chain says 0x127353ba...
-```
-
-Warnings do not change the exit code: the config is incomplete, not wrong. A reviewer that wants
-completeness enforced reads the warnings from the [JSON report](json-output.md). A count that
-cannot be read is a warning too, so an enumeration is never taken for fully expanded when it was
-not read. Enumerations of more than 1000 entries are reported and not read.

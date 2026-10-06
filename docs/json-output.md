@@ -63,6 +63,7 @@ chain offers no log source for. `warnings` counts the `warnings` entries below.
 | `inputs`                      | an inputs sibling was selected        | Absolute path of the selected inputs file.                                  |
 | `status`                      | always                                | `passed`, `failed`, or `error` when the run aborted inside this config.     |
 | `checks`, `errors`, `skipped` | always                                | The counters of this config; see `summary`.                                 |
+| `blocks`                      | `--block` was given                   | `{ "<section>": <number> }`: the block each network section was read at.    |
 | `error`                       | `status` is `error`                   | The abort message. The contracts checked before the abort are still listed. |
 | `warnings`                    | a warning fell outside every contract | Same shape as a contract's `warnings`.                                      |
 | `contracts`                   | a contract has something to report    | One entry per contract with a failure or a warning, in config order.        |

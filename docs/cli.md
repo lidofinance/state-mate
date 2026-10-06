@@ -10,20 +10,20 @@ yarn start <config-path> [options]
 
 Directory runs discover `.yaml` and `.yml` files recursively, skipping names containing `.seed.` and files ending in `.deployed.yaml`, `.inputs.yaml` (or `.yml`).
 
-| Option                            | Description                                                                                                                                                          |
-| --------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `-o, --only <check-path>`         | Run one section, contract, check type, or method. Requires a single config file                                                                                      |
-| `--deployed <path>`               | Load deployed address anchors from a separate YAML file. Requires a single config file                                                                               |
-| `--inputs <path>`                 | Load config and external-value anchors from a separate YAML file. Requires a single config file                                                                      |
-| `--auto-load-deployed-and-inputs` | For directory runs, load matching `.deployed` and `.inputs` files beside each config                                                                                 |
-| `--update-abi`                    | Re-download every ABI included in the run; missing ABIs download without this flag                                                                                   |
-| `--skip-implementation-check`     | Skip automatic implementation-address verification                                                                                                                   |
-| `--allow-unverified-explorer`     | Download ABIs when a fixed-chain explorer cannot confirm the configured chain ID                                                                                     |
-| `-q, --quiet`                     | Print contract headers, per-contract totals, warnings, and errors                                                                                                    |
-| `-J, --json`                      | Write one JSON report to stdout instead of the log; format in [json-output.md](json-output.md)                                                                       |
-| `--block <number\|hash\|latest>`  | Read every value at one block; see [Pin reads to one block](#pin-reads-to-one-block)                                                                                 |
-| `--observed <file>`               | Write every value the chain answered to a YAML file; see [observed.md](observed.md). Requires a single config file                                                   |
-| `--expand-enumerations`           | Read every element behind a declared `<name>Length` (`null` included) and warn about the ones the config omits; see [observed.md](observed.md#--expand-enumerations) |
+| Option                            | Description                                                                                                                                                     |
+| --------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `-o, --only <check-path>`         | Run one section, contract, check type, or method. Requires a single config file                                                                                 |
+| `--deployed <path>`               | Load deployed address anchors from a separate YAML file. Requires a single config file                                                                          |
+| `--inputs <path>`                 | Load config and external-value anchors from a separate YAML file. Requires a single config file                                                                 |
+| `--auto-load-deployed-and-inputs` | For directory runs, load matching `.deployed` and `.inputs` files beside each config                                                                            |
+| `--update-abi`                    | Re-download every ABI included in the run; missing ABIs download without this flag                                                                              |
+| `--skip-implementation-check`     | Skip automatic implementation-address verification                                                                                                              |
+| `--allow-unverified-explorer`     | Download ABIs when a fixed-chain explorer cannot confirm the configured chain ID                                                                                |
+| `-q, --quiet`                     | Print contract headers, per-contract totals, warnings, and errors                                                                                               |
+| `-J, --json`                      | Write one JSON report to stdout instead of the log; format in [json-output.md](json-output.md)                                                                  |
+| `--block <number\|hash\|latest>`  | Read every value at one block; see [Pin reads to one block](#pin-reads-to-one-block)                                                                            |
+| `--observed <file>`               | Write the values the chain answered to a YAML file; see [observed.md](observed.md). Requires a single config file                                               |
+| `--expand-enumerations`           | Read every element behind a declared `<name>Length` (`null` included) and warn about the ones the config omits; see [Expand enumerations](#expand-enumerations) |
 
 `--deployed` and `--inputs` can be used together. Paths are relative to the working directory; neither file is loaded automatically by default. Each option takes one file: a repeated option is a usage error, so keep all anchors of one kind in one file. See the [separate-file examples](how-to.md#separate-deployed-addresses).
 
@@ -59,7 +59,7 @@ yarn start path/to/config.yaml --only l1/vault/checks/owner
 
 `--block` sends every `eth_call`, `eth_getStorageAt`, `eth_getCode` and `eth_getBalance` to one block, and the ACL scans end at it. Without it, each read goes to the head of the moment, so a list and its length can come from different blocks.
 
-The value is a block number, a block hash, or `latest`, which is resolved to a number once per network section. A number or a hash needs a single config file, since a directory usually spans several chains, and fails the run if the RPC does not know the block.
+The value is a block number, a block hash, or `latest`, which is resolved to a number once per network section. A number or a hash belongs to one chain, so it needs a single config file and, when the config spans several chains, `-o <section>`. The run fails if the RPC does not know the block.
 
 A number names whichever block holds that height, so a reorg mid-run can mix two states. A hash is sent as an EIP-1898 reference with `requireCanonical`: after a reorg the node refuses the reads, and the checks fail instead of passing on a mix. Log scans cannot name a hash, so each section ends by re-reading the hash at that height and fails the run if it changed.
 
@@ -69,3 +69,15 @@ Use an archive RPC that is not load-balanced. A pruned backend can answer an old
 yarn start configs/vault.yaml --block 65439916
 yarn start configs/vault.yaml --block <block-hash>
 ```
+
+## Expand enumerations
+
+`--expand-enumerations` treats a `<name>Length` or `<name>Count` check next to a `<name>(uint256)` view as an enumeration. For each one the config declares, `null` included, the run reads the count from the chain, then reads every index the config does not list as a `<name>(i)` entry and reports it as a warning:
+
+```text
+⚠ .marketIds(4): not in the config; the chain says 0x127353ba...
+```
+
+A count that reverts is a warning too. Enumerations of more than 1000 entries are reported and not read. `-o` selects an enumeration by its length or by its getter.
+
+Warnings leave the exit code unchanged. To enforce completeness, check `warnings` in the [JSON report](json-output.md). With [`--observed`](observed.md), the entries and their count also go into the observed file.
