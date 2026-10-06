@@ -115,6 +115,7 @@ deployed:
     - &csFeeDistributorImplAddress "0x74c5be19CcD1a264899FbCf8dB1a64C1e3fb73Ac"
     - &csFeeOracle "0xe7314f561B2e72f9543F1004e741bab6Fc51028B"
     - &csFeeOracleImplAddress "0x27d1Ff0353AF6b7480CBc902169d0F89b49334B5"
+    - &csHashConsensus "0x54f74a10e4397dDeF85C4854d9dfcA129D72C637"
     - &csExitPenalties "0xD259b31083Be841E5C85b2D481Cfc17C14276800"
     - &csExitPenaltiesImplAddress "0xf38A3DA25B417D83182EEDD30d00557d78c35C96"
     - &csStrikes "0x8fBA385C3c334D251eE413e79d4D3890db98693c"
@@ -1507,7 +1508,7 @@ l1:
         SECONDS_PER_SLOT: *SECONDS_PER_SLOT
         STRIKES: *csStrikes
         SUBMIT_DATA_ROLE: *CS_ORACLE_SUBMIT_DATA_ROLE
-        getConsensusContract: "0x54f74a10e4397dDeF85C4854d9dfcA129D72C637"
+        getConsensusContract: *csHashConsensus
         getConsensusVersion: 4
         getContractVersion: 3
         getResumeSinceTimestamp: 0
@@ -1856,6 +1857,49 @@ l1:
         *CS_PAUSE_ROLE : [*resealManager, *circuitBreaker]
         *CS_RECOVERER_ROLE : []
         *CS_RESUME_ROLE : [*resealManager]
+
+    CSHashConsensus:
+      name: HashConsensus
+      address: *csHashConsensus
+      checks:
+        DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
+        DISABLE_CONSENSUS_ROLE: *DISABLE_CONSENSUS_ROLE
+        MANAGE_FAST_LANE_CONFIG_ROLE: *MANAGE_FAST_LANE_CONFIG_ROLE
+        MANAGE_FRAME_CONFIG_ROLE: *MANAGE_FRAME_CONFIG_ROLE
+        MANAGE_MEMBERS_AND_QUORUM_ROLE: *MANAGE_MEMBERS_AND_QUORUM_ROLE
+        MANAGE_REPORT_PROCESSOR_ROLE: *MANAGE_REPORT_PROCESSOR_ROLE
+        getChainConfig:
+          - *SLOTS_PER_EPOCH
+          - *SECONDS_PER_SLOT
+          - *GENESIS_TIME
+        # [initialEpoch, epochsPerFrame, fastLaneLengthSlots]
+        getFrameConfig:
+          - 96050
+          - 3150
+          - 100
+        getQuorum: 6
+        getReportProcessor: *csFeeOracle
+        getConsensusState: null
+        getConsensusStateForMember: null
+        getCurrentFrame: null
+        getFastLaneMembers: null
+        getInitialRefSlot: null
+        getIsFastLaneMember: null
+        getIsMember: null
+        getMembers: null
+        getReportVariants: null
+        getRoleAdmin: null
+        getRoleMember: null
+        getRoleMemberCount: null
+        hasRole: null
+        supportsInterface: null
+      ozAcl:
+        *DEFAULT_ADMIN_ROLE : [*aragonAgent, *csmManager]
+        *DISABLE_CONSENSUS_ROLE : []
+        *MANAGE_FAST_LANE_CONFIG_ROLE : [*oracleManager, *superManager]
+        *MANAGE_FRAME_CONFIG_ROLE : [*oracleManager, *superManager, *csmManager]
+        *MANAGE_MEMBERS_AND_QUORUM_ROLE : [*oracleManager, *superManager, *aragonAgent]
+        *MANAGE_REPORT_PROCESSOR_ROLE : []
 
     csm0x02Module:
       name: CSModule
@@ -2400,6 +2444,50 @@ l1:
         *CS_PAUSE_ROLE : [*resealManager, *circuitBreaker]
         *CS_RECOVERER_ROLE : []
         *CS_RESUME_ROLE : [*resealManager]
+
+    csm0x02HashConsensus:
+      name: HashConsensus
+      address: *csm0x02HashConsensus
+      checks:
+        DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
+        DISABLE_CONSENSUS_ROLE: *DISABLE_CONSENSUS_ROLE
+        MANAGE_FAST_LANE_CONFIG_ROLE: *MANAGE_FAST_LANE_CONFIG_ROLE
+        MANAGE_FRAME_CONFIG_ROLE: *MANAGE_FRAME_CONFIG_ROLE
+        MANAGE_MEMBERS_AND_QUORUM_ROLE: *MANAGE_MEMBERS_AND_QUORUM_ROLE
+        MANAGE_REPORT_PROCESSOR_ROLE: *MANAGE_REPORT_PROCESSOR_ROLE
+        getChainConfig:
+          - *SLOTS_PER_EPOCH
+          - *SECONDS_PER_SLOT
+          - *GENESIS_TIME
+        # [initialEpoch, epochsPerFrame, fastLaneLengthSlots]
+        getFrameConfig:
+          - 121738
+          - 3150
+          - 100
+        getQuorum: 6
+        getReportProcessor: *csm0x02FeeOracle
+        getConsensusState: null
+        getConsensusStateForMember: null
+        getCurrentFrame: null
+        getFastLaneMembers: null
+        getInitialRefSlot: null
+        getIsFastLaneMember: null
+        getIsMember: null
+        getMembers: null
+        getReportVariants: null
+        getRoleAdmin: null
+        getRoleMember: null
+        getRoleMemberCount: null
+        getRoleMembers: null
+        hasRole: null
+        supportsInterface: null
+      ozAcl:
+        *DEFAULT_ADMIN_ROLE : [*aragonAgent, *csmManager]
+        *DISABLE_CONSENSUS_ROLE : []
+        *MANAGE_FAST_LANE_CONFIG_ROLE : []
+        *MANAGE_FRAME_CONFIG_ROLE : []
+        *MANAGE_MEMBERS_AND_QUORUM_ROLE : [*aragonAgent]
+        *MANAGE_REPORT_PROCESSOR_ROLE : []
 
     curatedModule:
       name: CuratedModule
