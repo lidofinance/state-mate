@@ -50,7 +50,7 @@ export function parseCommandLineArguments() {
     .option("-q, --quiet", "print only contract headers, per-contract totals and errors")
     .option("-J, --json", "one JSON report on stdout: verdict, counters, failed checks; see docs/json-output.md")
     .option("--block <number|hash|latest>", "read every value at this block; 'latest' is resolved once per section")
-    .option("--observed <file>", "write every value the chain answered, with its block, to this YAML file")
+    .option("--observed <file>", "write the values the chain answered, with their block, to this YAML file")
     .option("--expand-enumerations", "read every element behind a declared <name>Length and report the unpinned ones");
 
   // A usage error under --json must reach the caller as a report, so commander may neither

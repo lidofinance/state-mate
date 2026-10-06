@@ -333,6 +333,14 @@ Run `yarn start config.yml` — the error surfaces the actual on-chain value:
 ✗ .unknownValue: expected REPLACEME, got 0xb13b0c93...
 ```
 
+For many unknowns at once, declare them `null` and keep what the chain answered:
+
+```bash
+yarn start config.yml -o l1/contractName --observed out.yaml --expand-enumerations
+```
+
+`out.yaml` lists every declared value and every `<name>(i)` behind a `<name>Length` (format in `docs/observed.md`).
+
 **Do not** use `REPLACEME` in `deployed:` — invalid-address errors block the whole file from loading. For unknown addresses, read EIP-1967 slots first:
 
 ```bash

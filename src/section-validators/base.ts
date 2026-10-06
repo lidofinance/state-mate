@@ -102,9 +102,13 @@ export function needCheck(level: CheckLevel, name: string) {
 
 export type CheckOutcome = { detail: string; ok: true } | { message: string; ok: false };
 
+export type Answer = { reverted: string } | { value: unknown };
+
 export abstract class SectionValidatorBase {
   /** Checks the run supplies rather than the config declares, e.g. the `null` coverage of an implementation ABI. */
   protected undeclared: ReadonlySet<string> = new Set();
+  /** What argumentless reads answered, so that the enumeration expansion does not read a count twice. */
+  protected answers = new Map<string, Answer>();
 
   constructor(
     protected provider: JsonRpcProvider,
@@ -194,13 +198,13 @@ export abstract class SectionValidatorBase {
     try {
       actual = await contractFunction.staticCall(...(args || ""));
     } catch (error) {
-      recordObservedCall(currentErrorContext, signature, args, { reverted: printError(error) });
+      this._answer(method, signature, args, { reverted: printError(error) });
       const errorMessage = `REVERTED with: ${printError(error)}`;
       logHandle.failure(errorMessage);
       incErrors(errorMessage);
       return;
     }
-    recordObservedCall(currentErrorContext, signature, args, { value: actual });
+    this._answer(method, signature, args, { value: actual });
     try {
       _assertEqual(actual, expected);
       logHandle.success(_stringify(actual));
@@ -225,12 +229,15 @@ export abstract class SectionValidatorBase {
     }
     setErrorContext({ method: `${signature}${args ? `(${args.toString()})` : ""}` });
     try {
-      recordObservedCall(currentErrorContext, signature, args, {
-        value: await contractFunction.staticCall(...(args || "")),
-      });
+      this._answer(method, signature, args, { value: await contractFunction.staticCall(...(args || "")) });
     } catch (error) {
-      recordObservedCall(currentErrorContext, signature, args, { reverted: printError(error) });
+      this._answer(method, signature, args, { reverted: printError(error) });
     }
+  }
+
+  private _answer(method: string, signature: string, args: readonly unknown[] | undefined, answer: Answer) {
+    recordObservedCall(currentErrorContext, signature, args, answer);
+    if (!args?.length) this.answers.set(method, answer);
   }
 
   protected async _checkViewMustRevert(contract: Contract, method: string, staticCallMustRevert: StaticCallMustRevert) {
@@ -252,12 +259,12 @@ export abstract class SectionValidatorBase {
     }
     try {
       const actual: unknown = await contractFunction.staticCall(...(args || ""));
-      recordObservedCall(currentErrorContext, signature, args, { value: actual });
+      this._answer(method, signature, args, { value: actual });
       const errorMessage = `Expected revert but got: ${_stringify(actual)}`;
       logHandle.failure(errorMessage);
       incErrors(errorMessage);
     } catch (error) {
-      recordObservedCall(currentErrorContext, signature, args, { reverted: printError(error) });
+      this._answer(method, signature, args, { reverted: printError(error) });
       logHandle.success(`REVERTED with: ${printError(error)}`);
     }
   }

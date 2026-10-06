@@ -34,6 +34,17 @@ export function pinBlockTag(method: string, parameters: unknown, blockTag: Pinne
   return pinned;
 }
 
+/** A block number or hash belongs to one chain; on another chain the same height is another block. */
+export function assertBlockOnOneChain(chainIds: readonly string[]): void {
+  if (context.block === undefined || context.block === "latest" || context.checkOnly) return;
+  const chains = new Set(chainIds).size;
+  if (chains > 1) {
+    logErrorAndExit(
+      `A --block number or hash belongs to one chain, but the config spans ${chains} chains; select a section with -o`,
+    );
+  }
+}
+
 /**
  * Resolves --block for one section and pins the provider to it. Every read of the section then
  * comes from one block, so that a list and its length cannot disagree because of an allocation

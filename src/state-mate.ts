@@ -48,8 +48,8 @@ import {
   WARNING_MARK,
 } from "./logger";
 import { beginObservedSection, writeObservedFile } from "./observed";
-import { assertPinnedHashCanonical, pinSectionBlock } from "./pinned-block";
-import { beginConfig, emitReport, endConfig } from "./report";
+import { assertBlockOnOneChain, assertPinnedHashCanonical, pinSectionBlock } from "./pinned-block";
+import { beginConfig, emitReport, endConfig, recordPinnedBlock } from "./report";
 import { ContractSectionValidator } from "./section-validators/contract";
 import {
   discoverSiblingPaths,
@@ -360,6 +360,7 @@ async function checkNetworkSection(sectionTitle: string, section: NetworkSection
   // when it has something to download
   await assertProviderChain(provider, chainId);
   await pinSectionBlock(provider);
+  if (provider.pinned) recordPinnedBlock(sectionTitle, provider.pinned.number);
   if (context.observedPath) {
     const pinned = provider.pinned;
     const hash = typeof pinned?.tag === "object" ? pinned.tag.blockHash : undefined;
@@ -399,14 +400,6 @@ async function main() {
     // Ctrl+C must still leave one parseable report, carrying whatever ran before it
     process.once("SIGINT", () => emitReport(130, "interrupted by SIGINT", () => process.exit(130)));
   }
-  if (context.observedPath) {
-    // Every way out passes the exit event: an aborted run still writes what it read
-    process.once("exit", flushObserved);
-    // a signal's default action skips the exit event
-    if (!context.json) process.once("SIGINT", () => process.exit(130));
-    process.once("SIGTERM", () => process.exit(143));
-  }
-
   if (!fs.existsSync(context.configPath)) {
     logErrorAndExit(`No such file or directory: ${chalk.magenta(context.configPath)}`);
   }
@@ -475,6 +468,14 @@ async function main() {
     return;
   }
 
+  if (context.observedPath) {
+    // After the usage checks: a refused run writes nothing, an aborted one writes what it read
+    process.once("exit", flushObserved);
+    // a signal's default action skips the exit event
+    if (!context.json) process.once("SIGINT", () => process.exit(130));
+    process.once("SIGTERM", () => process.exit(143));
+  }
+
   // No prune here: a single-file run has walked only its own addresses, and sweeping the shared
   // store now would drop the sibling configs' ABIs
   beginConfig(context.configPath);
@@ -510,6 +511,11 @@ async function runConfig() {
   const jsonDocument = loadStateWithOptionalSiblings();
 
   if (validateJsonWithSchema(jsonDocument, EntireDocumentTB)) {
+    assertBlockOnOneChain(
+      Object.values(jsonDocument).flatMap((section) =>
+        isTypeOfTB(section, NetworkSectionTB) ? [normalizeChainId(section.chainId)] : [],
+      ),
+    );
     await downloadAndCheckAllAbi(jsonDocument);
     await doChecks(jsonDocument);
   }

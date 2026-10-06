@@ -9,7 +9,7 @@ import { buildObservedDocument, resetObserved } from "../src/observed";
 import { beginConfig, beginContract, buildReport, endContract, resetReport } from "../src/report";
 import { resetContractCounters, setErrorContext } from "../src/section-validators/base";
 import { ChecksSectionValidator, pinnedIndices } from "../src/section-validators/checks";
-import type { ChecksEntryValue } from "../src/typebox";
+import type { ChecksEntryValue, StaticCallResult } from "../src/typebox";
 import type { Abi } from "../src/types";
 
 const ADDRESS = "0x7305bB45aF91893B7BCaF0Ad8Eae37cb16820Bb8";
@@ -43,6 +43,10 @@ function pinnedEntries(ids: string[]): ChecksEntryValue {
 class ExposedChecks extends ChecksSectionValidator {
   public expand(contract: Contract, checks: Record<string, ChecksEntryValue>) {
     return this._expandEnumerations(contract, ABI, checks);
+  }
+
+  public check(contract: Contract, method: string, entry: StaticCallResult) {
+    return this._checkViewResult(contract, method, entry);
   }
 
   public supplies(methods: string[]) {
@@ -84,12 +88,25 @@ describe("enumeration expansion", () => {
 
     assert.deepEqual(reads, ["marketIdsLength()", "marketIds(4)"]);
     assert.deepEqual(warnings(), [{ check: ".marketIds(4)", message: "not in the config; the chain says 0xe" }]);
-    // the count is recorded too: unpinned, it need not be the one the check asserted
+    // no check read the count here, so the expansion records its own read
     assert.deepEqual(buildObservedDocument("cfg.yaml").sections.l1.contracts.vault.checks, {
       marketIdsLength: [{ value: "5" }],
       marketIds: [{ args: [4], value: "0xe" }],
     });
     assert.equal(stats.totalChecks, 0);
+  });
+
+  it("goes by the count the check already read instead of reading it again", async () => {
+    const checker = new ExposedChecks({} as JsonRpcProvider, 1, EntryField.checks);
+    const contract = fakeContract(IDS, reads);
+    await checker.check(contract, "marketIdsLength", { result: 5 });
+    await checker.expand(contract, { marketIdsLength: 5, marketIds: pinnedEntries(IDS.slice(0, 4)) });
+
+    assert.deepEqual(reads, ["marketIdsLength()", "marketIds(4)"]);
+    assert.deepEqual(buildObservedDocument("cfg.yaml").sections.l1.contracts.vault.checks, {
+      marketIdsLength: [{ value: "5" }],
+      marketIds: [{ args: [4], value: "0xe" }],
+    });
   });
 
   it("says nothing when the config pins every entry", async () => {
