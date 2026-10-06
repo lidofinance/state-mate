@@ -46,6 +46,32 @@ l1:
 
 The addresses under `deployed` determine which ABIs state-mate stores. Include implementation addresses used by `checks`.
 
+## Separate address and input files
+
+Use `--deployed <path>` and/or `--inputs <path>` to supply anchors from separate YAML files. For a single config file, they are loaded only when explicitly selected. Directory runs can opt into matching sibling files with [`--auto-load-deployed-and-inputs`](cli.md). See the [how-to examples](how-to.md#separate-deployed-addresses).
+
+| File option  | Allowed top-level sections                    | Entry values                                                                                      |
+| ------------ | --------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| `--deployed` | `deployed:` mapping of network names to lists | Quoted `0x` addresses (20 bytes) or hashes (32 bytes)                                             |
+| `--inputs`   | `config:` and/or `externals:` lists           | `config:`: scalars or arrays; `externals:`: addresses, 32-byte hashes, or nonnegative decimal IDs |
+
+Each list entry must define a unique `&label` referenced by a `*alias` in the main config. Unused labels, duplicate labels, and labels colliding with main-config anchors are rejected. Unlike inline `deployed:` above, a separate address file defines anchors directly rather than listing aliases.
+
+Automatic loading pairs each main config with files in the same directory and with the same stem:
+`foo.yaml` loads only `foo.deployed.yaml` / `.yml` and `foo.inputs.yaml` / `.yml`.
+There is no directory-wide shared address book. For example, multiple wiring configs under
+`configs/lido-earn/mainnet` each need their own matching siblings when using automatic loading.
+An address book containing the union of their labels cannot serve configs that reference only a subset,
+because every label is checked against each main config independently.
+
+Separate single-file runs can explicitly select the same `--deployed <path>` or `--inputs <path>`,
+regardless of filename, provided each main config references every label in the selected files and
+satisfies the other composition rules.
+
+When using `--deployed`, remove the entire `deployed:` section from the main config. Top-level `config:` and `externals:` sections are allowed only in the inputs file. Keep network settings and contract checks in the main config. Each file must contain one YAML document without `%YAML` or `%TAG` directives.
+
+Existing configs with inline `deployed:` remain valid without `--deployed`.
+
 ## Network fields
 
 | Field              | Description                                                                                   |

@@ -1,4 +1,4 @@
-import { CommanderError, program } from "commander";
+import { CommanderError, InvalidArgumentError, program } from "commander";
 
 import { EntryField, printError } from "./common";
 import { type CheckOnly, context } from "./context";
@@ -7,6 +7,19 @@ import { parseBlockOption } from "./pinned-block";
 
 type CheckOnlyOptionType = null | CheckOnly;
 
+// Commander keeps only the last value of a repeated option, which would silently drop the anchors
+// of every earlier file. Each sibling kind takes one file, so a repeat is a usage error.
+function oneSiblingFile(optionName: string) {
+  return (value: string, previous: string | undefined): string => {
+    if (previous !== undefined) {
+      throw new InvalidArgumentError(
+        `${optionName} takes one file and already has '${previous}'; put all anchors of one kind in one file.`,
+      );
+    }
+    return value;
+  };
+}
+
 export function parseCommandLineArguments() {
   program
     .argument("<config-path>", "path to a .yaml state config file, or a directory to run every config inside it")
@@ -14,6 +27,22 @@ export function parseCommandLineArguments() {
     .option(
       "-o, --only <check-path>",
       `only checks to do, e.g. 'l2/proxyAdmin/${EntryField.checks}/owner', 'l1', 'l1/controller'`,
+    )
+    .option(
+      "--deployed <path>",
+      "path to a '.deployed' YAML file that provides the address anchors for a wiring-only main config " +
+        "(single-file runs only)",
+      oneSiblingFile("--deployed"),
+    )
+    .option(
+      "--inputs <path>",
+      "path to a '.inputs' YAML file that provides the config/externals anchors for a wiring-only main " +
+        "config (single-file runs only)",
+      oneSiblingFile("--inputs"),
+    )
+    .option(
+      "--auto-load-deployed-and-inputs",
+      "for directory runs, load matching .deployed and .inputs YAML files beside each config",
     )
     .option("--update-abi", "re-download every ABI; missing ones are downloaded without the flag too")
     .option("--skip-implementation-check", "do not verify implementation addresses against the chain")
@@ -73,8 +102,11 @@ export function parseCommandLineArguments() {
 
   return {
     configPath,
+    autoLoadDeployedAndInputs: Boolean(options.autoLoadDeployedAndInputs),
     checkOnly,
     checkOnlyCmdArg: options.only,
+    deployed: options.deployed as string | undefined,
+    inputs: options.inputs as string | undefined,
     updateAbi: options.updateAbi,
     skipImplementationCheck: Boolean(options.skipImplementationCheck),
     allowUnverifiedExplorer: Boolean(options.allowUnverifiedExplorer),

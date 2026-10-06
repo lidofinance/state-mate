@@ -52,6 +52,98 @@
         ]
       }
     },
+    "config": {
+      "type": "array",
+      "items": {
+        "anyOf": [
+          {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "number"
+              }
+            ]
+          },
+          {
+            "type": "array",
+            "items": {
+              "anyOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "number"
+                }
+              ]
+            }
+          },
+          {
+            "type": "array",
+            "items": {}
+          }
+        ]
+      }
+    },
+    "externals": {
+      "type": "array",
+      "items": {
+        "anyOf": [
+          {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "number"
+              }
+            ]
+          },
+          {
+            "type": "array",
+            "items": {
+              "anyOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "number"
+                }
+              ]
+            }
+          },
+          {
+            "type": "array",
+            "items": {}
+          }
+        ]
+      }
+    },
     "roles": {
       "anyOf": [
         {
