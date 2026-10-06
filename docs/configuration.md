@@ -77,6 +77,7 @@ Existing configs with inline `deployed:` remain valid without `--deployed`.
 | Field              | Description                                                                                   |
 | ------------------ | --------------------------------------------------------------------------------------------- |
 | `rpcUrl`           | An RPC URL or the name of an environment variable that contains one                           |
+| `logsRpcUrl`       | Optional, the same form as `rpcUrl`: the node every ACL scan reads its logs from              |
 | `chainId`          | The positive decimal EVM chain ID expected from the RPC                                       |
 | `explorerHostname` | Optional explorer host used to download missing ABIs                                          |
 | `explorerTokenEnv` | Optional API-key variable for `explorerHostname`; also used by ACL scans on the same explorer |
@@ -126,6 +127,14 @@ served; the slot is derived from the storage layout and touches neither, so it i
 independent witness. Explorers cap a logs response at a thousand records without saying so, so a
 full response is treated as possibly truncated and the block range is halved until every window
 comes back short.
+
+A section may name `logsRpcUrl`, a node that serves wide `eth_getLogs` windows but need not keep old
+state. Every log of the scan is then read there, the settled range as well as the tail, and neither
+the explorer nor `rpcUrl` is asked for logs; the node must serve the configured `chainId` and, under
+`--block`, have reached the pinned block (and, for a block hash, hold that very block). An RPC that
+refuses a span ("up to a 10 block range", "more than 10000 results") is asked again in halves until
+it answers. Under `--block`, a pin at least the chain's confirmation lag behind the head has no
+tail: the log source serves the whole range up to the pin.
 
 The scan refuses to report less than it claims. An explorer that will not answer, a response that
 cannot be narrowed, or a contract whose storage matches no known AccessControl layout are errors,

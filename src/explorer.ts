@@ -465,6 +465,11 @@ export class RetryingJsonRpcProvider extends JsonRpcProvider {
   override async getBlockNumber(): Promise<number> {
     return this.pinned?.number ?? (await super.getBlockNumber());
   }
+
+  /** The chain's head, whatever the pin. */
+  async getHeadBlockNumber(): Promise<number> {
+    return super.getBlockNumber();
+  }
 }
 
 export function createProvider(rpcUrl: string): RetryingJsonRpcProvider {
@@ -479,16 +484,18 @@ export function createProvider(rpcUrl: string): RetryingJsonRpcProvider {
  * The checks run against whatever chain the RPC serves, so a wrong endpoint would green-light an
  * audit of the wrong network. staticNetwork caches the answer, the probe costs one call.
  */
-export async function assertProviderChain(provider: JsonRpcProvider, chainId: string): Promise<void> {
+export async function assertProviderChain(provider: JsonRpcProvider, chainId: string, label = "RPC"): Promise<void> {
   let served: string;
   try {
     const network = await provider.getNetwork();
     served = String(network.chainId);
   } catch (error) {
-    logErrorAndExit(`The RPC did not answer eth_chainId: ${printError(error)}`);
+    logErrorAndExit(`The ${label} did not answer eth_chainId: ${printError(error)}`);
   }
   if (served !== chainId) {
-    logErrorAndExit(`The RPC serves chain ${chalk.yellow(served)}, while the config expects ${chalk.yellow(chainId)}`);
+    logErrorAndExit(
+      `The ${label} serves chain ${chalk.yellow(served)}, while the config expects ${chalk.yellow(chainId)}`,
+    );
   }
 }
 

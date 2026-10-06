@@ -21,6 +21,7 @@ import {
   makeSettledScanRange,
   resolveDeploymentBlock,
   resolveScanBounds,
+  type ScanBounds,
 } from "src/acl/log-source";
 import { EntryField, normalizeChainId, printError } from "src/common";
 import { LogCommand, log, logHeader2 } from "src/logger";
@@ -57,7 +58,12 @@ interface DeclaredRole {
  * config pins -- rather than through the view.
  */
 export class AragonAclSectionValidator extends SectionValidatorBase {
-  constructor(provider: JsonRpcProvider, chainId: ChainId) {
+  constructor(
+    provider: JsonRpcProvider,
+    chainId: ChainId,
+    /** The section's `logsRpcUrl`: when set, every log of the scan is read there. */
+    protected readonly logsProvider?: JsonRpcProvider,
+  ) {
     super(provider, EntryField.aragonAcl, chainId);
   }
 
@@ -103,23 +109,24 @@ export class AragonAclSectionValidator extends SectionValidatorBase {
     if (fromBlock === undefined) {
       return { ok: false, reason: `the explorer would not give a deployment block for ${address}` };
     }
-    const bounds = await resolveScanBounds(chainId, this.provider);
+    let bounds: ScanBounds;
     let range: { fromBlock: number; toBlock: number };
     try {
+      bounds = await resolveScanBounds(chainId, this.provider, this.logsProvider);
       // an ACL deployed above the settled head has no settled history yet, same rule as the OZ scan
       range = makeSettledScanRange(fromBlock, bounds.settled);
     } catch (error) {
       return { ok: false, reason: printError(error) };
     }
 
-    const raw = await collectTopicLogs(chainId, address, ARAGON_ACL_TOPICS, range);
+    const raw = await collectTopicLogs(chainId, address, ARAGON_ACL_TOPICS, range, this.logsProvider);
     if (!raw.ok) return raw;
 
     // the RPC fills the unsettled tail, so candidacy is complete through the captured head rather
     // than stopping minutes short of it on a schedule an attacker could rely on
     let tail: RawLog[];
     try {
-      tail = await collectTailLogs(this.provider, address, ARAGON_ACL_TOPICS, {
+      tail = await collectTailLogs(this.logsProvider ?? this.provider, address, ARAGON_ACL_TOPICS, {
         fromBlock: range.toBlock + 1,
         toBlock: bounds.captured,
       });

@@ -2,7 +2,7 @@ import type { JsonRpcProvider } from "ethers";
 
 import { printError } from "../common";
 import { registerSecret } from "../context";
-import { httpGetAsync, isTransientExplorerHttpError } from "../explorer";
+import { httpGetAsync, isTransientExplorerHttpError, RetryingJsonRpcProvider } from "../explorer";
 import { log } from "../logger";
 import { parseRoleLog, type RawLog, ROLE_GRANTED_TOPIC, type RoleEvent } from "./fold";
 
@@ -81,17 +81,46 @@ export async function fetchWindow(
   range: ScanRange,
   cap: number,
   fetchOnce: (range: ScanRange) => Promise<RawLog[]>,
+  refusesSpan?: (error: unknown) => boolean,
+  // the widest span not yet refused, shared by the halves so a known limit is not asked again
+  widest = { blocks: Number.POSITIVE_INFINITY },
 ): Promise<RawLog[]> {
-  const logs = await fetchOnce(range);
-  if (logs.length < cap) return logs;
+  const blocks = range.toBlock - range.fromBlock + 1;
+  if (blocks <= widest.blocks) {
+    try {
+      const logs = await fetchOnce(range);
+      if (logs.length < cap) return logs;
+    } catch (error) {
+      if (!refusesSpan?.(error) || blocks === 1) throw error;
+      widest.blocks = blocks - 1;
+    }
+  }
 
   if (range.fromBlock >= range.toBlock) {
     throw new Error(`block ${range.fromBlock} alone fills the ${cap}-record limit, so the window cannot be narrowed`);
   }
   const middle = Math.floor((range.fromBlock + range.toBlock) / 2);
-  const lower = await fetchWindow({ fromBlock: range.fromBlock, toBlock: middle }, cap, fetchOnce);
-  const upper = await fetchWindow({ fromBlock: middle + 1, toBlock: range.toBlock }, cap, fetchOnce);
+  const lower = await fetchWindow({ fromBlock: range.fromBlock, toBlock: middle }, cap, fetchOnce, refusesSpan, widest);
+  const upper = await fetchWindow(
+    { fromBlock: middle + 1, toBlock: range.toBlock },
+    cap,
+    fetchOnce,
+    refusesSpan,
+    widest,
+  );
   return [...lower, ...upper];
+}
+
+// How nodes word a getLogs span or response they will not serve: "up to a 10 block range",
+// "range too large", "limited to a 10,000 range", "more than 10000 results", "response size exceeded"
+const SPAN_REFUSED =
+  /block range|range (?:is )?too (?:large|wide|big)|limited to .*range|ranges? over|more than \d+ (?:results|logs)|max(?:imum)? (?:results|logs)|response size|too many (?:blocks|logs|results)/i;
+const RATE_LIMITED_RPC = /rate limit|too many requests|\b429\b|compute units/i;
+
+/** A refusal a narrower window answers; a rate limit is not one, halving would only add requests. */
+export function isSpanRefusal(error: unknown): boolean {
+  const text = printError(error);
+  return SPAN_REFUSED.test(text) && !RATE_LIMITED_RPC.test(text);
 }
 
 interface ExplorerLogsResponse {
@@ -249,15 +278,28 @@ export function hasLogSource(chainId: string): boolean {
 
 export type RawLogsOutcome = { logs: RawLog[]; ok: true; source: string } | { ok: false; reason: string };
 
-/** The transport every ACL flavour shares: capped-window fetching per topic0, nothing parsed. */
+export const LOGS_RPC_SOURCE = "logs rpc";
+
+/**
+ * The transport every ACL flavour shares: capped-window fetching per topic0, nothing parsed. A
+ * section that names a logs RPC reads the range there instead of from the chain's explorer.
+ */
 export async function collectTopicLogs(
   chainId: string,
   address: string,
   topics0: readonly string[],
   range: ScanRange,
+  logsProvider?: JsonRpcProvider,
 ): Promise<RawLogsOutcome> {
   const chain = CHAIN_LOG_SOURCES[chainId];
   if (!chain) return { ok: false, reason: `no log source is known for chainId ${chainId}` };
+  if (logsProvider) {
+    try {
+      return { logs: await collectTailLogs(logsProvider, address, topics0, range), ok: true, source: LOGS_RPC_SOURCE };
+    } catch (error) {
+      return { ok: false, reason: `${LOGS_RPC_SOURCE} failed: ${printError(error)}` };
+    }
+  }
 
   const name = describeSource(chain.source, chainId);
   try {
@@ -275,8 +317,13 @@ export async function collectTopicLogs(
   }
 }
 
-export async function collectRoleEvents(chainId: string, address: string, range: ScanRange): Promise<ScanOutcome> {
-  const outcome = await collectTopicLogs(chainId, address, ROLE_TOPICS, range);
+export async function collectRoleEvents(
+  chainId: string,
+  address: string,
+  range: ScanRange,
+  logsProvider?: JsonRpcProvider,
+): Promise<ScanOutcome> {
+  const outcome = await collectTopicLogs(chainId, address, ROLE_TOPICS, range, logsProvider);
   if (!outcome.ok) return outcome;
   const { events, rejected } = collect(outcome.logs);
   if (rejected.length > 0) {
@@ -345,13 +392,40 @@ export interface ScanBounds {
   settled: number;
 }
 
-export async function resolveScanBounds(chainId: string, provider: JsonRpcProvider): Promise<ScanBounds> {
+export async function resolveScanBounds(
+  chainId: string,
+  provider: JsonRpcProvider,
+  logsProvider?: JsonRpcProvider,
+): Promise<ScanBounds> {
   const lag = CHAIN_LOG_SOURCES[chainId]?.confirmationLag ?? 0;
-  const captured = await provider.getBlockNumber();
-  return { captured, settled: Math.max(0, captured - lag) };
+  // --block pins the capture; the head still decides how much of it is settled
+  const pinned = provider instanceof RetryingJsonRpcProvider ? provider.pinned?.number : undefined;
+  const head =
+    provider instanceof RetryingJsonRpcProvider && pinned !== undefined
+      ? await provider.getHeadBlockNumber()
+      : await provider.getBlockNumber();
+  let captured = pinned ?? head;
+  if (logsProvider) {
+    // A node short of the capture answers the blocks it lacks with silence, which reads as "no grants"
+    const served = await logsProvider.getBlockNumber();
+    if (served < captured) {
+      if (pinned !== undefined) throw new Error(`the logs RPC is at block ${served}, short of the pinned ${pinned}`);
+      captured = served;
+    }
+    // A hash pin is re-read on the state RPC only; logs from a node on another branch would not be caught
+    const tag = provider instanceof RetryingJsonRpcProvider ? provider.pinned?.tag : undefined;
+    if (typeof tag === "object") {
+      const hash = (await logsProvider.getBlock(captured))?.hash?.toLowerCase();
+      if (hash !== tag.blockHash) {
+        throw new Error(`the logs RPC holds ${hash ?? "no block"} at ${captured}, not the pinned ${tag.blockHash}`);
+      }
+    }
+  }
+  // A pin at least `lag` behind the head is settled already: the log source serves all of it
+  return { captured, settled: Math.max(0, Math.min(captured, head - lag)) };
 }
 
-/** The unsettled tail, straight from the RPC: one bounded request, no windowing needed. */
+/** An RPC's logs for a range, in windows halved for as long as the node refuses the span. */
 export async function collectTailLogs(
   provider: JsonRpcProvider,
   address: string,
@@ -359,19 +433,27 @@ export async function collectTailLogs(
   range: ScanRange,
 ): Promise<RawLog[]> {
   if (range.fromBlock > range.toBlock) return [];
-  const logs = await provider.getLogs({
-    address,
-    fromBlock: range.fromBlock,
-    toBlock: range.toBlock,
-    topics: [[...topics0]],
-  });
-  return logs.map((entry) => ({
-    address: entry.address,
-    blockNumber: entry.blockNumber,
-    data: entry.data,
-    logIndex: entry.index,
-    topics: [...entry.topics],
-  }));
+  // An RPC refuses rather than truncates, so there is no record cap, only the span
+  return fetchWindow(
+    range,
+    Number.POSITIVE_INFINITY,
+    async (window) => {
+      const logs = await provider.getLogs({
+        address,
+        fromBlock: window.fromBlock,
+        toBlock: window.toBlock,
+        topics: [[...topics0]],
+      });
+      return logs.map((entry) => ({
+        address: entry.address,
+        blockNumber: entry.blockNumber,
+        data: entry.data,
+        logIndex: entry.index,
+        topics: [...entry.topics],
+      }));
+    },
+    isSpanRefusal,
+  );
 }
 
 export async function collectTailRoleEvents(

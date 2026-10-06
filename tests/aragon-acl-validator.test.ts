@@ -481,4 +481,80 @@ describe("the RPC tail in the real scan", () => {
     assert.equal(stats.errors, 1);
     assert.match(stats.errorDetails[0].message, /live unconditional grant to .* is not declared/);
   });
+
+  // chain 4663: the archive node serves state but eth_getLogs over ten blocks at most, and the
+  // explorer's logs route answers 429; a second node serves the logs and nothing else
+  it("reads every log from the section's logs RPC, and none from the explorer or the state RPC", async () => {
+    const TRUE_WORD = `0x${"0".repeat(63)}1`;
+    const padded = (address: string) => `0x${"0".repeat(24)}${address.slice(2)}`;
+    const slots: Record<string, string> = {
+      [permissionSlot(AGENT, LIDO, ROLE)]: EMPTY_PARAM_HASH,
+      [managerSlot(LIDO, ROLE)]: word(AGENT),
+      [permissionSlot(VOTING, LIDO, ROLE)]: EMPTY_PARAM_HASH,
+    };
+    const history = [
+      {
+        address: ACL,
+        blockNumber: 5,
+        data: TRUE_WORD,
+        index: 0,
+        topics: [SET_PERMISSION_TOPIC, padded(AGENT), padded(LIDO), ROLE],
+      },
+      {
+        address: ACL,
+        blockNumber: 5,
+        data: "0x",
+        index: 1,
+        topics: [CHANGE_PERMISSION_MANAGER_TOPIC, padded(LIDO), ROLE, padded(AGENT)],
+      },
+      {
+        address: ACL,
+        blockNumber: 997,
+        data: TRUE_WORD,
+        index: 0,
+        topics: [SET_PERMISSION_TOPIC, padded(VOTING), padded(LIDO), ROLE],
+      },
+    ];
+    const logsAsked: { fromBlock: number; toBlock: number }[] = [];
+    const provider = {
+      getBlockNumber: async () => 1000,
+      getLogs: async () => {
+        throw new Error("Under the Free tier plan, you can make eth_getLogs requests with up to a 10 block range");
+      },
+      getStorage: async (_a: string, slot: string) => slots[slot.toLowerCase()] ?? ZERO_WORD,
+    } as unknown as JsonRpcProvider;
+    const logsProvider = {
+      getBlockNumber: async () => 1003,
+      getLogs: async ({ fromBlock, toBlock }: { fromBlock: number; toBlock: number }) => {
+        logsAsked.push({ fromBlock, toBlock });
+        return history.filter((log) => log.blockNumber >= fromBlock && log.blockNumber <= toBlock);
+      },
+    } as unknown as JsonRpcProvider;
+
+    resetRequestSlots();
+    const explorerAsked: string[] = [];
+    const fetchMock = mock.method(globalThis, "fetch", async (input: unknown) => {
+      const url = String(input);
+      if (url.includes("getcontractcreation")) {
+        return Response.json({ result: [{ blockNumber: "1", contractAddress: ACL }], status: "1" });
+      }
+      explorerAsked.push(url);
+      return new Response("rate limited", { status: 429, statusText: "Too Many Requests" });
+    });
+
+    try {
+      await new TailAragon(provider, "1", logsProvider).validateSection(entry(DECLARED), "acl");
+    } finally {
+      fetchMock.mock.restore();
+      resetRequestSlots();
+    }
+
+    assert.deepEqual(explorerAsked, []);
+    assert.deepEqual(logsAsked, [
+      { fromBlock: 1, toBlock: 992 },
+      { fromBlock: 993, toBlock: 1000 },
+    ]);
+    assert.equal(stats.errors, 1);
+    assert.match(stats.errorDetails[0].message, /live unconditional grant to .* is not declared/);
+  });
 });

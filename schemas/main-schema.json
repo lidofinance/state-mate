@@ -258,6 +258,9 @@
         "rpcUrl": {
           "type": "string"
         },
+        "logsRpcUrl": {
+          "type": "string"
+        },
         "explorerHostname": {
           "type": "string"
         },
@@ -2520,6 +2523,9 @@
       ],
       "properties": {
         "rpcUrl": {
+          "type": "string"
+        },
+        "logsRpcUrl": {
           "type": "string"
         },
         "explorerHostname": {

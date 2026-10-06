@@ -61,6 +61,8 @@ The value is a block number, a block hash, or `latest`, which is resolved to a n
 
 A number names whichever block holds that height, so a reorg mid-run can mix two states. A hash is sent as an EIP-1898 reference with `requireCanonical`: after a reorg the node refuses the reads, and the checks fail instead of passing on a mix. Log scans cannot name a hash, so each section ends by re-reading the hash at that height and fails the run if it changed.
 
+A pin at least the chain's confirmation lag behind the head is settled: the explorer, or the section's `logsRpcUrl`, serves the ACL logs all the way to it and no RPC tail is read.
+
 Use an archive RPC that is not load-balanced. A pruned backend can answer an old block's storage with zero, and a check that expects zero then passes.
 
 ```sh

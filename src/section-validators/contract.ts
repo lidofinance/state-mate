@@ -30,6 +30,7 @@ export class ContractSectionValidator {
   constructor(
     private provider: JsonRpcProvider,
     chainId: ChainId,
+    logsProvider?: JsonRpcProvider,
   ) {
     const sections = [
       EntryField.checks,
@@ -55,7 +56,7 @@ export class ContractSectionValidator {
           break;
         }
         case EntryField.ozNonEnumerableAcl: {
-          this.map.set(section, new OzNonEnumerableAclSectionValidator(provider, chainId));
+          this.map.set(section, new OzNonEnumerableAclSectionValidator(provider, chainId, logsProvider));
           break;
         }
         case EntryField.implementationChecks: {
@@ -67,7 +68,7 @@ export class ContractSectionValidator {
           break;
         }
         case EntryField.aragonAcl: {
-          this.map.set(section, new AragonAclSectionValidator(provider, chainId));
+          this.map.set(section, new AragonAclSectionValidator(provider, chainId, logsProvider));
           break;
         }
         default: {
