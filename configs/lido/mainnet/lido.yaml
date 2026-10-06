@@ -466,8 +466,8 @@ misc:
   - &CONSOLIDATIONS_PER_FRAME 1
   - &FRAME_DURATION_IN_SEC 30
 
-  # Lido deposits reserve target (Lido finalizeUpgrade_v4 param in the SRv3 upgrade vote)
-  - &LIDO_DEPOSITS_RESERVE_TARGET 1500000000000000000000 # 1500 ETH
+  # Lido deposits reserve target
+  - &LIDO_DEPOSITS_RESERVE_TARGET 0 # 0 ETH
 
   # StakingRouter global per-block top-up cap (StakingRouter finalizeUpgrade_v4 param, LIP-35)
   - &MAX_TOP_UP_PER_BLOCK_GWEI 3200000000000 # 3200 ETH
@@ -6443,7 +6443,7 @@ l1:
         getThreshold: 4
         getOwners: [
             "0x1555f8A94fC27A06C6610D00157216fa8783EA91", # @AlexDry
-            "0x4D55af0756B43Ee0C1052e585a185A47771b022e", # @snk999
+            "0x2d55aD2742d98961D0c6E68C6372a19614357708", # @snk999
             "0xDbB7D7941d1340CB3ba862dF3A0f18084b5a69Ad", # @KimonSh
             "0x28939ef21690Fe8358E93d661d1ce6d7fA9154F3", # @Willem
             "0x21b82AA7149c8Fd0562E78b740937442FfD43094", # @Mol_Eliza

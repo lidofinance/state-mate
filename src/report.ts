@@ -1,3 +1,4 @@
+import path from "node:path";
 import { stripVTControlCharacters } from "node:util";
 
 import { context, redactSecrets, stats } from "./context";
@@ -30,8 +31,10 @@ interface ConfigReport {
   checks: number;
   config: string;
   contracts?: ContractReport[];
+  deployed?: string;
   error?: string;
   errors: number;
+  inputs?: string;
   skipped: number;
   status: Status;
   warnings?: Warning[];
@@ -66,7 +69,15 @@ export function resetReport(): void {
 }
 
 export function beginConfig(configPath: string): void {
-  config = { config: configPath, status: "passed", checks: 0, errors: 0, skipped: 0 };
+  config = {
+    config: configPath,
+    deployed: context.deployed === undefined ? undefined : path.resolve(context.deployed),
+    inputs: context.inputs === undefined ? undefined : path.resolve(context.inputs),
+    status: "passed",
+    checks: 0,
+    errors: 0,
+    skipped: 0,
+  };
   configs.push(config);
 }
 

@@ -1,8 +1,18 @@
 import chalk from "chalk";
+import type * as YAML from "yaml";
 
 import { registerSecret } from "./context";
 import { logErrorAndExit } from "./logger";
 import type { Abi, AbiArgumentsLength, ChainId } from "./types";
+
+// Keep scalar parsing consistent between standalone and sibling-composed configs.
+export const YAML_PARSE_OPTIONS: YAML.ParseOptions & YAML.DocumentOptions & YAML.SchemaOptions = {
+  schema: "core",
+  intAsBigInt: true,
+};
+export const yamlBigintReviver = (_: unknown, value: unknown) => (typeof value === "bigint" ? String(value) : value);
+// Alias expansion happens at toJS time. Trusted first-party configs exceed the default budget of 100.
+export const YAML_TO_JS_OPTIONS: YAML.ToJSOptions = { reviver: yamlBigintReviver, maxAliasCount: -1 };
 
 // Contract entry fields
 export enum EntryField {

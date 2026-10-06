@@ -2363,7 +2363,8 @@ l1:
         getVerificationResult:
         hashCall:
         isAllowedCall:
-        merkleRoot: "0x41ac9bec065d13a5c929e29df8a78e1567fc80044287058beba831662334f236"
+        # Lazy Vault Admin nonce 38, executed on 2026-10-01 in tx 0x874aabeeb2e095e655252e22f7e40624a3735bea7ff08362ecd406515720d243 (adds Cap cUSD and stcUSD leaves)
+        merkleRoot: "0x6315eed29e55c3cc4b0b24587de67d4b33bd760e333d0c53ff46a0b1b8522024"
         vault: *earnUSDe_vault
         verifyCall:
       implementationChecks:
@@ -2402,7 +2403,8 @@ l1:
         getVerificationResult:
         hashCall:
         isAllowedCall:
-        merkleRoot: *ZERO_BYTES32
+        # Lazy Vault Admin nonce 38, executed on 2026-10-01 in tx 0x874aabeeb2e095e655252e22f7e40624a3735bea7ff08362ecd406515720d243 (first root, Aave eMode 47 leaves)
+        merkleRoot: "0xc01cf557312115e980e4d9820610f9c33cb3c39aa5609becd8e465f2ee12ccb4"
         vault: *earnUSDe_vault
         verifyCall:
       implementationChecks:
@@ -2685,8 +2687,10 @@ l1:
           - args: [3]
             result: "0x59bC9FaE5D62B19d4f8d07D758047aCb9EE19d34" # PT-srUSDe-22OCT2026
           - args: [4]
+            result: *sUSDe # Lazy Vault Admin nonce 38, executed on 2026-10-01 in tx 0x874aabeeb2e095e655252e22f7e40624a3735bea7ff08362ecd406515720d243, with a 1-wei marker report
+          - args: [5]
             mustRevert: true
-        supportedAssets: 4
+        supportedAssets: 5
         validatePrice:
         vault: *earnUSDe_vault
       implementationChecks:

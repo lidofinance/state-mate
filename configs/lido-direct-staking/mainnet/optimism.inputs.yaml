@@ -1,0 +1,42 @@
+# Direct Staking optimism parameters and external references.
+# Source layout: lidofinance/l2-direct-staking config/state; see ../README.md.
+# Automation ownership and the CRE author match the chain after the multisig handoff; see ../README.md.
+config:
+  - &syncDelay 43200 # 12h
+  - &executorGracePeriod 86400 # 24h
+  - &oracleHeartbeat 86400 # 24h staleness bound
+  - &minProcessMessageGas 75000 # CustomSender.MIN_PROCESS_MESSAGE_GAS
+  - &syncMinAmount "5000000000000000000" # 5e18
+  - &syncMaxAmount "100000000000000000000" # 100e18
+  - &maxGasLimit 7000000 # SyncTrigger.getMaxGasLimit() — Optimism EVM2EVMOnRamp (v1.5) maxPerMsgGasLimit
+  # feeOtoD = FeeCodec.encodeCCIP(maxFee=0.125e18, payInLink=false, gasLimit=1_000_000)
+  - &feeOtoD "0x000000000000000001bc16d674ec800000000f4240"
+  # feeDtoO = FeeCodec.encodeOptimismL1toL2(originL2Gas=100_000) — OP-stack feeAmount is always 0
+  - &feeDtoO "0x0000000000000000000000000000000000000186a0"
+  - &maxNativeFee "125000000000000000" # getMaxFees() = maxFee + DtoO(0) = 0.125e18
+
+externals:
+  # OP-stack predeploys: https://specs.optimism.io/protocol/predeploys.html
+  - &l2Weth "0x4200000000000000000000000000000000000006"
+  - &ovmL2CrossDomainMessenger "0x4200000000000000000000000000000000000007"
+  # https://docs.lido.fi/deployed-contracts
+  - &lidoDaoAgent "0x3e40D73EB977Dc6a537aF587D48316feE66E9C8c"
+  - &l2Wsteth "0x1F32b1c2345538c0c6f582fCB022739c4A194Ebb"
+  - &lolMsig "0xFc832dA3D688352C0aB1A32136c7fABbB16d66E6" # LOL multisig
+  # CCIP router (Optimism): https://docs.chain.link/ccip/directory/mainnet/chain/ethereum-mainnet-optimism-1
+  - &l2CcipRouter "0x3206695CaE29952f4b0c22a169725a865bc8Ce0f"
+  # LINK: https://docs.chain.link/resources/link-token-contracts
+  - &l2LinkToken "0x350a791Bfc2C21F9Ed5d10980Dad2e2638ffa7f6"
+  # PriceOracle.AGGREGATOR — Chainlink wstETH/stETH Exchange Rate: https://data.chain.link/feeds/optimism/mainnet/wsteth-steth%20exchangerate
+  - &l2WstethOracleAggregator "0xe59EBa0D492cA53C6f46015EEa00517F2707dc77"
+  # CRE KeystoneForwarder: https://docs.chain.link/cre/guides/workflow/using-evm-client/forwarder-directory-ts
+  - &l2CreForwarder "0xF8344CFd5c43616a4366C34E3EEE75af79a74482"
+  - &l2AutomationOwner "0x23AC4BF8ca7345eE533B12705aF40F69060D9b5b" # automation multisig; also the accepted CRE report author
+  - &initialOwner "0xb5c336a5c60D3482b29d83C742C65AE8351b91a8"
+  - &deployer "0xBeedf0c72D63eE8f8784eDB4A9326Fb43b69D50c"
+  # L1 LidoCustomReceiver encoded as bytes32 (CustomSender.getReceiver(selector))
+  - &l1LidoCustomReceiverBytes32 "0x0000000000000000000000006f357d53d6be3238180316ba5f8f11467e164588"
+  # CCIP chain selector of Ethereum mainnet (the sync destination):
+  # https://docs.chain.link/ccip/directory/mainnet/chain/mainnet
+  - &ethMainnetCcipChainSelector "5009297550715157269"
+  - &l2ChainId 10

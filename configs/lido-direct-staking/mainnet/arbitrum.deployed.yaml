@@ -1,0 +1,13 @@
+# Direct Staking deployment identities on arbitrum.
+# Source layout: lidofinance/l2-direct-staking config/state; see ../README.md.
+# Keep every checked contract here so nightly --update-abi refreshes its ABI.
+deployed:
+  l1:
+    - &l2CustomSender "0x72229141D4B016682d3618ECe47c046f30Da4AD1"
+    - &l2CustomSenderImpl "0x220F64A4793Bc8aca7330ceCc4ae4e2F3B5Bc664"
+    - &l2ProxyAdmin "0x5B42aEbFe95247f1d22e282831e2A513bF050217"
+    - &l2OraclePool "0xac143bF41BBA4a8014b4Ef5a5F46b39a36AE40A8"
+    - &l2SyncTrigger "0x871a5cddE9813627Ff37A2895A0c9B117A664622"
+    - &l2CreReceiver "0x09BdB4E8BA68d245DCb1c6fbEb1e4f13b57cc69A"
+    - &l2GovernanceExecutor "0x1dcA41859Cd23b526CBe74dA8F48aC96e14B1A29"
+    - &l2PriceOracle "0x328de900860816d29D1367F6903a24D8ed40C997" # Chainlink CSR PriceOracle wrapper

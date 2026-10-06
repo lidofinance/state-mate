@@ -1,0 +1,41 @@
+# Direct Staking ethereum parameters and external references.
+# Source layout: lidofinance/l2-direct-staking config/state; see ../README.md.
+# CRE workflow identity and ownership match the chain after the multisig handoff; see ../README.md.
+config:
+  - &minFailedMessageGas 45000 # LidoCustomReceiver.MIN_FAILED_MESSAGE_GAS (CCIPDefensiveReceiver immutable)
+  - &creWorkflowName "direct-staking-sync"
+  - &creDonFamily "zone-a"
+  - &WORKFLOW_ACTIVE 0 # WorkflowRegistry.WorkflowStatus.ACTIVE
+
+externals:
+  - &l1WETH "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
+  # https://docs.lido.fi/deployed-contracts
+  - &lidoDaoAgent "0x3e40D73EB977Dc6a537aF587D48316feE66E9C8c"
+  - &l1wstETH "0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0"
+  - &l1OptimismStandardBridge "0x76943C0D61395d8F2edF9060e1533529cAe05dE6"
+  - &l1BaseStandardBridge "0x9de443AdC5A411E83F1878Ef24C3F52C61571e72"
+  - &l1ArbitrumTokenGateway "0x0F25c1DC2a9922304f2eac71DCa9B07E310e8E5a"
+  - &l1LineaTokenBridge "0x051F1D88f0aF5763fB888eC4378b4D8B29ea3319"
+  - &l2OptimismWsteth "0x1F32b1c2345538c0c6f582fCB022739c4A194Ebb"
+  - &l2BaseWsteth "0xc1CBa3fCea344f92D9239c08C0568f6F2F0ee452"
+  # CCIP router (Ethereum): https://docs.chain.link/ccip/directory/mainnet/chain/mainnet
+  - &l1CCIPRouter "0x80226fc0Ee2b096224EeAc085Bb9a8cba1146f7D"
+  # L1 Gateway Router: https://docs.arbitrum.io/arbitrum-essentials/reference/contract-addresses.md
+  - &l1ArbitrumGatewayRouter "0x72Ce9c846789fdB6fC1f34aC4AD25Dd9ef7031ef"
+  - &initialOwner "0xb5c336a5c60D3482b29d83C742C65AE8351b91a8"
+  - &creWorkflowOwner "0x23AC4BF8ca7345eE533B12705aF40F69060D9b5b" # automation multisig
+  # L2 CustomSender addresses encoded as bytes32 (CustomReceiver.getSender(selector));
+  # L2_CUSTOM_SENDER per lane: https://github.com/lidofinance/l2-direct-staking/tree/main/script — <chain>/<Chain>MigrationConstants.sol
+  - &l2OptimismSenderBytes32 "0x000000000000000000000000328de900860816d29d1367f6903a24d8ed40c997"
+  - &l2ArbitrumSenderBytes32 "0x00000000000000000000000072229141d4b016682d3618ece47c046f30da4ad1"
+  - &l2BaseSenderBytes32 "0x000000000000000000000000328de900860816d29d1367f6903a24d8ed40c997"
+  - &l2LineaSenderBytes32 "0x000000000000000000000000328de900860816d29d1367f6903a24d8ed40c997"
+  # CCIP chain selectors of the four L2 lanes (Ethereum is their sync destination)
+  - &optimismCcipChainSelector "3734403246176062136" # https://docs.chain.link/ccip/directory/mainnet/chain/ethereum-mainnet-optimism-1
+  - &arbitrumCcipChainSelector "4949039107694359620" # https://docs.chain.link/ccip/directory/mainnet/chain/ethereum-mainnet-arbitrum-1
+  - &baseCcipChainSelector "15971525489660198786" # https://docs.chain.link/ccip/directory/mainnet/chain/ethereum-mainnet-base-1
+  - &lineaCcipChainSelector "4627098889531055414" # https://docs.chain.link/ccip/directory/mainnet/chain/ethereum-mainnet-linea-1
+  # The single CRE workflow driving all four lanes; its owner is the only report author the
+  # lane receivers accept
+  - &creWorkflowId "0x00baf350f6796ceb9860deb4eaf85e61efd3ab41b7f3fd5c9c9aca0fe2d4e242"
+  - &l1ChainId 1
