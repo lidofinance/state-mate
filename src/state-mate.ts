@@ -47,6 +47,7 @@ import {
   SUCCESS_MARK,
   WARNING_MARK,
 } from "./logger";
+import { beginObservedSection, writeObservedFile } from "./observed";
 import { assertPinnedHashCanonical, pinSectionBlock } from "./pinned-block";
 import { beginConfig, emitReport, endConfig } from "./report";
 import { ContractSectionValidator } from "./section-validators/contract";
@@ -359,6 +360,11 @@ async function checkNetworkSection(sectionTitle: string, section: NetworkSection
   // when it has something to download
   await assertProviderChain(provider, chainId);
   await pinSectionBlock(provider);
+  if (context.observedPath) {
+    const pinned = provider.pinned;
+    const hash = typeof pinned?.tag === "object" ? pinned.tag.blockHash : undefined;
+    beginObservedSection(sectionTitle, chainId, pinned?.number ?? (await provider.getBlockNumber()), !!pinned, hash);
+  }
   const contractSectionChecker = new ContractSectionValidator(provider, chainId);
 
   for (const contractAlias in section.contracts) {
@@ -393,6 +399,13 @@ async function main() {
     // Ctrl+C must still leave one parseable report, carrying whatever ran before it
     process.once("SIGINT", () => emitReport(130, "interrupted by SIGINT", () => process.exit(130)));
   }
+  if (context.observedPath) {
+    // Every way out passes the exit event: an aborted run still writes what it read
+    process.once("exit", flushObserved);
+    // a signal's default action skips the exit event
+    if (!context.json) process.once("SIGINT", () => process.exit(130));
+    process.once("SIGTERM", () => process.exit(143));
+  }
 
   if (!fs.existsSync(context.configPath)) {
     logErrorAndExit(`No such file or directory: ${chalk.magenta(context.configPath)}`);
@@ -411,6 +424,9 @@ async function main() {
     }
     if (context.checkOnly) {
       logErrorAndExit(`The ${chalk.yellow("-o")} option requires a single config file, not a directory`);
+    }
+    if (context.observedPath) {
+      logErrorAndExit(`The ${chalk.yellow("--observed")} option requires a single config file, not a directory`);
     }
     if (context.block !== undefined && context.block !== "latest") {
       logErrorAndExit(
@@ -465,6 +481,20 @@ async function main() {
   await runConfig();
   endConfig();
   exit(stats.errors);
+}
+
+let observedFlushed = false;
+
+/** Writes the observed file once, whichever way the run ends; a failed write is not retried. */
+function flushObserved(): void {
+  if (!context.observedPath || observedFlushed) return;
+  observedFlushed = true;
+  try {
+    writeObservedFile(context.observedPath, context.configPath);
+  } catch (error) {
+    process.stderr.write(`Could not write the observed file ${context.observedPath}: ${printError(error)}\n`);
+    process.exitCode ||= 1;
+  }
 }
 
 // Under --json the report owns the exit code; the log mode keeps exiting on the spot

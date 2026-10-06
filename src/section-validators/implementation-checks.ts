@@ -33,6 +33,8 @@ export class ImplementationChecksSectionValidator extends ChecksSectionValidator
     for (const x of allNonMutable) {
       skippedChecks[x.name] = null;
     }
+    // the coverage placeholders are the run's, not the config's: --observed does not read them
+    this.undeclared = new Set(Object.keys(skippedChecks).filter((key) => !(key in implementationChecks)));
     await super.validateSection(
       {
         checks: { ...skippedChecks, ...implementationChecks },
