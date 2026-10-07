@@ -1,7 +1,18 @@
 import chalk from "chalk";
+import type * as YAML from "yaml";
 
+import { registerSecret } from "./context";
 import { logErrorAndExit } from "./logger";
 import type { Abi, AbiArgumentsLength, ChainId } from "./types";
+
+// Keep scalar parsing consistent between standalone and sibling-composed configs.
+export const YAML_PARSE_OPTIONS: YAML.ParseOptions & YAML.DocumentOptions & YAML.SchemaOptions = {
+  schema: "core",
+  intAsBigInt: true,
+};
+export const yamlBigintReviver = (_: unknown, value: unknown) => (typeof value === "bigint" ? String(value) : value);
+// Alias expansion happens at toJS time. Trusted first-party configs exceed the default budget of 100.
+export const YAML_TO_JS_OPTIONS: YAML.ToJSOptions = { reviver: yamlBigintReviver, maxAliasCount: -1 };
 
 // Contract entry fields
 export enum EntryField {
@@ -13,6 +24,7 @@ export enum EntryField {
   implementationChecks = "implementationChecks",
   ozNonEnumerableAcl = "ozNonEnumerableAcl",
   ozAcl = "ozAcl",
+  aragonAcl = "aragonAcl",
   result = "result",
   contracts = "contracts",
   explorerHostname = "explorerHostname",
@@ -26,12 +38,14 @@ export function printError(error: unknown): string {
 
 export function readUrlOrFromEnvironment(urlOrEnvironmentVariableName: string) {
   if (isUrl(urlOrEnvironmentVariableName)) {
+    registerSecret(urlOrEnvironmentVariableName, "<rpcUrl>");
     return urlOrEnvironmentVariableName;
   }
   const valueFromEnvironment = process.env[urlOrEnvironmentVariableName];
   if (!valueFromEnvironment) {
     logErrorAndExit(`Env var ${chalk.yellow(urlOrEnvironmentVariableName)} is not set`);
   }
+  registerSecret(valueFromEnvironment, `$${urlOrEnvironmentVariableName}`);
   if (!isUrl(valueFromEnvironment)) {
     logErrorAndExit(
       `Env var ${chalk.yellow(urlOrEnvironmentVariableName)} is not a valid RPC url: ${chalk.yellow(valueFromEnvironment)}`,

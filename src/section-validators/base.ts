@@ -63,11 +63,21 @@ export function incErrors(errorMessage?: string): void {
 export function incChecks(): void {
   stats.totalChecks += 1;
   contractChecks += 1;
+  countSelected();
 }
 
 export function incSkipped(): void {
   stats.skipped += 1;
   contractSkipped += 1;
+  countSelected();
+}
+
+// The checks that run without being declared under a checks type
+const AUTOMATIC_CHECKS = new Set(["implementation", "proxyAdmin", "proxyAdminOwner"]);
+
+function countSelected(): void {
+  if (context.checkOnly?.checksType && AUTOMATIC_CHECKS.has(currentErrorContext.checksType ?? "")) return;
+  stats.selected += 1;
 }
 
 export enum CheckLevel {
@@ -85,6 +95,8 @@ export function needCheck(level: CheckLevel, name: string) {
   return checkOnTheLevel == null || name === checkOnTheLevel;
 }
 
+export type CheckOutcome = { detail: string; ok: true } | { message: string; ok: false };
+
 export abstract class SectionValidatorBase {
   constructor(
     protected provider: JsonRpcProvider,
@@ -97,6 +109,31 @@ export abstract class SectionValidatorBase {
     contractAlias: string,
     basePath?: string,
   ): Promise<void>;
+
+  /**
+   * One check: counted once, logged once, and any failure attributed to this contract. A section
+   * that routes everything through here cannot drift its tally from what actually ran, and a
+   * check that could not be made fails by default instead of passing by silence.
+   */
+  protected async _check(label: string, run: () => Promise<CheckOutcome>): Promise<void> {
+    incChecks();
+    const logHandle = new LogCommand(label);
+    setErrorContext({ method: label });
+
+    let outcome: CheckOutcome;
+    try {
+      outcome = await run();
+    } catch (error) {
+      outcome = { message: `REVERTED with: ${printError(error)}`, ok: false };
+    }
+
+    if (outcome.ok) {
+      logHandle.success(outcome.detail);
+      return;
+    }
+    logHandle.failure(outcome.message);
+    incErrors(outcome.message);
+  }
 
   /**
    * For proxy contracts, the checks run against the implementation ABI
@@ -140,12 +177,20 @@ export abstract class SectionValidatorBase {
       incErrors(errorMessage);
       return;
     }
+    let actual: unknown;
     try {
-      const actual: unknown = await contractFunction.staticCall(...(args || ""));
+      actual = await contractFunction.staticCall(...(args || ""));
+    } catch (error) {
+      const errorMessage = `REVERTED with: ${printError(error)}`;
+      logHandle.failure(errorMessage);
+      incErrors(errorMessage);
+      return;
+    }
+    try {
       _assertEqual(actual, expected);
       logHandle.success(_stringify(actual));
     } catch (error) {
-      const errorMessage = `REVERTED with: ${printError(error)}`;
+      const errorMessage = printError(error);
       logHandle.failure(errorMessage);
       incErrors(errorMessage);
     }

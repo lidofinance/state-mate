@@ -1,0 +1,283 @@
+# yaml-language-server: $schema=../../../schemas/main-schema.json
+---
+deployed:
+  l1:
+    # DSM guardians
+    - &dsmGuardianLidoDevTeam "0x915F0Fa50E1af761B113b41c79ab33Bf4734C36E"
+    - &dsmGuardianP2p "0xe387Ba1d5C9f6306eCe9ac949C7fB6233dD5411E"
+    - &dsmGuardianStakingFacilities "0x35506190Ca6df385aA6Bc4a970646dd4f49426c1"
+    - &dsmGuardianBlockscape "0xDc1579636686C082fc3b00B9EB25259A110D0C44"
+    - &dsmGuardianStakefish "0x031E597BcF680f1f2293b119b4b2B14096B15497"
+    - &dsmGuardianStakely "0x6A22d74a816662078f2371A7138E7614874cd61d"
+
+    # Oracle members
+    - &oracleInstadapp "0xE75A431A98487DC69A14Bdd13d858E3238e9C1b3"
+    - &oracleCaliber "0xc77d0Bf3AA4778E36a89CDC8bbc9c34d8060637d"
+    - &oracleStakingFacilities "0xc7442d4d8F3FfEa0fA4a18Ad3062c8137cE21749"
+    - &oracleChorusOne "0x56B3eA8016Da18C6E8CD8135492d242F0dE0DBBC"
+    - &oracleP2p "0x4E3F2DEeb59eB9a205D82D17647b3e56422e0FEe"
+    - &oracleChainlayer "0xd524101C3c40f71Fce7B9312D299603880a06Bdb"
+    - &oracleBloxroute "0x99Cd2EF33040879D40BBC77Df81863D97f13C64d"
+    - &oracleMatrixedLink "0xC4f2704273598d51A0ec76A31C12553ec8f5A891"
+    - &oracleStakefish "0x5e8Ed9f10307eD6FA793A347e4D0f407D00B9C6f"
+
+    # Depositor
+    - &depositor "0x6Aa249bA53A3abcaC52F91146583B3eE2Ee4C7F5"
+
+deployed-aux:
+  # Holder owners (contracts).
+  - &dsmGuardianLidoDevTeamOwner "0x2E6e175F57D7a18b3CA5490844034600FC18EF83"
+  - &dsmGuardianP2pOwner "0x1E8518cd5835B6775F902e1451a3Dd7b02EB3e8A"
+  - &dsmGuardianStakingFacilitiesOwner "0x3d49967d09637B83E465Cc32b1C5d968e3d34eA8"
+  - &dsmGuardianBlockscapeOwner "0xFcBC1BB96b3F521fe7BFD1E2E309eC032F078fDE"
+  - &dsmGuardianStakefishOwner "0xaB61339Cb8A5BBED2dEaC4D2c6E71B912919aBdB"
+  - &dsmGuardianStakelyOwner "0xce0F8F5019856D79840F9463b5D05c44c7d9B791"
+  - &oracleInstadappOwner "0x772E9D0387671Ce641f17FD1fCFB3a9cE8ED05fB"
+  - &oracleCaliberOwner "0x84225B558e224dc6C38f4eda1d3591fE6b5E34aa"
+  - &oracleStakingFacilitiesOwner "0x035AcCF7E230f32028a1134134A035dda567C86e"
+  - &oracleChorusOneOwner "0x6057526Da2Dc9Bd23a3C6F1b15C74De2D7593378"
+  - &oracleP2pOwner "0x1E8518cd5835B6775F902e1451a3Dd7b02EB3e8A"
+  - &oracleChainlayerOwner "0x48D10eaec45e330003E62115e56d2A05F29eca70"
+  - &oracleBloxrouteOwner "0x9462A9FfF5646d0b6517D8eac49de49277e89dB9"
+  - &oracleMatrixedLinkOwner "0x60D78785B763374bd552F5cE270da77781C6066C"
+  - &oracleStakefishOwner "0x3F7c24Cc2C91E8BEb20498E61b51a696ffb2AbA5"
+
+eoa:
+  # Active delegates.
+  - &dsmGuardianLidoDevTeamDelegate "0x5ecf14e7a3831D44e2F7d4542Ba98C6c96E47420"
+  - &dsmGuardianP2pDelegate "0xAEbd3E0c29111C02166FB2d560f7158a6ccE6841"
+  - &dsmGuardianStakingFacilitiesDelegate "0x06d6c4F26354aA1426c0Abd79A5f18A5d5fF684f"
+  - &dsmGuardianBlockscapeDelegate "0x6aF45f506fD171994D26d014Fc079137532Db219"
+  - &dsmGuardianStakefishDelegate "0xA4512893C5B8BCD8E7AE1cAa56b8402951720D14"
+  - &dsmGuardianStakelyDelegate "0xc04c1979e37e53FD21E40bd089D311EEfFdb4E00"
+  - &oracleInstadappDelegate "0x5595033F304217aFDB8ffB35E42C22B72184730b"
+  - &oracleCaliberDelegate "0x82A821E8a2585D1AC8f346BE7Da6995490d21Ca6"
+  - &oracleStakingFacilitiesDelegate "0x7abC999C7E1f22a7E12b2A1024bC17676FE18b4b"
+  - &oracleChorusOneDelegate "0x5416CAAb6f37BF81cb2dc7ce0a363AfB9DD92d57"
+  - &oracleP2pDelegate "0x565F04cB319EC2295E1fcbBbe5F708687FFcCE75"
+  - &oracleChainlayerDelegate "0x4D3aD7E8e591d389B612Fc063f53837E284d3F86"
+  - &oracleBloxrouteDelegate "0x375ABa35EA2011Af97b51bd395494C827d1C39BD"
+  - &oracleMatrixedLinkDelegate "0xC10258969442c7957351A0ddc8194D2685B2a2c2"
+  - &oracleStakefishDelegate "0x2aE828F10DfeE5b4c42f6E61D3d30033D4520753"
+  - &depositorDelegate "0x2df4013EF30b09100A027192E700114cD0D13900"
+
+misc:
+  - &ZERO_ADDRESS "0x0000000000000000000000000000000000000000"
+  - &ZERO_BYTES32 "0x0000000000000000000000000000000000000000000000000000000000000000"
+  - &DELEGATION_COOLDOWN 172800
+
+l1:
+  rpcUrl: ETH_RPC_URL
+  explorerHostname: api.etherscan.io
+  explorerTokenEnv: ETHERSCAN_TOKEN
+  chainId: 1
+  contracts:
+    # DSM guardians
+    dsmGuardianLidoDevTeam:
+      name: DelegationContract
+      address: *dsmGuardianLidoDevTeam
+      checks:
+        getCooldown: *DELEGATION_COOLDOWN
+        getDelegate: *dsmGuardianLidoDevTeamDelegate
+        # [delegate, activeFrom]; no pending rotation.
+        getPendingDelegate: [*ZERO_ADDRESS, 0]
+        isTerminated: false
+        isValidSignature: &INVALID_SIGNATURE_CHECK
+          - args: [*ZERO_BYTES32, "0x"]
+            result: "0xffffffff"
+        owner: *dsmGuardianLidoDevTeamOwner
+        supportsInterface: &EDF_INTERFACE_CHECKS
+          - args: ["0x01ffc9a7"] # IERC165
+            result: true
+          - args: ["0x1626ba7e"] # IERC1271
+            result: true
+          - args: ["0x8da5cb5b"] # IERC5313
+            result: true
+          # XOR of function selectors in IDelegationContract at EDF commit
+          # 557299104ad3eb1a74198933bd016328c490e276.
+          - args: ["0x97253c16"] # IDelegationContract
+            result: true
+          - args: ["0xffffffff"] # ERC-165 invalid interface
+            result: false
+
+    dsmGuardianP2p:
+      name: DelegationContract
+      address: *dsmGuardianP2p
+      checks:
+        getCooldown: *DELEGATION_COOLDOWN
+        getDelegate: *dsmGuardianP2pDelegate
+        getPendingDelegate: [*ZERO_ADDRESS, 0]
+        isTerminated: false
+        isValidSignature: *INVALID_SIGNATURE_CHECK
+        owner: *dsmGuardianP2pOwner
+        supportsInterface: *EDF_INTERFACE_CHECKS
+
+    dsmGuardianStakingFacilities:
+      name: DelegationContract
+      address: *dsmGuardianStakingFacilities
+      checks:
+        getCooldown: *DELEGATION_COOLDOWN
+        getDelegate: *dsmGuardianStakingFacilitiesDelegate
+        getPendingDelegate: [*ZERO_ADDRESS, 0]
+        isTerminated: false
+        isValidSignature: *INVALID_SIGNATURE_CHECK
+        owner: *dsmGuardianStakingFacilitiesOwner
+        supportsInterface: *EDF_INTERFACE_CHECKS
+
+    dsmGuardianBlockscape:
+      name: DelegationContract
+      address: *dsmGuardianBlockscape
+      checks:
+        getCooldown: *DELEGATION_COOLDOWN
+        getDelegate: *dsmGuardianBlockscapeDelegate
+        getPendingDelegate: [*ZERO_ADDRESS, 0]
+        isTerminated: false
+        isValidSignature: *INVALID_SIGNATURE_CHECK
+        owner: *dsmGuardianBlockscapeOwner
+        supportsInterface: *EDF_INTERFACE_CHECKS
+
+    dsmGuardianStakefish:
+      name: DelegationContract
+      address: *dsmGuardianStakefish
+      checks:
+        getCooldown: *DELEGATION_COOLDOWN
+        getDelegate: *dsmGuardianStakefishDelegate
+        getPendingDelegate: [*ZERO_ADDRESS, 0]
+        isTerminated: false
+        isValidSignature: *INVALID_SIGNATURE_CHECK
+        owner: *dsmGuardianStakefishOwner
+        supportsInterface: *EDF_INTERFACE_CHECKS
+
+    dsmGuardianStakely:
+      name: DelegationContract
+      address: *dsmGuardianStakely
+      checks:
+        getCooldown: *DELEGATION_COOLDOWN
+        getDelegate: *dsmGuardianStakelyDelegate
+        getPendingDelegate: [*ZERO_ADDRESS, 0]
+        isTerminated: false
+        isValidSignature: *INVALID_SIGNATURE_CHECK
+        owner: *dsmGuardianStakelyOwner
+        supportsInterface: *EDF_INTERFACE_CHECKS
+
+    # Oracle members
+    oracleInstadapp:
+      name: DelegationContract
+      address: *oracleInstadapp
+      checks:
+        getCooldown: *DELEGATION_COOLDOWN
+        getDelegate: *oracleInstadappDelegate
+        getPendingDelegate: [*ZERO_ADDRESS, 0]
+        isTerminated: false
+        isValidSignature: *INVALID_SIGNATURE_CHECK
+        owner: *oracleInstadappOwner
+        supportsInterface: *EDF_INTERFACE_CHECKS
+
+    oracleCaliber:
+      name: DelegationContract
+      address: *oracleCaliber
+      checks:
+        getCooldown: *DELEGATION_COOLDOWN
+        getDelegate: *oracleCaliberDelegate
+        getPendingDelegate: [*ZERO_ADDRESS, 0]
+        isTerminated: false
+        isValidSignature: *INVALID_SIGNATURE_CHECK
+        owner: *oracleCaliberOwner
+        supportsInterface: *EDF_INTERFACE_CHECKS
+
+    oracleStakingFacilities:
+      name: DelegationContract
+      address: *oracleStakingFacilities
+      checks:
+        getCooldown: *DELEGATION_COOLDOWN
+        getDelegate: *oracleStakingFacilitiesDelegate
+        getPendingDelegate: [*ZERO_ADDRESS, 0]
+        isTerminated: false
+        isValidSignature: *INVALID_SIGNATURE_CHECK
+        owner: *oracleStakingFacilitiesOwner
+        supportsInterface: *EDF_INTERFACE_CHECKS
+
+    oracleChorusOne:
+      name: DelegationContract
+      address: *oracleChorusOne
+      checks:
+        getCooldown: *DELEGATION_COOLDOWN
+        getDelegate: *oracleChorusOneDelegate
+        getPendingDelegate: [*ZERO_ADDRESS, 0]
+        isTerminated: false
+        isValidSignature: *INVALID_SIGNATURE_CHECK
+        owner: *oracleChorusOneOwner
+        supportsInterface: *EDF_INTERFACE_CHECKS
+
+    oracleP2p:
+      name: DelegationContract
+      address: *oracleP2p
+      checks:
+        getCooldown: *DELEGATION_COOLDOWN
+        getDelegate: *oracleP2pDelegate
+        getPendingDelegate: [*ZERO_ADDRESS, 0]
+        isTerminated: false
+        isValidSignature: *INVALID_SIGNATURE_CHECK
+        owner: *oracleP2pOwner
+        supportsInterface: *EDF_INTERFACE_CHECKS
+
+    oracleChainlayer:
+      name: DelegationContract
+      address: *oracleChainlayer
+      checks:
+        getCooldown: *DELEGATION_COOLDOWN
+        getDelegate: *oracleChainlayerDelegate
+        getPendingDelegate: [*ZERO_ADDRESS, 0]
+        isTerminated: false
+        isValidSignature: *INVALID_SIGNATURE_CHECK
+        owner: *oracleChainlayerOwner
+        supportsInterface: *EDF_INTERFACE_CHECKS
+
+    oracleBloxroute:
+      name: DelegationContract
+      address: *oracleBloxroute
+      checks:
+        getCooldown: *DELEGATION_COOLDOWN
+        getDelegate: *oracleBloxrouteDelegate
+        getPendingDelegate: [*ZERO_ADDRESS, 0]
+        isTerminated: false
+        isValidSignature: *INVALID_SIGNATURE_CHECK
+        owner: *oracleBloxrouteOwner
+        supportsInterface: *EDF_INTERFACE_CHECKS
+
+    oracleMatrixedLink:
+      name: DelegationContract
+      address: *oracleMatrixedLink
+      checks:
+        getCooldown: *DELEGATION_COOLDOWN
+        getDelegate: *oracleMatrixedLinkDelegate
+        getPendingDelegate: [*ZERO_ADDRESS, 0]
+        isTerminated: false
+        isValidSignature: *INVALID_SIGNATURE_CHECK
+        owner: *oracleMatrixedLinkOwner
+        supportsInterface: *EDF_INTERFACE_CHECKS
+
+    oracleStakefish:
+      name: DelegationContract
+      address: *oracleStakefish
+      checks:
+        getCooldown: *DELEGATION_COOLDOWN
+        getDelegate: *oracleStakefishDelegate
+        getPendingDelegate: [*ZERO_ADDRESS, 0]
+        isTerminated: false
+        isValidSignature: *INVALID_SIGNATURE_CHECK
+        owner: *oracleStakefishOwner
+        supportsInterface: *EDF_INTERFACE_CHECKS
+
+    # Depositor
+    depositor:
+      name: DelegationContract
+      address: *depositor
+      checks:
+        getCooldown: *DELEGATION_COOLDOWN
+        getDelegate: *depositorDelegate
+        getPendingDelegate: [*ZERO_ADDRESS, 0]
+        isTerminated: false
+        isValidSignature: *INVALID_SIGNATURE_CHECK
+        owner: *dsmGuardianLidoDevTeamOwner
+        supportsInterface: *EDF_INTERFACE_CHECKS

@@ -428,7 +428,7 @@ l1:
       checks:
         ORDER_TYPEHASH: "0xb367c53189b3057a91923801116b5f9c4e7211a314d1961f94770747512a1b68"
         asset: *ZERO_ADDRESS
-        canBeRemoved: true
+        canBeRemoved:
         claimableOf: # this queue doesn't have claimableOf shares
         consensus: *ZERO_ADDRESS
         consensusFactory: *consensusFactory
@@ -612,7 +612,7 @@ l1:
       checks:
         ORDER_TYPEHASH: "0xb367c53189b3057a91923801116b5f9c4e7211a314d1961f94770747512a1b68"
         asset: *ZERO_ADDRESS
-        canBeRemoved: true
+        canBeRemoved:
         claimableOf:
           - args: [*ZERO_ADDRESS]
             result: 0
@@ -1800,7 +1800,7 @@ l1:
       implementationChecks:
         asset: *ZERO_ADDRESS
         batchAt:
-        canBeRemoved: true
+        canBeRemoved:
         getState:
         requestsOf:
         vault: *ZERO_ADDRESS
@@ -1893,7 +1893,7 @@ l1:
       checks:
         SET_SYNC_REDEEM_PARAMS_ROLE: *SET_SYNC_REDEEM_PARAMS_ROLE
         asset: *lidoWsteth
-        canBeRemoved: true
+        canBeRemoved:
         getLiquidAssets:
         name: "SyncRedeemQueue"
         # [usage, remainingDailyLimit] — both move with every redeem
@@ -1904,7 +1904,7 @@ l1:
       implementationChecks:
         SET_SYNC_REDEEM_PARAMS_ROLE: *SET_SYNC_REDEEM_PARAMS_ROLE
         asset: *ZERO_ADDRESS
-        canBeRemoved: true
+        canBeRemoved:
         getLiquidAssets:
         name: "SyncRedeemQueue"
         remainingDailyLimit: [0, 0]
@@ -2284,7 +2284,8 @@ l1:
         getVerificationResult:
         hashCall:
         isAllowedCall:
-        merkleRoot: "0xa61ed3d1075e5942cc35956b9efd3bb1b67059785115a7cb6728ae77f42c7b10"
+        # Mellow strETH config 1.5.1 (adds Aave V4 Spoke leaves), set on 2026-09-30 by lazyVaultAdmin tx 0x384de4cb7c02de6f19edd8f6aac407a4b47304e1d4d8353ddaac26a8fac7e1c2
+        merkleRoot: "0x8f90b8a9a85561cd879a41a8dc41ae0e3dae4c787dc8ae83613f4d6c12f28391"
         vault: *vault
         verifyCall:
       implementationChecks:
@@ -2544,7 +2545,9 @@ l1:
         getVerificationResult:
         hashCall:
         isAllowedCall:
-        merkleRoot: "0xbbf7c96b84484997f65758984d04874d1e7f814487536ca566bba51313c2dfac"
+        # Mellow strETH config 1.5.1 (adds Aave V3 weETH/WETH leaves), set on 2026-09-30 by lazyVaultAdmin tx 0x384de4cb7c02de6f19edd8f6aac407a4b47304e1d4d8353ddaac26a8fac7e1c2
+        # The Aave V3 leaves name subvault5 as onBehalfOf and as the withdraw recipient, not subvault7
+        merkleRoot: "0x6099333374aaef45bb3c82793d81fcdd12e282cddf4125072fb47b4ccbd19fe4"
         vault: *vault
         verifyCall:
       implementationChecks:

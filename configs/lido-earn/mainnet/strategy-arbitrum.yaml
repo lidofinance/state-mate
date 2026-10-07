@@ -327,7 +327,7 @@ l1:
       checks:
         ORDER_TYPEHASH: "0xb367c53189b3057a91923801116b5f9c4e7211a314d1961f94770747512a1b68"
         asset: *ZERO_ADDRESS
-        canBeRemoved: true
+        canBeRemoved:
         claimableOf: # this queue doesn't have claimableOf shares
         consensus: *ZERO_ADDRESS
         consensusFactory: *consensusFactory
@@ -479,7 +479,7 @@ l1:
       checks:
         ORDER_TYPEHASH: "0xb367c53189b3057a91923801116b5f9c4e7211a314d1961f94770747512a1b68"
         asset: *ZERO_ADDRESS
-        canBeRemoved: true
+        canBeRemoved:
         claimableOf:
           - args: [*ZERO_ADDRESS]
             result: 0

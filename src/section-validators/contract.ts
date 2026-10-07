@@ -3,9 +3,10 @@ import type { JsonRpcProvider } from "ethers";
 
 import { EntryField } from "src/common";
 import { logFinalStatus, logHeader1, logHeader2 } from "src/logger";
+import { beginContract, endContract } from "src/report";
 import type { ContractEntry } from "src/typebox";
 import type { ChainId } from "src/types";
-
+import { AragonAclSectionValidator } from "./aragon-acl";
 import {
   CheckLevel,
   clearErrorContext,
@@ -37,6 +38,7 @@ export class ContractSectionValidator {
       EntryField.ozNonEnumerableAcl,
       EntryField.implementationChecks,
       EntryField.ozAcl,
+      EntryField.aragonAcl,
     ];
     for (const section of sections) {
       switch (section) {
@@ -64,6 +66,10 @@ export class ContractSectionValidator {
           this.map.set(section, new OzAclSectionValidator(provider, chainId));
           break;
         }
+        case EntryField.aragonAcl: {
+          this.map.set(section, new AragonAclSectionValidator(provider, chainId));
+          break;
+        }
         default: {
           //@ts-expect-error trick to detect compile-time errors when a new section is added
           const _: never = entryField;
@@ -80,6 +86,7 @@ export class ContractSectionValidator {
     resetContractCounters();
 
     logHeader1(`Contract: ${sectionTitle}/${contractAlias} (${contractEntry.name}, ${contractEntry.address})`);
+    beginContract(`${sectionTitle}/${contractAlias}`, contractEntry.name, contractEntry.address);
 
     // Set base error context for this contract
     setErrorContext({
@@ -124,11 +131,17 @@ export class ContractSectionValidator {
       await this.map.get(EntryField.ozAcl)!.validateSection(contractEntry, contractAlias, basePath);
     }
 
+    if (needCheck(CheckLevel.checksType, EntryField.aragonAcl)) {
+      setErrorContext({ checksType: EntryField.aragonAcl });
+      await this.map.get(EntryField.aragonAcl)!.validateSection(contractEntry, contractAlias, basePath);
+    }
+
     // Clear error context after contract validation
     clearErrorContext();
 
     // Show contract status (not last, global status follows)
     const { checks, errors, skipped } = getContractStats();
+    endContract();
     const skippedNote = skipped ? `, ${chalk.yellow(`${skipped} skipped`)}` : "";
     const statusMessage = errors
       ? `${checks} checks, ${chalk.red(`${errors} ${errors === 1 ? "error" : "errors"}`)}${skippedNote}`

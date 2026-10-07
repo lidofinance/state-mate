@@ -22,7 +22,7 @@ deployed:
     - &l1TokenBridgeImpl "0x168Cfea1Ad879d7032B3936eF3b0E90790b6B6D4"
     - &l1TokenRateNotifier "0xbe05d12Fd10919F1881125006523452F6aFF791b"
     - &l1OpStackTokenRatePusher "0xd54c1c6413caac3477AC14b2a80D5398E3c32FfE"
-    - &lidoLocatorImpl "0xF2Ffb952e129a63F0614Ff87126E1d4a494A2313"
+    - &lidoLocatorImpl "0x60E09F1791F1168d0450E4F100616B4a3F95119C"
 
   l2:
     - &l2GovernanceExecutor "0xEfa0dB536d2c8089685630fafe88CF7805966FC3"
@@ -36,7 +36,7 @@ deployed:
     - &l2TokenRateOracleImpl "0x4bF0d419793d8722b8391efaD4c9cE78F460CEd3"
 
 misc:
-  - &depositSecurityModule "0xF573E9E3de1f86B085417ab294f56E7920B4e9Be"
+  - &depositSecurityModule "0x39BB5d491e98A44D1bfe8047A737a81E296a63E0"
   - &elRewardsVault "0x388C818CA8B9251b393131C08a736A67ccB19297"
   - &oracleReportSanityChecker "0x147f8d3cf3004FAf9Bf94E88B54b6C06De507be9"
   - &burner "0xE76c52750019b80B43E36DF30bf4060EB73F573a"
@@ -254,6 +254,7 @@ l2:
         latestAnswer: null
         latestRoundData: null
       ozNonEnumerableAcl:
+        *DEFAULT_ADMIN_ROLE : [*l2GovernanceExecutor]
         *RATE_UPDATE_DISABLER_ROLE : [*l2GovernanceExecutor, *l2EmergencyBreaksMultisig]
         *RATE_UPDATE_ENABLER_ROLE : [*l2GovernanceExecutor]
     stETH:

@@ -52,6 +52,98 @@
         ]
       }
     },
+    "config": {
+      "type": "array",
+      "items": {
+        "anyOf": [
+          {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "number"
+              }
+            ]
+          },
+          {
+            "type": "array",
+            "items": {
+              "anyOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "number"
+                }
+              ]
+            }
+          },
+          {
+            "type": "array",
+            "items": {}
+          }
+        ]
+      }
+    },
+    "externals": {
+      "type": "array",
+      "items": {
+        "anyOf": [
+          {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "number"
+              }
+            ]
+          },
+          {
+            "type": "array",
+            "items": {
+              "anyOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "number"
+                }
+              ]
+            }
+          },
+          {
+            "type": "array",
+            "items": {}
+          }
+        ]
+      }
+    },
     "roles": {
       "anyOf": [
         {
@@ -837,6 +929,42 @@
                           }
                         }
                       }
+                    },
+                    "aragonAcl": {
+                      "type": "object",
+                      "patternProperties": {
+                        "^(0x[a-fA-F0-9]{40}|0x[a-fA-F0-9]{64}|.+)$": {
+                          "type": "object",
+                          "patternProperties": {
+                            "^(0x[a-fA-F0-9]{40}|0x[a-fA-F0-9]{64}|.+)$": {
+                              "additionalProperties": false,
+                              "type": "object",
+                              "required": [
+                                "manager"
+                              ],
+                              "properties": {
+                                "manager": {
+                                  "format": "ethereum-string",
+                                  "pattern": "^(0x[a-fA-F0-9]{40}|0x[a-fA-F0-9]{64}|.+)$",
+                                  "type": "string"
+                                },
+                                "granted": {
+                                  "type": "array",
+                                  "items": {
+                                    "format": "ethereum-string",
+                                    "pattern": "^(0x[a-fA-F0-9]{40}|0x[a-fA-F0-9]{64}|.+)$",
+                                    "type": "string"
+                                  }
+                                },
+                                "paramsDigest": {
+                                  "pattern": "^0x[a-fA-F0-9]{64}$",
+                                  "type": "string"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
                     }
                   }
                 },
@@ -1486,6 +1614,42 @@
                             "format": "ethereum-string",
                             "pattern": "^(0x[a-fA-F0-9]{40}|0x[a-fA-F0-9]{64}|.+)$",
                             "type": "string"
+                          }
+                        }
+                      }
+                    },
+                    "aragonAcl": {
+                      "type": "object",
+                      "patternProperties": {
+                        "^(0x[a-fA-F0-9]{40}|0x[a-fA-F0-9]{64}|.+)$": {
+                          "type": "object",
+                          "patternProperties": {
+                            "^(0x[a-fA-F0-9]{40}|0x[a-fA-F0-9]{64}|.+)$": {
+                              "additionalProperties": false,
+                              "type": "object",
+                              "required": [
+                                "manager"
+                              ],
+                              "properties": {
+                                "manager": {
+                                  "format": "ethereum-string",
+                                  "pattern": "^(0x[a-fA-F0-9]{40}|0x[a-fA-F0-9]{64}|.+)$",
+                                  "type": "string"
+                                },
+                                "granted": {
+                                  "type": "array",
+                                  "items": {
+                                    "format": "ethereum-string",
+                                    "pattern": "^(0x[a-fA-F0-9]{40}|0x[a-fA-F0-9]{64}|.+)$",
+                                    "type": "string"
+                                  }
+                                },
+                                "paramsDigest": {
+                                  "pattern": "^0x[a-fA-F0-9]{64}$",
+                                  "type": "string"
+                                }
+                              }
+                            }
                           }
                         }
                       }
@@ -3029,6 +3193,42 @@
                           }
                         }
                       }
+                    },
+                    "aragonAcl": {
+                      "type": "object",
+                      "patternProperties": {
+                        "^(0x[a-fA-F0-9]{40}|0x[a-fA-F0-9]{64}|.+)$": {
+                          "type": "object",
+                          "patternProperties": {
+                            "^(0x[a-fA-F0-9]{40}|0x[a-fA-F0-9]{64}|.+)$": {
+                              "additionalProperties": false,
+                              "type": "object",
+                              "required": [
+                                "manager"
+                              ],
+                              "properties": {
+                                "manager": {
+                                  "format": "ethereum-string",
+                                  "pattern": "^(0x[a-fA-F0-9]{40}|0x[a-fA-F0-9]{64}|.+)$",
+                                  "type": "string"
+                                },
+                                "granted": {
+                                  "type": "array",
+                                  "items": {
+                                    "format": "ethereum-string",
+                                    "pattern": "^(0x[a-fA-F0-9]{40}|0x[a-fA-F0-9]{64}|.+)$",
+                                    "type": "string"
+                                  }
+                                },
+                                "paramsDigest": {
+                                  "pattern": "^0x[a-fA-F0-9]{64}$",
+                                  "type": "string"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
                     }
                   }
                 },
@@ -3678,6 +3878,42 @@
                             "format": "ethereum-string",
                             "pattern": "^(0x[a-fA-F0-9]{40}|0x[a-fA-F0-9]{64}|.+)$",
                             "type": "string"
+                          }
+                        }
+                      }
+                    },
+                    "aragonAcl": {
+                      "type": "object",
+                      "patternProperties": {
+                        "^(0x[a-fA-F0-9]{40}|0x[a-fA-F0-9]{64}|.+)$": {
+                          "type": "object",
+                          "patternProperties": {
+                            "^(0x[a-fA-F0-9]{40}|0x[a-fA-F0-9]{64}|.+)$": {
+                              "additionalProperties": false,
+                              "type": "object",
+                              "required": [
+                                "manager"
+                              ],
+                              "properties": {
+                                "manager": {
+                                  "format": "ethereum-string",
+                                  "pattern": "^(0x[a-fA-F0-9]{40}|0x[a-fA-F0-9]{64}|.+)$",
+                                  "type": "string"
+                                },
+                                "granted": {
+                                  "type": "array",
+                                  "items": {
+                                    "format": "ethereum-string",
+                                    "pattern": "^(0x[a-fA-F0-9]{40}|0x[a-fA-F0-9]{64}|.+)$",
+                                    "type": "string"
+                                  }
+                                },
+                                "paramsDigest": {
+                                  "pattern": "^0x[a-fA-F0-9]{64}$",
+                                  "type": "string"
+                                }
+                              }
+                            }
                           }
                         }
                       }

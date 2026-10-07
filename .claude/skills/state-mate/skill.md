@@ -17,6 +17,8 @@ Validate EVM smart-contract state against YAML configs. state-mate calls view fu
 | Role/ACL checks                                         | [Access control](#access-control)                                  |
 | Unknown return values                                   | [REPLACEME discovery](#replaceme-discovery)                        |
 | Overloaded function (two ABI fragments with same name)  | [Function overloads](#function-overloads)                          |
+| Swap addresses without touching wiring                  | [Separate deployed addresses](#separate-deployed-addresses)        |
+| Externalize input values                                | [Separate inputs](#separate-inputs)                                |
 | ABI not found / rate-limit / revert reading             | [Troubleshooting](#troubleshooting)                                |
 | Deployment verification / audit (pre-vote state, roles) | Read `references/verification-playbook.md`                         |
 
@@ -350,6 +352,83 @@ cast call $CONTRACT "getRoleMember(bytes32,uint256)(address)" $ROLE 0 --rpc-url 
 cast call $CONTRACT "hasRole(bytes32,address)(bool)" $ROLE $ADDRESS --rpc-url $RPC
 ```
 
+## Separate deployed addresses
+
+Keep the **wiring** in the main config and point it at a fresh redeployment (test fork, another
+network) by moving the **addresses** into a separate `<name>.deployed.<ext>` file. This is _full
+delegation_: when a `.deployed` file is used, the main config holds **only the wiring** (`*label`
+aliases) and **no `deployed:` section**; the `.deployed` file holds only `deployed:` and is the
+sole source of the address anchors.
+
+```yaml
+# lido.yaml — wiring only, no deployed: section
+l1:
+  contracts:
+    lido:
+      address: *lido # anchor defined in the .deployed file
+      checks:
+        wstETH: *wstETH
+```
+
+```yaml
+# lido.hoodi.deployed.yaml — only the deployed: address book, one &label per address
+deployed:
+  l1:
+    - &lido "0x3F1c547b21f65e10480dE3 ..."
+    - &wstETH "0x47B594e9a3F87f6D60f33 ..."
+```
+
+```bash
+yarn start configs/lido/lido.yaml --deployed configs/lido/lido.deployed.yaml
+yarn start configs/lido/lido.yaml --deployed configs/lido/lido.hoodi.deployed.yaml   # another variant
+```
+
+Each file is parsed once, then its root mapping entries are assembled into one YAML document
+(addresses first), so `*label` aliases resolve to the `&label` anchors natively. Four invariants are enforced — each a hard error:
+
+- **every address has an `&label`** — a bare address in `.deployed` is rejected;
+- **every label is referenced** by a `*alias` in the main config — unused labels are rejected;
+- **the main config has no `deployed:` section** — move all addresses to the `.deployed` file;
+- **no duplicate labels** within `.deployed`, and none colliding with a main-config anchor.
+
+Notes:
+
+- **Opt-in**: use `--deployed <path>` for one config, or `--auto-load-deployed-and-inputs` for a directory.
+  Automatic mode loads same-stem `.deployed.yaml`/`.yml` and `.inputs.yaml`/`.yml` files beside each main,
+  rejects ambiguous extensions, and cannot be combined with explicit sibling paths. Without either
+  selection mode, missing aliases fail with guidance to supply sibling flags.
+- The `.deployed` file may contain **only** a `deployed:` section, must be a **single YAML document**
+  (no mid-file `---`/`...`), and every value must be a valid `0x` address/hash. RPC/explorer settings
+  stay in the main config (they are not deployment addresses).
+- Block and flow root mappings can be mixed; document markers and block scalar values are preserved.
+  Composed roots require string keys and cannot carry anchors or explicit tags. `%YAML`/`%TAG`
+  directives remain unsupported; all sources use shared parsing semantics. Anchors must precede
+  aliases in sibling order followed by main. Cyclic aliases are rejected before value conversion.
+  Alias errors are reported together with their original source positions.
+- Existing single-file configs (inline `deployed:`, no sibling) are unaffected.
+
+The `--deployed` and `--inputs` options require a single config file. Directory runs skip
+`*.deployed.yaml` / `*.inputs.yaml` (and `.yml`) files.
+
+## Separate inputs
+
+The dual of `.deployed`: where `.deployed` externalizes a deployment's _outputs_ (addresses), a
+sibling `<name>.inputs.<ext>` externalizes its _inputs_, in two sections (one `&label` per entry):
+
+```yaml
+# lido.inputs.yaml — project-chosen knobs + fixed external facts, the sole source of these anchors
+config: # any anchored scalar OR array; NO address check
+  - &lidoName "Liquid staked Ether 2.0"
+  - &oracleReportLimits [3600, 1800, 1000, 50]
+externals: # 3rd-party addresses (validated 0x); digit-only ids like chainId are exempt
+  - &depositContract "0x00000000219ab540356cBB839Cbe05303d7705Fa"
+  - &chainId 560048
+```
+
+The main config holds only the wiring (`*lidoName`, `l1.chainId: *chainId`, …) and **no
+`config:`/`externals:` section**; same full-delegation invariants as `.deployed`. **Opt-in**
+too — pass `--inputs <path>` for one config or `--auto-load-deployed-and-inputs` for a directory.
+
 ## Workflow
 
 Adding a new contract to an existing config:
@@ -383,6 +462,7 @@ yarn start config.yml -o l1/contractName                  # specific contract (g
 yarn start config.yml -o l1/contractName/checks/funcName  # single function
 yarn start <directory> --update-abi                       # rebuild the store: re-download all, drop unreferenced
 yarn start config.yml --quiet                             # failures and totals only (CI uses this)
+yarn start config.yml --json                              # one JSON report on stdout: verdict, counters, failed checks (docs/json-output.md)
 ```
 
 ## Best practices
@@ -434,6 +514,15 @@ The entry has no `implementation:`, yet the address holds a non-empty EIP-1967 s
 - Almost always RPC rate limiting or a 502 from the provider, not an on-chain revert.
 - Retry with `-o l1/contractName` scope; or switch RPC provider.
 - `drpc.org` public endpoints are decent for ad-hoc queries.
+
+### `The explorer challenged the request (HTTP 403)`
+
+- Explorer requests send a browser-like User-Agent and a same-origin Referer without API keys. If the host still challenges the request, try another `STATE_MATE_USER_AGENT` in `.env`; the override applies to explorer and RPC requests.
+- A 429 pauses the explorer queue for the server's `Retry-After`, or on Blockscout for `x-ratelimit-reset` milliseconds, which hold only the route family that answered. Each ABI download has a 300-second wait budget. A longer cooldown leaves the ABI unresolved and fails an ACL scan as a rate limit. A bare rate-limit count gives no per-minute window, and a skipped ABI download is not verified coverage.
+
+### `did not confirm chainId ... --allow-unverified-explorer`
+
+- The explorer left the chain-id probe unanswered. Confirm the explorer serves the intended network before using `--allow-unverified-explorer`. A reported mismatch is still rejected. RPC, ABI, name and state checks remain enabled, but cannot prove the ABI's chain of origin: names and interfaces can match across networks.
 
 ### `Invalid address` in `deployed:`
 

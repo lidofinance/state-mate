@@ -1,6 +1,7 @@
 import chalk from "chalk";
-import { Contract, JsonRpcProvider } from "ethers";
+import { Contract, FetchRequest, JsonRpcProvider } from "ethers";
 
+import packageJson from "../package.json";
 import { printError } from "./common";
 import { log, logErrorAndExit, WARNING_MARK } from "./logger";
 import {
@@ -12,9 +13,68 @@ import {
   isValidAbi,
 } from "./types";
 
+// Some explorer frontends reject the default HTTP client User-Agent.
+export const DEFAULT_USER_AGENT = `Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36 state-mate/${packageJson.version}`;
+
+export function userAgent(): string {
+  return process.env.STATE_MATE_USER_AGENT?.trim() || DEFAULT_USER_AGENT;
+}
+
+function requestHeaders(url: string, extra: Record<string, string> = {}): Record<string, string> {
+  // Send only the origin: explorer URLs can carry API keys in their query string.
+  return { "User-Agent": userAgent(), Referer: `${new URL(url).origin}/`, ...extra };
+}
+
 /** Blockscout instances serve ABIs without a key; etherscan does not. */
 export function explorerNeedsApiKey(explorerHostname: string): boolean {
   return explorerHostname.includes("etherscan.io");
+}
+
+// One probe per host decides whether it serves the Blockscout REST API: the etherscan-compatible
+// /api on such instances runs on a separate quota that dies mid-run, while /api/v2 keeps
+// answering. Downloads all start at once, so the memo holds the promise, not the answer
+const blockscoutHostProbes = new Map<string, Promise<boolean>>();
+
+export function isBlockscoutHost(explorerHostname: string): Promise<boolean> {
+  const hostname = explorerHostname.toLowerCase();
+  let probe = blockscoutHostProbes.get(hostname);
+  if (!probe) {
+    probe = _probeBlockscoutHost(hostname);
+    blockscoutHostProbes.set(hostname, probe);
+  }
+  return probe;
+}
+
+async function _probeBlockscoutHost(hostname: string, attempt = 0): Promise<boolean> {
+  try {
+    const response = await httpGetAsync<{ backend_version?: unknown }>(
+      `https://${hostname}/api/v2/config/backend-version`,
+    );
+    return typeof response.backend_version === "string";
+  } catch (error) {
+    // a 403 here may be a WAF guarding an unknown path, not an anti-bot wall; the follow-up
+    // request settles it — a genuinely challenged host fails there with the same diagnostic
+    if (error instanceof ExplorerChallengeError) return false;
+    // a cooldown is a flake too: forget the verdict, so a later download probes again
+    if (error instanceof ExplorerBudgetError) {
+      blockscoutHostProbes.delete(hostname);
+      return false;
+    }
+    if (error instanceof ExplorerHttpError && error.transient) {
+      if (attempt === 0) {
+        if (error.retryDelayMs) await sleep(error.retryDelayMs);
+        return _probeBlockscoutHost(hostname, 1);
+      }
+      // a verdict built from flakes must not pin the route for the rest of the process
+      blockscoutHostProbes.delete(hostname);
+    }
+    return false;
+  }
+}
+
+export function resetBlockscoutHostProbes(): void {
+  blockscoutHostProbes.clear();
+  warnedLegacyBlockscoutHosts.clear();
 }
 
 export function loadContract(address: string, abi: Abi, provider: JsonRpcProvider) {
@@ -41,16 +101,46 @@ class ExplorerHttpError extends Error {
   }
 }
 
+// An anti-bot layer answered instead of the API; retrying with the same User-Agent cannot help
+class ExplorerChallengeError extends ExplorerHttpError {
+  constructor(status: number) {
+    super(
+      `The explorer challenged the request (HTTP ${status}); set STATE_MATE_USER_AGENT to override the User-Agent`,
+      false,
+    );
+  }
+}
+
+// A cooldown the wait budget cannot cover: the host is throttling, not refusing
+class ExplorerBudgetError extends ExplorerHttpError {
+  constructor(message: string) {
+    super(message, false);
+  }
+}
+
+// Keep API authorization errors separate from explicit challenges and HTML refusals.
+function isChallenged(response: Response): boolean {
+  return (
+    response.headers?.get("cf-mitigated") === "challenge" ||
+    (response.status === 403 && /text\/html/i.test(response.headers?.get("content-type") ?? ""))
+  );
+}
+
+/** Keeps the HTTP error type private while letting a caller own one bounded retry budget. */
+export function isTransientExplorerHttpError(error: unknown): boolean {
+  return error instanceof ExplorerHttpError && error.transient;
+}
+
 export async function loadContractInfo(
   address: string,
   explorerHostname: string,
   explorerKey?: string,
   chainId?: number | string,
 ): Promise<ContractInfo | undefined> {
-  let outcome = await _fetchContractInfo(address, explorerHostname, explorerKey, chainId);
+  const budget = { remainingMs: MAX_RETRY_WAIT_MS };
+  let outcome = await _fetchContractInfo(address, explorerHostname, explorerKey, chainId, budget);
   if (!outcome.contract && outcome.transient) {
-    if (outcome.retryDelayMs) await sleep(outcome.retryDelayMs);
-    outcome = await _fetchContractInfo(address, explorerHostname, explorerKey, chainId);
+    outcome = await _fetchContractInfo(address, explorerHostname, explorerKey, chainId, budget, outcome.retryDelayMs);
   }
   return outcome.contract;
 }
@@ -60,11 +150,11 @@ type FetchOutcome = { contract?: ContractInfo; retryDelayMs?: number; transient?
 async function _fetchContractInfo(
   address: string,
   explorerHostname: string,
-  explorerKey?: string,
-  chainId?: number | string,
+  explorerKey: string | undefined,
+  chainId: number | string | undefined,
+  budget: WaitBudget,
+  retryDelayMs = 0,
 ): Promise<FetchOutcome> {
-  const sourcesUrl = _getExplorerApiUrl(explorerHostname, address, explorerKey, chainId);
-
   // One address the explorer cannot serve, an unverified contract or a dead host for instance, must
   // not take the whole run down: the caller skips it and the ABIs downloaded so far reach the store.
   // `transient` marks the failures worth one more fetch, against the definitive answers
@@ -74,12 +164,24 @@ async function _fetchContractInfo(
   };
 
   let sourcesResponse: unknown;
+  let blockscout = false;
   try {
-    sourcesResponse = await httpGetAsync(sourcesUrl);
+    // inside the try, so a retry delay beyond the budget skips this address like any failed download
+    await sleepWithinBudget(retryDelayMs, budget);
+    blockscout = !explorerNeedsApiKey(explorerHostname) && (await isBlockscoutHost(explorerHostname));
+    const sourcesUrl = _getExplorerApiUrl(explorerHostname, address, blockscout, explorerKey, chainId);
+    sourcesResponse = await httpGetAsync(sourcesUrl, budget);
   } catch (error) {
+    // a challenge dooms every request to the host: fail the run instead of skipping address by address
+    if (error instanceof ExplorerChallengeError) throw error;
     const transient = error instanceof ExplorerHttpError && error.transient;
     const retryDelayMs = error instanceof ExplorerHttpError ? error.retryDelayMs : 0;
-    return skip(`${explorerHostname} is unreachable: ${printError(error)}`, transient, retryDelayMs);
+    const state = error instanceof ExplorerBudgetError ? "is rate-limited" : "is unreachable";
+    return skip(`${explorerHostname} ${state}: ${printError(error)}`, transient, retryDelayMs);
+  }
+
+  if (blockscout) {
+    return _parseBlockscoutV2(sourcesResponse, address, skip);
   }
 
   if (isResponseBad(sourcesResponse)) {
@@ -97,54 +199,163 @@ async function _fetchContractInfo(
     return skip(`explorer served no ABI: ${JSON.stringify(result)}`);
   }
 
-  let abi: unknown;
-  try {
-    abi = JSON.parse(result.ABI);
-  } catch (error) {
-    return skip(`could not be read: ${printError(error)}`);
-  }
-  if (!isValidAbi(abi)) {
-    return skip(`ABI is not valid (type mismatch): ${JSON.stringify(abi)}`);
-  }
+  const parsed = _parseAbiField(result.ABI, skip);
+  if ("failure" in parsed) return parsed.failure;
 
   return {
-    contract: { abi, address, contractName: result.ContractName },
+    contract: { abi: parsed.abi, address, contractName: result.ContractName },
   };
 }
 
-// The free etherscan tier answers 3 calls per second and charges a multi-second penalty for
-// breaking that, so every request reserves a slot up front instead of finding out the hard way.
+type SkipFn = (reason: string, transient?: boolean, retryDelayMs?: number) => FetchOutcome;
+
+// etherscan serves the ABI as a JSON string; blockscout v2 documents a string too, while the
+// live instances serve the array itself, so both forms have to be read
+function _parseAbiField(raw: unknown, skip: SkipFn): { abi: Abi } | { failure: FetchOutcome } {
+  let abi: unknown = raw;
+  if (typeof abi === "string") {
+    try {
+      abi = JSON.parse(abi);
+    } catch (error) {
+      return { failure: skip(`could not be read: ${printError(error)}`) };
+    }
+  }
+  if (!isValidAbi(abi)) {
+    return { failure: skip(`ABI is not valid (type mismatch): ${JSON.stringify(abi)}`) };
+  }
+  return { abi };
+}
+
+type BlockscoutV2Response = { name?: unknown; abi?: unknown; is_verified?: unknown };
+
+function _parseBlockscoutV2(response: unknown, address: string, skip: SkipFn): FetchOutcome {
+  const source = (typeof response === "object" && response !== null ? response : {}) as BlockscoutV2Response;
+  if (typeof source.name !== "string" || source.abi === undefined || source.abi === null) {
+    return skip(`explorer served no ABI: ${JSON.stringify({ name: source.name, is_verified: source.is_verified })}`);
+  }
+  const parsed = _parseAbiField(source.abi, skip);
+  if ("failure" in parsed) return parsed.failure;
+  return { contract: { abi: parsed.abi, address, contractName: source.name } };
+}
+
+// Etherscan free-tier spacing; paceKey decides which requests share a queue and its cooldown.
 const EXPLORER_REQUESTS_PER_SECOND = 3;
 const MIN_REQUEST_INTERVAL_MS = Math.ceil(1000 / EXPLORER_REQUESTS_PER_SECOND);
-let nextRequestAt = 0;
+const MAX_RETRY_WAIT_MS = 300 * 1000;
+type WaitBudget = { remainingMs: number };
+const paceByHost = new Map<string, { nextAt: number; queue: Promise<void> }>();
+
+// Blockscout keeps a quota per route family, so a cooldown on one family must not hold the others
+function paceKey(url: string): string {
+  if (!url) return "";
+  const { host, pathname } = new URL(url);
+  if (pathname.startsWith("/api/v2/")) return `${host}/api/v2`;
+  if (pathname.startsWith("/api/eth-rpc")) return `${host}/api/eth-rpc`;
+  return host;
+}
+
+function paceFor(url: string) {
+  const key = paceKey(url);
+  let pace = paceByHost.get(key);
+  if (!pace) {
+    pace = { nextAt: 0, queue: Promise.resolve() };
+    paceByHost.set(key, pace);
+  }
+  return pace;
+}
 
 /** Returns how long this request has to wait, and books the slot for it. */
-export function reserveRequestSlot(now: number): number {
-  const slot = Math.max(now, nextRequestAt);
-  nextRequestAt = slot + MIN_REQUEST_INTERVAL_MS;
+export function reserveRequestSlot(now: number, url = ""): number {
+  const pace = paceFor(url);
+  const slot = Math.max(now, pace.nextAt);
+  pace.nextAt = slot + MIN_REQUEST_INTERVAL_MS;
   return slot - now;
 }
 
+/** Retry-After is seconds or an HTTP date; a bare rate-limit count gives no window duration. */
+export function learnRateLimit(url: string, headers?: Headers, now = Date.now(), status = 429): number {
+  const pace = paceFor(url);
+  const value = headers?.get("retry-after")?.trim() ?? "";
+  let delay = NaN;
+  if (/^[0-9]+$/.test(value)) {
+    delay = Number(value) * 1000;
+  } else if (
+    /^[A-Za-z]{3}, [0-9]{2} [A-Za-z]{3} [0-9]{4} [0-9:]{8} GMT$/.test(value) ||
+    /^[A-Za-z]+, [0-9]{2}-[A-Za-z]{3}-[0-9]{2} [0-9:]{8} GMT$/.test(value)
+  ) {
+    delay = Date.parse(value) - now;
+  } else if (/^[A-Za-z]{3} [A-Za-z]{3} +[0-9]{1,2} [0-9:]{8} [0-9]{4}$/.test(value)) {
+    delay = Date.parse(`${value} GMT`) - now;
+  }
+  if (Number.isNaN(delay) && status === 429 && headers?.has("bypass-429-option")) {
+    const reset = headers.get("x-ratelimit-reset") ?? "";
+    if (/^[0-9]+$/.test(reset)) delay = Number(reset);
+  }
+  const wait = Number.isNaN(delay) ? RATE_LIMIT_RETRY_MS : Math.max(0, delay);
+  if (!Number.isFinite(wait) || wait > MAX_RETRY_WAIT_MS) {
+    throw new ExplorerBudgetError(
+      `Explorer rate limit: cooldown ${wait}ms exceeds the ${MAX_RETRY_WAIT_MS}ms wait budget`,
+    );
+  }
+  pace.nextAt = Math.max(pace.nextAt, now + wait);
+  return wait;
+}
+
+async function sleepWithinBudget(ms: number, budget: WaitBudget): Promise<void> {
+  if (!Number.isFinite(ms) || ms > budget.remainingMs) {
+    throw new ExplorerBudgetError(
+      `Explorer rate limit: ${ms}ms more needed; wait budget has ${budget.remainingMs}ms remaining`,
+    );
+  }
+  if (ms > 0) {
+    const started = Date.now();
+    await sleep(ms);
+    budget.remainingMs -= Math.max(ms, Date.now() - started);
+  }
+}
+
+async function waitForRequestSlot(url: string, budget: WaitBudget = { remainingMs: MAX_RETRY_WAIT_MS }): Promise<void> {
+  const pace = paceFor(url);
+  const queuedAt = Date.now();
+  const turn = pace.queue.then(async () => {
+    budget.remainingMs -= Date.now() - queuedAt;
+    // A response can extend the cooldown while this request is waiting.
+    while (pace.nextAt > Date.now()) await sleepWithinBudget(pace.nextAt - Date.now(), budget);
+    await sleepWithinBudget(0, budget);
+    reserveRequestSlot(Date.now(), url);
+  });
+  // A rejected wait must not reject every later request to the host.
+  pace.queue = turn.catch(() => {});
+  await turn;
+}
+
 export function resetRequestSlots(): void {
-  nextRequestAt = 0;
+  paceByHost.clear();
 }
 
 // A single request with no retries of its own: loadContractInfo owns the whole retry budget,
 // and a second layer of attempts here would multiply it
-export async function httpGetAsync<T>(url: string): Promise<T> {
-  const delay = reserveRequestSlot(Date.now());
-  if (delay > 0) await sleep(delay);
+export async function httpGetAsync<T>(
+  url: string,
+  budget: WaitBudget = { remainingMs: MAX_RETRY_WAIT_MS },
+): Promise<T> {
+  await waitForRequestSlot(url, budget);
   let response: Response;
   try {
-    response = await fetch(url, { method: "GET" });
+    response = await fetch(url, { method: "GET", headers: requestHeaders(url) });
   } catch (error) {
     throw new ExplorerHttpError(`Failed to fetch contract source code: ${printError(error)}`, true);
   }
   if (!response.ok) {
+    if (isChallenged(response)) throw new ExplorerChallengeError(response.status);
+    const cooldown =
+      response.status === 429 || response.headers?.has("retry-after")
+        ? learnRateLimit(url, response.headers, Date.now(), response.status)
+        : 0;
     throw new ExplorerHttpError(
       `Failed to fetch contract source code: HTTP status code ${response.status}: ${response.statusText}`,
       isTransientHttpStatus(response.status),
-      response.status === 429 ? RATE_LIMIT_RETRY_MS : 0,
+      response.status === 429 ? Math.max(cooldown, RATE_LIMIT_RETRY_MS) : 0,
     );
   }
   try {
@@ -163,26 +374,36 @@ export async function fetchExplorerChainId(
   explorerKey?: string,
 ): Promise<string | undefined> {
   // A probe nobody answered blocks ABI downloads outright, so each route gets its own bounded
-  // retry on a flake; the two-fetch budget of loadContractInfo is not involved.
+  // retry on a flake; the download retry budget is not involved.
   // The eth-rpc route is the one every checked blockscout actually serves, so giving up on it
   // early would send the probe to a fallback that answers "Unknown module"
   for (let attempt = 0; attempt < 2; attempt++) {
     try {
-      const response = await fetch(`https://${explorerHostname}/api/eth-rpc`, {
+      const url = `https://${explorerHostname}/api/eth-rpc`;
+      await waitForRequestSlot(url);
+      const response = await fetch(url, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: requestHeaders(url, { "Content-Type": "application/json" }),
         body: JSON.stringify({ jsonrpc: "2.0", method: "eth_chainId", params: [], id: 1 }),
       });
       if (!response.ok) {
+        // the fallback route on the same host would meet the same challenge
+        if (isChallenged(response)) throw new ExplorerChallengeError(response.status);
         if (!isTransientHttpStatus(response.status) || attempt > 0) break;
-        if (response.status === 429) await sleep(RATE_LIMIT_RETRY_MS);
+        if (response.status === 429) {
+          learnRateLimit(url, response.headers);
+          await sleep(RATE_LIMIT_RETRY_MS);
+        }
         continue;
       }
       const decimal = _hexToDecimal(((await response.json()) as { result?: unknown }).result);
       if (decimal !== undefined) return decimal;
       // the host answered without a chainId: it does not serve this route
       break;
-    } catch {
+    } catch (error) {
+      if (error instanceof ExplorerChallengeError) throw error;
+      // a cooldown beyond the budget holds for the fallback route on the same host too
+      if (error instanceof ExplorerHttpError && !error.transient) return undefined;
       if (attempt > 0) break;
       /* a network flake: one more try, then the etherscan-compatible endpoint */
     }
@@ -202,6 +423,7 @@ export async function fetchExplorerChainId(
       if (!/rate limit/i.test(answer) || attempt > 0) return undefined;
       await sleep(RATE_LIMIT_RETRY_MS);
     } catch (error) {
+      if (error instanceof ExplorerChallengeError) throw error;
       if (!(error instanceof ExplorerHttpError) || !error.transient || attempt > 0) return undefined;
       if (error.retryDelayMs) await sleep(error.retryDelayMs);
     }
@@ -236,9 +458,11 @@ class RetryingJsonRpcProvider extends JsonRpcProvider {
 }
 
 export function createProvider(rpcUrl: string): JsonRpcProvider {
+  const request = new FetchRequest(rpcUrl);
+  request.setHeader("User-Agent", userAgent());
   // staticNetwork stops ethers from re-sending eth_chainId with every call, which otherwise
   // doubles traffic and trips rate limits on public RPCs
-  return new RetryingJsonRpcProvider(rpcUrl, undefined, { staticNetwork: true });
+  return new RetryingJsonRpcProvider(request, undefined, { staticNetwork: true });
 }
 
 /**
@@ -274,9 +498,18 @@ export async function verifyChainIdWithExplorer(
   const memoKey = `${explorerHostname}|${chainId}`;
   if (verifiedExplorerChains.has(memoKey)) return true;
 
-  const explorerChainId = await fetchExplorerChainId(explorerHostname, explorerKey);
+  let explorerChainId: string | undefined;
+  let detail = "";
+  try {
+    explorerChainId = await fetchExplorerChainId(explorerHostname, explorerKey);
+  } catch (error) {
+    // only a challenge escapes fetchExplorerChainId; the hint names the override
+    detail = `: ${printError(error)}`;
+  }
   if (explorerChainId === undefined) {
-    log(`${WARNING_MARK} ${chalk.yellow(`could not verify chainId ${chainId} against explorer ${explorerHostname}`)}`);
+    log(
+      `${WARNING_MARK} ${chalk.yellow(`could not verify chainId ${chainId} against explorer ${explorerHostname}${detail}`)}`,
+    );
     return false;
   }
   if (explorerChainId !== chainId) {
@@ -288,9 +521,12 @@ export async function verifyChainIdWithExplorer(
   return true;
 }
 
+const warnedLegacyBlockscoutHosts = new Set<string>();
+
 function _getExplorerApiUrl(
   explorerHostname: string,
   address: string,
+  blockscout: boolean,
   explorerKey?: string,
   chainId?: number | string,
 ) {
@@ -306,12 +542,23 @@ function _getExplorerApiUrl(
     }
     // Use Etherscan v2 aggregator regardless of subdomain
     url = `https://api.etherscan.io/v2/api?chainId=${chainIdNumber}&module=contract&action=getsourcecode&address=${address}`;
+  } else if (blockscout) {
+    url = `https://${explorerHostname}/api/v2/smart-contracts/${address}`;
   } else {
+    if (explorerHostname.toLowerCase().includes("blockscout") && !warnedLegacyBlockscoutHosts.has(explorerHostname)) {
+      warnedLegacyBlockscoutHosts.add(explorerHostname);
+      log(
+        `${WARNING_MARK} ${chalk.yellow(
+          `${explorerHostname} looks like a blockscout instance but did not answer the /api/v2 probe; ` +
+            `falling back to the etherscan-compatible /api`,
+        )}`,
+      );
+    }
     url = `https://${explorerHostname}/api?module=contract&action=getsourcecode&address=${address}`;
   }
 
   if (explorerKey) {
-    url += `&apikey=${explorerKey}`;
+    url += `${url.includes("?") ? "&" : "?"}apikey=${explorerKey}`;
   }
 
   return url;

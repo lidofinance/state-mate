@@ -118,6 +118,7 @@ misc:
   - &lidoSigner10 "0xE6CD29BF19769E44534099d241abAa07aa8c8E9a"
   - &lidoSigner11 "0x8aA493BcD7f989caD67dd3CB48A4c2E6b40FeDB0"
   - &lidoSigner12 "0xf2374BCb265505002055942D070459a4d2011012"
+  - &lidoSigner13 "0x7a63a5cc7F6A6352d0Ae1fE175D745Bce5d75657"
 
   # --- Mellow signers ---
   - &mellowSigner1 "0x44A388BBD782AE1D7f4542aEb6C3569E2CfdF5a1"
@@ -596,7 +597,7 @@ l1:
       checks:
         SET_SYNC_DEPOSIT_PARAMS_ROLE: *SET_SYNC_DEPOSIT_PARAMS_ROLE
         asset: *ETH
-        canBeRemoved: true
+        canBeRemoved:
         claim:
         claimableOf:
         name: "SyncDepositQueue"
@@ -605,7 +606,7 @@ l1:
       implementationChecks:
         SET_SYNC_DEPOSIT_PARAMS_ROLE: *SET_SYNC_DEPOSIT_PARAMS_ROLE
         asset: *ZERO_ADDRESS
-        canBeRemoved: true
+        canBeRemoved:
         claim:
         claimableOf:
         name: "SyncDepositQueue"
@@ -654,7 +655,7 @@ l1:
       checks:
         SET_SYNC_DEPOSIT_PARAMS_ROLE: *SET_SYNC_DEPOSIT_PARAMS_ROLE
         asset: *weth
-        canBeRemoved: true
+        canBeRemoved:
         claim:
         claimableOf:
         name: "SyncDepositQueue"
@@ -663,7 +664,7 @@ l1:
       implementationChecks:
         SET_SYNC_DEPOSIT_PARAMS_ROLE: *SET_SYNC_DEPOSIT_PARAMS_ROLE
         asset: *ZERO_ADDRESS
-        canBeRemoved: true
+        canBeRemoved:
         claim:
         claimableOf:
         name: "SyncDepositQueue"
@@ -712,7 +713,7 @@ l1:
       checks:
         SET_SYNC_DEPOSIT_PARAMS_ROLE: *SET_SYNC_DEPOSIT_PARAMS_ROLE
         asset: *wsteth
-        canBeRemoved: true
+        canBeRemoved:
         claim:
         claimableOf:
         name: "SyncDepositQueue"
@@ -721,7 +722,7 @@ l1:
       implementationChecks:
         SET_SYNC_DEPOSIT_PARAMS_ROLE: *SET_SYNC_DEPOSIT_PARAMS_ROLE
         asset: *ZERO_ADDRESS
-        canBeRemoved: true
+        canBeRemoved:
         claim:
         claimableOf:
         name: "SyncDepositQueue"
@@ -743,7 +744,7 @@ l1:
       checks:
         asset: *wsteth
         batchAt:
-        canBeRemoved: false
+        canBeRemoved:
         claimableOf:
         # getState: [batchIterator, batchCount, totalDemandAssets, totalPendingShares]
         getState:
@@ -752,7 +753,7 @@ l1:
       implementationChecks:
         asset: *ZERO_ADDRESS
         batchAt:
-        canBeRemoved: true
+        canBeRemoved:
         claimableOf:
         getState:
         requestsOf:
@@ -773,7 +774,7 @@ l1:
       checks:
         SET_SYNC_REDEEM_PARAMS_ROLE: *SET_SYNC_REDEEM_PARAMS_ROLE
         asset: *wsteth
-        canBeRemoved: true
+        canBeRemoved:
         getLiquidAssets:
         name: "SyncRedeemQueue"
         # [usage, remainingDailyLimit] — both move with every redeem
@@ -784,7 +785,7 @@ l1:
       implementationChecks:
         SET_SYNC_REDEEM_PARAMS_ROLE: *SET_SYNC_REDEEM_PARAMS_ROLE
         asset: *ZERO_ADDRESS
-        canBeRemoved: true
+        canBeRemoved:
         getLiquidAssets:
         name: "SyncRedeemQueue"
         remainingDailyLimit: [0, 0]
@@ -812,7 +813,7 @@ l1:
         vault: *vault
       implementationChecks:
         asset: *ZERO_ADDRESS
-        canBeRemoved: true
+        canBeRemoved:
         claimableOf:
         requestOf:
         unclaimedRequests: 0
@@ -833,7 +834,7 @@ l1:
       checks:
         SET_SYNC_DEPOSIT_PARAMS_ROLE: *SET_SYNC_DEPOSIT_PARAMS_ROLE
         asset: *ggv
-        canBeRemoved: true
+        canBeRemoved:
         claim:
         claimableOf:
         name: "SyncDepositQueue"
@@ -842,7 +843,7 @@ l1:
       implementationChecks:
         SET_SYNC_DEPOSIT_PARAMS_ROLE: *SET_SYNC_DEPOSIT_PARAMS_ROLE
         asset: *ZERO_ADDRESS
-        canBeRemoved: true
+        canBeRemoved:
         claim:
         claimableOf:
         name: "SyncDepositQueue"
@@ -870,7 +871,7 @@ l1:
         vault: *vault
       implementationChecks:
         asset: *ZERO_ADDRESS
-        canBeRemoved: true
+        canBeRemoved:
         claimableOf:
         requestOf:
         unclaimedRequests: 0
@@ -891,7 +892,7 @@ l1:
       checks:
         SET_SYNC_DEPOSIT_PARAMS_ROLE: *SET_SYNC_DEPOSIT_PARAMS_ROLE
         asset: *streth
-        canBeRemoved: true
+        canBeRemoved:
         claim:
         claimableOf:
         name: "SyncDepositQueue"
@@ -900,7 +901,7 @@ l1:
       implementationChecks:
         SET_SYNC_DEPOSIT_PARAMS_ROLE: *SET_SYNC_DEPOSIT_PARAMS_ROLE
         asset: *ZERO_ADDRESS
-        canBeRemoved: true
+        canBeRemoved:
         claim:
         claimableOf:
         name: "SyncDepositQueue"
@@ -928,7 +929,7 @@ l1:
         vault: *vault
       implementationChecks:
         asset: *ZERO_ADDRESS
-        canBeRemoved: true
+        canBeRemoved:
         claimableOf:
         requestOf:
         unclaimedRequests: 0
@@ -949,7 +950,7 @@ l1:
       checks:
         SET_SYNC_DEPOSIT_PARAMS_ROLE: *SET_SYNC_DEPOSIT_PARAMS_ROLE
         asset: *dVstETH
-        canBeRemoved: true
+        canBeRemoved:
         claim:
         claimableOf:
         name: "SyncDepositQueue"
@@ -958,7 +959,7 @@ l1:
       implementationChecks:
         SET_SYNC_DEPOSIT_PARAMS_ROLE: *SET_SYNC_DEPOSIT_PARAMS_ROLE
         asset: *ZERO_ADDRESS
-        canBeRemoved: true
+        canBeRemoved:
         claim:
         claimableOf:
         name: "SyncDepositQueue"
@@ -1144,8 +1145,8 @@ l1:
         feeRecipient: *treasury
         minPriceD18:
         owner: *lazyVaultAdmin
-        performanceFeeD6: 0
-        protocolFeeD6: 0
+        performanceFeeD6: 150000
+        protocolFeeD6: 2000
         redeemFeeD6: 0
         timestamps:
       implementationChecks:
@@ -1559,6 +1560,7 @@ l1:
         getChainId: 1
         getModulesPaginated:
         getOwners:
+          - *lidoSigner13
           - *lidoSigner6
           - *lidoSigner9
           - *lidoSigner2

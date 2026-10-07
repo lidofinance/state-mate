@@ -3748,6 +3748,126 @@ l1:
         canPerform: null
         getEVMScriptRegistry: null
         getPermissionManager: null
+      # The DAO permission map, verified against SetPermission/SetPermissionParams/
+      # ChangePermissionManager events, hasPermission, and the raw ACL storage. Roles are
+      # keyed by hash; the name is in the comment. paramsDigest = keccak256 over the
+      # (entity . paramsHash) pairs of a role's parameterized grants, sorted by entity.
+      aragonAcl:
+        *aragonAgent :
+          "0xcebf517aa4440d1d125e0355aae64401211d0848a23c02cc5d29a14822580ba4": # EXECUTE_ROLE
+            manager: *aragonAgent
+            granted: ["0x0ecc17597d292271836691358b22340b78f3035b"] # dual governance admin executor (hoodi)
+          "0xb421f7ad7646747f3051c50c0b8e2377839296cd4973e27f63821d73e390338f": # RUN_SCRIPT_ROLE
+            manager: *aragonAgent
+            granted: ["0x0ecc17597d292271836691358b22340b78f3035b", "0xd500a8adb182f55741e267730dfbfb4f1944c205"] # dual governance admin executor (hoodi), emergency governance executor (hoodi)
+          "0x8502233096d909befbda0999bb8ea2f3a6be3c138b9fbf003752a4c8bce86f6c": # TRANSFER_ROLE
+            manager: *aragonVoting
+            granted: [*aragonFinance]
+        *simpleDvt :
+          "0x78523850fdd761612f46e844cf5a16bda6b3151d6ae961fd7e8e7b92bfbca7f8": # MANAGE_NODE_OPERATOR_ROLE
+            manager: *aragonAgent
+            granted: [*evmScriptExecutor, *superManager, *curatedModuleManager]
+          "0x75abc64490e17b40ea1e66691c3eb493647b24430b358bd87ec3e5127f1621ee": # MANAGE_SIGNING_KEYS
+            manager: *evmScriptExecutor
+            granted: [*aragonVoting, *superManager, *curatedModuleManager]
+          "0x07b39e0faf2521001ae4e58cb9ffd3840a63e205d288dc9c93c3774f0d794754": # SET_NODE_OPERATOR_LIMIT_ROLE
+            manager: *aragonAgent
+            granted: [*evmScriptExecutor, *superManager, *curatedModuleManager]
+          "0xbb75b874360e0bfd87f964eadd8276d8efb7c942134fc329b513032d0803e0c6": # STAKING_ROUTER_ROLE
+            manager: *aragonAgent
+            granted: [*aragonAgent, *evmScriptExecutor, *stakingRouter, *superManager, *curatedModuleManager]
+        *aragonFinance :
+          "0xd79730e82bfef7d2f9639b9d10bf37ebb662b22ae2211502a00bdf7b2cc3a23a": # CHANGE_BUDGETS_ROLE
+            manager: *aragonVoting
+            granted: [*aragonVoting]
+          "0xd35e458bacdd5343c2f050f574554b2f417a8ea38d6a9a65ce2225dbe8bb9a9d": # CHANGE_PERIOD_ROLE
+            manager: *aragonVoting
+            granted: [*aragonVoting]
+          "0x5de467a460382d13defdc02aacddc9c7d6605d6d4e0b8bd2f70732cae8ea17bc": # CREATE_PAYMENTS_ROLE
+            manager: *aragonVoting
+            granted: [*aragonVoting]
+            paramsDigest: "0x87f709c83fe7e9f2a0b56d50154638853752edc04706d58d9e2fce741f1aeee2" # 1 parameterized grant(s)
+          "0x563165d3eae48bcb0a092543ca070d989169c98357e9a1b324ec5da44bab75fd": # EXECUTE_PAYMENTS_ROLE
+            manager: *aragonVoting
+            granted: [*aragonVoting]
+          "0x30597dd103acfaef0649675953d9cb22faadab7e9d9ed57acc1c429d04b80777": # MANAGE_PAYMENTS_ROLE
+            manager: *aragonVoting
+            granted: [*aragonVoting]
+        *lido :
+          "0x33969636f1fbf3d7d062d4de4a08e7bd3c46606ec28b3a4398d2665be559b921": # BUFFER_RESERVE_MANAGER_ROLE
+            manager: *aragonAgent
+            granted: [*aragonAgent, *evmScriptExecutor]
+          "0x139c2898040ef16910dc9f44dc697df79363da767d8bc92f2e310312b816e46d": # PAUSE_ROLE
+            manager: *aragonAgent
+          "0x2fc10cc8ae19568712f7a176fb4978616a610650813c9d05326c34abb62749c7": # RESUME_ROLE
+            manager: *aragonAgent
+          "0xa42eee1333c0758ba72be38e728b6dadb32ea767de5b4ddbaea1dae85b1b051f": # STAKING_CONTROL_ROLE
+            manager: *aragonAgent
+            granted: ["0x064a4d64040bfd52d0d1dc7f42ea799cb0a8ac40"] # stake limit helper (hoodi)
+          "0x84ea57490227bc2be925c684e2a367071d69890b629590198f4125a018eb1de8": # STAKING_PAUSE_ROLE
+            manager: *aragonAgent
+          "0xe6dc5d79630c61871e99d341ad72c5a052bed2fc8c79e5a4480a7cd31117576c": # UNSAFE_CHANGE_DEPOSITED_VALIDATORS_ROLE
+            manager: *aragonAgent
+        *aragonVoting :
+          "0xe7dcd7275292e064d090fbc5f3bd7995be23b502c1fed5cd94cfddbbdcd32bbc": # CREATE_VOTES_ROLE
+            manager: *aragonVoting
+            granted: [*aragonTokenManager]
+          "0xad15e7261800b4bb73f1b69d3864565ffb1fd00cb93cf14fe48da8f1f2149f39": # MODIFY_QUORUM_ROLE
+            manager: *aragonVoting
+            granted: [*aragonVoting]
+          "0xda3972983e62bdf826c4b807c4c9c2b8a941e1f83dfa76d53d6aeac11e1be650": # MODIFY_SUPPORT_ROLE
+            manager: *aragonVoting
+            granted: [*aragonVoting]
+          "0x068ca51c9d69625c7add396c98ca4f3b27d894c3b973051ad3ee53017d7094ea": # UNSAFELY_MODIFY_VOTE_TIME_ROLE
+            manager: *aragonVoting
+            granted: [*aragonVoting]
+        *nodeOperatorsRegistry :
+          "0x78523850fdd761612f46e844cf5a16bda6b3151d6ae961fd7e8e7b92bfbca7f8": # MANAGE_NODE_OPERATOR_ROLE
+            manager: *aragonAgent
+            granted: [*aragonAgent, *superManager, *curatedModuleManager]
+          "0x75abc64490e17b40ea1e66691c3eb493647b24430b358bd87ec3e5127f1621ee": # MANAGE_SIGNING_KEYS
+            manager: *aragonAgent
+            granted: [*superManager, *curatedModuleManager]
+          "0x07b39e0faf2521001ae4e58cb9ffd3840a63e205d288dc9c93c3774f0d794754": # SET_NODE_OPERATOR_LIMIT_ROLE
+            manager: *aragonAgent
+            granted: [*evmScriptExecutor, *superManager, *curatedModuleManager]
+          "0xbb75b874360e0bfd87f964eadd8276d8efb7c942134fc329b513032d0803e0c6": # STAKING_ROUTER_ROLE
+            manager: *aragonAgent
+            granted: [*stakingRouter, *superManager, *curatedModuleManager]
+        "0x682e94d2630846a503bdee8b6810df71c9806891": # sandbox staking module (hoodi)
+          "0x78523850fdd761612f46e844cf5a16bda6b3151d6ae961fd7e8e7b92bfbca7f8": # MANAGE_NODE_OPERATOR_ROLE
+            manager: *aragonVoting
+            granted: [*superManager, *curatedModuleManager]
+          "0x75abc64490e17b40ea1e66691c3eb493647b24430b358bd87ec3e5127f1621ee": # MANAGE_SIGNING_KEYS
+            manager: *aragonVoting
+            granted: [*superManager, *curatedModuleManager]
+            paramsDigest: "0x378fad46c43abc23059a25b90659319909a2f7e06dfc90e3fa42d375f46dc198" # 1 parameterized grant(s)
+          "0x07b39e0faf2521001ae4e58cb9ffd3840a63e205d288dc9c93c3774f0d794754": # SET_NODE_OPERATOR_LIMIT_ROLE
+            manager: *aragonVoting
+            granted: [*superManager, *curatedModuleManager]
+          "0xbb75b874360e0bfd87f964eadd8276d8efb7c942134fc329b513032d0803e0c6": # STAKING_ROUTER_ROLE
+            manager: *aragonVoting
+            granted: [*stakingRouter, *curatedModuleManager]
+        *aragonAcl :
+          "0x0b719b33c83b8e5d300c521cb8b54ae9bd933996a14bef8c2f4e0285d2d2400a": # CREATE_PERMISSIONS_ROLE
+            manager: *aragonAgent
+            granted: [*aragonAgent]
+        *aragonTokenManager :
+          "0xf5a08927c847d7a29dc35e105208dbde5ce951392105d712761cc5d17440e2ff": # ASSIGN_ROLE
+            manager: *aragonVoting
+            granted: [*aragonVoting]
+          "0xe97b137254058bd94f28d2f3eb79e2d34074ffb488d042e3bc958e0a57d2fa22": # BURN_ROLE
+            manager: *aragonVoting
+            granted: [*aragonVoting]
+          "0x2406f1e99f79cea012fb88c5c36566feaeefee0f4b98d3a376b49310222b53c4": # ISSUE_ROLE
+            manager: *aragonVoting
+            granted: [*aragonVoting]
+          "0x154c00819833dac601ee5ddded6fda79d9d8b506b911b3dbd54cdb95fe6c3686": # MINT_ROLE
+            manager: *aragonVoting
+            granted: [*aragonVoting]
+          "0x95ffc68daedf1eb334cfcd22ee24a5eeb5a8e58aa40679f2ad247a84140f8d6e": # REVOKE_VESTINGS_ROLE
+            manager: *aragonVoting
+            granted: [*aragonVoting]
 
     apm-registry-factory:
       name: APMRegistryFactory
