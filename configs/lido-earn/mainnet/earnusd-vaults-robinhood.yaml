@@ -379,7 +379,6 @@ l1:
         *PULL_LIQUIDITY_ROLE : [*curator]
         *PUSH_LIQUIDITY_ROLE : [*curator]
         *SET_FLAGS_ROLE : [*earnUSDe_timelockController]
-        # WARN: mellow_deployer must renounce SET_MERKLE_ROOT_ROLE (on-chain count is 2)
         *SET_MERKLE_ROOT_ROLE : [*earnUSDe_timelockController]
         *SET_QUEUE_STATUS_ROLE : [*earnUSDe_timelockController]
         *SUBMIT_REPORTS_ROLE : [*earnUSDe_oracleSubmitter]
@@ -447,7 +446,7 @@ l1:
         getVerificationResult:
         hashCall:
         isAllowedCall:
-        merkleRoot: *ZERO_BYTES32
+        merkleRoot: "0x0efe386b4d8c80ea07997499bd8ed0d872190cd5eceea05c5ae90dc263294642"
         vault: *earnUSDe_vault
         verifyCall:
       implementationChecks:
