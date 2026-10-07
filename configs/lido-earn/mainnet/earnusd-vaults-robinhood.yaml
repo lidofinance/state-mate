@@ -156,7 +156,8 @@ roles:
 
 l1:
   rpcUrl: ROBINHOOD_RPC_URL
-  explorerHostname: robinhoodchain.blockscout.com
+  explorerHostname: api.etherscan.io
+  explorerTokenEnv: ETHERSCAN_TOKEN
   chainId: 4663
   contracts:
     # =============================================
@@ -776,7 +777,7 @@ l1:
     proxyAdmin_multisig:
       name: SafeL2
       address: *proxyAdmin
-      proxyName: SafeProxy
+      proxyName: GnosisSafeProxy
       implementation: *safeImpl_1_4_1
       proxyChecks: {}
       storage:
