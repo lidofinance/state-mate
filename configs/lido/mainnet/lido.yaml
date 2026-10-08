@@ -1,5 +1,5 @@
 # yaml-language-server: $schema=../../../schemas/main-schema.json
-# Expected state after Voting and DG execution of lidofinance/scripts PR #682.
+# Expected state after Voting and DG execution of lidofinance/scripts PR #689.
 ---
 deployed:
   l1:
@@ -346,7 +346,7 @@ misc:
 
   # --- Contract versions/counts ---
   - &STAKING_ROUTER_VERSION 4
-  - &STAKING_MODULES_COUNT 4 # Curated, sDVT, CSM, CMv2
+  - &STAKING_MODULES_COUNT 5 # Curated, sDVT, CSM, CMv2, CSM 0x02
   - &BURNER_VERSION 1
 
   # --- Misc Limits ---
@@ -1065,10 +1065,23 @@ l1:
         getRoleMembers: null
         getStakingFeeAggregateDistribution: null
         getStakingFeeAggregateDistributionE4Precision: null
-        getStakingModule: null
+        getStakingModule:
+          - args: [1]
+            result:
+              [1, *nodeOperatorsRegistry, 350, 650, 0, 0, "curated-onchain-v1", null, null, null, 0, 150, 25, 1, null]
+          - args: [2]
+            result: [2, *simpleDvt, 800, 200, 430, 0, "SimpleDVT", null, null, null, 478, 150, 25, 1, null]
+          - args: [3]
+            result: [3, *csModule, 600, 400, 900, 0, "Community Staking", null, null, null, 1080, 30, 25, 1, null]
+          - args: [4]
+            result:
+              [4, *curatedModule, 400, 600, 10000, 0, "curated-onchain-v2", null, null, null, 10000, 100, 75, 2, null]
+          - args: [5]
+            result:
+              [5, *csm0x02Module, 200, 800, 1, 0, "Community Staking 0x02", null, null, null, 240, 30, 25, 2, null]
         getStakingModuleActiveValidatorsCount: null
         getStakingModuleDigests: null
-        getStakingModuleIds: null
+        getStakingModuleIds: [1, 2, 3, 4, 5]
         getStakingModuleIsActive: null
         getStakingModuleIsDepositsPaused: null
         getStakingModuleIsStopped: null
@@ -1412,7 +1425,7 @@ l1:
         supportsInterface: null
       ozAcl:
         *DEFAULT_ADMIN_ROLE : [*aragonAgent]
-        *REQUEST_BURN_MY_STETH_ROLE : [*csAccounting, *curatedAccounting]
+        *REQUEST_BURN_MY_STETH_ROLE : [*csAccounting, *curatedAccounting, *csm0x02Accounting]
         *REQUEST_BURN_SHARES_ROLE : [*accounting]
       implementationChecks:
         DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
@@ -2528,9 +2541,9 @@ l1:
         VERIFIER_ROLE: *SM_VERIFIER_ROLE
         getInitializedVersion: 3
         getType: *CSM_TYPE
-        getTopUpQueue: [true, 16, null, null]
+        getTopUpQueue: [true, 32, null, null]
         getResumeSinceTimestamp: null
-        isPaused: true
+        isPaused: false
         depositQueueItem: null
         depositQueuePointers: null
         exitDeadlineThreshold: null
@@ -3049,7 +3062,7 @@ l1:
         MANAGE_MEMBERS_AND_QUORUM_ROLE: *MANAGE_MEMBERS_AND_QUORUM_ROLE
         MANAGE_REPORT_PROCESSOR_ROLE: *MANAGE_REPORT_PROCESSOR_ROLE
         getChainConfig: [*SLOTS_PER_EPOCH, *SECONDS_PER_SLOT, *GENESIS_TIME]
-        getFrameConfig: [null, *HC_CSM_FRAME_EPOCHS, *HC_CSM_FAST_LANE]
+        getFrameConfig: [494340, *HC_CSM_FRAME_EPOCHS, *HC_CSM_FAST_LANE]
         getMembers: [*HASH_CONSENSUS_MEMBERS, null]
         getQuorum: *HASH_CONSENSUS_QUORUM
         getReportProcessor: *csm0x02FeeOracle
@@ -4771,8 +4784,7 @@ l1:
         supportsInterface: null
       ozAcl:
         *DEFAULT_ADMIN_ROLE : [*aragonAgent]
-        # VEBO (pre-existing) + New CSM Ejector + Curated Ejector, granted in the SRv3 upgrade vote
-        *ADD_FULL_WITHDRAWAL_REQUEST_ROLE : [*csEjector, *curatedEjector, *validatorsExitBusOracle]
+        *ADD_FULL_WITHDRAWAL_REQUEST_ROLE : [*csEjector, *curatedEjector, *csm0x02Ejector, *validatorsExitBusOracle]
         *TWG_PAUSE_ROLE : [*circuitBreaker, *resealManager]
         *TWG_RESUME_ROLE : [*resealManager]
         # "Grant TWG TW_EXIT_LIMIT_MANAGER_ROLE to AGENT" vote item
@@ -6311,6 +6323,11 @@ l1:
           - *curatedFeeOracle
           - *curatedVerifier
           - *curatedEjector
+          - *csm0x02Module
+          - *csm0x02Accounting
+          - *csm0x02FeeOracle
+          - *csm0x02Verifier
+          - *csm0x02Ejector
         getPauser:
           - args: [*withdrawalQueueERC721]
             result: *circuitBreakerCommittee
@@ -6350,11 +6367,21 @@ l1:
             result: *curatedModuleCommittee
           - args: [*curatedVerifier]
             result: *curatedModuleCommittee
+          - args: [*csm0x02Module]
+            result: *csmCommittee
+          - args: [*csm0x02Accounting]
+            result: *csmCommittee
+          - args: [*csm0x02FeeOracle]
+            result: *csmCommittee
+          - args: [*csm0x02Verifier]
+            result: *csmCommittee
+          - args: [*csm0x02Ejector]
+            result: *csmCommittee
         getPausableCount:
           - args: [*circuitBreakerCommittee]
             result: 7
           - args: [*csmCommittee]
-            result: 7
+            result: 12
           - args: [*curatedModuleCommittee]
             result: 5
         isPauserLive:
