@@ -327,7 +327,7 @@ export async function resolveDeploymentBlock(chainId: string, address: string): 
  * terminating check can cover. The RPC already decides membership through views and storage
  * reads, so letting it nominate tail candidates adds no new trust root.
  *
- * Views and storage reads are deliberately NOT pinned to the captured block. Answers describe
+ * By default views and storage reads are NOT pinned to the captured block. Answers describe
  * the state at read time: a permission that moves mid-run either fails a check closed -- one
  * cheap re-run on a chain that has stopped moving -- or moved after the run began, which no
  * terminating check covers pinned or not, because events through the captured head cannot
@@ -335,7 +335,8 @@ export async function resolveDeploymentBlock(chainId: string, address: string): 
  * snapshot consistency at the price of a hard archive-state dependency: a non-archive node keeps
  * roughly the last 128 states, under a minute of blocks on the fastest supported chains, which
  * an ordinary run outlives in its happy path. And a config is many sections, each capturing its
- * own head, so the run as a whole still would not describe one block.
+ * own head, so the run as a whole still would not describe one block. `--block` opts into that
+ * price: every read and this head then name one block, and the RPC must serve its state.
  */
 export interface ScanBounds {
   /** The chain head at the moment the scan started; candidacy is complete through here. */

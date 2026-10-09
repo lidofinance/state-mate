@@ -6,6 +6,7 @@ import { loadAbiFromFile } from "src/abi-provider";
 import { type EntryField, getNonMutables, printError } from "src/common";
 import { context, type ErrorDetail, stats } from "src/context";
 import { LogCommand, logError, logErrorAndExit, logMethodSkipped } from "src/logger";
+import { recordObservedCall } from "src/observed";
 import {
   type ArbitraryObject,
   type ContractEntry,
@@ -29,6 +30,10 @@ let currentErrorContext: Partial<ErrorDetail> = {};
 
 export function setErrorContext(update: Partial<ErrorDetail>): void {
   currentErrorContext = { ...currentErrorContext, ...update };
+}
+
+export function getErrorContext(): Readonly<Partial<ErrorDetail>> {
+  return currentErrorContext;
 }
 
 export function clearErrorContext(): void {
@@ -97,7 +102,14 @@ export function needCheck(level: CheckLevel, name: string) {
 
 export type CheckOutcome = { detail: string; ok: true } | { message: string; ok: false };
 
+export type Answer = { reverted: string } | { value: unknown };
+
 export abstract class SectionValidatorBase {
+  /** Checks the run supplies rather than the config declares, e.g. the `null` coverage of an implementation ABI. */
+  protected undeclared: ReadonlySet<string> = new Set();
+  /** What argumentless reads answered, so that the enumeration expansion does not read a count twice. */
+  protected answers = new Map<string, Answer>();
+
   constructor(
     protected provider: JsonRpcProvider,
     protected sectionName: EntryField,
@@ -158,6 +170,11 @@ export abstract class SectionValidatorBase {
     if (staticCallResult.result === null) {
       incSkipped();
       logMethodSkipped(method);
+      // `null` declines to assert a value, not to look: with --observed the run still records what
+      // the chain answered for every read the config declares
+      if (context.observedPath && !this.undeclared.has(method)) {
+        await this._recordOnly(contract, method, staticCallResult);
+      }
       return;
     }
     incChecks();
@@ -181,11 +198,13 @@ export abstract class SectionValidatorBase {
     try {
       actual = await contractFunction.staticCall(...(args || ""));
     } catch (error) {
+      this._answer(method, signature, args, { reverted: printError(error) });
       const errorMessage = `REVERTED with: ${printError(error)}`;
       logHandle.failure(errorMessage);
       incErrors(errorMessage);
       return;
     }
+    this._answer(method, signature, args, { value: actual });
     try {
       _assertEqual(actual, expected);
       logHandle.success(_stringify(actual));
@@ -194,6 +213,31 @@ export abstract class SectionValidatorBase {
       logHandle.failure(errorMessage);
       incErrors(errorMessage);
     }
+  }
+
+  /** Read a check the config declines to assert, for the observed file alone. */
+  protected async _recordOnly(contract: Contract, method: string, entry: StaticCallResult) {
+    const { args, signature = method } = entry;
+    let contractFunction: ReturnType<typeof contract.getFunction>;
+    try {
+      contractFunction = contract.getFunction(signature);
+      // `balanceOf: null` names no account, and a bare overloaded name names no function: a call
+      // would record ethers' complaint as a revert
+      if (contractFunction.fragment.inputs.length !== (args?.length ?? 0)) return;
+    } catch {
+      return;
+    }
+    setErrorContext({ method: `${signature}${args ? `(${args.toString()})` : ""}` });
+    try {
+      this._answer(method, signature, args, { value: await contractFunction.staticCall(...(args || "")) });
+    } catch (error) {
+      this._answer(method, signature, args, { reverted: printError(error) });
+    }
+  }
+
+  private _answer(method: string, signature: string, args: readonly unknown[] | undefined, answer: Answer) {
+    recordObservedCall(currentErrorContext, signature, args, answer);
+    if (!args?.length) this.answers.set(method, answer);
   }
 
   protected async _checkViewMustRevert(contract: Contract, method: string, staticCallMustRevert: StaticCallMustRevert) {
@@ -215,10 +259,12 @@ export abstract class SectionValidatorBase {
     }
     try {
       const actual: unknown = await contractFunction.staticCall(...(args || ""));
+      this._answer(method, signature, args, { value: actual });
       const errorMessage = `Expected revert but got: ${_stringify(actual)}`;
       logHandle.failure(errorMessage);
       incErrors(errorMessage);
     } catch (error) {
+      this._answer(method, signature, args, { reverted: printError(error) });
       logHandle.success(`REVERTED with: ${printError(error)}`);
     }
   }
@@ -236,7 +282,7 @@ export abstract class SectionValidatorBase {
   }
 }
 
-function _stringify(value: unknown) {
+export function _stringify(value: unknown) {
   return value instanceof Object ? JSON.stringify(value) : String(value);
 }
 

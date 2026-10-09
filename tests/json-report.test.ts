@@ -16,6 +16,7 @@ import {
   emitReport,
   endConfig,
   endContract,
+  recordPinnedBlock,
   resetReport,
 } from "../src/report";
 import { incChecks, incErrors, resetContractCounters, setErrorContext } from "../src/section-validators/base";
@@ -116,6 +117,15 @@ describe("--json report", () => {
         failures: [{ check: "owner", message: "Expected 0x1 to equal actual 0x2", type: "checks" }],
       },
     ]);
+  });
+
+  it("names the block each pinned section was read at", () => {
+    beginConfig("cfg.yaml");
+    recordPinnedBlock("l1", 26134363);
+    recordPinnedBlock("l2", 60553774);
+    endConfig();
+
+    assert.deepEqual(rendered(0).configs[0].blocks, { l1: 26134363, l2: 60553774 });
   });
 
   it("keeps a check that could not run visible as a warning on its contract", () => {
