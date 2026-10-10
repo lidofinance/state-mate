@@ -99,6 +99,14 @@ yarn start path/to/config.yaml --update-abi --allow-unverified-explorer
 
 The flag permits downloads when the explorer cannot confirm its chain. It still rejects a reported chain mismatch. RPC chain verification, ABI validation, contract-name checks, and state checks remain enabled. These checks do not prove that an ABI came from the intended chain: contracts on different networks can share the same name and interface.
 
+When you already know which chain the host serves, say so instead, and the host is not probed at all:
+
+```sh
+yarn start path/to/config.yaml --trusted-explorer robinhoodchain.blockscout.com=4663
+```
+
+A config that names another chain for a trusted host stops the run, as a disagreeing probe does. The option is repeatable and takes comma-separated pairs.
+
 ## Configure credentials for ACL scans
 
 Set `explorerTokenEnv` to the API-key variable for the section's `explorerHostname`. ACL scans select their explorer by chain and reuse that key only when the provider matches. For an independent ACL source, set `ETHERSCAN_TOKEN` for Etherscan or `BLOCKSCOUT_TOKEN` for Blockscout. Blockscout scans can also run without a key.

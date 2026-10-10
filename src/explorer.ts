@@ -3,6 +3,7 @@ import { Contract, FetchRequest, JsonRpcProvider } from "ethers";
 
 import packageJson from "../package.json";
 import { printError } from "./common";
+import { context } from "./context";
 import { log, logErrorAndExit, WARNING_MARK } from "./logger";
 import {
   type Abi,
@@ -431,6 +432,12 @@ export async function fetchExplorerChainId(
   return undefined;
 }
 
+/** "<host>=<chainId>", the form --trusted-explorer takes; null when the text is not that. */
+export function parseTrustedExplorer(text: string): [string, string] | null {
+  const match = /^([a-z0-9-]+(?:\.[a-z0-9-]+)*(?::\d+)?)=([1-9]\d*)$/i.exec(text.trim());
+  return match ? [match[1].toLowerCase(), match[2]] : null;
+}
+
 const TRANSIENT_RPC_RETRY_MS = 2000;
 const TRANSIENT_RPC_ERROR = /\b(408|429|5\d\d)\b|timeout|econnreset|econnrefused/i;
 
@@ -493,6 +500,19 @@ export async function verifyChainIdWithExplorer(
   // etherscan v2 takes the chain as a request parameter, so the host cannot disagree with it;
   // only a host that serves a single fixed chain can contradict the config
   if (explorerHostname.includes("etherscan.io")) return true;
+
+  // The caller already knows which chain this host serves; asking the host would only spend its
+  // rate limit, and a host that refuses the probe would block every download of the run
+  const trusted = context.trustedExplorers[explorerHostname.toLowerCase()];
+  if (trusted !== undefined) {
+    if (trusted !== chainId) {
+      logErrorAndExit(
+        `${chalk.yellow("--trusted-explorer")} names chain ${chalk.yellow(trusted)} for ${chalk.magenta(explorerHostname)}, while the config expects ${chalk.yellow(chainId)}`,
+      );
+    }
+    log(`Explorer ${chalk.magenta(explorerHostname)} trusted for chainId ${chainId}, not probed`);
+    return true;
+  }
 
   // one probe per host and chain: the ABI pass and the checks pass ask about the same sections
   const memoKey = `${explorerHostname}|${chainId}`;

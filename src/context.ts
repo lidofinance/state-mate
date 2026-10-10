@@ -28,6 +28,8 @@ export const context = {
   updateAbi: false,
   skipImplementationCheck: false,
   allowUnverifiedExplorer: false,
+  // --trusted-explorer: lowercase explorer host -> the decimal chainId it is known to serve
+  trustedExplorers: {} as Record<string, string>,
   quiet: false,
   // --json: one report on stdout instead of the log; see docs/json-output.md
   json: false,

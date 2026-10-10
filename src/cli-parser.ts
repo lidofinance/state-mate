@@ -2,6 +2,7 @@ import { CommanderError, InvalidArgumentError, program } from "commander";
 
 import { EntryField, printError } from "./common";
 import { type CheckOnly, context } from "./context";
+import { parseTrustedExplorer } from "./explorer";
 import { FatalError, logErrorAndExit } from "./logger";
 
 type CheckOnlyOptionType = null | CheckOnly;
@@ -46,6 +47,12 @@ export function parseCommandLineArguments() {
     .option("--update-abi", "re-download every ABI; missing ones are downloaded without the flag too")
     .option("--skip-implementation-check", "do not verify implementation addresses against the chain")
     .option("--allow-unverified-explorer", "download ABIs even when the explorer does not confirm the config's chainId")
+    .option(
+      "--trusted-explorer <host=chainId>",
+      "skip the chainId probe for an explorer host known to serve that chain; repeatable, or comma-separated",
+      (value: string, previous: string[]) => [...previous, value],
+      [] as string[],
+    )
     .option("-q, --quiet", "print only contract headers, per-contract totals and errors")
     .option("-J, --json", "one JSON report on stdout: verdict, counters, failed checks; see docs/json-output.md");
 
@@ -91,6 +98,15 @@ export function parseCommandLineArguments() {
     };
   }
 
+  const trustedExplorers: Record<string, string> = {};
+  for (const item of (options.trustedExplorer as string[]).flatMap((value) => value.split(","))) {
+    const parsed = parseTrustedExplorer(item);
+    if (!parsed || (trustedExplorers[parsed[0]] ?? parsed[1]) !== parsed[1]) {
+      logErrorAndExit(`Invalid --trusted-explorer value "${item}": expected <host>=<chainId>, one chain per host`);
+    }
+    trustedExplorers[parsed[0]] = parsed[1];
+  }
+
   return {
     configPath,
     autoLoadDeployedAndInputs: Boolean(options.autoLoadDeployedAndInputs),
@@ -101,6 +117,7 @@ export function parseCommandLineArguments() {
     updateAbi: options.updateAbi,
     skipImplementationCheck: Boolean(options.skipImplementationCheck),
     allowUnverifiedExplorer: Boolean(options.allowUnverifiedExplorer),
+    trustedExplorers,
     quiet: Boolean(options.quiet),
     json: Boolean(options.json),
   };
