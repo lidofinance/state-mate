@@ -1,5 +1,5 @@
 # yaml-language-server: $schema=../../../schemas/main-schema.json
-# Expected state after Voting and DG execution of lidofinance/scripts PR #682.
+# Expected state after Voting and DG execution of lidofinance/scripts PR #689.
 
 parameters:
   - &trustedCaller "0x18A1065c81b0Cc356F1b1C843ddd5E14e4AefffF"
@@ -32,11 +32,15 @@ misc:
   - &sdvtTrustedCaller "0x08637515E85A4633E23dfc7861e2A9f53af640f7"
   - &communityStakingModule "0xdA7dE2ECdDfccC6c3AF10108Db212ACBBf9EA83F"
   - &csmAccounting "0x4d72BFF1BeaC69925F8Bd12526a39BAAb069e5Da"
+  - &csm0x02Module "0x792Cd25e4aE3578375031FB55e048E163A804F7B"
+  - &csm0x02Accounting "0x3696dDd942A9e156F5D4728505D1b9a32dCef900"
   - &curatedModule "0xDa5F930cE326EB5205085D66c72A4E79d60cB8C1"
   - &curatedAccounting "0x2F91e3A8C5d6593bf4F8403fCfeCcd62dF59f6F6"
   - &curatedMetaRegistry "0xA64b339eebD3dC3De848298B6a140955932901d8"
   - &stakingRouter "0xFdDf38947aFB03C621C71b06C9C70bce73f12999"
   - &consolidationMigrator "0x9Dc70b5A4f4F5E4AF9058C983D560564F031f1D7"
+  - &finance "0xB9E5CBB9CA5b0d659238807E84D0176930753d86"
+  - &lolLdoTrustedCaller "0x87D93d9B2C672bf9c9642d853a8682546a5012B5"
 
   # -- Max fees ---
   - &MAX_INFRA_FEE_BP "100" # 1%
@@ -61,11 +65,16 @@ misc:
   - &TOP_UP_ALLOWED_RECIPIENTS_PERMISSIONS "0xb9e5cbb9ca5b0d659238807e84d0176930753d86f63648468d8b35ca51e7808098aff4918c21ce428c943f8966671229" # cast concat-hex "0xB9E5CBB9CA5b0d659238807E84D0176930753d86" $(cast sig "newImmediatePayment(address,address,uint256,string)") "0x8d8b35cA51e7808098afF4918C21Ce428c943F89" $(cast sig "updateSpentAmount(uint256)") | awk '{print tolower($0)}'
   - &ADD_ALLOWED_RECIPIENT_PERMISSIONS "0x8d8b35ca51e7808098aff4918c21ce428c943f89739b5384" # cast concat-hex "0x8d8b35cA51e7808098afF4918C21Ce428c943F89" $(cast sig "addRecipient(address,string)") | awk '{print tolower($0)}'
   - &REMOVE_ALLOWED_RECIPIENT_PERMISSIONS "0x8d8b35ca51e7808098aff4918c21ce428c943f8912a29198" # cast concat-hex "0x8d8b35cA51e7808098afF4918C21Ce428c943F89" $(cast sig "removeRecipient(address)") | awk '{print tolower($0)}'
+  - &CSM0X02_REPORT_WITHDRAWALS_FOR_SLASHED_VALIDATORS_PERMISSIONS "0x792cd25e4ae3578375031fb55e048e163a804f7b4412f7aa" # cast concat-hex "0x792Cd25e4aE3578375031FB55e048E163A804F7B" $(cast sig "reportSlashedWithdrawnValidators((uint256,uint256,uint256,uint256,bool)[])") | awk '{print tolower($0)}'
+  - &CSM0X02_SETTLE_GENERAL_DELAYED_PENALTY_PERMISSIONS "0x792cd25e4ae3578375031fb55e048e163a804f7b187d9f92" # cast concat-hex "0x792Cd25e4aE3578375031FB55e048E163A804F7B" $(cast sig "settleGeneralDelayedPenalty(uint256[],uint256[])") | awk '{print tolower($0)}'
+  - &CSM0X02_UPDATE_STAKING_MODULE_SHARE_LIMITS_PERMISSIONS "0x5b0de22e65c068430f6e769754d51133775408cc5adcee90fddf38947afb03c621c71b06c9c70bce73f1299913976a06" # cast concat-hex "0x5b0De22E65C068430f6e769754D51133775408cc" $(cast sig "validateParams((uint16,uint16,uint16,uint16))") "0xFdDf38947aFB03C621C71b06C9C70bce73f12999" $(cast sig "updateModuleShares(uint256,uint16,uint16)") | awk '{print tolower($0)}'
+  - &LOL_LDO_TOP_UP_ALLOWED_RECIPIENTS_PERMISSIONS "0xb9e5cbb9ca5b0d659238807e84d0176930753d86f6364846f1e9c3bd021ed1419dd3b37f9b6e49eb662877fe66671229" # cast concat-hex "0xB9E5CBB9CA5b0d659238807E84D0176930753d86" $(cast sig "newImmediatePayment(address,address,uint256,string)") "0xf1e9c3bD021ED1419Dd3b37f9b6E49Eb662877Fe" $(cast sig "updateSpentAmount(uint256)") | awk '{print tolower($0)}'
 
 roles:
   - &ET_CANCEL_ROLE "0x9f959e00d95122f5cbd677010436cf273ef535b86b056afc172852144b9491d7"
   - &ET_PAUSE_ROLE "0x139c2898040ef16910dc9f44dc697df79363da767d8bc92f2e310312b816e46d"
   - &ET_UNPAUSE_ROLE "0x265b220c5a8891efdd9e1b1b7fa72f257bd5169f8d87e319cf3dad6ff52b94ae"
+  - &UPDATE_SPENT_AMOUNT_ROLE "0xc5260260446719a726d11a6faece21d19daa48b4cbcca118345832d4cb71df99"
 
 deployed:
   l1:
@@ -85,6 +94,9 @@ deployed:
     - &csmReportWithdrawalsForSlashedValidators "0xE330516a03bDdEBA4209b5591112f1aa3dd90F0A"
     - &csmSettleGeneralDelayedPenalty "0xB71755bE764abB4Ce26cb4dADf056Be57fB8880F"
     - &csmUpdateStakingModuleShareLimits "0xde3e46E3129fA4e4e3f66c9024B0A3Ad509b27a1"
+    - &csm0x02ReportWithdrawalsForSlashedValidators "0x8D74020d8EACCdFf0366dAAFfb96e6c98CDFc112"
+    - &csm0x02SettleGeneralDelayedPenalty "0x0B676AdEABcf4A696187cfAb90290Aa3ac51aFA2"
+    - &csm0x02UpdateStakingModuleShareLimits "0x5b0De22E65C068430f6e769754D51133775408cc"
     - &cmSetMerkleGateTree "0xa121667D1780a1D54EAEd67AE17ee13d0f872D60"
     - &cmReportWithdrawalsForSlashedValidators "0x71862Abd99819597670007bb992A7a7562fE50f2"
     - &cmSettleGeneralDelayedPenalty "0xfffEFC16231eDC6Dc9C93e364ff4D4E3f787f416"
@@ -95,6 +107,8 @@ deployed:
     - &removeAllowedRecipient "0xF4d5D97C85eD18f77F99B57f55E9E11d52992632"
     - &newSdvtSubmitExitHashesFactory "0x58A59dDC6Aea9b1D5743D024E15DfA4badB56E37"
     - &newCuratedSubmitExitHashesFactory "0x4F716AD3Cc7A3A5cdA2359e5B2c84335c171dCde"
+    - &lolLdoTopUpAllowedRecipients "0xa3e98cb26F1277B623Edb95cee3bd33269b305F7"
+    - &lolLdoAllowedRecipientsRegistry "0xf1e9c3bD021ED1419Dd3b37f9b6E49Eb662877Fe"
 
 l1:
   rpcUrl: ETH_RPC_URL
@@ -175,6 +189,14 @@ l1:
           - args: [51]
             result: *setDepositsReserveTarget
           - args: [52]
+            result: *csm0x02ReportWithdrawalsForSlashedValidators
+          - args: [53]
+            result: *csm0x02SettleGeneralDelayedPenalty
+          - args: [54]
+            result: *csm0x02UpdateStakingModuleShareLimits
+          - args: [55]
+            result: *lolLdoTopUpAllowedRecipients
+          - args: [56]
             mustRevert: true
         evmScriptFactoryPermissions:
           - args: [*setDepositsReserveTarget]
@@ -203,6 +225,14 @@ l1:
             result: *ADD_ALLOWED_RECIPIENT_PERMISSIONS
           - args: [*removeAllowedRecipient]
             result: *REMOVE_ALLOWED_RECIPIENT_PERMISSIONS
+          - args: [*csm0x02ReportWithdrawalsForSlashedValidators]
+            result: *CSM0X02_REPORT_WITHDRAWALS_FOR_SLASHED_VALIDATORS_PERMISSIONS
+          - args: [*csm0x02SettleGeneralDelayedPenalty]
+            result: *CSM0X02_SETTLE_GENERAL_DELAYED_PENALTY_PERMISSIONS
+          - args: [*csm0x02UpdateStakingModuleShareLimits]
+            result: *CSM0X02_UPDATE_STAKING_MODULE_SHARE_LIMITS_PERMISSIONS
+          - args: [*lolLdoTopUpAllowedRecipients]
+            result: *LOL_LDO_TOP_UP_ALLOWED_RECIPIENTS_PERMISSIONS
         getEVMScriptFactories:
           [
             *etFirstFactory,
@@ -257,6 +287,10 @@ l1:
             *addAllowedRecipient,
             *removeAllowedRecipient,
             *setDepositsReserveTarget,
+            *csm0x02ReportWithdrawalsForSlashedValidators,
+            *csm0x02SettleGeneralDelayedPenalty,
+            *csm0x02UpdateStakingModuleShareLimits,
+            *lolLdoTopUpAllowedRecipients,
           ]
         getMotion: null
         getMotions: null
@@ -314,12 +348,53 @@ l1:
             result: true
           - args: [*removeAllowedRecipient]
             result: true
+          - args: [*csm0x02ReportWithdrawalsForSlashedValidators]
+            result: true
+          - args: [*csm0x02SettleGeneralDelayedPenalty]
+            result: true
+          - args: [*csm0x02UpdateStakingModuleShareLimits]
+            result: true
+          - args: [*lolLdoTopUpAllowedRecipients]
+            result: true
         motionDuration: 259200
         motions: null
         motionsCountLimit: 20
         objections: null
         objectionsThreshold: 50
         paused: false
+        supportsInterface: null
+    LOLLDOTopUpAllowedRecipients:
+      name: TopUpAllowedRecipients
+      address: *lolLdoTopUpAllowedRecipients
+      checks:
+        allowedRecipientsRegistry: *lolLdoAllowedRecipientsRegistry
+        createEVMScript: null
+        decodeEVMScriptCallData: null
+        easyTrack: *easyTrack
+        finance: *finance
+        token: *ldo
+        trustedCaller: *lolLdoTrustedCaller
+    LOLLDOAllowedRecipientsRegistry:
+      name: AllowedRecipientsRegistry
+      address: *lolLdoAllowedRecipientsRegistry
+      checks:
+        getLimitParameters: [7500000000000000000000000, 12]
+        getAllowedRecipients: [*lolLdoTrustedCaller]
+        ADD_RECIPIENT_TO_ALLOWED_LIST_ROLE: null
+        DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
+        REMOVE_RECIPIENT_FROM_ALLOWED_LIST_ROLE: null
+        SET_PARAMETERS_ROLE: null
+        UPDATE_SPENT_AMOUNT_ROLE: *UPDATE_SPENT_AMOUNT_ROLE
+        allowedRecipients: null
+        bokkyPooBahsDateTimeContract: null
+        getPeriodState: null
+        getRoleAdmin: null
+        hasRole:
+          - args: [*UPDATE_SPENT_AMOUNT_ROLE, *evmScriptExecutor]
+            result: true
+        isRecipientAllowed: null
+        isUnderSpendableBalance: null
+        spendableBalance: null
         supportsInterface: null
     RegisterGroupsInOperatorGrid:
       name: RegisterGroupsInOperatorGrid
@@ -452,6 +527,40 @@ l1:
         maxStakeShareLimitIncrease: *MAX_STAKE_SHARE_LIMIT_INCREASE
         name: CSM
         stakingModuleId: 3
+        stakingRouter: *stakingRouter
+        trustedCaller: *csmCommittee
+        validateParams: null
+    CSM0x02ReportWithdrawalsForSlashedValidators:
+      name: ReportWithdrawalsForSlashedValidators
+      address: *csm0x02ReportWithdrawalsForSlashedValidators
+      checks:
+        createEVMScript: null
+        decodeEVMScriptCallData: null
+        module: *csm0x02Module
+        name: CSM0x02
+        trustedCaller: *csmCommittee
+    CSM0x02SettleGeneralDelayedPenalty:
+      name: SettleGeneralDelayedPenalty
+      address: *csm0x02SettleGeneralDelayedPenalty
+      checks:
+        accounting: *csm0x02Accounting
+        createEVMScript: null
+        decodeEVMScriptCallData: null
+        module: *csm0x02Module
+        name: CSM0x02
+        trustedCaller: *csmCommittee
+    CSM0x02UpdateStakingModuleShareLimits:
+      name: UpdateStakingModuleShareLimits
+      address: *csm0x02UpdateStakingModuleShareLimits
+      checks:
+        createEVMScript: null
+        decodeEVMScriptCallData: null
+        maxPriorityExitShareThresholdDecrease: *MAX_PRIORITY_EXIT_SHARE_THRESHOLD_DECREASE
+        maxPriorityExitShareThresholdIncrease: *MAX_PRIORITY_EXIT_SHARE_THRESHOLD_INCREASE
+        maxStakeShareLimitDecrease: *MAX_STAKE_SHARE_LIMIT_DECREASE
+        maxStakeShareLimitIncrease: *MAX_STAKE_SHARE_LIMIT_INCREASE
+        name: CSM0x02
+        stakingModuleId: 5
         stakingRouter: *stakingRouter
         trustedCaller: *csmCommittee
         validateParams: null
