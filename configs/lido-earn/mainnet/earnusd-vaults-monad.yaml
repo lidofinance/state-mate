@@ -4,8 +4,6 @@
 #
 # Vaults included:
 # - earnUSDc: Conservative vault with subvaults
-#
-# WARN: another vault with the same name and symbol lives at 0x01344cF9B0159E7b809Ce4c80B6A7ea64a23cd87
 
 deployed:
   l1:
@@ -43,11 +41,10 @@ deployed:
     - &treasury "0xcCf2daba8Bb04a232a2fDA0D01010D4EF6C69B85"
     - &lidoPauser "0xA916fD5252160A7E56A6405741De76dc0Da5A0Cd"
     - &mellowPauser "0x6E887aF318c6b29CEE42Ea28953Bd0BAdb3cE638"
+    - &activeVaultAdmin "0x982aB69785f5329BB59c36B19CBd4865353fEf10"
 
 misc:
-  # --- Actors ---
-  # WARN: no code on Monad yet (counterfactual Safe addresses), roles granted to them are inert
-  - &activeVaultAdmin "0x982aB69785f5329BB59c36B19CBd4865353fEf10"
+  # --- Actors without code on Monad yet ---
   - &curator "0x9745F161b0160a99924845BeFCE1d7b9Daee6899"
 
   - &earnUSDc_swapModuleOracle "0x47eFaf83Ca041070aEf6c0cE2eb1C98CD23d26c6"
@@ -75,7 +72,6 @@ misc:
   - &syrupUsdc "0xaB6e5a0C3799d020c790D34F7B2C02639e238AF7"
 
   # --- CoW Protocol ---
-  # WARN: no CoW Protocol code on Monad
   - &cowswapSettlement "0x9008D19f58AAbD9eD0D60971565AA8510560ab41"
   - &cowswapVaultRelayer "0xC92E8bdf79f0507f65a392b0ab4667716BFE0110"
 
@@ -85,6 +81,7 @@ misc:
   # --- Multisig thresholds ---
   - &PROXY_ADMIN_THRESHOLD 5
   - &LAZY_VAULT_ADMIN_THRESHOLD 5
+  - &ACTIVE_VAULT_ADMIN_THRESHOLD 3
   - &TREASURY_THRESHOLD 4
   - &LIDO_PAUSER_THRESHOLD 3
   - &ORACLE_UPDATER_THRESHOLD 3
@@ -556,7 +553,6 @@ l1:
         *SM_CALLER_ROLE : [*earnUSDc_curatorAccount]
         *ROUTER_ROLE : [*swapModuleRouter]
         *SET_SLIPPAGE_ROLE : []
-        # WARN: USDC is not a swap token, Mellow's deploy script lists WMON and USDC
         *TOKEN_IN_ROLE : [*wmon, *syrupUsdc]
         *TOKEN_OUT_ROLE : [*wmon, *syrupUsdc]
 
@@ -999,6 +995,45 @@ l1:
           - *lidoSigner9
         getStorageAt:
         getThreshold: *LIDO_PAUSER_THRESHOLD
+        getTransactionHash:
+        isModuleEnabled:
+        isOwner:
+        nonce:
+        signedMessages:
+
+    activeVaultAdmin_multisig:
+      name: SafeL2
+      address: *activeVaultAdmin
+      proxyName: SafeProxy
+      implementation: *safeImpl_1_4_1
+      proxyChecks: {}
+      storage:
+        - slot: *SAFE_FALLBACK_HANDLER_SLOT
+          expected: *fallbackHandler
+          label: fallbackHandler
+        - slot: *SAFE_GUARD_SLOT
+          expected: *ZERO_ADDRESS
+          label: guard
+      checks:
+        VERSION: 1.4.1
+        approvedHashes:
+        checkNSignatures:
+        checkSignatures:
+        domainSeparator:
+        encodeTransactionData:
+        getChainId: 143
+        getModulesPaginated:
+          - args: [*SAFE_SENTINEL_MODULES, 10]
+            result: [[], *SAFE_SENTINEL_MODULES]
+        getOwners: # WARN: extMellowSigner1 and extMellowSigner5 are missing, they are owners on Ethereum
+          - *extMellowSigner2
+          - *mellowSigner2
+          - *mellowSigner3
+          - *mellowSigner1
+          - *mellowSigner4
+          - *extMellowSigner4
+        getStorageAt:
+        getThreshold: *ACTIVE_VAULT_ADMIN_THRESHOLD
         getTransactionHash:
         isModuleEnabled:
         isOwner:
