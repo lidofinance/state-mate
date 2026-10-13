@@ -288,7 +288,6 @@ l1:
             result: false
         hasQueue:
         hasRole:
-          # WARN: oracle actors are not wired, no OracleSubmitter holds the report roles
           - args: [*SUBMIT_REPORTS_ROLE, *oracleUpdater]
             result: false
           - args: [*ACCEPT_REPORT_ROLE, *oracleAccepter]
@@ -394,16 +393,16 @@ l1:
         *CREATE_SUBVAULT_ROLE : []
         *DISCONNECT_SUBVAULT_ROLE : []
         *SET_ACCOUNT_INFO_ROLE : []
-        *SET_FLAGS_ROLE : [] # WARN: held by the timelock on other earnUSD vaults
+        *SET_FLAGS_ROLE : []
         *SET_WHITELIST_MERKLE_ROOT_ROLE : []
         *DISALLOW_SUBVAULT_ASSETS_ROLE : []
         *MODIFY_PENDING_ASSETS_ROLE : []
-        *MODIFY_SUBVAULT_BALANCE_ROLE : [] # WARN: held by activeVaultAdmin on other earnUSD vaults
-        *MODIFY_VAULT_BALANCE_ROLE : [] # WARN: held by activeVaultAdmin on other earnUSD vaults
-        *ACCEPT_REPORT_ROLE : [] # WARN: no OracleSubmitter
+        *MODIFY_SUBVAULT_BALANCE_ROLE : []
+        *MODIFY_VAULT_BALANCE_ROLE : []
+        *ACCEPT_REPORT_ROLE : []
         *ADD_SUPPORTED_ASSETS_ROLE : []
         *REMOVE_SUPPORTED_ASSETS_ROLE : []
-        *SUBMIT_REPORTS_ROLE : [] # WARN: no OracleSubmitter
+        *SUBMIT_REPORTS_ROLE : []
         *SET_SECURITY_PARAMS_ROLE : []
         *ALLOW_CALL_ROLE : []
         *DISALLOW_CALL_ROLE : []
@@ -411,7 +410,7 @@ l1:
         *REMOVE_QUEUE_ROLE : []
         *SET_HOOK_ROLE : []
         *SET_QUEUE_LIMIT_ROLE : []
-        *SET_QUEUE_STATUS_ROLE : [] # WARN: held by the timelock on other earnUSD vaults
+        *SET_QUEUE_STATUS_ROLE : []
 
     earnUSDc_subvault0:
       name: Subvault
@@ -673,7 +672,6 @@ l1:
           expected: *feeManagerImplementation
           label: implementation
       checks:
-        # WARN: base asset is not set, Mellow's deploy script sets USDC
         baseAsset:
           - args: [*earnUSDc_vault]
             result: *ZERO_ADDRESS
