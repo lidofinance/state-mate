@@ -42,11 +42,9 @@ deployed:
     - &lidoPauser "0xA916fD5252160A7E56A6405741De76dc0Da5A0Cd"
     - &mellowPauser "0x6E887aF318c6b29CEE42Ea28953Bd0BAdb3cE638"
     - &activeVaultAdmin "0x982aB69785f5329BB59c36B19CBd4865353fEf10"
+    - &curator "0x9745F161b0160a99924845BeFCE1d7b9Daee6899"
 
 misc:
-  # --- Actors without code on Monad yet ---
-  - &curator "0x9745F161b0160a99924845BeFCE1d7b9Daee6899"
-
   - &earnUSDc_swapModuleOracle "0x47eFaf83Ca041070aEf6c0cE2eb1C98CD23d26c6"
   - &depositQueueFactory "0xF429ba2a8437E7de85078CF7481E8Ad52df7E58c"
   - &redeemQueueFactory "0xe08dc488bD6756323F8bf478869529D03db627ef"
@@ -82,6 +80,7 @@ misc:
   - &PROXY_ADMIN_THRESHOLD 5
   - &LAZY_VAULT_ADMIN_THRESHOLD 5
   - &ACTIVE_VAULT_ADMIN_THRESHOLD 3
+  - &CURATOR_THRESHOLD 3
   - &TREASURY_THRESHOLD 4
   - &LIDO_PAUSER_THRESHOLD 3
   - &ORACLE_UPDATER_THRESHOLD 3
@@ -1034,6 +1033,46 @@ l1:
           - *extMellowSigner4
         getStorageAt:
         getThreshold: *ACTIVE_VAULT_ADMIN_THRESHOLD
+        getTransactionHash:
+        isModuleEnabled:
+        isOwner:
+        nonce:
+        signedMessages:
+
+    curator_multisig:
+      name: SafeL2
+      address: *curator
+      proxyName: SafeProxy
+      implementation: *safeImpl_1_4_1
+      proxyChecks: {}
+      storage:
+        - slot: *SAFE_FALLBACK_HANDLER_SLOT
+          expected: *fallbackHandler
+          label: fallbackHandler
+        - slot: *SAFE_GUARD_SLOT
+          expected: *ZERO_ADDRESS
+          label: guard
+      checks:
+        VERSION: 1.4.1
+        approvedHashes:
+        checkNSignatures:
+        checkSignatures:
+        domainSeparator:
+        encodeTransactionData:
+        getChainId: 143
+        getModulesPaginated:
+          - args: [*SAFE_SENTINEL_MODULES, 10]
+            result: [[], *SAFE_SENTINEL_MODULES]
+        getOwners: # WARN: extMellowSigner1 is missing and mellowSigner1 is extra, compared with Ethereum
+          - *extMellowSigner5
+          - *extMellowSigner2
+          - *mellowSigner2
+          - *mellowSigner3
+          - *mellowSigner1
+          - *mellowSigner4
+          - *extMellowSigner4
+        getStorageAt:
+        getThreshold: *CURATOR_THRESHOLD
         getTransactionHash:
         isModuleEnabled:
         isOwner:
