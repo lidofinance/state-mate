@@ -129,7 +129,8 @@ export function writeObservedFile(filePath: string, configPath: string): void {
   }
   fs.mkdirSync(path.dirname(path.resolve(filePath)), { recursive: true });
   // temp + rename: a write that dies short leaves the earlier file whole
-  fs.writeFileSync(`${filePath}.tmp`, YAML.stringify(buildObservedDocument(configPath)));
+  // one value per line, however long: a wrapped hash defeats diff and grep
+  fs.writeFileSync(`${filePath}.tmp`, YAML.stringify(buildObservedDocument(configPath), { lineWidth: 0 }));
   fs.renameSync(`${filePath}.tmp`, filePath);
   log(`Observed values written to ${filePath}`);
 }

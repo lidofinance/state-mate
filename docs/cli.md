@@ -23,7 +23,7 @@ Directory runs discover `.yaml` and `.yml` files recursively, skipping names con
 | `-J, --json`                      | Write one JSON report to stdout instead of the log; format in [json-output.md](json-output.md)                                                                  |
 | `--block <number\|hash\|latest>`  | Read every value at one block; see [Pin reads to one block](#pin-reads-to-one-block)                                                                            |
 | `--observed <file>`               | Write the values the chain answered to a YAML file; see [observed.md](observed.md). Requires a single config file                                               |
-| `--expand-enumerations`           | Read every element behind a declared `<name>Length` (`null` included) and warn about the ones the config omits; see [Expand enumerations](#expand-enumerations) |
+| `--expand-enumerations`           | Read every element behind a declared `<name>Length` or `<name>Count`, and warn about the ones the config omits; see [Expand enumerations](#expand-enumerations) |
 
 `--deployed` and `--inputs` can be used together. Paths are relative to the working directory; neither file is loaded automatically by default. Each option takes one file: a repeated option is a usage error, so keep all anchors of one kind in one file. See the [separate-file examples](how-to.md#separate-deployed-addresses).
 

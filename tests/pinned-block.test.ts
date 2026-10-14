@@ -28,6 +28,8 @@ describe("--block option", () => {
     assert.equal(parseBlockOption("0x3e688ac"), null);
     assert.equal(parseBlockOption("pending"), null);
     assert.equal(parseBlockOption("-1"), null);
+    assert.equal(parseBlockOption(String(Number.MAX_SAFE_INTEGER)), String(Number.MAX_SAFE_INTEGER));
+    assert.equal(parseBlockOption("9007199254740993"), null);
   });
 
   it("renders a block as the hex tag JSON-RPC takes", () => {

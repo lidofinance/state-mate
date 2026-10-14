@@ -31,8 +31,9 @@ const ENUMERATION = /^(.+?)(Length|Count)$/;
 // Beyond this many entries the expansion would be a scan, not a check
 const ENUMERATION_CAP = 1000;
 
-function indexedGetter(abi: Abi, stem: string): boolean {
-  return abi.some(
+/** The signature of `<stem>(uint*)`: a bare name is ambiguous to ethers when the getter is overloaded. */
+function indexedGetter(abi: Abi, stem: string): string | undefined {
+  const getter = abi.find(
     ({ type, name, inputs, stateMutability }) =>
       type === "function" &&
       name === stem &&
@@ -40,6 +41,7 @@ function indexedGetter(abi: Abi, stem: string): boolean {
       inputs?.length === 1 &&
       /^uint\d*$/.test(inputs[0].type ?? ""),
   );
+  return getter?.inputs ? `${stem}(${getter.inputs[0].type})` : undefined;
 }
 
 function argumentless(abi: Abi, name: string): boolean {
@@ -112,7 +114,8 @@ export class ChecksSectionValidator extends SectionValidatorBase {
       // the implementationChecks coverage placeholders are not the config's: nothing to expand
       if (this.undeclared.has(key)) continue;
       const stem = ENUMERATION.exec(key)?.[1];
-      if (!stem || !indexedGetter(abi, stem) || !argumentless(abi, key)) continue;
+      const getter = stem && indexedGetter(abi, stem);
+      if (!stem || !getter || !argumentless(abi, key)) continue;
       if (!needCheck(CheckLevel.method, key) && !needCheck(CheckLevel.method, stem)) continue;
 
       // the check's own read of the count, when it made one: a second read is a second observed row
@@ -144,7 +147,7 @@ export class ChecksSectionValidator extends SectionValidatorBase {
         if (pinned.has(index)) continue;
         const logHandle = new LogCommand(`.${stem}(${index})`);
         try {
-          const value: unknown = await contract.getFunction(stem).staticCall(index);
+          const value: unknown = await contract.getFunction(getter).staticCall(index);
           recordObservedCall(getErrorContext(), stem, [index], { value });
           logHandle.warning(`not in the config; the chain says ${_stringify(value)}`);
         } catch (error) {

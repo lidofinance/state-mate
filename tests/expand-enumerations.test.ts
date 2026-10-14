@@ -24,8 +24,9 @@ const ABI: Abi = [
 
 function fakeContract(ids: string[], reads: string[], countReverts = false): Contract {
   return {
-    getFunction: (name: string) => ({
+    getFunction: (signature: string) => ({
       staticCall: (...args: unknown[]) => {
+        const name = signature.split("(")[0];
         reads.push(`${name}(${args.join(",")})`);
         if (name.endsWith("Length")) {
           return countReverts ? Promise.reject(callError(REVERT)) : Promise.resolve(BigInt(ids.length));
@@ -42,8 +43,8 @@ function pinnedEntries(ids: string[]): ChecksEntryValue {
 }
 
 class ExposedChecks extends ChecksSectionValidator {
-  public expand(contract: Contract, checks: Record<string, ChecksEntryValue>) {
-    return this._expandEnumerations(contract, ABI, checks);
+  public expand(contract: Contract, checks: Record<string, ChecksEntryValue>, abi: Abi = ABI) {
+    return this._expandEnumerations(contract, abi, checks);
   }
 
   public check(contract: Contract, method: string, entry: StaticCallResult) {
@@ -101,6 +102,25 @@ describe("enumeration expansion", () => {
     }
 
     assert.match(printed.join(""), /\.marketIds\(i\): .*5 entries on chain, 1 not in the config/);
+  });
+
+  it("reads an overloaded getter by its signature, which ethers resolves where a bare name is ambiguous", async () => {
+    const overloaded: Abi = [
+      ...ABI,
+      { type: "function", name: "marketIds", inputs: [{ name: "", type: "address" }], stateMutability: "view" },
+    ];
+    const fake = fakeContract(IDS, reads);
+    const contract = {
+      getFunction: (name: string) => {
+        if (name === "marketIds") throw new Error("ambiguous function description");
+        return fake.getFunction(name);
+      },
+    } as unknown as Contract;
+
+    await validator.expand(contract, { marketIdsLength: 5, marketIds: pinnedEntries(IDS.slice(0, 4)) }, overloaded);
+
+    assert.deepEqual(reads, ["marketIdsLength()", "marketIds(4)"]);
+    assert.deepEqual(warnings(), [{ check: ".marketIds(4)", message: "not in the config; the chain says 0xe" }]);
   });
 
   it("reads the entries the config leaves out, records them and reports each one", async () => {

@@ -20,7 +20,9 @@ const BLOCK_HASH = /^0x[0-9a-fA-F]{64}$/;
 
 /** "latest", a decimal block number or a block hash; null when the text is none of them. */
 export function parseBlockOption(text: string): string | null {
-  return /^(latest|\d+)$/.test(text) || BLOCK_HASH.test(text) ? text : null;
+  // a height past 2^53 would reach the RPC rounded to another block
+  if (/^\d+$/.test(text)) return Number.isSafeInteger(Number(text)) ? text : null;
+  return text === "latest" || BLOCK_HASH.test(text) ? text : null;
 }
 
 export function toBlockTag(block: number): string {
