@@ -121,7 +121,7 @@ export class ChecksSectionValidator extends SectionValidatorBase {
       let answer: Answer | undefined = this.answers.get(key);
       if (!answer) {
         try {
-          answer = { value: await contract.getFunction(key).staticCall() };
+          answer = { value: await contract.getFunction(`${key}()`).staticCall() };
         } catch (error) {
           answer = await this._failed(error);
         }

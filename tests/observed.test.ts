@@ -195,6 +195,23 @@ describe("a check the config declines to assert", () => {
     assert.equal(stats.errors, 0);
   });
 
+  it("words an empty revert the same whether the backend sends data 0x or none", async () => {
+    context.observedPath = "state.observed.yaml";
+    const withEmptyData = {
+      getFunction: () => ({
+        fragment: NO_INPUTS,
+        staticCall: () => Promise.reject(callError({ ...REVERT, code: 3, data: "0x" })),
+      }),
+    } as unknown as Contract;
+    await validator.run(reverts, "canSendAssets", { result: null } as unknown as StaticCallCheck);
+    await validator.run(withEmptyData, "canSendAssets", { result: null } as unknown as StaticCallCheck);
+
+    const [none, empty] = (
+      buildObservedDocument("state.yaml").sections.robinhood.contracts.vault.checks as Record<string, ObservedCall[]>
+    ).canSendAssets;
+    assert.deepEqual(empty, none);
+  });
+
   it("records a read the node did not serve as an error, not as a revert, and warns about it", async () => {
     context.observedPath = "state.observed.yaml";
     beginConfig("state.yaml");
@@ -386,6 +403,10 @@ describe("an observed file that cannot be written", () => {
         { exit_code: 1, process: 1, status: "error" },
       );
       assert.match(report.error, /Could not write the observed file/);
+      assert.deepEqual(
+        fs.readdirSync(directory).filter((name) => name.endsWith(".tmp")),
+        [],
+      );
     } finally {
       server.close();
       fs.rmSync(directory, { recursive: true, force: true });

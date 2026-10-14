@@ -128,9 +128,15 @@ export function writeObservedFile(filePath: string, configPath: string): void {
     return;
   }
   fs.mkdirSync(path.dirname(path.resolve(filePath)), { recursive: true });
-  // temp + rename: a write that dies short leaves the earlier file whole
-  // one value per line, however long: a wrapped hash defeats diff and grep
-  fs.writeFileSync(`${filePath}.tmp`, YAML.stringify(buildObservedDocument(configPath), { lineWidth: 0 }));
-  fs.renameSync(`${filePath}.tmp`, filePath);
+  // a temporary file of this process, renamed into place: a write that dies short leaves the earlier file whole
+  const temporary = `${filePath}.${process.pid}.tmp`;
+  try {
+    // one value per line, however long: a wrapped hash defeats diff and grep
+    fs.writeFileSync(temporary, YAML.stringify(buildObservedDocument(configPath), { lineWidth: 0 }));
+    fs.renameSync(temporary, filePath);
+  } catch (error) {
+    fs.rmSync(temporary, { force: true });
+    throw error;
+  }
   log(`Observed values written to ${filePath}`);
 }

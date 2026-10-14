@@ -80,7 +80,7 @@ yarn start configs/vault.yaml --block <block-hash>
 ⚠ .marketIds(4): not in the config; the chain says 0x127353ba...
 ```
 
-A count that reverts is a warning too. Enumerations of more than 1000 entries are reported and not read. `-o` selects an enumeration by its length or by its getter. The run prints one line for each enumeration it expanded.
+A count that cannot be read is a warning too. Enumerations of more than 1000 entries are reported and not read. `-o` selects an enumeration by its length or by its getter. The run prints one line for each enumeration it expanded.
 
 A count whose getter has another name, such as `getAssetCount` next to `assetAt(uint256)`, is outside the rule: the run neither expands it nor warns about it.
 

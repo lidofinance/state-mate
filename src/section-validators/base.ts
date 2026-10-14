@@ -145,8 +145,10 @@ export function failedCall(error: unknown): Failure {
   const nodeFailed =
     NOT_A_REVERT.has(String(code)) ||
     (code === "CALL_EXCEPTION" && typeof data !== "string" && !EVM_FAILURE.test(String(nodeMessage ?? "")));
-  // without revert data ethers says "missing revert data" whatever the node said; the node names the cause
-  const text = typeof data !== "string" && typeof nodeMessage === "string" ? nodeMessage : printError(error);
+  // without revert data ethers says "missing revert data" whatever the node said, and an empty "0x"
+  // varies by backend; the node names the cause the same way on both
+  const empty = typeof data !== "string" || data === "0x";
+  const text = empty && typeof nodeMessage === "string" ? nodeMessage : printError(error);
   return nodeFailed ? { error: text } : { reverted: text };
 }
 
@@ -187,7 +189,7 @@ export abstract class SectionValidatorBase {
     try {
       outcome = await run();
     } catch (error) {
-      outcome = { message: `REVERTED with: ${printError(error)}`, ok: false };
+      outcome = { message: `FAILED with: ${printError(error)}`, ok: false };
     }
 
     if (outcome.ok) {
