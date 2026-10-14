@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { afterEach, beforeEach, describe, it } from "node:test";
+import { afterEach, beforeEach, describe, it, mock } from "node:test";
 
 import type { Contract, JsonRpcProvider } from "ethers";
 
@@ -83,6 +83,25 @@ describe("enumeration expansion", () => {
     endContract();
     return buildReport(0).configs[0].contracts?.[0]?.warnings ?? [];
   }
+
+  it("names each enumeration it expanded, since a list outside the rule gives no warning either", async () => {
+    context.json = false;
+    const printed: string[] = [];
+    const write = mock.method(process.stdout, "write", (chunk: unknown) => {
+      printed.push(String(chunk));
+      return true;
+    });
+    try {
+      await validator.expand(fakeContract(IDS, reads), {
+        marketIdsLength: 5,
+        marketIds: pinnedEntries(IDS.slice(0, 4)),
+      });
+    } finally {
+      write.mock.restore();
+    }
+
+    assert.match(printed.join(""), /\.marketIds\(i\): .*5 entries on chain, 1 not in the config/);
+  });
 
   it("reads the entries the config leaves out, records them and reports each one", async () => {
     await validator.expand(fakeContract(IDS, reads), { marketIdsLength: 5, marketIds: pinnedEntries(IDS.slice(0, 4)) });

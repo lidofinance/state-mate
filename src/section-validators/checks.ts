@@ -137,6 +137,9 @@ export class ChecksSectionValidator extends SectionValidatorBase {
         continue;
       }
       const pinned = pinnedIndices(checks[stem]);
+      const omitted = count - [...pinned].filter((index) => index < count).length;
+      // the run names what it expanded: no warning is no proof for a list the rule does not cover
+      new LogCommand(`.${stem}(i)`).success(`${count} entries on chain, ${omitted} not in the config`);
       for (let index = 0; index < count; index++) {
         if (pinned.has(index)) continue;
         const logHandle = new LogCommand(`.${stem}(${index})`);
