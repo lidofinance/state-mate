@@ -33,10 +33,10 @@ sections:
           marketIdsLength:
             - value: "4"
           marketIds:
-            - args: [0]
+            - args: ["0"]
               value: "0x..."
           adapters:
-            - args: [9]
+            - args: ["9"]
               reverted: execution reverted
         storage:
           "0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc": "0x..."

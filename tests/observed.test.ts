@@ -61,11 +61,11 @@ describe("observed values", () => {
           address: "0xVault",
           checks: {
             marketIds: [
-              { args: [0], value: "0xaaa" },
+              { args: ["0"], value: "0xaaa" },
               { args: ["1"], value: "0xbbb" },
             ],
             owner: [{ value: "0xOwner" }],
-            adapters: [{ args: [9], reverted: "execution reverted" }],
+            adapters: [{ args: ["9"], reverted: "execution reverted" }],
           },
           proxyChecks: { proxy__getAdmin: [{ value: "0xAdmin" }] },
           storage: { "0x00": "0x01" },
@@ -100,7 +100,7 @@ describe("observed values", () => {
     assert.deepEqual(toPlain(Result.fromItems([Result.fromItems(["0xabc"], ["_"])], ["vaults"])), {
       vaults: ["0xabc"],
     });
-    assert.deepEqual(toPlain([null, 3, "x", false]), [null, 3, "x", false]);
+    assert.deepEqual(toPlain([null, 3, 4n, "x", false]), [null, "3", "4", "x", false]);
   });
 
   it("keeps a read whose section was never announced instead of dropping it", () => {

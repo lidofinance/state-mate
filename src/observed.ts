@@ -10,7 +10,7 @@ import { log } from "./logger";
 // What the chain answered, keyed the way the config asks. The config declares, this file
 // observes, and the report is the difference; see docs/observed.md
 
-export type Plain = boolean | null | number | Plain[] | string | { [key: string]: Plain };
+export type Plain = boolean | null | Plain[] | string | { [key: string]: Plain };
 
 export interface ObservedCall {
   args?: Plain[];
@@ -58,7 +58,8 @@ export function beginObservedSection(
 
 /** bigint to its decimal text, an ethers Result to an object when its fields are named, else to an array. */
 export function toPlain(value: unknown): Plain {
-  if (typeof value === "bigint") return value.toString();
+  // a config index arrives as a bigint and an expanded one as a number: both are decimal text
+  if (typeof value === "bigint" || typeof value === "number") return value.toString();
   if (value instanceof Result) {
     // ethers names the elements of an unnamed array `_`, so a map is right only for real names
     if (value.length === 0) return [];
@@ -73,7 +74,7 @@ export function toPlain(value: unknown): Plain {
     return value.toArray().map((item) => toPlain(item));
   }
   if (Array.isArray(value)) return value.map((item) => toPlain(item));
-  if (value === null || typeof value === "string" || typeof value === "number" || typeof value === "boolean") {
+  if (value === null || typeof value === "string" || typeof value === "boolean") {
     return value;
   }
   return String(value);

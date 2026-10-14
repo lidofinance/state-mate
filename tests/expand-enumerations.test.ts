@@ -111,7 +111,7 @@ describe("enumeration expansion", () => {
     // no check read the count here, so the expansion records its own read
     assert.deepEqual(buildObservedDocument("cfg.yaml").sections.l1.contracts.vault.checks, {
       marketIdsLength: [{ value: "5" }],
-      marketIds: [{ args: [4], value: "0xe" }],
+      marketIds: [{ args: ["4"], value: "0xe" }],
     });
     assert.equal(stats.totalChecks, 0);
   });
@@ -125,7 +125,7 @@ describe("enumeration expansion", () => {
     assert.deepEqual(reads, ["marketIdsLength()", "marketIds(4)"]);
     assert.deepEqual(buildObservedDocument("cfg.yaml").sections.l1.contracts.vault.checks, {
       marketIdsLength: [{ value: "5" }],
-      marketIds: [{ args: [4], value: "0xe" }],
+      marketIds: [{ args: ["4"], value: "0xe" }],
     });
   });
 
@@ -161,8 +161,8 @@ describe("enumeration expansion", () => {
     assert.deepEqual(buildObservedDocument("cfg.yaml").sections.l1.contracts.vault.checks, {
       marketIdsLength: [{ value: "2" }],
       marketIds: [
-        { args: [0], value: "0xa" },
-        { args: [1], value: "0xb" },
+        { args: ["0"], value: "0xa" },
+        { args: ["1"], value: "0xb" },
       ],
     });
   });
