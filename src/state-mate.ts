@@ -398,7 +398,10 @@ async function main() {
   Object.assign(context, parseCommandLineArguments());
   if (context.json) {
     // Ctrl+C must still leave one parseable report, carrying whatever ran before it
-    process.once("SIGINT", () => emitReport(130, "interrupted by SIGINT", () => process.exit(130)));
+    process.once("SIGINT", () => {
+      const failure = flushObserved();
+      emitReport(130, failure ? `interrupted by SIGINT; ${failure}` : "interrupted by SIGINT", () => process.exit(130));
+    });
   }
   if (!fs.existsSync(context.configPath)) {
     logErrorAndExit(`No such file or directory: ${chalk.magenta(context.configPath)}`);
@@ -488,27 +491,29 @@ let observedFlushed = false;
 
 /**
  * Writes the observed file once, whichever way the run ends; a failed write is not retried.
- * Returns false when the write failed.
+ * Returns why the write failed, for the report.
  */
-function flushObserved(): boolean {
-  if (!context.observedPath || observedFlushed) return true;
+function flushObserved(): string | undefined {
+  if (!context.observedPath || observedFlushed) return undefined;
   observedFlushed = true;
   try {
     writeObservedFile(context.observedPath, context.configPath);
-    return true;
+    return undefined;
   } catch (error) {
-    process.stderr.write(`Could not write the observed file ${context.observedPath}: ${printError(error)}\n`);
+    const failure = `Could not write the observed file ${context.observedPath}: ${printError(error)}`;
+    process.stderr.write(`${failure}\n`);
     process.exitCode ||= 1;
-    return false;
+    return failure;
   }
 }
 
 // Under --json the report owns the exit code; the log mode keeps exiting on the spot
 function exit(code: number): void {
   // the observed file first, so that the report carries a write that failed
-  if (!flushObserved()) code ||= 1;
+  const failure = flushObserved();
+  if (failure) code ||= 1;
   if (context.json) {
-    emitReport(code);
+    emitReport(code, failure);
   } else if (code) {
     process.exit(code);
   }
@@ -532,7 +537,8 @@ async function runConfig() {
 if (require.main === module) {
   main().catch((error) => {
     if (context.json) {
-      emitReport(1, printError(error));
+      const failure = flushObserved();
+      emitReport(1, failure ? `${printError(error)}; ${failure}` : printError(error));
       // A FatalError is fully told by the report; anything else is a bug worth its stack
       if (!(error instanceof FatalError)) console.error(error);
     } else {

@@ -380,7 +380,12 @@ describe("an observed file that cannot be written", () => {
         (error: { code: number; stdout: string }) => error,
       );
 
-      assert.deepEqual({ report: JSON.parse(run.stdout).exit_code, status: run.code }, { report: 1, status: 1 });
+      const report = JSON.parse(run.stdout);
+      assert.deepEqual(
+        { exit_code: report.exit_code, process: run.code, status: report.status },
+        { exit_code: 1, process: 1, status: "error" },
+      );
+      assert.match(report.error, /Could not write the observed file/);
     } finally {
       server.close();
       fs.rmSync(directory, { recursive: true, force: true });
