@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it, mock } from "node:test";
 
-import { JsonRpcProvider } from "ethers";
+import { FetchRequest, FetchResponse, JsonRpcProvider, toUtf8Bytes } from "ethers";
 
 import { ROLE_GRANTED_TOPIC } from "../src/acl/fold";
 import {
@@ -536,6 +536,35 @@ describe("a node that limits the eth_getLogs span", () => {
     for (const text of ["execution reverted", "Too Many Requests", "rate limit exceeded", "missing trie node"]) {
       assert.equal(isSpanRefusal(new Error(text)), false, text);
     }
+  });
+
+  it("reads the refusal from the node's answer, not from the request id ethers quotes beside it", () => {
+    const REFUSAL = { code: 22, message: "eth_getLogs range over 100000 blocks is not supported on robinhood" };
+    const provider = new JsonRpcProvider("http://localhost:0", undefined, { staticNetwork: true });
+    try {
+      for (const id of [4, 429, 1429]) {
+        const payload = { id, jsonrpc: "2.0" as const, method: "eth_getLogs", params: [{ fromBlock: "0x0" }] };
+        assert.equal(isSpanRefusal(provider.getRpcError(payload, { error: REFUSAL, id })), true, `JSON-RPC id ${id}`);
+      }
+    } finally {
+      provider.destroy();
+    }
+
+    // the error ethers raises for an HTTP status that is not 2xx
+    const httpError = (status: number, statusText: string, error: { code: number; message: string }) => {
+      const body = toUtf8Bytes(JSON.stringify({ error, id: 429, jsonrpc: "2.0" }));
+      const response = new FetchResponse(status, statusText, {}, body, new FetchRequest("https://rpc.example"));
+      try {
+        response.assertOk();
+      } catch (thrown) {
+        return thrown;
+      }
+      throw new Error(`HTTP ${status} was accepted`);
+    };
+    const RANGE = { code: -32602, message: "block range too large" };
+    assert.equal(isSpanRefusal(httpError(400, "Bad Request", RANGE)), true);
+    assert.equal(isSpanRefusal(httpError(429, "Too Many Requests", RANGE)), false);
+    assert.equal(isSpanRefusal(httpError(400, "Bad Request", { ...RANGE, code: 429 })), false);
   });
 });
 

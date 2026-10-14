@@ -115,12 +115,44 @@ export async function fetchWindow(
 // "range too large", "limited to a 10,000 range", "more than 10000 results", "response size exceeded"
 const SPAN_REFUSED =
   /block range|range (?:is )?too (?:large|wide|big)|limited to .*range|ranges? over|more than \d+ (?:results|logs)|max(?:imum)? (?:results|logs)|response size|too many (?:blocks|logs|results)/i;
-const RATE_LIMITED_RPC = /rate limit|too many requests|\b429\b|compute units/i;
+const RATE_LIMITED_RPC = /rate limit|too many requests|compute units/i;
+
+/**
+ * What the node said, without the request ethers quotes beside it: a request id of 429 in the
+ * full message would read as a rate limit.
+ */
+function nodeAnswer(error: unknown): { code?: unknown; message: string; status?: string } {
+  const {
+    error: rpcError,
+    info,
+    shortMessage,
+  } = error as {
+    error?: { code?: unknown; message?: unknown };
+    info?: { responseBody?: unknown; responseStatus?: unknown };
+    shortMessage?: unknown;
+  };
+  const status = typeof info?.responseStatus === "string" ? info.responseStatus : undefined;
+  // a JSON-RPC error over HTTP 200
+  if (typeof rpcError?.message === "string") return { code: rpcError.code, message: rpcError.message, status };
+  // an HTTP error, whose body may still carry the JSON-RPC error
+  if (typeof info?.responseBody === "string") {
+    try {
+      const body = JSON.parse(info.responseBody) as { error?: { code?: unknown; message?: unknown } };
+      if (typeof body.error?.message === "string")
+        return { code: body.error.code, message: body.error.message, status };
+    } catch {
+      // the body is plain text
+    }
+    return { message: info.responseBody, status };
+  }
+  return { message: typeof shortMessage === "string" ? shortMessage : printError(error), status };
+}
 
 /** A refusal a narrower window answers; a rate limit is not one, halving would only add requests. */
 export function isSpanRefusal(error: unknown): boolean {
-  const text = printError(error);
-  return SPAN_REFUSED.test(text) && !RATE_LIMITED_RPC.test(text);
+  const { code, message, status } = nodeAnswer(error);
+  const rateLimited = status?.startsWith("429") || code === 429 || RATE_LIMITED_RPC.test(message);
+  return SPAN_REFUSED.test(message) && !rateLimited;
 }
 
 interface ExplorerLogsResponse {
