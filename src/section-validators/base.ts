@@ -5,8 +5,10 @@ import { type Contract, type JsonRpcProvider, Result } from "ethers";
 import { loadAbiFromFile } from "src/abi-provider";
 import { type EntryField, getNonMutables, printError } from "src/common";
 import { context, type ErrorDetail, stats } from "src/context";
+import type { RetryingJsonRpcProvider } from "src/explorer";
 import { LogCommand, logError, logErrorAndExit, logMethodSkipped } from "src/logger";
 import { recordObservedCall } from "src/observed";
+import { assertPinnedState } from "src/pinned-block";
 import {
   type ArbitraryObject,
   type ContractEntry,
@@ -102,7 +104,8 @@ export function needCheck(level: CheckLevel, name: string) {
 
 export type CheckOutcome = { detail: string; ok: true } | { message: string; ok: false };
 
-export type Answer = { error: string } | { reverted: string } | { value: unknown };
+export type Failure = { error: string } | { reverted: string };
+export type Answer = Failure | { value: unknown };
 
 // How the clients word a call the EVM ended, from a revert to an exceptional halt: geth and Erigon
 // ("invalid opcode: INVALID", "stack limit reached"), revm ("EVM error: InvalidFEOpcode"), Nethermind
@@ -136,7 +139,7 @@ const NOT_A_REVERT = new Set(["BAD_DATA", "NETWORK_ERROR", "SERVER_ERROR", "TIME
  * node's own message shows that the EVM ended the call. An error ethers raises before sending,
  * such as arguments that do not encode, never reaches a node and keeps counting as a revert.
  */
-export function failedCall(error: unknown): Answer {
+export function failedCall(error: unknown): Failure {
   const { code, data, info } = error as { code?: unknown; data?: unknown; info?: { error?: { message?: unknown } } };
   const nodeMessage = info?.error?.message;
   const nodeFailed =
@@ -148,7 +151,7 @@ export function failedCall(error: unknown): Answer {
 }
 
 /** The log line for a read that did not return a value. */
-export function describeFailure(answer: { error: string } | { reverted: string }): string {
+export function describeFailure(answer: Failure): string {
   return "reverted" in answer ? `REVERTED with: ${answer.reverted}` : `FAILED with: ${answer.error}`;
 }
 
@@ -246,7 +249,7 @@ export abstract class SectionValidatorBase {
     try {
       actual = await contractFunction.staticCall(...(args || ""));
     } catch (error) {
-      const answer = failedCall(error) as { error: string } | { reverted: string };
+      const answer = await this._failed(error);
       this._answer(method, signature, args, answer);
       const errorMessage = describeFailure(answer);
       logHandle.failure(errorMessage);
@@ -280,8 +283,16 @@ export abstract class SectionValidatorBase {
     try {
       this._answer(method, signature, args, { value: await contractFunction.staticCall(...(args || "")) });
     } catch (error) {
-      this._answer(method, signature, args, failedCall(error));
+      this._answer(method, signature, args, await this._failed(error));
     }
+  }
+
+  /** A failed read. Under --block, a node error may mean the RPC dropped the pinned state, which stops the run. */
+  protected async _failed(error: unknown): Promise<Failure> {
+    const answer = failedCall(error);
+    const provider = this.provider as RetryingJsonRpcProvider;
+    if ("error" in answer && provider.pinned) await assertPinnedState(provider, true);
+    return answer;
   }
 
   private _answer(method: string, signature: string, args: readonly unknown[] | undefined, answer: Answer) {
@@ -313,7 +324,7 @@ export abstract class SectionValidatorBase {
       logHandle.failure(errorMessage);
       incErrors(errorMessage);
     } catch (error) {
-      const answer = failedCall(error) as { error: string } | { reverted: string };
+      const answer = await this._failed(error);
       this._answer(method, signature, args, answer);
       // a node that refused the read has not shown that the function reverts
       if ("reverted" in answer) {

@@ -8,6 +8,7 @@ import path from "node:path";
 import { afterEach, describe, it } from "node:test";
 
 import { Contract, JsonRpcProvider } from "ethers";
+import { EntryField } from "../src/common";
 import { context } from "../src/context";
 import { createProvider, RetryingJsonRpcProvider } from "../src/explorer";
 import { FatalError } from "../src/logger";
@@ -18,6 +19,8 @@ import {
   pinSectionBlock,
   toBlockTag,
 } from "../src/pinned-block";
+import { ChecksSectionValidator } from "../src/section-validators/checks";
+import type { StaticCallCheck } from "../src/typebox";
 
 describe("--block option", () => {
   it("accepts a block number, a block hash or latest and nothing else", () => {
@@ -231,15 +234,44 @@ describe("ethers over a pinned provider", () => {
     assert.match(sent.eth_getLogs, /"toBlock":"0x10"/);
   });
 
-  it("refuses a block whose header the RPC knows but whose state it does not keep", async () => {
+  for (const block of [HASH, "16", "latest"]) {
+    it(`refuses a ${block === "latest" ? "latest" : "pinned"} block whose state the RPC does not keep`, async () => {
+      const { answers, close, failures, provider } = await wire();
+      answers.eth_getBlockByNumber = BLOCK;
+      failures.eth_call = { code: -32000, message: `historical state ${HASH} is not available` };
+      context.block = block;
+      context.json = true;
+      try {
+        await assert.rejects(
+          pinSectionBlock(provider),
+          (error: unknown) =>
+            error instanceof FatalError && /Could not read the state at block \d+/.test(error.message),
+        );
+      } finally {
+        context.block = undefined;
+        context.json = false;
+        close();
+      }
+    });
+  }
+
+  it("stops the run when the RPC drops the pinned state after the pin", async () => {
+    // a node that keeps only recent states serves the pin first and refuses it seconds later
     const { close, failures, provider } = await wire();
-    failures.eth_getBalance = { code: -32000, message: `historical state ${HASH} is not available` };
     context.block = HASH;
     context.json = true;
+    class Exposed extends ChecksSectionValidator {
+      public run(contract: Contract) {
+        return this._checkViewFunction(contract, "f", { mustRevert: true } as unknown as StaticCallCheck);
+      }
+    }
     try {
+      await pinSectionBlock(provider);
+      failures.eth_call = { code: -32000, message: "missing trie node" };
+      const contract = new Contract(ADDRESS, ["function f() view returns (uint256)"], provider);
       await assert.rejects(
-        pinSectionBlock(provider),
-        (error: unknown) => error instanceof FatalError && /no state at block 16/.test(error.message),
+        new Exposed(provider, 1, EntryField.checks).run(contract),
+        (error: unknown) => error instanceof FatalError && /no state at block 16 any more/.test(error.message),
       );
     } finally {
       context.block = undefined;

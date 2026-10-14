@@ -20,7 +20,6 @@ import {
   type Answer,
   CheckLevel,
   describeFailure,
-  failedCall,
   getErrorContext,
   needCheck,
   SectionValidatorBase,
@@ -124,7 +123,7 @@ export class ChecksSectionValidator extends SectionValidatorBase {
         try {
           answer = { value: await contract.getFunction(key).staticCall() };
         } catch (error) {
-          answer = failedCall(error);
+          answer = await this._failed(error);
         }
         recordObservedCall(getErrorContext(), key, undefined, answer);
       }
@@ -151,7 +150,7 @@ export class ChecksSectionValidator extends SectionValidatorBase {
           recordObservedCall(getErrorContext(), stem, [index], { value });
           logHandle.warning(`not in the config; the chain says ${_stringify(value)}`);
         } catch (error) {
-          const answer = failedCall(error) as { error: string } | { reverted: string };
+          const answer = await this._failed(error);
           recordObservedCall(getErrorContext(), stem, [index], answer);
           logHandle.warning(`not in the config; the read ${describeFailure(answer)}`);
         }

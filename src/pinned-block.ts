@@ -57,29 +57,43 @@ export function assertBlockOnOneChain(chainIds: readonly string[]): void {
  */
 export async function pinSectionBlock(provider: RetryingJsonRpcProvider): Promise<void> {
   if (context.block === undefined) return;
+  let hash = "";
   if (context.block === "latest") {
     const number = await provider.getBlockNumber();
     provider.pinned = { number, tag: toBlockTag(number) };
-    log(`Reads pinned to block ${number}`);
-    return;
+  } else {
+    const byHash = BLOCK_HASH.test(context.block);
+    const block = await provider.getBlock(byHash ? context.block : Number(context.block));
+    if (block === null) logErrorAndExit(`Block ${context.block} is not on the chain the RPC serves`);
+    // A hash pin survives a reorg only as a refusal: requireCanonical makes the node reject a
+    // replaced block instead of serving its sibling
+    const tag: PinnedTag = byHash
+      ? { blockHash: context.block.toLowerCase(), requireCanonical: true }
+      : toBlockTag(block.number);
+    provider.pinned = { number: block.number, tag };
+    if (byHash) hash = ` (${context.block})`;
   }
-  const byHash = BLOCK_HASH.test(context.block);
-  const block = await provider.getBlock(byHash ? context.block : Number(context.block));
-  if (block === null) logErrorAndExit(`Block ${context.block} is not on the chain the RPC serves`);
-  // A hash pin survives a reorg only as a refusal: requireCanonical makes the node reject a
-  // replaced block instead of serving its sibling
-  const tag: PinnedTag = byHash
-    ? { blockHash: context.block.toLowerCase(), requireCanonical: true }
-    : toBlockTag(block.number);
-  provider.pinned = { number: block.number, tag };
-  // A node that keeps the header but not the state would answer every read with an error, and
-  // a mustRevert check or the observed file could take that error for the chain's answer
+  await assertPinnedState(provider);
+  log(`Reads pinned to block ${provider.pinned.number}${hash}`);
+}
+
+/**
+ * Makes one call at the pinned block. A node that keeps the header but not the state answers
+ * every read with an error, which a mustRevert check or the observed file could take for the
+ * chain's answer; a node that keeps only recent states drops the pin while the run goes on.
+ */
+export async function assertPinnedState(provider: RetryingJsonRpcProvider, midRun = false): Promise<void> {
+  const number = provider.pinned?.number;
+  if (number === undefined) return;
   try {
-    await provider.getBalance(ZeroAddress);
+    await provider.call({ data: "0x", to: ZeroAddress });
   } catch (error) {
-    logErrorAndExit(`The RPC has no state at block ${block.number}: ${printError(error)}`);
+    logErrorAndExit(
+      midRun
+        ? `The RPC keeps no state at block ${number} any more; use an archive RPC: ${printError(error)}`
+        : `Could not read the state at block ${number}: ${printError(error)}`,
+    );
   }
-  log(`Reads pinned to block ${block.number}${byHash ? ` (${context.block})` : ""}`);
 }
 
 /**
