@@ -120,8 +120,15 @@ export function buildObservedDocument(configPath: string): ObservedDocument {
   return { config: configPath, generated_at: new Date().toISOString(), sections };
 }
 
+/** A run that stopped before its first section read nothing, and leaves the file of an earlier run as it was. */
 export function writeObservedFile(filePath: string, configPath: string): void {
+  if (Object.keys(sections).length === 0) {
+    log(`No section was read; ${filePath} is left as it was`);
+    return;
+  }
   fs.mkdirSync(path.dirname(path.resolve(filePath)), { recursive: true });
-  fs.writeFileSync(filePath, YAML.stringify(buildObservedDocument(configPath)));
+  // temp + rename: a write that dies short leaves the earlier file whole
+  fs.writeFileSync(`${filePath}.tmp`, YAML.stringify(buildObservedDocument(configPath)));
+  fs.renameSync(`${filePath}.tmp`, filePath);
   log(`Observed values written to ${filePath}`);
 }

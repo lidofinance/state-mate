@@ -298,23 +298,30 @@ describe("an aborted run", () => {
     }
   });
 
-  for (const mode of [[], ["--json"]]) {
-    it(`still writes the observed file${mode.length ? " under --json" : ""}`, () => {
-      // the section's RPC variable is unset, so the run exits before its first read
+  // the RPC variables are unset: a run that gets past the refusals stops before its first read
+  const CONFIG = [
+    "deployed:\n  l1: []\n  l2: []",
+    "l1:\n  rpcUrl: STATE_MATE_TEST_UNSET_L1_RPC_URL\n  chainId: 1\n  contracts: {}",
+    "l2:\n  rpcUrl: STATE_MATE_TEST_UNSET_L2_RPC_URL\n  chainId: 10\n  contracts: {}\n",
+  ].join("\n");
+
+  for (const [stop, args] of [
+    ["stops before its first read", ["-o", "l1"]],
+    ["stops before its first read under --json", ["-o", "l1", "--json"]],
+    ["refuses a --block for a config that spans two chains", ["--block", "16"]],
+  ] as const) {
+    it(`leaves the file of an earlier run as it was when it ${stop}`, () => {
       const directory = fs.mkdtempSync(path.join(os.tmpdir(), "state-mate-observed-"));
       const config = path.join(directory, "cfg.yaml");
-      const observed = path.join(directory, "out", "cfg.observed.yaml");
-      fs.writeFileSync(
-        config,
-        "deployed:\n  l1: []\nl1:\n  rpcUrl: STATE_MATE_TEST_UNSET_RPC_URL\n  chainId: 1\n  contracts: {}\n",
-      );
+      const observed = path.join(directory, "cfg.observed.yaml");
+      fs.writeFileSync(config, CONFIG);
+      fs.writeFileSync(observed, "previous run\n");
       try {
-        const run = runCli(config, "--observed", observed, ...mode);
+        const run = runCli(config, "--observed", observed, ...args);
 
         assert.equal(run.status, 1);
-        const document = YAML.parse(fs.readFileSync(observed, "utf8"));
-        assert.equal(document.config, config);
-        assert.deepEqual(document.sections, {});
+        assert.equal(fs.readFileSync(observed, "utf8"), "previous run\n");
+        assert.deepEqual(fs.readdirSync(directory).sort(), ["cfg.observed.yaml", "cfg.yaml"]);
       } finally {
         fs.rmSync(directory, { recursive: true, force: true });
       }
