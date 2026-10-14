@@ -234,6 +234,21 @@ describe("ethers over a pinned provider", () => {
     assert.match(sent.eth_getLogs, /"toBlock":"0x10"/);
   });
 
+  it("pins latest by the hash of the head, so a reorg fails the reads instead of mixing two states", async () => {
+    const { answers, close, provider, read, sent } = await wire();
+    answers.eth_getBlockByNumber = BLOCK;
+    context.block = "latest";
+    try {
+      await pinSectionBlock(provider);
+      await read();
+    } finally {
+      context.block = undefined;
+      close();
+    }
+    assert.deepEqual(provider.pinned, { number: 16, tag: { blockHash: HASH, requireCanonical: true } });
+    assert.ok(sent.eth_call.endsWith(`{"blockHash":"${HASH}","requireCanonical":true}]`));
+  });
+
   for (const block of [HASH, "16", "latest"]) {
     it(`refuses a ${block === "latest" ? "latest" : "pinned"} block whose state the RPC does not keep`, async () => {
       const { answers, close, failures, provider } = await wire();

@@ -59,8 +59,11 @@ export async function pinSectionBlock(provider: RetryingJsonRpcProvider): Promis
   if (context.block === undefined) return;
   let hash = "";
   if (context.block === "latest") {
-    const number = await provider.getBlockNumber();
-    provider.pinned = { number, tag: toBlockTag(number) };
+    // the head by its hash: requireCanonical and the end-of-section re-read then catch a reorg
+    const head = await provider.getBlock("latest");
+    if (!head?.hash) logErrorAndExit("The RPC did not name its head block");
+    provider.pinned = { number: head.number, tag: { blockHash: head.hash.toLowerCase(), requireCanonical: true } };
+    hash = ` (${head.hash})`;
   } else {
     const byHash = BLOCK_HASH.test(context.block);
     const block = await provider.getBlock(byHash ? context.block : Number(context.block));
