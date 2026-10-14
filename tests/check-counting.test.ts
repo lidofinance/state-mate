@@ -102,11 +102,33 @@ describe("a mustRevert check", () => {
   });
 
   it("passes on a halt the EVM made, however the node words it", async () => {
-    for (const message of ["invalid opcode: INVALID", "EVM error: InvalidFEOpcode", "out of gas"]) {
-      await validator.run(failingWith(callError({ code: -32000, message })), "getTotalPooledEther");
+    const halts = {
+      "geth and Erigon": [
+        "invalid opcode: INVALID",
+        "invalid opcode: opcode 0x5f not defined",
+        "out of gas",
+        "stack underflow (0 <=> 1)",
+        "stack limit reached 1024 (1023)",
+        "invalid jump destination",
+        "write protection",
+      ],
+      "revm and reth": [
+        "EVM error: InvalidFEOpcode",
+        "EVM error: OpcodeNotFound",
+        "EVM error: OutOfGas(Basic)",
+        "EVM error: StackUnderflow",
+        "EVM error: InvalidJump",
+        "EVM error: StateChangeDuringStaticCall",
+      ],
+      Nethermind: ["invalid instruction", "bad instruction", "stack overflow", "static call violation"],
+      Besu: ["INVALID_OPERATION", "INSUFFICIENT_GAS", "INSUFFICIENT_STACK_ITEMS", "ILLEGAL_STATE_CHANGE"],
+    };
+    for (const [client, messages] of Object.entries(halts)) {
+      for (const message of messages) {
+        await validator.run(failingWith(callError({ code: -32000, message })), "getTotalPooledEther");
+        assert.equal(stats.errors, 0, `${client}: ${message}`);
+      }
     }
-
-    assert.equal(stats.errors, 0);
   });
 
   it("passes when ethers refuses the call before it reaches a node, as before", async () => {

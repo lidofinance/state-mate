@@ -104,9 +104,28 @@ export type CheckOutcome = { detail: string; ok: true } | { message: string; ok:
 
 export type Answer = { error: string } | { reverted: string } | { value: unknown };
 
-// How a node words a call the EVM ended: geth "invalid opcode: INVALID", revm "EVM error: InvalidFEOpcode"
-const EVM_FAILURE =
-  /revert|invalid\s*(?:fe\s*)?opcode|opcode\s*not\s*found|out\s*of\s*gas|stack\s*(?:under|over)flow|invalid\s*jump/i;
+// How the clients word a call the EVM ended, from a revert to an exceptional halt: geth and Erigon
+// ("invalid opcode: INVALID", "stack limit reached"), revm ("EVM error: InvalidFEOpcode"), Nethermind
+// ("invalid instruction"), Besu ("INVALID_OPERATION", "INSUFFICIENT_STACK_ITEMS")
+const EVM_FAILURE = new RegExp(
+  [
+    "revert",
+    "invalid[\\s_]*(?:fe[\\s_]*)?(?:opcode|operation|instruction)",
+    "bad[\\s_]*instruction",
+    "opcode[\\s_]*not[\\s_]*found",
+    "out[\\s_]*of[\\s_]*gas",
+    "insufficient[\\s_]*gas",
+    "stack[\\s_]*(?:under|over)flow",
+    "stack[\\s_]*limit[\\s_]*reached",
+    "(?:too[\\s_]*many|insufficient)[\\s_]*stack[\\s_]*items",
+    "invalid[\\s_]*jump",
+    "write[\\s_]*protection",
+    "static[\\s_]*call[\\s_]*violation",
+    "state[\\s_]*change[\\s_]*during[\\s_]*static[\\s_]*call",
+    "illegal[\\s_]*state[\\s_]*change",
+  ].join("|"),
+  "i",
+);
 // Failures of the node or of the way to it; any other error ethers raises before the call leaves
 const NODE_FAILURES = new Set(["NETWORK_ERROR", "SERVER_ERROR", "TIMEOUT", "UNKNOWN_ERROR"]);
 
