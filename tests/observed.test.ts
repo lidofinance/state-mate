@@ -24,6 +24,7 @@ import {
 import { resetContractCounters, setErrorContext } from "../src/section-validators/base";
 import { ChecksSectionValidator } from "../src/section-validators/checks";
 import type { StaticCallCheck } from "../src/typebox";
+import { callError, NO_STATE, REVERT } from "./helpers/rpc-errors";
 
 const POSITION = { section: "robinhood", contract: "vault", contractAddress: "0xVault", checksType: "checks" };
 
@@ -135,7 +136,10 @@ describe("a check the config declines to assert", () => {
     getFunction: () => ({ fragment: NO_INPUTS, staticCall: () => Promise.resolve("0xTotal") }),
   } as unknown as Contract;
   const reverts = {
-    getFunction: () => ({ fragment: NO_INPUTS, staticCall: () => Promise.reject(new Error("execution reverted")) }),
+    getFunction: () => ({ fragment: NO_INPUTS, staticCall: () => Promise.reject(callError(REVERT)) }),
+  } as unknown as Contract;
+  const refused = {
+    getFunction: () => ({ fragment: NO_INPUTS, staticCall: () => Promise.reject(callError(NO_STATE)) }),
   } as unknown as Contract;
 
   class Exposed extends ChecksSectionValidator {
@@ -184,6 +188,17 @@ describe("a check the config declines to assert", () => {
     assert.deepEqual(Object.keys(checks), ["canSendAssets"]);
     assert.match(String(checks.canSendAssets[0].reverted), /execution reverted/);
     assert.equal(stats.errors, 0);
+  });
+
+  it("records a read the node did not serve as an error, not as a revert", async () => {
+    context.observedPath = "state.observed.yaml";
+    await validator.run(refused, "canSendAssets", { result: null } as unknown as StaticCallCheck);
+
+    const [call] = (
+      buildObservedDocument("state.yaml").sections.robinhood.contracts.vault.checks as Record<string, ObservedCall[]>
+    ).canSendAssets;
+    assert.equal(call.reverted, undefined);
+    assert.match(String(call.error), /historical state .* is not available/);
   });
 
   it("is not read at all without the observed file", async () => {

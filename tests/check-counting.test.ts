@@ -8,11 +8,12 @@ import { context, resetStats, stats } from "../src/context";
 import { resetContractCounters, setErrorContext } from "../src/section-validators/base";
 import { ChecksSectionValidator } from "../src/section-validators/checks";
 import type { StaticCallCheck } from "../src/typebox";
+import { callError, NO_STATE, REVERT } from "./helpers/rpc-errors";
 
 // A null result never reaches the chain; a mustRevert entry needs a function that reverts
 const CONTRACT = {
   getFunction: () => ({
-    staticCall: () => Promise.reject(new Error("execution reverted")),
+    staticCall: () => Promise.reject(callError(REVERT)),
   }),
 } as unknown as Contract;
 
@@ -74,5 +75,37 @@ describe("filter selection accounting", () => {
     await validator.run("nonce", { result: null } as unknown as StaticCallCheck);
 
     assert.equal(stats.selected, 2);
+  });
+});
+
+describe("a mustRevert check", () => {
+  const failingWith = (error: Error) =>
+    ({ getFunction: () => ({ staticCall: () => Promise.reject(error) }) }) as unknown as Contract;
+
+  class Exposed extends ChecksSectionValidator {
+    public run(contract: Contract, method: string) {
+      return this._checkViewFunction(contract, method, { mustRevert: true } as unknown as StaticCallCheck);
+    }
+  }
+
+  const validator = new Exposed({} as JsonRpcProvider, 1, EntryField.checks);
+
+  beforeEach(() => {
+    resetStats();
+    resetContractCounters();
+  });
+
+  it("passes when the EVM reverts the call", async () => {
+    await validator.run(failingWith(callError(REVERT)), "subvaultAt");
+
+    assert.equal(stats.errors, 0);
+  });
+
+  it("fails when the node has no state to run the call at", async () => {
+    // a node that kept the header of a pinned block but not its state refuses every eth_call
+    await validator.run(failingWith(callError(NO_STATE)), "subvaultAt");
+
+    assert.equal(stats.errors, 1);
+    assert.match(stats.errorDetails[0].message, /historical state .* is not available/);
   });
 });

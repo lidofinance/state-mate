@@ -41,7 +41,8 @@ sections:
 ```
 
 `checks`, `proxyChecks` and `implementationChecks` list one entry per call, in config order,
-with `args` when the call took any and either `value` or `reverted`. Numbers are decimal
+with `args` when the call took any and one of `value`, `reverted` (the EVM ended the call) or
+`error` (the node did not serve it). Numbers are decimal
 strings, structs with named fields are maps, other tuples and arrays are lists. `block` is the
 pinned block, or the head when the section started with `pinned: false`; a section pinned by
 hash also carries `blockHash`. `storage` maps each slot the config checks to the word the chain

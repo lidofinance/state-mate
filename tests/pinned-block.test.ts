@@ -165,6 +165,7 @@ async function wire() {
     eth_getLogs: [],
     eth_getBlockByHash: BLOCK,
   };
+  const failures: Record<string, { code: number; message: string }> = {};
   const server = http.createServer((request, response) => {
     let body = "";
     request.on("data", (chunk) => (body += chunk));
@@ -172,6 +173,8 @@ async function wire() {
       const parsed = JSON.parse(body);
       const replies = [parsed].flat().map((message: { id: number; method: string; params: unknown }) => {
         sent[message.method] = JSON.stringify(message.params);
+        const failure = failures[message.method];
+        if (failure) return { jsonrpc: "2.0", id: message.id, error: failure };
         return { jsonrpc: "2.0", id: message.id, result: answers[message.method] ?? `0x${"0".repeat(63)}1` };
       });
       response.setHeader("content-type", "application/json");
@@ -190,7 +193,7 @@ async function wire() {
     provider.destroy();
     server.close();
   };
-  return { answers, close, provider, read, sent };
+  return { answers, close, failures, provider, read, sent };
 }
 
 describe("ethers over a pinned provider", () => {
@@ -224,6 +227,23 @@ describe("ethers over a pinned provider", () => {
     assert.ok(sent.eth_getStorageAt.endsWith(`${reference}]`));
     assert.ok(sent.eth_getCode.endsWith(`${reference}]`));
     assert.match(sent.eth_getLogs, /"toBlock":"0x10"/);
+  });
+
+  it("refuses a block whose header the RPC knows but whose state it does not keep", async () => {
+    const { close, failures, provider } = await wire();
+    failures.eth_getBalance = { code: -32000, message: `historical state ${HASH} is not available` };
+    context.block = HASH;
+    context.json = true;
+    try {
+      await assert.rejects(
+        pinSectionBlock(provider),
+        (error: unknown) => error instanceof FatalError && /no state at block 16/.test(error.message),
+      );
+    } finally {
+      context.block = undefined;
+      context.json = false;
+      close();
+    }
   });
 
   for (const [still, heldHash] of [

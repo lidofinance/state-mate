@@ -102,7 +102,30 @@ export function needCheck(level: CheckLevel, name: string) {
 
 export type CheckOutcome = { detail: string; ok: true } | { message: string; ok: false };
 
-export type Answer = { reverted: string } | { value: unknown };
+export type Answer = { error: string } | { reverted: string } | { value: unknown };
+
+// How a node words a call the EVM ended, as opposed to one the node could not or would not serve
+const EVM_FAILURE = /revert|invalid opcode|out of gas|stack (?:underflow|overflow)|invalid jump/i;
+
+/**
+ * A failed read, sorted by who ended it. ethers reports every eth_call error as CALL_EXCEPTION, so
+ * a node without the state at a pinned block reads as a revert unless the revert data or the
+ * node's own message shows that the EVM ended the call.
+ */
+export function failedCall(error: unknown): Answer {
+  const { code, data, info } = error as { code?: unknown; data?: unknown; info?: { error?: { message?: unknown } } };
+  const nodeMessage = info?.error?.message;
+  const reverted =
+    code === "CALL_EXCEPTION" && (typeof data === "string" || EVM_FAILURE.test(String(nodeMessage ?? "")));
+  // without revert data ethers says "missing revert data" whatever the node said; the node names the cause
+  const text = typeof data !== "string" && typeof nodeMessage === "string" ? nodeMessage : printError(error);
+  return reverted ? { reverted: text } : { error: text };
+}
+
+/** The log line for a read that did not return a value. */
+export function describeFailure(answer: { error: string } | { reverted: string }): string {
+  return "reverted" in answer ? `REVERTED with: ${answer.reverted}` : `FAILED with: ${answer.error}`;
+}
 
 export abstract class SectionValidatorBase {
   /** Checks the run supplies rather than the config declares, e.g. the `null` coverage of an implementation ABI. */
@@ -198,8 +221,9 @@ export abstract class SectionValidatorBase {
     try {
       actual = await contractFunction.staticCall(...(args || ""));
     } catch (error) {
-      this._answer(method, signature, args, { reverted: printError(error) });
-      const errorMessage = `REVERTED with: ${printError(error)}`;
+      const answer = failedCall(error) as { error: string } | { reverted: string };
+      this._answer(method, signature, args, answer);
+      const errorMessage = describeFailure(answer);
       logHandle.failure(errorMessage);
       incErrors(errorMessage);
       return;
@@ -231,7 +255,7 @@ export abstract class SectionValidatorBase {
     try {
       this._answer(method, signature, args, { value: await contractFunction.staticCall(...(args || "")) });
     } catch (error) {
-      this._answer(method, signature, args, { reverted: printError(error) });
+      this._answer(method, signature, args, failedCall(error));
     }
   }
 
@@ -264,8 +288,16 @@ export abstract class SectionValidatorBase {
       logHandle.failure(errorMessage);
       incErrors(errorMessage);
     } catch (error) {
-      this._answer(method, signature, args, { reverted: printError(error) });
-      logHandle.success(`REVERTED with: ${printError(error)}`);
+      const answer = failedCall(error) as { error: string } | { reverted: string };
+      this._answer(method, signature, args, answer);
+      // a node that refused the read has not shown that the function reverts
+      if ("reverted" in answer) {
+        logHandle.success(describeFailure(answer));
+      } else {
+        const errorMessage = `Expected revert but the call ${describeFailure(answer)}`;
+        logHandle.failure(errorMessage);
+        incErrors(errorMessage);
+      }
     }
   }
 

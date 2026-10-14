@@ -1,6 +1,6 @@
 import type { Contract, JsonRpcProvider } from "ethers";
 
-import { EntryField, printError } from "src/common";
+import { EntryField } from "src/common";
 import { context } from "src/context";
 import { loadContract } from "src/explorer";
 import { LogCommand, logErrorAndExit } from "src/logger";
@@ -15,7 +15,16 @@ import {
 } from "src/typebox";
 import type { Abi, ChainId } from "src/types";
 
-import { _stringify, type Answer, CheckLevel, getErrorContext, needCheck, SectionValidatorBase } from "./base";
+import {
+  _stringify,
+  type Answer,
+  CheckLevel,
+  describeFailure,
+  failedCall,
+  getErrorContext,
+  needCheck,
+  SectionValidatorBase,
+} from "./base";
 
 // <name>Length or <name>Count next to an indexed getter <name>(uint256) is an enumeration
 const ENUMERATION = /^(.+?)(Length|Count)$/;
@@ -112,12 +121,12 @@ export class ChecksSectionValidator extends SectionValidatorBase {
         try {
           answer = { value: await contract.getFunction(key).staticCall() };
         } catch (error) {
-          answer = { reverted: printError(error) };
+          answer = failedCall(error);
         }
         recordObservedCall(getErrorContext(), key, undefined, answer);
       }
-      if ("reverted" in answer) {
-        new LogCommand(`.${key}`).warning(`.${stem}(i) not expanded: the count REVERTED with: ${answer.reverted}`);
+      if (!("value" in answer)) {
+        new LogCommand(`.${key}`).warning(`.${stem}(i) not expanded: the count ${describeFailure(answer)}`);
         continue;
       }
       const count = Number(answer.value);
@@ -136,8 +145,9 @@ export class ChecksSectionValidator extends SectionValidatorBase {
           recordObservedCall(getErrorContext(), stem, [index], { value });
           logHandle.warning(`not in the config; the chain says ${_stringify(value)}`);
         } catch (error) {
-          recordObservedCall(getErrorContext(), stem, [index], { reverted: printError(error) });
-          logHandle.warning(`not in the config; the read REVERTED with: ${printError(error)}`);
+          const answer = failedCall(error) as { error: string } | { reverted: string };
+          recordObservedCall(getErrorContext(), stem, [index], answer);
+          logHandle.warning(`not in the config; the read ${describeFailure(answer)}`);
         }
       }
     }

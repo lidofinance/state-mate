@@ -14,6 +14,7 @@ export type Plain = boolean | null | number | Plain[] | string | { [key: string]
 
 export interface ObservedCall {
   args?: Plain[];
+  error?: string;
   reverted?: string;
   value?: Plain;
 }
@@ -91,7 +92,7 @@ export function recordObservedCall(
   position: Partial<ErrorDetail>,
   method: string,
   args: readonly unknown[] | undefined,
-  outcome: { reverted: string } | { value: unknown },
+  outcome: { error: string } | { reverted: string } | { value: unknown },
 ): void {
   // without --observed nothing is kept: a run must not hold every answer it asserted
   if (!context.observedPath) return;
@@ -102,7 +103,8 @@ export function recordObservedCall(
   const call: ObservedCall = {};
   if (args && args.length > 0) call.args = args.map((item) => toPlain(item));
   if ("value" in outcome) call.value = toPlain(outcome.value);
-  else call.reverted = redactSecrets(outcome.reverted);
+  else if ("reverted" in outcome) call.reverted = redactSecrets(outcome.reverted);
+  else call.error = redactSecrets(outcome.error);
   calls[method] ??= [];
   calls[method].push(call);
 }

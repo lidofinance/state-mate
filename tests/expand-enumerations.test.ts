@@ -11,6 +11,7 @@ import { resetContractCounters, setErrorContext } from "../src/section-validator
 import { ChecksSectionValidator, pinnedIndices } from "../src/section-validators/checks";
 import type { ChecksEntryValue, StaticCallResult } from "../src/typebox";
 import type { Abi } from "../src/types";
+import { callError, REVERT } from "./helpers/rpc-errors";
 
 const ADDRESS = "0x7305bB45aF91893B7BCaF0Ad8Eae37cb16820Bb8";
 const IDS = ["0xa", "0xb", "0xc", "0xd", "0xe"];
@@ -27,10 +28,10 @@ function fakeContract(ids: string[], reads: string[], countReverts = false): Con
       staticCall: (...args: unknown[]) => {
         reads.push(`${name}(${args.join(",")})`);
         if (name.endsWith("Length")) {
-          return countReverts ? Promise.reject(new Error("execution reverted")) : Promise.resolve(BigInt(ids.length));
+          return countReverts ? Promise.reject(callError(REVERT)) : Promise.resolve(BigInt(ids.length));
         }
         const index = Number(args[0]);
-        return index < ids.length ? Promise.resolve(ids[index]) : Promise.reject(new Error("execution reverted"));
+        return index < ids.length ? Promise.resolve(ids[index]) : Promise.reject(callError(REVERT));
       },
     }),
   } as unknown as Contract;

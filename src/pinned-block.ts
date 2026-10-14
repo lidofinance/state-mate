@@ -1,3 +1,6 @@
+import { ZeroAddress } from "ethers";
+
+import { printError } from "./common";
 import { context } from "./context";
 import type { RetryingJsonRpcProvider } from "./explorer";
 import { log, logErrorAndExit } from "./logger";
@@ -67,6 +70,13 @@ export async function pinSectionBlock(provider: RetryingJsonRpcProvider): Promis
     ? { blockHash: context.block.toLowerCase(), requireCanonical: true }
     : toBlockTag(block.number);
   provider.pinned = { number: block.number, tag };
+  // A node that keeps the header but not the state would answer every read with an error, and
+  // a mustRevert check or the observed file could take that error for the chain's answer
+  try {
+    await provider.getBalance(ZeroAddress);
+  } catch (error) {
+    logErrorAndExit(`The RPC has no state at block ${block.number}: ${printError(error)}`);
+  }
   log(`Reads pinned to block ${block.number}${byHash ? ` (${context.block})` : ""}`);
 }
 
