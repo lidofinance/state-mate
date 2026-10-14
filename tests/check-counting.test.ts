@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { afterEach, beforeEach, describe, it } from "node:test";
 
-import type { Contract, JsonRpcProvider } from "ethers";
+import { type Contract, Contract as EthersContract, JsonRpcProvider } from "ethers";
 
 import { EntryField } from "../src/common";
 import { context, resetStats, stats } from "../src/context";
@@ -99,6 +99,34 @@ describe("a mustRevert check", () => {
     await validator.run(failingWith(callError(REVERT)), "subvaultAt");
 
     assert.equal(stats.errors, 0);
+  });
+
+  it("passes on a halt the EVM made, however the node words it", async () => {
+    for (const message of ["invalid opcode: INVALID", "EVM error: InvalidFEOpcode", "out of gas"]) {
+      await validator.run(failingWith(callError({ code: -32000, message })), "getTotalPooledEther");
+    }
+
+    assert.equal(stats.errors, 0);
+  });
+
+  it("passes when ethers refuses the call before it reaches a node, as before", async () => {
+    const contract = new EthersContract(
+      "0x0000000000000000000000000000000000000001",
+      ["function renounceRole(bytes32 role, address account)"],
+      new JsonRpcProvider("http://localhost:0", undefined, { staticNetwork: true }),
+    );
+    await validator.run(contract, "renounceRole");
+
+    assert.equal(stats.errors, 0);
+  });
+
+  it("fails when the node refuses the request", async () => {
+    await validator.run(
+      failingWith(Object.assign(new Error("server response 403 Forbidden"), { code: "SERVER_ERROR" })),
+      "observers",
+    );
+
+    assert.equal(stats.errors, 1);
   });
 
   it("fails when the node has no state to run the call at", async () => {

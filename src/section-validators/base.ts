@@ -104,22 +104,27 @@ export type CheckOutcome = { detail: string; ok: true } | { message: string; ok:
 
 export type Answer = { error: string } | { reverted: string } | { value: unknown };
 
-// How a node words a call the EVM ended, as opposed to one the node could not or would not serve
-const EVM_FAILURE = /revert|invalid opcode|out of gas|stack (?:underflow|overflow)|invalid jump/i;
+// How a node words a call the EVM ended: geth "invalid opcode: INVALID", revm "EVM error: InvalidFEOpcode"
+const EVM_FAILURE =
+  /revert|invalid\s*(?:fe\s*)?opcode|opcode\s*not\s*found|out\s*of\s*gas|stack\s*(?:under|over)flow|invalid\s*jump/i;
+// Failures of the node or of the way to it; any other error ethers raises before the call leaves
+const NODE_FAILURES = new Set(["NETWORK_ERROR", "SERVER_ERROR", "TIMEOUT", "UNKNOWN_ERROR"]);
 
 /**
  * A failed read, sorted by who ended it. ethers reports every eth_call error as CALL_EXCEPTION, so
  * a node without the state at a pinned block reads as a revert unless the revert data or the
- * node's own message shows that the EVM ended the call.
+ * node's own message shows that the EVM ended the call. An error ethers raises before sending,
+ * such as arguments that do not encode, never reaches a node and keeps counting as a revert.
  */
 export function failedCall(error: unknown): Answer {
   const { code, data, info } = error as { code?: unknown; data?: unknown; info?: { error?: { message?: unknown } } };
   const nodeMessage = info?.error?.message;
-  const reverted =
-    code === "CALL_EXCEPTION" && (typeof data === "string" || EVM_FAILURE.test(String(nodeMessage ?? "")));
+  const nodeFailed =
+    NODE_FAILURES.has(String(code)) ||
+    (code === "CALL_EXCEPTION" && typeof data !== "string" && !EVM_FAILURE.test(String(nodeMessage ?? "")));
   // without revert data ethers says "missing revert data" whatever the node said; the node names the cause
   const text = typeof data !== "string" && typeof nodeMessage === "string" ? nodeMessage : printError(error);
-  return reverted ? { reverted: text } : { error: text };
+  return nodeFailed ? { error: text } : { reverted: text };
 }
 
 /** The log line for a read that did not return a value. */
