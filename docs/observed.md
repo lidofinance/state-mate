@@ -16,7 +16,7 @@ yarn start configs/vault.yaml --block latest --observed out/vault.observed.yaml
 
 The values the chain answered, written when the run ends as YAML, keyed the way the config asks.
 A run that stops before its first network section reads nothing and leaves an earlier file as it
-was:
+was. A split config also gets `deployed` and `inputs`, the files it was read with:
 
 ```yaml
 config: configs/vault.yaml

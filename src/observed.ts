@@ -35,6 +35,8 @@ interface ObservedSection {
 
 export interface ObservedDocument {
   config: string;
+  deployed?: string;
+  inputs?: string;
   generated_at: string;
   sections: Record<string, ObservedSection>;
 }
@@ -118,7 +120,14 @@ export function recordObservedStorage(position: Partial<ErrorDetail>, slot: stri
 }
 
 export function buildObservedDocument(configPath: string): ObservedDocument {
-  return { config: configPath, generated_at: new Date().toISOString(), sections };
+  return {
+    config: configPath,
+    // the address book and the inputs of a split config, named as the JSON report names them
+    ...(context.deployed === undefined ? {} : { deployed: path.resolve(context.deployed) }),
+    ...(context.inputs === undefined ? {} : { inputs: path.resolve(context.inputs) }),
+    generated_at: new Date().toISOString(),
+    sections,
+  };
 }
 
 /** A run that stopped before its first section read nothing, and leaves the file of an earlier run as it was. */

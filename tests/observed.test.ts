@@ -107,6 +107,22 @@ describe("observed values", () => {
     assert.deepEqual(toPlain([null, 3, 4n, "x", false]), [null, "3", "4", "x", false]);
   });
 
+  it("names the deployed and inputs files a split config was read with", () => {
+    context.deployed = "cfg.deployed.yaml";
+    context.inputs = "cfg.inputs.yaml";
+    try {
+      const document = buildObservedDocument("cfg.yaml");
+      assert.deepEqual(
+        { deployed: document.deployed, inputs: document.inputs },
+        { deployed: path.resolve("cfg.deployed.yaml"), inputs: path.resolve("cfg.inputs.yaml") },
+      );
+    } finally {
+      context.deployed = undefined;
+      context.inputs = undefined;
+    }
+    assert.deepEqual(Object.keys(buildObservedDocument("cfg.yaml")), ["config", "generated_at", "sections"]);
+  });
+
   it("keeps a read whose section was never announced instead of dropping it", () => {
     recordObservedCall(POSITION, "owner", undefined, { value: "0x1" });
 
