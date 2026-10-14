@@ -8,6 +8,7 @@ import path from "node:path";
 import { afterEach, describe, it } from "node:test";
 
 import { Contract, JsonRpcProvider } from "ethers";
+import { resolveScanBounds } from "../src/acl/log-source";
 import { EntryField } from "../src/common";
 import { context } from "../src/context";
 import { createProvider, RetryingJsonRpcProvider } from "../src/explorer";
@@ -124,7 +125,7 @@ describe("a pinned provider", () => {
     return new RetryingJsonRpcProvider("http://localhost:0", undefined, { staticNetwork: true });
   }
 
-  it("sends every read at the pinned block and reports that block as the head", async () => {
+  it("sends every read at the pinned block", async () => {
     const pinned = provider();
     pinned.pinned = { number: 16, tag: "0x10" };
 
@@ -135,7 +136,6 @@ describe("a pinned provider", () => {
       ["eth_call", [{ to: "0x1" }, "0x10"]],
       ["eth_getStorageAt", ["0x1", "0x0", "0x10"]],
     ]);
-    assert.equal(await pinned.getBlockNumber(), 16);
   });
 
   it("sends an unpinned read as it came", async () => {
@@ -192,7 +192,11 @@ async function wire() {
     await new Contract(ADDRESS, ["function f() view returns (uint256)"], provider).getFunction("f").staticCall();
     await provider.getStorage(ADDRESS, 0);
     await provider.getCode(ADDRESS);
-    await provider.getLogs({ address: ADDRESS, fromBlock: 1, toBlock: await provider.getBlockNumber() });
+    await provider.getLogs({
+      address: ADDRESS,
+      fromBlock: 1,
+      toBlock: (await resolveScanBounds("1", provider)).captured,
+    });
   };
   const close = () => {
     provider.destroy();
@@ -214,7 +218,6 @@ describe("ethers over a pinned provider", () => {
     assert.match(sent.eth_getStorageAt, /"0x10"\]$/);
     assert.match(sent.eth_getCode, /"0x10"\]$/);
     assert.match(sent.eth_getLogs, /"toBlock":"0x10"/);
-    assert.equal(sent.eth_blockNumber, undefined);
   });
 
   it("pins a block hash as a canonical EIP-1898 reference, and scans logs to its number", async () => {

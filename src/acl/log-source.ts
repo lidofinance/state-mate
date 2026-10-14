@@ -380,10 +380,7 @@ export async function resolveScanBounds(chainId: string, provider: JsonRpcProvid
   const lag = CHAIN_LOG_SOURCES[chainId]?.confirmationLag ?? 0;
   // --block pins the capture; the head still decides how much of it is settled
   const pinned = provider instanceof RetryingJsonRpcProvider ? provider.pinned?.number : undefined;
-  const head =
-    provider instanceof RetryingJsonRpcProvider && pinned !== undefined
-      ? await provider.getHeadBlockNumber()
-      : await provider.getBlockNumber();
+  const head = await provider.getBlockNumber();
   const captured = pinned ?? head;
   // A pin at least `lag` behind the head is settled already: the log source serves all of it
   return { captured, settled: Math.max(0, Math.min(captured, head - lag)) };

@@ -496,15 +496,6 @@ export class RetryingJsonRpcProvider extends JsonRpcProvider {
       this.pinned === undefined ? parameters : (pinBlockTag(method, parameters, this.pinned.tag) as typeof parameters);
     return withTransientRetry(() => super.send(method, sent));
   }
-
-  override async getBlockNumber(): Promise<number> {
-    return this.pinned?.number ?? (await super.getBlockNumber());
-  }
-
-  /** The chain's head, whatever the pin. */
-  async getHeadBlockNumber(): Promise<number> {
-    return super.getBlockNumber();
-  }
 }
 
 export function createProvider(rpcUrl: string): RetryingJsonRpcProvider {
