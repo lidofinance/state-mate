@@ -279,11 +279,15 @@ export abstract class SectionValidatorBase {
     } catch {
       return;
     }
-    setErrorContext({ method: `${signature}${args ? `(${args.toString()})` : ""}` });
+    const label = `${signature}${args ? `(${args.toString()})` : ""}`;
+    setErrorContext({ method: label });
     try {
       this._answer(method, signature, args, { value: await contractFunction.staticCall(...(args || "")) });
     } catch (error) {
-      this._answer(method, signature, args, await this._failed(error));
+      const answer = await this._failed(error);
+      this._answer(method, signature, args, answer);
+      // nothing asserts this read, so the log and the report are the only place a node failure shows
+      if ("error" in answer) new LogCommand(`.${label}`).warning(`not read: the call ${describeFailure(answer)}`);
     }
   }
 

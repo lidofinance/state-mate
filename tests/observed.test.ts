@@ -24,6 +24,7 @@ import {
   toPlain,
   writeObservedFile,
 } from "../src/observed";
+import { beginConfig, beginContract, buildReport, endContract, resetReport } from "../src/report";
 import { resetContractCounters, setErrorContext } from "../src/section-validators/base";
 import { ChecksSectionValidator } from "../src/section-validators/checks";
 import type { StaticCallCheck } from "../src/typebox";
@@ -159,6 +160,7 @@ describe("a check the config declines to assert", () => {
 
   beforeEach(() => {
     resetObserved();
+    resetReport();
     resetStats();
     resetContractCounters();
     setErrorContext(POSITION);
@@ -193,9 +195,19 @@ describe("a check the config declines to assert", () => {
     assert.equal(stats.errors, 0);
   });
 
-  it("records a read the node did not serve as an error, not as a revert", async () => {
+  it("records a read the node did not serve as an error, not as a revert, and warns about it", async () => {
     context.observedPath = "state.observed.yaml";
+    beginConfig("state.yaml");
+    beginContract("robinhood/vault", "Vault", "0xVault");
     await validator.run(refused, "canSendAssets", { result: null } as unknown as StaticCallCheck);
+    endContract();
+
+    assert.deepEqual(buildReport(0).configs[0].contracts?.[0]?.warnings, [
+      {
+        check: ".canSendAssets",
+        message: `not read: the call FAILED with: historical state 0x${"ab".repeat(32)} is not available`,
+      },
+    ]);
 
     const [call] = (
       buildObservedDocument("state.yaml").sections.robinhood.contracts.vault.checks as Record<string, ObservedCall[]>
