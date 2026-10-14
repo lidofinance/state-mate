@@ -247,6 +247,8 @@ checks:
       mustRevert: true
 ```
 
+`mustRevert` passes only on a revert or a halt of the EVM. A node error or an answer that does not decode fails it. `FAILED with: not sent: ...` means the `args` do not match the ABI: give arguments of the types the function takes.
+
 ### Tuple / array returns
 
 Document field names with comments — tuple positions aren't obvious from YAML alone:

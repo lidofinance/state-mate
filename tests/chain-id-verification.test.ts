@@ -194,6 +194,22 @@ describe("withTransientRetry", () => {
     assert.equal(calls, 1);
   });
 
+  it("retries a rate limit that the node words as a JSON-RPC error over HTTP 200", async () => {
+    const provider = new JsonRpcProvider("http://localhost:0", undefined, { staticNetwork: true });
+    const limited = provider.getRpcError(
+      { id: 1, jsonrpc: "2.0", method: "eth_getLogs", params: [] },
+      { error: { code: 429, message: "Too Many Requests" }, id: 1 },
+    );
+    provider.destroy();
+    let calls = 0;
+    const result = await withTransientRetry(async () => {
+      calls++;
+      if (calls === 1) throw limited;
+      return "ok";
+    }, 0);
+    assert.deepEqual({ calls, result }, { calls: 2, result: "ok" });
+  });
+
   it("does not mask a real revert as a flake", async () => {
     let calls = 0;
     await assert.rejects(

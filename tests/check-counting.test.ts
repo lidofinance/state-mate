@@ -13,6 +13,7 @@ import { callError, NO_STATE, REVERT } from "./helpers/rpc-errors";
 // A null result never reaches the chain; a mustRevert entry needs a function that reverts
 const CONTRACT = {
   getFunction: () => ({
+    populateTransaction: async () => ({}),
     staticCall: () => Promise.reject(callError(REVERT)),
   }),
 } as unknown as Contract;
@@ -81,7 +82,9 @@ describe("filter selection accounting", () => {
 describe("a mustRevert check", () => {
   const ADDRESS = "0x0000000000000000000000000000000000000001";
   const failingWith = (error: Error) =>
-    ({ getFunction: () => ({ staticCall: () => Promise.reject(error) }) }) as unknown as Contract;
+    ({
+      getFunction: () => ({ populateTransaction: async () => ({}), staticCall: () => Promise.reject(error) }),
+    }) as unknown as Contract;
 
   class Exposed extends ChecksSectionValidator {
     public run(contract: Contract, method: string) {
@@ -122,7 +125,6 @@ describe("a mustRevert check", () => {
         "EVM error: StateChangeDuringStaticCall",
       ],
       Nethermind: ["invalid instruction", "bad instruction", "stack overflow", "static call violation"],
-      Besu: ["INVALID_OPERATION", "INSUFFICIENT_GAS", "INSUFFICIENT_STACK_ITEMS", "ILLEGAL_STATE_CHANGE"],
     };
     for (const [client, messages] of Object.entries(halts)) {
       for (const message of messages) {
@@ -153,6 +155,17 @@ describe("a mustRevert check", () => {
 
     assert.equal(stats.errors, 1);
     assert.match(stats.errorDetails[0].message, /could not decode result data/);
+  });
+
+  it("does not blame the config for an answer that came back and does not decode", async () => {
+    const garbled = { call: async () => "not a hex answer", provider: null } as ContractRunner;
+    await validator.run(
+      new EthersContract(ADDRESS, ["function getOwners() view returns (address[])"], garbled),
+      "getOwners",
+    );
+
+    assert.equal(stats.errors, 1);
+    assert.doesNotMatch(stats.errorDetails[0].message, /not sent/);
   });
 
   it("fails when the node refuses the request", async () => {

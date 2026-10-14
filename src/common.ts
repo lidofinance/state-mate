@@ -36,6 +36,39 @@ export function printError(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
 }
 
+/**
+ * What the node said, without the request ethers quotes beside it: a request id of 429 in the
+ * full message would read as a rate limit.
+ */
+export function nodeAnswer(error: unknown): { code?: unknown; message: string; status?: string } {
+  const {
+    error: coalesced,
+    info,
+    shortMessage,
+  } = error as {
+    error?: { code?: unknown; message?: unknown };
+    info?: { error?: { code?: unknown; message?: unknown }; responseBody?: unknown; responseStatus?: unknown };
+    shortMessage?: unknown;
+  };
+  // ethers keeps the JSON-RPC error of an eth_call in info.error, of any other method in error
+  const rpcError = coalesced ?? info?.error;
+  const status = typeof info?.responseStatus === "string" ? info.responseStatus : undefined;
+  // a JSON-RPC error over HTTP 200
+  if (typeof rpcError?.message === "string") return { code: rpcError.code, message: rpcError.message, status };
+  // an HTTP error, whose body may still carry the JSON-RPC error
+  if (typeof info?.responseBody === "string") {
+    try {
+      const body = JSON.parse(info.responseBody) as { error?: { code?: unknown; message?: unknown } };
+      if (typeof body.error?.message === "string")
+        return { code: body.error.code, message: body.error.message, status };
+    } catch {
+      // the body is plain text
+    }
+    return { message: info.responseBody, status };
+  }
+  return { message: typeof shortMessage === "string" ? shortMessage : printError(error), status };
+}
+
 export function readUrlOrFromEnvironment(urlOrEnvironmentVariableName: string) {
   if (isUrl(urlOrEnvironmentVariableName)) {
     registerSecret(urlOrEnvironmentVariableName, "<rpcUrl>");

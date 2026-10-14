@@ -1,6 +1,6 @@
 import { ZeroAddress } from "ethers";
 
-import { printError } from "./common";
+import { nodeAnswer } from "./common";
 import { context } from "./context";
 import type { RetryingJsonRpcProvider } from "./explorer";
 import { log, logErrorAndExit } from "./logger";
@@ -86,17 +86,29 @@ export async function pinSectionBlock(provider: RetryingJsonRpcProvider): Promis
  * chain's answer; a node that keeps only recent states drops the pin while the run goes on.
  */
 export async function assertPinnedState(provider: RetryingJsonRpcProvider, midRun = false): Promise<void> {
-  const number = provider.pinned?.number;
-  if (number === undefined) return;
+  const pinned = provider.pinned;
+  if (pinned === undefined) return;
   try {
     await provider.call({ data: "0x", to: ZeroAddress });
   } catch (error) {
+    const { message } = nodeAnswer(error);
+    if (!midRun) logErrorAndExit(`Could not read the state at block ${pinned.number}: ${message}`);
+    // a node refuses a hash pin once a reorg replaced the block: name the reorg, not the state
+    if (typeof pinned.tag === "object") {
+      const held = await provider.getBlock(pinned.number).catch(() => null);
+      if (held?.hash && held.hash.toLowerCase() !== pinned.tag.blockHash) logErrorAndExit(reorg(pinned.tag.blockHash));
+    }
+    const transport = ["NETWORK_ERROR", "SERVER_ERROR", "TIMEOUT"].includes(String((error as { code?: unknown }).code));
     logErrorAndExit(
-      midRun
-        ? `The RPC keeps no state at block ${number} any more; use an archive RPC: ${printError(error)}`
-        : `Could not read the state at block ${number}: ${printError(error)}`,
+      transport
+        ? `The RPC failed a read at block ${pinned.number}: ${message}`
+        : `The RPC keeps no state at block ${pinned.number} any more; use an archive RPC: ${message}`,
     );
   }
+}
+
+function reorg(blockHash: string): string {
+  return `Block ${blockHash} left the canonical chain during the run; re-run on a settled block`;
 }
 
 /**
@@ -109,6 +121,6 @@ export async function assertPinnedHashCanonical(provider: RetryingJsonRpcProvide
   if (typeof tag !== "object" || tag === null) return;
   const current = await provider.getBlock(provider.pinned?.number ?? 0);
   if (current?.hash?.toLowerCase() !== tag.blockHash) {
-    logErrorAndExit(`Block ${tag.blockHash} left the canonical chain during the run; re-run on a settled block`);
+    logErrorAndExit(reorg(tag.blockHash));
   }
 }

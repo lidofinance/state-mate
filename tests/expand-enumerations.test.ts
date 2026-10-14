@@ -25,6 +25,7 @@ const ABI: Abi = [
 function fakeContract(ids: string[], reads: string[], countReverts = false): Contract {
   return {
     getFunction: (signature: string) => ({
+      populateTransaction: async () => ({}),
       staticCall: (...args: unknown[]) => {
         const name = signature.split("(")[0];
         reads.push(`${name}(${args.join(",")})`);

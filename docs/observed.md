@@ -16,7 +16,8 @@ yarn start configs/vault.yaml --block latest --observed out/vault.observed.yaml
 
 The values the chain answered, written when the run ends as YAML, keyed the way the config asks.
 A run that stops before its first network section reads nothing and leaves an earlier file as it
-was. A split config also gets `deployed` and `inputs`, the files it was read with:
+was. A split config also gets `deployed` and `inputs`, the absolute paths of the files it was read
+with, as in the JSON report:
 
 ```yaml
 config: configs/vault.yaml
@@ -44,10 +45,10 @@ sections:
 
 `checks`, `proxyChecks` and `implementationChecks` list one entry per call, in config order,
 with `args` when the call took any and one of `value`, `reverted` (the EVM ended the call) or
-`error` (the node did not serve it, the address returned no data, or the arguments did not encode). Numbers are decimal
+`error` (the node did not serve it, the answer did not decode, or the arguments did not encode). Numbers are decimal
 strings, structs with named fields are maps, other tuples and arrays are lists. `block` is the
-pinned block, or the head when the section started with `pinned: false`; a section pinned by
-hash also carries `blockHash`. `storage` maps each slot the config checks to the word the chain
+pinned block, or the head when the section started with `pinned: false`; a section pinned by a
+hash or by `latest` also carries `blockHash`. `storage` maps each slot the config checks to the word the chain
 holds. `ozAcl` records its `getRoleMemberCount` and `hasRole` calls; `ozNonEnumerableAcl`,
 `aragonAcl` and the automatic proxy checks record nothing.
 [`--expand-enumerations`](cli.md#expand-enumerations) adds the entries it reads and their count.

@@ -120,11 +120,7 @@ export class ChecksSectionValidator extends SectionValidatorBase {
       // the check's own read of the count, when it made one: a second read is a second observed row
       let answer: Answer | undefined = this.answers.get(key);
       if (!answer) {
-        try {
-          answer = { value: await contract.getFunction(`${key}()`).staticCall() };
-        } catch (error) {
-          answer = await this._failed(error);
-        }
+        answer = await this._call(contract.getFunction(`${key}()`), undefined);
         recordObservedCall(getErrorContext(), key, undefined, answer);
       }
       if (!("value" in answer)) {
@@ -144,16 +140,13 @@ export class ChecksSectionValidator extends SectionValidatorBase {
       new LogCommand(`.${stem}(i)`).success(`${count} entries on chain, ${omitted} not in the config`);
       for (let index = 0; index < count; index++) {
         if (pinned.has(index)) continue;
-        const logHandle = new LogCommand(`.${stem}(${index})`);
-        try {
-          const value: unknown = await contract.getFunction(getter).staticCall(index);
-          recordObservedCall(getErrorContext(), stem, [index], { value });
-          logHandle.warning(`not in the config; the chain says ${_stringify(value)}`);
-        } catch (error) {
-          const answer = await this._failed(error);
-          recordObservedCall(getErrorContext(), stem, [index], answer);
-          logHandle.warning(`not in the config; the read ${describeFailure(answer)}`);
-        }
+        const entry = await this._call(contract.getFunction(getter), [index]);
+        recordObservedCall(getErrorContext(), stem, [index], entry);
+        new LogCommand(`.${stem}(${index})`).warning(
+          "value" in entry
+            ? `not in the config; the chain says ${_stringify(entry.value)}`
+            : `not in the config; the read ${describeFailure(entry)}`,
+        );
       }
     }
   }

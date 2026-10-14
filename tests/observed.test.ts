@@ -153,13 +153,25 @@ describe("observed values", () => {
 describe("a check the config declines to assert", () => {
   const NO_INPUTS = { inputs: [] };
   const answered = {
-    getFunction: () => ({ fragment: NO_INPUTS, staticCall: () => Promise.resolve("0xTotal") }),
+    getFunction: () => ({
+      fragment: NO_INPUTS,
+      populateTransaction: async () => ({}),
+      staticCall: () => Promise.resolve("0xTotal"),
+    }),
   } as unknown as Contract;
   const reverts = {
-    getFunction: () => ({ fragment: NO_INPUTS, staticCall: () => Promise.reject(callError(REVERT)) }),
+    getFunction: () => ({
+      fragment: NO_INPUTS,
+      populateTransaction: async () => ({}),
+      staticCall: () => Promise.reject(callError(REVERT)),
+    }),
   } as unknown as Contract;
   const refused = {
-    getFunction: () => ({ fragment: NO_INPUTS, staticCall: () => Promise.reject(callError(NO_STATE)) }),
+    getFunction: () => ({
+      fragment: NO_INPUTS,
+      populateTransaction: async () => ({}),
+      staticCall: () => Promise.reject(callError(NO_STATE)),
+    }),
   } as unknown as Contract;
 
   class Exposed extends ChecksSectionValidator {
@@ -216,6 +228,7 @@ describe("a check the config declines to assert", () => {
     const withEmptyData = {
       getFunction: () => ({
         fragment: NO_INPUTS,
+        populateTransaction: async () => ({}),
         staticCall: () => Promise.reject(callError({ ...REVERT, code: 3, data: "0x" })),
       }),
     } as unknown as Contract;
@@ -254,6 +267,7 @@ describe("a check the config declines to assert", () => {
     const counted = {
       getFunction: () => ({
         fragment: NO_INPUTS,
+        populateTransaction: async () => ({}),
         staticCall: () => {
           calls += 1;
           return Promise.resolve("0x0");
@@ -274,6 +288,7 @@ describe("a check the config declines to assert", () => {
     const balanceOf = {
       getFunction: () => ({
         fragment: { inputs: [{ type: "address" }] },
+        populateTransaction: async () => ({}),
         staticCall: () => {
           calls += 1;
           return Promise.reject(new Error("missing argument"));
@@ -296,6 +311,7 @@ describe("a check the config declines to assert", () => {
         get fragment(): never {
           throw new Error('ambiguous function description (i.e. matches "getFee(uint32)", "getFee(uint16)")');
         },
+        populateTransaction: async () => ({}),
         staticCall: () => {
           calls += 1;
           return Promise.resolve("0x0");

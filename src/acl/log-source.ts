@@ -1,8 +1,8 @@
 import type { JsonRpcProvider } from "ethers";
 
-import { printError } from "../common";
+import { nodeAnswer, printError } from "../common";
 import { registerSecret } from "../context";
-import { httpGetAsync, isTransientExplorerHttpError, nodeAnswer, RetryingJsonRpcProvider } from "../explorer";
+import { httpGetAsync, isTransientExplorerHttpError, RetryingJsonRpcProvider } from "../explorer";
 import { log } from "../logger";
 import { parseRoleLog, type RawLog, ROLE_GRANTED_TOPIC, type RoleEvent } from "./fold";
 

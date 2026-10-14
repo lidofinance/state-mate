@@ -171,11 +171,21 @@ async function wire() {
     eth_getBlockByHash: BLOCK,
   };
   const failures: Record<string, { code: number; message: string }> = {};
+  const statuses: Record<string, number> = {};
   const server = http.createServer((request, response) => {
     let body = "";
     request.on("data", (chunk) => (body += chunk));
     request.on("end", () => {
       const parsed = JSON.parse(body);
+      const status = [parsed]
+        .flat()
+        .map((message: { method: string }) => statuses[message.method])
+        .find(Boolean);
+      if (status) {
+        response.statusCode = status;
+        response.end("upstream unavailable");
+        return;
+      }
       const replies = [parsed].flat().map((message: { id: number; method: string; params: unknown }) => {
         sent[message.method] = JSON.stringify(message.params);
         const failure = failures[message.method];
@@ -202,7 +212,7 @@ async function wire() {
     provider.destroy();
     server.close();
   };
-  return { answers, close, failures, provider, read, sent };
+  return { answers, close, failures, provider, read, sent, statuses };
 }
 
 describe("ethers over a pinned provider", () => {
@@ -273,30 +283,44 @@ describe("ethers over a pinned provider", () => {
     });
   }
 
-  it("stops the run when the RPC drops the pinned state after the pin", async () => {
-    // a node that keeps only recent states serves the pin first and refuses it seconds later
-    const { close, failures, provider } = await wire();
-    context.block = HASH;
-    context.json = true;
-    class Exposed extends ChecksSectionValidator {
-      public run(contract: Contract) {
-        return this._checkViewFunction(contract, "f", { mustRevert: true } as unknown as StaticCallCheck);
+  // the pin is served first; then a node that keeps only recent states drops it, a reorg replaces
+  // the block, or the node fails for a reason of its own
+  for (const [cause, stop] of [
+    ["the node drops the pinned state", /no state at block 16 any more; use an archive RPC: missing trie node/],
+    ["a reorg replaces the pinned block", /left the canonical chain during the run/],
+    ["the node answers 500", /failed a read at block 16: upstream unavailable/],
+  ] as const) {
+    it(`stops the run and names the cause when ${cause}`, async () => {
+      const { answers, close, failures, provider, statuses } = await wire();
+      answers.eth_getBlockByNumber = BLOCK;
+      context.block = HASH;
+      context.json = true;
+      class Exposed extends ChecksSectionValidator {
+        public run(contract: Contract) {
+          return this._checkViewFunction(contract, "f", { mustRevert: true } as unknown as StaticCallCheck);
+        }
       }
-    }
-    try {
-      await pinSectionBlock(provider);
-      failures.eth_call = { code: -32000, message: "missing trie node" };
-      const contract = new Contract(ADDRESS, ["function f() view returns (uint256)"], provider);
-      await assert.rejects(
-        new Exposed(provider, 1, EntryField.checks).run(contract),
-        (error: unknown) => error instanceof FatalError && /no state at block 16 any more/.test(error.message),
-      );
-    } finally {
-      context.block = undefined;
-      context.json = false;
-      close();
-    }
-  });
+      try {
+        await pinSectionBlock(provider);
+        if (cause === "the node drops the pinned state")
+          failures.eth_call = { code: -32000, message: "missing trie node" };
+        if (cause === "a reorg replaces the pinned block") {
+          failures.eth_call = { code: -32000, message: "hash is not currently canonical" };
+          answers.eth_getBlockByNumber = { ...BLOCK, hash: `0x${"ef".repeat(32)}` };
+        }
+        if (cause === "the node answers 500") statuses.eth_call = 500;
+        const contract = new Contract(ADDRESS, ["function f() view returns (uint256)"], provider);
+        await assert.rejects(
+          new Exposed(provider, 1, EntryField.checks).run(contract),
+          (error: unknown) => error instanceof FatalError && stop.test(error.message),
+        );
+      } finally {
+        context.block = undefined;
+        context.json = false;
+        close();
+      }
+    });
+  }
 
   for (const [still, heldHash] of [
     [true, HASH],

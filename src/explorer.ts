@@ -2,7 +2,7 @@ import chalk from "chalk";
 import { Contract, FetchRequest, JsonRpcProvider } from "ethers";
 
 import packageJson from "../package.json";
-import { printError } from "./common";
+import { nodeAnswer, printError } from "./common";
 import { log, logErrorAndExit, WARNING_MARK } from "./logger";
 import { type PinnedTag, pinBlockTag } from "./pinned-block";
 import {
@@ -435,41 +435,12 @@ export async function fetchExplorerChainId(
 const TRANSIENT_RPC_RETRY_MS = 2000;
 const TRANSIENT_RPC_ERROR = /\b(408|429|5\d\d)\b|timeout|econnreset|econnrefused/i;
 
-/**
- * What the node said, without the request ethers quotes beside it: a request id of 429 in the
- * full message would read as a rate limit.
- */
-export function nodeAnswer(error: unknown): { code?: unknown; message: string; status?: string } {
-  const {
-    error: rpcError,
-    info,
-    shortMessage,
-  } = error as {
-    error?: { code?: unknown; message?: unknown };
-    info?: { responseBody?: unknown; responseStatus?: unknown };
-    shortMessage?: unknown;
-  };
-  const status = typeof info?.responseStatus === "string" ? info.responseStatus : undefined;
-  // a JSON-RPC error over HTTP 200
-  if (typeof rpcError?.message === "string") return { code: rpcError.code, message: rpcError.message, status };
-  // an HTTP error, whose body may still carry the JSON-RPC error
-  if (typeof info?.responseBody === "string") {
-    try {
-      const body = JSON.parse(info.responseBody) as { error?: { code?: unknown; message?: unknown } };
-      if (typeof body.error?.message === "string")
-        return { code: body.error.code, message: body.error.message, status };
-    } catch {
-      // the body is plain text
-    }
-    return { message: info.responseBody, status };
-  }
-  return { message: typeof shortMessage === "string" ? shortMessage : printError(error), status };
-}
-
 function isTransientRpcError(error: unknown): boolean {
-  const { message, status } = nodeAnswer(error);
+  const { code: rpcCode, message, status } = nodeAnswer(error);
   // an HTTP answer is transient by its status: a 400 or 403 refuses the same request again
   if (status !== undefined) return /^(408|429|5\d\d)\b/.test(status);
+  // a rate limit worded as a JSON-RPC error over HTTP 200
+  if (rpcCode === 429) return true;
   const { code } = error as { code?: unknown };
   if (code === "SERVER_ERROR" || code === "TIMEOUT") return true;
   // the node's words, not the request ethers quotes beside them: its id may read as a status

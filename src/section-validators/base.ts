@@ -1,9 +1,9 @@
 import { AssertionError } from "chai";
 import chalk from "chalk";
-import { type Contract, type JsonRpcProvider, Result } from "ethers";
+import { type BaseContractMethod, type Contract, type JsonRpcProvider, Result } from "ethers";
 
 import { loadAbiFromFile } from "src/abi-provider";
-import { type EntryField, getNonMutables, printError } from "src/common";
+import { type EntryField, getNonMutables, nodeAnswer, printError } from "src/common";
 import { context, type ErrorDetail, stats } from "src/context";
 import type { RetryingJsonRpcProvider } from "src/explorer";
 import { LogCommand, logError, logErrorAndExit, logMethodSkipped } from "src/logger";
@@ -109,47 +109,39 @@ export type Answer = Failure | { value: unknown };
 
 // How the clients word a call the EVM ended, from a revert to an exceptional halt: geth and Erigon
 // ("invalid opcode: INVALID", "stack limit reached"), revm ("EVM error: InvalidFEOpcode"), Nethermind
-// ("invalid instruction"), Besu ("INVALID_OPERATION", "INSUFFICIENT_STACK_ITEMS")
+// ("invalid instruction"). Besu answers a halt with "Internal error", as it does a failure of its
+// own, so a halt fails a mustRevert check there
 const EVM_FAILURE = new RegExp(
   [
     "revert",
-    "invalid[\\s_]*(?:fe[\\s_]*)?(?:opcode|operation|instruction)",
-    "bad[\\s_]*instruction",
-    "opcode[\\s_]*not[\\s_]*found",
-    "out[\\s_]*of[\\s_]*gas",
-    "insufficient[\\s_]*gas",
-    "stack[\\s_]*(?:under|over)flow",
-    "stack[\\s_]*limit[\\s_]*reached",
-    "(?:too[\\s_]*many|insufficient)[\\s_]*stack[\\s_]*items",
-    "invalid[\\s_]*jump",
-    "write[\\s_]*protection",
-    "static[\\s_]*call[\\s_]*violation",
-    "state[\\s_]*change[\\s_]*during[\\s_]*static[\\s_]*call",
-    "illegal[\\s_]*state[\\s_]*change",
+    "invalid\\s*(?:fe\\s*)?(?:opcode|instruction)",
+    "bad\\s*instruction",
+    "opcode\\s*not\\s*found",
+    "out\\s*of\\s*gas",
+    "stack\\s*(?:under|over)flow",
+    "stack\\s*limit\\s*reached",
+    "invalid\\s*jump",
+    "write\\s*protection",
+    "static\\s*call\\s*violation",
+    "state\\s*change\\s*during\\s*static\\s*call",
   ].join("|"),
   "i",
 );
-// What ethers raises once the call has left: the node failed it, the way to the node failed, or the
-// address answered no data, as one without code at this block does. Any other error comes before
-// sending, from arguments the config gives that do not encode
-const SENT = new Set(["BAD_DATA", "CALL_EXCEPTION", "NETWORK_ERROR", "SERVER_ERROR", "TIMEOUT", "UNKNOWN_ERROR"]);
 
 /**
- * A failed read, sorted by who ended it. Only the EVM reverts: ethers reports every eth_call error
+ * A failed call, sorted by who ended it. Only the EVM reverts: ethers reports every eth_call error
  * as CALL_EXCEPTION, so a node without the state at a pinned block would read as a revert unless
  * the revert data or the node's own message shows that the EVM ended the call.
  */
 export function failedCall(error: unknown): Failure {
-  const { code, data, info } = error as { code?: unknown; data?: unknown; info?: { error?: { message?: unknown } } };
-  const nodeMessage = info?.error?.message;
+  const { code, data } = error as { code?: unknown; data?: unknown };
+  const { message: nodeMessage } = nodeAnswer(error);
   // without revert data ethers says "missing revert data" whatever the node said, and an empty "0x"
   // varies by backend; the node names the cause the same way on both
   const empty = typeof data !== "string" || data === "0x";
-  const text = empty && typeof nodeMessage === "string" ? nodeMessage : printError(error);
-  if (code === "CALL_EXCEPTION" && (typeof data === "string" || EVM_FAILURE.test(String(nodeMessage ?? "")))) {
-    return { reverted: text };
-  }
-  return { error: SENT.has(String(code)) ? text : `not sent: ${text}` };
+  const text = empty ? nodeMessage : printError(error);
+  const reverted = code === "CALL_EXCEPTION" && (typeof data === "string" || EVM_FAILURE.test(nodeMessage));
+  return reverted ? { reverted: text } : { error: text };
 }
 
 /** The log line for a read that did not return a value. */
@@ -247,21 +239,17 @@ export abstract class SectionValidatorBase {
       incErrors(errorMessage);
       return;
     }
-    let actual: unknown;
-    try {
-      actual = await contractFunction.staticCall(...(args || ""));
-    } catch (error) {
-      const answer = await this._failed(error);
-      this._answer(method, signature, args, answer);
+    const answer = await this._call(contractFunction, args);
+    this._answer(method, signature, args, answer);
+    if (!("value" in answer)) {
       const errorMessage = describeFailure(answer);
       logHandle.failure(errorMessage);
       incErrors(errorMessage);
       return;
     }
-    this._answer(method, signature, args, { value: actual });
     try {
-      _assertEqual(actual, expected);
-      logHandle.success(_stringify(actual));
+      _assertEqual(answer.value, expected);
+      logHandle.success(_stringify(answer.value));
     } catch (error) {
       const errorMessage = printError(error);
       logHandle.failure(errorMessage);
@@ -283,13 +271,27 @@ export abstract class SectionValidatorBase {
     }
     const label = `${signature}${args ? `(${args.toString()})` : ""}`;
     setErrorContext({ method: label });
+    const answer = await this._call(contractFunction, args);
+    this._answer(method, signature, args, answer);
+    // nothing asserts this read, so the log and the report are the only place a failure shows
+    if ("error" in answer) new LogCommand(`.${label}`).warning(`not read: the call ${describeFailure(answer)}`);
+  }
+
+  /**
+   * One call. Arguments that do not encode are the config's error and never reach the node, so they
+   * are told apart before the call rather than from the error ethers raises after it.
+   */
+  protected async _call(contractFunction: BaseContractMethod, args: readonly unknown[] | undefined): Promise<Answer> {
+    const values = [...(args ?? [])];
     try {
-      this._answer(method, signature, args, { value: await contractFunction.staticCall(...(args || "")) });
+      await contractFunction.populateTransaction(...values);
     } catch (error) {
-      const answer = await this._failed(error);
-      this._answer(method, signature, args, answer);
-      // nothing asserts this read, so the log and the report are the only place a node failure shows
-      if ("error" in answer) new LogCommand(`.${label}`).warning(`not read: the call ${describeFailure(answer)}`);
+      return { error: `not sent: ${printError(error)}` };
+    }
+    try {
+      return { value: await contractFunction.staticCall(...values) };
+    } catch (error) {
+      return this._failed(error);
     }
   }
 
@@ -323,24 +325,19 @@ export abstract class SectionValidatorBase {
       incErrors(errorMessage);
       return;
     }
-    try {
-      const actual: unknown = await contractFunction.staticCall(...(args || ""));
-      this._answer(method, signature, args, { value: actual });
-      const errorMessage = `Expected revert but got: ${_stringify(actual)}`;
-      logHandle.failure(errorMessage);
-      incErrors(errorMessage);
-    } catch (error) {
-      const answer = await this._failed(error);
-      this._answer(method, signature, args, answer);
-      // a node that refused the read has not shown that the function reverts
-      if ("reverted" in answer) {
-        logHandle.success(describeFailure(answer));
-      } else {
-        const errorMessage = `Expected revert but the call ${describeFailure(answer)}`;
-        logHandle.failure(errorMessage);
-        incErrors(errorMessage);
-      }
+    const answer = await this._call(contractFunction, args);
+    this._answer(method, signature, args, answer);
+    if ("reverted" in answer) {
+      logHandle.success(describeFailure(answer));
+      return;
     }
+    // a node that refused the read has not shown that the function reverts
+    const errorMessage =
+      "value" in answer
+        ? `Expected revert but got: ${_stringify(answer.value)}`
+        : `Expected revert but the call ${describeFailure(answer)}`;
+    logHandle.failure(errorMessage);
+    incErrors(errorMessage);
   }
 
   protected _reportNonCoveredNonMutableChecks(contractAlias: string, abi: Abi, checks: string[]) {
