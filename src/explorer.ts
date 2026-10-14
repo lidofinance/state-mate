@@ -465,6 +465,11 @@ export class RetryingJsonRpcProvider extends JsonRpcProvider {
   override async getBlockNumber(): Promise<number> {
     return this.pinned?.number ?? (await super.getBlockNumber());
   }
+
+  /** The chain's head, whatever the pin. */
+  async getHeadBlockNumber(): Promise<number> {
+    return super.getBlockNumber();
+  }
 }
 
 export function createProvider(rpcUrl: string): RetryingJsonRpcProvider {
