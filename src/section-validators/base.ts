@@ -126,8 +126,9 @@ const EVM_FAILURE = new RegExp(
   ].join("|"),
   "i",
 );
-// Failures of the node or of the way to it; any other error ethers raises before the call leaves
-const NODE_FAILURES = new Set(["NETWORK_ERROR", "SERVER_ERROR", "TIMEOUT", "UNKNOWN_ERROR"]);
+// Failures of the node or of the way to it, and an answer with no data to decode: an address
+// without code at this block, or a fallback that returns nothing. The EVM reverted none of them
+const NOT_A_REVERT = new Set(["BAD_DATA", "NETWORK_ERROR", "SERVER_ERROR", "TIMEOUT", "UNKNOWN_ERROR"]);
 
 /**
  * A failed read, sorted by who ended it. ethers reports every eth_call error as CALL_EXCEPTION, so
@@ -139,7 +140,7 @@ export function failedCall(error: unknown): Answer {
   const { code, data, info } = error as { code?: unknown; data?: unknown; info?: { error?: { message?: unknown } } };
   const nodeMessage = info?.error?.message;
   const nodeFailed =
-    NODE_FAILURES.has(String(code)) ||
+    NOT_A_REVERT.has(String(code)) ||
     (code === "CALL_EXCEPTION" && typeof data !== "string" && !EVM_FAILURE.test(String(nodeMessage ?? "")));
   // without revert data ethers says "missing revert data" whatever the node said; the node names the cause
   const text = typeof data !== "string" && typeof nodeMessage === "string" ? nodeMessage : printError(error);

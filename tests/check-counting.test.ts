@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { afterEach, beforeEach, describe, it } from "node:test";
 
-import { type Contract, Contract as EthersContract, JsonRpcProvider } from "ethers";
+import { type Contract, type ContractRunner, Contract as EthersContract, JsonRpcProvider } from "ethers";
 
 import { EntryField } from "../src/common";
 import { context, resetStats, stats } from "../src/context";
@@ -79,6 +79,7 @@ describe("filter selection accounting", () => {
 });
 
 describe("a mustRevert check", () => {
+  const ADDRESS = "0x0000000000000000000000000000000000000001";
   const failingWith = (error: Error) =>
     ({ getFunction: () => ({ staticCall: () => Promise.reject(error) }) }) as unknown as Contract;
 
@@ -140,6 +141,17 @@ describe("a mustRevert check", () => {
     await validator.run(contract, "renounceRole");
 
     assert.equal(stats.errors, 0);
+  });
+
+  it("fails when the address returns no data, as an address without code at the pinned block does", async () => {
+    const empty = { call: async () => "0x", provider: null } as ContractRunner;
+    await validator.run(
+      new EthersContract(ADDRESS, ["function getOwners() view returns (address[])"], empty),
+      "getOwners",
+    );
+
+    assert.equal(stats.errors, 1);
+    assert.match(stats.errorDetails[0].message, /could not decode result data/);
   });
 
   it("fails when the node refuses the request", async () => {
