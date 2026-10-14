@@ -1,9 +1,12 @@
 import assert from "node:assert/strict";
-import { spawnSync } from "node:child_process";
+import { execFile, spawnSync } from "node:child_process";
 import fs from "node:fs";
+import http from "node:http";
+import type { AddressInfo } from "node:net";
 import os from "node:os";
 import path from "node:path";
 import { afterEach, beforeEach, describe, it } from "node:test";
+import { promisify } from "node:util";
 
 import type { Contract, JsonRpcProvider } from "ethers";
 import { Result } from "ethers";
@@ -327,4 +330,48 @@ describe("an aborted run", () => {
       }
     });
   }
+});
+
+describe("an observed file that cannot be written", () => {
+  it("fails the run in the JSON report too, not only in the process status", async () => {
+    const directory = fs.mkdtempSync(path.join(os.tmpdir(), "state-mate-observed-"));
+    // an RPC that answers 0x1 to everything: chain 1, head 1, and a section the run gets to read
+    const server = http.createServer(async (request, response) => {
+      let body = "";
+      for await (const chunk of request) body += chunk;
+      const payload = JSON.parse(body);
+      const reply = (call: { id: number }) => ({ jsonrpc: "2.0", id: call.id, result: "0x1" });
+      response.setHeader("content-type", "application/json");
+      response.end(JSON.stringify(Array.isArray(payload) ? payload.map(reply) : reply(payload)));
+    });
+    await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
+    try {
+      const { port } = server.address() as AddressInfo;
+      const config = path.join(directory, "cfg.yaml");
+      fs.writeFileSync(
+        config,
+        `deployed: {l1: []}\nl1: {rpcUrl: "http://127.0.0.1:${port}", chainId: 1, contracts: {}}\n`,
+      );
+      // a directory where the file should go
+      const observed = path.join(directory, "taken");
+      fs.mkdirSync(observed);
+
+      const run = await promisify(execFile)(
+        process.execPath,
+        [
+          ...["--require", "ts-node/register", "--require", "tsconfig-paths/register", "src/state-mate.ts", config],
+          ...["--json", "--observed", observed],
+        ],
+        { cwd: path.resolve(__dirname, ".."), env: { ...process.env, NO_COLOR: "1" } },
+      ).then(
+        ({ stdout }) => ({ code: 0, stdout }),
+        (error: { code: number; stdout: string }) => error,
+      );
+
+      assert.deepEqual({ report: JSON.parse(run.stdout).exit_code, status: run.code }, { report: 1, status: 1 });
+    } finally {
+      server.close();
+      fs.rmSync(directory, { recursive: true, force: true });
+    }
+  });
 });

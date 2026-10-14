@@ -486,20 +486,27 @@ async function main() {
 
 let observedFlushed = false;
 
-/** Writes the observed file once, whichever way the run ends; a failed write is not retried. */
-function flushObserved(): void {
-  if (!context.observedPath || observedFlushed) return;
+/**
+ * Writes the observed file once, whichever way the run ends; a failed write is not retried.
+ * Returns false when the write failed.
+ */
+function flushObserved(): boolean {
+  if (!context.observedPath || observedFlushed) return true;
   observedFlushed = true;
   try {
     writeObservedFile(context.observedPath, context.configPath);
+    return true;
   } catch (error) {
     process.stderr.write(`Could not write the observed file ${context.observedPath}: ${printError(error)}\n`);
     process.exitCode ||= 1;
+    return false;
   }
 }
 
 // Under --json the report owns the exit code; the log mode keeps exiting on the spot
 function exit(code: number): void {
+  // the observed file first, so that the report carries a write that failed
+  if (!flushObserved()) code ||= 1;
   if (context.json) {
     emitReport(code);
   } else if (code) {
