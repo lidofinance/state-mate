@@ -129,27 +129,27 @@ const EVM_FAILURE = new RegExp(
   ].join("|"),
   "i",
 );
-// Failures of the node or of the way to it, and an answer with no data to decode: an address
-// without code at this block, or a fallback that returns nothing. The EVM reverted none of them
-const NOT_A_REVERT = new Set(["BAD_DATA", "NETWORK_ERROR", "SERVER_ERROR", "TIMEOUT", "UNKNOWN_ERROR"]);
+// What ethers raises once the call has left: the node failed it, the way to the node failed, or the
+// address answered no data, as one without code at this block does. Any other error comes before
+// sending, from arguments the config gives that do not encode
+const SENT = new Set(["BAD_DATA", "CALL_EXCEPTION", "NETWORK_ERROR", "SERVER_ERROR", "TIMEOUT", "UNKNOWN_ERROR"]);
 
 /**
- * A failed read, sorted by who ended it. ethers reports every eth_call error as CALL_EXCEPTION, so
- * a node without the state at a pinned block reads as a revert unless the revert data or the
- * node's own message shows that the EVM ended the call. An error ethers raises before sending,
- * such as arguments that do not encode, never reaches a node and keeps counting as a revert.
+ * A failed read, sorted by who ended it. Only the EVM reverts: ethers reports every eth_call error
+ * as CALL_EXCEPTION, so a node without the state at a pinned block would read as a revert unless
+ * the revert data or the node's own message shows that the EVM ended the call.
  */
 export function failedCall(error: unknown): Failure {
   const { code, data, info } = error as { code?: unknown; data?: unknown; info?: { error?: { message?: unknown } } };
   const nodeMessage = info?.error?.message;
-  const nodeFailed =
-    NOT_A_REVERT.has(String(code)) ||
-    (code === "CALL_EXCEPTION" && typeof data !== "string" && !EVM_FAILURE.test(String(nodeMessage ?? "")));
   // without revert data ethers says "missing revert data" whatever the node said, and an empty "0x"
   // varies by backend; the node names the cause the same way on both
   const empty = typeof data !== "string" || data === "0x";
   const text = empty && typeof nodeMessage === "string" ? nodeMessage : printError(error);
-  return nodeFailed ? { error: text } : { reverted: text };
+  if (code === "CALL_EXCEPTION" && (typeof data === "string" || EVM_FAILURE.test(String(nodeMessage ?? "")))) {
+    return { reverted: text };
+  }
+  return { error: SENT.has(String(code)) ? text : `not sent: ${text}` };
 }
 
 /** The log line for a read that did not return a value. */

@@ -132,7 +132,7 @@ describe("a mustRevert check", () => {
     }
   });
 
-  it("passes when ethers refuses the call before it reaches a node, as before", async () => {
+  it("fails a call whose arguments do not encode: the config, not the chain, is wrong", async () => {
     const contract = new EthersContract(
       "0x0000000000000000000000000000000000000001",
       ["function renounceRole(bytes32 role, address account)"],
@@ -140,7 +140,8 @@ describe("a mustRevert check", () => {
     );
     await validator.run(contract, "renounceRole");
 
-    assert.equal(stats.errors, 0);
+    assert.equal(stats.errors, 1);
+    assert.match(stats.errorDetails[0].message, /not sent: no matching fragment/);
   });
 
   it("fails when the address returns no data, as an address without code at the pinned block does", async () => {
