@@ -160,6 +160,23 @@ describe("withTransientRetry", () => {
     assert.equal(calls, 2);
   });
 
+  it("does not repeat a request the node refused with a 4xx status", async () => {
+    // drpc answers a getLogs span it will not serve with HTTP 400; the same window gets the same answer
+    for (const status of ["400 Bad Request", "403 Forbidden"]) {
+      let calls = 0;
+      await assert.rejects(
+        withTransientRetry(async () => {
+          calls++;
+          throw Object.assign(new Error(`server response ${status}`), {
+            code: "SERVER_ERROR",
+            info: { responseStatus: status },
+          });
+        }, 0),
+      );
+      assert.equal(calls, 1, status);
+    }
+  });
+
   it("does not mask a real revert as a flake", async () => {
     let calls = 0;
     await assert.rejects(

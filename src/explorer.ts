@@ -436,7 +436,9 @@ const TRANSIENT_RPC_RETRY_MS = 2000;
 const TRANSIENT_RPC_ERROR = /\b(408|429|5\d\d)\b|timeout|econnreset|econnrefused/i;
 
 function isTransientRpcError(error: unknown): boolean {
-  const code = (error as { code?: unknown }).code;
+  const { code, info } = error as { code?: unknown; info?: { responseStatus?: unknown } };
+  // an HTTP answer is transient by its status: a 400 or 403 refuses the same request again
+  if (typeof info?.responseStatus === "string") return /^(408|429|5\d\d)\b/.test(info.responseStatus);
   if (code === "SERVER_ERROR" || code === "TIMEOUT") return true;
   return TRANSIENT_RPC_ERROR.test(printError(error));
 }
