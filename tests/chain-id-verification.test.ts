@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { beforeEach, describe, it, mock } from "node:test";
 
-import type { JsonRpcProvider } from "ethers";
+import { JsonRpcProvider } from "ethers";
 
 import { normalizeChainId } from "../src/common";
 import { context, resetStats, stats } from "../src/context";
@@ -175,6 +175,23 @@ describe("withTransientRetry", () => {
       );
       assert.equal(calls, 1, status);
     }
+  });
+
+  it("reads a JSON-RPC error by the node's words, not by the request id ethers quotes beside them", async () => {
+    const provider = new JsonRpcProvider("http://localhost:0", undefined, { staticNetwork: true });
+    const refusal = provider.getRpcError(
+      { id: 429, jsonrpc: "2.0", method: "eth_getLogs", params: [] },
+      { error: { code: 22, message: "eth_getLogs range over 100000 blocks is not supported" }, id: 429 },
+    );
+    provider.destroy();
+    let calls = 0;
+    await assert.rejects(
+      withTransientRetry(async () => {
+        calls++;
+        throw refusal;
+      }, 0),
+    );
+    assert.equal(calls, 1);
   });
 
   it("does not mask a real revert as a flake", async () => {

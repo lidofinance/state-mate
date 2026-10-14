@@ -1,4 +1,6 @@
 import assert from "node:assert/strict";
+import http from "node:http";
+import type { AddressInfo } from "node:net";
 import { describe, it, mock } from "node:test";
 
 import { FetchRequest, FetchResponse, JsonRpcProvider, toUtf8Bytes } from "ethers";
@@ -565,6 +567,36 @@ describe("a node that limits the eth_getLogs span", () => {
     assert.equal(isSpanRefusal(httpError(400, "Bad Request", RANGE)), true);
     assert.equal(isSpanRefusal(httpError(429, "Too Many Requests", RANGE)), false);
     assert.equal(isSpanRefusal(httpError(400, "Bad Request", { ...RANGE, code: 429 })), false);
+  });
+
+  it("takes a 429 that ethers escalated to 599 for a rate limit, whatever the body says", async () => {
+    const server = http.createServer(async (request, response) => {
+      for await (const _ of request) {
+        // drain the request
+      }
+      response.statusCode = 429;
+      response.setHeader("content-type", "application/json");
+      response.end(
+        JSON.stringify({ error: { code: -32602, message: "block range too large" }, id: 1, jsonrpc: "2.0" }),
+      );
+    });
+    await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
+    const request = new FetchRequest(`http://127.0.0.1:${(server.address() as AddressInfo).port}`);
+    // one attempt: ethers would otherwise wait out a dozen retries before it escalates
+    request.setThrottleParams({ maxAttempts: 1 });
+    const provider = new JsonRpcProvider(request, 1, { batchMaxCount: 1, staticNetwork: true });
+    try {
+      const refusal = await provider.getLogs({ fromBlock: 1, toBlock: 2 }).then(
+        () => assert.fail("the node answered 429"),
+        (error: unknown) => error,
+      );
+      assert.match(String((refusal as { info?: { responseStatus?: unknown } }).info?.responseStatus), /^599 .*429/);
+      assert.equal(isSpanRefusal(refusal), false);
+    } finally {
+      provider.destroy();
+      server.closeAllConnections();
+      server.close();
+    }
   });
 });
 

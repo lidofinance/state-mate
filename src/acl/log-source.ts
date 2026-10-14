@@ -2,7 +2,7 @@ import type { JsonRpcProvider } from "ethers";
 
 import { printError } from "../common";
 import { registerSecret } from "../context";
-import { httpGetAsync, isTransientExplorerHttpError, RetryingJsonRpcProvider } from "../explorer";
+import { httpGetAsync, isTransientExplorerHttpError, nodeAnswer, RetryingJsonRpcProvider } from "../explorer";
 import { log } from "../logger";
 import { parseRoleLog, type RawLog, ROLE_GRANTED_TOPIC, type RoleEvent } from "./fold";
 
@@ -117,41 +117,11 @@ const SPAN_REFUSED =
   /block range|range (?:is )?too (?:large|wide|big)|limited to .*range|ranges? over|more than \d+ (?:results|logs)|max(?:imum)? (?:results|logs)|response size|too many (?:blocks|logs|results)/i;
 const RATE_LIMITED_RPC = /rate limit|too many requests|compute units/i;
 
-/**
- * What the node said, without the request ethers quotes beside it: a request id of 429 in the
- * full message would read as a rate limit.
- */
-function nodeAnswer(error: unknown): { code?: unknown; message: string; status?: string } {
-  const {
-    error: rpcError,
-    info,
-    shortMessage,
-  } = error as {
-    error?: { code?: unknown; message?: unknown };
-    info?: { responseBody?: unknown; responseStatus?: unknown };
-    shortMessage?: unknown;
-  };
-  const status = typeof info?.responseStatus === "string" ? info.responseStatus : undefined;
-  // a JSON-RPC error over HTTP 200
-  if (typeof rpcError?.message === "string") return { code: rpcError.code, message: rpcError.message, status };
-  // an HTTP error, whose body may still carry the JSON-RPC error
-  if (typeof info?.responseBody === "string") {
-    try {
-      const body = JSON.parse(info.responseBody) as { error?: { code?: unknown; message?: unknown } };
-      if (typeof body.error?.message === "string")
-        return { code: body.error.code, message: body.error.message, status };
-    } catch {
-      // the body is plain text
-    }
-    return { message: info.responseBody, status };
-  }
-  return { message: typeof shortMessage === "string" ? shortMessage : printError(error), status };
-}
-
 /** A refusal a narrower window answers; a rate limit is not one, halving would only add requests. */
 export function isSpanRefusal(error: unknown): boolean {
   const { code, message, status } = nodeAnswer(error);
-  const rateLimited = status?.startsWith("429") || code === 429 || RATE_LIMITED_RPC.test(message);
+  // ethers retries a 429 itself and then raises it as "599 CLIENT ESCALATED SERVER ERROR (429 ...)"
+  const rateLimited = /\b429\b/.test(status ?? "") || code === 429 || RATE_LIMITED_RPC.test(message);
   return SPAN_REFUSED.test(message) && !rateLimited;
 }
 
