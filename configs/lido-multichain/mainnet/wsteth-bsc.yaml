@@ -209,8 +209,10 @@ l1:
         WORMHOLE_TRANSCEIVER_VERSION: *NTT_MANAGER_VERSION
         consistencyLevel: 1
         encodeWormholeTransceiverInstruction:
-          - args: []
-            mustRevert: true
+          - args: [[false]]
+            result: "0x00"
+          - args: [[true]]
+            result: "0x01"
         gasLimit: *GAS_LIMIT
         getMigratesImmutables: false
         getNttManagerOwner: *ethDaoAgent
@@ -247,9 +249,7 @@ l1:
           - args: ["0x"]
             result: [false]
         pauser: *l1EmergencyBrakes
-        quoteDeliveryPrice:
-          - args: [*BSC_CHAIN_ID, "0x"]
-            mustRevert: true
+        quoteDeliveryPrice: null
         specialRelayer: *l1L2WormholeSpecialRelayer # unused
         wormhole: *l1L2Wormhole
         wormholeRelayer: *l1L2WormholeRelayer
@@ -257,8 +257,10 @@ l1:
         WORMHOLE_TRANSCEIVER_VERSION: *NTT_MANAGER_VERSION
         consistencyLevel: 1
         encodeWormholeTransceiverInstruction:
-          - args: []
-            mustRevert: true
+          - args: [[false]]
+            result: "0x00"
+          - args: [[true]]
+            result: "0x01"
         gasLimit: *GAS_LIMIT
         getMigratesImmutables: false
         getNttManagerOwner: *ethDaoAgent
@@ -295,9 +297,7 @@ l1:
           - args: ["0x"]
             result: [false]
         pauser: *ZERO_ADDRESS
-        quoteDeliveryPrice:
-          - args: [*BSC_CHAIN_ID, "0x"]
-            mustRevert: true
+        quoteDeliveryPrice: null
         specialRelayer: *l1L2WormholeSpecialRelayer # unused
         wormhole: *l1L2Wormhole
         wormholeRelayer: *l1L2WormholeRelayer
@@ -320,9 +320,7 @@ l1:
         nttManagerToken: *l1Wsteth
         owner: *ethDaoAgent
         pauser: *l1EmergencyBrakes
-        quoteDeliveryPrice:
-          - args: [*BSC_CHAIN_ID, "0x"]
-            mustRevert: true
+        quoteDeliveryPrice: null
       implementationChecks:
         AXELAR_TRANSCEIVER_VERSION: *NTT_MANAGER_VERSION
         gasService: *l1AxelarGasService
@@ -336,9 +334,7 @@ l1:
         nttManagerToken: *l1Wsteth
         owner: *ZERO_ADDRESS
         pauser: *ZERO_ADDRESS
-        quoteDeliveryPrice:
-          - args: [*BSC_CHAIN_ID, "0x"]
-            mustRevert: true
+        quoteDeliveryPrice: null
 
 l2:
   rpcUrl: BNB_RPC_URL
@@ -516,8 +512,10 @@ l2:
         WORMHOLE_TRANSCEIVER_VERSION: *NTT_MANAGER_VERSION
         consistencyLevel: 15
         encodeWormholeTransceiverInstruction:
-          - args: []
-            mustRevert: true
+          - args: [[false]]
+            result: "0x00"
+          - args: [[true]]
+            result: "0x01"
         gasLimit: *GAS_LIMIT
         getMigratesImmutables: false
         getNttManagerOwner: *bscAdiExecutor
@@ -554,9 +552,7 @@ l2:
           - args: ["0x"]
             result: [false]
         pauser: *l2EmergencyBrakes
-        quoteDeliveryPrice:
-          - args: [*BSC_CHAIN_ID, "0x"]
-            mustRevert: true
+        quoteDeliveryPrice: null
         specialRelayer: *l1L2WormholeSpecialRelayer
         wormhole: *l1L2Wormhole
         wormholeRelayer: *l1L2WormholeRelayer
@@ -564,8 +560,10 @@ l2:
         WORMHOLE_TRANSCEIVER_VERSION: *NTT_MANAGER_VERSION
         consistencyLevel: 15
         encodeWormholeTransceiverInstruction:
-          - args: []
-            mustRevert: true
+          - args: [[false]]
+            result: "0x00"
+          - args: [[true]]
+            result: "0x01"
         gasLimit: *GAS_LIMIT
         getMigratesImmutables: false
         getNttManagerOwner: *bscAdiExecutor
@@ -602,9 +600,7 @@ l2:
           - args: ["0x"]
             result: [false]
         pauser: *ZERO_ADDRESS
-        quoteDeliveryPrice:
-          - args: [*BSC_CHAIN_ID, "0x"]
-            mustRevert: true
+        quoteDeliveryPrice: null
         specialRelayer: *l1L2WormholeSpecialRelayer # unused
         wormhole: *l1L2Wormhole
         wormholeRelayer: *l1L2WormholeRelayer
@@ -627,9 +623,7 @@ l2:
         nttManagerToken: *l2wstETHToken
         owner: *bscAdiExecutor
         pauser: *l2EmergencyBrakes
-        quoteDeliveryPrice:
-          - args: [*BSC_CHAIN_ID, "0x"]
-            mustRevert: true
+        quoteDeliveryPrice: null
       implementationChecks:
         AXELAR_TRANSCEIVER_VERSION: *NTT_MANAGER_VERSION
         gasService: *l2AxelarGasService
@@ -643,6 +637,4 @@ l2:
         nttManagerToken: *l2wstETHToken
         owner: *ZERO_ADDRESS
         pauser: *ZERO_ADDRESS
-        quoteDeliveryPrice:
-          - args: [*BSC_CHAIN_ID, "0x"]
-            mustRevert: true
+        quoteDeliveryPrice: null

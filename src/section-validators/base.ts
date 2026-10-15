@@ -1,11 +1,14 @@
 import { AssertionError } from "chai";
 import chalk from "chalk";
-import { type Contract, type JsonRpcProvider, Result } from "ethers";
+import { type BaseContractMethod, type Contract, type JsonRpcProvider, Result } from "ethers";
 
 import { loadAbiFromFile } from "src/abi-provider";
-import { type EntryField, getNonMutables, printError } from "src/common";
+import { type EntryField, getNonMutables, nodeAnswer, printError } from "src/common";
 import { context, type ErrorDetail, stats } from "src/context";
+import type { RetryingJsonRpcProvider } from "src/explorer";
 import { LogCommand, logError, logErrorAndExit, logMethodSkipped } from "src/logger";
+import { recordObservedCall } from "src/observed";
+import { assertPinnedState } from "src/pinned-block";
 import {
   type ArbitraryObject,
   type ContractEntry,
@@ -29,6 +32,10 @@ let currentErrorContext: Partial<ErrorDetail> = {};
 
 export function setErrorContext(update: Partial<ErrorDetail>): void {
   currentErrorContext = { ...currentErrorContext, ...update };
+}
+
+export function getErrorContext(): Readonly<Partial<ErrorDetail>> {
+  return currentErrorContext;
 }
 
 export function clearErrorContext(): void {
@@ -97,7 +104,57 @@ export function needCheck(level: CheckLevel, name: string) {
 
 export type CheckOutcome = { detail: string; ok: true } | { message: string; ok: false };
 
+export type Failure = { error: string } | { reverted: string };
+export type Answer = Failure | { value: unknown };
+
+// How the clients word a call the EVM ended, from a revert to an exceptional halt: geth and Erigon
+// ("invalid opcode: INVALID", "stack limit reached"), revm ("EVM error: InvalidFEOpcode"), Nethermind
+// ("invalid instruction"). Besu answers a halt with "Internal error", as it does a failure of its
+// own, so a halt fails a mustRevert check there
+const EVM_FAILURE = new RegExp(
+  [
+    "revert",
+    "invalid\\s*(?:fe\\s*)?(?:opcode|instruction)",
+    "bad\\s*instruction",
+    "opcode\\s*not\\s*found",
+    "out\\s*of\\s*gas",
+    "stack\\s*(?:under|over)flow",
+    "stack\\s*limit\\s*reached",
+    "invalid\\s*jump",
+    "write\\s*protection",
+    "static\\s*call\\s*violation",
+    "state\\s*change\\s*during\\s*static\\s*call",
+  ].join("|"),
+  "i",
+);
+
+/**
+ * A failed call, sorted by who ended it. Only the EVM reverts: ethers reports every eth_call error
+ * as CALL_EXCEPTION, so a node without the state at a pinned block would read as a revert unless
+ * the revert data or the node's own message shows that the EVM ended the call.
+ */
+export function failedCall(error: unknown): Failure {
+  const { code, data } = error as { code?: unknown; data?: unknown };
+  const { message: nodeMessage } = nodeAnswer(error);
+  // without revert data ethers says "missing revert data" whatever the node said, and an empty "0x"
+  // varies by backend; the node names the cause the same way on both
+  const empty = typeof data !== "string" || data === "0x";
+  const text = empty ? nodeMessage : printError(error);
+  const reverted = code === "CALL_EXCEPTION" && (typeof data === "string" || EVM_FAILURE.test(nodeMessage));
+  return reverted ? { reverted: text } : { error: text };
+}
+
+/** The log line for a read that did not return a value. */
+export function describeFailure(answer: Failure): string {
+  return "reverted" in answer ? `REVERTED with: ${answer.reverted}` : `FAILED with: ${answer.error}`;
+}
+
 export abstract class SectionValidatorBase {
+  /** Checks the run supplies rather than the config declares, e.g. the `null` coverage of an implementation ABI. */
+  protected undeclared: ReadonlySet<string> = new Set();
+  /** What argumentless reads answered, so that the enumeration expansion does not read a count twice. */
+  protected answers = new Map<string, Answer>();
+
   constructor(
     protected provider: JsonRpcProvider,
     protected sectionName: EntryField,
@@ -124,7 +181,7 @@ export abstract class SectionValidatorBase {
     try {
       outcome = await run();
     } catch (error) {
-      outcome = { message: `REVERTED with: ${printError(error)}`, ok: false };
+      outcome = { message: `FAILED with: ${printError(error)}`, ok: false };
     }
 
     if (outcome.ok) {
@@ -158,6 +215,11 @@ export abstract class SectionValidatorBase {
     if (staticCallResult.result === null) {
       incSkipped();
       logMethodSkipped(method);
+      // `null` declines to assert a value, not to look: with --observed the run still records what
+      // the chain answered for every read the config declares
+      if (context.observedPath && !this.undeclared.has(method)) {
+        await this._recordOnly(contract, method, staticCallResult);
+      }
       return;
     }
     incChecks();
@@ -177,23 +239,73 @@ export abstract class SectionValidatorBase {
       incErrors(errorMessage);
       return;
     }
-    let actual: unknown;
-    try {
-      actual = await contractFunction.staticCall(...(args || ""));
-    } catch (error) {
-      const errorMessage = `REVERTED with: ${printError(error)}`;
+    const answer = await this._call(contractFunction, args);
+    this._answer(method, signature, args, answer);
+    if (!("value" in answer)) {
+      const errorMessage = describeFailure(answer);
       logHandle.failure(errorMessage);
       incErrors(errorMessage);
       return;
     }
     try {
-      _assertEqual(actual, expected);
-      logHandle.success(_stringify(actual));
+      _assertEqual(answer.value, expected);
+      logHandle.success(_stringify(answer.value));
     } catch (error) {
       const errorMessage = printError(error);
       logHandle.failure(errorMessage);
       incErrors(errorMessage);
     }
+  }
+
+  /** Read a check the config declines to assert, for the observed file alone. */
+  protected async _recordOnly(contract: Contract, method: string, entry: StaticCallResult) {
+    const { args, signature = method } = entry;
+    let contractFunction: ReturnType<typeof contract.getFunction>;
+    try {
+      contractFunction = contract.getFunction(signature);
+      // `balanceOf: null` names no account, and a bare overloaded name names no function: a call
+      // would record ethers' complaint as a revert
+      if (contractFunction.fragment.inputs.length !== (args?.length ?? 0)) return;
+    } catch {
+      return;
+    }
+    const label = `${signature}${args ? `(${args.toString()})` : ""}`;
+    setErrorContext({ method: label });
+    const answer = await this._call(contractFunction, args);
+    this._answer(method, signature, args, answer);
+    // nothing asserts this read, so the log and the report are the only place a failure shows
+    if ("error" in answer) new LogCommand(`.${label}`).warning(`not read: the call ${describeFailure(answer)}`);
+  }
+
+  /**
+   * One call. Arguments that do not encode are the config's error and never reach the node, so they
+   * are told apart before the call rather than from the error ethers raises after it.
+   */
+  protected async _call(contractFunction: BaseContractMethod, args: readonly unknown[] | undefined): Promise<Answer> {
+    const values = [...(args ?? [])];
+    try {
+      await contractFunction.populateTransaction(...values);
+    } catch (error) {
+      return { error: `not sent: ${printError(error)}` };
+    }
+    try {
+      return { value: await contractFunction.staticCall(...values) };
+    } catch (error) {
+      return this._failed(error);
+    }
+  }
+
+  /** A failed read. Under --block, a node error may mean the RPC dropped the pinned state, which stops the run. */
+  protected async _failed(error: unknown): Promise<Failure> {
+    const answer = failedCall(error);
+    const provider = this.provider as RetryingJsonRpcProvider;
+    if ("error" in answer && provider.pinned) await assertPinnedState(provider, true);
+    return answer;
+  }
+
+  private _answer(method: string, signature: string, args: readonly unknown[] | undefined, answer: Answer) {
+    recordObservedCall(currentErrorContext, signature, args, answer);
+    if (!args?.length) this.answers.set(method, answer);
   }
 
   protected async _checkViewMustRevert(contract: Contract, method: string, staticCallMustRevert: StaticCallMustRevert) {
@@ -213,14 +325,19 @@ export abstract class SectionValidatorBase {
       incErrors(errorMessage);
       return;
     }
-    try {
-      const actual: unknown = await contractFunction.staticCall(...(args || ""));
-      const errorMessage = `Expected revert but got: ${_stringify(actual)}`;
-      logHandle.failure(errorMessage);
-      incErrors(errorMessage);
-    } catch (error) {
-      logHandle.success(`REVERTED with: ${printError(error)}`);
+    const answer = await this._call(contractFunction, args);
+    this._answer(method, signature, args, answer);
+    if ("reverted" in answer) {
+      logHandle.success(describeFailure(answer));
+      return;
     }
+    // a node that refused the read has not shown that the function reverts
+    const errorMessage =
+      "value" in answer
+        ? `Expected revert but got: ${_stringify(answer.value)}`
+        : `Expected revert but the call ${describeFailure(answer)}`;
+    logHandle.failure(errorMessage);
+    incErrors(errorMessage);
   }
 
   protected _reportNonCoveredNonMutableChecks(contractAlias: string, abi: Abi, checks: string[]) {
@@ -236,7 +353,7 @@ export abstract class SectionValidatorBase {
   }
 }
 
-function _stringify(value: unknown) {
+export function _stringify(value: unknown) {
   return value instanceof Object ? JSON.stringify(value) : String(value);
 }
 

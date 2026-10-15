@@ -127,6 +127,11 @@ independent witness. Explorers cap a logs response at a thousand records without
 full response is treated as possibly truncated and the block range is halved until every window
 comes back short.
 
+The RPC tail is read in windows: a node that refuses a span ("up to a 10 block range", "more than
+10000 results") is asked again in halves until it answers. Under `--block`, a pin at least the
+chain's confirmation lag behind the head has no tail: the explorer serves the whole range up to the
+pin.
+
 The scan refuses to report less than it claims. An explorer that will not answer, a response that
 cannot be narrowed, or a contract whose storage matches no known AccessControl layout are errors,
 not a quiet fall back to the declared-only checks. A chain with no log source at all is different

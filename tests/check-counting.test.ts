@@ -1,18 +1,20 @@
 import assert from "node:assert/strict";
 import { afterEach, beforeEach, describe, it } from "node:test";
 
-import type { Contract, JsonRpcProvider } from "ethers";
+import { type Contract, type ContractRunner, Contract as EthersContract, JsonRpcProvider } from "ethers";
 
 import { EntryField } from "../src/common";
 import { context, resetStats, stats } from "../src/context";
 import { resetContractCounters, setErrorContext } from "../src/section-validators/base";
 import { ChecksSectionValidator } from "../src/section-validators/checks";
 import type { StaticCallCheck } from "../src/typebox";
+import { callError, NO_STATE, REVERT } from "./helpers/rpc-errors";
 
 // A null result never reaches the chain; a mustRevert entry needs a function that reverts
 const CONTRACT = {
   getFunction: () => ({
-    staticCall: () => Promise.reject(new Error("execution reverted")),
+    populateTransaction: async () => ({}),
+    staticCall: () => Promise.reject(callError(REVERT)),
   }),
 } as unknown as Contract;
 
@@ -74,5 +76,112 @@ describe("filter selection accounting", () => {
     await validator.run("nonce", { result: null } as unknown as StaticCallCheck);
 
     assert.equal(stats.selected, 2);
+  });
+});
+
+describe("a mustRevert check", () => {
+  const ADDRESS = "0x0000000000000000000000000000000000000001";
+  const failingWith = (error: Error) =>
+    ({
+      getFunction: () => ({ populateTransaction: async () => ({}), staticCall: () => Promise.reject(error) }),
+    }) as unknown as Contract;
+
+  class Exposed extends ChecksSectionValidator {
+    public run(contract: Contract, method: string) {
+      return this._checkViewFunction(contract, method, { mustRevert: true } as unknown as StaticCallCheck);
+    }
+  }
+
+  const validator = new Exposed({} as JsonRpcProvider, 1, EntryField.checks);
+
+  beforeEach(() => {
+    resetStats();
+    resetContractCounters();
+  });
+
+  it("passes when the EVM reverts the call", async () => {
+    await validator.run(failingWith(callError(REVERT)), "subvaultAt");
+
+    assert.equal(stats.errors, 0);
+  });
+
+  it("passes on a halt the EVM made, however the node words it", async () => {
+    const halts = {
+      "geth and Erigon": [
+        "invalid opcode: INVALID",
+        "invalid opcode: opcode 0x5f not defined",
+        "out of gas",
+        "stack underflow (0 <=> 1)",
+        "stack limit reached 1024 (1023)",
+        "invalid jump destination",
+        "write protection",
+      ],
+      "revm and reth": [
+        "EVM error: InvalidFEOpcode",
+        "EVM error: OpcodeNotFound",
+        "EVM error: OutOfGas(Basic)",
+        "EVM error: StackUnderflow",
+        "EVM error: InvalidJump",
+        "EVM error: StateChangeDuringStaticCall",
+      ],
+      Nethermind: ["invalid instruction", "bad instruction", "stack overflow", "static call violation"],
+    };
+    for (const [client, messages] of Object.entries(halts)) {
+      for (const message of messages) {
+        await validator.run(failingWith(callError({ code: -32000, message })), "getTotalPooledEther");
+        assert.equal(stats.errors, 0, `${client}: ${message}`);
+      }
+    }
+  });
+
+  it("fails a call whose arguments do not encode: the config, not the chain, is wrong", async () => {
+    const contract = new EthersContract(
+      "0x0000000000000000000000000000000000000001",
+      ["function renounceRole(bytes32 role, address account)"],
+      new JsonRpcProvider("http://localhost:0", undefined, { staticNetwork: true }),
+    );
+    await validator.run(contract, "renounceRole");
+
+    assert.equal(stats.errors, 1);
+    assert.match(stats.errorDetails[0].message, /not sent: no matching fragment/);
+  });
+
+  it("fails when the address returns no data, as an address without code at the pinned block does", async () => {
+    const empty = { call: async () => "0x", provider: null } as ContractRunner;
+    await validator.run(
+      new EthersContract(ADDRESS, ["function getOwners() view returns (address[])"], empty),
+      "getOwners",
+    );
+
+    assert.equal(stats.errors, 1);
+    assert.match(stats.errorDetails[0].message, /could not decode result data/);
+  });
+
+  it("does not blame the config for an answer that came back and does not decode", async () => {
+    const garbled = { call: async () => "not a hex answer", provider: null } as ContractRunner;
+    await validator.run(
+      new EthersContract(ADDRESS, ["function getOwners() view returns (address[])"], garbled),
+      "getOwners",
+    );
+
+    assert.equal(stats.errors, 1);
+    assert.doesNotMatch(stats.errorDetails[0].message, /not sent/);
+  });
+
+  it("fails when the node refuses the request", async () => {
+    await validator.run(
+      failingWith(Object.assign(new Error("server response 403 Forbidden"), { code: "SERVER_ERROR" })),
+      "observers",
+    );
+
+    assert.equal(stats.errors, 1);
+  });
+
+  it("fails when the node has no state to run the call at", async () => {
+    // a node that kept the header of a pinned block but not its state refuses every eth_call
+    await validator.run(failingWith(callError(NO_STATE)), "subvaultAt");
+
+    assert.equal(stats.errors, 1);
+    assert.match(stats.errorDetails[0].message, /historical state .* is not available/);
   });
 });

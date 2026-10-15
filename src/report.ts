@@ -28,6 +28,7 @@ interface ContractReport {
 }
 
 interface ConfigReport {
+  blocks?: Record<string, number>;
   checks: number;
   config: string;
   contracts?: ContractReport[];
@@ -107,6 +108,13 @@ export function endContract(): void {
     config.contracts.push(contract);
   }
   contract = undefined;
+}
+
+/** The block --block pinned a network section to. */
+export function recordPinnedBlock(section: string, block: number): void {
+  if (!config) return;
+  config.blocks ??= {};
+  config.blocks[section] = block;
 }
 
 export function recordWarning(check: string, message: string): void {

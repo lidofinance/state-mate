@@ -2871,7 +2871,8 @@ l1:
         withdrawableValue: null
         feeLeftover: null
         renounceRole:
-          mustRevert: true
+          - args: [*ZERO_BYTES32, *ZERO_ADDRESS]
+            mustRevert: true
       ozAcl:
         *NODE_OPERATOR_MANAGER_ROLE : []
         *PAUSE_BEACON_CHAIN_DEPOSITS_ROLE : []

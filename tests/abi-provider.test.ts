@@ -940,7 +940,8 @@ describe("tuple checks", () => {
     }
   }
   const validator = new ProbeValidator(new JsonRpcProvider("http://localhost:1"), EntryField.checks, ETH_CHAIN_ID);
-  const contractReturning = (value: unknown) => ({ getFunction: () => ({ staticCall: async () => value }) }) as unknown;
+  const contractReturning = (value: unknown) =>
+    ({ getFunction: () => ({ populateTransaction: async () => ({}), staticCall: async () => value }) }) as unknown;
 
   it("skips tuple elements pinned as null and verifies the rest", async () => {
     resetStats();

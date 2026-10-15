@@ -247,6 +247,8 @@ checks:
       mustRevert: true
 ```
 
+`mustRevert` passes only on a revert or a halt of the EVM. A node error or an answer that does not decode fails it. `FAILED with: not sent: ...` means the `args` do not match the ABI: give arguments of the types the function takes.
+
 ### Tuple / array returns
 
 Document field names with comments — tuple positions aren't obvious from YAML alone:
@@ -332,6 +334,14 @@ Run `yarn start config.yml` — the error surfaces the actual on-chain value:
 ```
 ✗ .unknownValue: expected REPLACEME, got 0xb13b0c93...
 ```
+
+For many unknowns at once, declare them `null` and keep what the chain answered:
+
+```bash
+yarn start config.yml -o l1/contractName --observed out.yaml --expand-enumerations
+```
+
+`out.yaml` lists what the checks read, `null` entries included, and every `<name>(i)` behind a `<name>Length` or `<name>Count`. `docs/observed.md` gives the format and the reads it leaves out.
 
 **Do not** use `REPLACEME` in `deployed:` — invalid-address errors block the whole file from loading. For unknown addresses, read EIP-1967 slots first:
 
