@@ -182,6 +182,7 @@ misc:
   - &aura "0xC0c293ce456fF0ED870ADd98a0828Dd4d2903DBF"
   - &bal "0xba100000625a3754423978a60c9317c58a424e3D"
   - &usDe "0x4c9EDD5852cd905f086C759E8383e09bff1E68B3"
+  - &usdg "0xe343167631d89B6Ffc58B88d6b7fB0228795491D"
 
   # --- CoW Protocol ---
   - &cowswapSettlement "0x9008D19f58AAbD9eD0D60971565AA8510560ab41"
@@ -1076,8 +1077,8 @@ l1:
         feeRecipient: *treasury
         minPriceD18:
         owner: *lazyVaultAdmin
-        performanceFeeD6: 0
-        protocolFeeD6: 0
+        performanceFeeD6: 150000
+        protocolFeeD6: 2000
         redeemFeeD6: 0
         timestamps:
       implementationChecks:
@@ -2363,8 +2364,7 @@ l1:
         getVerificationResult:
         hashCall:
         isAllowedCall:
-        # Lazy Vault Admin nonce 38, executed on 2026-10-01 in tx 0x874aabeeb2e095e655252e22f7e40624a3735bea7ff08362ecd406515720d243 (adds Cap cUSD and stcUSD leaves)
-        merkleRoot: "0x6315eed29e55c3cc4b0b24587de67d4b33bd760e333d0c53ff46a0b1b8522024"
+        merkleRoot: "0xf885de2f16a42ec7fd4bbae76be189a49b5659ad8c4cd525c969a634f3df16d4"
         vault: *earnUSDe_vault
         verifyCall:
       implementationChecks:
@@ -2403,8 +2403,7 @@ l1:
         getVerificationResult:
         hashCall:
         isAllowedCall:
-        # Lazy Vault Admin nonce 38, executed on 2026-10-01 in tx 0x874aabeeb2e095e655252e22f7e40624a3735bea7ff08362ecd406515720d243 (first root, Aave eMode 47 leaves)
-        merkleRoot: "0xc01cf557312115e980e4d9820610f9c33cb3c39aa5609becd8e465f2ee12ccb4"
+        merkleRoot: "0x8822021397b8d5bc422b2882573193fb06d16dcfeb15a8ddd6a17a85c97bfdae"
         vault: *earnUSDe_vault
         verifyCall:
       implementationChecks:
@@ -2687,7 +2686,7 @@ l1:
           - args: [3]
             result: "0x59bC9FaE5D62B19d4f8d07D758047aCb9EE19d34" # PT-srUSDe-22OCT2026
           - args: [4]
-            result: *sUSDe # Lazy Vault Admin nonce 38, executed on 2026-10-01 in tx 0x874aabeeb2e095e655252e22f7e40624a3735bea7ff08362ecd406515720d243, with a 1-wei marker report
+            result: *sUSDe
           - args: [5]
             mustRevert: true
         supportedAssets: 5
@@ -2951,8 +2950,8 @@ l1:
         *SM_CALLER_ROLE : [*mellowCurator]
         *ROUTER_ROLE : [*swapModuleRouter]
         *SET_SLIPPAGE_ROLE : []
-        *TOKEN_IN_ROLE : [*usdc, *usdt, *sUSDe, *usDe, *syrupUSDT]
-        *TOKEN_OUT_ROLE : [*usdc, *usdt, *sUSDe, *usDe, *syrupUSDT]
+        *TOKEN_IN_ROLE : [*usdc, *usdt, *sUSDe, *usDe, *syrupUSDT, *usdg]
+        *TOKEN_OUT_ROLE : [*usdc, *usdt, *sUSDe, *usDe, *syrupUSDT, *usdg]
 
     earnUSDe_timelockController:
       name: TimelockController

@@ -2,8 +2,9 @@ import chalk from "chalk";
 import { Contract, FetchRequest, JsonRpcProvider } from "ethers";
 
 import packageJson from "../package.json";
-import { printError } from "./common";
+import { nodeAnswer, printError } from "./common";
 import { log, logErrorAndExit, WARNING_MARK } from "./logger";
+import { type PinnedTag, pinBlockTag } from "./pinned-block";
 import {
   type Abi,
   type ContractInfo,
@@ -435,9 +436,15 @@ const TRANSIENT_RPC_RETRY_MS = 2000;
 const TRANSIENT_RPC_ERROR = /\b(408|429|5\d\d)\b|timeout|econnreset|econnrefused/i;
 
 function isTransientRpcError(error: unknown): boolean {
-  const code = (error as { code?: unknown }).code;
+  const { code: rpcCode, message, status } = nodeAnswer(error);
+  // an HTTP answer is transient by its status: a 400 or 403 refuses the same request again
+  if (status !== undefined) return /^(408|429|5\d\d)\b/.test(status);
+  // a rate limit worded as a JSON-RPC error over HTTP 200
+  if (rpcCode === 429) return true;
+  const { code } = error as { code?: unknown };
   if (code === "SERVER_ERROR" || code === "TIMEOUT") return true;
-  return TRANSIENT_RPC_ERROR.test(printError(error));
+  // the node's words, not the request ethers quotes beside them: its id may read as a status
+  return TRANSIENT_RPC_ERROR.test(message);
 }
 
 /** A public RPC drops a request now and then; one retry separates a flake from a real answer. */
@@ -451,13 +458,18 @@ export async function withTransientRetry<T>(run: () => Promise<T>, delayMs = TRA
   }
 }
 
-class RetryingJsonRpcProvider extends JsonRpcProvider {
+export class RetryingJsonRpcProvider extends JsonRpcProvider {
+  // Set by --block: reads name this block instead of "latest", and the log scans end at its number
+  public pinned: { number: number; tag: PinnedTag } | undefined;
+
   override async send(method: string, parameters: unknown[] | Record<string, unknown>): Promise<unknown> {
-    return withTransientRetry(() => super.send(method, parameters));
+    const sent =
+      this.pinned === undefined ? parameters : (pinBlockTag(method, parameters, this.pinned.tag) as typeof parameters);
+    return withTransientRetry(() => super.send(method, sent));
   }
 }
 
-export function createProvider(rpcUrl: string): JsonRpcProvider {
+export function createProvider(rpcUrl: string): RetryingJsonRpcProvider {
   const request = new FetchRequest(rpcUrl);
   request.setHeader("User-Agent", userAgent());
   // staticNetwork stops ethers from re-sending eth_chainId with every call, which otherwise

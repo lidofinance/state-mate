@@ -1,8 +1,8 @@
 import type { JsonRpcProvider } from "ethers";
 
-import { printError } from "../common";
+import { nodeAnswer, printError } from "../common";
 import { registerSecret } from "../context";
-import { httpGetAsync, isTransientExplorerHttpError } from "../explorer";
+import { httpGetAsync, isTransientExplorerHttpError, RetryingJsonRpcProvider } from "../explorer";
 import { log } from "../logger";
 import { parseRoleLog, type RawLog, ROLE_GRANTED_TOPIC, type RoleEvent } from "./fold";
 
@@ -31,7 +31,7 @@ export const CHAIN_LOG_SOURCES: Readonly<Record<string, ChainLogSource>> = {
   "1": { confirmationLag: 8, source: { kind: "etherscan" } },
   "10": { confirmationLag: 60, source: { hostname: "explorer.optimism.io", kind: "blockscout" } },
   "130": { confirmationLag: 120, source: { kind: "etherscan" } },
-  "4663": { confirmationLag: 1200, source: { hostname: "robinhoodchain.blockscout.com", kind: "blockscout" } },
+  "4663": { confirmationLag: 1200, source: { kind: "etherscan" } },
   "8453": { confirmationLag: 60, source: { hostname: "base.blockscout.com", kind: "blockscout" } },
   "42161": { confirmationLag: 240, source: { kind: "etherscan" } },
   "59144": { confirmationLag: 30, source: { kind: "etherscan" } },
@@ -81,17 +81,48 @@ export async function fetchWindow(
   range: ScanRange,
   cap: number,
   fetchOnce: (range: ScanRange) => Promise<RawLog[]>,
+  refusesSpan?: (error: unknown) => boolean,
+  // the widest span not yet refused, shared by the halves so a known limit is not asked again
+  widest = { blocks: Number.POSITIVE_INFINITY },
 ): Promise<RawLog[]> {
-  const logs = await fetchOnce(range);
-  if (logs.length < cap) return logs;
+  const blocks = range.toBlock - range.fromBlock + 1;
+  if (blocks <= widest.blocks) {
+    try {
+      const logs = await fetchOnce(range);
+      if (logs.length < cap) return logs;
+    } catch (error) {
+      if (!refusesSpan?.(error) || blocks === 1) throw error;
+      widest.blocks = blocks - 1;
+    }
+  }
 
   if (range.fromBlock >= range.toBlock) {
     throw new Error(`block ${range.fromBlock} alone fills the ${cap}-record limit, so the window cannot be narrowed`);
   }
   const middle = Math.floor((range.fromBlock + range.toBlock) / 2);
-  const lower = await fetchWindow({ fromBlock: range.fromBlock, toBlock: middle }, cap, fetchOnce);
-  const upper = await fetchWindow({ fromBlock: middle + 1, toBlock: range.toBlock }, cap, fetchOnce);
+  const lower = await fetchWindow({ fromBlock: range.fromBlock, toBlock: middle }, cap, fetchOnce, refusesSpan, widest);
+  const upper = await fetchWindow(
+    { fromBlock: middle + 1, toBlock: range.toBlock },
+    cap,
+    fetchOnce,
+    refusesSpan,
+    widest,
+  );
   return [...lower, ...upper];
+}
+
+// How nodes word a getLogs span or response they will not serve: "up to a 10 block range",
+// "range too large", "limited to a 10,000 range", "more than 10000 results", "response size exceeded"
+const SPAN_REFUSED =
+  /block range|range (?:is )?too (?:large|wide|big)|limited to .*range|ranges? over|more than \d+ (?:results|logs)|max(?:imum)? (?:results|logs)|response size|too many (?:blocks|logs|results)/i;
+const RATE_LIMITED_RPC = /rate limit|too many requests|compute units/i;
+
+/** A refusal a narrower window answers; a rate limit is not one, halving would only add requests. */
+export function isSpanRefusal(error: unknown): boolean {
+  const { code, message, status } = nodeAnswer(error);
+  // ethers retries a 429 itself and then raises it as "599 CLIENT ESCALATED SERVER ERROR (429 ...)"
+  const rateLimited = /\b429\b/.test(status ?? "") || code === 429 || RATE_LIMITED_RPC.test(message);
+  return SPAN_REFUSED.test(message) && !rateLimited;
 }
 
 interface ExplorerLogsResponse {
@@ -327,7 +358,7 @@ export async function resolveDeploymentBlock(chainId: string, address: string): 
  * terminating check can cover. The RPC already decides membership through views and storage
  * reads, so letting it nominate tail candidates adds no new trust root.
  *
- * Views and storage reads are deliberately NOT pinned to the captured block. Answers describe
+ * By default views and storage reads are NOT pinned to the captured block. Answers describe
  * the state at read time: a permission that moves mid-run either fails a check closed -- one
  * cheap re-run on a chain that has stopped moving -- or moved after the run began, which no
  * terminating check covers pinned or not, because events through the captured head cannot
@@ -335,7 +366,8 @@ export async function resolveDeploymentBlock(chainId: string, address: string): 
  * snapshot consistency at the price of a hard archive-state dependency: a non-archive node keeps
  * roughly the last 128 states, under a minute of blocks on the fastest supported chains, which
  * an ordinary run outlives in its happy path. And a config is many sections, each capturing its
- * own head, so the run as a whole still would not describe one block.
+ * own head, so the run as a whole still would not describe one block. `--block` opts into that
+ * price: every read and this head then name one block, and the RPC must serve its state.
  */
 export interface ScanBounds {
   /** The chain head at the moment the scan started; candidacy is complete through here. */
@@ -346,11 +378,15 @@ export interface ScanBounds {
 
 export async function resolveScanBounds(chainId: string, provider: JsonRpcProvider): Promise<ScanBounds> {
   const lag = CHAIN_LOG_SOURCES[chainId]?.confirmationLag ?? 0;
-  const captured = await provider.getBlockNumber();
-  return { captured, settled: Math.max(0, captured - lag) };
+  // --block pins the capture; the head still decides how much of it is settled
+  const pinned = provider instanceof RetryingJsonRpcProvider ? provider.pinned?.number : undefined;
+  const head = await provider.getBlockNumber();
+  const captured = pinned ?? head;
+  // A pin at least `lag` behind the head is settled already: the log source serves all of it
+  return { captured, settled: Math.max(0, Math.min(captured, head - lag)) };
 }
 
-/** The unsettled tail, straight from the RPC: one bounded request, no windowing needed. */
+/** An RPC's logs for a range, in windows halved for as long as the node refuses the span. */
 export async function collectTailLogs(
   provider: JsonRpcProvider,
   address: string,
@@ -358,19 +394,27 @@ export async function collectTailLogs(
   range: ScanRange,
 ): Promise<RawLog[]> {
   if (range.fromBlock > range.toBlock) return [];
-  const logs = await provider.getLogs({
-    address,
-    fromBlock: range.fromBlock,
-    toBlock: range.toBlock,
-    topics: [[...topics0]],
-  });
-  return logs.map((entry) => ({
-    address: entry.address,
-    blockNumber: entry.blockNumber,
-    data: entry.data,
-    logIndex: entry.index,
-    topics: [...entry.topics],
-  }));
+  // An RPC refuses rather than truncates, so there is no record cap, only the span
+  return fetchWindow(
+    range,
+    Number.POSITIVE_INFINITY,
+    async (window) => {
+      const logs = await provider.getLogs({
+        address,
+        fromBlock: window.fromBlock,
+        toBlock: window.toBlock,
+        topics: [[...topics0]],
+      });
+      return logs.map((entry) => ({
+        address: entry.address,
+        blockNumber: entry.blockNumber,
+        data: entry.data,
+        logIndex: entry.index,
+        topics: [...entry.topics],
+      }));
+    },
+    isSpanRefusal,
+  );
 }
 
 export async function collectTailRoleEvents(

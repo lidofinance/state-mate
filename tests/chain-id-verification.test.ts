@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { beforeEach, describe, it, mock } from "node:test";
 
-import type { JsonRpcProvider } from "ethers";
+import { JsonRpcProvider } from "ethers";
 
 import { normalizeChainId } from "../src/common";
 import { context, resetStats, stats } from "../src/context";
@@ -158,6 +158,56 @@ describe("withTransientRetry", () => {
     }, 0);
     assert.equal(result, "ok");
     assert.equal(calls, 2);
+  });
+
+  it("does not repeat a request the node refused with a 4xx status", async () => {
+    // drpc answers a getLogs span it will not serve with HTTP 400; the same window gets the same answer
+    for (const status of ["400 Bad Request", "403 Forbidden"]) {
+      let calls = 0;
+      await assert.rejects(
+        withTransientRetry(async () => {
+          calls++;
+          throw Object.assign(new Error(`server response ${status}`), {
+            code: "SERVER_ERROR",
+            info: { responseStatus: status },
+          });
+        }, 0),
+      );
+      assert.equal(calls, 1, status);
+    }
+  });
+
+  it("reads a JSON-RPC error by the node's words, not by the request id ethers quotes beside them", async () => {
+    const provider = new JsonRpcProvider("http://localhost:0", undefined, { staticNetwork: true });
+    const refusal = provider.getRpcError(
+      { id: 429, jsonrpc: "2.0", method: "eth_getLogs", params: [] },
+      { error: { code: 22, message: "eth_getLogs range over 100000 blocks is not supported" }, id: 429 },
+    );
+    provider.destroy();
+    let calls = 0;
+    await assert.rejects(
+      withTransientRetry(async () => {
+        calls++;
+        throw refusal;
+      }, 0),
+    );
+    assert.equal(calls, 1);
+  });
+
+  it("retries a rate limit that the node words as a JSON-RPC error over HTTP 200", async () => {
+    const provider = new JsonRpcProvider("http://localhost:0", undefined, { staticNetwork: true });
+    const limited = provider.getRpcError(
+      { id: 1, jsonrpc: "2.0", method: "eth_getLogs", params: [] },
+      { error: { code: 429, message: "Too Many Requests" }, id: 1 },
+    );
+    provider.destroy();
+    let calls = 0;
+    const result = await withTransientRetry(async () => {
+      calls++;
+      if (calls === 1) throw limited;
+      return "ok";
+    }, 0);
+    assert.deepEqual({ calls, result }, { calls: 2, result: "ok" });
   });
 
   it("does not mask a real revert as a flake", async () => {

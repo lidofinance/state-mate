@@ -1,7 +1,9 @@
 import assert from "node:assert/strict";
+import http from "node:http";
+import type { AddressInfo } from "node:net";
 import { describe, it, mock } from "node:test";
 
-import type { JsonRpcProvider } from "ethers";
+import { FetchRequest, FetchResponse, JsonRpcProvider, toUtf8Bytes } from "ethers";
 
 import { ROLE_GRANTED_TOPIC } from "../src/acl/fold";
 import {
@@ -12,6 +14,7 @@ import {
   describeSource,
   fetchWindow,
   isRateLimitAnswer,
+  isSpanRefusal,
   makeSettledScanRange,
   parseQuantity,
   resolveScanBounds,
@@ -19,7 +22,8 @@ import {
   setExplorerTokenEnv,
   setRateLimitPause,
 } from "../src/acl/log-source";
-import { resetRequestSlots } from "../src/explorer";
+import { RetryingJsonRpcProvider, resetRequestSlots } from "../src/explorer";
+import { toBlockTag } from "../src/pinned-block";
 
 const CONTRACT = "0xccccccccccccccccccccccccccccccccccccccc3";
 
@@ -378,9 +382,7 @@ describe("the explorer token", () => {
   it("knows chain 4663, whose holders were invisible while it did not", () => {
     // A chain absent from this table skips the scan and records "holders cannot be enumerated",
     // so an undeclared role holder is invisible rather than reported.
-    const source = CHAIN_LOG_SOURCES["4663"]?.source;
-    assert.equal(source?.kind, "blockscout");
-    assert.equal(source?.kind === "blockscout" ? source.hostname : "", "robinhoodchain.blockscout.com");
+    assert.equal(CHAIN_LOG_SOURCES["4663"]?.source.kind, "etherscan");
   });
 
   it("does not send an Etherscan key to the independent Base or Optimism log source", async () => {
@@ -407,15 +409,15 @@ describe("the explorer token", () => {
 
   it("uses a configured Blockscout key only on its matching log host", async () => {
     await withEnv({ CUSTOM_EXPLORER_KEY: "custom/key", BLOCKSCOUT_TOKEN: undefined }, async () => {
-      setExplorerTokenEnv("CUSTOM_EXPLORER_KEY", "robinhoodchain.blockscout.com");
+      setExplorerTokenEnv("CUSTOM_EXPLORER_KEY", "base.blockscout.com");
       const seen: URL[] = [];
       const restore = mock.method(globalThis, "fetch", async (url: Parameters<typeof fetch>[0]) => {
         seen.push(new URL(String(url)));
         return Response.json({ result: [], status: "1" });
       });
       try {
-        await collectRoleEvents("4663", `0x${"11".repeat(20)}`, makeSettledScanRange(0, 10));
         await collectRoleEvents("8453", `0x${"11".repeat(20)}`, makeSettledScanRange(0, 10));
+        await collectRoleEvents("10", `0x${"11".repeat(20)}`, makeSettledScanRange(0, 10));
       } finally {
         restore.mock.restore();
       }
@@ -450,5 +452,184 @@ describe("the explorer token", () => {
         );
       },
     );
+  });
+});
+
+describe("a node that limits the eth_getLogs span", () => {
+  const ALCHEMY_FREE =
+    'could not coalesce error (error={ "code": -32600, "message": "Under the Free tier plan, you can make ' +
+    "eth_getLogs requests with up to a 10 block range. Based on your parameters, this block range should work: " +
+    '[0x4, 0xd]" }, code=UNKNOWN_ERROR, version=6.17.0)';
+
+  function limitedTo(span: number, asked: ScanRange[], blocks: number[] = []) {
+    return {
+      getLogs: async ({ fromBlock, toBlock }: ScanRange) => {
+        asked.push({ fromBlock, toBlock });
+        if (toBlock - fromBlock + 1 > span) throw new Error(ALCHEMY_FREE);
+        return blocks
+          .filter((block) => block >= fromBlock && block <= toBlock)
+          .map((blockNumber) => ({
+            address: CONTRACT,
+            blockNumber,
+            data: "0x",
+            index: 0,
+            topics: [ROLE_GRANTED_TOPIC],
+          }));
+      },
+    } as unknown as JsonRpcProvider;
+  }
+
+  it("halves the tail until the node answers, and covers every block exactly once", async () => {
+    // chain 4663: a 1200-block tail against an archive node that serves ten blocks at a time
+    const asked: ScanRange[] = [];
+    const logs = await collectTailLogs(limitedTo(10, asked, [7, 600, 1199]), CONTRACT, [ROLE_GRANTED_TOPIC], {
+      fromBlock: 1,
+      toBlock: 1200,
+    });
+
+    assert.deepEqual(
+      logs.map((entry) => entry.blockNumber),
+      [7, 600, 1199],
+    );
+    const served = asked.filter(({ fromBlock, toBlock }) => toBlock - fromBlock + 1 <= 10);
+    const covered = served.flatMap(({ fromBlock, toBlock }) =>
+      Array.from({ length: toBlock - fromBlock + 1 }, (_, index) => fromBlock + index),
+    );
+    assert.deepEqual(
+      covered,
+      Array.from({ length: 1200 }, (_, index) => index + 1),
+    );
+    // a refused span is not asked again: one refusal per halving on the way down, not per window
+    assert.ok(asked.length - served.length <= 8, `${asked.length - served.length} refusals`);
+  });
+
+  it("gives up on a single block the node still refuses", async () => {
+    await assert.rejects(
+      collectTailLogs(limitedTo(0, []), CONTRACT, [ROLE_GRANTED_TOPIC], { fromBlock: 1, toBlock: 4 }),
+      /10 block range/,
+    );
+  });
+
+  it("does not halve on a rate limit, which a narrower window would not cure", async () => {
+    const asked: ScanRange[] = [];
+    const provider = {
+      getLogs: async (range: ScanRange) => {
+        asked.push(range);
+        throw new Error("server response 429 Too Many Requests");
+      },
+    } as unknown as JsonRpcProvider;
+
+    await assert.rejects(collectTailLogs(provider, CONTRACT, [ROLE_GRANTED_TOPIC], { fromBlock: 1, toBlock: 1200 }));
+    assert.equal(asked.length, 1);
+  });
+
+  it("recognises how the common nodes word a span refusal", () => {
+    for (const text of [
+      ALCHEMY_FREE,
+      "query returned more than 10000 results",
+      "eth_getLogs is limited to a 10,000 range",
+      "exceed maximum block range: 50000",
+      "block range is too wide",
+      "Log response size exceeded.",
+      "ranges over 10000 blocks are not supported on freemium keys",
+    ]) {
+      assert.equal(isSpanRefusal(new Error(text)), true, text);
+    }
+    for (const text of ["execution reverted", "Too Many Requests", "rate limit exceeded", "missing trie node"]) {
+      assert.equal(isSpanRefusal(new Error(text)), false, text);
+    }
+  });
+
+  it("reads the refusal from the node's answer, not from the request id ethers quotes beside it", () => {
+    const REFUSAL = { code: 22, message: "eth_getLogs range over 100000 blocks is not supported on robinhood" };
+    const provider = new JsonRpcProvider("http://localhost:0", undefined, { staticNetwork: true });
+    try {
+      for (const id of [4, 429, 1429]) {
+        const payload = { id, jsonrpc: "2.0" as const, method: "eth_getLogs", params: [{ fromBlock: "0x0" }] };
+        assert.equal(isSpanRefusal(provider.getRpcError(payload, { error: REFUSAL, id })), true, `JSON-RPC id ${id}`);
+      }
+    } finally {
+      provider.destroy();
+    }
+
+    // the error ethers raises for an HTTP status that is not 2xx
+    const httpError = (status: number, statusText: string, error: { code: number; message: string }) => {
+      const body = toUtf8Bytes(JSON.stringify({ error, id: 429, jsonrpc: "2.0" }));
+      const response = new FetchResponse(status, statusText, {}, body, new FetchRequest("https://rpc.example"));
+      try {
+        response.assertOk();
+      } catch (thrown) {
+        return thrown;
+      }
+      throw new Error(`HTTP ${status} was accepted`);
+    };
+    const RANGE = { code: -32602, message: "block range too large" };
+    assert.equal(isSpanRefusal(httpError(400, "Bad Request", RANGE)), true);
+    assert.equal(isSpanRefusal(httpError(429, "Too Many Requests", RANGE)), false);
+    assert.equal(isSpanRefusal(httpError(400, "Bad Request", { ...RANGE, code: 429 })), false);
+  });
+
+  it("takes a 429 that ethers escalated to 599 for a rate limit, whatever the body says", async () => {
+    const server = http.createServer(async (request, response) => {
+      for await (const _ of request) {
+        // drain the request
+      }
+      response.statusCode = 429;
+      response.setHeader("content-type", "application/json");
+      response.end(
+        JSON.stringify({ error: { code: -32602, message: "block range too large" }, id: 1, jsonrpc: "2.0" }),
+      );
+    });
+    await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
+    const request = new FetchRequest(`http://127.0.0.1:${(server.address() as AddressInfo).port}`);
+    // one attempt: ethers would otherwise wait out a dozen retries before it escalates
+    request.setThrottleParams({ maxAttempts: 1 });
+    const provider = new JsonRpcProvider(request, 1, { batchMaxCount: 1, staticNetwork: true });
+    try {
+      const refusal = await provider.getLogs({ fromBlock: 1, toBlock: 2 }).then(
+        () => assert.fail("the node answered 429"),
+        (error: unknown) => error,
+      );
+      assert.match(String((refusal as { info?: { responseStatus?: unknown } }).info?.responseStatus), /^599 .*429/);
+      assert.equal(isSpanRefusal(refusal), false);
+    } finally {
+      provider.destroy();
+      server.closeAllConnections();
+      server.close();
+    }
+  });
+});
+
+describe("a pinned scan", () => {
+  const prototype = JsonRpcProvider.prototype as { send?: unknown };
+
+  function pinnedAt(pin: number, head: number): RetryingJsonRpcProvider {
+    prototype.send = async (method: string) => {
+      if (method === "eth_blockNumber") return `0x${head.toString(16)}`;
+      throw new Error(`unexpected ${method}`);
+    };
+    const provider = new RetryingJsonRpcProvider("http://localhost:0", undefined, { staticNetwork: true });
+    provider.pinned = { number: pin, tag: toBlockTag(pin) };
+    return provider;
+  }
+
+  it("lets the log source serve all the way to a pin older than head minus the lag", async () => {
+    // chain 4663's lag is 1200 blocks
+    try {
+      assert.deepEqual(await resolveScanBounds("4663", pinnedAt(67_125_350, 67_200_000)), {
+        captured: 67_125_350,
+        settled: 67_125_350,
+      });
+    } finally {
+      delete prototype.send;
+    }
+  });
+
+  it("still leaves a tail when the pin is within the lag of the head", async () => {
+    try {
+      assert.deepEqual(await resolveScanBounds("4663", pinnedAt(10_000, 10_500)), { captured: 10_000, settled: 9_300 });
+    } finally {
+      delete prototype.send;
+    }
   });
 });

@@ -47,7 +47,9 @@ import {
   SUCCESS_MARK,
   WARNING_MARK,
 } from "./logger";
-import { beginConfig, emitReport, endConfig } from "./report";
+import { beginObservedSection, writeObservedFile } from "./observed";
+import { assertBlockOnOneChain, assertPinnedHashCanonical, pinSectionBlock } from "./pinned-block";
+import { beginConfig, emitReport, endConfig, recordPinnedBlock } from "./report";
 import { ContractSectionValidator } from "./section-validators/contract";
 import {
   discoverSiblingPaths,
@@ -357,12 +359,20 @@ async function checkNetworkSection(sectionTitle: string, section: NetworkSection
   // assertProviderChain vouches for the RPC; the explorer is probed by the ABI pass, and only
   // when it has something to download
   await assertProviderChain(provider, chainId);
+  await pinSectionBlock(provider);
+  if (provider.pinned) recordPinnedBlock(sectionTitle, provider.pinned.number);
+  if (context.observedPath) {
+    const pinned = provider.pinned;
+    const hash = typeof pinned?.tag === "object" ? pinned.tag.blockHash : undefined;
+    beginObservedSection(sectionTitle, chainId, pinned?.number ?? (await provider.getBlockNumber()), !!pinned, hash);
+  }
   const contractSectionChecker = new ContractSectionValidator(provider, chainId);
 
   for (const contractAlias in section.contracts) {
     const contractEntry = section.contracts[contractAlias];
     await contractSectionChecker.see(contractEntry, sectionTitle, contractAlias);
   }
+  await assertPinnedHashCanonical(provider);
 }
 
 export function collectYamlConfigs(directory: string): string[] {
@@ -388,9 +398,11 @@ async function main() {
   Object.assign(context, parseCommandLineArguments());
   if (context.json) {
     // Ctrl+C must still leave one parseable report, carrying whatever ran before it
-    process.once("SIGINT", () => emitReport(130, "interrupted by SIGINT", () => process.exit(130)));
+    process.once("SIGINT", () => {
+      const failure = flushObserved();
+      emitReport(130, failure ? `interrupted by SIGINT; ${failure}` : "interrupted by SIGINT", () => process.exit(130));
+    });
   }
-
   if (!fs.existsSync(context.configPath)) {
     logErrorAndExit(`No such file or directory: ${chalk.magenta(context.configPath)}`);
   }
@@ -408,6 +420,14 @@ async function main() {
     }
     if (context.checkOnly) {
       logErrorAndExit(`The ${chalk.yellow("-o")} option requires a single config file, not a directory`);
+    }
+    if (context.observedPath) {
+      logErrorAndExit(`The ${chalk.yellow("--observed")} option requires a single config file, not a directory`);
+    }
+    if (context.block !== undefined && context.block !== "latest") {
+      logErrorAndExit(
+        `A ${chalk.yellow("--block")} number or hash requires a single config file; a directory takes --block latest`,
+      );
     }
     const configs = collectYamlConfigs(context.configPath);
     if (configs.length === 0) {
@@ -451,6 +471,14 @@ async function main() {
     return;
   }
 
+  if (context.observedPath) {
+    // After the usage checks: a refused run writes nothing, an aborted one writes what it read
+    process.once("exit", flushObserved);
+    // a signal's default action skips the exit event
+    if (!context.json) process.once("SIGINT", () => process.exit(130));
+    process.once("SIGTERM", () => process.exit(143));
+  }
+
   // No prune here: a single-file run has walked only its own addresses, and sweeping the shared
   // store now would drop the sibling configs' ABIs
   beginConfig(context.configPath);
@@ -459,10 +487,33 @@ async function main() {
   exit(stats.errors);
 }
 
+let observedFlushed = false;
+
+/**
+ * Writes the observed file once, whichever way the run ends; a failed write is not retried.
+ * Returns why the write failed, for the report.
+ */
+function flushObserved(): string | undefined {
+  if (!context.observedPath || observedFlushed) return undefined;
+  observedFlushed = true;
+  try {
+    writeObservedFile(context.observedPath, context.configPath);
+    return undefined;
+  } catch (error) {
+    const failure = `Could not write the observed file ${context.observedPath}: ${printError(error)}`;
+    process.stderr.write(`${failure}\n`);
+    process.exitCode ||= 1;
+    return failure;
+  }
+}
+
 // Under --json the report owns the exit code; the log mode keeps exiting on the spot
 function exit(code: number): void {
+  // the observed file first, so that the report carries a write that failed
+  const failure = flushObserved();
+  if (failure) code ||= 1;
   if (context.json) {
-    emitReport(code);
+    emitReport(code, failure);
   } else if (code) {
     process.exit(code);
   }
@@ -472,6 +523,11 @@ async function runConfig() {
   const jsonDocument = loadStateWithOptionalSiblings();
 
   if (validateJsonWithSchema(jsonDocument, EntireDocumentTB)) {
+    assertBlockOnOneChain(
+      Object.values(jsonDocument).flatMap((section) =>
+        isTypeOfTB(section, NetworkSectionTB) ? [normalizeChainId(section.chainId)] : [],
+      ),
+    );
     await downloadAndCheckAllAbi(jsonDocument);
     await doChecks(jsonDocument);
   }
@@ -481,7 +537,8 @@ async function runConfig() {
 if (require.main === module) {
   main().catch((error) => {
     if (context.json) {
-      emitReport(1, printError(error));
+      const failure = flushObserved();
+      emitReport(1, failure ? `${printError(error)}; ${failure}` : printError(error));
       // A FatalError is fully told by the report; anything else is a bug worth its stack
       if (!(error instanceof FatalError)) console.error(error);
     } else {
