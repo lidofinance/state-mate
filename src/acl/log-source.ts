@@ -23,8 +23,9 @@ interface ChainLogSource {
 }
 
 // etherscan v2's free tier serves most of these but refuses 10 and 8453 outright ("Free API
-// access is not supported for this chain"), so those two are served by blockscout. A chain absent
-// from this table cannot be scanned at all, and the check records a skip rather than a pass.
+// access is not supported for this chain"). Linea's community quota is exhausted independently
+// of the API key, so it also uses Blockscout. A chain absent from this table cannot be scanned
+// at all, and the check records a skip rather than a pass.
 // The lag is roughly two minutes of wall time on each chain: enough to clear the explorer's
 // indexing delay and any shallow reorg.
 export const CHAIN_LOG_SOURCES: Readonly<Record<string, ChainLogSource>> = {
@@ -34,7 +35,7 @@ export const CHAIN_LOG_SOURCES: Readonly<Record<string, ChainLogSource>> = {
   "4663": { confirmationLag: 1200, source: { kind: "etherscan" } },
   "8453": { confirmationLag: 60, source: { hostname: "base.blockscout.com", kind: "blockscout" } },
   "42161": { confirmationLag: 240, source: { kind: "etherscan" } },
-  "59144": { confirmationLag: 30, source: { kind: "etherscan" } },
+  "59144": { confirmationLag: 30, source: { hostname: "api-explorer.linea.build", kind: "blockscout" } },
   "560048": { confirmationLag: 8, source: { kind: "etherscan" } },
   "11155111": { confirmationLag: 8, source: { kind: "etherscan" } },
   "11155420": { confirmationLag: 60, source: { kind: "etherscan" } },
@@ -325,7 +326,11 @@ export async function collectRoleEvents(chainId: string, address: string, range:
  * A bound that came back too high would silently cut the front off the history, the one error this
  * scan cannot afford; the explorer's record is a transaction, not prunable state.
  */
-export async function resolveDeploymentBlock(chainId: string, address: string): Promise<number | undefined> {
+export async function resolveDeploymentBlock(
+  chainId: string,
+  address: string,
+  provider?: Pick<JsonRpcProvider, "getTransactionReceipt">,
+): Promise<number | undefined> {
   const source = CHAIN_LOG_SOURCES[chainId]?.source;
   if (!source) return undefined;
 
@@ -345,8 +350,21 @@ export async function resolveDeploymentBlock(chainId: string, address: string): 
   // be checked against the address that was asked about rather than assumed to match
   if (!entry || String(entry.contractAddress ?? "").toLowerCase() !== address.toLowerCase()) return undefined;
 
-  const blockNumber = Number(entry.blockNumber);
-  return Number.isInteger(blockNumber) && blockNumber >= 0 ? blockNumber : undefined;
+  const blockNumber = parseQuantity(entry.blockNumber);
+  if (blockNumber !== undefined) return blockNumber;
+
+  // Some explorers identify the creation transaction without its block (Linea's Blockscout).
+  // Its receipt gives the exact block, including factory deployments, without probing historical code.
+  const txHash = entry.txHash;
+  if (!provider || typeof txHash !== "string" || !/^0x[\da-f]{64}$/i.test(txHash)) return undefined;
+  try {
+    const receipt = await provider.getTransactionReceipt(txHash);
+    if (receipt?.hash.toLowerCase() !== txHash.toLowerCase()) return undefined;
+    return parseQuantity(receipt.blockNumber);
+  } catch (error) {
+    log(`    creation receipt: ${printError(error)}`);
+    return undefined;
+  }
 }
 
 /**
