@@ -1058,7 +1058,11 @@ l1:
         getDepositAllocations: null
         getModuleValidatorsBalance: null
         getNodeOperatorDigests: null
-        getNodeOperatorSummary: null
+        getNodeOperatorSummary:
+          - args: [1, 21] # vote item 1.15: CMv1 operator 21, target limit 0, soft mode
+            result: [1, 0, null, null, null, null, null, null]
+          - args: [4, 6] # vote item 1.16: CMv2 operator 6, target limit 0, soft mode
+            result: [1, 0, null, null, null, null, null, null]
         getRoleAdmin: null
         getRoleMember: null
         getRoleMemberCount: null
