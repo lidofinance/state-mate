@@ -129,7 +129,7 @@ deployed:
 
     # --- Curated Module v2 ---
     - &curatedModule "0x87EB69Ae51317405FD285efD2326a4a11f6173b9"
-    - &curatedModuleImplAddress "0xf01b6b3E27fD3A4c063E391A0714c770d9422CE8"
+    - &curatedModuleImplAddress "0x0d7cBAf91cc6cbfB72ea70ec09c04855A06ac7Ee"
     - &curatedAccountingImplAddress "0x665eA8EFf296f67C59eda4F4130ba12De49c1cc3"
     - &curatedFeeOracle "0x5D2F27000C80f6f7A03015Fd49dB7FEba3fBfa83"
     - &curatedFeeOracleImplAddress "0x5AE7D76050f57D3c42931B3c845ec09b42c3370d"
@@ -488,6 +488,7 @@ roles:
   - &CS_REPORT_SLASHED_WITHDRAWN_VALIDATORS_ROLE "0x2dba60a7b2c6bc437f1868d48dc8e53a95d71e78cef88de0aff6d952ecff8daa"
   - &CS_MANAGE_TOP_UP_QUEUE_ROLE "0x81511e3a8c7e2b344d3617cf758c2d428c80221db07b6540fad6be6136fbfd6f"
   - &CS_REWIND_TOP_UP_QUEUE_ROLE "0x97bfc32813cbc510bc652b4e968b6ba148512936cf0e860c71c2823d4a88990d"
+  - &CS_ENABLE_TOP_UP_ALLOCATION_ROLE "0xf541c17eb0542b50d1f6df03622f7d9ab80d01dffb50bbd033a4dd4c57f09889"
   - &CS_OPERATOR_ADDRESSES_ADMIN_ROLE "0x345e59b4376c6f29f90479f5cbd4035c078c4d1b68a48554f3db0c61b6b547e2"
 
   # CSParametersRegistry
@@ -1855,6 +1856,7 @@ l1:
         ACCOUNTING: *curatedAccounting
         CREATE_NODE_OPERATOR_ROLE: *CS_CREATE_NODE_OPERATOR_ROLE
         DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
+        ENABLE_TOP_UP_ALLOCATION_ROLE: *CS_ENABLE_TOP_UP_ALLOCATION_ROLE
         EXIT_PENALTIES: *curatedExitPenalties
         FEE_DISTRIBUTOR: *curatedFeeDistributor
         LIDO_LOCATOR: *lidoLocator
@@ -1872,10 +1874,11 @@ l1:
         STAKING_ROUTER_ROLE: *CS_STAKING_ROUTER_ROLE
         STETH: *lido
         VERIFIER_ROLE: *CS_VERIFIER_ROLE
-        getInitializedVersion: 1
+        getInitializedVersion: 2
         getResumeSinceTimestamp: null
         getType: "0x637572617465642d6f6e636861696e2d76320000000000000000000000000000"
         isPaused: false
+        isTopUpAllocationEnabled: null
         exitDeadlineThreshold: null
         getActiveNodeOperatorsCount: null
         getDepositAllocationTargets: null
@@ -1923,6 +1926,7 @@ l1:
             *curatedOperatorManager6,
             *curatedOperatorManager7,
           ]
+        *CS_ENABLE_TOP_UP_ALLOCATION_ROLE : [*curatedCircuitBreakerPauser]
         *CS_OPERATOR_ADDRESSES_ADMIN_ROLE : []
         *CS_PAUSE_ROLE : [*circuitBreaker, *resealManager]
         *CS_RECOVERER_ROLE : []
@@ -1937,6 +1941,7 @@ l1:
         ACCOUNTING: *curatedAccounting
         CREATE_NODE_OPERATOR_ROLE: *CS_CREATE_NODE_OPERATOR_ROLE
         DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
+        ENABLE_TOP_UP_ALLOCATION_ROLE: *CS_ENABLE_TOP_UP_ALLOCATION_ROLE
         EXIT_PENALTIES: *curatedExitPenalties
         FEE_DISTRIBUTOR: *curatedFeeDistributor
         LIDO_LOCATOR: *lidoLocator
