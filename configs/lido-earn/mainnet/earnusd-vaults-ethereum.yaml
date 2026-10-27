@@ -3175,7 +3175,7 @@ l1:
           - *lidoSigner11
           - *lidoSigner6
           - *lidoSigner12
-          - *lidoSigner9
+          - *lidoSigner13
           - *lidoSigner7
         getStorageAt:
         getThreshold: *TREASURY_THRESHOLD
@@ -3222,7 +3222,7 @@ l1:
           - *lidoSigner6
           - *lidoSigner12
           - *lidoSigner1
-          - *lidoSigner9
+          - *lidoSigner13
         getStorageAt:
         getThreshold: *LIDO_PAUSER_THRESHOLD
         getTransactionHash:
