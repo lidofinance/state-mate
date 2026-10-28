@@ -17,6 +17,7 @@ import {
   isSpanRefusal,
   makeSettledScanRange,
   parseQuantity,
+  resolveDeploymentBlock,
   resolveScanBounds,
   type ScanRange,
   setExplorerTokenEnv,
@@ -26,6 +27,49 @@ import { RetryingJsonRpcProvider, resetRequestSlots } from "../src/explorer";
 import { toBlockTag } from "../src/pinned-block";
 
 const CONTRACT = "0xccccccccccccccccccccccccccccccccccccccc3";
+
+describe("deployment block discovery", () => {
+  const TX_HASH = `0x${"a".repeat(64)}`;
+
+  for (const testCase of [
+    { label: "uses the explorer's block without an RPC call", entry: { blockNumber: "42" }, expected: 42, calls: 0 },
+    { label: "resolves a creation transaction receipt", entry: { txHash: TX_HASH }, expected: 42, calls: 1 },
+    { label: "rejects a missing receipt", entry: { txHash: TX_HASH }, receipt: null, expected: undefined, calls: 1 },
+    { label: "rejects a malformed transaction hash", entry: { txHash: "0x123" }, expected: undefined, calls: 0 },
+    { label: "rejects a missing block and hash", entry: {}, expected: undefined, calls: 0 },
+    {
+      label: "rejects another contract's creation record",
+      entry: { contractAddress: "0x0000000000000000000000000000000000000001", txHash: TX_HASH },
+      expected: undefined,
+      calls: 0,
+    },
+    {
+      label: "rejects another transaction's receipt",
+      entry: { txHash: TX_HASH },
+      receipt: { hash: `0x${"b".repeat(64)}`, blockNumber: 42 },
+      expected: undefined,
+      calls: 1,
+    },
+  ]) {
+    it(testCase.label, async () => {
+      resetRequestSlots();
+      const fetchMock = mock.method(globalThis, "fetch", async () =>
+        Response.json({ status: "1", result: [{ contractAddress: CONTRACT, ...testCase.entry }] }),
+      );
+      const getTransactionReceipt = mock.fn(async () =>
+        "receipt" in testCase ? testCase.receipt : { hash: TX_HASH, blockNumber: 42 },
+      );
+      const provider = { getTransactionReceipt } as unknown as JsonRpcProvider;
+      try {
+        assert.equal(await resolveDeploymentBlock("59144", CONTRACT, provider), testCase.expected);
+        assert.equal(getTransactionReceipt.mock.calls.length, testCase.calls);
+      } finally {
+        fetchMock.mock.restore();
+        resetRequestSlots();
+      }
+    });
+  }
+});
 
 describe("explorer quantity parsing", () => {
   // etherscan really does serve the zeroth log index as "0x"; reading it as NaN dropped the log
@@ -301,9 +345,9 @@ describe("chain log sources", () => {
     }
   });
 
-  // etherscan's free tier answers "Free API access is not supported for this chain" for both
-  it("keeps optimism and base off etherscan", () => {
-    for (const chainId of ["10", "8453"]) {
+  // Optimism and Base refuse the free tier; Linea's community quota can be exhausted for the day.
+  it("keeps optimism, base and linea off etherscan", () => {
+    for (const chainId of ["10", "8453", "59144"]) {
       assert.equal(CHAIN_LOG_SOURCES[chainId].source.kind, "blockscout");
     }
   });

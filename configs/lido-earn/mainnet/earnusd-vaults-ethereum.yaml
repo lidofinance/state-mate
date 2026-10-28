@@ -161,6 +161,7 @@ misc:
   - &mellowSigner2 "0x185111c113d9B19Ea4C424D3cD8628A1ee09Be6A"
   - &mellowSigner3 "0x06C3992a6067bEA8FB3Af7F004EdEbC13656761F"
   - &mellowSigner4 "0x8888843c607F4Bbd6aD72128F478085256Bdd15D"
+  - &mellowSigner4Replacement "0x0C61C2a0DdD48C499e2732fE9D91cE56c195DBC3"
 
   # --- Ext Mellow signers ---
   - &extMellowSigner1 "0x78Eb634731bE1957D370BEcbbD254F427Af5D13b"
@@ -3033,7 +3034,7 @@ l1:
           - *mellowSigner2
           - *mellowSigner3
           - *mellowSigner1
-          - *mellowSigner4
+          - *mellowSigner4Replacement
         getStorageAt:
         getThreshold: *PROXY_ADMIN_THRESHOLD
         getTransactionHash:
@@ -3076,7 +3077,7 @@ l1:
         getModulesPaginated:
         getOwners:
           - *lidoSigner5
-          - *lidoSigner9
+          - *lidoSigner13
           - *lidoSigner6
           - *lidoSigner4
           - *lidoSigner2
@@ -3126,7 +3127,6 @@ l1:
         getOwners:
           - *lidoSigner13
           - *lidoSigner6
-          - *lidoSigner9
           - *lidoSigner2
           - *lidoSigner7
           - *lidoSigner12
@@ -3175,7 +3175,7 @@ l1:
           - *lidoSigner11
           - *lidoSigner6
           - *lidoSigner12
-          - *lidoSigner9
+          - *lidoSigner13
           - *lidoSigner7
         getStorageAt:
         getThreshold: *TREASURY_THRESHOLD
@@ -3222,7 +3222,7 @@ l1:
           - *lidoSigner6
           - *lidoSigner12
           - *lidoSigner1
-          - *lidoSigner9
+          - *lidoSigner13
         getStorageAt:
         getThreshold: *LIDO_PAUSER_THRESHOLD
         getTransactionHash:

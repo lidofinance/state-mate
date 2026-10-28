@@ -22,6 +22,7 @@ parameters:
   - &mellowSigner2 "0x185111c113d9B19Ea4C424D3cD8628A1ee09Be6A"
   - &mellowSigner3 "0x06C3992a6067bEA8FB3Af7F004EdEbC13656761F"
   - &mellowSigner4 "0x8888843c607F4Bbd6aD72128F478085256Bdd15D"
+  - &mellowSigner4Replacement "0x0C61C2a0DdD48C499e2732fE9D91cE56c195DBC3"
 
   # --- Lido signers ---
   - &lidoSigner1 "0x59F8D74Fe49d5ebEAc069E3baf07eB4b614BD5A7"
@@ -40,7 +41,7 @@ parameters:
   - &extLidoSigner1 "0x59d07dc34B135B17b87840a86BFF7302039E7EDf"
   - &extLidoSigner2 "0x73B254db9cb71a129C4E73aF087D71Ac7d34a8d7"
   - &extLidoSigner3 "0xf2374BCb265505002055942D070459a4d2011012"
-  - &extLidoSigner4 "0x75D95fF8D48E2Ca5c4235322A8AC8e52A76124cD"
+  - &extLidoSigner5 "0x7a63a5cc7F6A6352d0Ae1fE175D745Bce5d75657"
 
   # --- Thresholds for msigs ---
   - &PROXY_ADMIN_THRESHOLD 5
@@ -2689,7 +2690,7 @@ l1:
           - *mellowSigner2
           - *mellowSigner3
           - *mellowSigner1
-          - *mellowSigner4
+          - *mellowSigner4Replacement
         getStorageAt:
         getThreshold: *PROXY_ADMIN_THRESHOLD
         getTransactionHash:
@@ -2784,7 +2785,7 @@ l1:
           - *mellowSigner2
           - *mellowSigner3
           - *mellowSigner1
-          - *mellowSigner4
+          - *mellowSigner4Replacement
           - *extMellowSigner4
         getStorageAt:
         getThreshold: *ACTIVE_VAULT_ADMIN_THRESHOLD
@@ -2831,7 +2832,7 @@ l1:
           - *mellowSigner2
           - *mellowSigner3
           - *mellowSigner1
-          - *mellowSigner4
+          - *mellowSigner4Replacement
           - *extMellowSigner4
         getStorageAt:
         getThreshold: *ORACLE_UPDATER_THRESHOLD
@@ -2879,7 +2880,7 @@ l1:
           - *mellowSigner2
           - *mellowSigner3
           - *mellowSigner1
-          - *mellowSigner4
+          - *mellowSigner4Replacement
           - *extMellowSigner4
         getStorageAt:
         getThreshold: *CURATOR_THRESHOLD
@@ -2969,7 +2970,7 @@ l1:
           - *extLidoSigner2
           - *extLidoSigner3
           - *lidoSigner1
-          - *extLidoSigner4
+          - *extLidoSigner5
         getStorageAt:
         getThreshold: *LIDO_PAUSER_THRESHOLD
         getTransactionHash:
@@ -3017,13 +3018,13 @@ l1:
           - *mellowSigner2
           - *mellowSigner3
           - *mellowSigner1
-          - *mellowSigner4
+          - *mellowSigner4Replacement
         getStorageAt:
         getThreshold: *MELLOW_PAUSER_THRESHOLD
         getTransactionHash:
         isModuleEnabled:
         isOwner:
-        nonce: 1
+        nonce: 2
         signedMessages:
       implementationChecks:
         VERSION:
