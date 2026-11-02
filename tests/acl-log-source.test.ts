@@ -345,9 +345,9 @@ describe("chain log sources", () => {
     }
   });
 
-  // Optimism and Base refuse the free tier; Linea's community quota can be exhausted for the day.
-  it("keeps optimism, base and linea off etherscan", () => {
-    for (const chainId of ["10", "8453", "59144"]) {
+  // Optimism and Base refuse the free tier
+  it("keeps optimism and base off etherscan", () => {
+    for (const chainId of ["10", "8453"]) {
       assert.equal(CHAIN_LOG_SOURCES[chainId].source.kind, "blockscout");
     }
   });

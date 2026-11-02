@@ -11,7 +11,7 @@ parameters:
   # Core
   - &lidoLocator "0xC1d0b3DE6792Bf6b4b37EccdcC24e45978Cfd2Eb"
   # External dependencies
-  - &curveAdmin "0x97aA696e37659Fb4f0B53824246d802Df40E980A"
+  - &curveAdmin "0xeDA0108D5bB8cdE2ba4A59E22F3Ed5d211C77187"
   - &curveTwocryptoFactory "0x98EE851a00abeE0d95D08cF4CA2BdCE32aeaAF7F"
   - &curveFeeReceiver "0xa2Bcd1a4Efbd04B63cd03f5aFf2561106ebCCE00"
   - &curveMathImplementation "0x1Fd8Af16DC4BEBd950521308D55d0543b6cDF4A1"
@@ -466,8 +466,8 @@ l1:
           - "0xCFfE0F3B089e46D8212408Ba061c425776E64322" # folkyatina
           - "0xdd19274b614b5ecAcf493Bc43C380ef6B8dfB56c" # ujenjt
           - "0x59F8D74Fe49d5ebEAc069E3baf07eB4b614BD5A7" # theDZhon
-          - "0x6f5c9B92DC47C89155930E708fBc305b55A5519A" # kadmil
-          - "0x2a61d3ba5030Ef471C74f612962c7367ECa3a62d" # psirex
+          - "0x989514afbf073ab4759e920729d93D1e4306d923" # dgusakov
+          - "0xeF83852FaBd22bda23857abF171e05Bae9463F95" # psirex
         getThreshold: 3
         VERSION: "1.3.0"
         getChainId: 1
