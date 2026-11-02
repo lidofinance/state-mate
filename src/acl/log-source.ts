@@ -23,8 +23,7 @@ interface ChainLogSource {
 }
 
 // etherscan v2's free tier serves most of these but refuses 10 and 8453 outright ("Free API
-// access is not supported for this chain"). Linea's community quota is exhausted independently
-// of the API key, so it also uses Blockscout. A chain absent from this table cannot be scanned
+// access is not supported for this chain"). A chain absent from this table cannot be scanned
 // at all, and the check records a skip rather than a pass.
 // The lag is roughly two minutes of wall time on each chain: enough to clear the explorer's
 // indexing delay and any shallow reorg.
@@ -35,7 +34,7 @@ export const CHAIN_LOG_SOURCES: Readonly<Record<string, ChainLogSource>> = {
   "4663": { confirmationLag: 1200, source: { kind: "etherscan" } },
   "8453": { confirmationLag: 60, source: { hostname: "base.blockscout.com", kind: "blockscout" } },
   "42161": { confirmationLag: 240, source: { kind: "etherscan" } },
-  "59144": { confirmationLag: 30, source: { hostname: "api-explorer.linea.build", kind: "blockscout" } },
+  "59144": { confirmationLag: 30, source: { kind: "etherscan" } },
   "560048": { confirmationLag: 8, source: { kind: "etherscan" } },
   "11155111": { confirmationLag: 8, source: { kind: "etherscan" } },
   "11155420": { confirmationLag: 60, source: { kind: "etherscan" } },

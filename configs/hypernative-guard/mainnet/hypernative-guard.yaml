@@ -350,6 +350,7 @@ l1:
         getThreshold: 5
         domainSeparator: *lidoLabsDomainSeparator
         getOwners:
+          - "0x2c1444892059c28b87b27228359D07eac64Cf07a"
           - "0xB95fdA03A90290Bd5853C79796a768E37130d193"
           - "0xf15f39f29b2C57Ab77745E73FD92f33aDA024791"
           - "0x48e6DC201c91BC67018566682defD37924f7bde3"

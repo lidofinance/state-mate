@@ -941,7 +941,7 @@ l1:
             1000000000000000,
             72000,
             3600,
-            172800,
+            72000,
           ]
         supportedAssetAt:
           - args: [0]
@@ -1481,7 +1481,7 @@ l1:
         getVerificationResult:
         hashCall:
         isAllowedCall:
-        merkleRoot: "0x96fa8812de8095a59158650e84eb67ae38e24b366d902ff29530e93b66c65a4d"
+        merkleRoot: "0x5ef4dd455960df7a961ad581850584596592ff651061ca44fe61d1c13055824e"
         vault: *earnUSDc_vault
         verifyCall:
       implementationChecks:
