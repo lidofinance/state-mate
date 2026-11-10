@@ -22,6 +22,7 @@ parameters:
   - &mellowSigner2 "0x185111c113d9B19Ea4C424D3cD8628A1ee09Be6A"
   - &mellowSigner3 "0x06C3992a6067bEA8FB3Af7F004EdEbC13656761F"
   - &mellowSigner4 "0x8888843c607F4Bbd6aD72128F478085256Bdd15D"
+  - &mellowSigner4Replacement "0x0C61C2a0DdD48C499e2732fE9D91cE56c195DBC3"
 
   # --- Lido signers ---
   - &lidoSigner1 "0x59F8D74Fe49d5ebEAc069E3baf07eB4b614BD5A7"
@@ -35,6 +36,7 @@ parameters:
   - &extMellowSigner3 "0x112C1aAB1463A32eD8B1f5F2e8b5244D876Ef740"
   - &extMellowSigner4 "0x1f3E4c3dBF27056CD7881D8eb376B1D7815757a6"
   - &extMellowSigner5 "0x5fa3B054D91aF2e1dC76124D7E774044697b942e"
+  - &extMellowSigner6 "0xE18c9C6250a6a4A82569F7dc46a7eeCc34A15112"
 
   # --- Ext Lido signers ---
   - &extLidoSigner1 "0x59d07dc34B135B17b87840a86BFF7302039E7EDf"
@@ -2284,8 +2286,8 @@ l1:
         getVerificationResult:
         hashCall:
         isAllowedCall:
-        # Mellow strETH config 1.5.1 (adds Aave V4 Spoke leaves), set on 2026-09-30 by lazyVaultAdmin tx 0x384de4cb7c02de6f19edd8f6aac407a4b47304e1d4d8353ddaac26a8fac7e1c2
-        merkleRoot: "0x8f90b8a9a85561cd879a41a8dc41ae0e3dae4c787dc8ae83613f4d6c12f28391"
+        # Set on 2026-10-28 by lazyVaultAdmin tx 0x02f1eba0e92b1b8afe7ef9a8abf994d0d9a8cecd2f0432dd8431e4e4d19298a7
+        merkleRoot: "0x57db71d7bce400c6f93e1c71da453fcb3a04ca485362388c401d8db099b60b2a"
         vault: *vault
         verifyCall:
       implementationChecks:
@@ -2545,9 +2547,9 @@ l1:
         getVerificationResult:
         hashCall:
         isAllowedCall:
-        # Mellow strETH config 1.5.1 (adds Aave V3 weETH/WETH leaves), set on 2026-09-30 by lazyVaultAdmin tx 0x384de4cb7c02de6f19edd8f6aac407a4b47304e1d4d8353ddaac26a8fac7e1c2
+        # Set on 2026-10-28 by lazyVaultAdmin tx 0x02f1eba0e92b1b8afe7ef9a8abf994d0d9a8cecd2f0432dd8431e4e4d19298a7
         # The Aave V3 leaves name subvault5 as onBehalfOf and as the withdraw recipient, not subvault7
-        merkleRoot: "0x6099333374aaef45bb3c82793d81fcdd12e282cddf4125072fb47b4ccbd19fe4"
+        merkleRoot: "0xc0f13e8bc6943d958aadeec26104096411ad6cc94c71bd1c34c645d1933c7c14"
         vault: *vault
         verifyCall:
       implementationChecks:
@@ -2689,7 +2691,7 @@ l1:
           - *mellowSigner2
           - *mellowSigner3
           - *mellowSigner1
-          - *mellowSigner4
+          - *mellowSigner4Replacement
         getStorageAt:
         getThreshold: *PROXY_ADMIN_THRESHOLD
         getTransactionHash:
@@ -2731,12 +2733,12 @@ l1:
         getModulesPaginated:
         getOwners:
           - *extMellowSigner1
-          - *extMellowSigner2
+          - *extMellowSigner6
           - *extMellowSigner3
           - *mellowSigner2
           - *mellowSigner3
           - *mellowSigner1
-          - *mellowSigner4
+          - *mellowSigner4Replacement
           - *extMellowSigner4
         getStorageAt:
         getThreshold: *LAZY_VAULT_ADMIN_THRESHOLD
@@ -2784,7 +2786,7 @@ l1:
           - *mellowSigner2
           - *mellowSigner3
           - *mellowSigner1
-          - *mellowSigner4
+          - *mellowSigner4Replacement
           - *extMellowSigner4
         getStorageAt:
         getThreshold: *ACTIVE_VAULT_ADMIN_THRESHOLD
@@ -2831,7 +2833,7 @@ l1:
           - *mellowSigner2
           - *mellowSigner3
           - *mellowSigner1
-          - *mellowSigner4
+          - *mellowSigner4Replacement
           - *extMellowSigner4
         getStorageAt:
         getThreshold: *ORACLE_UPDATER_THRESHOLD
@@ -2879,7 +2881,7 @@ l1:
           - *mellowSigner2
           - *mellowSigner3
           - *mellowSigner1
-          - *mellowSigner4
+          - *mellowSigner4Replacement
           - *extMellowSigner4
         getStorageAt:
         getThreshold: *CURATOR_THRESHOLD
@@ -3017,13 +3019,13 @@ l1:
           - *mellowSigner2
           - *mellowSigner3
           - *mellowSigner1
-          - *mellowSigner4
+          - *mellowSigner4Replacement
         getStorageAt:
         getThreshold: *MELLOW_PAUSER_THRESHOLD
         getTransactionHash:
         isModuleEnabled:
         isOwner:
-        nonce: 1
+        nonce: 2
         signedMessages:
       implementationChecks:
         VERSION:

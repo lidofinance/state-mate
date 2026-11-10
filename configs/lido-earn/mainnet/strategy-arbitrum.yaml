@@ -17,6 +17,7 @@ parameters:
   - &mellowSigner2 "0x185111c113d9B19Ea4C424D3cD8628A1ee09Be6A"
   - &mellowSigner3 "0x06C3992a6067bEA8FB3Af7F004EdEbC13656761F"
   - &mellowSigner4 "0x8888843c607F4Bbd6aD72128F478085256Bdd15D"
+  - &mellowSigner4Replacement "0x0C61C2a0DdD48C499e2732fE9D91cE56c195DBC3"
 
   # --- Lido signers ---
   - &lidoSigner1 "0x59F8D74Fe49d5ebEAc069E3baf07eB4b614BD5A7"
@@ -1454,7 +1455,7 @@ l1:
           - *mellowSigner2
           - *mellowSigner3
           - *mellowSigner1
-          - *mellowSigner4
+          - *mellowSigner4Replacement
         getStorageAt:
         getThreshold: *PROXY_ADMIN_THRESHOLD
         getTransactionHash:

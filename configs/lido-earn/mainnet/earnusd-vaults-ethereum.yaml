@@ -160,6 +160,7 @@ misc:
   - &mellowSigner2 "0x185111c113d9B19Ea4C424D3cD8628A1ee09Be6A"
   - &mellowSigner3 "0x06C3992a6067bEA8FB3Af7F004EdEbC13656761F"
   - &mellowSigner4 "0x8888843c607F4Bbd6aD72128F478085256Bdd15D"
+  - &mellowSigner4Replacement "0x0C61C2a0DdD48C499e2732fE9D91cE56c195DBC3"
 
   # --- Ext Mellow signers ---
   - &extMellowSigner1 "0x78Eb634731bE1957D370BEcbbD254F427Af5D13b"
@@ -939,7 +940,7 @@ l1:
             1000000000000000,
             72000,
             3600,
-            172800,
+            72000,
           ]
         supportedAssetAt:
           - args: [0]
@@ -1479,7 +1480,7 @@ l1:
         getVerificationResult:
         hashCall:
         isAllowedCall:
-        merkleRoot: "0x96fa8812de8095a59158650e84eb67ae38e24b366d902ff29530e93b66c65a4d"
+        merkleRoot: "0x5ef4dd455960df7a961ad581850584596592ff651061ca44fe61d1c13055824e"
         vault: *earnUSDc_vault
         verifyCall:
       implementationChecks:
@@ -3032,7 +3033,7 @@ l1:
           - *mellowSigner2
           - *mellowSigner3
           - *mellowSigner1
-          - *mellowSigner4
+          - *mellowSigner4Replacement
         getStorageAt:
         getThreshold: *PROXY_ADMIN_THRESHOLD
         getTransactionHash:
