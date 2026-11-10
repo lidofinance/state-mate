@@ -721,7 +721,7 @@ l1:
         getOwners:
           - *lidoSigner4
           - *lidoSigner6
-          - *lidoSigner9
+          - *lidoSigner13
           - *lidoSigner5
           - *lidoSigner2
           - *lidoSigner1

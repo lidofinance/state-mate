@@ -45,6 +45,7 @@ deployed-aux:
 eoa:
   # Active delegates.
   - &dsmGuardianLidoDevTeamDelegate "0x5ecf14e7a3831D44e2F7d4542Ba98C6c96E47420"
+  - &dsmGuardianP2pDelegate "0x20aB528Ba6c3323B5a54f0f146f9873aea7f0e96"
   - &dsmGuardianStakingFacilitiesDelegate "0x06d6c4F26354aA1426c0Abd79A5f18A5d5fF684f"
   - &dsmGuardianBlockscapeDelegate "0x6aF45f506fD171994D26d014Fc079137532Db219"
   - &dsmGuardianStakefishDelegate "0xA4512893C5B8BCD8E7AE1cAa56b8402951720D14"
@@ -53,9 +54,10 @@ eoa:
   - &oracleCaliberDelegate "0x82A821E8a2585D1AC8f346BE7Da6995490d21Ca6"
   - &oracleStakingFacilitiesDelegate "0x7abC999C7E1f22a7E12b2A1024bC17676FE18b4b"
   - &oracleChorusOneDelegate "0x5416CAAb6f37BF81cb2dc7ce0a363AfB9DD92d57"
+  - &oracleP2pDelegate "0x3f0dAF0066533bE244dBeF17fDD21fb1F24F41e0"
   - &oracleChainlayerDelegate "0x4D3aD7E8e591d389B612Fc063f53837E284d3F86"
   - &oracleBloxrouteDelegate "0x375ABa35EA2011Af97b51bd395494C827d1C39BD"
-  - &oracleMatrixedLinkDelegate "0xC10258969442c7957351A0ddc8194D2685B2a2c2"
+  - &oracleMatrixedLinkDelegate "0x0194Ab59A22b6787ef7529954142B269824551d2"
   - &oracleStakefishDelegate "0x2aE828F10DfeE5b4c42f6E61D3d30033D4520753"
   - &depositorDelegate "0x2df4013EF30b09100A027192E700114cD0D13900"
 
@@ -103,7 +105,7 @@ l1:
       address: *dsmGuardianP2p
       checks:
         getCooldown: *DELEGATION_COOLDOWN
-        getDelegate: *ZERO_ADDRESS
+        getDelegate: *dsmGuardianP2pDelegate
         getPendingDelegate: [*ZERO_ADDRESS, 0]
         isTerminated: false
         isValidSignature: *INVALID_SIGNATURE_CHECK
@@ -212,7 +214,7 @@ l1:
       address: *oracleP2p
       checks:
         getCooldown: *DELEGATION_COOLDOWN
-        getDelegate: *ZERO_ADDRESS
+        getDelegate: *oracleP2pDelegate
         getPendingDelegate: [*ZERO_ADDRESS, 0]
         isTerminated: false
         isValidSignature: *INVALID_SIGNATURE_CHECK
