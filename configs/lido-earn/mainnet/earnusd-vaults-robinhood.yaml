@@ -88,6 +88,7 @@ misc:
   - &lidoSigner10 "0xE6CD29BF19769E44534099d241abAa07aa8c8E9a"
   - &lidoSigner11 "0x8aA493BcD7f989caD67dd3CB48A4c2E6b40FeDB0"
   - &lidoSigner12 "0xf2374BCb265505002055942D070459a4d2011012"
+  - &lidoSigner13 "0x7a63a5cc7F6A6352d0Ae1fE175D745Bce5d75657"
   - &lidoPauserSigner2 "0x04e7C0350241b818eE5c92cc260008C9898F41cf"
   - &lidoPauserSigner3 "0xc7a8DE05264442A318189f2bd160d2830902C8CD"
 
@@ -844,7 +845,7 @@ l1:
           - *lidoSigner12
           - *lidoSigner4
           - *lidoSigner6
-          - *lidoSigner9
+          - *lidoSigner13
           - *lidoSigner2
           - *lidoSigner1
           - *lidoSigner7
@@ -882,7 +883,7 @@ l1:
           - args: [*SAFE_SENTINEL_MODULES, 10]
             result: [[], *SAFE_SENTINEL_MODULES]
         getOwners:
-          - *lidoSigner9
+          - *lidoSigner13
           - *lidoSigner12
           - *lidoSigner10
           - *lidoSigner11
