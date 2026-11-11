@@ -35,6 +35,8 @@ deployed:
     - &consolidationBusImplAddress "0x2908c4B32548D8799fDc601C1a75E7d5C2FbC556"
     - &consolidationMigrator "0x747d357F5b6410B80Eb63406FaC5E2A91131B4f8"
     - &consolidationMigratorImplAddress "0x8BF11ead77fFe142AB27BE486Bc5aB22D9baF520"
+    - &consolidationMigratorCMv2 "0xc8a7F4917cA03FDCD24a5E11A48Ab448318976e7"
+    - &consolidationMigratorCMv2ImplAddress "0x5D2DDD6817180c2135b4652503bD555c2d3Bb392"
     - &topUpGateway "0x10DBEb3367876826d00D21718D1d893e0fbD2956"
     - &topUpGatewayImplAddress "0x8621D8a402fdf2a131E38e16ac50f4C97660Fc2b"
     - &validatorExitDelayVerifier "0xa5F5A9360275390fF9728262a29384399f38d2f0"
@@ -3007,7 +3009,7 @@ l1:
       ozAcl:
         *DEFAULT_ADMIN_ROLE : [*aragonAgent]
         *CB_MANAGE_ROLE : []
-        *CB_PUBLISH_ROLE : [*consolidationMigrator]
+        *CB_PUBLISH_ROLE : [*consolidationMigrator, *consolidationMigratorCMv2]
         *CB_REMOVE_ROLE : [*curatedCircuitBreakerPauser]
       implementationChecks:
         DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
@@ -3056,6 +3058,50 @@ l1:
         getConsolidationBus: *consolidationBus # immutable
         getStakingRouter: *stakingRouter # immutable
         sourceModuleId: 1 # immutable
+        targetModuleId: 5 # immutable
+
+    # CMv2 -> CMv2 migrator: Curated Module v2 operators consolidate inside the module.
+    # The Curated Module Committee allows (N, N) pairs directly, without Easy Track.
+    consolidationMigratorCMv2:
+      name: ConsolidationMigrator
+      address: *consolidationMigratorCMv2
+      proxyName: OssifiableProxy
+      implementation: *consolidationMigratorCMv2ImplAddress
+      proxyChecks:
+        proxy__getAdmin: *aragonAgent
+        proxy__getImplementation: *consolidationMigratorCMv2ImplAddress
+        proxy__getIsOssified: false
+      checks:
+        DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
+        ALLOW_PAIR_ROLE: *CM_ALLOW_PAIR_ROLE
+        DISALLOW_PAIR_ROLE: *CM_DISALLOW_PAIR_ROLE
+        PUBKEY_LENGTH: 48
+        getConsolidationBus: *consolidationBus
+        getStakingRouter: *stakingRouter
+        sourceModuleId: 5 # Curated Module v2
+        targetModuleId: 5 # Curated Module v2
+        getAllowedTargets: null
+        getSubmitter: null
+        isPairAllowed: null
+        getRoleAdmin: null
+        getRoleMember: null
+        getRoleMemberCount: null
+        getRoleMembers: null
+        hasRole: null
+        supportsInterface: null
+      ozAcl:
+        *DEFAULT_ADMIN_ROLE : [*aragonAgent]
+        # Curated Module Committee: same Safe as *curatedCircuitBreakerPauser on Hoodi
+        *CM_ALLOW_PAIR_ROLE : [*curatedCircuitBreakerPauser]
+        *CM_DISALLOW_PAIR_ROLE : [*curatedCircuitBreakerPauser]
+      implementationChecks:
+        DEFAULT_ADMIN_ROLE: *ZERO_BYTES32
+        ALLOW_PAIR_ROLE: *CM_ALLOW_PAIR_ROLE
+        DISALLOW_PAIR_ROLE: *CM_DISALLOW_PAIR_ROLE
+        PUBKEY_LENGTH: 48
+        getConsolidationBus: *consolidationBus # immutable
+        getStakingRouter: *stakingRouter # immutable
+        sourceModuleId: 5 # immutable
         targetModuleId: 5 # immutable
 
     topUpGateway:
