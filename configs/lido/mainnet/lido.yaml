@@ -6978,10 +6978,7 @@ l1:
         DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
         DISALLOW_PAIR_ROLE: *DISALLOW_PAIR_ROLE
         PUBKEY_LENGTH: 48
-        getAllowedTargets:
-          # no pairs allowed yet; the Curated Module Committee adds them (ALLOW_PAIR_ROLE)
-          - args: [1]
-            result: []
+        getAllowedTargets: null # pairs change as the Curated Module Committee allows them
         getConsolidationBus: *consolidationBus
         getRoleAdmin:
           - args: [*DEFAULT_ADMIN_ROLE]
@@ -6994,13 +6991,9 @@ l1:
         getRoleMemberCount:
         getRoleMembers:
         getStakingRouter: *stakingRouter
-        getSubmitter:
-          - args: [1, 1]
-            result: *ZERO_ADDRESS
+        getSubmitter: null
         hasRole: null
-        isPairAllowed:
-          - args: [1, 1]
-            result: false
+        isPairAllowed: null
         sourceModuleId: 4 # CMv2 Mainnet StakingRouter
         supportsInterface:
         targetModuleId: 4 # CMv2 Mainnet StakingRouter
