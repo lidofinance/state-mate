@@ -154,7 +154,7 @@ deployed:
     - &curatedAccountingImplAddress "0x665eA8EFf296f67C59eda4F4130ba12De49c1cc3"
     - &curatedFeeOracle "0x5D2F27000C80f6f7A03015Fd49dB7FEba3fBfa83"
     - &curatedFeeOracleImplAddress "0x5AE7D76050f57D3c42931B3c845ec09b42c3370d"
-    - &curatedVerifier "0x209190Ebc2Be80367a15d05e626784Eb94d6A880"
+    - &curatedVerifier "0xd82f10880590dc6C67D1e84098357DBbc88058EA"
     - &curatedEjector "0xfDbde2B3554B69C84e0f8d7daB68D390Ff0f4394"
     - &curatedHashConsensus "0x920883908A78c1554f682006a8aB32E62Be09F33"
     # Internal sub-contracts of the curated module v2 (referenced as constants).
@@ -2773,7 +2773,7 @@ l1:
         isPaused: false
 
     curatedVerifier:
-      name: Verifier
+      name: CuratedVerifier
       address: *curatedVerifier
       checks:
         BEACON_ROOTS: *beaconRoots
@@ -2787,9 +2787,6 @@ l1:
         GI_FIRST_HISTORICAL_SUMMARY_PREV: "0x000000000000000000000000000000000000000000000000000000b600000018"
         GI_FIRST_VALIDATOR_CURR: *GI_FIRST_VALIDATOR_CURR
         GI_FIRST_VALIDATOR_PREV: *GI_FIRST_VALIDATOR_PREV
-        GI_FIRST_WITHDRAWAL_CURR: "0x000000000000000000000000000000000000000000000000000000000161c004"
-        GI_FIRST_WITHDRAWAL_PREV: "0x000000000000000000000000000000000000000000000000000000000161c004"
-        MIN_WITHDRAWAL_RATIO: 9950
         MODULE: *curatedModule
         PAUSE_INFINITELY: *MAX_UINT256
         PAUSE_ROLE: *CS_PAUSE_ROLE
@@ -2798,7 +2795,7 @@ l1:
         SLOTS_PER_EPOCH: *SLOTS_PER_EPOCH
         SLOTS_PER_HISTORICAL_ROOT: *SLOTS_PER_HISTORICAL_ROOT
         WITHDRAWAL_ADDRESS: *withdrawalVault
-        getResumeSinceTimestamp: null
+        getResumeSinceTimestamp: 0
         isPaused: false
         getRoleAdmin: null
         getRoleMember: null
@@ -4735,13 +4732,13 @@ l1:
           - *curatedModule
           - *curatedAccounting
           - *curatedFeeOracle
-          - *curatedVerifier
+          - *csm0x02Ejector
           - *curatedEjector
           - *csm0x02Module
           - *csm0x02Accounting
           - *csm0x02FeeOracle
           - *csm0x02Verifier
-          - *csm0x02Ejector
+          - *curatedVerifier
         getPauser:
           - args: [*withdrawalQueueERC721]
             result: *circuitBreakerCommittee
