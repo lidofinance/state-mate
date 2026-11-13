@@ -157,7 +157,7 @@ deployed:
     - &curatedMetaRegistryImpl "0x6d852907463496622bb5FE5bc55cc30C4682E10e"
     - &curatedValidatorStrikes "0xf4618370a1fBf46905B16C10817c8CFaD924D6db"
     - &curatedValidatorStrikesImpl "0x239Ee6ab18fB06370ad53Ce05097B32208fB0a30"
-    - &curatedVerifier "0xC392F457960f1B13Ebaf1aa6C065479dD507E1E3"
+    - &curatedVerifier "0x8c9C8c8C91D6de09D256264B33E7C54794feb033"
     - &professionalOperatorGate "0x6093EFA6B5E2FF3be54d1c895c9deA932805c49F"
     - &professionalTrustedOperatorGate "0x8c002c6eE10cf8adb78D1F9EB2e134FdaF8A7C1a"
     - &publicGoodOperatorGate "0x207798e6fD1aa7Ee8a63782A64c959cD6727b78C"
@@ -442,7 +442,6 @@ misc:
   - &CURATED_TRUSTED_BOND_CURVE_WEIGHT 100000
   - &CURATED_UNTRUSTED_BOND_CURVE_WEIGHT 50000
 
-  - &CURATED_MIN_WITHDRAWAL_RATIO 9950
   # --- SRv3 upgrade ---
   # System predeploys
   # EIP-7002 withdrawal requests
@@ -4147,7 +4146,7 @@ l1:
         verifyProof: null
 
     CuratedVerifier:
-      name: Verifier
+      name: CuratedVerifier
       address: *curatedVerifier
       checks:
         BEACON_ROOTS: *eip4788BeaconRootsContract
@@ -4161,9 +4160,6 @@ l1:
         GI_FIRST_HISTORICAL_SUMMARY_PREV: *GI_FIRST_HISTORICAL_SUMMARY_ELECTRA
         GI_FIRST_VALIDATOR_CURR: *GI_FIRST_VALIDATOR_ELECTRA
         GI_FIRST_VALIDATOR_PREV: *GI_FIRST_VALIDATOR_ELECTRA
-        GI_FIRST_WITHDRAWAL_CURR: *GI_FIRST_WITHDRAWAL_ELECTRA
-        GI_FIRST_WITHDRAWAL_PREV: *GI_FIRST_WITHDRAWAL_ELECTRA
-        MIN_WITHDRAWAL_RATIO: *CURATED_MIN_WITHDRAWAL_RATIO
         MODULE: *curatedModule
         PAUSE_INFINITELY: *MAX_UINT256
         PAUSE_ROLE: *SM_PAUSE_ROLE
