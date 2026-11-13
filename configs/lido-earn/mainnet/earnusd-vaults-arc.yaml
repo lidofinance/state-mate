@@ -765,8 +765,9 @@ l1:
     # === Admin Multisigs ===
     # =============================================
 
-    # WARN: on 2026-11-12 only the ProxyAdmin Safe has code on Arc. The owners
-    # and the threshold of each Safe are the launch state of the sibling chains.
+    # WARN: on 2026-11-13 only the ProxyAdmin, LazyAdmin, and Treasury Safes have
+    # code on Arc. LazyAdmin and Treasury have the owners of Ethereum. The owners
+    # and the threshold of each other Safe are the launch state of the sibling chains.
     proxyAdmin_multisig:
       name: GnosisSafe
       address: *proxyAdmin
@@ -833,10 +834,10 @@ l1:
           - args: [*SAFE_SENTINEL_MODULES, 10]
             result: [[], *SAFE_SENTINEL_MODULES]
         getOwners:
-          - *lidoSigner4
-          - *lidoSigner6
-          - *lidoSigner13
           - *lidoSigner5
+          - *lidoSigner13
+          - *lidoSigner6
+          - *lidoSigner4
           - *lidoSigner2
           - *lidoSigner1
           - *lidoSigner7
@@ -874,11 +875,11 @@ l1:
           - args: [*SAFE_SENTINEL_MODULES, 10]
             result: [[], *SAFE_SENTINEL_MODULES]
         getOwners:
-          - *lidoSigner13
-          - *lidoSigner12
-          - *lidoSigner6
           - *lidoSigner10
           - *lidoSigner11
+          - *lidoSigner6
+          - *lidoSigner12
+          - *lidoSigner13
           - *lidoSigner7
         getStorageAt:
         getThreshold: *TREASURY_THRESHOLD
