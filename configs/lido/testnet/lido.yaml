@@ -3078,8 +3078,8 @@ l1:
         getStakingRouter: *stakingRouter
         sourceModuleId: 5 # Curated Module v2
         targetModuleId: 5 # Curated Module v2
-        getAllowedTargets: null # reverts while no pairs are allowed
-        getSubmitter: null # reverts while unset
+        getAllowedTargets: null
+        getSubmitter: null
         isPairAllowed: null
         getRoleAdmin: null
         getRoleMember: null
@@ -3096,10 +3096,10 @@ l1:
         ALLOW_PAIR_ROLE: *CM_ALLOW_PAIR_ROLE
         DISALLOW_PAIR_ROLE: *CM_DISALLOW_PAIR_ROLE
         PUBKEY_LENGTH: 48
-        getConsolidationBus: *consolidationBus # immutable
-        getStakingRouter: *stakingRouter # immutable
-        sourceModuleId: 5 # immutable
-        targetModuleId: 5 # immutable
+        getConsolidationBus: *consolidationBus
+        getStakingRouter: *stakingRouter
+        sourceModuleId: 5
+        targetModuleId: 5
 
     topUpGateway:
       name: TopUpGateway
