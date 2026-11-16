@@ -66,9 +66,6 @@ l1:
             result: *DEFAULT_ADMIN_ROLE
           - args: [*SYNC_ROLE]
             result: *DEFAULT_ADMIN_ROLE
-      ozNonEnumerableAcl:
-        *DEFAULT_ADMIN_ROLE : [*l2GovernanceExecutor]
-        *SYNC_ROLE : [*l2SyncTrigger]
       implementationChecks:
         CCIP_ROUTER: *l2CcipRouter
         DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
