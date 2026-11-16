@@ -17,7 +17,6 @@ deployed:
     - &riskManagerImplementation "0x00000000CC26BC741E75B181738Ac2B16156179b"
 
     # --- Safe implementation ---
-    - &safeImpl_1_3_0 "0xd9Db270c1B5E3Bd161E8c8503c55cEABeE709552"
     - &safeImpl_1_4_1 "0x29fcB43b46531BcA003ddC8FCB67FFE91900C762"
 
     # --- earnUSDe Vault ---
@@ -768,15 +767,14 @@ l1:
     # WARN: on 2026-11-13 only the ProxyAdmin, LazyAdmin, and Treasury Safes have
     # code on Arc. LazyAdmin and Treasury have the owners of Ethereum. The owners
     # and the threshold of each other Safe are the launch state of the sibling chains.
-    # WARN: on 2026-11-16 the ProxyAdmin Safe on Arc is GnosisSafe 1.3.0, 2 of 4, with
-    # mellowSigner1-4 only; it owns the ProxyAdmin of each vault proxy. A signed and
-    # unexecuted Safe transaction (nonce 0) migrates it to SafeL2 1.4.1, as on the
-    # sibling chains. The owners and the threshold below are the launch state.
+    # WARN: on 2026-11-16 the ProxyAdmin Safe on Arc is SafeL2 1.4.1 (migrated at
+    # nonce 0), 2 of 4, with mellowSigner1-4 only; it owns the ProxyAdmin of each
+    # vault proxy. The owners and the threshold below are the launch state.
     proxyAdmin_multisig:
-      name: GnosisSafe
+      name: SafeL2
       address: *proxyAdmin
       proxyName: GnosisSafeProxy
-      implementation: *safeImpl_1_3_0
+      implementation: *safeImpl_1_4_1
       proxyChecks: {}
       storage:
         - slot: *SAFE_FALLBACK_HANDLER_SLOT
@@ -786,7 +784,7 @@ l1:
           expected: *ZERO_ADDRESS
           label: guard
       checks:
-        VERSION: 1.3.0
+        VERSION: 1.4.1
         approvedHashes:
         checkNSignatures:
         checkSignatures:
