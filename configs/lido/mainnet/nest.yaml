@@ -464,7 +464,7 @@ l1:
         # and rotation https://research.lido.fi/t/emergency-brakes-signer-rotation/5286
         getOwners:
           - "0xCFfE0F3B089e46D8212408Ba061c425776E64322" # folkyatina
-          - "0xdd19274b614b5ecAcf493Bc43C380ef6B8dfB56c" # ujenjt
+          - "0xcfc7834eb929e7E621F0Ba71d421A27Eddf6DDA1" # tamtamchik
           - "0x59F8D74Fe49d5ebEAc069E3baf07eB4b614BD5A7" # theDZhon
           - "0x989514afbf073ab4759e920729d93D1e4306d923" # dgusakov
           - "0xeF83852FaBd22bda23857abF171e05Bae9463F95" # psirex
