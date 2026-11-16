@@ -868,6 +868,8 @@ l1:
         getModulesPaginated:
           - args: [*SAFE_SENTINEL_MODULES, 10]
             result: [[], *SAFE_SENTINEL_MODULES]
+        # WARN: the result of Safe tx 0xb36b7a23…ee4a (nonce 1): it swaps skelneko for
+        # Sacha_G and removes lidoSigner8. Until it executes, this check fails.
         getOwners:
           - *lidoSigner13
           - *lidoSigner12
