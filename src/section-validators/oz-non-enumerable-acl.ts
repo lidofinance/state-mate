@@ -173,7 +173,7 @@ export class OzNonEnumerableAclSectionValidator extends SectionValidatorBase {
   }
 
   private async _scanRange(chainId: string, address: string): Promise<{ captured: number; explorer: ScanRange }> {
-    const deployed = await resolveDeploymentBlock(chainId, address);
+    const deployed = await resolveDeploymentBlock(chainId, address, this.provider);
     if (deployed === undefined) throw new Error(`the explorer would not give a deployment block for ${address}`);
     const bounds = await resolveScanBounds(chainId, this.provider);
     return { captured: bounds.captured, explorer: makeSettledScanRange(deployed, bounds.settled) };

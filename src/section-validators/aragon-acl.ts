@@ -99,7 +99,7 @@ export class AragonAclSectionValidator extends SectionValidatorBase {
     | { events: AragonEvent[]; fromBlock: number; ok: true; source: string; toBlock: number }
     | { ok: false; reason: string }
   > {
-    const fromBlock = await resolveDeploymentBlock(chainId, address);
+    const fromBlock = await resolveDeploymentBlock(chainId, address, this.provider);
     if (fromBlock === undefined) {
       return { ok: false, reason: `the explorer would not give a deployment block for ${address}` };
     }
