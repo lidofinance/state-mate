@@ -1,5 +1,5 @@
 # yaml-language-server: $schema=../../../schemas/main-schema.json
-# Expected state after Voting and DG execution of lidofinance/scripts PR #689.
+# Expected state after Voting and DG execution of lidofinance/scripts PR #699.
 ---
 deployed:
   l1:
@@ -142,7 +142,7 @@ deployed:
 
     # --- CMv2 ---
     - &curatedModule "0xDa5F930cE326EB5205085D66c72A4E79d60cB8C1"
-    - &curatedModuleImpl "0x959fc67fe53c8a6c7a1aed73430aa07a36ed9337"
+    - &curatedModuleImpl "0x02bEFd784c6C382a021774472563671Ae23980C0"
     - &curatedAccounting "0x2F91e3A8C5d6593bf4F8403fCfeCcd62dF59f6F6"
     - &curatedAccountingImpl "0xB41F5d2721906b3BE4fC7ae08261266C801076C2"
     - &curatedFeeDistributor "0x367d23c756599c20DCc8D6943F4976E8F88D60d7"
@@ -3109,6 +3109,7 @@ l1:
         ACCOUNTING: *curatedAccounting
         CREATE_NODE_OPERATOR_ROLE: *SM_CREATE_NODE_OPERATOR_ROLE
         DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        ENABLE_TOP_UP_ALLOCATION_ROLE: *SM_ENABLE_TOP_UP_ALLOCATION_ROLE
         EXIT_PENALTIES: *curatedExitPenalties
         FEE_DISTRIBUTOR: *curatedFeeDistributor
         LIDO_LOCATOR: *lidoLocator
@@ -3130,7 +3131,7 @@ l1:
         getActiveNodeOperatorsCount: null
         getDepositAllocationTargets: null
         getDepositsAllocation: null
-        getInitializedVersion: 1
+        getInitializedVersion: 2
         getKeyAllocatedBalances: null
         getKeyConfirmedBalances: null
         getNodeOperator: null
@@ -3172,6 +3173,8 @@ l1:
             args: [*STAKING_ROUTER_ROLE]
           - result: *DEFAULT_ADMIN_ROLE
             args: [*SM_VERIFIER_ROLE]
+          - result: *DEFAULT_ADMIN_ROLE
+            args: [*SM_ENABLE_TOP_UP_ALLOCATION_ROLE]
         getRoleMember: null
         getRoleMemberCount: null
         getRoleMembers: null
@@ -3183,6 +3186,7 @@ l1:
         getType: *CURATED_TYPE
         hasRole: null
         isPaused: false
+        isTopUpAllocationEnabled: null
         isValidatorExitDelayPenaltyApplicable: null
         isValidatorSlashed: null
         isValidatorWithdrawn: null
@@ -3216,6 +3220,7 @@ l1:
         ACCOUNTING: *curatedAccounting
         CREATE_NODE_OPERATOR_ROLE: *SM_CREATE_NODE_OPERATOR_ROLE
         DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        ENABLE_TOP_UP_ALLOCATION_ROLE: *SM_ENABLE_TOP_UP_ALLOCATION_ROLE
         EXIT_PENALTIES: *curatedExitPenalties
         FEE_DISTRIBUTOR: *curatedFeeDistributor
         LIDO_LOCATOR: *lidoLocator
@@ -3266,6 +3271,7 @@ l1:
         getType: *CURATED_TYPE
         hasRole: null
         isPaused: null
+        isTopUpAllocationEnabled: null
         isValidatorExitDelayPenaltyApplicable: null
         isValidatorSlashed: null
         isValidatorWithdrawn: null
@@ -6325,13 +6331,13 @@ l1:
           - *curatedModule
           - *curatedAccounting
           - *curatedFeeOracle
-          - *curatedVerifier
+          - *csm0x02Ejector
           - *curatedEjector
           - *csm0x02Module
           - *csm0x02Accounting
           - *csm0x02FeeOracle
           - *csm0x02Verifier
-          - *csm0x02Ejector
+          - *curatedVerifier
         getPauser:
           - args: [*withdrawalQueueERC721]
             result: *circuitBreakerCommittee
@@ -6842,8 +6848,7 @@ l1:
       ozAcl:
         *DEFAULT_ADMIN_ROLE : [*aragonAgent]
         *MANAGE_ROLE : []
-        # The omnibus vote grants PUBLISH_ROLE to *consolidationMigratorCMv2; add it here after enactment.
-        *PUBLISH_ROLE : [*consolidationMigrator]
+        *PUBLISH_ROLE : [*consolidationMigrator, *consolidationMigratorCMv2]
         *REMOVE_ROLE : [*curatedModuleCommittee]
       implementationChecks:
         DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
