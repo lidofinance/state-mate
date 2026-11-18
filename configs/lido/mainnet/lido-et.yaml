@@ -1,5 +1,5 @@
 # yaml-language-server: $schema=../../../schemas/main-schema.json
-# Expected state after Voting and DG execution of lidofinance/scripts PR #689.
+# Expected state after Voting and DG execution of lidofinance/scripts PR #699.
 
 parameters:
   - &trustedCaller "0x18A1065c81b0Cc356F1b1C843ddd5E14e4AefffF"
@@ -8,6 +8,7 @@ parameters:
   - &MAX_DEFAULT_TIER_SHARE_LIMIT "1000000000000000000000000"
   - &csmCommittee "0xC52fC3081123073078698F1EAc2f1Dc7Bd71880f"
   - &curatedModuleCommittee "0x2570e0b22AD904501dfB0d49575991ACB801dD91"
+  - &lidoLendCommittee "0x4f29aA4c299e17176b48c41D67ee97aE673d29bC"
   # https://research.lido.fi/t/community-staking-module/5917/231
   - &MAX_PRIORITY_EXIT_SHARE_THRESHOLD_DECREASE 60
   - &MAX_PRIORITY_EXIT_SHARE_THRESHOLD_INCREASE 60
@@ -44,6 +45,15 @@ misc:
   - &finance "0xB9E5CBB9CA5b0d659238807E84D0176930753d86"
   - &lolLdoTrustedCaller "0x87D93d9B2C672bf9c9642d853a8682546a5012B5"
 
+  - &lidoLend "0x026a770badc7126c7252Ef8d407E5b9C56147491"
+  - &lidoLendOwner "0x85378a1073E8f338e11A97E090E47e2F0FdD3D5a"
+  - &lidoLendIrmRouter "0x81B7cC9523B30429110282d90db2fa90ff443d91"
+  - &lidoLendAdaptiveCurveIrm "0xf6f1565F4fD3d29E6bDAb86764A50BCde381422f"
+  - &lidoLendMarketFactory "0xBe1C1eaBda3eD8a93D3CE3246cf4EeF8111c76C7"
+  - &lidoLendRiskStewardDashboard "0xC3C241bC213EF3ba16234A7c689999209cE515D7"
+  - &lidoLendCircuitBreaker "0xd0A81A130a303237d338A0b5835edcB011Ab3afd"
+  - &lidoLendPreseeder "0x3F107d1fbCA49F425321Cb27f6Ef5CbB94a72c41"
+
   # -- Max fees ---
   - &MAX_INFRA_FEE_BP "100" # 1%
   - &MAX_LIQUIDITY_FEE_BP "1000" # 10%
@@ -71,6 +81,12 @@ misc:
   - &CSM0X02_SETTLE_GENERAL_DELAYED_PENALTY_PERMISSIONS "0x792cd25e4ae3578375031fb55e048e163a804f7b187d9f92" # cast concat-hex "0x792Cd25e4aE3578375031FB55e048E163A804F7B" $(cast sig "settleGeneralDelayedPenalty(uint256[],uint256[])") | awk '{print tolower($0)}'
   - &CSM0X02_UPDATE_STAKING_MODULE_SHARE_LIMITS_PERMISSIONS "0x5b0de22e65c068430f6e769754d51133775408cc5adcee90fddf38947afb03c621c71b06c9c70bce73f1299913976a06" # cast concat-hex "0x5b0De22E65C068430f6e769754D51133775408cc" $(cast sig "validateParams((uint16,uint16,uint16,uint16))") "0xFdDf38947aFB03C621C71b06C9C70bce73f12999" $(cast sig "updateModuleShares(uint256,uint16,uint16)") | awk '{print tolower($0)}'
   - &LOL_LDO_TOP_UP_ALLOWED_RECIPIENTS_PERMISSIONS "0xb9e5cbb9ca5b0d659238807e84d0176930753d86f6364846f1e9c3bd021ed1419dd3b37f9b6e49eb662877fe66671229" # cast concat-hex "0xB9E5CBB9CA5b0d659238807E84D0176930753d86" $(cast sig "newImmediatePayment(address,address,uint256,string)") "0xf1e9c3bD021ED1419Dd3b37f9b6E49Eb662877Fe" $(cast sig "updateSpentAmount(uint256)") | awk '{print tolower($0)}'
+  - &LIDO_LEND_ACTIVATE_MARKET_PERMISSIONS "0xf6f1565f4fd3d29e6bdab86764a50bcde381422f2078614b81b7cc9523b30429110282d90db2fa90ff443d914451cfc585378a1073e8f338e11a97e090e47e2f0fdd3d5abee60e2ec3c241bc213ef3ba16234a7c689999209ce515d7182d4cbbd0a81a130a303237d338a0b5835edcb011ab3afd338d93fc3f107d1fbca49f425321cb27f6ef5cbb94a72c419e90390c85378a1073e8f338e11a97e090e47e2f0fdd3d5a2b4f013c" # cast concat-hex "0xf6f1565F4fD3d29E6bDAb86764A50BCde381422f" $(cast sig "applyIrmConfig((address,address,address,address,uint256),address)") "0x81B7cC9523B30429110282d90db2fa90ff443d91" $(cast sig "setMarketIrm((address,address,address,address,uint256),address)") "0x85378a1073E8f338e11A97E090E47e2F0FdD3D5a" $(cast sig "createMarket((address,address,address,address,uint256),address,bool)") "0xC3C241bC213EF3ba16234A7c689999209cE515D7" $(cast sig "addMarketSteward(bytes32,address)") "0xd0A81A130a303237d338A0b5835edcB011Ab3afd" $(cast sig "registerPauser(address,address)") "0x3F107d1fbCA49F425321Cb27f6Ef5CbB94a72c41" $(cast sig "preseedMarket((address,address,address,address,uint256),address)") "0x85378a1073E8f338e11A97E090E47e2F0FdD3D5a" $(cast sig "setFee((address,address,address,address,uint256),uint256)") | awk '{print tolower($0)}'
+  - &LIDO_LEND_CIRCUIT_BREAKER_ACTIONS_PERMISSIONS "0xd0a81a130a303237d338a0b5835edcb011ab3afd338d93fcd0a81a130a303237d338a0b5835edcb011ab3afdc9387332d0a81a130a303237d338a0b5835edcb011ab3afd71a99c22" # cast concat-hex "0xd0A81A130a303237d338A0b5835edcB011Ab3afd" $(cast sig "registerPauser(address,address)") "0xd0A81A130a303237d338A0b5835edcB011Ab3afd" $(cast sig "setPauseDuration(uint256)") "0xd0A81A130a303237d338A0b5835edcB011Ab3afd" $(cast sig "setHeartbeatInterval(uint256)") | awk '{print tolower($0)}'
+  - &LIDO_LEND_GUARDIAN_ACTIONS_PERMISSIONS "0x85378a1073e8f338e11a97e090e47e2f0fdd3d5a8543159685378a1073e8f338e11a97e090e47e2f0fdd3d5af3ad2cac85378a1073e8f338e11a97e090e47e2f0fdd3d5a3cab947d85378a1073e8f338e11a97e090e47e2f0fdd3d5ad9101d1785378a1073e8f338e11a97e090e47e2f0fdd3d5adf03d75d85378a1073e8f338e11a97e090e47e2f0fdd3d5a42abe0fd" # cast concat-hex "0x85378a1073E8f338e11A97E090E47e2F0FdD3D5a" $(cast sig "addGuardian(bytes32,address)") "0x85378a1073E8f338e11A97E090E47e2F0FdD3D5a" $(cast sig "setGuardiansQuorum(bytes32,uint256)") "0x85378a1073E8f338e11A97E090E47e2F0FdD3D5a" $(cast sig "removeGuardian(bytes32,address)") "0x85378a1073E8f338e11A97E090E47e2F0FdD3D5a" $(cast sig "replaceGuardian(bytes32,address,address)") "0x85378a1073E8f338e11A97E090E47e2F0FdD3D5a" $(cast sig "setGuardiansSuspectWindow(bytes32,uint256)") "0x85378a1073E8f338e11A97E090E47e2F0FdD3D5a" $(cast sig "unbanGuardianSignals(bytes32[],address)") | awk '{print tolower($0)}'
+  - &LIDO_LEND_MARKET_MANAGER_ACTIONS_PERMISSIONS "0x85378a1073e8f338e11a97e090e47e2f0fdd3d5a6835da9685378a1073e8f338e11a97e090e47e2f0fdd3d5a084f4e3f85378a1073e8f338e11a97e090e47e2f0fdd3d5a3d15094a85378a1073e8f338e11a97e090e47e2f0fdd3d5abf96eb0185378a1073e8f338e11a97e090e47e2f0fdd3d5ac49495df85378a1073e8f338e11a97e090e47e2f0fdd3d5a2b4f013c" # cast concat-hex "0x85378a1073E8f338e11A97E090E47e2F0FdD3D5a" $(cast sig "setInstantActivation(bytes32,address,bool)") "0x85378a1073E8f338e11A97E090E47e2F0FdD3D5a" $(cast sig "setMarketCollateralActivationConfig(bytes32,(uint40,uint40,uint128,uint128,uint40,uint128,uint40,uint40,uint40))") "0x85378a1073E8f338e11A97E090E47e2F0FdD3D5a" $(cast sig "setMarketSettlementConfig(bytes32,(uint16,uint96,uint96,uint16))") "0x85378a1073E8f338e11A97E090E47e2F0FdD3D5a" $(cast sig "setMarketSupplyCap(bytes32,uint256)") "0x85378a1073E8f338e11A97E090E47e2F0FdD3D5a" $(cast sig "unfreezeMarket(bytes32)") "0x85378a1073E8f338e11A97E090E47e2F0FdD3D5a" $(cast sig "setFee((address,address,address,address,uint256),uint256)") | awk '{print tolower($0)}'
+  - &LIDO_LEND_RISK_STEWARD_ACTIONS_PERMISSIONS "0xc3c241bc213ef3ba16234a7c689999209ce515d7182d4cbbc3c241bc213ef3ba16234a7c689999209ce515d79fdcc880" # cast concat-hex "0xC3C241bC213EF3ba16234A7c689999209cE515D7" $(cast sig "addMarketSteward(bytes32,address)") "0xC3C241bC213EF3ba16234A7c689999209cE515D7" $(cast sig "removeMarketSteward(bytes32,address)") | awk '{print tolower($0)}'
+  - &LIDO_LEND_APPLY_IRM_CONFIG_PERMISSIONS "0x026a770badc7126c7252ef8d407e5b9c56147491151c1adef6f1565f4fd3d29e6bdab86764a50bcde381422f2078614b" # cast concat-hex "0x026a770badc7126c7252Ef8d407E5b9C56147491" $(cast sig "accrueInterest((address,address,address,address,uint256))") "0xf6f1565F4fD3d29E6bDAb86764A50BCde381422f" $(cast sig "applyIrmConfig((address,address,address,address,uint256),address)") | awk '{print tolower($0)}'
 
 roles:
   - &ET_CANCEL_ROLE "0x9f959e00d95122f5cbd677010436cf273ef535b86b056afc172852144b9491d7"
@@ -114,6 +130,12 @@ deployed:
     - &newCuratedSubmitExitHashesFactory "0x4F716AD3Cc7A3A5cdA2359e5B2c84335c171dCde"
     - &lolLdoTopUpAllowedRecipients "0xa3e98cb26F1277B623Edb95cee3bd33269b305F7"
     - &lolLdoAllowedRecipientsRegistry "0xf1e9c3bD021ED1419Dd3b37f9b6E49Eb662877Fe"
+    - &lidoLendActivateMarket "0x17bb2A2B5983D29392A5d31D627D4C8B13383fe6"
+    - &lidoLendCircuitBreakerActions "0x4e89cc970F0DBAE2f8C38C083D5D345B4F9e76b8"
+    - &lidoLendGuardianActions "0x9fE41afb2114bF9430D7f9B1Fb65f0a4B9DeF779"
+    - &lidoLendMarketManagerActions "0x9D75EaE321976e85e472847AFD21246F1f87dC43"
+    - &lidoLendRiskStewardActions "0x7276CE5f92911216d41C7b0A9C3575DE873763E9"
+    - &lidoLendApplyIrmConfig "0x5795E73C0c2007ceD7D65cE4FC21c0C09F14C668"
 
 l1:
   rpcUrl: ETH_RPC_URL
@@ -202,6 +224,18 @@ l1:
           - args: [55]
             result: *lolLdoTopUpAllowedRecipients
           - args: [56]
+            result: *lidoLendActivateMarket
+          - args: [57]
+            result: *lidoLendCircuitBreakerActions
+          - args: [58]
+            result: *lidoLendGuardianActions
+          - args: [59]
+            result: *lidoLendMarketManagerActions
+          - args: [60]
+            result: *lidoLendRiskStewardActions
+          - args: [61]
+            result: *lidoLendApplyIrmConfig
+          - args: [62]
             mustRevert: true
         evmScriptFactoryPermissions:
           - args: [*setDepositsReserveTarget]
@@ -238,6 +272,18 @@ l1:
             result: *CSM0X02_UPDATE_STAKING_MODULE_SHARE_LIMITS_PERMISSIONS
           - args: [*lolLdoTopUpAllowedRecipients]
             result: *LOL_LDO_TOP_UP_ALLOWED_RECIPIENTS_PERMISSIONS
+          - args: [*lidoLendActivateMarket]
+            result: *LIDO_LEND_ACTIVATE_MARKET_PERMISSIONS
+          - args: [*lidoLendCircuitBreakerActions]
+            result: *LIDO_LEND_CIRCUIT_BREAKER_ACTIONS_PERMISSIONS
+          - args: [*lidoLendGuardianActions]
+            result: *LIDO_LEND_GUARDIAN_ACTIONS_PERMISSIONS
+          - args: [*lidoLendMarketManagerActions]
+            result: *LIDO_LEND_MARKET_MANAGER_ACTIONS_PERMISSIONS
+          - args: [*lidoLendRiskStewardActions]
+            result: *LIDO_LEND_RISK_STEWARD_ACTIONS_PERMISSIONS
+          - args: [*lidoLendApplyIrmConfig]
+            result: *LIDO_LEND_APPLY_IRM_CONFIG_PERMISSIONS
         getEVMScriptFactories:
           [
             *etFirstFactory,
@@ -296,6 +342,12 @@ l1:
             *csm0x02SettleGeneralDelayedPenalty,
             *csm0x02UpdateStakingModuleShareLimits,
             *lolLdoTopUpAllowedRecipients,
+            *lidoLendActivateMarket,
+            *lidoLendCircuitBreakerActions,
+            *lidoLendGuardianActions,
+            *lidoLendMarketManagerActions,
+            *lidoLendRiskStewardActions,
+            *lidoLendApplyIrmConfig,
           ]
         getMotion: null
         getMotions: null
@@ -360,6 +412,18 @@ l1:
           - args: [*csm0x02UpdateStakingModuleShareLimits]
             result: true
           - args: [*lolLdoTopUpAllowedRecipients]
+            result: true
+          - args: [*lidoLendActivateMarket]
+            result: true
+          - args: [*lidoLendCircuitBreakerActions]
+            result: true
+          - args: [*lidoLendGuardianActions]
+            result: true
+          - args: [*lidoLendMarketManagerActions]
+            result: true
+          - args: [*lidoLendRiskStewardActions]
+            result: true
+          - args: [*lidoLendApplyIrmConfig]
             result: true
         motionDuration: 259200
         motions: null
@@ -658,3 +722,78 @@ l1:
         stakingRouter: *stakingRouter
         trustedCaller: *sdvtTrustedCaller
         validatorsExitBusOracle: *validatorsExitBusOracle
+    LidoLendActivateMarket:
+      name: LidoLendActivateMarket
+      address: *lidoLendActivateMarket
+      checks:
+        circuitBreaker: *lidoLendCircuitBreaker
+        configurableIrm: *lidoLendAdaptiveCurveIrm
+        createEVMScript: null
+        decodeEVMScriptCallData: null
+        irmRouter: *lidoLendIrmRouter
+        lidoLend: *lidoLend
+        lidoLendMarketFactory: *lidoLendMarketFactory
+        lidoLendOwner: *lidoLendOwner
+        lidoLendPreseeder: *lidoLendPreseeder
+        riskStewardDashboard: *lidoLendRiskStewardDashboard
+        trustedCaller: *lidoLendCommittee
+    LidoLendCircuitBreakerActions:
+      name: LidoLendCircuitBreakerActions
+      address: *lidoLendCircuitBreakerActions
+      checks:
+        circuitBreaker: *lidoLendCircuitBreaker
+        createEVMScript: null
+        decodeConfigValuePayload: null
+        decodeEVMScriptCallData: null
+        decodeRegisterPauserPayload: null
+        lidoLend: *lidoLend
+        trustedCaller: *lidoLendCommittee
+    LidoLendGuardianActions:
+      name: LidoLendGuardianActions
+      address: *lidoLendGuardianActions
+      checks:
+        createEVMScript: null
+        decodeAddGuardianPayload: null
+        decodeEVMScriptCallData: null
+        decodeRemoveGuardianPayload: null
+        decodeReplaceGuardianPayload: null
+        decodeSetGuardiansQuorumPayload: null
+        decodeSetSuspectWindowPayload: null
+        decodeUnbanAccountsPayload: null
+        lidoLend: *lidoLend
+        lidoLendOwner: *lidoLendOwner
+        trustedCaller: *lidoLendCommittee
+    LidoLendMarketManagerActions:
+      name: LidoLendMarketManagerActions
+      address: *lidoLendMarketManagerActions
+      checks:
+        createEVMScript: null
+        decodeEVMScriptCallData: null
+        decodeSetCollateralActivationConfigPayload: null
+        decodeSetFeePayload: null
+        decodeSetInstantActivationPayload: null
+        decodeSetSettlementConfigPayload: null
+        decodeSetSupplyCapPayload: null
+        decodeUnfreezeMarketsPayload: null
+        lidoLend: *lidoLend
+        lidoLendOwner: *lidoLendOwner
+        trustedCaller: *lidoLendCommittee
+    LidoLendRiskStewardActions:
+      name: LidoLendRiskStewardActions
+      address: *lidoLendRiskStewardActions
+      checks:
+        createEVMScript: null
+        decodeEVMScriptCallData: null
+        decodeRiskStewardPayload: null
+        riskStewardDashboard: *lidoLendRiskStewardDashboard
+        trustedCaller: *lidoLendCommittee
+    LidoLendApplyIrmConfig:
+      name: LidoLendApplyIrmConfig
+      address: *lidoLendApplyIrmConfig
+      checks:
+        configurableIrm: *lidoLendAdaptiveCurveIrm
+        createEVMScript: null
+        decodeEVMScriptCallData: null
+        irmRouter: *lidoLendIrmRouter
+        lidoLend: *lidoLend
+        trustedCaller: *lidoLendCommittee

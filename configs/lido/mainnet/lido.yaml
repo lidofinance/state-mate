@@ -1,5 +1,5 @@
 # yaml-language-server: $schema=../../../schemas/main-schema.json
-# Expected state after Voting and DG execution of lidofinance/scripts PR #689.
+# Expected state after Voting and DG execution of lidofinance/scripts PR #699.
 ---
 deployed:
   l1:
@@ -35,6 +35,8 @@ deployed:
     - &consolidationBusImplAddress "0xFfDe8Acab9D7037f29198Ad03ad6d05bac8B0a2E"
     - &consolidationMigrator "0x9Dc70b5A4f4F5E4AF9058C983D560564F031f1D7"
     - &consolidationMigratorImplAddress "0x6Fb4c152F092373dD71f0C07C83c1E77406599aB"
+    - &consolidationMigratorCMv2 "0xc8a7F4917cA03FDCD24a5E11A48Ab448318976e7"
+    - &consolidationMigratorCMv2ImplAddress "0x5D2DDD6817180c2135b4652503bD555c2d3Bb392"
     - &beaconChainDepositor "0xf98AC162eAB766bDB9507c3584c00C535B8F6216"
     - &srLib "0xc0be9942Fd8f54aB126A5F0Ba649A90049ccad14"
 
@@ -140,7 +142,7 @@ deployed:
 
     # --- CMv2 ---
     - &curatedModule "0xDa5F930cE326EB5205085D66c72A4E79d60cB8C1"
-    - &curatedModuleImpl "0x959fc67fe53c8a6c7a1aed73430aa07a36ed9337"
+    - &curatedModuleImpl "0x02bEFd784c6C382a021774472563671Ae23980C0"
     - &curatedAccounting "0x2F91e3A8C5d6593bf4F8403fCfeCcd62dF59f6F6"
     - &curatedAccountingImpl "0xB41F5d2721906b3BE4fC7ae08261266C801076C2"
     - &curatedFeeDistributor "0x367d23c756599c20DCc8D6943F4976E8F88D60d7"
@@ -157,7 +159,7 @@ deployed:
     - &curatedMetaRegistryImpl "0x6d852907463496622bb5FE5bc55cc30C4682E10e"
     - &curatedValidatorStrikes "0xf4618370a1fBf46905B16C10817c8CFaD924D6db"
     - &curatedValidatorStrikesImpl "0x239Ee6ab18fB06370ad53Ce05097B32208fB0a30"
-    - &curatedVerifier "0xC392F457960f1B13Ebaf1aa6C065479dD507E1E3"
+    - &curatedVerifier "0x8c9C8c8C91D6de09D256264B33E7C54794feb033"
     - &professionalOperatorGate "0x6093EFA6B5E2FF3be54d1c895c9deA932805c49F"
     - &professionalTrustedOperatorGate "0x8c002c6eE10cf8adb78D1F9EB2e134FdaF8A7C1a"
     - &publicGoodOperatorGate "0x207798e6fD1aa7Ee8a63782A64c959cD6727b78C"
@@ -442,7 +444,6 @@ misc:
   - &CURATED_TRUSTED_BOND_CURVE_WEIGHT 100000
   - &CURATED_UNTRUSTED_BOND_CURVE_WEIGHT 50000
 
-  - &CURATED_MIN_WITHDRAWAL_RATIO 9950
   # --- SRv3 upgrade ---
   # System predeploys
   # EIP-7002 withdrawal requests
@@ -687,6 +688,7 @@ roles:
   - &SM_SET_OPERATOR_INFO_ROLE "0xa5d637221c1b6367879c2d833ce35c3f9149e645ec28f1c21dd81f6fec2344a7"
   - &SM_MANAGE_TOP_UP_QUEUE_ROLE "0x81511e3a8c7e2b344d3617cf758c2d428c80221db07b6540fad6be6136fbfd6f"
   - &SM_REWIND_TOP_UP_QUEUE_ROLE "0x97bfc32813cbc510bc652b4e968b6ba148512936cf0e860c71c2823d4a88990d"
+  - &SM_ENABLE_TOP_UP_ALLOCATION_ROLE "0xf541c17eb0542b50d1f6df03622f7d9ab80d01dffb50bbd033a4dd4c57f09889"
 
   # --- SRv3 upgrade ---
   # Common (Lido, VEBO, ConsolidationGateway, TopUpGateway)
@@ -1059,9 +1061,9 @@ l1:
         getModuleValidatorsBalance: null
         getNodeOperatorDigests: null
         getNodeOperatorSummary:
-          - args: [1, 21] # vote item 1.15: CMv1 operator 21, target limit 0, soft mode
+          - args: [1, 21] # PR #689 vote item 1.15: CMv1 operator 21, target limit 0, soft mode
             result: [1, 0, null, null, null, null, null, null]
-          - args: [4, 6] # vote item 1.16: CMv2 operator 6, target limit 0, soft mode
+          - args: [4, 6] # PR #689 vote item 1.16: CMv2 operator 6, target limit 0, soft mode
             result: [1, 0, null, null, null, null, null, null]
         getRoleAdmin: null
         getRoleMember: null
@@ -1082,7 +1084,7 @@ l1:
               [4, *curatedModule, 400, 600, 10000, 0, "curated-onchain-v2", null, null, null, 10000, 100, 75, 2, null]
           - args: [5]
             result:
-              [5, *csm0x02Module, 200, 800, 1, 0, "Community Staking 0x02", null, null, null, 240, 30, 25, 2, null]
+              [5, *csm0x02Module, 200, 800, 50, 0, "Community Staking 0x02", null, null, null, 240, 30, 25, 2, null]
         getStakingModuleActiveValidatorsCount: null
         getStakingModuleDigests: null
         getStakingModuleIds: [1, 2, 3, 4, 5]
@@ -3107,6 +3109,7 @@ l1:
         ACCOUNTING: *curatedAccounting
         CREATE_NODE_OPERATOR_ROLE: *SM_CREATE_NODE_OPERATOR_ROLE
         DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        ENABLE_TOP_UP_ALLOCATION_ROLE: *SM_ENABLE_TOP_UP_ALLOCATION_ROLE
         EXIT_PENALTIES: *curatedExitPenalties
         FEE_DISTRIBUTOR: *curatedFeeDistributor
         LIDO_LOCATOR: *lidoLocator
@@ -3128,7 +3131,7 @@ l1:
         getActiveNodeOperatorsCount: null
         getDepositAllocationTargets: null
         getDepositsAllocation: null
-        getInitializedVersion: 1
+        getInitializedVersion: 2
         getKeyAllocatedBalances: null
         getKeyConfirmedBalances: null
         getNodeOperator: null
@@ -3170,6 +3173,8 @@ l1:
             args: [*STAKING_ROUTER_ROLE]
           - result: *DEFAULT_ADMIN_ROLE
             args: [*SM_VERIFIER_ROLE]
+          - result: *DEFAULT_ADMIN_ROLE
+            args: [*SM_ENABLE_TOP_UP_ALLOCATION_ROLE]
         getRoleMember: null
         getRoleMemberCount: null
         getRoleMembers: null
@@ -3181,6 +3186,7 @@ l1:
         getType: *CURATED_TYPE
         hasRole: null
         isPaused: false
+        isTopUpAllocationEnabled: null
         isValidatorExitDelayPenaltyApplicable: null
         isValidatorSlashed: null
         isValidatorWithdrawn: null
@@ -3209,10 +3215,12 @@ l1:
         *SM_SETTLE_GENERAL_DELAYED_PENALTY_ROLE : [*evmScriptExecutor]
         *SM_VERIFIER_ROLE : [*curatedVerifier]
         *SM_OPERATOR_ADDRESSES_ADMIN_ROLE : []
+        *SM_ENABLE_TOP_UP_ALLOCATION_ROLE : [*curatedModuleCommittee]
       implementationChecks:
         ACCOUNTING: *curatedAccounting
         CREATE_NODE_OPERATOR_ROLE: *SM_CREATE_NODE_OPERATOR_ROLE
         DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        ENABLE_TOP_UP_ALLOCATION_ROLE: *SM_ENABLE_TOP_UP_ALLOCATION_ROLE
         EXIT_PENALTIES: *curatedExitPenalties
         FEE_DISTRIBUTOR: *curatedFeeDistributor
         LIDO_LOCATOR: *lidoLocator
@@ -3263,6 +3271,7 @@ l1:
         getType: *CURATED_TYPE
         hasRole: null
         isPaused: null
+        isTopUpAllocationEnabled: null
         isValidatorExitDelayPenaltyApplicable: null
         isValidatorSlashed: null
         isValidatorWithdrawn: null
@@ -4147,7 +4156,7 @@ l1:
         verifyProof: null
 
     CuratedVerifier:
-      name: Verifier
+      name: CuratedVerifier
       address: *curatedVerifier
       checks:
         BEACON_ROOTS: *eip4788BeaconRootsContract
@@ -4161,9 +4170,6 @@ l1:
         GI_FIRST_HISTORICAL_SUMMARY_PREV: *GI_FIRST_HISTORICAL_SUMMARY_ELECTRA
         GI_FIRST_VALIDATOR_CURR: *GI_FIRST_VALIDATOR_ELECTRA
         GI_FIRST_VALIDATOR_PREV: *GI_FIRST_VALIDATOR_ELECTRA
-        GI_FIRST_WITHDRAWAL_CURR: *GI_FIRST_WITHDRAWAL_ELECTRA
-        GI_FIRST_WITHDRAWAL_PREV: *GI_FIRST_WITHDRAWAL_ELECTRA
-        MIN_WITHDRAWAL_RATIO: *CURATED_MIN_WITHDRAWAL_RATIO
         MODULE: *curatedModule
         PAUSE_INFINITELY: *MAX_UINT256
         PAUSE_ROLE: *SM_PAUSE_ROLE
@@ -6325,13 +6331,13 @@ l1:
           - *curatedModule
           - *curatedAccounting
           - *curatedFeeOracle
-          - *curatedVerifier
+          - *csm0x02Ejector
           - *curatedEjector
           - *csm0x02Module
           - *csm0x02Accounting
           - *csm0x02FeeOracle
           - *csm0x02Verifier
-          - *csm0x02Ejector
+          - *curatedVerifier
         getPauser:
           - args: [*withdrawalQueueERC721]
             result: *circuitBreakerCommittee
@@ -6842,7 +6848,7 @@ l1:
       ozAcl:
         *DEFAULT_ADMIN_ROLE : [*aragonAgent]
         *MANAGE_ROLE : []
-        *PUBLISH_ROLE : [*consolidationMigrator]
+        *PUBLISH_ROLE : [*consolidationMigrator, *consolidationMigratorCMv2]
         *REMOVE_ROLE : [*curatedModuleCommittee]
       implementationChecks:
         DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
@@ -6937,6 +6943,84 @@ l1:
         getConsolidationBus: *consolidationBus # immutable
         getStakingRouter: *stakingRouter # immutable
         sourceModuleId: 1 # immutable, CMv1 (NOR)
+        targetModuleId: 4 # immutable, CMv2
+        getRoleMemberCount:
+          - args: [*DEFAULT_ADMIN_ROLE]
+            result: 0
+          - args: [*ALLOW_PAIR_ROLE]
+            result: 0
+          - args: [*DISALLOW_PAIR_ROLE]
+            result: 0
+        getRoleMembers:
+          - args: [*DEFAULT_ADMIN_ROLE]
+            result: []
+        hasRole:
+          - args: [*DEFAULT_ADMIN_ROLE, *aragonAgent]
+            result: false
+
+    # CMv2 -> CMv2 migrator: Curated Module v2 operators consolidate inside the module.
+    # The Curated Module Committee allows (N, N) pairs directly, without Easy Track.
+    consolidationMigratorCMv2:
+      name: ConsolidationMigrator
+      address: *consolidationMigratorCMv2
+      proxyName: OssifiableProxy
+      implementation: *consolidationMigratorCMv2ImplAddress
+      proxyChecks:
+        proxy__getAdmin: *aragonAgent
+        proxy__getImplementation: *consolidationMigratorCMv2ImplAddress
+        proxy__getIsOssified: false
+      storage:
+        - slot: *EIP1967_ADMIN_SLOT
+          expected: *aragonAgent
+          label: admin
+        - slot: *EIP1967_IMPLEMENTATION_SLOT
+          expected: *consolidationMigratorCMv2ImplAddress
+          label: implementation
+      checks:
+        ALLOW_PAIR_ROLE: *ALLOW_PAIR_ROLE
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        DISALLOW_PAIR_ROLE: *DISALLOW_PAIR_ROLE
+        PUBKEY_LENGTH: 48
+        getAllowedTargets: null # pairs change as the Curated Module Committee allows them
+        getConsolidationBus: *consolidationBus
+        getRoleAdmin:
+          - args: [*DEFAULT_ADMIN_ROLE]
+            result: *DEFAULT_ADMIN_ROLE
+          - args: [*ALLOW_PAIR_ROLE]
+            result: *DEFAULT_ADMIN_ROLE
+          - args: [*DISALLOW_PAIR_ROLE]
+            result: *DEFAULT_ADMIN_ROLE
+        getRoleMember:
+        getRoleMemberCount:
+        getRoleMembers:
+        getStakingRouter: *stakingRouter
+        getSubmitter: null
+        hasRole: null
+        isPairAllowed: null
+        sourceModuleId: 4 # CMv2 Mainnet StakingRouter
+        supportsInterface:
+        targetModuleId: 4 # CMv2 Mainnet StakingRouter
+      ozAcl:
+        *DEFAULT_ADMIN_ROLE : [*aragonAgent]
+        *ALLOW_PAIR_ROLE : [*curatedModuleCommittee]
+        *DISALLOW_PAIR_ROLE : [*curatedModuleCommittee]
+      implementationChecks:
+        getAllowedTargets:
+          - args: [1]
+            result: []
+        getSubmitter:
+          - args: [1, 1]
+            result: *ZERO_ADDRESS
+        isPairAllowed:
+          - args: [1, 1]
+            result: false
+        ALLOW_PAIR_ROLE: *ALLOW_PAIR_ROLE
+        DEFAULT_ADMIN_ROLE: *DEFAULT_ADMIN_ROLE
+        DISALLOW_PAIR_ROLE: *DISALLOW_PAIR_ROLE
+        PUBKEY_LENGTH: 48
+        getConsolidationBus: *consolidationBus # immutable
+        getStakingRouter: *stakingRouter # immutable
+        sourceModuleId: 4 # immutable, CMv2
         targetModuleId: 4 # immutable, CMv2
         getRoleMemberCount:
           - args: [*DEFAULT_ADMIN_ROLE]
