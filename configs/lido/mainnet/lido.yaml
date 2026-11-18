@@ -1084,7 +1084,7 @@ l1:
               [4, *curatedModule, 400, 600, 10000, 0, "curated-onchain-v2", null, null, null, 10000, 100, 75, 2, null]
           - args: [5]
             result:
-              [5, *csm0x02Module, 200, 800, 1, 0, "Community Staking 0x02", null, null, null, 240, 30, 25, 2, null]
+              [5, *csm0x02Module, 200, 800, 50, 0, "Community Staking 0x02", null, null, null, 240, 30, 25, 2, null]
         getStakingModuleActiveValidatorsCount: null
         getStakingModuleDigests: null
         getStakingModuleIds: [1, 2, 3, 4, 5]
