@@ -31,6 +31,7 @@ export const CHAIN_LOG_SOURCES: Readonly<Record<string, ChainLogSource>> = {
   "1": { confirmationLag: 8, source: { kind: "etherscan" } },
   "10": { confirmationLag: 60, source: { hostname: "explorer.optimism.io", kind: "blockscout" } },
   "130": { confirmationLag: 120, source: { kind: "etherscan" } },
+  "988": { confirmationLag: 180, source: { kind: "etherscan" } },
   "4663": { confirmationLag: 1200, source: { kind: "etherscan" } },
   "8453": { confirmationLag: 60, source: { hostname: "base.blockscout.com", kind: "blockscout" } },
   "42161": { confirmationLag: 240, source: { kind: "etherscan" } },

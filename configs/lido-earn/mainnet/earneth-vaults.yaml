@@ -258,17 +258,17 @@ l1:
           - args: [2]
             result: *wsteth
           - args: [3]
-            result: *ggv
+            result: *dVstETH
           - args: [4]
             result: *streth
           - args: [5]
-            result: *dVstETH
+            mustRevert: true
         claimableSharesOf:
         defaultDepositHook: *redirectingDepositHook
         defaultRedeemHook: *basicRedeemHook
         depositQueueFactory: *depositQueueFactory
         feeManager: *feeManager
-        getAssetCount: 6
+        getAssetCount: 5
         getHook:
           # Deposit queues → redirectingDepositHook
           - args: [*depositQueueETH]
@@ -283,10 +283,6 @@ l1:
             result: *redirectingDepositHook
           - args: [*syncDepositQueueWstETH]
             result: *redirectingDepositHook
-          - args: [*depositQueueGG]
-            result: *redirectingDepositHook
-          - args: [*syncDepositQueueGG]
-            result: *redirectingDepositHook
           - args: [*depositQueueStrETH]
             result: *redirectingDepositHook
           - args: [*syncDepositQueueStrETH]
@@ -298,7 +294,7 @@ l1:
           # Redeem queue → basicRedeemHook
           - args: [*redeemQueueWstETH]
             result: *basicRedeemHook
-        getQueueCount: 14
+        getQueueCount: 12
         getLiquidAssets:
         getRoleAdmin:
         getRoleMember:
@@ -313,7 +309,7 @@ l1:
           - args: [*wsteth]
             result: true
           - args: [*ggv]
-            result: true
+            result: false
           - args: [*streth]
             result: true
           - args: [*dVstETH]
@@ -336,9 +332,9 @@ l1:
           - args: [*syncRedeemQueueWstETH]
             result: true
           - args: [*depositQueueGG]
-            result: true
+            result: false
           - args: [*syncDepositQueueGG]
-            result: true
+            result: false
           - args: [*depositQueueStrETH]
             result: true
           - args: [*syncDepositQueueStrETH]
@@ -368,9 +364,9 @@ l1:
           - args: [*syncDepositQueueWstETH]
             result: true
           - args: [*depositQueueGG]
-            result: true
+            result: false
           - args: [*syncDepositQueueGG]
-            result: true
+            result: false
           - args: [*depositQueueStrETH]
             result: true
           - args: [*syncDepositQueueStrETH]
@@ -399,10 +395,6 @@ l1:
           - args: [*syncDepositQueueWstETH]
             result: false
           - args: [*syncRedeemQueueWstETH]
-            result: false
-          - args: [*depositQueueGG]
-            result: false
-          - args: [*syncDepositQueueGG]
             result: false
           - args: [*depositQueueStrETH]
             result: false
@@ -434,11 +426,6 @@ l1:
             result: *syncDepositQueueWstETH
           - args: [*wsteth, 3]
             result: *syncRedeemQueueWstETH
-          # GGV - depositQueue + syncDepositQueue
-          - args: [*ggv, 0]
-            result: *depositQueueGG
-          - args: [*ggv, 1]
-            result: *syncDepositQueueGG
           # STRETH - depositQueue + syncDepositQueue
           - args: [*streth, 0]
             result: *depositQueueStrETH
@@ -995,7 +982,7 @@ l1:
           - args: [*wsteth]
             result: true
           - args: [*ggv]
-            result: true
+            result: false
           - args: [*streth]
             result: true
           - args: [*dVstETH]
@@ -1010,14 +997,12 @@ l1:
           - args: [2]
             result: *wsteth
           - args: [3]
-            result: *ggv
+            result: *dVstETH
           - args: [4]
             result: *streth
           - args: [5]
-            result: *dVstETH
-          - args: [6]
             mustRevert: true
-        supportedAssets: 6
+        supportedAssets: 5
         validatePrice:
         vault: *vault
       implementationChecks:
