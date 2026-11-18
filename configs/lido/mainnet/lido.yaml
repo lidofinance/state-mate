@@ -1061,9 +1061,9 @@ l1:
         getModuleValidatorsBalance: null
         getNodeOperatorDigests: null
         getNodeOperatorSummary:
-          - args: [1, 21] # vote item 1.15: CMv1 operator 21, target limit 0, soft mode
+          - args: [1, 21] # PR #689 vote item 1.15: CMv1 operator 21, target limit 0, soft mode
             result: [1, 0, null, null, null, null, null, null]
-          - args: [4, 6] # vote item 1.16: CMv2 operator 6, target limit 0, soft mode
+          - args: [4, 6] # PR #689 vote item 1.16: CMv2 operator 6, target limit 0, soft mode
             result: [1, 0, null, null, null, null, null, null]
         getRoleAdmin: null
         getRoleMember: null
