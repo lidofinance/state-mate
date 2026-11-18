@@ -331,29 +331,34 @@ describe("truncation defence", () => {
 });
 
 describe("chain log sources", () => {
-  it("scans Stable role grants through Etherscan V2", async () => {
-    resetRequestSlots();
-    const seen: URL[] = [];
-    const fetchMock = mock.method(globalThis, "fetch", async (url: Parameters<typeof fetch>[0]) => {
-      seen.push(new URL(String(url)));
-      return Response.json({ status: "0", message: "No records found", result: [] });
-    });
-    try {
-      assert.deepEqual(await collectRoleEvents("988", CONTRACT, { fromBlock: 1, toBlock: 1 }), {
-        ok: true,
-        events: [],
-        source: "etherscan-v2(chainId=988)",
-      });
-      assert.equal(seen.length, 1);
-      assert.equal(seen[0].hostname, "api.etherscan.io");
-      assert.equal(seen[0].pathname, "/v2/api");
-      assert.equal(seen[0].searchParams.get("chainid"), "988");
-      assert.equal(seen[0].searchParams.get("topic0"), ROLE_GRANTED_TOPIC);
-    } finally {
-      fetchMock.mock.restore();
+  for (const [chainId, chainName] of [
+    ["988", "Stable"],
+    ["999", "HyperEVM"],
+  ]) {
+    it(`scans ${chainName} role grants through Etherscan V2`, async () => {
       resetRequestSlots();
-    }
-  });
+      const seen: URL[] = [];
+      const fetchMock = mock.method(globalThis, "fetch", async (url: Parameters<typeof fetch>[0]) => {
+        seen.push(new URL(String(url)));
+        return Response.json({ status: "0", message: "No records found", result: [] });
+      });
+      try {
+        assert.deepEqual(await collectRoleEvents(chainId, CONTRACT, { fromBlock: 1, toBlock: 1 }), {
+          ok: true,
+          events: [],
+          source: `etherscan-v2(chainId=${chainId})`,
+        });
+        assert.equal(seen.length, 1);
+        assert.equal(seen[0].hostname, "api.etherscan.io");
+        assert.equal(seen[0].pathname, "/v2/api");
+        assert.equal(seen[0].searchParams.get("chainid"), chainId);
+        assert.equal(seen[0].searchParams.get("topic0"), ROLE_GRANTED_TOPIC);
+      } finally {
+        fetchMock.mock.restore();
+        resetRequestSlots();
+      }
+    });
+  }
 
   it("gives every supported chain a source and a confirmation lag", () => {
     for (const [chainId, chain] of Object.entries(CHAIN_LOG_SOURCES)) {
