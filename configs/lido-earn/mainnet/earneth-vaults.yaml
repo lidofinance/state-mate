@@ -544,7 +544,7 @@ l1:
         *SET_QUEUE_STATUS_ROLE : [*timelockController, *lazyVaultAdmin]
         *SUBMIT_REPORTS_ROLE : [*oracleSubmitter]
         *ACCEPT_REPORT_ROLE : [*oracleSubmitter]
-        *SET_SECURITY_PARAMS_ROLE : [*activeVaultAdmin]
+        *SET_SECURITY_PARAMS_ROLE : [*lazyVaultAdmin]
 
     depositQueueETH:
       name: DepositQueue
