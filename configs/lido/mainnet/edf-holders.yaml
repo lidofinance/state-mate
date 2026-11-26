@@ -51,7 +51,7 @@ eoa:
   - &dsmGuardianStakefishDelegate "0xA4512893C5B8BCD8E7AE1cAa56b8402951720D14"
   - &dsmGuardianStakelyDelegate "0xc04c1979e37e53FD21E40bd089D311EEfFdb4E00"
   - &oracleInstadappDelegate "0x5595033F304217aFDB8ffB35E42C22B72184730b"
-  - &oracleCaliberDelegate "0x82A821E8a2585D1AC8f346BE7Da6995490d21Ca6"
+  - &oracleCaliberDelegate "0x2d79aBE30287636408dD14B2a3175D37FA4cC9FE"
   - &oracleStakingFacilitiesDelegate "0x7abC999C7E1f22a7E12b2A1024bC17676FE18b4b"
   - &oracleChorusOneDelegate "0x5416CAAb6f37BF81cb2dc7ce0a363AfB9DD92d57"
   - &oracleP2pDelegate "0x3f0dAF0066533bE244dBeF17fDD21fb1F24F41e0"
