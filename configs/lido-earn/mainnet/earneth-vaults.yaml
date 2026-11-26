@@ -133,6 +133,7 @@ misc:
   - &extMellowSigner3 "0x112C1aAB1463A32eD8B1f5F2e8b5244D876Ef740"
   - &extMellowSigner4 "0x1f3E4c3dBF27056CD7881D8eb376B1D7815757a6"
   - &extMellowSigner5 "0x5fa3B054D91aF2e1dC76124D7E774044697b942e"
+  - &extMellowSigner7 "0xD7345bcD09b1B22936C10C2a8dc3D67bbBfc509C"
 
   # --- EIP-1967 Storage Slots ---
   - &EIP1967_IMPLEMENTATION_SLOT "0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc"
@@ -448,6 +449,8 @@ l1:
         subvaultFactory: *subvaultFactory
         subvaults: 2
         supportedRoleAt:
+          - args: [14]
+            result: *SET_SECURITY_PARAMS_ROLE
           - args: [13]
             result: *ACCEPT_REPORT_ROLE
           - args: [12]
@@ -476,7 +479,7 @@ l1:
             result: *SET_VAULT_LIMIT_ROLE
           - args: [0]
             result: *DEFAULT_ADMIN_ROLE
-        supportedRoles: 14
+        supportedRoles: 15
         supportsInterface:
         verifierFactory: *verifierFactory
       implementationChecks:
@@ -541,7 +544,7 @@ l1:
         *SET_QUEUE_STATUS_ROLE : [*timelockController, *lazyVaultAdmin]
         *SUBMIT_REPORTS_ROLE : [*oracleSubmitter]
         *ACCEPT_REPORT_ROLE : [*oracleSubmitter]
-        *SET_SECURITY_PARAMS_ROLE : []
+        *SET_SECURITY_PARAMS_ROLE : [*lazyVaultAdmin]
 
     depositQueueETH:
       name: DepositQueue
@@ -988,7 +991,7 @@ l1:
           - args: [*dVstETH]
             result: true
         # securityParams: [maxAbsDeviation, suspAbsDeviation, maxRelDeviationD18, suspRelDeviationD18, timeout, depositInterval, redeemInterval]
-        securityParams: [5000000000000000, 1000000000000000, 5000000000000000, 1000000000000000, 72000, 3600, 86400]
+        securityParams: [5000000000000000, 1000000000000000, 5000000000000000, 1000000000000000, 72000, 3600, 43200]
         supportedAssetAt:
           - args: [0]
             result: *ETH
@@ -1595,7 +1598,7 @@ l1:
         getOwners:
           - *extMellowSigner1
           - *extMellowSigner5
-          - *extMellowSigner2
+          - *extMellowSigner7
           - *mellowSigner2
           - *mellowSigner3
           - *mellowSigner1

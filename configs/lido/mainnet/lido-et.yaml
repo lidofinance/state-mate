@@ -201,7 +201,7 @@ l1:
             result: *csm0x02UpdateStakingModuleShareLimits
           - args: [55]
             result: *lolLdoTopUpAllowedRecipients
-          - args: [56]
+          - args: [62]
             mustRevert: true
         evmScriptFactoryPermissions:
           - args: [*setDepositsReserveTarget]
@@ -296,6 +296,12 @@ l1:
             *csm0x02SettleGeneralDelayedPenalty,
             *csm0x02UpdateStakingModuleShareLimits,
             *lolLdoTopUpAllowedRecipients,
+            "0x17bb2A2B5983D29392A5d31D627D4C8B13383fe6",
+            "0x4e89cc970F0DBAE2f8C38C083D5D345B4F9e76b8",
+            "0x9fE41afb2114bF9430D7f9B1Fb65f0a4B9DeF779",
+            "0x9D75EaE321976e85e472847AFD21246F1f87dC43",
+            "0x7276CE5f92911216d41C7b0A9C3575DE873763E9",
+            "0x5795E73C0c2007ceD7D65cE4FC21c0C09F14C668",
           ]
         getMotion: null
         getMotions: null

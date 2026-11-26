@@ -169,6 +169,7 @@ misc:
   - &extMellowSigner3 "0x112C1aAB1463A32eD8B1f5F2e8b5244D876Ef740"
   - &extMellowSigner4 "0x1f3E4c3dBF27056CD7881D8eb376B1D7815757a6"
   - &extMellowSigner5 "0x5fa3B054D91aF2e1dC76124D7E774044697b942e"
+  - &extMellowSigner7 "0xD7345bcD09b1B22936C10C2a8dc3D67bbBfc509C"
 
   # --- Tokens ---
   - &usdc "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
@@ -941,7 +942,7 @@ l1:
             1000000000000000,
             72000,
             3600,
-            72000,
+            43200,
           ]
         supportedAssetAt:
           - args: [0]
@@ -3317,7 +3318,7 @@ l1:
         getOwners:
           - *extMellowSigner1
           - *extMellowSigner5
-          - *extMellowSigner2
+          - *extMellowSigner7
           - *mellowSigner2
           - *mellowSigner3
           - *mellowSigner4
@@ -3365,7 +3366,7 @@ l1:
         getOwners:
           - *extMellowSigner1
           - *extMellowSigner5
-          - *extMellowSigner2
+          - *extMellowSigner7
           - *mellowSigner2
           - *mellowSigner3
           - *mellowSigner1

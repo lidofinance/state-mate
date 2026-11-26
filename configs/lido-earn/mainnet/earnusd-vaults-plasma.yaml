@@ -111,6 +111,7 @@ misc:
   - &extMellowSigner3 "0x112C1aAB1463A32eD8B1f5F2e8b5244D876Ef740"
   - &extMellowSigner4 "0x1f3E4c3dBF27056CD7881D8eb376B1D7815757a6"
   - &extMellowSigner5 "0x5fa3B054D91aF2e1dC76124D7E774044697b942e"
+  - &extMellowSigner7 "0xD7345bcD09b1B22936C10C2a8dc3D67bbBfc509C"
 
   # --- Deployer ---
   - &deployer "0x5C0F3DE4ba6AD53bb8E27f965170A52671e525Bf"
@@ -1053,7 +1054,7 @@ l1:
         getModulesPaginated:
         getOwners:
           - *extMellowSigner1
-          - *extMellowSigner2
+          - *extMellowSigner7
           - *extMellowSigner3
           - *extMellowSigner4
           - *mellowSigner2

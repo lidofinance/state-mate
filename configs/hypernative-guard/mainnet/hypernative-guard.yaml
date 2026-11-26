@@ -396,7 +396,7 @@ l1:
         getThreshold: 4
         domainSeparator: *lidoEcosystemDomainSeparator
         getOwners:
-          - "0xcC692077C65dd464cAA7e7ae614328914f8469b3"
+          - "0x5422F2100Ca6e56a9cd18188cD58AAa247A180fe"
           - "0x27a3Fc3D99EACE1FdCA71900A72079F6c3a4b4F8"
           - "0x48e6DC201c91BC67018566682defD37924f7bde3"
           - "0x85029FB6393416c54ea8Fb04f2bf2BBe3cA16E23"
@@ -442,7 +442,7 @@ l1:
         getOwners:
           - "0xeD85C7Bd46DDE10E1C48bbd78E9fa63076c5736C"
           - "0xB95fdA03A90290Bd5853C79796a768E37130d193"
-          - "0xcC692077C65dd464cAA7e7ae614328914f8469b3"
+          - "0x109bF0Fe8385C8A3D31971f76a4a738b903B0402"
           - "0xC8b73076df04d1938f7c4900f17808b76Fe15e8B"
           - "0xcb408B2c5e45E43DF0F3B2d665873F805D435598"
         getModulesPaginated:
